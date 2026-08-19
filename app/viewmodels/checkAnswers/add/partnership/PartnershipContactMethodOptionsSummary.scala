@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.contact.ContactMethodOptions
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -48,6 +49,28 @@ object PartnershipContactMethodOptionsSummary {
             .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "partnership-methods-of-contact")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    Some {
+      val options =
+        ContactMethodOptions
+          .ordered(answers.partnershipContactMethodOptions)
+          .map(m =>
+            HtmlFormat
+              .escape(messages(s"partnershipContactMethodOptions.$m"))
+              .toString
+          )
+
+      SummaryListRowViewModel(
+        key = "partnershipContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq.empty
       )
     }
 }

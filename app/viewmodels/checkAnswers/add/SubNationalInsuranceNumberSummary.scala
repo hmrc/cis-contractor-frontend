@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 object SubNationalInsuranceNumberSummary {
 
@@ -38,6 +39,17 @@ object SubNationalInsuranceNumberSummary {
             .withVisuallyHiddenText(messages("subNationalInsuranceNumber.change.hidden"))
             .withAttribute("id" -> "sub-national-insurance-number")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyIndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nino.map { answer =>
+      SummaryListRowViewModel(
+        key = "subNationalInsuranceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

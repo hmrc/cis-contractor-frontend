@@ -27,6 +27,7 @@ import pages.add.SubcontractorsUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -147,6 +148,122 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       )
 
       row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+  }
+
+  "ViewOnly - SubcontractorsUniqueTaxpayerReferenceSummary.row" - {
+
+    "must return a SummaryListRow when UTR exists" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("1234567890"),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorsUniqueTaxpayerReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when UTR does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      SubcontractorsUniqueTaxpayerReferenceSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly for ViewOnly UTR" in {
+
+      val utr = "1234567890 & Ref'01"
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some(utr),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorsUniqueTaxpayerReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
 
       row.actions             shouldBe defined
       row.actions.value.items shouldBe empty

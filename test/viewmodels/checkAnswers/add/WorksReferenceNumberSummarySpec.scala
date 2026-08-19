@@ -27,6 +27,7 @@ import pages.add.WorksReferenceNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -103,6 +104,118 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       WorksReferenceNumberSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - WorksReferenceNumberSummary.row" - {
+
+    "must return a SummaryListRow when works reference exists" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("1234567890"),
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        WorksReferenceNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("worksReferenceNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when works reference does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = Some(false),
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      WorksReferenceNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly for ViewOnly works reference" in {
+
+      val worksReference = "WRN & Ref'01"
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = Some(true),
+          worksReference = Some(worksReference),
+          verificationNumber = None
+        )
+
+      val row =
+        WorksReferenceNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "WRN &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

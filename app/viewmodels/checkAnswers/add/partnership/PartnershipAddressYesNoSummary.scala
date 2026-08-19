@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.Messages
@@ -46,6 +47,20 @@ object PartnershipAddressYesNoSummary {
             .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-address")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.addressYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        "partnershipAddressYesNo.checkYourAnswersLabel",
+        ValueViewModel(value),
+        Seq.empty
       )
     }
 }

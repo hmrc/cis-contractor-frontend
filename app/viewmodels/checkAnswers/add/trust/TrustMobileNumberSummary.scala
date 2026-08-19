@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustMobileNumberPage
 import play.api.i18n.Messages
@@ -38,6 +39,16 @@ object TrustMobileNumberSummary {
             .withVisuallyHiddenText(messages("trustMobileNumber.change.hidden"))
             .withAttribute("id" -> "trust-mobile-number")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyTrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.mobile.map { answer =>
+      SummaryListRowViewModel(
+        key = "trustMobileNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer)
       )
     }
 }

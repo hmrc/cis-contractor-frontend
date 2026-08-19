@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
@@ -53,5 +54,21 @@ object PartnershipUniqueTaxpayerReferenceSummary {
         )
       }
 
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key =
+          if (isVerified)
+            "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel"
+          else
+            "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
+      )
     }
 }

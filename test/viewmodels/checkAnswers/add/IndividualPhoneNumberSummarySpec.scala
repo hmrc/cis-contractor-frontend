@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
+import models.viewOnly.ViewOnlyIndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -118,6 +119,123 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
 
       assertEscaped(html, "020 7946 0958 &amp; ext&#x27;78")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - IndividualPhoneNumberSummary.row" - {
+
+    "must return a SummaryListRow when phone number exists" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = Some("0987456231"),
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        IndividualPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("individualPhoneNumber.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when phone number does not exist" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      IndividualPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly" in {
+
+      val phone = "020 7946 0958 & ext'78"
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = Some(phone),
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        IndividualPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "020 7946 0958 &amp; ext&#x27;78")
+      assertNoDoubleEncoding(html)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

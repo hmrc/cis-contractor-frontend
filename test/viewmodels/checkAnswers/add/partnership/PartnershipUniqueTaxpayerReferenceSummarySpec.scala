@@ -28,6 +28,8 @@ import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -148,6 +150,119 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
 
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipUniqueTaxpayerReferenceSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      utr: Option[String]
+    ): ViewOnlyPartnershipAnswers =
+      ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = utr,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with the normal label when isVerified is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipUniqueTaxpayerReferenceSummary.row(
+          answers,
+          isVerified = false
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with the verified label when isVerified is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipUniqueTaxpayerReferenceSummary.row(
+          answers,
+          isVerified = true
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the UTR does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      PartnershipUniqueTaxpayerReferenceSummary.row(
+        answers,
+        isVerified = false
+      ) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890 & Ref'01"))
+
+      val row =
+        PartnershipUniqueTaxpayerReferenceSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import models.contact.ContactMethodOptions
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -48,6 +49,28 @@ object TrustContactMethodOptionsSummary {
             .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "trust-methods-of-contact")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyTrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    Option.when(answers.trustContactMethod.nonEmpty) {
+
+      val options =
+        ContactMethodOptions
+          .ordered(answers.trustContactMethod)
+          .map(m =>
+            HtmlFormat
+              .escape(messages(s"trustContactMethodOptions.$m"))
+              .toString
+          )
+
+      SummaryListRowViewModel(
+        key = "trustContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent("")))
       )
     }
 }

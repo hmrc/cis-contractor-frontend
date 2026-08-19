@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 object CompanyAddressYesNoSummary {
 
@@ -46,6 +47,20 @@ object CompanyAddressYesNoSummary {
             .withVisuallyHiddenText(messages("companyAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-address")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.addressYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "companyAddressYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

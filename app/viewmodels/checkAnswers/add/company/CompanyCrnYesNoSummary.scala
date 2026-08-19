@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 object CompanyCrnYesNoSummary {
 
@@ -46,6 +47,20 @@ object CompanyCrnYesNoSummary {
             .withVisuallyHiddenText(messages("companyCrnYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-crn")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.crnYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "companyCrnYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

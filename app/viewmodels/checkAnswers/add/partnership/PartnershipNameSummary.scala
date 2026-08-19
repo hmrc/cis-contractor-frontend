@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNamePage
@@ -39,6 +40,17 @@ object PartnershipNameSummary {
             .withVisuallyHiddenText(messages("partnershipName.change.hidden"))
             .withAttribute("id" -> "partnership-name")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.partnershipName.map { answer =>
+      SummaryListRowViewModel(
+        key = "partnershipName.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

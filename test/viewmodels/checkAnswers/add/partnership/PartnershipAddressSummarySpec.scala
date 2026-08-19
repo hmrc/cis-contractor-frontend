@@ -28,6 +28,8 @@ import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -156,6 +158,146 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
           .set(PartnershipAddressPage, address)
           .success
           .value
+
+      val row = PartnershipAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
+      assertRaw(html, "Building &amp; Sons")
+
+      assertHasBreaks(html)
+
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipAddressSummary.row(ViewOnlyPartnershipAnswers)" should {
+
+    "return a SummaryListRow when the address exists" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = Some(true),
+        address = Some(address),
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val result = PartnershipAddressSummary.row(answers)
+
+      result shouldBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "return None when the address does not exist" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = Some(false),
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      PartnershipAddressSummary.row(answers) shouldBe None
+    }
+
+    "must render the ViewOnly address safely without double encoding and preserve line breaks" in {
+
+      val address = Address(
+        addressLine1 = "10 O'Reilly & Co",
+        addressLine2 = Some("Building & Sons"),
+        addressLine3 = Some("Main Street"),
+        addressLine4 = Some("London"),
+        postcode = Some("AB1 2CD"),
+        country = Some(Country(Some("GB"), Some("UK")))
+      )
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = Some(true),
+        address = Some(address),
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
 
       val row = PartnershipAddressSummary.row(answers).value
 

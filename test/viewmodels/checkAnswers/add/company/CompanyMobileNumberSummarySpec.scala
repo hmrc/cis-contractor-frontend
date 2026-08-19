@@ -28,6 +28,8 @@ import pages.add.company.CompanyMobileNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -124,6 +126,77 @@ class CompanyMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaE
           .value
 
       val row = CompanyMobileNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "07700 900000 &amp; ext&#x27;123")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "CompanyMobileNumberSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      mobile: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = mobile,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the mobile number exists" in {
+
+      val answers = viewOnlyAnswers(Some("07700 900 982"))
+
+      val maybeRow = CompanyMobileNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyMobileNumber.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("07700 900 982")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the mobile number does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyMobileNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val mobile = "07700 900000 & ext'123"
+
+      val answers = viewOnlyAnswers(Some(mobile))
+
+      val maybeRow = CompanyMobileNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
 
       val html = extractHtml(row)
 

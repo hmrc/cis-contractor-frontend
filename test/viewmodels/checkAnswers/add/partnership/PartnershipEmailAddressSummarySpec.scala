@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -137,6 +139,121 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
 
       assertEscaped(html, "partners+o&#x27;reilly&amp;co@test.com")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipEmailAddressSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    "must return a SummaryListRow when the email exists with no actions" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = Some("partners@test.com"),
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val maybeRow = PartnershipEmailAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipEmailAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("partners@test.com")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the email does not exist" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      PartnershipEmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val email = "partners+o'reilly&co@test.com"
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = Some(email),
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val row = PartnershipEmailAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "partners+o&#x27;reilly&amp;co@test.com")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

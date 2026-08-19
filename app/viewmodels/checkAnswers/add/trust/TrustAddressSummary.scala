@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
@@ -36,6 +37,16 @@ object TrustAddressSummary {
         },
         hiddenTextKey = "trustAddress.change.hidden",
         id = "address-of-trust"
+      )
+    }
+
+  def row(
+    answers: ViewOnlyTrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.address.map { address =>
+      AddressSummaryRow.viewOnlyRow(
+        address = address,
+        key = "trustAddress.checkYourAnswersLabel"
       )
     }
 }

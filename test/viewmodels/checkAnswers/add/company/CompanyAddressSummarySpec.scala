@@ -28,6 +28,8 @@ import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -165,6 +167,104 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
       assertHasBreaks(html)
 
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - CompanyAddressSummary.row" should {
+
+    def viewOnlyAnswers(
+      address: Option[Address]
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = address,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        crnYesNo = None,
+        crn = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the address exists" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val answers = viewOnlyAnswers(Some(address))
+
+      val maybeRow =
+        CompanyAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the address does not exist" in {
+
+      val answers = viewOnlyAnswers(None)
+
+      CompanyAddressSummary.row(answers) shouldBe None
+    }
+
+    "must render the address safely without double encoding and preserve line breaks" in {
+
+      val address = Address(
+        addressLine1 = "10 O'Reilly & Co",
+        addressLine2 = Some("Building & Sons"),
+        addressLine3 = Some("Main Street"),
+        addressLine4 = Some("London"),
+        postcode = Some("AB1 2CD"),
+        country = Some(Country(Some("GB"), Some("UK")))
+      )
+
+      val answers = viewOnlyAnswers(Some(address))
+
+      val row =
+        CompanyAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
+      assertRaw(html, "Building &amp; Sons")
+
+      assertHasBreaks(html)
+
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

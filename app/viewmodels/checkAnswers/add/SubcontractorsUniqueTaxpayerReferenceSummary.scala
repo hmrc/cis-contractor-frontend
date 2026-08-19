@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
@@ -47,6 +48,17 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
         value = value,
         actions = actions
+      )
+    }
+
+  def row(
+    answers: ViewOnlyIndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage}
 import play.api.i18n.Messages
@@ -56,6 +57,32 @@ object PartnershipHasUtrYesNoSummary {
             messages("partnershipHasUtrYesNo.change.hidden")
           ).withAttribute("id" -> "add-partnership-utr")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyPartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.hasUtrYesNo.map { answer =>
+
+      val partnershipName =
+        answers.partnershipName.getOrElse("")
+
+      val yesNoText =
+        if (answer) messages("site.yes")
+        else messages("site.no")
+
+      SummaryListRowViewModel(
+        key = KeyViewModel(
+          Text(
+            messages(
+              "partnershipHasUtrYesNo.checkYourAnswersLabel",
+              partnershipName
+            )
+          )
+        ),
+        value = ValueViewModel(yesNoText),
+        actions = Seq.empty
       )
     }
 }

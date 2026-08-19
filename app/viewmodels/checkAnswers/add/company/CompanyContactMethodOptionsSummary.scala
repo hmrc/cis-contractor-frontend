@@ -26,6 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 object CompanyContactMethodOptionsSummary {
 
@@ -48,6 +49,29 @@ object CompanyContactMethodOptionsSummary {
             .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "company-methods-of-contact")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyCompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    Option.when(answers.companyContactMethod.nonEmpty) {
+
+      val options =
+        ContactMethodOptions
+          .ordered(answers.companyContactMethod)
+          .map(m =>
+            HtmlFormat
+              .escape(messages(s"companyContactMethodOptions.$m"))
+              .toString
+          )
+
+      SummaryListRowViewModel(
+        key = "companyContactMethodOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq.empty
       )
     }
 }

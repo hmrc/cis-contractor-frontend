@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -154,6 +156,85 @@ class PartnershipPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with C
 
       assertEscaped(html, "020 7000 1234 &amp; ext&#x27;78")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipPhoneNumberSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      phone: Option[String]
+    ): ViewOnlyPartnershipAnswers =
+      ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = phone,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the phone number exists" in {
+
+      val answers =
+        viewOnlyAnswers(Some("0123456789"))
+
+      val maybeRow =
+        PartnershipPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipPhoneNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("0123456789")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the phone number does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      PartnershipPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val phone = "020 7000 1234 & ext'78"
+
+      val answers =
+        viewOnlyAnswers(Some(phone))
+
+      val row =
+        PartnershipPhoneNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "020 7000 1234 &amp; ext&#x27;78")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 

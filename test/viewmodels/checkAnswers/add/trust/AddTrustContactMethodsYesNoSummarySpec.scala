@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,6 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
+
   implicit val messages: Messages = stubMessages()
 
   "AddTrustContactMethodsYesNoSummary.row" - {
@@ -38,31 +40,44 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] =
+        AddTrustContactMethodsYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
-      val expectedValue = messages("site.yes")
-      row.value.content.asHtml.toString should include(expectedValue)
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
 
       row.actions shouldBe defined
+
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction       = actions.head
-      val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.AddTrustContactMethodsYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("addTrustContactMethodsYesNo.change.hidden")
+      val changeAction = actions.head
 
-      changeAction.content.asHtml.toString    should include(expectedChangeText)
-      changeAction.href                     shouldBe expectedHref
-      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                 should contain("id" -> "add-trust-contact-details")
+      changeAction.content.asHtml.toString should include(
+        messages("site.change")
+      )
+
+      changeAction.href shouldBe
+        routes.AddTrustContactMethodsYesNoController
+          .onPageLoad(CheckMode)
+          .url
+
+      changeAction.visuallyHiddenText.value shouldBe
+        messages("addTrustContactMethodsYesNo.change.hidden")
+
+      changeAction.attributes should contain(
+        "id" -> "add-trust-contact-details"
+      )
     }
 
     "must return a SummaryListRow with 'Yes' when the answer is true in AmendMode" in {
@@ -71,33 +86,33 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+      val maybeRow =
+        AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
-      row.key.content.asHtml.toString should include(expectedKeyText)
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
 
-      val expectedValue = messages("site.yes")
-      row.value.content.asHtml.toString should include(expectedValue)
-
-      row.actions shouldBe defined
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction       = actions.head
-      val expectedChangeText = messages("site.change")
-      val expectedHref       = controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
-        .onPageLoad("contact-details")
-        .url
-      val expectedHiddenText = messages("addTrustContactMethodsYesNo.change.hidden")
+      val changeAction = actions.head
 
-      changeAction.content.asHtml.toString    should include(expectedChangeText)
-      changeAction.href                     shouldBe expectedHref
-      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                 should contain("id" -> "add-trust-contact-details")
+      changeAction.href shouldBe
+        controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+          .onPageLoad("contact-details")
+          .url
+
+      changeAction.visuallyHiddenText.value shouldBe
+        messages("addTrustContactMethodsYesNo.change.hidden")
+
+      changeAction.attributes should contain(
+        "id" -> "add-trust-contact-details"
+      )
     }
 
     "must return a SummaryListRow with 'No' and change action pointing to add flow when the answer is false in AmendMode" in {
@@ -106,20 +121,26 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+      val maybeRow =
+        AddTrustContactMethodsYesNoSummary.row(answers, AmendMode)
+
       maybeRow shouldBe defined
 
-      val row           = maybeRow.value
-      val expectedValue = messages("site.no")
-      row.value.content.asHtml.toString should include(expectedValue)
+      val row = maybeRow.value
 
-      row.actions shouldBe defined
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
       val actions = row.actions.value.items
       actions should have size 1
 
       val changeAction = actions.head
-      val expectedHref = routes.AddTrustContactMethodsYesNoController.onPageLoad(AmendMode).url
-      changeAction.href shouldBe expectedHref
+
+      changeAction.href shouldBe
+        routes.AddTrustContactMethodsYesNoController
+          .onPageLoad(AmendMode)
+          .url
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
@@ -128,16 +149,123 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddTrustContactMethodsYesNoSummary.row(answers)
+      val maybeRow =
+        AddTrustContactMethodsYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row           = maybeRow.value
-      val expectedValue = messages("site.no")
-      row.value.content.asHtml.toString should include(expectedValue)
+      val row = maybeRow.value
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+
+      AddTrustContactMethodsYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - AddTrustContactMethodsYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' for ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = Some(true),
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        AddTrustContactMethodsYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return a SummaryListRow with 'No' for ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = Some(false),
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        AddTrustContactMethodsYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("addTrustContactMethodsYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when trustContactMethodsYesNo is missing in ViewOnlyTrustAnswers" in {
+      val answers =
+        ViewOnlyTrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
       AddTrustContactMethodsYesNoSummary.row(answers) shouldBe None
     }
   }

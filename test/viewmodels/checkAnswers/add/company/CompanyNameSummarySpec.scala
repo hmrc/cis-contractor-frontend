@@ -18,7 +18,8 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, CheckMode, UserAnswers}
+import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.{AmendMode, CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -115,6 +116,77 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
           .value
 
       val row = CompanyNameSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly &amp; Sons Ltd")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "CompanyNameSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      companyName: Option[String] = None
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = companyName,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the company name exists" in {
+
+      val answers = viewOnlyAnswers(Some("ABC Construction Ltd"))
+
+      val maybeRow = CompanyNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyName.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("ABC Construction Ltd")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the company name does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyNameSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val name = "O'Reilly & Sons Ltd"
+
+      val answers = viewOnlyAnswers(Some(name))
+
+      val maybeRow = CompanyNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
 
       val html = extractHtml(row)
 

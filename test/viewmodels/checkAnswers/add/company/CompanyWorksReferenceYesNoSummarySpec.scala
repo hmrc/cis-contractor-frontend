@@ -28,6 +28,8 @@ import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -119,6 +121,83 @@ class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      CompanyWorksReferenceYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "CompanyWorksReferenceYesNoSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      worksReferenceYesNo: Option[Boolean] = None
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = worksReferenceYesNo,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+
+      val answers = viewOnlyAnswers(Some(true))
+
+      val maybeRow = CompanyWorksReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyWorksReferenceYesNo.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+
+      val answers = viewOnlyAnswers(Some(false))
+
+      val maybeRow = CompanyWorksReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyWorksReferenceYesNo.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the answer does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
       CompanyWorksReferenceYesNoSummary.row(answers) shouldBe None
     }
   }

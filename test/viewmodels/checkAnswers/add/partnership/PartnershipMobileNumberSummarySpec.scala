@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
 
 class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -121,6 +123,121 @@ class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with 
 
       assertEscaped(html, "07700 900000 &amp; ext&#x27;45")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipMobileNumberSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    "must return a SummaryListRow when the mobile number exists with no actions" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = Some("0987456231"),
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val maybeRow = PartnershipMobileNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipMobileNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the mobile number does not exist" in {
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      PartnershipMobileNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val mobile = "07700 900000 & ext'45"
+
+      val answers = ViewOnlyPartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = Some(mobile),
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+      val row = PartnershipMobileNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "07700 900000 &amp; ext&#x27;45")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 

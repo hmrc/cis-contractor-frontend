@@ -28,6 +28,7 @@ import pages.add.UniqueTaxpayerReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import models.viewOnly.ViewOnlyIndividualAnswers
 
 class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -117,6 +118,121 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      UniqueTaxpayerReferenceYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - UniqueTaxpayerReferenceYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' when utrYesNo is true" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("1234567890"),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        UniqueTaxpayerReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when utrYesNo is false" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(false),
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        UniqueTaxpayerReferenceYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when utrYesNo is not set" in {
+
+      val answers =
+        ViewOnlyIndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
       UniqueTaxpayerReferenceYesNoSummary.row(answers) shouldBe None
     }
   }

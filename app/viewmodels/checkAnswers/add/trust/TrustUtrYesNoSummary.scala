@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.viewOnly.trust.ViewOnlyTrustAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustUtrYesNoPage
 import play.api.i18n.Messages
@@ -43,6 +44,19 @@ object TrustUtrYesNoSummary {
             .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-utr")
         )
+      )
+    }
+
+  def row(
+    answers: ViewOnlyTrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utrYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "trustUtrYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value)
       )
     }
 }

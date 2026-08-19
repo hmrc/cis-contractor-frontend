@@ -25,6 +25,8 @@ import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -146,6 +148,88 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
       CompanyAddressYesNoSummary.row(ua) mustBe None
+    }
+  }
+
+  "CompanyAddressYesNoSummary.row(ViewOnlyCompanyAnswers)" - {
+
+    def viewOnlyAnswers(
+      addressYesNo: Option[Boolean]
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = addressYesNo,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        crnYesNo = None,
+        crn = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "return a row with value = yes when addressYesNo is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some(true))
+
+      val maybeRow =
+        CompanyAddressYesNoSummary.row(answers)
+
+      maybeRow mustBe defined
+
+      val row = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(messages("companyAddressYesNo.checkYourAnswersLabel"))
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.yes"))
+      )
+
+      row.actions must not be empty
+      row.actions.value.items mustBe empty
+    }
+
+    "return a row with value = no when addressYesNo is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some(false))
+
+      val maybeRow =
+        CompanyAddressYesNoSummary.row(answers)
+
+      maybeRow mustBe defined
+
+      val row = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(messages("companyAddressYesNo.checkYourAnswersLabel"))
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.no"))
+      )
+
+      row.actions must not be empty
+      row.actions.value.items mustBe empty
+    }
+
+    "return None when addressYesNo does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      CompanyAddressYesNoSummary.row(answers) mustBe None
     }
   }
 }

@@ -27,6 +27,8 @@ import pages.add.company.CompanyCrnYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.viewOnly.company.ViewOnlyCompanyAnswers
 
 class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -118,6 +120,88 @@ class CompanyCrnYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      CompanyCrnYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "CompanyCrnYesNoSummary.row(ViewOnlyCompanyAnswers)" - {
+
+    def viewOnlyAnswers(
+      crnYesNo: Option[Boolean]
+    ): ViewOnlyCompanyAnswers =
+      ViewOnlyCompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        crnYesNo = crnYesNo,
+        crn = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' when crnYesNo is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some(true))
+
+      val maybeRow =
+        CompanyCrnYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyCrnYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when crnYesNo is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some(false))
+
+      val maybeRow =
+        CompanyCrnYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("companyCrnYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when crnYesNo does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
       CompanyCrnYesNoSummary.row(answers) shouldBe None
     }
   }
