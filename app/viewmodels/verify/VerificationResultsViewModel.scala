@@ -57,6 +57,9 @@ object VerificationResultsViewModel {
       .flatten
       .toSet
 
+  def hasUnmatchedVerifications(response: GetLastSubmittedVerificationBatchResponse): Boolean =
+    response.verifications.exists(!isVerified(_))
+
   private def isVerified(verification: VerificationLastVerification): Boolean = {
     val hasVerificationNumber =
       verification.verificationNumber.exists(_.trim.nonEmpty)

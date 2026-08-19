@@ -170,4 +170,17 @@ class VerificationResultsViewModelSpec extends SpecBase {
       VerificationResultsViewModel.unmatchedSubcontractorIds(response(verification())) mustBe Set.empty
     }
   }
+
+  "VerificationResultsViewModel.hasUnmatchedVerifications" - {
+
+    "must be true when an unmatched verification has no subcontractorId" in {
+      VerificationResultsViewModel.hasUnmatchedVerifications(
+        response(verification(verificationNumber = None, subcontractorId = None))
+      ) mustBe true
+    }
+
+    "must be false when all verifications are matched" in {
+      VerificationResultsViewModel.hasUnmatchedVerifications(response(verification())) mustBe false
+    }
+  }
 }
