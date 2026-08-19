@@ -49,9 +49,12 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
       ) match {
         case (Some(response), Some(cisId)) =>
           val unmatchedIds = VerificationResultsViewModel.unmatchedSubcontractorIds(response)
+          val hasUnmatched = VerificationResultsViewModel.hasUnmatchedVerifications(response)
 
-          if (unmatchedIds.isEmpty) {
+          if (!hasUnmatched) {
             Future.successful(Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad()))
+          } else if (unmatchedIds.isEmpty) {
+            Future.successful(Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad()))
           } else {
             verificationService
               .anyUnmatchedSubcontractorsStillPresent(cisId, unmatchedIds)

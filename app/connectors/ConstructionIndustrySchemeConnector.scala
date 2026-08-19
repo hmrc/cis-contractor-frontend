@@ -245,13 +245,13 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def getSubcontractorList(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] = {
-    logger.info(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
+    logger.debug(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
 
     http
       .get(url"$cisBaseUrl/subcontractors/$cisId")
       .execute[GetSubcontractorListResponse]
       .map { response =>
-        logger.info(
+        logger.debug(
           s"[ConstructionIndustrySchemeConnector][getSubcontractorList] " +
             s"Retrieved ${response.subcontractors.size} subcontractors for cisId=$cisId"
         )

@@ -123,6 +123,30 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must redirect to NoUnmatchedSubcontractors when all unmatched verifications have no subcontractorId" in {
+      val mockService = mock[VerificationService]
+      val response    = batchResponse(verification(verificationNumber = None, subcontractorId = None))
+      val userAnswers = emptyUserAnswers
+        .set(LastSubmittedVerificationBatchResponsePage, response)
+        .success
+        .value
+        .set(CisIdQuery, "900063")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[VerificationService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad().url
+      }
+    }
+
     "must redirect back to VerificationResults when there are no unmatched subcontractors" in {
       val mockService = mock[VerificationService]
       val response    = batchResponse(verification())
