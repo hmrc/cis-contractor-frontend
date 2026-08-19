@@ -426,6 +426,7 @@ amendConfirmation.beforeYouGo.p1                                                
 amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
 amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
 amendConfirmation.table.content.none                                                =  None provided
+amendConfirmation.table.selectContent.none                                          =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
