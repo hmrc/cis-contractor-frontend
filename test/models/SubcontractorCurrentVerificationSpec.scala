@@ -17,6 +17,7 @@
 package models
 
 import base.SpecBase
+import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.i18n.Messages
 import play.api.libs.json.Json
@@ -30,6 +31,7 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
 
   def subcontractor(
+    subcontractorType: Option[String] = None,
     firstName: Option[String] = None,
     surname: Option[String] = None,
     tradingName: Option[String] = None,
@@ -247,8 +249,9 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
 
     "displayName" - {
 
-      "return partnership trading name when available" in {
+      "return partnership trading name for a partnership when available" in {
         subcontractor(
+          subcontractorType = Some(Partnership.toString),
           firstName = Some("John"),
           surname = Some("Smith"),
           tradingName = Some("Trading Ltd"),
@@ -256,23 +259,49 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
         ).displayName shouldBe "Partnership Ltd"
       }
 
-      "return trading name when partnership trading name is not available" in {
+      "return trading name for a partnership when partnership trading name is not available" in {
         subcontractor(
+          subcontractorType = Some(Partnership.toString),
           tradingName = Some("Trading Ltd")
         ).displayName shouldBe "Trading Ltd"
       }
 
-      "return surname and first name when no trading names are available" in {
+      "return trading name for a limited company" in {
         subcontractor(
+          subcontractorType = Some(Limitedcompany.toString),
+          firstName = Some("John"),
+          surname = Some("Smith"),
+          tradingName = Some("Trading Ltd")
+        ).displayName shouldBe "Trading Ltd"
+      }
+
+      "return trading name for a trust" in {
+        subcontractor(
+          subcontractorType = Some(Trust.toString),
+          firstName = Some("John"),
+          surname = Some("Smith"),
+          tradingName = Some("Trading Ltd")
+        ).displayName shouldBe "Trading Ltd"
+      }
+
+      "return surname and first name for an individual or sole trader" in {
+        subcontractor(
+          subcontractorType = Some(Individualorsoletrader.toString),
           firstName = Some("John"),
           surname = Some("Smith")
         ).displayName shouldBe "Smith, John"
       }
 
+      "return trading name for an individual or sole trader when no individual name is available" in {
+        subcontractor(
+          subcontractorType = Some(Individualorsoletrader.toString),
+          tradingName = Some("Trading Ltd")
+        ).displayName shouldBe "Trading Ltd"
+      }
+
       "return the no name message when no name is available" in {
         subcontractor().displayName shouldBe messages("verify.noName")
       }
-
     }
   }
 }
