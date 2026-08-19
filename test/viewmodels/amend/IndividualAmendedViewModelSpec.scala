@@ -23,7 +23,7 @@ import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
 import pages.add.*
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 
 class IndividualAmendedViewModelSpec extends SpecBase {
 
@@ -268,9 +268,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      addressRow.head.content mustBe Text(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
-      addressRow(1).content mustBe Text("1 High Street, Leeds, SA1 1AA, England")
-      addressRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      addressRow.head.content mustBe HtmlContent(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
+      addressRow(1).content mustBe HtmlContent("1 High Street</br>Leeds</br>SA1 1AA</br>England")
+      addressRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return an address row when the address changes" in {
@@ -294,9 +294,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
-      row(1).content mustBe Text("1 High Street, Leeds, SA1 1AA, England")
-      row(2).content mustBe Text("1 HIGH Street, Leeds, SA1 1AA, England")
+      row.head.content mustBe HtmlContent(msgs("addressOfSubcontractor.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent("1 High Street</br>Leeds</br>SA1 1AA</br>England")
+      row(2).content mustBe HtmlContent("1 HIGH Street</br>Leeds</br>SA1 1AA</br>England")
     }
 
     "must return contact rows when contact methods are removed" in {
