@@ -33,7 +33,7 @@ contractordetails.schemeName.error.required                                    =
 contractordetails.schemeName.error.length                                      =  Rydych wedi nodi gormod o gymeriadau ar gyfer enw’r cynllun
 contractordetails.schemeName.error.invalidCharacters                           =  Rydych wedi nodi enw’r cynllun yn y fformat anghywir
 contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
-contractordetails.schemeName.change.hidden                                     =  snw’r Cynllun
+contractordetails.schemeName.change.hidden                                     =  enw'r Cynllun
 
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
@@ -44,10 +44,10 @@ contractordetails.addEmailAddressYesNo.change.hidden                           =
 contractordetails.enterContractorEmailAddress.title                            =  Beth yw cyfeiriad e-bost y contractwr?
 contractordetails.enterContractorEmailAddress.heading                          =  Beth yw cyfeiriad e-bost y contractwr?
 contractordetails.enterContractorEmailAddress.error.required                   =  Nodwch gyfeiriad e-bost
-contractordetails.enterContractorEmailAddress.error.length                     =  TRydych wedi nodi gormod o gymeriadau ar gyfer y cyfeiriad e-bost
+contractordetails.enterContractorEmailAddress.error.length                     =  Rydych wedi nodi gormod o gymeriadau ar gyfer y cyfeiriad e-bost
 contractordetails.enterContractorEmailAddress.error.invalid                    =  Rydych wedi nodi’r cyfeiriad e-bost yn y fformat anghywir
 contractordetails.enterContractorEmailAddress.checkYourAnswersLabel            =  Cyfeiriad e-bost
-contractordetails.enterContractorEmailAddress.change.hidden                    =  eyfeiriad e-bost
+contractordetails.enterContractorEmailAddress.change.hidden                    =  cyfeiriad e-bost
 
 contractordetails.contractorDetailsCheckAnswers.title                          =  Manylion y contractwr
 contractordetails.contractorDetailsCheckAnswers.heading                        =  Manylion y contractwr
