@@ -181,7 +181,7 @@ object IndividualAmendedViewModel {
       Option.when(
         original.individualContactMethod != currentMethods
       ) {
-        row(
+        htmlRow(
           messages("individualContactMethodOptions.checkYourAnswersLabel"),
           formatContactMethods(original.individualContactMethod),
           formatContactMethods(currentMethods)
@@ -214,7 +214,7 @@ object IndividualAmendedViewModel {
     if (methods.isEmpty) {
       missingValue
     } else {
-      ContactMethodOptions
+      val contactOptions = ContactMethodOptions
         .ordered(methods)
         .map {
           case ContactMethodOptions.Email  =>
@@ -224,7 +224,15 @@ object IndividualAmendedViewModel {
           case ContactMethodOptions.Mobile =>
             messages("individualContactMethodOptions.mobile")
         }
-        .mkString(", ")
+
+      if (contactOptions.size > 1) {
+        contactOptions
+          .map(item => s"<li>$item</li>")
+          .mkString("<ul>", "", "</ul>")
+      } else {
+        contactOptions.mkString
+      }
+
     }
 
   private def worksReferenceRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit

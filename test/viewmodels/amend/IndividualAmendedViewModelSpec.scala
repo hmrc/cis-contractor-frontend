@@ -326,9 +326,9 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      methodRow.head.content mustBe HtmlContent(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.content.none"))
 
       emailRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("john@test.com")
@@ -357,12 +357,14 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
-      row(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
-      row(2).content mustBe Text(
-        s"${msgs("individualContactMethodOptions.email")}, " +
-          s"${msgs("individualContactMethodOptions.phone")}, " +
-          msgs("individualContactMethodOptions.mobile")
+      row.head.content mustBe HtmlContent(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent(msgs("individualContactMethodOptions.email"))
+      row(2).content mustBe HtmlContent(
+        "<ul>" +
+          s"<li>${msgs("individualContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("individualContactMethodOptions.phone")}</li>" +
+          s"<li>${msgs("individualContactMethodOptions.mobile")}</li>" +
+          "</ul>"
       )
     }
 
@@ -392,8 +394,8 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       val emailRow  = result(1)
       val phoneRow  = result(2)
 
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("trustContactMethodOptions.phone"))
+      methodRow(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("trustContactMethodOptions.phone"))
 
       emailRow(1).content mustBe Text("john@test.com")
       emailRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
@@ -557,10 +559,13 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       val methodRow = result.head
       val phoneRow  = result(1)
 
-      methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("individualContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(
-        s"${msgs("individualContactMethodOptions.email")}, ${msgs("individualContactMethodOptions.phone")}"
+      methodRow.head.content mustBe HtmlContent(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("individualContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(
+        s"<ul>" +
+          s"<li>${msgs("individualContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("individualContactMethodOptions.phone")}</li>" +
+          s"</ul>"
       )
 
       phoneRow.head.content mustBe Text(msgs("individualPhoneNumber.checkYourAnswersLabel"))
