@@ -241,7 +241,7 @@ class CompanyAmendConfirmationViewModelSpec extends SpecBase {
 
       methodRow.head.content mustBe Text(msgs("companyContactMethodOptions.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("companyContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.selectContent.none"))
 
       emailRow.head.content mustBe Text(msgs("companyEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("company@test.com")
