@@ -22,6 +22,7 @@ import models.UserAnswers
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import pages.add.partnership.*
 import models.requests.DataRequest
+import pages.amend.ShowVerificationDetailsPage
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -105,7 +106,10 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
       case AmendPartnershipRemoveDetail.Utr =>
         userAnswers
           .get(PartnershipHasUtrYesNoPage)
-          .contains(true)
+          .contains(true) &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
         userAnswers
@@ -115,7 +119,10 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
       case AmendPartnershipRemoveDetail.NominatedPartnerUtr =>
         userAnswers
           .get(PartnershipNominatedPartnerUtrYesNoPage)
-          .contains(true)
+          .contains(true) &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
         userAnswers
