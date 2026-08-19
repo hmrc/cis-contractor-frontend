@@ -155,8 +155,10 @@ class VerificationResultsViewSpec extends SpecBase {
         )
       }
 
-      doc.select("button").text() mustBe
+      doc.select(".govuk-button").text() mustBe
         messages("verify.verificationResults.reviewUnmatchedSubcontractors.button")
+      doc.select(".govuk-button").attr("href") mustBe
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
     }
 
   }
