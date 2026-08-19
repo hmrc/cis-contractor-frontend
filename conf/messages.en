@@ -429,6 +429,7 @@ amendConfirmation.beforeYouGo.p1                                                
 amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
 amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
 amendConfirmation.table.content.none                                                =  None provided
+amendConfirmation.table.selectContent.none                                          =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
@@ -493,7 +494,7 @@ noUnmatchedSubcontractors.backTo                                                
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
 # Partnership
-addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
 addPartnershipContactMethodsYesNo.error.required                   =  Select yes if you want to add contact details for this partnership
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Add contact details?
@@ -951,7 +952,7 @@ verify.verifyYourSubcontractorsYesNo.p3                                 =  You m
 verify.verifyYourSubcontractorsYesNo.list.l1                            =  have recently changed any of their information
 verify.verifyYourSubcontractorsYesNo.list.l2                            =  have not been included on a return recently and have lost their verified status
 verify.verifyYourSubcontractorsYesNo.list.l3                            =  are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to reverify any existing subcontractors?
 verify.verifyYourSubcontractorsYesNo.error.required                     =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                              =  Verification request in progress
@@ -982,6 +983,24 @@ verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Highe
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
 verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
+verify.reviewInsufficientInfo.title                                     =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.heading                                   =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.p1                                        =  Some of the subcontractors in your verification request do not have all the information we need to verify them.
+verify.reviewInsufficientInfo.p2                                        =  To fix this, you can:
+verify.reviewInsufficientInfo.bullet1                                   =  edit their information and correct any of their details
+verify.reviewInsufficientInfo.bullet2                                   =  proceed with including them in this verification request without making any changes
+verify.reviewInsufficientInfo.bullet3                                   =  remove the subcontractor from this verification request
+verify.reviewInsufficientInfo.whatYouNeed.link                          =  What you''ll need to verify subcontractors (opens in new tab)
+verify.reviewInsufficientInfo.missing.subheading                        =  Subcontractors with missing information
+verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
+verify.reviewInsufficientInfo.name                                      =  Name
+verify.reviewInsufficientInfo.utr                                       =  UTR
+verify.reviewInsufficientInfo.noneProvided                              =  None provided
+verify.reviewInsufficientInfo.actions                                   =  Actions
+verify.reviewInsufficientInfo.action.edit                               =  Edit
+verify.reviewInsufficientInfo.action.proceed                            =  Proceed
+verify.reviewInsufficientInfo.action.remove                             =  Remove
+
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
@@ -1008,10 +1027,10 @@ verify.reverifyExistingSubcontractorsYesNo.p2                           =  You m
 verify.reverifyExistingSubcontractorsYesNo.list.l1                      =  have recently changed any of their information
 verify.reverifyExistingSubcontractorsYesNo.list.l2                      =  have not been included on a return recently and have lost their verified status
 verify.reverifyExistingSubcontractorsYesNo.list.l3                      =  are about to lose their verified status
-verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to reverify any existing subcontractors?
 verify.reverifyExistingSubcontractorsYesNo.error.required               =  Select yes if you want to add existing subcontractors to this verification request
-verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to add other subcontractors to this verification request?
-verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to reverify any existing subcontractors?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to reverify any existing subcontractors?
 
 verify.verifyDepartmentalError.title                                    =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                  =  There was a problem with your verification request
