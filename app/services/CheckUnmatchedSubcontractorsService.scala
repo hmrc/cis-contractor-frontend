@@ -36,16 +36,18 @@ object CheckUnmatchedSubcontractorsService {
           subcontractorsByResourceRef.get
         )
 
+      val isUnmatched = determineIsUnmatched(verification)
+
       ReverificationDecision(
         verificationId = verification.verificationId,
         subcontractorId = associatedSubcontractor.map(_.subcontractorId),
-        considerForReverification = associatedSubcontractor.isDefined &&
-          shouldConsiderForReverification(verification)
+        isUnmatched = isUnmatched,
+        considerForReverification = isUnmatched && associatedSubcontractor.isDefined
       )
     }
   }
 
-  private def shouldConsiderForReverification(
+  private def determineIsUnmatched(
     verification: Verification
   ): Boolean = {
     val verificationNumberExists =

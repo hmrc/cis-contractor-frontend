@@ -1462,11 +1462,13 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
             ReverificationDecision(
               verificationId = 1L,
               subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+              isUnmatched = true,
               considerForReverification = true
             ),
             ReverificationDecision(
               verificationId = 2L,
               subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+              isUnmatched = false,
               considerForReverification = false
             )
           )
@@ -1540,6 +1542,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           ReverificationDecision(
             verificationId = ineligibleVerification.verificationId,
             subcontractorId = Some(associatedUnverifiedSubcontractor.subcontractorId),
+            isUnmatched = false,
             considerForReverification = false
           )
         )

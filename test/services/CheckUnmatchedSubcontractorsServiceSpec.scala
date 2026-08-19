@@ -121,21 +121,25 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = Some(11L),
+          isUnmatched = true,
           considerForReverification = true
         ),
         ReverificationDecision(
           verificationId = 2L,
           subcontractorId = Some(12L),
+          isUnmatched = false,
           considerForReverification = false
         ),
         ReverificationDecision(
           verificationId = 3L,
           subcontractorId = Some(13L),
+          isUnmatched = false,
           considerForReverification = false
         ),
         ReverificationDecision(
           verificationId = 4L,
           subcontractorId = None,
+          isUnmatched = true,
           considerForReverification = false
         )
       )
@@ -227,17 +231,52 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         )
 
       result mustBe Seq(
-        ReverificationDecision(1L, Some(11L), considerForReverification = true),
-        ReverificationDecision(2L, Some(12L), considerForReverification = true),
-        ReverificationDecision(3L, Some(13L), considerForReverification = true),
-        ReverificationDecision(4L, Some(14L), considerForReverification = true),
-        ReverificationDecision(5L, Some(15L), considerForReverification = false),
-        ReverificationDecision(6L, Some(16L), considerForReverification = false),
-        ReverificationDecision(7L, Some(17L), considerForReverification = false)
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = Some(11L),
+          isUnmatched = true,
+          considerForReverification = true
+        ),
+        ReverificationDecision(
+          verificationId = 2L,
+          subcontractorId = Some(12L),
+          isUnmatched = true,
+          considerForReverification = true
+        ),
+        ReverificationDecision(
+          verificationId = 3L,
+          subcontractorId = Some(13L),
+          isUnmatched = true,
+          considerForReverification = true
+        ),
+        ReverificationDecision(
+          verificationId = 4L,
+          subcontractorId = Some(14L),
+          isUnmatched = true,
+          considerForReverification = true
+        ),
+        ReverificationDecision(
+          verificationId = 5L,
+          subcontractorId = Some(15L),
+          isUnmatched = false,
+          considerForReverification = false
+        ),
+        ReverificationDecision(
+          verificationId = 6L,
+          subcontractorId = Some(16L),
+          isUnmatched = false,
+          considerForReverification = false
+        ),
+        ReverificationDecision(
+          verificationId = 7L,
+          subcontractorId = Some(17L),
+          isUnmatched = false,
+          considerForReverification = false
+        )
       )
     }
 
-    "must store false when an unmatched verification has no associated subcontractor" in {
+    "must store unmatched but not consider for reverification when no associated subcontractor exists" in {
       val result =
         CheckUnmatchedSubcontractorsService.reverificationDecisions(
           verifications = Seq(
@@ -261,12 +300,13 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = None,
+          isUnmatched = true,
           considerForReverification = false
         )
       )
     }
 
-    "must store false when verificationResourceRef is missing" in {
+    "must store unmatched but not consider for reverification when verificationResourceRef is missing" in {
       val result =
         CheckUnmatchedSubcontractorsService.reverificationDecisions(
           verifications = Seq(
@@ -290,6 +330,7 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = None,
+          isUnmatched = true,
           considerForReverification = false
         )
       )
@@ -319,6 +360,7 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = Some(11L),
+          isUnmatched = true,
           considerForReverification = true
         )
       )

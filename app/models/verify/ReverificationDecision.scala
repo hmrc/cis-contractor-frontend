@@ -21,6 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 final case class ReverificationDecision(
   verificationId: Long,
   subcontractorId: Option[Long],
+  isUnmatched: Boolean,
   considerForReverification: Boolean
 )
 

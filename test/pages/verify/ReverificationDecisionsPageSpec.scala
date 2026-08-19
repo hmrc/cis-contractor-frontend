@@ -27,10 +27,12 @@ class ReverificationDecisionsPageSpec extends PageBehaviours {
       for {
         verificationId            <- Gen.choose(1L, 1000000L)
         subcontractorId           <- Gen.option(Gen.choose(1L, 1000000L))
+        isUnmatched               <- Gen.oneOf(true, false)
         considerForReverification <- Gen.oneOf(true, false)
       } yield ReverificationDecision(
         verificationId = verificationId,
         subcontractorId = subcontractorId,
+        isUnmatched = isUnmatched,
         considerForReverification = considerForReverification
       )
     }
