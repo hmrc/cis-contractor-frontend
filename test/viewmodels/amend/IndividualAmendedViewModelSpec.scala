@@ -328,7 +328,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       methodRow.head.content mustBe Text(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.selectContent.none"))
 
       emailRow.head.content mustBe Text(msgs("individualEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("john@test.com")

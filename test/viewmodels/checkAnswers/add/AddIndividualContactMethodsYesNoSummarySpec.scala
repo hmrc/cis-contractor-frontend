@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -90,7 +91,10 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.AddIndividualContactMethodsYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+          .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+          .url
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)

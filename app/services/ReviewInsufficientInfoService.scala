@@ -17,6 +17,8 @@
 package services
 
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
 import connectors.ConstructionIndustrySchemeConnector
 import models.requests.ProceedInsufficientVerificationRequest
@@ -89,7 +91,7 @@ class ReviewInsufficientInfoService @Inject() (
   private def toMissingRow(
     sub: SubcontractorCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
-    val name = sub.displayName
+    val name = displayName(sub)
     MissingSubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -106,7 +108,7 @@ class ReviewInsufficientInfoService @Inject() (
   }
 
   private def toReadyRow(sub: SubcontractorCurrentVerification)(implicit messages: Messages): ReadySubcontractorRow = {
-    val name = sub.displayName
+    val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -119,4 +121,26 @@ class ReviewInsufficientInfoService @Inject() (
       .map(_.trim)
       .filter(_.nonEmpty)
       .getOrElse(messages("verify.reviewInsufficientInfo.noneProvided"))
+
+  private def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    nameFor(sub).getOrElse(messages("verify.noName"))
+
+  private def nameFor(sub: SubcontractorCurrentVerification): Option[String] = {
+    val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
+    val surname            = sub.surname.map(_.trim).filter(_.nonEmpty)
+    val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
+    val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+    val individualName = surname.map { s =>
+      first.map(f => s"$s, $f").getOrElse(s)
+    }
+
+    sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+      case Some(Individualorsoletrader) => individualName.orElse(trading)
+      case Some(Limitedcompany)         => trading
+      case Some(Trust)                  => trading
+      case Some(Partnership)            => partnershipTrading.orElse(trading)
+      case _                            => partnershipTrading.orElse(trading).orElse(individualName)
+    }
+  }
 }
