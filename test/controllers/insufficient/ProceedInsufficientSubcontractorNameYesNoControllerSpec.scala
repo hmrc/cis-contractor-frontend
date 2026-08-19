@@ -31,7 +31,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ReviewInsufficientInfoService, VerificationService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
 import scala.concurrent.Future
@@ -192,10 +193,14 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
       val mockSessionRepository = mock[SessionRepository]
 
-      val mockService = mock[ReviewInsufficientInfoService]
+      val mockService      = mock[ReviewInsufficientInfoService]
+      val mockBatchService = mock[VerificationService]
+
       when(
         mockService.proceedInsufficientVerification(any(), any(), any())(any())
       ).thenReturn(Future.successful(()))
+      when(mockBatchService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswers))
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -203,7 +208,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ReviewInsufficientInfoService].toInstance(mockService)
+            bind[ReviewInsufficientInfoService].toInstance(mockService),
+            bind[VerificationService].toInstance(mockBatchService)
           )
           .build()
 

@@ -29,7 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ReviewInsufficientInfoService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
@@ -45,6 +45,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
   requireData: DataRequiredAction,
   formProvider: ProceedInsufficientSubcontractorNameYesNoFormProvider,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
+  verificationBatchService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: ProceedInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
@@ -110,12 +111,12 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                       ),
                     value =>
                       for {
-                        updatedAnswers <-
+                        updatedAnswers     <-
                           Future.fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
-                        _              <- sessionRepository.set(updatedAnswers)
-                        _              <-
+                        _                  <-
                           reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
-
+                        uaWithUpdatedBatch <- verificationBatchService.getCurrentVerificationBatch(request.userAnswers)
+                        _                  <- sessionRepository.set(updatedAnswers)
                       } yield Redirect(
                         navigator.nextPage(
                           ProceedInsufficientSubcontractorNameYesNoPage,
