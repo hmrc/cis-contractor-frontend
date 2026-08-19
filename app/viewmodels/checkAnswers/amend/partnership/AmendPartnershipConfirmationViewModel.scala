@@ -141,7 +141,7 @@ object AmendPartnershipConfirmationViewModel {
     methods: Set[ContactMethodOptions]
   )(implicit messages: Messages): String =
     if (methods.isEmpty) {
-      missingValue
+      missingSelect
     } else {
       ContactMethodOptions
         .ordered(methods)
@@ -281,15 +281,16 @@ object AmendPartnershipConfirmationViewModel {
     page: QuestionPage[String],
     label: String,
     original: Option[String],
-    current: UserAnswers
+    current: UserAnswers,
+    missingValue: Messages => String = missingValue
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
     Option.when(original != currentVal) {
       row(
         label,
-        original.getOrElse(missingValue),
-        currentVal.getOrElse(missingValue)
+        original.getOrElse(missingValue(messages)),
+        currentVal.getOrElse(missingValue(messages))
       )
     }
   }
@@ -303,4 +304,7 @@ object AmendPartnershipConfirmationViewModel {
 
   private def missingValue(implicit messages: Messages): String =
     messages("amendConfirmation.table.content.none")
+
+  private def missingSelect(implicit messages: Messages): String =
+    messages("amendConfirmation.table.selectContent.none")
 }
