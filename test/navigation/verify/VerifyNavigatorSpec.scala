@@ -384,9 +384,16 @@ class VerifyNavigatorSpec extends SpecBase {
               .onPageLoad()
         }
 
-        "must go to Journey recovery page when answer is missing" in {
+        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is false" in {
 
-          navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, emptyUserAnswers) mustBe journeyRecovery
+          val ua = emptyUserAnswers
+            .set(ProceedInsufficientSubcontractorNameYesNoPage, false)
+            .success
+            .value
+
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+              .onPageLoad()
         }
       }
     }

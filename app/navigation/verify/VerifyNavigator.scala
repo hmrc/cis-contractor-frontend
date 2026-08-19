@@ -59,7 +59,7 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
     case VerificationDeclarationPage                   =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case ProceedInsufficientSubcontractorNameYesNoPage =>
-      userAnswers => navigatorFromProceedInsufficientSubcontractorNameYesNoPage(NormalMode)(userAnswers)
+      _ => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
     case _                                             => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -229,15 +229,6 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
         controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
       case _ =>
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
-
-  private def navigatorFromProceedInsufficientSubcontractorNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(ProceedInsufficientSubcontractorNameYesNoPage), mode) match {
-      case (Some(true), NormalMode) =>
-        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-          .onPageLoad()
-      case _                        =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }

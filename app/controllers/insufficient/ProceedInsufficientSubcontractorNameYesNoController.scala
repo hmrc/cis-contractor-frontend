@@ -110,20 +110,33 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                         )
                       ),
                     value =>
-                      for {
-                        updatedAnswers     <-
-                          Future.fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
-                        _                  <-
-                          reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
-                        uaWithUpdatedBatch <- verificationBatchService.getCurrentVerificationBatch(request.userAnswers)
-                        _                  <- sessionRepository.set(updatedAnswers)
-                      } yield Redirect(
-                        navigator.nextPage(
-                          ProceedInsufficientSubcontractorNameYesNoPage,
-                          mode,
-                          updatedAnswers
+                      if (value) {
+                        for {
+                          updatedAnswers     <-
+                            Future
+                              .fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
+                          _                  <-
+                            reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
+                          uaWithUpdatedBatch <-
+                            verificationBatchService.getCurrentVerificationBatch(request.userAnswers)
+                          _                  <- sessionRepository.set(updatedAnswers)
+                        } yield Redirect(
+                          navigator.nextPage(
+                            ProceedInsufficientSubcontractorNameYesNoPage,
+                            mode,
+                            updatedAnswers
+                          )
                         )
-                      )
+                      } else {
+                        for {
+                          updatedAnswers <-
+                            Future
+                              .fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
+                          _              <- sessionRepository.set(updatedAnswers)
+                        } yield Redirect(
+                          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, mode, updatedAnswers)
+                        )
+                      }
                   )
               }
               .getOrElse(Future.successful(recoveryRedirect))
