@@ -360,7 +360,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       row.head.content mustBe HtmlContent(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       row(1).content mustBe HtmlContent(msgs("individualContactMethodOptions.email"))
       row(2).content mustBe HtmlContent(
-        s"<ul>" +
+        s"<ul class=\"govuk-list govuk-list--bullet\">" +
           s"<li>${msgs("individualContactMethodOptions.email")}</li>" +
           s"<li>${msgs("individualContactMethodOptions.phone")}</li>" +
           s"<li>${msgs("individualContactMethodOptions.mobile")}</li>" +
@@ -562,7 +562,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
       methodRow.head.content mustBe HtmlContent(msgs("individualContactMethodOptions.checkYourAnswersLabel"))
       methodRow(1).content mustBe HtmlContent(msgs("individualContactMethodOptions.email"))
       methodRow(2).content mustBe HtmlContent(
-        s"<ul>" +
+        s"<ul class=\"govuk-list govuk-list--bullet\">" +
           s"<li>${msgs("individualContactMethodOptions.email")}</li>" +
           s"<li>${msgs("individualContactMethodOptions.phone")}</li>" +
           s"</ul>"

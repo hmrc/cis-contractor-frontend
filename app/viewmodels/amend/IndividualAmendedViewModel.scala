@@ -228,7 +228,7 @@ object IndividualAmendedViewModel {
       if (contactOptions.size > 1) {
         contactOptions
           .map(item => s"<li>$item</li>")
-          .mkString("<ul>", "", "</ul>")
+          .mkString("<ul class=\"govuk-list govuk-list--bullet\">", "", "</ul>")
       } else {
         contactOptions.mkString
       }
