@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package models.verify
+
 import play.api.libs.json.{Json, OFormat}
 
-final case class Verification(
+final case class ReverificationDecision(
   verificationId: Long,
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  verificationBatchId: Option[Long],
   subcontractorId: Option[Long],
-  actionIndicator: Option[String] = None,
-  verificationResourceRef: Option[Long] = None
+  isUnmatched: Boolean,
+  considerForReverification: Boolean
 )
 
-object Verification:
-  given format: OFormat[Verification] = Json.format[Verification]
+object ReverificationDecision:
+  given format: OFormat[ReverificationDecision] =
+    Json.format[ReverificationDecision]

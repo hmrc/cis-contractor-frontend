@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package models
-import play.api.libs.json.{Json, OFormat}
+package pages.verify
 
-final case class Verification(
-  verificationId: Long,
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  verificationBatchId: Option[Long],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String] = None,
-  verificationResourceRef: Option[Long] = None
-)
+import models.verify.ReverificationDecision
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-object Verification:
-  given format: OFormat[Verification] = Json.format[Verification]
+case object ReverificationDecisionsPage extends QuestionPage[Seq[ReverificationDecision]] with VerifyJourney {
+
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "reverificationDecisions"
+}
