@@ -17,26 +17,26 @@
 package controllers.actions
 
 import javax.inject.Inject
-import controllers.routes
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.{CisIdDataRequest, DataRequest}
+import pages.CisIdPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
+import queries.CisIdQuery
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends DataRequiredAction {
+class CisIdRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CisIdRequiredAction {
 
-  override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] =
-    request.userAnswers match {
-      case None       =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
-      case Some(data) =>
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] =
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
         Future.successful(
           Right(
-            DataRequest(
+            CisIdDataRequest[A](
               request.request,
               request.userId,
-              data,
+              request.userAnswers,
+              cisId,
               request.employerReference,
               request.agentReference,
               request.isAgent,
@@ -44,7 +44,13 @@ class DataRequiredActionImpl @Inject() (implicit val executionContext: Execution
             )
           )
         )
+      case None        =>
+        if (request.isAgent) {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())))
+        } else {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())))
+        }
     }
 }
 
-trait DataRequiredAction extends ActionRefiner[OptionalDataRequest, DataRequest]
+trait CisIdRequiredAction extends ActionRefiner[DataRequest, CisIdDataRequest]

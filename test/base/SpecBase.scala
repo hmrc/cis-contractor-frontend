@@ -69,7 +69,8 @@ trait SpecBase
           bind[IdentifierAction]
             .qualifiedWith("ContractorIdentifier")
             .to(new FakeIdentifierAction(false, false, true)(parsers)),
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl]
         ) ++ additionalBindings
       )
 }

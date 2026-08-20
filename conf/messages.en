@@ -490,6 +490,24 @@ noUnmatchedSubcontractors.p2                                                    
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
+unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.heading                              =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.p1                                   =  You have updated the subcontractor details for {0}.
+unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2                       =  Updates made
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details                    =  Details
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous                   =  Previous
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  Updated
+unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  None provided
+unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  None selected
+unmatched.unmatchedSubcontractorDetailsUpdated.backTo                               =  Back to
+unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  Cannot verify all subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  Before you go
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  Your feedback helps us make our service better.
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey         =  Take a short survey
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback            =  to share your feedback on this service.
+unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  Review unmatched subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  Your subcontractors
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
