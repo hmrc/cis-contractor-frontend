@@ -20,11 +20,18 @@ import base.SpecBase
 import controllers.routes
 import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.ReviewInsufficientInfoService
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
+
+import scala.concurrent.Future
 
 class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
@@ -127,6 +134,36 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         val service   = application.injector.instanceOf[ReviewInsufficientInfoService]
         val view      = application.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
         val viewModel = service.buildViewModel(batchOf(missingSub, readySub))(messages(application))
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual
+          view(viewModel)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when batch is ready for verification" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage, batchOf(readySub))
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+
+        val result = route(application, request).value
+
+        val service   = application.injector.instanceOf[ReviewInsufficientInfoService]
+        val view      = application.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
+        val viewModel = service.buildViewModel(batchOf(readySub))(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual

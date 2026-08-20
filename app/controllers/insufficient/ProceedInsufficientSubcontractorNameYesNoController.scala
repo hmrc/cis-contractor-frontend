@@ -112,14 +112,16 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                     value =>
                       if (value) {
                         for {
-                          updatedAnswers     <-
+                          updatedAnswers            <-
                             Future
                               .fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
-                          _                  <-
+                          _                         <-
                             reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
-                          uaWithUpdatedBatch <-
-                            verificationBatchService.getCurrentVerificationBatch(request.userAnswers)
-                          _                  <- sessionRepository.set(updatedAnswers)
+                          uaWithUpdatedCurrentBatch <-
+                            verificationBatchService.getCurrentVerificationBatch(updatedAnswers)
+                          uaWithNewestBatch         <-
+                            verificationBatchService.refreshNewestVerificationBatch(request.userAnswers)
+                          _                         <- sessionRepository.set(uaWithNewestBatch)
                         } yield Redirect(
                           navigator.nextPage(
                             ProceedInsufficientSubcontractorNameYesNoPage,

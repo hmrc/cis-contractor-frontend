@@ -201,6 +201,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       ).thenReturn(Future.successful(()))
       when(mockBatchService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(userAnswers))
+      when(mockBatchService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswers))
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
