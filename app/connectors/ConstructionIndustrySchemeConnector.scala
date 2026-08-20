@@ -27,9 +27,9 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 final case class HasClientResponse(hasClient: Boolean)
 
@@ -138,6 +138,25 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           s"[ConstructionIndustrySchemeConnector][getCurrentVerificationBatch] instanceId=$instanceId - Response received"
         )
         response
+      }
+
+  def getLastSubmittedVerificationBatch(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetLastSubmittedVerificationBatchResponse] =
+    http
+      .get(url"$cisBaseUrl/verification-batch/last/$instanceId")
+      .execute[GetLastSubmittedVerificationBatchResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getLastSubmittedVerificationBatch] instanceId=$instanceId - Response received"
+        )
+        response
+      }
+      .andThen { case Failure(ex) =>
+        logger.error(
+          s"[ConstructionIndustrySchemeConnector][getLastSubmittedVerificationBatch] instanceId=$instanceId - Request failed",
+          ex
+        )
       }
 
   def createVerificationBatchAndVerifications(
