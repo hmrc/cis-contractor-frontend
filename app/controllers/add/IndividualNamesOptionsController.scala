@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,67 +17,56 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.TradingNameOfSubcontractorFormProvider
+import forms.add.IndividualNamesOptionsFormProvider
 import models.Mode
-import models.add.IndividualNamesOptions.TradingName
 import navigation.Navigator
-import pages.add.{IndividualNamesOptionsPage, TradingNameOfSubcontractorPage}
+import pages.add.IndividualNamesOptionsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.TradingNameOfSubcontractorView
+import views.html.add.IndividualNamesOptionsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class TradingNameOfSubcontractorController @Inject() (
+class IndividualNamesOptionsController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: TradingNameOfSubcontractorFormProvider,
+  formProvider: IndividualNamesOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TradingNameOfSubcontractorView
+  view: IndividualNamesOptionsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = formProvider()
+  val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
-
-    namesOptions match {
-      case Some(namesOptions) if namesOptions.contains(TradingName) =>
-        val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-
-        Ok(view(preparedForm, mode))
-
-      case _ =>
-        Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+    val preparedForm = request.userAnswers.get(IndividualNamesOptionsPage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
     }
+
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TradingNameOfSubcontractorPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualNamesOptionsPage, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TradingNameOfSubcontractorPage, mode, updatedAnswers)
-            )
+            } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage, mode, updatedAnswers))
         )
-    }
+  }
 }

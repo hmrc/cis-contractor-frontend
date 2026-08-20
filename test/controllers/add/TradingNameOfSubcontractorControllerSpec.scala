@@ -19,11 +19,12 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
+import models.add.IndividualNamesOptions
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage}
+import pages.add.{IndividualNamesOptionsPage, TradingNameOfSubcontractorPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,13 +42,17 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
   private lazy val nameOfSubcontractorRoute =
     controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode).url
 
+  private def uaWithTradingNameOption: UserAnswers =
+    emptyUserAnswers
+      .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
+      .success
+      .value
+
   "NameOfSubcontractor Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers =
-        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, true).success.value)
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(uaWithTradingNameOption)).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSubcontractorRoute)
@@ -63,10 +68,9 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(TradingNameOfSubcontractorPage, "answer").success.value
+      val userAnswers = uaWithTradingNameOption.set(TradingNameOfSubcontractorPage, "answer").success.value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers.set(SubTradingNameYesNoPage, true).success.value)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, nameOfSubcontractorRoute)
@@ -77,44 +81,6 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
-
-      val application = applicationBuilder(userAnswers =
-        Some(emptyUserAnswers.set(SubTradingNameYesNoPage, false).success.value)
-      ).build()
-
-      running(application) {
-        val request = FakeRequest(GET, nameOfSubcontractorRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual controllers.add.routes.SubTradingNameYesNoController
-          .onPageLoad(NormalMode)
-          .url
-
-      }
-    }
-
-    "must redirect to journey recovery page when none for yesorno page for a GET" in {
-
-      val application = applicationBuilder(userAnswers =
-        Some(emptyUserAnswers.set(TradingNameOfSubcontractorPage, "answer").success.value)
-      ).build()
-
-      running(application) {
-        val request = FakeRequest(GET, nameOfSubcontractorRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-
       }
     }
 
@@ -213,6 +179,44 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to IndividualNamesOptionsPage for a GET when TradingName is not selected" in {
+
+      def uaWithSubcontractorNameOption: UserAnswers =
+        emptyUserAnswers
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractorNameOption)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualNamesOptionsController
+          .onPageLoad(NormalMode)
+          .url
+      }
+    }
+
+    "must redirect to IndividualNamesOptionsPage for a GET when IndividualNamesOptions is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nameOfSubcontractorRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualNamesOptionsController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
   }

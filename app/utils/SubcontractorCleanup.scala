@@ -30,7 +30,7 @@ object SubcontractorCleanup {
   def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(AddressOfSubcontractorPage)
-      .flatMap(_.remove(AddIndividualContactMethodsYesNoPage))
+      .flatMap(_.remove(IndividualNamesOptionsPage))
       .flatMap(_.remove(IndividualContactMethodOptionsPage))
       .flatMap(_.remove(IndividualEmailAddressPage))
       .flatMap(_.remove(IndividualMobileNumberPage))

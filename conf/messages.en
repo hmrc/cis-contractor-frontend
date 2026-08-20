@@ -490,8 +490,17 @@ noUnmatchedSubcontractors.p2                                                    
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
+individualNamesOptions.title                                                        =  Which names do you want to add for this subcontractor?
+individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
+individualNamesOptions.subcontractorName                                            =  Subcontractor name
+individualNamesOptions.tradingName                                                  =  Trading name
+individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
+individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
+individualNamesOptions.checkYourAnswersLabel                                        =  Names
+individualNamesOptions.change.hidden                                                =  names
+
 # Partnership
-addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
 addPartnershipContactMethodsYesNo.error.required                   =  Select yes if you want to add contact details for this partnership
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Add contact details?

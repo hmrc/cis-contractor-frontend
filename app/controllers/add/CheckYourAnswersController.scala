@@ -70,7 +70,7 @@ class CheckYourAnswersController @Inject() (
         val list = SummaryListViewModel(
           rows = Seq(
             TypeOfSubcontractorSummary.row(ua),
-            SubTradingNameYesNoSummary.row(ua),
+            IndividualNamesOptionsSummary.row(ua),
             SubcontractorNameSummary.row(ua),
             TradingNameOfSubcontractorSummary.row(ua),
             SubAddressYesNoSummary.row(ua),
