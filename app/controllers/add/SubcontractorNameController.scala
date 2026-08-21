@@ -52,21 +52,21 @@ class SubcontractorNameController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
+      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
 
-    namesOptions match {
-      case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
-        val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
-          case Some(subcontractorName) => form.fill(subcontractorName)
-          case None                    => form
-        }
+      namesOptions match {
+        case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
+          val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
+            case Some(subcontractorName) => form.fill(subcontractorName)
+            case None                    => form
+          }
 
-        Ok(view(preparedForm, mode))
+          Ok(view(preparedForm, mode))
 
-      case _ =>
-        Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+        case _ =>
+          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+      }
     }
-  }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>

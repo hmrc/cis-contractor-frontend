@@ -51,21 +51,21 @@ class TradingNameOfSubcontractorController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
+      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
 
-    namesOptions match {
-      case Some(namesOptions) if namesOptions.contains(TradingName) =>
-        val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+      namesOptions match {
+        case Some(namesOptions) if namesOptions.contains(TradingName) =>
+          val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
 
-        Ok(view(preparedForm, mode))
+          Ok(view(preparedForm, mode))
 
-      case _ =>
-        Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+        case _ =>
+          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+      }
     }
-  }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
