@@ -1113,6 +1113,12 @@ verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Revie
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
 
+verify.verificationResults.status.matched                               = Verified
+verify.verificationResults.status.unmatched                             = Unmatched
+verify.verificationResults.taxTreatment.net                             = Standard rate
+verify.verificationResults.taxTreatment.gross                           = Gross
+verify.verificationResults.taxTreatment.unmatched                       = Higher rate
+
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
 contractordetails.contractorDetailsIndex.heading                               =  Manage contractor details

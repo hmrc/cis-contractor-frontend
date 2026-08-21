@@ -16,9 +16,48 @@
 
 package viewmodels.verify
 
+import models.VerificationLastVerification
+import models.response.GetLastSubmittedVerificationBatchResponse
+import play.api.i18n.Messages
+
 case class VerificationResultsViewModel(
   name: String,
   verificationStatus: String,
   taxTreatment: String,
-  verificationNumber: String
+  verificationNumber: String,
+  isUnmatched: Boolean
 )
+
+object VerificationResultsViewModel {
+
+  def from(
+    response: GetLastSubmittedVerificationBatchResponse
+  )(implicit messages: Messages): Seq[VerificationResultsViewModel] =
+    response.verifications.map { verification =>
+      VerificationResultsViewModel(
+        name = verification.subcontractorName.getOrElse(messages("verify.noName")),
+        verificationStatus = verificationStatusFor(verification),
+        taxTreatment = taxTreatmentFor(verification),
+        verificationNumber = verification.verificationNumber.getOrElse(""),
+        isUnmatched = isUnmatched(verification)
+      )
+    }
+
+  private def verificationStatusFor(verification: VerificationLastVerification)(implicit messages: Messages): String =
+    verification.matched match {
+      case Some("Y") => messages("verify.verificationResults.status.matched")
+      case Some("N") => messages("verify.verificationResults.status.unmatched")
+      case _         => messages("site.unknown")
+    }
+
+  private def isUnmatched(verification: VerificationLastVerification): Boolean =
+    verification.matched.contains("N")
+
+  private def taxTreatmentFor(verification: VerificationLastVerification)(implicit messages: Messages): String =
+    verification.taxTreatment match {
+      case Some("net")       => messages("verify.verificationResults.taxTreatment.net")
+      case Some("gross")     => messages("verify.verificationResults.taxTreatment.gross")
+      case Some("unmatched") => messages("verify.verificationResults.taxTreatment.unmatched")
+      case _                 => messages("site.unknown")
+    }
+}
