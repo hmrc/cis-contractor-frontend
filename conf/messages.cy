@@ -1,6 +1,6 @@
 site.continue = Parhau
 site.yes      = Iawn
-site.nor      = Na
+site.no       = Na
 site.back     = Yn ôl
 
 amendPartnershipRemoveDetailYesNo.heading                                           =  Ydych chi’n siŵr eich bod chi am dynnu’r {0} o gofnod {1}?
