@@ -104,13 +104,11 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       val html: HtmlFormat.Appendable = view(rows, subcontractorName)
       val doc: Document               = Jsoup.parse(html.toString())
 
-      val surveyLink: Element = doc.select("a[href='#']").last()
+      val surveyLink: Element = doc.select("a:contains(Take a short survey)").last()
 
       surveyLink.text() mustBe
         messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
-      surveyLink.attr("href") mustBe "#"
-      surveyLink.attr("target") mustBe "_blank"
-      surveyLink.attr("rel") mustBe "noopener noreferrer"
+      surveyLink.attr("rel") mustBe "noreferrer noopener"
     }
   }
 

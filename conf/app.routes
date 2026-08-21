@@ -123,7 +123,9 @@ POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.P
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
 
-GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
+POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/cancel              controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 

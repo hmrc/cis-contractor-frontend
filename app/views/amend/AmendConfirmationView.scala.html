@@ -63,10 +63,10 @@
 
     @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
 
-    <p class="govuk-body">
-        <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
-            @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
-        </a>
-        @messages("amendConfirmation.beforeYouGo.shareFeedback")
-    </p>
+    @link(
+        "amendConfirmation.beforeYouGo.takeAShortSurvey",
+        appConfig.feedbackUrl,
+        suffixTextKey = "amendConfirmation.beforeYouGo.shareFeedback",
+        isNewTab = true
+    )
 }

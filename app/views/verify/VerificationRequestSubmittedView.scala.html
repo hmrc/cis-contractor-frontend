@@ -40,7 +40,11 @@
 )
 
 @(vm: VerificationRequestSubmittedViewModel
-)(implicit request: Request[_],appConfig: FrontendAppConfig, messages: Messages)
+)(
+    implicit request: Request[_],
+    appConfig: FrontendAppConfig,
+    messages: Messages
+)
 
 @layout(pageTitle = titleNoForm(messages("verify.verificationRequestSubmitted.title")), showBackLink = false) {
 
@@ -180,7 +184,7 @@
 
     @link(
         "verify.verificationRequestSubmitted.feedback.survey.link",
-        appConfig.exitSurveyUrl, // TODO: Link to be confirmed & verified
+        appConfig.feedbackUrl,
         suffixTextKey = "verify.verificationRequestSubmitted.feedback.p2"
     )
 }
