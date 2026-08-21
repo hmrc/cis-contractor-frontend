@@ -18,8 +18,8 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock

@@ -55,7 +55,7 @@ final class VerificationBatchSpec extends AnyWordSpec with Matchers {
     }
 
     "round-trip (model -> json -> model) without losing data" in {
-      val model = VerificationBatch(1L, None, None, None)
+      val model = VerificationBatch(1L, None, None)
       val json  = Json.toJson(model)
       json.validate[VerificationBatch] mustBe JsSuccess(model)
     }
