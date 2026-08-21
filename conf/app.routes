@@ -680,5 +680,8 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
 
+#Insufficient
+GET   /subcontractor/insufficient/subcontractor-details-updated   controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
+
 GET   /subcontractor/verify/unmatched-subcontractors-exist                       controllers.UnmatchedSubcontractorsController.onPageLoad()
 GET   /subcontractor/verify/no-unmatched-subcontractors                      controllers.NoUnmatchedSubcontractorsController.onPageLoad()
