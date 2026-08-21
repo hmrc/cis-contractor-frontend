@@ -19,6 +19,7 @@ package navigation.add
 import javax.inject.{Inject, Singleton}
 import navigation.NavigatorForJourney
 import controllers.routes
+import models.add.IndividualNamesOptions.{SubcontractorName, TradingName}
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.{Page, QuestionPage}
@@ -43,9 +44,9 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage                   => userAnswers => navigatorFromSubTradingNameYesNoPage(NormalMode)(userAnswers)
+    case IndividualNamesOptionsPage                => userAnswers => navigatorFromIndividualNamesOptionsPage(NormalMode)(userAnswers)
+    case SubcontractorNamePage                     => userAnswers => navigatorFromSubcontractorNamePage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case SubcontractorNamePage                     => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage                       =>
       userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage          =>
@@ -74,7 +75,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case SubTradingNameYesNoPage              => navigatorFromSubTradingNameYesNoPage(CheckMode)(_)
+    case IndividualNamesOptionsPage           => userAnswers => navigatorFromIndividualNamesOptionsPage(CheckMode)(userAnswers)
+    case SubcontractorNamePage                => userAnswers => navigatorFromSubcontractorNamePage(CheckMode)(userAnswers)
     case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(CheckMode)(_)
     case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
     case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
@@ -119,6 +121,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                    => _ => cyaRoute(AmendMode)
   }
 
+  // TODO REMOVE after fix amend in DTR-5688
   private def navigatorFromSubTradingNameYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     (ua.get(SubTradingNameYesNoPage), mode) match {
       case (Some(true), NormalMode) =>
@@ -151,6 +154,50 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
             controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name")
           case Some(_) => cyaRoute(mode)
         }
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromIndividualNamesOptionsPage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(IndividualNamesOptionsPage), mode) match {
+      case (Some(nameOptions), NormalMode) if nameOptions.contains(SubcontractorName) =>
+        controllers.add.routes.SubcontractorNameController.onPageLoad(NormalMode)
+
+      case (Some(nameOptions), NormalMode) if nameOptions.contains(TradingName) =>
+        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+
+      case (Some(nameOptions), CheckMode)
+          if nameOptions.contains(SubcontractorName) && ua.get(SubcontractorNamePage).isEmpty =>
+        controllers.add.routes.SubcontractorNameController.onPageLoad(CheckMode)
+
+      case (Some(nameOptions), CheckMode)
+          if nameOptions.contains(TradingName) && ua.get(TradingNameOfSubcontractorPage).isEmpty =>
+        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+
+      case (Some(nameOptions), CheckMode) =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
+
+    }
+
+  private def navigatorFromSubcontractorNamePage(mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(IndividualNamesOptionsPage), mode) match {
+
+      case (Some(nameOptions), NormalMode) if nameOptions.contains(TradingName) =>
+        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(NormalMode)
+
+      case (Some(_), NormalMode) =>
+        controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+
+      case (Some(nameOptions), CheckMode)
+          if nameOptions.contains(TradingName) && ua.get(TradingNameOfSubcontractorPage).isEmpty =>
+        controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode)
+
+      case (Some(nameOptions), CheckMode) =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()

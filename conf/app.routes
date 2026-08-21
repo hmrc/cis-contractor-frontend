@@ -133,6 +133,9 @@ POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.un
 GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
 
+GET   /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = AmendMode)
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -225,6 +228,11 @@ GET   /subcontractor/add/select-contact-details         controllers.add.Individu
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
+GET   /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
@@ -570,8 +578,10 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 GET   /subcontractor/verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/change  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
 
-GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
-GET   /subcontractor/verify/check-results                     controllers.verify.CheckVerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+
+GET   /subcontractor/verify/check-results  controllers.verify.CheckVerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current         controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = NormalMode)
@@ -650,6 +660,7 @@ GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatched
 
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
+
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
 

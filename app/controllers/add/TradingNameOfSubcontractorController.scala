@@ -19,13 +19,12 @@ package controllers.add
 import controllers.actions.*
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.Mode
+import models.add.IndividualNamesOptions.TradingName
 import navigation.Navigator
-import pages.QuestionPage
-import pages.add.{SubTradingNameYesNoPage, TradingNameOfSubcontractorPage}
+import pages.add.{IndividualNamesOptionsPage, TradingNameOfSubcontractorPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.TradingNameOfSubcontractorView
 
@@ -42,8 +41,7 @@ class TradingNameOfSubcontractorController @Inject() (
   formProvider: TradingNameOfSubcontractorFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
-  view: TradingNameOfSubcontractorView,
-  yesOrNoPageGuardService: YesOrNoPageGuardService
+  view: TradingNameOfSubcontractorView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -53,17 +51,20 @@ class TradingNameOfSubcontractorController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-      val yesOrNoPage: QuestionPage[Boolean] = SubTradingNameYesNoPage
-      val yesOrNoPageOption                  = request.userAnswers.get(SubTradingNameYesNoPage)
+      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
 
-      val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
+      namesOptions match {
+        case Some(namesOptions) if namesOptions.contains(TradingName) =>
+          val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode))
+
+        case _ =>
+          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
       }
-      val result       = Ok(view(preparedForm, mode))
-
-      yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
