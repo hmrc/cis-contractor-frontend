@@ -70,6 +70,18 @@ class VerificationService @Inject() (
       _        <- sessionRepository.set(updated)
     } yield updated
 
+  def getLastSubmittedVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.getLastSubmittedVerificationBatch(instanceId)
+      updated  <- Future.fromTry(userAnswers.set(LastSubmittedVerificationBatchResponsePage, response))
+      _        <- sessionRepository.set(updated)
+    } yield updated
+
   def createVerificationBatchAndVerifications(
     userAnswers: UserAnswers,
     selectedSubcontractorIds: Seq[Long],

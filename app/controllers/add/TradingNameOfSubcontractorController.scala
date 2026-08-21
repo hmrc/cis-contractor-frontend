@@ -39,6 +39,7 @@ class TradingNameOfSubcontractorController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TradingNameOfSubcontractorFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameOfSubcontractorView
 )(implicit ec: ExecutionContext)
@@ -47,7 +48,8 @@ class TradingNameOfSubcontractorController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
     val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
 
@@ -66,7 +68,7 @@ class TradingNameOfSubcontractorController @Inject() (
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
