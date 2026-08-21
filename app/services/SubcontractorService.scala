@@ -20,14 +20,15 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
-import models.response.GetSubcontractorResponse
+import models.response.*
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
-import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
+import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
+import queries.{CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -182,4 +183,252 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] =
     cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
+
+  def updateSubcontractor(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+    for {
+      cisId             <- getCisId(userAnswers)
+      subcontractorType <- getSubcontractorType(userAnswers)
+      original          <- getOriginalSubcontractor(userAnswers)
+
+      subcontractor =
+        updateSubcontractorFromUserAnswers(
+          original = original,
+          subcontractorType = subcontractorType,
+          userAnswers = userAnswers
+        )
+
+      response <-
+        cisConnector.updateSubcontractor(
+          UpdateSubcontractorRequest(
+            cisId = cisId,
+            subcontractor = subcontractor
+          )
+        )
+    } yield response
+
+  private def getOriginalSubcontractor(
+    userAnswers: UserAnswers
+  ): Future[SubcontractorResponse] =
+    userAnswers.get(OriginalSubcontractorQuery) match {
+      case Some(subcontractor) =>
+        Future.successful(subcontractor)
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            "OriginalSubcontractorQuery not found in session data"
+          )
+        )
+    }
+
+  private def toSubcontractorRequest(
+    subcontractor: SubcontractorResponse
+  ): SubcontractorRequest =
+    SubcontractorRequest(
+      subcontractorId = subcontractor.subcontractorId,
+      utr = subcontractor.utr,
+      pageVisited = subcontractor.pageVisited,
+      partnerUtr = subcontractor.partnerUtr,
+      crn = subcontractor.crn,
+      firstName = subcontractor.firstName,
+      nino = subcontractor.nino,
+      secondName = subcontractor.secondName,
+      surname = subcontractor.surname,
+      partnershipTradingName = subcontractor.partnershipTradingName,
+      tradingName = subcontractor.tradingName,
+      subcontractorType = subcontractor.subcontractorType,
+      addressLine1 = subcontractor.addressLine1,
+      addressLine2 = subcontractor.addressLine2,
+      addressLine3 = subcontractor.addressLine3,
+      addressLine4 = subcontractor.addressLine4,
+      country = subcontractor.country,
+      postcode = subcontractor.postcode,
+      emailAddress = subcontractor.emailAddress,
+      phoneNumber = subcontractor.phoneNumber,
+      mobilePhoneNumber = subcontractor.mobilePhoneNumber,
+      worksReferenceNumber = subcontractor.worksReferenceNumber,
+      createDate = subcontractor.createDate,
+      lastUpdate = subcontractor.lastUpdate,
+      subbieResourceRef = subcontractor.subbieResourceRef,
+      matched = subcontractor.matched,
+      autoVerified = subcontractor.autoVerified,
+      verified = subcontractor.verified,
+      verificationNumber = subcontractor.verificationNumber,
+      taxTreatment = subcontractor.taxTreatment,
+      verificationDate = subcontractor.verificationDate,
+      version = subcontractor.version,
+      updatedTaxTreatment = subcontractor.updatedTaxTreatment,
+      lastMonthlyReturnDate = subcontractor.lastMonthlyReturnDate,
+      pendingVerifications = subcontractor.pendingVerifications
+    )
+
+  private def updateSubcontractorFromUserAnswers(
+    original: SubcontractorResponse,
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
+
+    val existing =
+      toSubcontractorRequest(original)
+
+    subcontractorType match {
+      case Individualorsoletrader =>
+        updateIndividual(
+          existing,
+          userAnswers
+        )
+
+      case Limitedcompany =>
+        updateCompany(
+          existing,
+          userAnswers
+        )
+
+      case Partnership =>
+        updatePartnership(
+          existing,
+          userAnswers
+        )
+
+      case Trust =>
+        updateTrust(
+          existing,
+          userAnswers
+        )
+    }
+  }
+
+  private def updateCompany(
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
+
+    val address =
+      userAnswers.get(CompanyAddressPage)
+
+    existing.copy(
+      utr = userAnswers.get(CompanyUtrPage),
+      crn = userAnswers.get(CompanyCrnPage),
+      tradingName = userAnswers.get(CompanyNamePage),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address.flatMap(_.country).flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(CompanyEmailAddressPage),
+      phoneNumber = userAnswers.get(CompanyPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(CompanyMobileNumberPage),
+      worksReferenceNumber = userAnswers.get(CompanyWorksReferencePage)
+    )
+  }
+
+  private def updatePartnership(existing: SubcontractorRequest, userAnswers: UserAnswers): SubcontractorRequest = {
+    val address = userAnswers.get(PartnershipAddressPage)
+
+    existing.copy(
+      utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
+      partnerUtr = userAnswers.get(PartnershipNominatedPartnerUtrPage),
+      partnershipTradingName = userAnswers.get(PartnershipNamePage),
+      tradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
+      nino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
+      crn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(
+        PartnershipEmailAddressPage
+      ),
+      phoneNumber = userAnswers.get(
+        PartnershipPhoneNumberPage
+      ),
+      mobilePhoneNumber = userAnswers.get(
+        PartnershipMobileNumberPage
+      ),
+      worksReferenceNumber = userAnswers.get(
+        PartnershipWorksReferenceNumberPage
+      )
+    )
+  }
+
+  private def updateTrust(
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
+
+    val address =
+      userAnswers.get(TrustAddressPage)
+
+    existing.copy(
+      utr = userAnswers.get(TrustUtrPage),
+      tradingName = userAnswers.get(TrustNamePage),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(TrustEmailAddressPage),
+      phoneNumber = userAnswers.get(TrustPhoneNumberPage),
+      mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
+      worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
+    )
+  }
+
+  private def updateIndividual(
+    existing: SubcontractorRequest,
+    userAnswers: UserAnswers
+  ): SubcontractorRequest = {
+
+    val name =
+      userAnswers.get(SubcontractorNamePage)
+
+    val address =
+      userAnswers.get(AddressOfSubcontractorPage)
+
+    existing.copy(
+      firstName = name.map(_.firstName),
+      secondName = name.flatMap(_.middleName),
+      surname = name.map(_.lastName),
+      tradingName = userAnswers.get(
+        TradingNameOfSubcontractorPage
+      ),
+      nino = userAnswers.get(
+        SubNationalInsuranceNumberPage
+      ),
+      utr = userAnswers.get(
+        SubcontractorsUniqueTaxpayerReferencePage
+      ),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      addressLine3 = address.flatMap(_.addressLine3),
+      addressLine4 = address.flatMap(_.addressLine4),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      postcode = address.flatMap(_.postcode),
+      emailAddress = userAnswers.get(
+        IndividualEmailAddressPage
+      ),
+      phoneNumber = userAnswers.get(
+        IndividualPhoneNumberPage
+      ),
+      mobilePhoneNumber = userAnswers.get(
+        IndividualMobileNumberPage
+      ),
+      worksReferenceNumber = userAnswers.get(
+        WorksReferenceNumberPage
+      )
+    )
+  }
+
 }

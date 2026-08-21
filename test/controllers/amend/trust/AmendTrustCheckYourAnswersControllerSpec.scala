@@ -43,6 +43,7 @@ import pages.amend.AmendCheckYourAnswersSubmittedPage
 import queries.CisIdQuery
 import utils.AmendmentHelper
 import config.FrontendAppConfig
+import models.response.UpdateSubcontractorResponse
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -322,8 +323,17 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
+      when(
+        mockSubcontractorService.updateSubcontractor(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          UpdateSubcontractorResponse(
+            version = 2
+          )
+        )
+      )
       when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
 
       val application =
@@ -347,7 +357,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+        .updateSubcontractor(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
       captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
@@ -445,8 +457,15 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
 
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(
+        mockSubcontractorService.updateSubcontractor(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(minUa))
@@ -469,7 +488,9 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+        .updateSubcontractor(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
     }
 
     "must redirect to Journey Recovery when POST validation fails" in {
@@ -503,8 +524,12 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService, never())
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(
+        mockSubcontractorService,
+        never()
+      ).updateSubcontractor(
+        any[UserAnswers]
+      )(any[HeaderCarrier])
     }
 
     "must clear answers and redirect to your subcontractor page on cancel" in {
