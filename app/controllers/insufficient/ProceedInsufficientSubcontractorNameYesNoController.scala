@@ -126,7 +126,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                           navigator.nextPage(
                             ProceedInsufficientSubcontractorNameYesNoPage,
                             mode,
-                            updatedAnswers
+                            uaWithNewestBatch
                           )
                         )
                       } else {
