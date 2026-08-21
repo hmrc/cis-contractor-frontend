@@ -19,7 +19,7 @@ package utils
 import forms.Validation.nameRegex
 
 object TradingName {
-  private val length          = 56
+  private val length = 56
 
   def isValid(name: String): Boolean = name != null && name.matches(nameRegex)
 

@@ -20,7 +20,7 @@ import forms.Validation.worksRefRegex
 
 object WorkReferenceNumber {
 
-  private val length         = 20
+  private val length = 20
 
   def isValid(wrn: String): Boolean = wrn != null && wrn.matches(worksRefRegex)
 

@@ -20,8 +20,8 @@ import forms.Validation.firstMiddleNameRegex
 import forms.Validation.firstCharLetterRegex
 
 object FirstMiddleName {
-  
-  private val length                   = 35
+
+  private val length = 35
 
   def isValid(name: String): Boolean =
     name != null && name.matches(firstMiddleNameRegex) && name.matches(firstCharLetterRegex)

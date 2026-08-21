@@ -21,7 +21,7 @@ import forms.Validation.surnameFormat
 
 object Surname {
 
-  private val length                   = 35
+  private val length = 35
 
   def isValid(name: String): Boolean =
     name != null && name.matches(surnameFormat) && name.matches(firstCharLetterRegex)

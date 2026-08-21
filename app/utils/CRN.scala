@@ -19,7 +19,7 @@ package utils
 import forms.Validation.companyRegNumberRegex
 
 object CRN {
-  private val length         = 8
+  private val length = 8
 
   def isValid(crn: String): Boolean = crn != null && crn.matches(companyRegNumberRegex)
 
