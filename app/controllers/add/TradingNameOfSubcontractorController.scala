@@ -40,6 +40,7 @@ class TradingNameOfSubcontractorController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TradingNameOfSubcontractorFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: TradingNameOfSubcontractorView,
   yesOrNoPageGuardService: YesOrNoPageGuardService
@@ -49,23 +50,24 @@ class TradingNameOfSubcontractorController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val yesOrNoPage: QuestionPage[Boolean] = SubTradingNameYesNoPage
-    val yesOrNoPageOption                  = request.userAnswers.get(SubTradingNameYesNoPage)
+      val yesOrNoPage: QuestionPage[Boolean] = SubTradingNameYesNoPage
+      val yesOrNoPageOption                  = request.userAnswers.get(SubTradingNameYesNoPage)
 
-    val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+      val result       = Ok(view(preparedForm, mode))
+
+      yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
+
     }
-    val result       = Ok(view(preparedForm, mode))
-
-    yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-
-  }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

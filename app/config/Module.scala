@@ -42,5 +42,6 @@ class Module extends AbstractModule {
       .to(classOf[AgentIdentifierAction])
       .asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[RedirectVerifiedSubcontractorAction]).to(classOf[RedirectVerifiedSubcontractorActionImpl])
   }
 }

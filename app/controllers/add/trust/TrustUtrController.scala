@@ -41,6 +41,7 @@ class TrustUtrController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TrustUtrFormProvider,
   subcontractorService: SubcontractorService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: TrustUtrView
@@ -59,25 +60,26 @@ class TrustUtrController @Inject() (
       navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val yesOrNoPage       = TrustUtrYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val yesOrNoPage       = TrustUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
 
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustUtrPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          val preparedForm = request.userAnswers.get(TrustUtrPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          val result       = Ok(view(preparedForm, mode, trustName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
-        val result       = Ok(view(preparedForm, mode, trustName))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -108,5 +110,5 @@ class TrustUtrController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

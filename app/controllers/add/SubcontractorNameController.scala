@@ -39,6 +39,7 @@ class SubcontractorNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SubcontractorNameFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorNameView
 )(implicit ec: ExecutionContext)
@@ -47,25 +48,26 @@ class SubcontractorNameController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
-      case Some(subcontractorName) => form.fill(subcontractorName)
-      case None                    => form
-    }
-    request.userAnswers.get(SubTradingNameYesNoPage) match {
-      case Some(false) =>
-        Ok(view(preparedForm, mode))
-      case Some(true)  =>
-        Redirect(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode))
-      case none        =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
+      val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
+        case Some(subcontractorName) => form.fill(subcontractorName)
+        case None                    => form
+      }
+      request.userAnswers.get(SubTradingNameYesNoPage) match {
+        case Some(false) =>
+          Ok(view(preparedForm, mode))
+        case Some(true)  =>
+          Redirect(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode))
+        case none        =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
 
-  }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

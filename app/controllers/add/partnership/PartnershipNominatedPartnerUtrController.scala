@@ -40,6 +40,7 @@ class PartnershipNominatedPartnerUtrController @Inject() (
   requireData: DataRequiredAction,
   formProvider: PartnershipNominatedPartnerUtrFormProvider,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNominatedPartnerUtrView
 )(implicit ec: ExecutionContext)
@@ -48,25 +49,26 @@ class PartnershipNominatedPartnerUtrController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val yesOrNoPage       = PartnershipNominatedPartnerUtrYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val yesOrNoPage       = PartnershipNominatedPartnerUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage)
 
-    request.userAnswers
-      .get(PartnershipNominatedPartnerNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerUtrPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { partnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerUtrPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          val result       = Ok(view(preparedForm, mode, partnershipName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
-        val result       = Ok(view(preparedForm, mode, partnershipName))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(PartnershipNominatedPartnerNamePage)
         .map { partnershipNominatedPartnerName =>
@@ -83,5 +85,5 @@ class PartnershipNominatedPartnerUtrController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

@@ -264,6 +264,73 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "getNewestVerificationBatch" should {
+
+    val instanceId = "cis-123"
+
+    "preserve the F3a verification fields returned by the backend" in {
+      val responseJson =
+        """
+          |{
+          |  "scheme": null,
+          |  "subcontractors": [
+          |    {
+          |      "subcontractorId": 1,
+          |      "subbieResourceRef": 10
+          |    }
+          |  ],
+          |  "verificationBatch": {
+          |    "verificationBatchId": 99,
+          |    "status": "SUBMITTED",
+          |    "verificationNumber": "VB123"
+          |  },
+          |  "verifications": [
+          |    {
+          |      "verificationId": 1001,
+          |      "matched": "N",
+          |      "verificationNumber": "V0000000001",
+          |      "taxTreatment": "0",
+          |      "verificationBatchId": 99,
+          |      "subcontractorId": 1,
+          |      "actionIndicator": "VERIFY",
+          |      "verificationResourceRef": 10
+          |    }
+          |  ],
+          |  "submission": null,
+          |  "monthlyReturn": null,
+          |  "monthlyReturnSubmission": null
+          |}
+          |""".stripMargin
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/verification-batch/newest/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(responseJson)
+          )
+      )
+
+      val result =
+        connector.getNewestVerificationBatch(instanceId).futureValue
+
+      result.verificationBatch.flatMap(_.status) mustBe Some("SUBMITTED")
+      result.subcontractors.head.subbieResourceRef mustBe Some(10L)
+
+      result.verifications must have size 1
+
+      val verification = result.verifications.head
+
+      verification.verificationId mustBe 1001L
+      verification.verificationNumber mustBe Some("V0000000001")
+      verification.subcontractorId mustBe Some(1L)
+      verification.actionIndicator mustBe Some("VERIFY")
+      verification.matched mustBe Some("N")
+      verification.verificationResourceRef mustBe Some(10L)
+    }
+  }
+
   "getCurrentVerificationBatch" should {
 
     val instanceId = "cis-123"
