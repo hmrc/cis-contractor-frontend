@@ -1,12 +1,16 @@
 # Infrastructure
-service.name                              =  Construction Industry Scheme
+service.name                              =  Cynllun y Diwydiant Adeiladu
 site.back                                 =  Yn ôl
+site.remove                               =  Dileu
 site.change                               =  Newid
 site.no                                   =  Na
 site.yes                                  =  Iawn
 site.continue                             =  Parhau
 site.update                               =  Diweddaru
 
+site.pagination.previous                  =  Blaenorol
+site.pagination.next                      =  Nesaf
+site.pagination.landmark                  =  Rhifo tudalennau
 
 # Individual and Common
 typeOfSubcontractor.title                                                           =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
@@ -57,7 +61,6 @@ companyEmailAddress.error.invalid                    =  Nodwch gyfeiriad e-bost 
 companyEmailAddress.error.length                     =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
 companyEmailAddress.change.hidden                    =  cyfeiriad e-bost
 
-companyPhoneNumber.title                             =  What is the phone number for this company?
 companyPhoneNumber.heading                           =  Beth yw’r rhif ffôn ar gyfer {0}?
 companyPhoneNumber.hint                              =  Ni fydd CThEF yn defnyddio’r rhif ffôn hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
 companyPhoneNumber.error.required                    =  Nodwch rif ffôn
@@ -66,13 +69,12 @@ companyPhoneNumber.error.length                      =  Nodwch rif ffôn dilys, 
 companyPhoneNumber.checkYourAnswersLabel             =  Rhif ffôn
 companyPhoneNumber.change.hidden                     =  rhif ffôn
 
-companyMobileNumber.title                            =  What is the mobile number for this company?
 companyMobileNumber.heading                          =  Beth yw’r rhif ffôn symudol ar gyfer {0}?
 companyMobileNumber.hintText                         =  Ni fydd CThEF yn defnyddio’r rhif ffôn symudol hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
 companyMobileNumber.checkYourAnswersLabel            =  Rhif ffôn symudol
 companyMobileNumber.error.required                   =  Nodwch rif ffôn symudol
-companyMobileNumber.error.invalid                    =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 982
-companyMobileNumber.error.length                     =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 982
+companyMobileNumber.error.invalid                    =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
+companyMobileNumber.error.length                     =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
 companyMobileNumber.change.hidden                    =  rhif ffôn symudol
 
 companyUtrYesNo.heading                              =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
@@ -110,7 +112,6 @@ companyWorksReferenceYesNo.hint                      =  Dyma’r cyfeirnod a dde
 companyWorksReferenceYesNo.checkYourAnswersLabel     =  Ychwanegu cyfeirnod y gwaith?
 companyWorksReferenceYesNo.error.required            =  Dewiswch p’un a oes cyfeirnod y gwaith yn gysylltiedig â’r cwmni hwn.
 
-companyWorksReference.title                          =  What is the works reference number associated with this company?
 companyWorksReference.heading                        =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
 companyWorksReference.hintText                       =  Mae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
 companyWorksReference.checkYourAnswersLabel          =  Cyfeirnod y gwaith
@@ -125,3 +126,244 @@ companyCheckYourAnswers.subHeading                   =  Manylion yr is-gontractw
 companyCheckYourAnswers.trailHeading                 =  Nawr ychwanegwch yr is-gontractwr hwn
 companyCheckYourAnswers.trailText                    =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
 companyCheckYourAnswers.continue                     =  Derbyn a chyflwyno
+
+# Trust
+
+addTrustContactMethodsYesNo.heading                =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
+addTrustContactMethodsYesNo.error.required         =  Dewiswch ‘Iawn’ os ydych chi am ychwanegu manylion cysylltu ar gyfer yr ymddiriedolaeth hon
+addTrustContactMethodsYesNo.checkYourAnswersLabel  =  Ychwanegu manylion cysylltu?
+
+trustName.title                                    =  Beth yw enw’r ymddiriedolaeth?
+trustName.heading                                  =  Beth yw enw’r ymddiriedolaeth?
+trustName.hint                                     =  Dyma’r enw fel y mae wedi’i gofrestru gyda CThEF
+trustName.checkYourAnswersLabel                    =  Enw’r ymddiriedolaeth
+trustName.error.required                           =  Nodwch enw ymddiriedolaeth, fel Adeiladu ABC Cyf
+trustName.error.length                             =  Nodwch enw ymddiriedolaeth hyd at 56 o gymeriadau
+trustName.error.invalidCharacters                  =  Nodwch enw ymddiriedolaeth gan ddefnyddio’r llythrennau a-z, rhifau, collnodau, symbolau ampersand, comas, cysylltnodau, atalnodau llawn, blaenslaesau a bylchau
+
+trustAddressYesNo.heading                          =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
+trustAddressYesNo.hint                             =  Gallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
+trustAddressYesNo.error.required                   =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer yr ymddiriedolaeth hon
+trustAddressYesNo.checkYourAnswersLabel            =  Ychwanegu cyfeiriad yr ymddiriedolaeth?
+
+trustAddress.checkYourAnswersLabel                 =  Cyfeiriad
+trustAddress.change.hidden                         =  cyfeiriad
+
+trustEmailAddress.heading                          =  Beth yw’r cyfeiriad e-bost ar gyfer {0}?
+trustEmailAddress.hint                             =  Ni fydd CThEF yn defnyddio’r cyfeiriad e-bost hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+trustEmailAddress.checkYourAnswersLabel            =  Cyfeiriad e-bost
+trustEmailAddress.error.required                   =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
+trustEmailAddress.error.length                     =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
+trustEmailAddress.error.invalid                    =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
+
+trustPhoneNumber.heading                           =  Beth yw’r rhif ffôn ar gyfer {0}?
+trustPhoneNumber.hint                              =  Ni fydd CThEF yn defnyddio’r rhif ffôn hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+trustPhoneNumber.checkYourAnswersLabel             =  Rhif ffôn
+trustPhoneNumber.error.required                    =  Nodwch rif ffôn
+trustPhoneNumber.error.invalid                     =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+trustPhoneNumber.error.length                      =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+
+trustMobileNumber.heading                          =  Beth yw’r rhif ffôn symudol ar gyfer {0}?
+trustMobileNumber.hint                             =  Ni fydd CThEF yn defnyddio’r rhif ffôn symudol hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+trustMobileNumber.checkYourAnswersLabel            =  Rhif ffôn symudol
+trustMobileNumber.error.required                   =  Nodwch rif ffôn symudol
+trustMobileNumber.error.invalid                    =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 7700 900 999
+trustMobileNumber.error.length                     =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 7700 900 999
+
+trustUtrYesNo.heading                              =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
+trustUtrYesNo.hint                                 =  Defnyddir yr wybodaeth hon i ddilysu’r ymddiriedolaeth fel is-gontractwr
+trustUtrYesNo.checkYourAnswersLabel                =  Ychwanegu UTR?
+trustUtrYesNo.error.required                       =  Dewiswch p’un a ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer yr ymddiriedolaeth hon
+
+trustUtr.title                                     =  Cyfeirnod Trethdalwr Unigryw (UTR) yr ymddiriedolaeth
+trustUtr.heading                                   =  Cyfeirnod Trethdalwr Unigryw (UTR) yr ymddiriedolaeth
+trustUtr.p1                                        =  Bydd yr UTR i’w weld ar Ffurflenni Treth a dogfennau eraill gan CThEF.
+trustUtr.linkText                                  =  Cael rhagor o help i ddod o hyd i UTR (yn agor tab newydd)
+trustUtr.label                                     =  Beth yw’r UTR ar gyfer {0}?
+trustUtr.hint                                      =  Rhif 10 digid yw UTR
+trustUtr.verified.checkYourAnswersLabel            =  UTR
+trustUtr.error.required                            =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys
+trustUtr.error.length                              =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys
+trustUtr.error.invalid                             =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys
+trustUtr.error.duplicate                           =  Rydych chi eisoes wedi defnyddio Cyfeirnod Unigryw y Trethdalwr (UTR) hwn ar gyfer is-gontractwr presennol
+
+trustWorksReferenceYesNo.heading                   =  Oes cyfeirnod y gwaith yn gysylltiedig â {0}?
+trustWorksReferenceYesNo.hint                      =  Dyma’r cyfeirnod a ddefnyddir i adnabod gwaith neu brosiect is-gontractwr. Gall hwn gynnwys llythrennau a rhifau.
+trustWorksReferenceYesNo.checkYourAnswersLabel     =  Ychwanegu cyfeirnod y gwaith?
+trustWorksReferenceYesNo.error.required            =  Dewiswch p’un a oes cyfeirnod y gwaith yn gysylltiedig â’r ymddiriedolaeth hon
+
+trustWorksReference.heading                        =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
+trustWorksReference.hint                           =  Mae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
+trustWorksReference.checkYourAnswersLabel          =  Cyfeirnod y gwaith
+trustWorksReference.error.required                 =  Nodwch gyfeirnod y gwaith
+trustWorksReference.error.invalid                  =  Nodwch gyfeirnod y gwaith dilys
+trustWorksReference.error.length                   =  Nodwch gyfeirnod y gwaith, hyd at 20 o gymeriadau
+
+trustCheckYourAnswers.title                        =  Gwiriwch eich atebion cyn ychwanegu’r ymddiriedolaeth hon
+trustCheckYourAnswers.heading                      =  Gwiriwch eich atebion cyn ychwanegu’r ymddiriedolaeth hon
+trustCheckYourAnswers.subHeading                   =  Manylion yr is-gontractwr
+trustCheckYourAnswers.trailHeading                 =  Nawr ychwanegwch yr is-gontractwr hwn
+trustCheckYourAnswers.trailText                    =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
+trustCheckYourAnswers.continue                     =  Derbyn a chyflwyno
+
+trustContactMethodOptions.heading                  =  Pa fanylion cysylltu ydych chi am eu hychwanegu ar gyfer {0}?
+trustContactMethodOptions.hint                     =  Mae’r manylion cysylltu ar gyfer eich cofnodion chi yn unig
+trustContactMethodOptions.email                    =  Cyfeiriad e-bost
+trustContactMethodOptions.phone                    =  Rhif ffôn
+trustContactMethodOptions.mobile                   =  Rhif ffôn symudol
+trustContactMethodOptions.error.required           =  Dewiswch y dulliau o gysylltu rydych chi am eu hychwanegu ar gyfer yr ymddiriedolaeth hon
+trustContactMethodOptions.checkYourAnswersLabel    =  Dulliau o gysylltu
+
+addressLookup.individualQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
+addressLookup.individualQuestionsAddress.lookupPage.submitLabel                     =  Parhau
+addressLookup.individualQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
+
+addressLookup.individualQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
+addressLookup.individualQuestionsAddress.selectPage.submitLabel                     =  Parhau
+
+addressLookup.individualQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
+addressLookup.individualQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
+addressLookup.individualQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
+addressLookup.individualQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
+addressLookup.individualQuestionsAddress.editPage.postcodeLabel                     =  Cod post
+addressLookup.individualQuestionsAddress.editPage.countryLabel                      =  Gwlad
+addressLookup.individualQuestionsAddress.editPage.submitLabel                       =  Parhau
+addressLookup.individualQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
+addressLookup.individualQuestionsAddress.confirmPage.submitLabel                    =  Parhau
+addressLookup.individualQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
+addressLookup.individualQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
+
+# Partnership
+addPartnershipContactMethodsYesNo.heading                          =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
+addPartnershipContactMethodsYesNo.error.required                   =  Dewiswch ‘Iawn’ os ydych chi am ychwanegu manylion cysylltu ar gyfer y bartneriaeth hon
+addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Ychwanegu manylion cysylltu?
+
+partnershipWorksReferenceNumberYesNo.heading                       =  Oes cyfeirnod y gwaith yn gysylltiedig â {0}?
+partnershipWorksReferenceNumberYesNo.hint                          =  Dyma’r cyfeirnod a ddefnyddir i adnabod gwaith neu brosiect is-gontractwr. Gall hwn gynnwys llythrennau neu rifau.
+partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel         =  Ychwanegu cyfeirnod y gwaith?
+
+partnershipName.title                                              =  Beth yw enw’r bartneriaeth?
+partnershipName.heading                                            =  Beth yw enw’r bartneriaeth?
+partnershipName.hint                                               =  Dyma enw cofrestredig y bartneriaeth
+partnershipName.error.required                                     =  Nodwch enw cofrestredig y bartneriaeth
+partnershipName.error.length                                       =  Rhaid i enw’r bartneriaeth fod yn 56 o gymeriadau neu lai
+partnershipName.error.invalidCharacters                            =  Nodwch enw dilys ar gyfer y bartneriaeth
+partnershipName.checkYourAnswersLabel                              =  Enw’r bartneriaeth
+
+partnershipWorksReferenceNumber.heading                            =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
+partnershipWorksReferenceNumber.hint                               =  Mae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu. Efallai eich bod wedi cael hwn gan y contractwr.
+partnershipWorksReferenceNumber.checkYourAnswersLabel              =  Cyfeirnod y gwaith
+partnershipWorksReferenceNumber.error.required                     =  Nodwch gyfeirnod y gwaith
+partnershipWorksReferenceNumber.error.invalid                      =  Nodwch gyfeirnod y gwaith dilys
+partnershipWorksReferenceNumber.error.length                       =  Nodwch gyfeirnod y gwaith, hyd at 20 o gymeriadau
+
+partnershipUniqueTaxpayerReference.title                           =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y bartneriaeth
+partnershipUniqueTaxpayerReference.heading                         =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y bartneriaeth
+partnershipUniqueTaxpayerReference.paragraph                       =  Bydd yr UTR i’w weld ar Ffurflenni Treth a dogfennau eraill gan CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+partnershipUniqueTaxpayerReference.linkText                        =  Cael rhagor o help i ddod o hyd i UTR (yn agor tab newydd)
+partnershipUniqueTaxpayerReference.heading2                        =  Beth yw’r UTR ar gyfer {0}?
+partnershipUniqueTaxpayerReference.hint                            =  Rhif 10 digid yw UTR
+partnershipUniqueTaxpayerReference.error.required                  =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+partnershipUniqueTaxpayerReference.error.invalid                   =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+partnershipUniqueTaxpayerReference.error.length                    =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+partnershipUniqueTaxpayerReference.error.duplicate                 =  Rydych chi eisoes wedi defnyddio Cyfeirnod Unigryw y Trethdalwr (UTR) hwn ar gyfer is-gontractwr presennol
+partnershipUniqueTaxpayerReference.checkYourAnswersLabel           =  UTR ar gyfer y bartneriaeth
+partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel  =  UTR ar gyfer y bartneriaeth
+
+partnershipHasUtrYesNo.heading                                     =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
+partnershipHasUtrYesNo.hint                                        =  Defnyddir yr wybodaeth hon i ddilysu’r bartneriaeth fel is-gontractwr
+partnershipHasUtrYesNo.checkYourAnswersLabel                       =  Ychwanegu UTR?
+partnershipHasUtrYesNo.error.required                              =  Dewiswch p’un a oes Cyfeirnod Unigryw y Trethdalwr (UTR) gan y bartneriaeth hon
+
+partnershipNominatedPartnerUtrYesNo.heading                        =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
+partnershipNominatedPartnerUtrYesNo.hint                           =  Defnyddir yr wybodaeth hon i’w ddilysu fel is-gontractwr
+partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel          =  Ychwanegu UTR ar gyfer y partner enwebedig?
+partnershipNominatedPartnerUtrYesNo.error.required                 =  Dewiswch p’un a ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y partner enwebedig
+
+partnershipNominatedPartnerUtr.heading                             =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad
+partnershipNominatedPartnerUtr.paragraph                           =  Bydd yr UTR i’w weld ar Ffurflenni Treth a dogfennau eraill gan CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+partnershipNominatedPartnerUtr.linkText                            =  Cael rhagor o help i ddod o hyd i UTR (yn agor tab newydd)
+partnershipNominatedPartnerUtr.heading2                            =  Beth yw’r UTR ar gyfer Hunanasesiad ar gyfer {0}?
+partnershipNominatedPartnerUtr.hint                                =  Rhif 10 digid yw UTR
+partnershipNominatedPartnerUtr.checkYourAnswersLabel               =  UTR ar gyfer y partner enwebedig
+partnershipNominatedPartnerUtr.error.required                      =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys, fel 1234567890
+partnershipNominatedPartnerUtr.error.length                        =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 digid
+partnershipNominatedPartnerUtr.error.invalid                       =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 digid
+
+partnershipAddress.checkYourAnswersLabel                           =  Cyfeiriad
+partnershipAddress.change.hidden                                   =  cyfeiriad
+
+partnershipNominatedPartnerNino.heading                            =  Beth yw rhif Yswiriant Gwladol {0}?
+partnershipNominatedPartnerNino.hint                               =  Gellir dod o hyd i rifau Yswiriant Gwladol ar slipiau cyflog, P60s a dogfennau treth eraill. Er enghraifft, ‘QQ 12 34 56 C’
+partnershipNominatedPartnerNino.error.required                     =  Nodwch rif Yswiriant Gwladol
+partnershipNominatedPartnerNino.checkYourAnswersLabel              =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
+partnershipNominatedPartnerNino.change.hidden                      =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
+
+partnershipAddressYesNo.heading                                    =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
+partnershipAddressYesNo.hint                                       =  Gallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
+partnershipAddressYesNo.checkYourAnswersLabel                      =  Ychwanegu cyfeiriad y bartneriaeth?
+partnershipAddressYesNo.error.required                             =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer y bartneriaeth hon
+
+partnershipNominatedPartnerNinoYesNo.heading                       =  Ydych chi’n gwybod beth yw rhif Yswiriant Gwladol {0}?
+partnershipNominatedPartnerNinoYesNo.hint                          =  Defnyddir yr wybodaeth hon i’w ddilysu fel is-gontractwr
+partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel         =  Ychwanegu rhif Yswiriant Gwladol ar gyfer y partner enwebedig?
+partnershipNominatedPartnerNinoYesNo.error.required                =  Dewiswch p’un a ydych chi’n gwybod beth yw rhif Yswiriant Gwladol y partner enwebedig hwn
+
+partnershipNominatedPartnerName.heading                            =  Pwy yw’r partner enwebedig ar gyfer {0}?
+partnershipNominatedPartnerName.hint                               =  Y partner enwebedig sy’n gyfrifol am gadw trefn ar faterion treth y bartneriaeth.
+partnershipNominatedPartnerName.label                              =  Enw llawn
+partnershipNominatedPartnerName.error.required                     =  Nodwch enw llawn dilys
+partnershipNominatedPartnerName.error.invalid                      =  Nodwch enw llawn gan ddefnyddio’r llythrennau a-z, rhifau, collnodau, symbolau ampersand, comas, cysylltnodau, atalnodau llawn, blaenslaesau a bylchau
+partnershipNominatedPartnerName.error.length                       =  Nodwch enw llawn hyd at 56 o gymeriadau
+
+partnershipNominatedPartnerCrn.heading                             =  Beth yw rhif cofrestru’r cwmni ar gyfer {0}?
+partnershipNominatedPartnerCrn.hint                                =  Mae pob rhif cofrestru’r cwmni yn 8 o gymeriadau. Gall hyn fod yn 8 digid (01234567), neu 2 lythyren a 6 digid (AC012345). Gallwch chi ddod o hyd i rif cwmni ar gofrestr Tŷ’r Cwmnïau.
+partnershipNominatedPartnerCrn.error.required                      =  Nodwch rif cofrestru’r cwmni
+partnershipNominatedPartnerCrn.error.length                        =  Nodwch rif cofrestru cwmni dilys
+partnershipNominatedPartnerCrn.error.invalidCharacters             =  Nodwch rif cofrestru cwmni dilys
+partnershipNominatedPartnerCrn.checkYourAnswersLabel               =  Rhif cofrestru’r cwmni ar gyfer y partner enwebedig
+
+partnershipNominatedPartnerCrnYesNo.heading                        =  Oes rhif cofrestru’r cwmni gan {0}?
+partnershipNominatedPartnerCrnYesNo.hint                           =  Mae hyn yn berthnasol dim ond os yw’n bartner corfforaethol neu’n gyfarwyddwr cwmni. Defnyddir yr wybodaeth hon i’w ddilysu fel is-gontractwr.
+partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel          =  Ychwanegu rhif cofrestru’r cwmni ar gyfer y partner enwebedig?
+partnershipNominatedPartnerCrnYesNo.error.required                 =  Dewiswch p’un a oes rhif cofrestru’r cwmni gan y partner enwebedig hwn
+
+partnershipEmailAddress.heading                                    =  Beth yw’r cyfeiriad e-bost ar gyfer {0}?
+partnershipEmailAddress.hint                                       =  Ni fydd CThEF yn defnyddio’r cyfeiriad e-bost hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+partnershipEmailAddress.checkYourAnswersLabel                      =  Cyfeiriad e-bost
+partnershipEmailAddress.error.required                             =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
+partnershipEmailAddress.error.invalid                              =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
+partnershipEmailAddress.error.length                               =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
+
+partnershipPhoneNumber.heading                                     =  Beth yw’r rhif ffôn ar gyfer {0}?
+partnershipPhoneNumber.hint                                        =  Ni fydd CThEF yn defnyddio’r rhif ffôn hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+partnershipPhoneNumber.checkYourAnswersLabel                       =  Rhif ffôn
+partnershipPhoneNumber.error.required                              =  Nodwch rif ffôn
+partnershipPhoneNumber.error.length                                =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+partnershipPhoneNumber.error.invalid                               =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+
+partnershipCheckYourAnswers.title                                  =  Gwiriwch eich atebion cyn ychwanegu’r bartneriaeth hon
+partnershipCheckYourAnswers.heading                                =  Gwiriwch eich atebion cyn ychwanegu’r bartneriaeth hon
+partnershipCheckYourAnswers.subHeading                             =  Manylion yr is-gontractwr
+partnershipCheckYourAnswers.trailHeading                           =  Nawr ychwanegwch yr is-gontractwr hwn
+partnershipCheckYourAnswers.trailText                              =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
+partnershipCheckYourAnswers.continue                               =  Derbyn a chyflwyno
+
+partnershipMobileNumber.heading                                    =  Beth yw’r rhif ffôn symudol ar gyfer {0}?
+partnershipMobileNumber.hint                                       =  Ni fydd CThEF yn defnyddio’r rhif ffôn symudol hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+partnershipMobileNumber.error.required                             =  Nodwch rif ffôn symudol
+partnershipMobileNumber.error.length                               =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
+partnershipMobileNumber.error.invalid                              =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
+partnershipMobileNumber.checkYourAnswersLabel                      =  Rhif ffôn symudol
+
+partnershipContactMethodOptions.heading                            =  Pa fanylion cysylltu ydych chi am eu hychwanegu ar gyfer {0}?
+partnershipContactMethodOptions.hint                               =  Mae’r manylion cysylltu ar gyfer eich cofnodion chi yn unig
+partnershipContactMethodOptions.email                              =  Cyfeiriad e-bost
+partnershipContactMethodOptions.phone                              =  Rhif ffôn
+partnershipContactMethodOptions.mobile                             =  Rhif ffôn symudol
+partnershipContactMethodOptions.error.required                     =  Dewiswch y dulliau o gysylltu rydych chi am eu hychwanegu ar gyfer y bartneriaeth hon
+partnershipContactMethodOptions.checkYourAnswersLabel              =  Dulliau o gysylltu
+
