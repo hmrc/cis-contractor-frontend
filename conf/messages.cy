@@ -4,6 +4,9 @@ site.yes                                  =  Iawn
 site.continue                             =  Parhau
 site.change                               =  Newid
 site.saveAndContinue                      =  Cadw a pharhau
+service.name                              =  Cynllun y Diwydiant Adeiladu
+site.govuk                                =  GOV.UK
+error.title.prefix                        =  Error:
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Manylion y contractwr
@@ -25,7 +28,7 @@ contractordetails.addSchemeNameYesNo.title                                     =
 contractordetails.addSchemeNameYesNo.heading                                   =  A ydych am nodi enw cynllun y contractwr?
 contractordetails.addSchemeNameYesNo.error.required                            =  Dewiswch ‘Iawn’ i nodi enw cynllun y contractwr
 contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Ychwanegu enw’r cynllun?
-contractordetails.addSchemeNameYesNo.change.hidden                             =  ychwanegu enw'r cynllun?
+contractordetails.addSchemeNameYesNo.change.hidden                             =  ychwanegu enw’r cynllun?
 
 contractordetails.schemeName.title                                             =  Beth yw enw cynllun y contractwr?
 contractordetails.schemeName.heading                                           =  Beth yw enw cynllun y contractwr?
@@ -33,7 +36,7 @@ contractordetails.schemeName.error.required                                    =
 contractordetails.schemeName.error.length                                      =  Rydych wedi nodi gormod o gymeriadau ar gyfer enw’r cynllun
 contractordetails.schemeName.error.invalidCharacters                           =  Rydych wedi nodi enw’r cynllun yn y fformat anghywir
 contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
-contractordetails.schemeName.change.hidden                                     =  enw'r Cynllun
+contractordetails.schemeName.change.hidden                                     =  enw’r Cynllun
 
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
