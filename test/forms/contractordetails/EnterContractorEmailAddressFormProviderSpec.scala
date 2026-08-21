@@ -26,7 +26,7 @@ class EnterContractorEmailAddressFormProviderSpec extends StringFieldBehaviours 
   val requiredKey = "contractordetails.enterContractorEmailAddress.error.required"
   val lengthKey   = "contractordetails.enterContractorEmailAddress.error.length"
   val invalidKey  = "contractordetails.enterContractorEmailAddress.error.invalid"
-  val maxLength   = 256
+  val maxLength   = 254
 
   val form = new EnterContractorEmailAddressFormProvider()()
 
