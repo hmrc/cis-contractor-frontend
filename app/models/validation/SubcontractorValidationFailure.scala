@@ -16,19 +16,15 @@
 
 package models.validation
 
-import play.api.libs.json.{
-  Json,
-  OFormat
-}
+import play.api.libs.json.{Json, OFormat}
 
 final case class SubcontractorValidationFailure(
-                                                 subcontractorId: Long,
-                                                 failedFields: List[FieldValidationFailure]
-                                               )
+  subcontractorId: Long,
+  failedFields: List[FieldValidationFailure]
+)
 
 object SubcontractorValidationFailure {
 
-  implicit val format
-  : OFormat[SubcontractorValidationFailure] =
+  implicit val format: OFormat[SubcontractorValidationFailure] =
     Json.format[SubcontractorValidationFailure]
 }

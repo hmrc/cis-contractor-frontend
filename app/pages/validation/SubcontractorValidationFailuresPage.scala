@@ -21,9 +21,9 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object SubcontractorValidationFailuresPage
-  extends QuestionPage[
-    List[SubcontractorValidationFailure]
-  ] {
+    extends QuestionPage[
+      List[SubcontractorValidationFailure]
+    ] {
 
   override def path: JsPath =
     JsPath \ toString

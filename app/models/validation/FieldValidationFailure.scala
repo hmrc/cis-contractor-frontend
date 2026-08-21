@@ -16,15 +16,12 @@
 
 package models.validation
 
-import play.api.libs.json.{
-  Json,
-  OFormat
-}
+import play.api.libs.json.{Json, OFormat}
 
 final case class FieldValidationFailure(
-                                         field: SubcontractorValidationField,
-                                         value: Option[String]
-                                       )
+  field: SubcontractorValidationField,
+  value: Option[String]
+)
 
 object FieldValidationFailure {
 

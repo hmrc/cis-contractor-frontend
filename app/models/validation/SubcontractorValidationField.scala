@@ -16,16 +16,7 @@
 
 package models.validation
 
-import play.api.libs.json.{
-  Format,
-  JsError,
-  JsResult,
-  JsString,
-  JsSuccess,
-  JsValue,
-  Reads,
-  Writes
-}
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue, Reads, Writes}
 
 sealed trait SubcontractorValidationField {
   def value: String
@@ -33,48 +24,39 @@ sealed trait SubcontractorValidationField {
 
 object SubcontractorValidationField {
 
-  case object EmailAddress
-    extends SubcontractorValidationField {
+  case object EmailAddress extends SubcontractorValidationField {
     override val value: String = "emailAddress"
   }
 
-  case object PhoneNumber
-    extends SubcontractorValidationField {
+  case object PhoneNumber extends SubcontractorValidationField {
     override val value: String = "phoneNumber"
   }
 
-  case object MobilePhoneNumber
-    extends SubcontractorValidationField {
+  case object MobilePhoneNumber extends SubcontractorValidationField {
     override val value: String = "mobilePhoneNumber"
   }
 
-  case object AddressLine1
-    extends SubcontractorValidationField {
+  case object AddressLine1 extends SubcontractorValidationField {
     override val value: String = "addressLine1"
   }
 
-  case object AddressLine2
-    extends SubcontractorValidationField {
+  case object AddressLine2 extends SubcontractorValidationField {
     override val value: String = "addressLine2"
   }
 
-  case object AddressLine3
-    extends SubcontractorValidationField {
+  case object AddressLine3 extends SubcontractorValidationField {
     override val value: String = "addressLine3"
   }
 
-  case object AddressLine4
-    extends SubcontractorValidationField {
+  case object AddressLine4 extends SubcontractorValidationField {
     override val value: String = "addressLine4"
   }
 
-  case object Postcode
-    extends SubcontractorValidationField {
+  case object Postcode extends SubcontractorValidationField {
     override val value: String = "postcode"
   }
 
-  case object Country
-    extends SubcontractorValidationField {
+  case object Country extends SubcontractorValidationField {
     override val value: String = "country"
   }
 
@@ -92,8 +74,8 @@ object SubcontractorValidationField {
     )
 
   private def fromString(
-                          value: String
-                        ): JsResult[SubcontractorValidationField] =
+    value: String
+  ): JsResult[SubcontractorValidationField] =
     values
       .find(_.value == value)
       .fold[JsResult[SubcontractorValidationField]](
@@ -102,8 +84,7 @@ object SubcontractorValidationField {
         )
       )(JsSuccess(_))
 
-  implicit val format
-  : Format[SubcontractorValidationField] =
+  implicit val format: Format[SubcontractorValidationField] =
     Format(
       Reads {
         case JsString(value) =>

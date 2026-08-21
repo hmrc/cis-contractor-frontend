@@ -16,16 +16,11 @@
 
 package utils.validation
 
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class EmailAddressValidatorSpec
-  extends AnyWordSpec
-    with Matchers {
+class EmailAddressValidatorSpec extends AnyWordSpec with Matchers {
 
   "EmailAddressValidator.validate" must {
 
@@ -71,8 +66,7 @@ class EmailAddressValidatorSpec
         .validate(Some(emailAddress)) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         )
@@ -86,8 +80,7 @@ class EmailAddressValidatorSpec
         .validate(Some(emailAddress)) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         )
@@ -101,8 +94,7 @@ class EmailAddressValidatorSpec
         .validate(Some(emailAddress)) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         )
@@ -116,8 +108,7 @@ class EmailAddressValidatorSpec
         .validate(Some(emailAddress)) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         )

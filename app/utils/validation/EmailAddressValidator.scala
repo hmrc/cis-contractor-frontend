@@ -18,16 +18,13 @@ package utils.validation
 
 import forms.Validation.emailRegex
 import forms.mappings.Constants.MaxLength254
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object EmailAddressValidator {
 
   def validate(
-                value: Option[String]
-              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
       .flatMap { emailAddress =>
@@ -36,8 +33,7 @@ object EmailAddressValidator {
             !emailAddress.matches(emailRegex)
         ) {
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         }

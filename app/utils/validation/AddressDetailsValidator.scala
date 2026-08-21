@@ -16,33 +16,23 @@
 
 package utils.validation
 
-import forms.Validation.{
-  addressRegex,
-  firstCharLetterOrDigitRegex,
-  ukPostcodeRegex
-}
-import forms.mappings.Constants.{
-  MaxLength35,
-  MaxLength8
-}
+import forms.Validation.{addressRegex, firstCharLetterOrDigitRegex, ukPostcodeRegex}
+import forms.mappings.Constants.{MaxLength35, MaxLength8}
 import models.address.Address
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object AddressDetailsValidator {
 
   def validate(
-                address: Option[Address]
-              ): List[FieldValidationFailure] =
+    address: Option[Address]
+  ): List[FieldValidationFailure] =
     address.fold(List.empty[FieldValidationFailure])(
       validateAddress
     )
 
   private def validateAddress(
-                               address: Address
-                             ): List[FieldValidationFailure] =
+    address: Address
+  ): List[FieldValidationFailure] =
     List(
       validateAddressLine1(address),
       validateAddressField(
@@ -65,8 +55,8 @@ object AddressDetailsValidator {
     ).flatten
 
   private def validateAddressLine1(
-                                    address: Address
-                                  ): Option[FieldValidationFailure] = {
+    address: Address
+  ): Option[FieldValidationFailure] = {
     val value =
       Option(address.addressLine1)
 
@@ -92,17 +82,16 @@ object AddressDetailsValidator {
       missingWhenRequired || suppliedButInvalid
     ) {
       FieldValidationFailure(
-        field =
-          SubcontractorValidationField.AddressLine1,
+        field = SubcontractorValidationField.AddressLine1,
         value = completedValue(value)
       )
     }
   }
 
   private def validateAddressField(
-                                    field: SubcontractorValidationField,
-                                    value: Option[String]
-                                  ): Option[FieldValidationFailure] =
+    field: SubcontractorValidationField,
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     completedValue(value)
       .filter(isInvalidAddressValue)
       .map { invalidValue =>
@@ -113,43 +102,42 @@ object AddressDetailsValidator {
       }
 
   private def validatePostcode(
-                                value: Option[String]
-                              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     completedValue(value)
       .filter { postcode =>
         postcode.length > MaxLength8 ||
-          !postcode.matches(ukPostcodeRegex)
+        !postcode.matches(ukPostcodeRegex)
       }
       .map { invalidValue =>
         FieldValidationFailure(
-          field =
-            SubcontractorValidationField.Postcode,
+          field = SubcontractorValidationField.Postcode,
           value = Some(invalidValue)
         )
       }
 
   private def isInvalidAddressValue(
-                                     value: String
-                                   ): Boolean =
+    value: String
+  ): Boolean =
     value.length > MaxLength35 ||
       !value.matches(addressRegex) ||
       !value.matches(firstCharLetterOrDigitRegex)
 
   private def countryValue(
-                            address: Address
-                          ): Option[String] =
+    address: Address
+  ): Option[String] =
     address.country.flatMap { country =>
       completedValue(country.name)
         .orElse(completedValue(country.code))
     }
 
   private def completedValue(
-                              value: Option[String]
-                            ): Option[String] =
+    value: Option[String]
+  ): Option[String] =
     value.filter(_.trim.nonEmpty)
 
   private def isCompleted(
-                           value: Option[String]
-                         ): Boolean =
+    value: Option[String]
+  ): Boolean =
     completedValue(value).isDefined
 }

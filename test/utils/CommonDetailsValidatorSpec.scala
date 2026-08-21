@@ -17,16 +17,11 @@
 package utils
 
 import models.address.Address
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class CommonDetailsValidatorSpec
-  extends AnyWordSpec
-    with Matchers {
+class CommonDetailsValidatorSpec extends AnyWordSpec with Matchers {
 
   "CommonDetailsValidator.validate" must {
 
@@ -53,12 +48,9 @@ class CommonDetailsValidatorSpec
         )
 
       CommonDetailsValidator.validate(
-        emailAddress =
-          Some("subcontractor@example.com"),
-        phoneNumber =
-          Some("0191 123 4567"),
-        mobilePhoneNumber =
-          Some("07700 900123"),
+        emailAddress = Some("subcontractor@example.com"),
+        phoneNumber = Some("0191 123 4567"),
+        mobilePhoneNumber = Some("07700 900123"),
         address = Some(address)
       ) mustBe Nil
     }
@@ -75,8 +67,7 @@ class CommonDetailsValidatorSpec
       ) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           )
         )
@@ -113,39 +104,32 @@ class CommonDetailsValidatorSpec
       CommonDetailsValidator.validate(
         emailAddress = Some(emailAddress),
         phoneNumber = Some(phoneNumber),
-        mobilePhoneNumber =
-          Some(mobilePhoneNumber),
+        mobilePhoneNumber = Some(mobilePhoneNumber),
         address = Some(address)
       ) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.EmailAddress,
+            field = SubcontractorValidationField.EmailAddress,
             value = Some(emailAddress)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.MobilePhoneNumber,
+            field = SubcontractorValidationField.MobilePhoneNumber,
             value = Some(mobilePhoneNumber)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = None
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine2,
+            field = SubcontractorValidationField.AddressLine2,
             value = Some(addressLine2)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Postcode,
+            field = SubcontractorValidationField.Postcode,
             value = Some(postcode)
           )
         )
@@ -156,18 +140,14 @@ class CommonDetailsValidatorSpec
         "0191 ABC 4567"
 
       CommonDetailsValidator.validate(
-        emailAddress =
-          Some("subcontractor@example.com"),
-        phoneNumber =
-          Some(invalidPhoneNumber),
-        mobilePhoneNumber =
-          Some("07700 900123"),
+        emailAddress = Some("subcontractor@example.com"),
+        phoneNumber = Some(invalidPhoneNumber),
+        mobilePhoneNumber = Some("07700 900123"),
         address = None
       ) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(invalidPhoneNumber)
           )
         )

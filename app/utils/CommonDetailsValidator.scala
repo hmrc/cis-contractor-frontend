@@ -23,11 +23,11 @@ import utils.validation.*
 object CommonDetailsValidator {
 
   def validate(
-                emailAddress: Option[String],
-                phoneNumber: Option[String],
-                mobilePhoneNumber: Option[String],
-                address: Option[Address]
-              ): List[FieldValidationFailure] =
+    emailAddress: Option[String],
+    phoneNumber: Option[String],
+    mobilePhoneNumber: Option[String],
+    address: Option[Address]
+  ): List[FieldValidationFailure] =
     EmailAddressValidator
       .validate(emailAddress)
       .toList ++

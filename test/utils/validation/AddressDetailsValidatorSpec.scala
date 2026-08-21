@@ -17,16 +17,11 @@
 package utils.validation
 
 import models.address.{Address, Country}
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class AddressDetailsValidatorSpec
-  extends AnyWordSpec
-    with Matchers {
+class AddressDetailsValidatorSpec extends AnyWordSpec with Matchers {
 
   "AddressDetailsValidator.validate" must {
 
@@ -49,13 +44,12 @@ class AddressDetailsValidatorSpec
           addressLine2 = Some("Newcastle"),
           addressLine3 = Some("Tyne and Wear"),
           postcode = Some("NE1 1AA"),
-          country =
-            Some(
-              Country(
-                code = Some("GB"),
-                name = Some("United Kingdom")
-              )
+          country = Some(
+            Country(
+              code = Some("GB"),
+              name = Some("United Kingdom")
             )
+          )
         )
 
       AddressDetailsValidator
@@ -73,8 +67,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = None
           )
         )
@@ -91,8 +84,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = None
           )
         )
@@ -102,21 +94,19 @@ class AddressDetailsValidatorSpec
       val address =
         createAddress(
           addressLine1 = "",
-          country =
-            Some(
-              Country(
-                code = Some("GB"),
-                name = Some("United Kingdom")
-              )
+          country = Some(
+            Country(
+              code = Some("GB"),
+              name = Some("United Kingdom")
             )
+          )
         )
 
       AddressDetailsValidator
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = None
           )
         )
@@ -145,8 +135,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = Some(value)
           )
         )
@@ -165,8 +154,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = Some(value)
           )
         )
@@ -194,18 +182,15 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine2,
+            field = SubcontractorValidationField.AddressLine2,
             value = Some(addressLine2)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine3,
+            field = SubcontractorValidationField.AddressLine3,
             value = Some(addressLine3)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine4,
+            field = SubcontractorValidationField.AddressLine4,
             value = Some(addressLine4)
           )
         )
@@ -236,8 +221,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Postcode,
+            field = SubcontractorValidationField.Postcode,
             value = Some(postcode)
           )
         )
@@ -257,8 +241,7 @@ class AddressDetailsValidatorSpec
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Postcode,
+            field = SubcontractorValidationField.Postcode,
             value = Some(postcode)
           )
         )
@@ -271,21 +254,19 @@ class AddressDetailsValidatorSpec
       val address =
         createAddress(
           addressLine1 = "1 High Street",
-          country =
-            Some(
-              Country(
-                code = None,
-                name = Some(country)
-              )
+          country = Some(
+            Country(
+              code = None,
+              name = Some(country)
             )
+          )
         )
 
       AddressDetailsValidator
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Country,
+            field = SubcontractorValidationField.Country,
             value = Some(country)
           )
         )
@@ -310,41 +291,35 @@ class AddressDetailsValidatorSpec
           addressLine2 = Some(addressLine2),
           addressLine3 = Some(addressLine3),
           postcode = Some(postcode),
-          country =
-            Some(
-              Country(
-                code = None,
-                name = Some(country)
-              )
+          country = Some(
+            Country(
+              code = None,
+              name = Some(country)
             )
+          )
         )
 
       AddressDetailsValidator
         .validate(Some(address)) mustBe
         List(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine1,
+            field = SubcontractorValidationField.AddressLine1,
             value = None
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine2,
+            field = SubcontractorValidationField.AddressLine2,
             value = Some(addressLine2)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.AddressLine3,
+            field = SubcontractorValidationField.AddressLine3,
             value = Some(addressLine3)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Postcode,
+            field = SubcontractorValidationField.Postcode,
             value = Some(postcode)
           ),
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.Country,
+            field = SubcontractorValidationField.Country,
             value = Some(country)
           )
         )
@@ -352,13 +327,13 @@ class AddressDetailsValidatorSpec
   }
 
   private def createAddress(
-                             addressLine1: String,
-                             addressLine2: Option[String] = None,
-                             addressLine3: Option[String] = None,
-                             addressLine4: Option[String] = None,
-                             postcode: Option[String] = None,
-                             country: Option[Country] = None
-                           ): Address =
+    addressLine1: String,
+    addressLine2: Option[String] = None,
+    addressLine3: Option[String] = None,
+    addressLine4: Option[String] = None,
+    postcode: Option[String] = None,
+    country: Option[Country] = None
+  ): Address =
     Address(
       addressLine1 = addressLine1,
       addressLine2 = addressLine2,

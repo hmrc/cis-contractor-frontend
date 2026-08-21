@@ -16,21 +16,15 @@
 
 package utils.validation
 
-import forms.Validation.{
-  mobileRegex,
-  phoneRegex
-}
+import forms.Validation.{mobileRegex, phoneRegex}
 import forms.mappings.Constants.MaxLength35
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object PhoneNumberValidator {
 
   def validatePhoneNumber(
-                           value: Option[String]
-                         ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     validate(
       field = SubcontractorValidationField.PhoneNumber,
       value = value,
@@ -38,20 +32,19 @@ object PhoneNumberValidator {
     )
 
   def validateMobilePhoneNumber(
-                                 value: Option[String]
-                               ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     validate(
-      field =
-        SubcontractorValidationField.MobilePhoneNumber,
+      field = SubcontractorValidationField.MobilePhoneNumber,
       value = value,
       regex = mobileRegex
     )
 
   private def validate(
-                        field: SubcontractorValidationField,
-                        value: Option[String],
-                        regex: String
-                      ): Option[FieldValidationFailure] =
+    field: SubcontractorValidationField,
+    value: Option[String],
+    regex: String
+  ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
       .flatMap { phoneNumber =>

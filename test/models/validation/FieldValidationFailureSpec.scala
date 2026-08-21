@@ -16,20 +16,12 @@
 
 package models.validation
 
-import models.validation.SubcontractorValidationField.{
-  AddressLine1,
-  EmailAddress
-}
+import models.validation.SubcontractorValidationField.{AddressLine1, EmailAddress}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{
-  JsNull,
-  Json
-}
+import play.api.libs.json.{JsNull, Json}
 
-class FieldValidationFailureSpec
-  extends AnyWordSpec
-    with Matchers {
+class FieldValidationFailureSpec extends AnyWordSpec with Matchers {
 
   "FieldValidationFailure JSON format" must {
 

@@ -16,34 +16,23 @@
 
 package pages.validation
 
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationFailure,
-  SubcontractorValidationField
-}
-import org.scalacheck.{
-  Arbitrary,
-  Gen
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationFailure, SubcontractorValidationField}
+import org.scalacheck.{Arbitrary, Gen}
 
 import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import pages.behaviours.PageBehaviours
 
-class SubcontractorValidationFailuresPageSpec
-  extends SpecBase
-    with PageBehaviours{
+class SubcontractorValidationFailuresPageSpec extends SpecBase with PageBehaviours {
 
-  private implicit val arbitraryValidationField
-  : Arbitrary[SubcontractorValidationField] =
+  private implicit val arbitraryValidationField: Arbitrary[SubcontractorValidationField] =
     Arbitrary(
       Gen.oneOf(
         SubcontractorValidationField.values
       )
     )
 
-  private implicit val arbitraryFieldValidationFailure
-  : Arbitrary[FieldValidationFailure] =
+  private implicit val arbitraryFieldValidationFailure: Arbitrary[FieldValidationFailure] =
     Arbitrary {
       for {
         field <-
@@ -56,13 +45,12 @@ class SubcontractorValidationFailuresPageSpec
       )
     }
 
-  private implicit val arbitrarySubcontractorValidationFailure
-  : Arbitrary[SubcontractorValidationFailure] =
+  private implicit val arbitrarySubcontractorValidationFailure: Arbitrary[SubcontractorValidationFailure] =
     Arbitrary {
       for {
         subcontractorId <-
           Gen.posNum[Long]
-        failedFields <-
+        failedFields    <-
           Gen.listOf(
             arbitrary[FieldValidationFailure]
           )

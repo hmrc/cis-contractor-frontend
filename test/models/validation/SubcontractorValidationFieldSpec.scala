@@ -18,46 +18,37 @@ package models.validation
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{
-  JsNumber,
-  JsString,
-  Json
-}
+import play.api.libs.json.{JsNumber, JsString, Json}
 
-class SubcontractorValidationFieldSpec
-  extends AnyWordSpec
-    with Matchers {
+class SubcontractorValidationFieldSpec extends AnyWordSpec with Matchers {
 
   "SubcontractorValidationField JSON format" must {
 
     "write every supported field using its expected value" in {
-      SubcontractorValidationField.values.foreach {
-        field =>
-          Json.toJson(field) mustBe
-            JsString(field.value)
+      SubcontractorValidationField.values.foreach { field =>
+        Json.toJson(field) mustBe
+          JsString(field.value)
       }
     }
 
     "read every supported field" in {
-      SubcontractorValidationField.values.foreach {
-        field =>
-          Json
-            .fromJson[SubcontractorValidationField](
-              JsString(field.value)
-            )
-            .get mustBe field
+      SubcontractorValidationField.values.foreach { field =>
+        Json
+          .fromJson[SubcontractorValidationField](
+            JsString(field.value)
+          )
+          .get mustBe field
       }
     }
 
     "round-trip every supported field" in {
-      SubcontractorValidationField.values.foreach {
-        field =>
-          val json =
-            Json.toJson(field)
+      SubcontractorValidationField.values.foreach { field =>
+        val json =
+          Json.toJson(field)
 
-          json
-            .validate[SubcontractorValidationField]
-            .get mustBe field
+        json
+          .validate[SubcontractorValidationField]
+          .get mustBe field
       }
     }
 

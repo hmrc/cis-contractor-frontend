@@ -16,16 +16,11 @@
 
 package utils.validation
 
-import models.validation.{
-  FieldValidationFailure,
-  SubcontractorValidationField
-}
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class PhoneNumberValidatorSpec
-  extends AnyWordSpec
-    with Matchers {
+class PhoneNumberValidatorSpec extends AnyWordSpec with Matchers {
 
   "PhoneNumberValidator.validatePhoneNumber" must {
 
@@ -61,8 +56,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           )
         )
@@ -78,8 +72,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           )
         )
@@ -105,8 +98,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           )
         )
@@ -122,8 +114,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           )
         )
@@ -139,8 +130,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.PhoneNumber,
+            field = SubcontractorValidationField.PhoneNumber,
             value = Some(phoneNumber)
           )
         )
@@ -171,8 +161,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.MobilePhoneNumber,
+            field = SubcontractorValidationField.MobilePhoneNumber,
             value = Some(mobilePhoneNumber)
           )
         )
@@ -188,8 +177,7 @@ class PhoneNumberValidatorSpec
         ) mustBe
         Some(
           FieldValidationFailure(
-            field =
-              SubcontractorValidationField.MobilePhoneNumber,
+            field = SubcontractorValidationField.MobilePhoneNumber,
             value = Some(mobilePhoneNumber)
           )
         )
