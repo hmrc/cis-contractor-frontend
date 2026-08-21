@@ -1,10 +1,12 @@
 # Infrastructure
 service.name                              =  Construction Industry Scheme
 site.back                                 =  Yn ôl
+site.change                               =  Newid
 site.no                                   =  Na
 site.yes                                  =  Iawn
 site.continue                             =  Parhau
 site.update                               =  Diweddaru
+
 
 # Individual and Common
 typeOfSubcontractor.title                                                           =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
@@ -13,25 +15,31 @@ typeOfSubcontractor.soletrader                                                  
 typeOfSubcontractor.company                                                         =  Cwmni cyfyngedig
 typeOfSubcontractor.partnership                                                     =  Partneriaeth
 typeOfSubcontractor.trust                                                           =  Ymddiriedolaeth
+typeOfSubcontractor.checkYourAnswersLabel                                           =  Math
 typeOfSubcontractor.error.required                                                  =  Dewiswch sut mae’r is-gontractwr yn gweithredu
+typeOfSubcontractor.change.hidden                                                   =  Math
 
 # Company
-addCompanyContactMethodsYesNo.title                  =  Do you want to add contact details for this company?
 addCompanyContactMethodsYesNo.heading                =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
 addCompanyContactMethodsYesNo.error.required         =  Dewiswch ‘Iawn’ os ydych am ychwanegu manylion cysylltu ar gyfer y cwmni hwn
-addCompanyContactMethodsYesNo.checkYourAnswersLabel  =  Add contact details?
-addCompanyContactMethodsYesNo.change.hidden          =  add contact details?
+addCompanyContactMethodsYesNo.checkYourAnswersLabel  =  Ychwanegu manylion cysylltu?
+addCompanyContactMethodsYesNo.change.hidden          =  ychwanegu manylion cysylltu?
 
 companyName.title                                    =  Beth yw enw’r cwmni?
 companyName.heading                                  =  Beth yw enw’r cwmni?
 companyName.hint                                     =  Dyma’r enw fel y mae wedi’i gofrestru gyda Thŷ’r Cwmnïau
+companyName.checkYourAnswersLabel                    =  Enw’r cwmni
 companyName.error.required                           =  Nodwch enw cwmni, fel Adeiladu ABC Cyf
 companyName.error.length                             =  Nodwch enw cwmni hyd at 56 o gymeriadau
 companyName.error.invalidCharacters                  =  Nodwch enw cwmni gan ddefnyddio’r llythrennau a-z, rhifau, collnodau, symbolau ampersand, comas, cysylltnodau, atalnodau llawn, blaenslaesau a bylchau
 
 companyAddressYesNo.heading                          =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
 companyAddressYesNo.hint                             =  Gallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
+companyAddressYesNo.checkYourAnswersLabel            =  Ychwanegu cyfeiriad y cwmni?
 companyAddressYesNo.error.required                   =  Dewiswch p’un a ydych am ychwanegu cyfeiriad ar gyfer y cwmni hwn
+
+companyAddress.checkYourAnswersLabel                 =  Cyfeiriad
+companyAddress.change.hidden                         =  cyfeiriad
 
 companyContactMethodOptions.heading                  =  Pa fanylion cysylltu ydych chi am eu hychwanegu ar gyfer {0}?
 companyContactMethodOptions.hint                     =  Mae’r manylion cysylltu ar gyfer eich cofnodion chi yn unig
@@ -39,6 +47,7 @@ companyContactMethodOptions.email                    =  Cyfeiriad e-bost
 companyContactMethodOptions.phone                    =  Rhif ffôn
 companyContactMethodOptions.mobile                   =  Rhif ffôn symudol
 companyContactMethodOptions.error.required           =  Dewiswch y dulliau o gysylltu rydych chi am eu hychwanegu ar gyfer y cwmni hwn
+companyContactMethodOptions.checkYourAnswersLabel    =  Dulliau o gysylltu
 
 companyEmailAddress.heading                          =  Beth yw’r cyfeiriad e-bost ar gyfer {0}?
 companyEmailAddress.hintText                         =  Ni fydd CThEF yn defnyddio’r cyfeiriad e-bost hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
@@ -68,7 +77,9 @@ companyMobileNumber.change.hidden                    =  rhif ffôn symudol
 
 companyUtrYesNo.heading                              =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
 companyUtrYesNo.hint                                 =  Defnyddir yr wybodaeth hon i ddilysu’r cwmni fel is-gontractwr
+companyUtrYesNo.checkYourAnswersLabel                =  Ychwanegu UTR?
 companyUtrYesNo.error.required                       =  Dewiswch p’un a ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer y cwmni hwn
+companyUtrYesNo.change.hidden                        =  ychwanegu UTR?
 
 companyUtr.title                                     =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Treth Gorfforaeth
 companyUtr.heading                                   =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Treth Gorfforaeth
@@ -79,9 +90,12 @@ companyUtr.error.required                            =  Nodwch Gyfeirnod Unigryw
 companyUtr.error.length                              =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys
 companyUtr.error.invalid                             =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys
 companyUtr.error.duplicate                           =  Rydych chi eisoes wedi defnyddio Cyfeirnod Unigryw y Trethdalwr (UTR) hwn ar gyfer is-gontractwr presennol
+companyUtr.checkYourAnswersLabel                     =  UTR ar gyfer Treth Gorfforaeth
+companyUtr.verified.checkYourAnswersLabel            =  UTR
 
 companyCrnYesNo.heading                              =  Oes gan {0} rif cofrestru’r cwmni?
 companyCrnYesNo.hint                                 =  Defnyddir yr wybodaeth hon i ddilysu’r cwmni fel is-gontractwr
+companyCrnYesNo.checkYourAnswersLabel                =  Ychwanegu rhif cofrestru’r cwmni?
 companyCrnYesNo.error.required                       =  Dewiswch p’un a oes gan y cwmni hwn rif cofrestru’r cwmni
 
 companyCrn.heading                                   =  Beth yw rhif cofrestru’r cwmni ar gyfer {0}?
@@ -89,17 +103,25 @@ companyCrn.hint                                      =  Mae pob rhif cofrestru�
 companyCrn.error.required                            =  Nodwch rif cofrestru’r cwmni
 companyCrn.error.length                              =  Nodwch rif cofrestru cwmni dilys
 companyCrn.error.invalid                             =  Nodwch rif cofrestru cwmni dilys
+companyCrn.checkYourAnswersLabel                     =  Rhif cofrestru’r cwmni
 
 companyWorksReferenceYesNo.heading                   =  Oes cyfeirnod y gwaith yn gysylltiedig â {0}?
 companyWorksReferenceYesNo.hint                      =  Dyma’r cyfeirnod a ddefnyddir i adnabod gwaith neu brosiect is-gontractwr. Gall hwn gynnwys llythrennau a rhifau.
+companyWorksReferenceYesNo.checkYourAnswersLabel     =  Ychwanegu cyfeirnod y gwaith?
 companyWorksReferenceYesNo.error.required            =  Dewiswch p’un a oes cyfeirnod y gwaith yn gysylltiedig â’r cwmni hwn.
 
 companyWorksReference.title                          =  What is the works reference number associated with this company?
-companyWorksReference.heading                        =  What is the works reference number associated with {0}?
-companyWorksReference.hintText                       =  This is unique to the construction work or project
-companyWorksReference.checkYourAnswersLabel          =  Works reference number
-companyWorksReference.error.required                 =  Enter a works reference number
-companyWorksReference.error.invalid                  =  Enter a valid works reference number
-companyWorksReference.error.length                   =  Enter a works reference number, up to 20 characters
-companyWorksReference.change.hidden                  =  works reference number
+companyWorksReference.heading                        =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
+companyWorksReference.hintText                       =  Mae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
+companyWorksReference.checkYourAnswersLabel          =  Cyfeirnod y gwaith
+companyWorksReference.error.required                 =  Nodwch gyfeirnod y gwaith
+companyWorksReference.error.invalid                  =  Nodwch gyfeirnod y gwaith dilys
+companyWorksReference.error.length                   =  Nodwch gyfeirnod y gwaith, hyd at 20 o gymeriadau
+companyWorksReference.change.hidden                  =  cyfeirnod y gwaith
 
+companyCheckYourAnswers.title                        =  Gwiriwch eich atebion cyn ychwanegu’r cwmni hwn
+companyCheckYourAnswers.heading                      =  Gwiriwch eich atebion cyn ychwanegu’r cwmni hwn
+companyCheckYourAnswers.subHeading                   =  Manylion yr is-gontractwr
+companyCheckYourAnswers.trailHeading                 =  Nawr ychwanegwch yr is-gontractwr hwn
+companyCheckYourAnswers.trailText                    =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
+companyCheckYourAnswers.continue                     =  Derbyn a chyflwyno
