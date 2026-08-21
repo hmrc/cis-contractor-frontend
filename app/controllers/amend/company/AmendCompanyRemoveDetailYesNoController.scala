@@ -21,6 +21,7 @@ import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
 import models.UserAnswers
 import models.amend.company.AmendCompanyRemoveDetail
 import pages.add.company.*
+import pages.amend.ShowVerificationDetailsPage
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -83,7 +84,10 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
       case AmendCompanyRemoveDetail.Utr =>
         userAnswers
           .get(CompanyUtrYesNoPage)
-          .contains(true)
+          .contains(true) &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendCompanyRemoveDetail.CompanyRegistrationNumber =>
         userAnswers
