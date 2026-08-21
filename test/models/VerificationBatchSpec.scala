@@ -30,8 +30,7 @@ final class VerificationBatchSpec extends AnyWordSpec with Matchers {
           |{
           |  "verificationBatchId": 99,
           |  "status": "STARTED",
-          |  "verificationNumber": "VB00000001",
-          |  "verifBatchResourceRef": 10
+          |  "verificationNumber": "VB00000001"
           |}
           |""".stripMargin
       )
@@ -40,22 +39,19 @@ final class VerificationBatchSpec extends AnyWordSpec with Matchers {
       out.verificationBatchId mustBe 99L
       out.status mustBe Some("STARTED")
       out.verificationNumber mustBe Some("VB00000001")
-      out.verifBatchResourceRef mustBe Some(10)
     }
 
     "write model to JSON" in {
       val model = VerificationBatch(
         verificationBatchId = 99L,
         status = Some("VALIDATED"),
-        verificationNumber = Some("VB00000002"),
-        verifBatchResourceRef = Some(10L)
+        verificationNumber = Some("VB00000002")
       )
 
       val json = Json.toJson(model)
       (json \ "verificationBatchId").as[Long] mustBe 99L
       (json \ "status").as[String] mustBe "VALIDATED"
       (json \ "verificationNumber").as[String] mustBe "VB00000002"
-      (json \ "verifBatchResourceRef").as[Long] mustBe 10L
     }
 
     "round-trip (model -> json -> model) without losing data" in {

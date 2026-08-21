@@ -63,8 +63,7 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
           VerificationBatch(
             verificationBatchId = 99L,
             status = Some("STARTED"),
-            verificationNumber = Some("V0000000001"),
-            verifBatchResourceRef = Some(10L)
+            verificationNumber = Some("V0000000001")
           )
         ),
         verifications = Seq(
@@ -74,8 +73,7 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
             verificationBatchId = Some(99L),
-            subcontractorId = Some(1L),
-            verificationResourceRef = Some(10L)
+            subcontractorId = Some(1L)
           )
         ),
         submission = Some(
@@ -135,7 +133,6 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       (vb0 \ "verificationBatchId").as[Long] mustBe 99L
       (vb0 \ "status").as[String] mustBe "STARTED"
       (vb0 \ "verificationNumber").as[String] mustBe "V0000000001"
-      (vb0 \ "verifBatchResourceRef").as[Long] mustBe 10L
 
       val v0 = (json \ "verifications")(0)
 
@@ -145,7 +142,6 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       (v0 \ "taxTreatment").as[String] mustBe "0"
       (v0 \ "verificationBatchId").as[Long] mustBe 99L
       (v0 \ "subcontractorId").as[Long] mustBe 1L
-      (v0 \ "verificationResourceRef").as[Long] mustBe 10L
 
       val subm0 = json \ "submission"
 

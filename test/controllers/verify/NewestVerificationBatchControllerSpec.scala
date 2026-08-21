@@ -92,8 +92,7 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
         models.VerificationBatch(
           verificationBatchId = 1L,
           status = status,
-          verificationNumber = Some("VB123"),
-          verifBatchResourceRef = Some(10L)
+          verificationNumber = Some("VB123")
         )
       ),
       verifications = verifications,

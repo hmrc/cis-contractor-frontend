@@ -39,8 +39,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
     VerificationBatch(
       verificationBatchId = 1L,
       status = Some("Submitted"),
-      verificationNumber = Some("VB00000001"),
-      verifBatchResourceRef = Some(10L)
+      verificationNumber = Some("VB00000001")
     )
 
   private val submission =
