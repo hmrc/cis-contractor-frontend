@@ -120,7 +120,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                           uaWithUpdatedCurrentBatch <-
                             verificationBatchService.getCurrentVerificationBatch(updatedAnswers)
                           uaWithNewestBatch         <-
-                            verificationBatchService.refreshNewestVerificationBatch(request.userAnswers)
+                            verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch)
                           _                         <- sessionRepository.set(uaWithNewestBatch)
                         } yield Redirect(
                           navigator.nextPage(
