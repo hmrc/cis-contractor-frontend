@@ -112,13 +112,10 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                     value =>
                       if (value) {
                         for {
-                          updatedAnswers            <-
-                            Future
-                              .fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
                           _                         <-
                             reviewInsufficientInfoService.proceedInsufficientVerification(cisId, subcontractorId, batch)
                           uaWithUpdatedCurrentBatch <-
-                            verificationBatchService.getCurrentVerificationBatch(updatedAnswers)
+                            verificationBatchService.getCurrentVerificationBatch(request.userAnswers)
                           uaWithNewestBatch         <-
                             verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch)
                           _                         <- sessionRepository.set(uaWithNewestBatch)
@@ -130,13 +127,10 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                           )
                         )
                       } else {
-                        for {
-                          updatedAnswers <-
-                            Future
-                              .fromTry(request.userAnswers.set(ProceedInsufficientSubcontractorNameYesNoPage, value))
-                          _              <- sessionRepository.set(updatedAnswers)
-                        } yield Redirect(
-                          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, mode, updatedAnswers)
+                        Future.successful(
+                          Redirect(
+                            navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, mode, request.userAnswers)
+                          )
                         )
                       }
                   )
