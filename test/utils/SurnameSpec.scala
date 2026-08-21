@@ -48,7 +48,7 @@ class SurnameSpec extends SpecBase {
       isLengthInRange(validName) mustBe true
     }
 
-    "returns true for a known invalid Name format but invalid length" in {
+    "returns false for a known invalid Name format but invalid length" in {
       val invalidName = "123456789012345678901234567890<>{}[]!"
       isValid(invalidName) mustBe false
       isLengthInRange(invalidName) mustBe false

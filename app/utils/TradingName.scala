@@ -16,12 +16,12 @@
 
 package utils
 
+import forms.Validation.nameRegex
+
 object TradingName {
-  private val validNameFormat =
-    "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\\\£\\€]*"
   private val length          = 56
 
-  def isValid(name: String): Boolean = name != null && name.matches(validNameFormat)
+  def isValid(name: String): Boolean = name != null && name.matches(nameRegex)
 
   def isLengthInRange(name: String): Boolean = name != null && (name.length <= length)
 

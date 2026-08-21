@@ -43,7 +43,7 @@ class WorkReferenceNumberSpec extends SpecBase {
       isLengthInRange(validWRN) mustBe true
     }
 
-    "returns true for a known invalid WorkReferenceNumber format but valid length" in {
+    "returns false for a known invalid WorkReferenceNumber format but valid length" in {
       val invalidWRN = "WRN No <>"
       isValid(invalidWRN) mustBe false
       isLengthInRange(invalidWRN) mustBe true

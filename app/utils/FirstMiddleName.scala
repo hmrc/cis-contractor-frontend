@@ -16,14 +16,15 @@
 
 package utils
 
-object FirstMiddleName {
+import forms.Validation.firstMiddleNameRegex
+import forms.Validation.firstCharLetterRegex
 
-  private val validNameFormat          = "[A-Za-z\\'\\-]+"
-  private val validNameFirstCharFormat = "^[a-zA-Z]{1}.*"
+object FirstMiddleName {
+  
   private val length                   = 35
 
   def isValid(name: String): Boolean =
-    name != null && name.matches(validNameFormat) && name.matches(validNameFirstCharFormat)
+    name != null && name.matches(firstMiddleNameRegex) && name.matches(firstCharLetterRegex)
 
   def isLengthInRange(name: String): Boolean = name != null && (name.length <= length)
 }

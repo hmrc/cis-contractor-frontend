@@ -16,14 +16,15 @@
 
 package utils
 
+import forms.Validation.firstCharLetterRegex
+import forms.Validation.surnameFormat
+
 object Surname {
 
-  private val validNameFormat          = "[A-Za-z0-9\\s,\\.\\(\\)/\\&\\'\\-]+"
-  private val validNameFirstCharFormat = "^[a-zA-Z]{1}.*"
   private val length                   = 35
 
   def isValid(name: String): Boolean =
-    name != null && name.matches(validNameFormat) && name.matches(validNameFirstCharFormat)
+    name != null && name.matches(surnameFormat) && name.matches(firstCharLetterRegex)
 
   def isLengthInRange(name: String): Boolean = name != null && (name.length <= length)
 }

@@ -42,7 +42,7 @@ class TradingNameSpec extends SpecBase {
       isLengthInRange(validName) mustBe true
     }
 
-    "returns true for a known invalid TradingName format but valid length" in {
+    "returns false for a known invalid TradingName format but valid length" in {
       val invalidName = "12345678901234567890123456789012345678901234567890<>"
       isValid(invalidName) mustBe false
       isLengthInRange(invalidName) mustBe true

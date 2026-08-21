@@ -42,13 +42,13 @@ class CRNSpec extends SpecBase {
       isLengthInRange(validCrn) mustBe true
     }
 
-    "returns true for a known invalid CRN format with first value=char" in {
+    "returns false for a known invalid CRN format with first value=char" in {
       val validCrn = "A5860"
       isValid(validCrn) mustBe false
       isLengthInRange(validCrn) mustBe true
     }
 
-    "returns true for a known invalid CRN format but valid length" in {
+    "returns false for a known invalid CRN format but valid length" in {
       val invalidCrn = "ABC5860"
       isValid(invalidCrn) mustBe false
       isLengthInRange(invalidCrn) mustBe true

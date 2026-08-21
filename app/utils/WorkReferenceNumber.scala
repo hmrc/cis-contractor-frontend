@@ -16,13 +16,13 @@
 
 package utils
 
+import forms.Validation.worksRefRegex
+
 object WorkReferenceNumber {
 
-  private val validWrnFormat =
-    "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\\\\\£\\€]+"
   private val length         = 20
 
-  def isValid(wrn: String): Boolean = wrn != null && wrn.matches(validWrnFormat)
+  def isValid(wrn: String): Boolean = wrn != null && wrn.matches(worksRefRegex)
 
   def isLengthInRange(wrn: String): Boolean = wrn != null && (wrn.length <= length)
 

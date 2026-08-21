@@ -49,7 +49,7 @@ class FirstMiddleNameSpec extends SpecBase {
       isLengthInRange(validName) mustBe true
     }
 
-    "returns true for a known invalid Name format but valid length" in {
+    "returns false for a known invalid Name format but valid length" in {
       val invalidName = "123456789012345678901234567890<>!&"
       isValid(invalidName) mustBe false
       isLengthInRange(invalidName) mustBe true

@@ -16,11 +16,12 @@
 
 package utils
 
+import forms.Validation.companyRegNumberRegex
+
 object CRN {
-  private val validCrnFormat = "[A-Za-z]{2}[0-9]{1,6}|[0-9]{1,8}"
   private val length         = 8
 
-  def isValid(crn: String): Boolean = crn != null && crn.matches(validCrnFormat)
+  def isValid(crn: String): Boolean = crn != null && crn.matches(companyRegNumberRegex)
 
   def isLengthInRange(crn: String): Boolean = crn != null && (crn.length <= length)
 }
