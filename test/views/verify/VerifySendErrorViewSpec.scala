@@ -28,14 +28,16 @@ import play.twirl.api.HtmlFormat
 import views.html.verify.VerifySendErrorView
 
 class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+  private val cisManagementUrl       = "http://localhost:6996/construction-industry-scheme/management"
+  private val verificationHistoryUrl = s"$cisManagementUrl/verify/history/"
+
   "VerifySendErrorView" should {
 
     "render the page with correct title, heading, paragraphs and both links" in new Setup {
+      private val givenCisId              = "12345"
+      private val manageSubcontractorsUrl = s"$cisManagementUrl/manage-subcontractors/12345"
 
-      private val manageSubcontractorsUrl =
-        "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/12345"
-
-      val html: HtmlFormat.Appendable = view(manageSubcontractorsUrl)
+      val html: HtmlFormat.Appendable = view(givenCisId)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("verify.verifySendError.title"))
@@ -44,8 +46,7 @@ class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
       doc.select("p").text must include(messages("verify.verifySendError.p1"))
 
-      val verificationHistoryLink: Elements =
-        doc.select(s"a[href='#']")
+      val verificationHistoryLink: Elements = doc.select(s"a[href='$verificationHistoryUrl']")
       verificationHistoryLink.size() mustBe 1
       verificationHistoryLink.text() mustBe
         messages("verify.verifySendError.verificationHistory.p1.link")

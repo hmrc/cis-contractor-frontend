@@ -64,7 +64,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   }
 
   def manageYourSubcontractorsUrl(cisId: String): String =
-    s"$managefrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
+    s"$manageFrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
 
   lazy val loginUrl: String                          = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String                  = configuration.get[String]("urls.loginContinue")
@@ -76,9 +76,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val payeCisForAgentsOnlineService: String     = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisReturnDashboardUrl: String             = configuration.get[String]("urls.cisReturnDashboard")
   lazy val findUtr: String                           = configuration.get[String]("urls.findUtr")
-  lazy val managefrontendBaseUrl: String             = configuration.get[String]("urls.manageFrontendBaseUrl")
-  lazy val verificationHistoryUrl: String            = s"$managefrontendBaseUrl/verification-history/retrieve"
-  lazy val retrieveSubcontractorListUrl: String      = s"$managefrontendBaseUrl/subcontractors/retrieve"
+  lazy val manageFrontendBaseUrl: String             = configuration.get[String]("urls.manageFrontendBaseUrl")
+  lazy val verificationHistoryUrl: String            = s"$manageFrontendBaseUrl/verification-history/retrieve"
+  lazy val retrieveSubcontractorListUrl: String      = s"$manageFrontendBaseUrl/subcontractors/retrieve"
   lazy val subcontractorVerificationGuideUrl: String = configuration.get[String]("urls.subcontractorVerificationGuide")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl

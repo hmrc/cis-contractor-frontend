@@ -64,7 +64,7 @@ class VerifySendErrorControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[VerifySendErrorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(s"${applicationConfig.manageSubcontractorsUrl}/$cisId")(
+        contentAsString(result) mustEqual view(cisId)(
           request,
           messages(application)
         ).toString

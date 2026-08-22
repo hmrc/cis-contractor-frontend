@@ -14,16 +14,18 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import views.html.components._
 
 @this(
+        appConfig: FrontendAppConfig,
         layout: templates.Layout,
         header: H1,
         paragraph: Paragraph,
         link: Link
 )
 
-@(manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+@(cisId: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("verify.verifySendError.title")),
@@ -36,7 +38,7 @@
 
     @link(
         linkTextKey = "verify.verifySendError.verificationHistory.p1.link",
-        linkUrl = "#",
+        linkUrl = s"${appConfig.manageFrontendBaseUrl}/verify/history/",
         hasFullStop = true,
         prefixTextKey = "verify.verifySendError.verificationHistory.p1",
         isNewTab = false
@@ -44,7 +46,7 @@
 
     @link(
         linkTextKey = "verify.verifySendError.manageSubcontractors.p1.link",
-        linkUrl = manageSubcontractorsUrl,
+        linkUrl = s"${appConfig.manageSubcontractorsUrl}/${cisId}",
         hasFullStop = true,
         prefixTextKey = "verify.verifySendError.manageSubcontractors.p1",
         isNewTab = false
