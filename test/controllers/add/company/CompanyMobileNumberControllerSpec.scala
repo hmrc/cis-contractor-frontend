@@ -115,7 +115,7 @@ class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, companyMobileNumberRoute)
-            .withFormUrlEncodedBody(("value", "+44 7700 900 999"))
+            .withFormUrlEncodedBody(("value", "44 7700 900 999"))
 
         val result = route(application, request).value
 
