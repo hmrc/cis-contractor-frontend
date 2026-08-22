@@ -23,6 +23,164 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Dewiswch sut mae’r is-gontractwr yn gweithredu
 typeOfSubcontractor.change.hidden                                                   =  Math
 
+subTradingNameYesNo.title                                                           =  Ydy’r busnes yn defnyddio enw masnachu?
+subTradingNameYesNo.heading                                                         =  Ydy’r busnes yn defnyddio enw masnachu?
+subTradingNameYesNo.hint                                                            =  Dyma enw’r busnes, sy’n wahanol i’w enw ei hun.
+subTradingNameYesNo.checkYourAnswersLabel                                           =  Ydy’r is-gontractwr yn defnyddio enw masnachu?
+subTradingNameYesNo.error.required                                                  =  Dewiswch p’un a yw’r is-gontractwr hwn yn defnyddio enw masnachu
+
+tradingNameOfSubcontractor.title                                                    =  Beth yw enw masnachu’r is-gontractwr?
+tradingNameOfSubcontractor.heading                                                  =  Beth yw enw masnachu’r is-gontractwr?
+tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Enw masnachu’r is-gontractwr
+tradingNameOfSubcontractor.error.required                                           =  Nodwch enw masnachu, fel Adeiladu ABC Cyf
+tradingNameOfSubcontractor.error.length                                             =  Nodwch enw masnachu hyd at 56 o gymeriadau
+tradingNameOfSubcontractor.error.invalidCharacters                                  =  Nodwch enw masnachu, fel Adeiladu ABC Cyf
+
+subAddressYesNo.heading                                                             =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
+subAddressYesNo.hint                                                                =  YGallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
+subAddressYesNo.checkYourAnswersLabel                                               =  Ychwanegu manylion cysylltu?
+subAddressYesNo.error.required                                                      =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer yr is-gontractwr hwn
+
+nationalInsuranceNumberYesNo.heading                                                =  Ydych chi’n gwybod beth yw rhif Yswiriant Gwladol {0}?
+nationalInsuranceNumberYesNo.hint                                                   =  Defnyddir yr wybodaeth hon i’w ddilysu fel is-gontractwr
+nationalInsuranceNumberYesNo.checkYourAnswersLabel                                  =  Ychwanegu rhif Yswiriant Gwladol?
+nationalInsuranceNumberYesNo.error.required                                         =  Dewiswch p’un a ydych chi’n gwybod beth yw rhif Yswiriant Gwladol yr is-gontractwr hwn
+
+subcontractorName.title                                                             =  Beth yw enw’r is-gontractwr?
+subcontractorName.heading                                                           =  Beth yw enw’r is-gontractwr?
+subcontractorName.firstName                                                         =  Enw cyntaf
+subcontractorName.middleName                                                        =  Enwau canol
+subcontractorName.lastName                                                          =  Enw olaf
+subcontractorName.firstName.error.required                                          =  Nodwch enw cyntaf
+subcontractorName.firstName.error.invalidCharacters                                 =  Nodwch enw cyntaf gan ddefnyddio’r llythrennau a i z, collnodau a llinellau toriad
+subcontractorName.firstName.error.firstChar                                         =  Nodwch enw cyntaf.  Rhaid i’r cymeriad cyntaf fod yn llythyren
+subcontractorName.firstName.error.length                                            =  Nodwch enw cyntaf hyd at 35 o gymeriadau
+subcontractorName.middleName.error.invalidCharacters                                =  Rhaid i enwau canol gynnwys dim ond y llythrennau a i z, cysylltnodau a llinellau toriad
+subcontractorName.middleName.error.firstChar                                        =  Rhaid i enwau canol ddechrau gyda llythyren
+subcontractorName.middleName.error.length                                           =  Rhaid i enwau canol fod yn 35 o gymeriadau neu lai
+subcontractorName.lastName.error.required                                           =  Nodwch enw olaf
+subcontractorName.lastName.error.invalidCharacters                                  =  Nodwch enw olaf gan ddefnyddio’r llythrennau a i z, y rhifau 0 i 9, ampersandau (&), collnodau, atalnodau llawn, cromfachau crwn, blaenslaesau, comas a llinellau toriad.
+subcontractorName.lastName.error.firstChar                                          =  Nodwch enw olaf.  Rhaid i’r cymeriad cyntaf fod yn llythyren
+subcontractorName.lastName.error.length                                             =  Nodwch enw olaf hyd at 35 o gymeriadau
+subcontractorName.checkYourAnswersLabel                                             =  Enw’r is-gontractwr
+
+uniqueTaxpayerReferenceYesNo.heading                                                =  Ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer {0}?
+uniqueTaxpayerReferenceYesNo.hint                                                   =  Defnyddir yr wybodaeth hon i’w ddilysu fel is-gontractwr
+uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel                                  =  Ychwanegu UTR?
+uniqueTaxpayerReferenceYesNo.error.required                                         =  Dewiswch p’un a ydych chi’n gwybod beth yw Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer yr is-gontractwr hwn
+
+worksReferenceNumberYesNo.heading                                                   =  Oes cyfeirnod y gwaith yn gysylltiedig â {0}?
+worksReferenceNumberYesNo.hint                                                      =  Dyma’r cyfeirnod a ddefnyddir i adnabod gwaith neu brosiect is-gontractwr. Gall hwn gynnwys llythrennau a rhifau.
+worksReferenceNumberYesNo.checkYourAnswersLabel                                     =  Ychwanegu cyfeirnod y gwaith?
+worksReferenceNumberYesNo.error.required                                            =  Dewiswch p’un a oes cyfeirnod y gwaith gan yr is-gontractwr hwn
+
+subNationalInsuranceNumber.heading                                                  =  Beth yw rhif Yswiriant Gwladol {0}?
+subNationalInsuranceNumber.hint                                                     =  Gellir dod o hyd i rifau Yswiriant Gwladol ar slipiau cyflog, P60s a dogfennau treth eraill. Er enghraifft, ‘QQ 12 34 56 C’
+subNationalInsuranceNumber.checkYourAnswersLabel                                    =  Rhif Yswiriant Gwladol
+subNationalInsuranceNumber.error.required                                           =  Nodwch rif Yswiriant Gwladol
+subNationalInsuranceNumber.error.length                                             =  Nodwch rif Yswiriant Gwladol dilys
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Nodwch rif Yswiriant Gwladol dilys
+subNationalInsuranceNumber.change.hidden                                            =  Rhif Yswiriant Gwladol
+
+worksReferenceNumber.heading                                                        =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
+worksReferenceNumber.hint                                                           =  TMae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
+worksReferenceNumber.checkYourAnswersLabel                                          =  Cyfeirnod y gwaith
+worksReferenceNumber.error.required                                                 =  Nodwch gyfeirnod y gwaith
+worksReferenceNumber.error.invalid                                                  =  Nodwch gyfeirnod y gwaith dilys
+worksReferenceNumber.error.length                                                   =  Nodwch gyfeirnod y gwaith, hyd at 20 o gymeriadau
+
+addressLookup.individualQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
+addressLookup.individualQuestionsAddress.lookupPage.submitLabel                     =  Parhau
+addressLookup.individualQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
+
+addressLookup.individualQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
+addressLookup.individualQuestionsAddress.selectPage.submitLabel                     =  Parhau
+
+addressLookup.individualQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
+addressLookup.individualQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
+addressLookup.individualQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
+addressLookup.individualQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
+addressLookup.individualQuestionsAddress.editPage.postcodeLabel                     =  Cod post
+addressLookup.individualQuestionsAddress.editPage.countryLabel                      =  Gwlad
+addressLookup.individualQuestionsAddress.editPage.submitLabel                       =  Parhau
+addressLookup.individualQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
+addressLookup.individualQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
+addressLookup.individualQuestionsAddress.confirmPage.submitLabel                    =  Parhau
+addressLookup.individualQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
+addressLookup.individualQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
+
+subcontractorsUniqueTaxpayerReference.title                                         =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad
+subcontractorsUniqueTaxpayerReference.heading                                       =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad
+subcontractorsUniqueTaxpayerReference.p1                                            =  Bydd yr UTR i’w weld ar Ffurflenni Treth a dogfennau eraill gan CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+subcontractorsUniqueTaxpayerReference.linkText                                      =  Cael rhagor o help i ddod o hyd i UTR (yn agor tab newydd)
+subcontractorsUniqueTaxpayerReference.label                                         =  Beth yw’r UTR ar gyfer Hunanasesiad ar gyfer {0}?
+subcontractorsUniqueTaxpayerReference.hint                                          =  Rhif 10 digid yw UTR
+subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel                         =  UTR
+subcontractorsUniqueTaxpayerReference.error.required                                =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+subcontractorsUniqueTaxpayerReference.error.invalid                                 =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+subcontractorsUniqueTaxpayerReference.error.length                                  =  Nodwch Gyfeirnod Unigryw y Trethdalwr (UTR) dilys gan ddefnyddio 10 rhif, fel 1234567890
+subcontractorsUniqueTaxpayerReference.error.duplicate                               =  Rydych chi eisoes wedi defnyddio Cyfeirnod Unigryw y Trethdalwr (UTR) hwn ar gyfer is-gontractwr presennol
+subcontractorsUniqueTaxpayerReference.change.hidden                                 =  UTR
+
+individualMobileNumber.heading                                                      =  Beth yw’r rhif ffôn symudol ar gyfer {0}?
+individualMobileNumber.hint                                                         =  HMRC will never use this mobile number to contact this subcontractor
+individualMobileNumber.checkYourAnswersLabel                                        =  Rhif ffôn symudol
+individualMobileNumber.error.required                                               =  Nodwch rif ffôn symudol
+individualMobileNumber.error.length                                                 =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
+individualMobileNumber.error.invalid                                                =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
+
+individualPhoneNumber.heading                                                       =  Beth yw’r rhif ffôn ar gyfer {0}?
+individualPhoneNumber.hint                                                          =  Ni fydd CThEF yn defnyddio’r rhif ffôn hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+individualPhoneNumber.checkYourAnswersLabel                                         =  Rhif ffôn
+individualPhoneNumber.error.required                                                =  ENodwch rif ffôn
+individualPhoneNumber.error.length                                                  =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+individualPhoneNumber.error.invalid                                                 =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
+
+individualEmailAddress.heading                                                      =  Beth yw’r cyfeiriad e-bost ar gyfer {0}?
+individualEmailAddress.hintText                                                     =  Ni fydd CThEF yn defnyddio’r cyfeiriad e-bost hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
+individualEmailAddress.checkYourAnswersLabel                                        =  Cyfeiriad e-bost
+individualEmailAddress.error.required                                               =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
+individualEmailAddress.error.length                                                 =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
+individualEmailAddress.error.invalid                                                =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
+
+addIndividualContactMethodsYesNo.heading                                            =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
+addIndividualContactMethodsYesNo.error.required                                     =  Dewiswch ‘Iawn’ os ydych am ychwanegu manylion cysylltu ar gyfer yr is-gontractwr hwn
+addIndividualContactMethodsYesNo.checkYourAnswersLabel                              =  Ychwanegu manylion cysylltu?
+
+individualContactMethodOptions.heading                                              =  Pa fanylion cysylltu ydych chi am eu hychwanegu ar gyfer {0}?
+individualContactMethodOptions.email                                                =  Cyfeiriad e-bost
+individualContactMethodOptions.phone                                                =  Rhif ffôn
+individualContactMethodOptions.mobile                                               =  Rhif ffôn symudol
+individualContactMethodOptions.checkYourAnswersLabel                                =  Dulliau o gysylltu
+individualContactMethodOptions.hint                                                 =  Mae’r manylion cysylltu ar gyfer eich cofnodion chi yn unig
+individualContactMethodOptions.error.required                                       =  Dewiswch y dulliau o gysylltu rydych chi am eu hychwanegu ar gyfer yr is-gontractwr hwn
+
+addressOfSubcontractor.checkYourAnswersLabel                                        =  Cyfeiriad
+addressOfSubcontractor.change.hidden                                                =  cyfeiriad
+
+subcontractorAdded.heading                                                          =  Wedi ychwanegu’r is-gontractwr
+subcontractorAdded.p1                                                               =  Erbyn hyn, mae {0} i’w weld ar eich rhestr o is-gontractwyr.
+subcontractorAdded.nextSteps.h2                                                     =  Camau nesaf
+subcontractorAdded.nextSteps.p1                                                     =  Cyn i chi allu gwneud unrhyw daliadau i’r is-gontractwr hwn, bydd angen i chi ei ddilysu.
+subcontractorAdded.nextSteps.p2                                                     =  Unwaith y bydd wedi’i ddilysu gyda CThEF, byddwch yn gallu:
+subcontractorAdded.nextSteps.list.l1                                                =  gwneud didyniadau CIS ar y gyfradd gywir
+subcontractorAdded.nextSteps.list.l2                                                =  cynnwys yr is-gontractwr ar ddatganiad misol
+subcontractorAdded.nextSteps.list.l3                                                =  rhoi cyfriflenni talu a didynnu iddo
+subcontractorAdded.nextSteps.link                                                   =  Rheoli’ch is-gontractwyr
+subcontractorAdded.helpAndSupport.h2                                                =  Help a chymorth
+subcontractorAdded.helpAndSupport.p1                                                =  Os oes angen help arnoch chi gyda Chynllun y Diwydiant Adeiladu (CIS), a’r hyn y mae’n ei olygu i chi,
+subcontractorAdded.helpAndSupport.p1.link                                           =  mae arweiniad ar gael ar GOV.UK
+subcontractorAdded.partnership                                                      =  Partneriaeth
+subcontractorAdded.trust                                                            =  Ymddiriedolaeth
+
+checkYourAnswers.heading                  =  Gwiriwch eich atebion cyn ychwanegu’r unigolyn hwn
+checkYourAnswers.heading.sub.h2           =  Manylion yr is-gontractwr
+checkYourAnswers.heading.h2               =  Nawr ychwanegwch yr is-gontractwr hwn
+checkYourAnswers.p1                       =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
+checkYourAnswers.addSubcontractor         =  Derbyn a chyflwyno
+
 # Company
 addCompanyContactMethodsYesNo.heading                =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
 addCompanyContactMethodsYesNo.error.required         =  Dewiswch ‘Iawn’ os ydych am ychwanegu manylion cysylltu ar gyfer y cwmni hwn
@@ -214,27 +372,6 @@ trustContactMethodOptions.mobile                   =  Rhif ffôn symudol
 trustContactMethodOptions.error.required           =  Dewiswch y dulliau o gysylltu rydych chi am eu hychwanegu ar gyfer yr ymddiriedolaeth hon
 trustContactMethodOptions.checkYourAnswersLabel    =  Dulliau o gysylltu
 
-addressLookup.individualQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
-addressLookup.individualQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
-addressLookup.individualQuestionsAddress.lookupPage.submitLabel                     =  Parhau
-addressLookup.individualQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
-
-addressLookup.individualQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
-addressLookup.individualQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
-addressLookup.individualQuestionsAddress.selectPage.submitLabel                     =  Parhau
-
-addressLookup.individualQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
-addressLookup.individualQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
-addressLookup.individualQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
-addressLookup.individualQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
-addressLookup.individualQuestionsAddress.editPage.postcodeLabel                     =  Cod post
-addressLookup.individualQuestionsAddress.editPage.countryLabel                      =  Gwlad
-addressLookup.individualQuestionsAddress.editPage.submitLabel                       =  Parhau
-addressLookup.individualQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
-addressLookup.individualQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
-addressLookup.individualQuestionsAddress.confirmPage.submitLabel                    =  Parhau
-addressLookup.individualQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
-addressLookup.individualQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
 
 # Partnership
 addPartnershipContactMethodsYesNo.heading                          =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
@@ -299,6 +436,8 @@ partnershipAddress.change.hidden                                   =  cyfeiriad
 partnershipNominatedPartnerNino.heading                            =  Beth yw rhif Yswiriant Gwladol {0}?
 partnershipNominatedPartnerNino.hint                               =  Gellir dod o hyd i rifau Yswiriant Gwladol ar slipiau cyflog, P60s a dogfennau treth eraill. Er enghraifft, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Nodwch rif Yswiriant Gwladol
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Nodwch rif Yswiriant Gwladol dilys
+partnershipNominatedPartnerNino.error.length                       =  Nodwch rif Yswiriant Gwladol dilys
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
 partnershipNominatedPartnerNino.change.hidden                      =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
 
