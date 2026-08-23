@@ -49,22 +49,22 @@ case class AddSubcontractorAuditEventModel(
 object AddSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
-    (__ \ "typeOfSubcontractor").write[String] and
-    (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
-    (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
-    (__ \ "subAddressYesNo").writeNullable[Boolean] and
-    (__ \ "addressOfSubcontractor").writeNullable[Address] and
-    (__ \ "addIndividualContactMethodsYesNo").writeNullable[Boolean] and
-    (__ \ "individualContactMethodOptions").writeNullable[Seq[String]] and
-    (__ \ "individualEmailAddress").writeNullable[String] and
-    (__ \ "individualPhoneNumber").writeNullable[String] and
-    (__ \ "individualMobileNumber").writeNullable[String] and
-    (__ \ "uniqueTaxpayerReferenceYesNo").writeNullable[Boolean] and
-    (__ \ "subcontractorsUniqueTaxpayerReference").writeNullable[String] and
-    (__ \ "nationalInsuranceNumberYesNo").writeNullable[Boolean] and
-    (__ \ "subNationalInsuranceNumber").writeNullable[String] and
-    (__ \ "worksReferenceNumberYesNo").writeNullable[Boolean] and
-    (__ \ "worksReferenceNumber").writeNullable[String]
+      (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
+      (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
+      (__ \ "subAddressYesNo").writeNullable[Boolean] and
+      (__ \ "addressOfSubcontractor").writeNullable[Address] and
+      (__ \ "addIndividualContactMethodsYesNo").writeNullable[Boolean] and
+      (__ \ "individualContactMethodOptions").writeNullable[Seq[String]] and
+      (__ \ "individualEmailAddress").writeNullable[String] and
+      (__ \ "individualPhoneNumber").writeNullable[String] and
+      (__ \ "individualMobileNumber").writeNullable[String] and
+      (__ \ "uniqueTaxpayerReferenceYesNo").writeNullable[Boolean] and
+      (__ \ "subcontractorsUniqueTaxpayerReference").writeNullable[String] and
+      (__ \ "nationalInsuranceNumberYesNo").writeNullable[Boolean] and
+      (__ \ "subNationalInsuranceNumber").writeNullable[String] and
+      (__ \ "worksReferenceNumberYesNo").writeNullable[Boolean] and
+      (__ \ "worksReferenceNumber").writeNullable[String]
   )(Tuple.fromProductTyped(_))
 }
 
@@ -92,21 +92,21 @@ case class AddCompanySubcontractorAuditEventModel(
 object AddCompanySubcontractorAuditEventModel {
   implicit val writes: OWrites[AddCompanySubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
-    (__ \ "typeOfSubcontractor").write[String] and
-    (__ \ "companyName").writeNullable[String] and
-    (__ \ "companyAddressYesNo").writeNullable[Boolean] and
-    (__ \ "companyAddress").writeNullable[Address] and
-    (__ \ "addCompanyContactMethodsYesNo").writeNullable[Boolean] and
-    (__ \ "companyContactMethodOptions").writeNullable[Seq[String]] and
-    (__ \ "companyEmailAddress").writeNullable[String] and
-    (__ \ "companyPhoneNumber").writeNullable[String] and
-    (__ \ "companyMobileNumber").writeNullable[String] and
-    (__ \ "companyUtrYesNo").writeNullable[Boolean] and
-    (__ \ "companyUtr").writeNullable[String] and
-    (__ \ "companyCrnYesNo").writeNullable[Boolean] and
-    (__ \ "companyCrn").writeNullable[String] and
-    (__ \ "companyWorksReferenceYesNo").writeNullable[Boolean] and
-    (__ \ "companyWorksReference").writeNullable[String]
+      (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "companyName").writeNullable[String] and
+      (__ \ "companyAddressYesNo").writeNullable[Boolean] and
+      (__ \ "companyAddress").writeNullable[Address] and
+      (__ \ "addCompanyContactMethodsYesNo").writeNullable[Boolean] and
+      (__ \ "companyContactMethodOptions").writeNullable[Seq[String]] and
+      (__ \ "companyEmailAddress").writeNullable[String] and
+      (__ \ "companyPhoneNumber").writeNullable[String] and
+      (__ \ "companyMobileNumber").writeNullable[String] and
+      (__ \ "companyUtrYesNo").writeNullable[Boolean] and
+      (__ \ "companyUtr").writeNullable[String] and
+      (__ \ "companyCrnYesNo").writeNullable[Boolean] and
+      (__ \ "companyCrn").writeNullable[String] and
+      (__ \ "companyWorksReferenceYesNo").writeNullable[Boolean] and
+      (__ \ "companyWorksReference").writeNullable[String]
   )(Tuple.fromProductTyped(_))
 }
 
@@ -139,26 +139,26 @@ case class AddPartnershipSubcontractorAuditEventModel(
 object AddPartnershipSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddPartnershipSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
-    (__ \ "typeOfSubcontractor").write[String] and
-    (__ \ "partnershipName").writeNullable[String] and
-    (__ \ "partnershipAddressYesNo").writeNullable[Boolean] and
-    (__ \ "partnershipAddress").writeNullable[Address] and
-    (__ \ "addPartnershipContactMethodsYesNo").writeNullable[Boolean] and
-    (__ \ "partnershipContactMethodOptions").writeNullable[Seq[String]] and
-    (__ \ "partnershipEmailAddress").writeNullable[String] and
-    (__ \ "partnershipPhoneNumber").writeNullable[String] and
-    (__ \ "partnershipMobileNumber").writeNullable[String] and
-    (__ \ "partnershipHasUtrYesNo").writeNullable[Boolean] and
-    (__ \ "partnershipUniqueTaxpayerReference").writeNullable[String] and
-    (__ \ "partnershipNominatedPartnerName").writeNullable[String] and
-    (__ \ "partnershipNominatedPartnerUtrYesNo").writeNullable[Boolean] and
-    (__ \ "partnershipNominatedPartnerUtr").writeNullable[String] and
-    (__ \ "partnershipNominatedPartnerNinoYesNo").writeNullable[Boolean] and
-    (__ \ "nominatedPartnerNationalInsuranceNumber").writeNullable[String] and
-    (__ \ "partnershipNominatedPartnerCrnYesNo").writeNullable[Boolean] and
-    (__ \ "nominatedPartnerCompanyRegistrationNumber").writeNullable[String] and
-    (__ \ "partnershipWorksReferenceNumberYesNo").writeNullable[Boolean] and
-    (__ \ "partnershipWorksReference").writeNullable[String]
+      (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "partnershipName").writeNullable[String] and
+      (__ \ "partnershipAddressYesNo").writeNullable[Boolean] and
+      (__ \ "partnershipAddress").writeNullable[Address] and
+      (__ \ "addPartnershipContactMethodsYesNo").writeNullable[Boolean] and
+      (__ \ "partnershipContactMethodOptions").writeNullable[Seq[String]] and
+      (__ \ "partnershipEmailAddress").writeNullable[String] and
+      (__ \ "partnershipPhoneNumber").writeNullable[String] and
+      (__ \ "partnershipMobileNumber").writeNullable[String] and
+      (__ \ "partnershipHasUtrYesNo").writeNullable[Boolean] and
+      (__ \ "partnershipUniqueTaxpayerReference").writeNullable[String] and
+      (__ \ "partnershipNominatedPartnerName").writeNullable[String] and
+      (__ \ "partnershipNominatedPartnerUtrYesNo").writeNullable[Boolean] and
+      (__ \ "partnershipNominatedPartnerUtr").writeNullable[String] and
+      (__ \ "partnershipNominatedPartnerNinoYesNo").writeNullable[Boolean] and
+      (__ \ "nominatedPartnerNationalInsuranceNumber").writeNullable[String] and
+      (__ \ "partnershipNominatedPartnerCrnYesNo").writeNullable[Boolean] and
+      (__ \ "nominatedPartnerCompanyRegistrationNumber").writeNullable[String] and
+      (__ \ "partnershipWorksReferenceNumberYesNo").writeNullable[Boolean] and
+      (__ \ "partnershipWorksReference").writeNullable[String]
   )(Tuple.fromProductTyped(_))
 }
 
@@ -184,18 +184,18 @@ case class AddTrustSubcontractorAuditEventModel(
 object AddTrustSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddTrustSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
-    (__ \ "typeOfSubcontractor").write[String] and
-    (__ \ "trustName").writeNullable[String] and
-    (__ \ "trustAddressYesNo").writeNullable[Boolean] and
-    (__ \ "trustAddress").writeNullable[Address] and
-    (__ \ "addTrustContactMethodsYesNo").writeNullable[Boolean] and
-    (__ \ "trustContactMethodOptions").writeNullable[Seq[String]] and
-    (__ \ "trustEmailAddress").writeNullable[String] and
-    (__ \ "trustPhoneNumber").writeNullable[String] and
-    (__ \ "trustMobileNumber").writeNullable[String] and
-    (__ \ "trustUtrYesNo").writeNullable[Boolean] and
-    (__ \ "trustUtr").writeNullable[String] and
-    (__ \ "trustWorksReferenceYesNo").writeNullable[Boolean] and
-    (__ \ "trustWorksReference").writeNullable[String]
+      (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "trustName").writeNullable[String] and
+      (__ \ "trustAddressYesNo").writeNullable[Boolean] and
+      (__ \ "trustAddress").writeNullable[Address] and
+      (__ \ "addTrustContactMethodsYesNo").writeNullable[Boolean] and
+      (__ \ "trustContactMethodOptions").writeNullable[Seq[String]] and
+      (__ \ "trustEmailAddress").writeNullable[String] and
+      (__ \ "trustPhoneNumber").writeNullable[String] and
+      (__ \ "trustMobileNumber").writeNullable[String] and
+      (__ \ "trustUtrYesNo").writeNullable[Boolean] and
+      (__ \ "trustUtr").writeNullable[String] and
+      (__ \ "trustWorksReferenceYesNo").writeNullable[Boolean] and
+      (__ \ "trustWorksReference").writeNullable[String]
   )(Tuple.fromProductTyped(_))
 }

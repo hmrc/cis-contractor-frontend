@@ -57,100 +57,148 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
 
     "must send an explicit audit event with the correct auditType and typeOfSubcontractor for minimal answers" in {
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader).success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
-      (detail \ "cisId").toOption                 mustBe None
-      (detail \ "subTradingNameYesNo").toOption   mustBe None
+      (detail \ "cisId").toOption mustBe None
+      (detail \ "subTradingNameYesNo").toOption mustBe None
     }
 
     "must include all fields in the audit event when full individual answers are provided" in {
       val address = Address(
-        addressLine1     = "4 Other Place",
-        addressLine2     = Some("Some District"),
-        addressLine3     = Some("Anytown"),
-        postcode         = Some("ZZ1 1ZZ"),
-        country          = Some(Country(Some("GB"), Some("United Kingdom"))),
+        addressLine1 = "4 Other Place",
+        addressLine2 = Some("Some District"),
+        addressLine3 = Some("Anytown"),
+        postcode = Some("ZZ1 1ZZ"),
+        country = Some(Country(Some("GB"), Some("United Kingdom"))),
         addressValidated = true
       )
 
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage,                   TypeOfSubcontractor.Individualorsoletrader).success.value
-        .set(SubTradingNameYesNoPage,                   true).success.value
-        .set(TradingNameOfSubcontractorPage,            "TradingName").success.value
-        .set(SubAddressYesNoPage,                       true).success.value
-        .set(AddressOfSubcontractorPage,                address).success.value
-        .set(AddIndividualContactMethodsYesNoPage,      true).success.value
-        .set(IndividualContactMethodOptionsPage,
-          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)).success.value
-        .set(IndividualEmailAddressPage,                "test@test.com").success.value
-        .set(IndividualPhoneNumberPage,                 "+447960141611").success.value
-        .set(IndividualMobileNumberPage,                "01912170507").success.value
-        .set(UniqueTaxpayerReferenceYesNoPage,          true).success.value
-        .set(SubcontractorsUniqueTaxpayerReferencePage, "1111122222").success.value
-        .set(NationalInsuranceNumberYesNoPage,          true).success.value
-        .set(SubNationalInsuranceNumberPage,            "NH112233D").success.value
-        .set(WorksReferenceNumberYesNoPage,             true).success.value
-        .set(WorksReferenceNumberPage,                  "WORKREF-001").success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
+        .set(SubTradingNameYesNoPage, true)
+        .success
+        .value
+        .set(TradingNameOfSubcontractorPage, "TradingName")
+        .success
+        .value
+        .set(SubAddressYesNoPage, true)
+        .success
+        .value
+        .set(AddressOfSubcontractorPage, address)
+        .success
+        .value
+        .set(AddIndividualContactMethodsYesNoPage, true)
+        .success
+        .value
+        .set(
+          IndividualContactMethodOptionsPage,
+          Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+        )
+        .success
+        .value
+        .set(IndividualEmailAddressPage, "test@test.com")
+        .success
+        .value
+        .set(IndividualPhoneNumberPage, "+447960141611")
+        .success
+        .value
+        .set(IndividualMobileNumberPage, "01912170507")
+        .success
+        .value
+        .set(UniqueTaxpayerReferenceYesNoPage, true)
+        .success
+        .value
+        .set(SubcontractorsUniqueTaxpayerReferencePage, "1111122222")
+        .success
+        .value
+        .set(NationalInsuranceNumberYesNoPage, true)
+        .success
+        .value
+        .set(SubNationalInsuranceNumberPage, "NH112233D")
+        .success
+        .value
+        .set(WorksReferenceNumberYesNoPage, true)
+        .success
+        .value
+        .set(WorksReferenceNumberPage, "WORKREF-001")
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
-      (detail \ "typeOfSubcontractor").as[String]                    mustBe "soletrader"
-      (detail \ "subTradingNameYesNo").as[Boolean]                   mustBe true
-      (detail \ "tradingNameOfSubcontractor").as[String]             mustBe "TradingName"
-      (detail \ "subAddressYesNo").as[Boolean]                       mustBe true
+      (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
+      (detail \ "subTradingNameYesNo").as[Boolean] mustBe true
+      (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
+      (detail \ "subAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"
-      (detail \ "addIndividualContactMethodsYesNo").as[Boolean]      mustBe true
-      (detail \ "individualContactMethodOptions").as[Seq[String]]    mustBe Seq("email", "phone", "mobile")
-      (detail \ "individualEmailAddress").as[String]                 mustBe "test@test.com"
-      (detail \ "individualPhoneNumber").as[String]                  mustBe "+447960141611"
-      (detail \ "individualMobileNumber").as[String]                 mustBe "01912170507"
-      (detail \ "uniqueTaxpayerReferenceYesNo").as[Boolean]          mustBe true
-      (detail \ "subcontractorsUniqueTaxpayerReference").as[String]  mustBe "1111122222"
-      (detail \ "nationalInsuranceNumberYesNo").as[Boolean]          mustBe true
-      (detail \ "subNationalInsuranceNumber").as[String]             mustBe "NH112233D"
-      (detail \ "worksReferenceNumberYesNo").as[Boolean]             mustBe true
-      (detail \ "worksReferenceNumber").as[String]                   mustBe "WORKREF-001"
+      (detail \ "addIndividualContactMethodsYesNo").as[Boolean] mustBe true
+      (detail \ "individualContactMethodOptions").as[Seq[String]] mustBe Seq("email", "phone", "mobile")
+      (detail \ "individualEmailAddress").as[String] mustBe "test@test.com"
+      (detail \ "individualPhoneNumber").as[String] mustBe "+447960141611"
+      (detail \ "individualMobileNumber").as[String] mustBe "01912170507"
+      (detail \ "uniqueTaxpayerReferenceYesNo").as[Boolean] mustBe true
+      (detail \ "subcontractorsUniqueTaxpayerReference").as[String] mustBe "1111122222"
+      (detail \ "nationalInsuranceNumberYesNo").as[Boolean] mustBe true
+      (detail \ "subNationalInsuranceNumber").as[String] mustBe "NH112233D"
+      (detail \ "worksReferenceNumberYesNo").as[Boolean] mustBe true
+      (detail \ "worksReferenceNumber").as[String] mustBe "WORKREF-001"
     }
 
     "must build a company audit event for a limited company" in {
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany).success.value
-        .set(CompanyNamePage,         "Test Co Ltd").success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+        .success
+        .value
+        .set(CompanyNamePage, "Test Co Ltd")
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "company"
-      (detail \ "companyName").as[String]         mustBe "Test Co Ltd"
+      (detail \ "companyName").as[String] mustBe "Test Co Ltd"
     }
 
     "must build a partnership audit event for a partnership" in {
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership).success.value
-        .set(PartnershipNamePage,     "Test Partnership").success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        .success
+        .value
+        .set(PartnershipNamePage, "Test Partnership")
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "partnership"
-      (detail \ "partnershipName").as[String]     mustBe "Test Partnership"
+      (detail \ "partnershipName").as[String] mustBe "Test Partnership"
     }
 
     "must build a trust audit event for a trust" in {
       val ua = emptyUserAnswers
-        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust).success.value
-        .set(TrustNamePage,           "Test Trust").success.value
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+        .success
+        .value
+        .set(TrustNamePage, "Test Trust")
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "trust"
-      (detail \ "trustName").as[String]           mustBe "Test Trust"
+      (detail \ "trustName").as[String] mustBe "Test Trust"
     }
   }
 }

@@ -23,11 +23,11 @@ import play.api.libs.json.{Json, OWrites}
 class AuditEventModelSpec extends SpecBase {
 
   private val address = Address(
-    addressLine1     = "4 Other Place",
-    addressLine2     = Some("Some District"),
-    addressLine3     = Some("Anytown"),
-    postcode         = Some("ZZ1 1ZZ"),
-    country          = Some(Country(Some("GB"), Some("United Kingdom"))),
+    addressLine1 = "4 Other Place",
+    addressLine2 = Some("Some District"),
+    addressLine3 = Some("Anytown"),
+    postcode = Some("ZZ1 1ZZ"),
+    country = Some(Country(Some("GB"), Some("United Kingdom"))),
     addressValidated = true
   )
 
@@ -35,46 +35,46 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise with only the mandatory field when all optionals are absent" in {
       val model = AddSubcontractorAuditEventModel(
-        cisId                                 = None,
-        typeOfSubcontractor                   = "soletrader",
-        subTradingNameYesNo                   = None,
-        tradingNameOfSubcontractor            = None,
-        subAddressYesNo                       = None,
-        addressOfSubcontractor                = None,
-        addIndividualContactMethodsYesNo      = None,
-        individualContactMethodOptions        = None,
-        individualEmailAddress                = None,
-        individualPhoneNumber                 = None,
-        individualMobileNumber                = None,
-        uniqueTaxpayerReferenceYesNo          = None,
+        cisId = None,
+        typeOfSubcontractor = "soletrader",
+        subTradingNameYesNo = None,
+        tradingNameOfSubcontractor = None,
+        subAddressYesNo = None,
+        addressOfSubcontractor = None,
+        addIndividualContactMethodsYesNo = None,
+        individualContactMethodOptions = None,
+        individualEmailAddress = None,
+        individualPhoneNumber = None,
+        individualMobileNumber = None,
+        uniqueTaxpayerReferenceYesNo = None,
         subcontractorsUniqueTaxpayerReference = None,
-        nationalInsuranceNumberYesNo          = None,
-        subNationalInsuranceNumber            = None,
-        worksReferenceNumberYesNo             = None,
-        worksReferenceNumber                  = None
+        nationalInsuranceNumberYesNo = None,
+        subNationalInsuranceNumber = None,
+        worksReferenceNumberYesNo = None,
+        worksReferenceNumber = None
       )
       Json.toJson(model) mustEqual Json.obj("typeOfSubcontractor" -> "soletrader")
     }
 
     "must serialise all fields when all are present" in {
       val model = AddSubcontractorAuditEventModel(
-        cisId                                 = Some("1"),
-        typeOfSubcontractor                   = "soletrader",
-        subTradingNameYesNo                   = Some(true),
-        tradingNameOfSubcontractor            = Some("TradingName"),
-        subAddressYesNo                       = Some(true),
-        addressOfSubcontractor                = Some(address),
-        addIndividualContactMethodsYesNo      = Some(true),
-        individualContactMethodOptions        = Some(Seq("email", "phone", "mobile")),
-        individualEmailAddress                = Some("test@test.com"),
-        individualPhoneNumber                 = Some("+447960141611"),
-        individualMobileNumber                = Some("01912170507"),
-        uniqueTaxpayerReferenceYesNo          = Some(true),
+        cisId = Some("1"),
+        typeOfSubcontractor = "soletrader",
+        subTradingNameYesNo = Some(true),
+        tradingNameOfSubcontractor = Some("TradingName"),
+        subAddressYesNo = Some(true),
+        addressOfSubcontractor = Some(address),
+        addIndividualContactMethodsYesNo = Some(true),
+        individualContactMethodOptions = Some(Seq("email", "phone", "mobile")),
+        individualEmailAddress = Some("test@test.com"),
+        individualPhoneNumber = Some("+447960141611"),
+        individualMobileNumber = Some("01912170507"),
+        uniqueTaxpayerReferenceYesNo = Some(true),
         subcontractorsUniqueTaxpayerReference = Some("1111122222"),
-        nationalInsuranceNumberYesNo          = Some(true),
-        subNationalInsuranceNumber            = Some("NH112233D"),
-        worksReferenceNumberYesNo             = Some(true),
-        worksReferenceNumber                  = Some("WORKREF-001")
+        nationalInsuranceNumberYesNo = Some(true),
+        subNationalInsuranceNumber = Some("NH112233D"),
+        worksReferenceNumberYesNo = Some(true),
+        worksReferenceNumber = Some("WORKREF-001")
       )
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                 -> "1",
@@ -99,13 +99,23 @@ class AuditEventModelSpec extends SpecBase {
 
     "must have auditType addSubcontractor" in {
       AddSubcontractorAuditEventModel(
-        cisId = None, typeOfSubcontractor = "soletrader", subTradingNameYesNo = None,
-        tradingNameOfSubcontractor = None, subAddressYesNo = None, addressOfSubcontractor = None,
-        addIndividualContactMethodsYesNo = None, individualContactMethodOptions = None,
-        individualEmailAddress = None, individualPhoneNumber = None, individualMobileNumber = None,
-        uniqueTaxpayerReferenceYesNo = None, subcontractorsUniqueTaxpayerReference = None,
-        nationalInsuranceNumberYesNo = None, subNationalInsuranceNumber = None,
-        worksReferenceNumberYesNo = None, worksReferenceNumber = None
+        cisId = None,
+        typeOfSubcontractor = "soletrader",
+        subTradingNameYesNo = None,
+        tradingNameOfSubcontractor = None,
+        subAddressYesNo = None,
+        addressOfSubcontractor = None,
+        addIndividualContactMethodsYesNo = None,
+        individualContactMethodOptions = None,
+        individualEmailAddress = None,
+        individualPhoneNumber = None,
+        individualMobileNumber = None,
+        uniqueTaxpayerReferenceYesNo = None,
+        subcontractorsUniqueTaxpayerReference = None,
+        nationalInsuranceNumberYesNo = None,
+        subNationalInsuranceNumber = None,
+        worksReferenceNumberYesNo = None,
+        worksReferenceNumber = None
       ).auditType mustBe "addSubcontractor"
     }
   }
@@ -114,11 +124,21 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise with only the mandatory field when all optionals are absent" in {
       val model = AddCompanySubcontractorAuditEventModel(
-        cisId = None, typeOfSubcontractor = "company", companyName = None,
-        companyAddressYesNo = None, companyAddress = None, addCompanyContactMethodsYesNo = None,
-        companyContactMethodOptions = None, companyEmailAddress = None, companyPhoneNumber = None,
-        companyMobileNumber = None, companyUtrYesNo = None, companyUtr = None,
-        companyCrnYesNo = None, companyCrn = None, companyWorksReferenceYesNo = None,
+        cisId = None,
+        typeOfSubcontractor = "company",
+        companyName = None,
+        companyAddressYesNo = None,
+        companyAddress = None,
+        addCompanyContactMethodsYesNo = None,
+        companyContactMethodOptions = None,
+        companyEmailAddress = None,
+        companyPhoneNumber = None,
+        companyMobileNumber = None,
+        companyUtrYesNo = None,
+        companyUtr = None,
+        companyCrnYesNo = None,
+        companyCrn = None,
+        companyWorksReferenceYesNo = None,
         companyWorksReference = None
       )
       Json.toJson(model) mustEqual Json.obj("typeOfSubcontractor" -> "company")
@@ -126,22 +146,22 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise all fields when all are present" in {
       val model = AddCompanySubcontractorAuditEventModel(
-        cisId                         = Some("1"),
-        typeOfSubcontractor           = "company",
-        companyName                   = Some("Test Co Ltd"),
-        companyAddressYesNo           = Some(true),
-        companyAddress                = Some(address),
+        cisId = Some("1"),
+        typeOfSubcontractor = "company",
+        companyName = Some("Test Co Ltd"),
+        companyAddressYesNo = Some(true),
+        companyAddress = Some(address),
         addCompanyContactMethodsYesNo = Some(true),
-        companyContactMethodOptions   = Some(Seq("email")),
-        companyEmailAddress           = Some("company@test.com"),
-        companyPhoneNumber            = Some("01912170507"),
-        companyMobileNumber           = Some("+447960141611"),
-        companyUtrYesNo               = Some(true),
-        companyUtr                    = Some("1111122222"),
-        companyCrnYesNo               = Some(true),
-        companyCrn                    = Some("12345678"),
-        companyWorksReferenceYesNo    = Some(true),
-        companyWorksReference         = Some("WORKREF-002")
+        companyContactMethodOptions = Some(Seq("email")),
+        companyEmailAddress = Some("company@test.com"),
+        companyPhoneNumber = Some("01912170507"),
+        companyMobileNumber = Some("+447960141611"),
+        companyUtrYesNo = Some(true),
+        companyUtr = Some("1111122222"),
+        companyCrnYesNo = Some(true),
+        companyCrn = Some("12345678"),
+        companyWorksReferenceYesNo = Some(true),
+        companyWorksReference = Some("WORKREF-002")
       )
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                         -> "1",
@@ -168,15 +188,26 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise with only the mandatory field when all optionals are absent" in {
       val model = AddPartnershipSubcontractorAuditEventModel(
-        cisId = None, typeOfSubcontractor = "partnership", partnershipName = None,
-        partnershipAddressYesNo = None, partnershipAddress = None,
-        addPartnershipContactMethodsYesNo = None, partnershipContactMethodOptions = None,
-        partnershipEmailAddress = None, partnershipPhoneNumber = None, partnershipMobileNumber = None,
-        partnershipHasUtrYesNo = None, partnershipUniqueTaxpayerReference = None,
-        partnershipNominatedPartnerName = None, partnershipNominatedPartnerUtrYesNo = None,
-        partnershipNominatedPartnerUtr = None, partnershipNominatedPartnerNinoYesNo = None,
-        nominatedPartnerNationalInsuranceNumber = None, partnershipNominatedPartnerCrnYesNo = None,
-        nominatedPartnerCompanyRegistrationNumber = None, partnershipWorksReferenceNumberYesNo = None,
+        cisId = None,
+        typeOfSubcontractor = "partnership",
+        partnershipName = None,
+        partnershipAddressYesNo = None,
+        partnershipAddress = None,
+        addPartnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = None,
+        partnershipEmailAddress = None,
+        partnershipPhoneNumber = None,
+        partnershipMobileNumber = None,
+        partnershipHasUtrYesNo = None,
+        partnershipUniqueTaxpayerReference = None,
+        partnershipNominatedPartnerName = None,
+        partnershipNominatedPartnerUtrYesNo = None,
+        partnershipNominatedPartnerUtr = None,
+        partnershipNominatedPartnerNinoYesNo = None,
+        nominatedPartnerNationalInsuranceNumber = None,
+        partnershipNominatedPartnerCrnYesNo = None,
+        nominatedPartnerCompanyRegistrationNumber = None,
+        partnershipWorksReferenceNumberYesNo = None,
         partnershipWorksReference = None
       )
       Json.toJson(model) mustEqual Json.obj("typeOfSubcontractor" -> "partnership")
@@ -184,27 +215,27 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise all fields when all are present" in {
       val model = AddPartnershipSubcontractorAuditEventModel(
-        cisId                                     = Some("1"),
-        typeOfSubcontractor                       = "partnership",
-        partnershipName                           = Some("Test Partnership"),
-        partnershipAddressYesNo                   = Some(true),
-        partnershipAddress                        = Some(address),
-        addPartnershipContactMethodsYesNo         = Some(true),
-        partnershipContactMethodOptions           = Some(Seq("email")),
-        partnershipEmailAddress                   = Some("partnership@test.com"),
-        partnershipPhoneNumber                    = Some("01912170507"),
-        partnershipMobileNumber                   = Some("+447960141611"),
-        partnershipHasUtrYesNo                    = Some(true),
-        partnershipUniqueTaxpayerReference        = Some("1111122222"),
-        partnershipNominatedPartnerName           = Some("Nominated Partner"),
-        partnershipNominatedPartnerUtrYesNo       = Some(true),
-        partnershipNominatedPartnerUtr            = Some("2222233333"),
-        partnershipNominatedPartnerNinoYesNo      = Some(true),
-        nominatedPartnerNationalInsuranceNumber   = Some("NH112233D"),
-        partnershipNominatedPartnerCrnYesNo       = Some(true),
+        cisId = Some("1"),
+        typeOfSubcontractor = "partnership",
+        partnershipName = Some("Test Partnership"),
+        partnershipAddressYesNo = Some(true),
+        partnershipAddress = Some(address),
+        addPartnershipContactMethodsYesNo = Some(true),
+        partnershipContactMethodOptions = Some(Seq("email")),
+        partnershipEmailAddress = Some("partnership@test.com"),
+        partnershipPhoneNumber = Some("01912170507"),
+        partnershipMobileNumber = Some("+447960141611"),
+        partnershipHasUtrYesNo = Some(true),
+        partnershipUniqueTaxpayerReference = Some("1111122222"),
+        partnershipNominatedPartnerName = Some("Nominated Partner"),
+        partnershipNominatedPartnerUtrYesNo = Some(true),
+        partnershipNominatedPartnerUtr = Some("2222233333"),
+        partnershipNominatedPartnerNinoYesNo = Some(true),
+        nominatedPartnerNationalInsuranceNumber = Some("NH112233D"),
+        partnershipNominatedPartnerCrnYesNo = Some(true),
         nominatedPartnerCompanyRegistrationNumber = Some("12345678"),
-        partnershipWorksReferenceNumberYesNo      = Some(true),
-        partnershipWorksReference                 = Some("WORKREF-003")
+        partnershipWorksReferenceNumberYesNo = Some(true),
+        partnershipWorksReference = Some("WORKREF-003")
       )
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                     -> "1",
@@ -236,30 +267,40 @@ class AuditEventModelSpec extends SpecBase {
 
     "must serialise with only the mandatory field when all optionals are absent" in {
       val model = AddTrustSubcontractorAuditEventModel(
-        cisId = None, typeOfSubcontractor = "trust", trustName = None, trustAddressYesNo = None,
-        trustAddress = None, addTrustContactMethodsYesNo = None, trustContactMethodOptions = None,
-        trustEmailAddress = None, trustPhoneNumber = None, trustMobileNumber = None,
-        trustUtrYesNo = None, trustUtr = None, trustWorksReferenceYesNo = None, trustWorksReference = None
+        cisId = None,
+        typeOfSubcontractor = "trust",
+        trustName = None,
+        trustAddressYesNo = None,
+        trustAddress = None,
+        addTrustContactMethodsYesNo = None,
+        trustContactMethodOptions = None,
+        trustEmailAddress = None,
+        trustPhoneNumber = None,
+        trustMobileNumber = None,
+        trustUtrYesNo = None,
+        trustUtr = None,
+        trustWorksReferenceYesNo = None,
+        trustWorksReference = None
       )
       Json.toJson(model) mustEqual Json.obj("typeOfSubcontractor" -> "trust")
     }
 
     "must serialise all fields when all are present" in {
       val model = AddTrustSubcontractorAuditEventModel(
-        cisId                       = Some("1"),
-        typeOfSubcontractor         = "trust",
-        trustName                   = Some("Test Trust"),
-        trustAddressYesNo           = Some(true),
-        trustAddress                = Some(address),
+        cisId = Some("1"),
+        typeOfSubcontractor = "trust",
+        trustName = Some("Test Trust"),
+        trustAddressYesNo = Some(true),
+        trustAddress = Some(address),
         addTrustContactMethodsYesNo = Some(true),
-        trustContactMethodOptions   = Some(Seq("email")),
-        trustEmailAddress           = Some("trust@test.com"),
-        trustPhoneNumber            = Some("01912170507"),
-        trustMobileNumber           = Some("+447960141611"),
-        trustUtrYesNo               = Some(true),
-        trustUtr                    = Some("1111122222"),
-        trustWorksReferenceYesNo    = Some(true),
-        trustWorksReference         = Some("WORKREF-004")
+        trustContactMethodOptions = Some(Seq("email")),
+        trustEmailAddress = Some("trust@test.com"),
+        trustPhoneNumber = Some("01912170507"),
+        trustMobileNumber = Some("+447960141611"),
+        trustUtrYesNo = Some(true),
+        trustUtr = Some("1111122222"),
+        trustWorksReferenceYesNo = Some(true),
+        trustWorksReference = Some("WORKREF-004")
       )
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                       -> "1",
