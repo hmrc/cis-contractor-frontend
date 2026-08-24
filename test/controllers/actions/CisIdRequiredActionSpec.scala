@@ -22,14 +22,14 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import pages.CisIdPage
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CisIdRequiredActionSpec extends SpecBase {
 
-  private class TestCisIdRequiredAction extends CisIdRequiredAction {
+  private class TestCisIdRequiredAction extends CisIdRequiredActionImpl {
 
     def testRefine[A](
       request: DataRequest[A]
@@ -42,9 +42,10 @@ class CisIdRequiredActionSpec extends SpecBase {
   "CisIdRequiredAction" - {
 
     "return a CisIdDataRequest when CIS ID is present" in {
+
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery, "12345")
+          .set(CisIdPage, "12345")
           .success
           .value
 
@@ -66,7 +67,8 @@ class CisIdRequiredActionSpec extends SpecBase {
       cisIdRequest.userId mustBe "user-id"
     }
 
-    "redirect to Journey Recovery when CIS ID is missing" in {
+    "redirect to Unauthorised Organisation Affinity when CIS ID is missing" in {
+
       val request =
         DataRequest(
           request = FakeRequest(GET, "/"),
@@ -81,7 +83,7 @@ class CisIdRequiredActionSpec extends SpecBase {
       result match {
         case Left(redirect) =>
           redirect mustBe Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
+            controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()
           )
 
         case Right(_) =>

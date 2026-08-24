@@ -59,14 +59,3 @@ case class CisIdDataRequest[A](
   isAgent: Boolean = false,
   agentCode: Option[String] = None
 ) extends WrappedRequest[A](request)
-
-case class CisIdDataRequest[A](
-  request: Request[A],
-  userId: String,
-  userAnswers: UserAnswers,
-  cisId: String,
-  employerReference: Option[EmployerReference] = None,
-  agentReference: Option[String] = None,
-  isAgent: Boolean = false
-) extends WrappedRequest[A](request)
-    with DataRequestFields[A]
