@@ -36,13 +36,13 @@
         subHeading: H2,
         paragraph: Paragraph,
         printLink: PrintLink,
-        link: Link
+        link: Link,
+        appConfig: FrontendAppConfig,
 )
 
 @(vm: VerificationRequestSubmittedViewModel
 )(
     implicit request: Request[_],
-    appConfig: FrontendAppConfig,
     messages: Messages
 )
 
