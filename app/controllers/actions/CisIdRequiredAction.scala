@@ -16,51 +16,40 @@
 
 package controllers.actions
 
-import models.requests.{CisIdDataRequest, DataRequest}
-import play.api.mvc.{ActionRefiner, Result}
-import play.api.mvc.Results.Redirect
-import queries.CisIdQuery
-import play.api.Logging
-
 import javax.inject.Inject
+import models.requests.{CisIdDataRequest, DataRequest}
+import pages.CisIdPage
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionRefiner, Result}
+
 import scala.concurrent.{ExecutionContext, Future}
 
-class CisIdRequiredAction @Inject() (implicit
-  val executionContext: ExecutionContext
-) extends ActionRefiner[DataRequest, CisIdDataRequest]
-    with Logging {
+class CisIdRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CisIdRequiredAction {
 
-  override protected def refine[A](
-    request: DataRequest[A]
-  ): Future[Either[Result, CisIdDataRequest[A]]] =
-    request.userAnswers.get(CisIdQuery) match {
-
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] =
+    request.userAnswers.get(CisIdPage) match {
       case Some(cisId) =>
         Future.successful(
           Right(
-            CisIdDataRequest(
-              request = request.request,
-              userId = request.userId,
-              userAnswers = request.userAnswers,
-              cisId = cisId,
-              employerReference = request.employerReference,
-              agentReference = request.agentReference,
-              isAgent = request.isAgent
+            CisIdDataRequest[A](
+              request.request,
+              request.userId,
+              request.userAnswers,
+              cisId,
+              request.employerReference,
+              request.agentReference,
+              request.isAgent,
+              request.agentCode
             )
           )
         )
-
-      case None =>
-        logger.error(
-          "[CisIdRequiredAction] Missing CIS ID, redirecting to journey recovery"
-        )
-
-        Future.successful(
-          Left(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-          )
-        )
+      case None        =>
+        if (request.isAgent) {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())))
+        } else {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())))
+        }
     }
 }
+
+trait CisIdRequiredAction extends ActionRefiner[DataRequest, CisIdDataRequest]
