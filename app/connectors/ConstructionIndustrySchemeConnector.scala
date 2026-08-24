@@ -274,12 +274,12 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .execute[HttpResponse]
       .flatMap { resp =>
         resp.status match {
-          case OK    =>
+          case NO_CONTENT =>
             logger.info(
               s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
             )
             Future.successful(())
-          case other =>
+          case other      =>
             Future.failed(
               UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
             )

@@ -620,7 +620,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "proceedInsufficientVerification" should {
 
-    "successfully create verification batch and verifications when BE returns 200" in {
+    "successfully create verification batch and verifications when BE returns 204" in {
       val request = ProceedInsufficientVerificationRequest(
         instanceId = "1",
         verificationBatchResourceRef = 10L,
@@ -629,7 +629,9 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       stubFor(
-        post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(aResponse().withStatus(OK))
+        post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(
+          aResponse().withStatus(NO_CONTENT)
+        )
       )
 
       connector.proceedInsufficientVerification(request).futureValue mustBe ((): Unit)
