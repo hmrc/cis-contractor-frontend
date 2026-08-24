@@ -49,9 +49,8 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       doc.text must include(
         messages(
           "verify.verificationRequestSubmitted.submittedAt",
-          submittedAt.format(
-            DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy")
-          )
+          submittedAt.format(DateTimeFormatter.ofPattern("HH:mm")),
+          submittedAt.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
         )
       )
 
