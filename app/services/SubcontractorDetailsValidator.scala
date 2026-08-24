@@ -58,8 +58,8 @@ class SubcontractorDetailsValidator @Inject() () {
       postcode = subcontractor.postcode,
       country = subcontractor.country.map { country =>
         Country(
-          code = Some(country),
-          name = None
+          code = None,
+          name = Some(country)
         )
       },
       addressValidated = false
