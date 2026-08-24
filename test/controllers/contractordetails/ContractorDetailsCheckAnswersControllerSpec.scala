@@ -28,6 +28,7 @@ import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterCo
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.ContractorDetailsService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -134,7 +135,7 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must submit contractor details and redirect to ontractor details updated page" in {
+    "must submit contractor details and redirect to Contractor Details Updated page" in {
 
       val userAnswers =
         emptyUserAnswers
@@ -150,19 +151,20 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           .set(EnterContractorEmailAddressPage, "test@mail.com")
           .success
           .value
-      val mockConnector =
-        mock[ConstructionIndustrySchemeConnector]
+      val mockService =
+        mock[ContractorDetailsService]
 
       val application =
         applicationBuilder(Some(userAnswers))
           .overrides(
-            inject.bind[ConstructionIndustrySchemeConnector]
-              .toInstance(mockConnector)
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
           )
           .build()
 
       when(
-        mockConnector.submitContractorDetails(
+        mockService.updateContractorDetails(
           any[UpdateContractorSchemeParams]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(()))
@@ -184,8 +186,8 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         val captor =
           ArgumentCaptor.forClass(classOf[UpdateContractorSchemeParams])
 
-        verify(mockConnector)
-          .submitContractorDetails(
+        verify(mockService)
+          .updateContractorDetails(
             captor.capture()
           )(any[HeaderCarrier])
 
@@ -198,20 +200,24 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           utr = Some("1234567890"),
           name = Some("Scheme ABC"),
           emailAddress = Some("test@mail.com"),
-          version = scheme.version
+          version = scheme.version,
+          displayWelcomePage = scheme.displayWelcomePage,
+          prePopCount = scheme.prePopCount,
+          prePopSuccessful = scheme.prePopSuccessful
         )
       }
     }
     "must redirect to journey recovery on submit when ContractorSchemePage is missing" in {
 
-      val mockConnector =
-        mock[ConstructionIndustrySchemeConnector]
+      val mockService =
+        mock[ContractorDetailsService]
 
       val application =
         applicationBuilder(Some(emptyUserAnswers))
           .overrides(
-            inject.bind[ConstructionIndustrySchemeConnector]
-              .toInstance(mockConnector)
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
           )
           .build()
 
@@ -229,12 +235,12 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockConnector, never())
-          .submitContractorDetails(any())(any())
+        verify(mockService, never())
+          .updateContractorDetails(any())(any())
       }
     }
 
-    "must fail when connector submit fails" in {
+    "must redirect to journey recovery when submitContractorDetails fails" in {
 
       val userAnswers =
         emptyUserAnswers
@@ -242,22 +248,25 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           .success
           .value
 
-      val mockConnector =
-          mock[ConstructionIndustrySchemeConnector]
+      val mockService =
+        mock[ContractorDetailsService]
 
       val application =
         applicationBuilder(Some(userAnswers))
           .overrides(
-            inject.bind[ConstructionIndustrySchemeConnector]
-              .toInstance(mockConnector)
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
           )
           .build()
 
       when(
-        mockConnector.submitContractorDetails(any[UpdateContractorSchemeParams])(
-          any()
-        )
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+        mockService.updateContractorDetails(
+          any[UpdateContractorSchemeParams]
+        )(any())
+      ).thenReturn(
+        Future.failed(new RuntimeException("boom"))
+      )
 
       running(application) {
 
@@ -266,10 +275,12 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           routes.ContractorDetailsCheckAnswersController.onSubmit().url
         )
 
-        val exception =
-          route(application, request).value.failed.futureValue
+        val result = route(application, request).value
 
-        exception mustBe a[RuntimeException]
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

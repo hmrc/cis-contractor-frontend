@@ -728,8 +728,8 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
     "POST /contractor-details/submit with the request body and return Unit" in {
 
       val config = mock[ServicesConfig]
-      val http = mock[HttpClientV2]
-      val rb = mock[RequestBuilder]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
 
       when(config.baseUrl("construction-industry-scheme"))
         .thenReturn("http://cis-host")
@@ -758,7 +758,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         )
 
       val result =
-        connector.submitContractorDetails(request).futureValue
+        connector.updateContractorDetails(request).futureValue
 
       result mustBe (())
 
@@ -779,7 +779,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       bodyCaptor.getValue mustBe Json.toJson(request)
     }
 
-    "throw an exception when the API returns a non-success status" in {
+    "return success when the API returns OK" in {
 
       val config = mock[ServicesConfig]
       val http = mock[HttpClientV2]
@@ -789,8 +789,45 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         .thenReturn("http://cis-host")
 
       when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any())(any(), any(), any())).thenReturn(rb)
+
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(OK, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "instanceId",
+          accountsOfficeReference = "123PA12345678",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678"
+        )
+
+      connector
+        .updateContractorDetails(request)
+        .futureValue mustBe (())
+    }
+
+    "throw an exception when the API returns a non-success status" in {
+
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
       when(rb.withBody(any)(any(), any(), any())).thenReturn(rb)
-      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
@@ -805,15 +842,14 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val ex =
         connector
-          .submitContractorDetails(request)
+          .updateContractorDetails(request)
           .failed
           .futureValue
 
       ex mustBe a[RuntimeException]
 
-      ex.getMessage must include(
-        "Submit contractor details failed"
-      )
+      ex.getMessage mustEqual
+        "Update contractor details failed, returned 500"
     }
   }
 }

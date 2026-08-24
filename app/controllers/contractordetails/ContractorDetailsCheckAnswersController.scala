@@ -22,26 +22,29 @@ import controllers.Execution.trampoline
 import controllers.actions.*
 import models.requests.UpdateContractorSchemeParams
 import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.contractordetails.*
 import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ContractorDetailsCheckAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  connector: ConstructionIndustrySchemeConnector,
+  service: ContractorDetailsService,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsCheckAnswersView
-)(implicit appConfig: FrontendAppConfig)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -85,14 +88,27 @@ class ContractorDetailsCheckAnswersController @Inject() (
               utr = request.userAnswers.get(ContractorUtrPage),
               name = request.userAnswers.get(SchemeNamePage),
               emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
-              version = scheme.version
+              version = scheme.version,
+              displayWelcomePage = scheme.displayWelcomePage,
+              prePopCount = scheme.prePopCount,
+              prePopSuccessful = scheme.prePopSuccessful
             )
 
-          connector
-            .submitContractorDetails(updateRequest)
+          service
+            .updateContractorDetails(updateRequest)
             .map { _ =>
               Redirect(
                 routes.ContractorDetailsUpdatedController.onPageLoad()
+              )
+            }
+            .recover { case t =>
+              logger.error(
+                "[ContractorDetailsCheckAnswersController.onSubmit] Failed to update contractor details",
+                t
+              )
+
+              Redirect(
+                controllers.routes.JourneyRecoveryController.onPageLoad()
               )
             }
 
