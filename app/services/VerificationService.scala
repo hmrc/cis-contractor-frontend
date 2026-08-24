@@ -396,7 +396,7 @@ class VerificationService @Inject() (
                                           ): Seq[Long] = {
       val unmatchedIds =
         response.verifications
-          .filter(_.matched.contains("N"))
+          .filterNot(_.matched.contains("Y"))
           .flatMap(_.subcontractorId)
           .distinct
 
