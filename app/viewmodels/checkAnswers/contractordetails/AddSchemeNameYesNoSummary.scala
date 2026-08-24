@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.contractordetails
 
 import models.{CheckMode, UserAnswers}
-import pages.contractordetails.AddSchemeNameYesNoPage
+import pages.contractordetails.{AddSchemeNameYesNoPage, ContractorSchemePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -30,13 +30,20 @@ object AddSchemeNameYesNoSummary {
 
       val value = if (answer) "site.yes" else "site.no"
 
+      val changeUrl =
+        if (ContractorSchemePage.hasExistingUtr(answers)) {
+          controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("scheme-name").url
+        } else {
+          controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
+        }
+
       SummaryListRowViewModel(
         key = "contractordetails.addSchemeNameYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
+            changeUrl
           )
             .withVisuallyHiddenText(messages("contractordetails.addSchemeNameYesNo.change.hidden"))
             .withAttribute("id" -> "add-scheme-name-yes-no")
