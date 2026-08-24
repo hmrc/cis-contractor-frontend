@@ -59,7 +59,8 @@
     @paragraph(
         messages(
             "verify.verificationRequestSubmitted.submittedAt",
-            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy"))
+            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm")),
+            vm.submittedAt.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
         )
     )
 
