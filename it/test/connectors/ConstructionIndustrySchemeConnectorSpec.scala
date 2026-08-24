@@ -620,13 +620,14 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "proceedInsufficientVerification" should {
 
-    "successfully create verification batch and verifications when BE returns 204" in {
-      val request = ProceedInsufficientVerificationRequest(
-        instanceId = "1",
-        verificationBatchResourceRef = 10L,
-        verificationResourceRef = 9L,
-        proceed = "Y"
-      )
+    val request = ProceedInsufficientVerificationRequest(
+      instanceId = "1",
+      verificationBatchResourceRef = 10L,
+      verificationResourceRef = 9L,
+      proceed = "Y"
+    )
+
+    "successfully proceed verification when BE returns 204" in {
 
       stubFor(
         post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(
@@ -638,12 +639,6 @@ class ConstructionIndustrySchemeConnectorSpec
     }
 
     "propagate upstream error on non-2xx (e.g. 500)" in {
-      val request = ProceedInsufficientVerificationRequest(
-        instanceId = "1",
-        verificationBatchResourceRef = 10L,
-        verificationResourceRef = 9L,
-        proceed = "Y"
-      )
 
       stubFor(
         post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data"))
