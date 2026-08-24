@@ -1210,6 +1210,7 @@ insufficientSubcontractorDetailsUpdated.table.hdr.previous                     =
 insufficientSubcontractorDetailsUpdated.table.hdr.updated                      = Updated
 insufficientSubcontractorDetailsUpdated.noneProvided                           = None provided
 insufficientSubcontractorDetailsUpdated.noneSelected                           = None selected
+insufficientSubcontractorDetailsUpdated.noName                                 = No name provided
 insufficientSubcontractorDetailsUpdated.backTo                                 = Back to
 insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                         = Before you go
 insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                         = Your feedback helps us make our service better.

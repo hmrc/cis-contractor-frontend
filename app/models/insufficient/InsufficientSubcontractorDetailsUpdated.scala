@@ -34,7 +34,7 @@ object InsufficientSubcontractorDetailsUpdatedReturnTo {
   case object YourSubcontractors extends InsufficientSubcontractorDetailsUpdatedReturnTo
   case object CannotVerifyAllSubcontractors extends InsufficientSubcontractorDetailsUpdatedReturnTo
 
-  implicit val reads: Reads[InsufficientSubcontractorDetailsUpdatedReturnTo] =
+  private val reads: Reads[InsufficientSubcontractorDetailsUpdatedReturnTo] =
     Reads.of[String].flatMap {
       case "reviewUnmatchedSubcontractors" =>
         Reads.pure(ReviewUnmatchedSubcontractors)
@@ -49,7 +49,7 @@ object InsufficientSubcontractorDetailsUpdatedReturnTo {
         Reads(_ => JsError(s"Unknown returnTo value: $value"))
     }
 
-  implicit val writes: Writes[InsufficientSubcontractorDetailsUpdatedReturnTo] =
+  private val writes: Writes[InsufficientSubcontractorDetailsUpdatedReturnTo] =
     Writes {
       case ReviewUnmatchedSubcontractors =>
         JsString("reviewUnmatchedSubcontractors")
@@ -60,19 +60,22 @@ object InsufficientSubcontractorDetailsUpdatedReturnTo {
       case CannotVerifyAllSubcontractors =>
         JsString("cannotVerifyAllSubcontractors")
     }
+
+  implicit val format: Format[InsufficientSubcontractorDetailsUpdatedReturnTo] =
+    Format(reads, writes)
 }
 
 object InsufficientSubcontractorDetailsUpdated {
 
-  implicit val reads: Reads[InsufficientSubcontractorDetailsUpdated] = (
+  private val reads: Reads[InsufficientSubcontractorDetailsUpdated] = (
     (__ \ "subcontractorName").read[InsufficientSubcontractorName] and
       (__ \ "updates").read[Seq[InsufficientSubcontractorUpdate]] and
       (__ \ "returnTo").readWithDefault(
         InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
       )
-  )(InsufficientSubcontractorDetailsUpdated.apply)
+    )(InsufficientSubcontractorDetailsUpdated.apply)
 
-  implicit val writes: OWrites[InsufficientSubcontractorDetailsUpdated] =
+  private val writes: OWrites[InsufficientSubcontractorDetailsUpdated] =
     Json.writes[InsufficientSubcontractorDetailsUpdated]
 
   implicit val format: OFormat[InsufficientSubcontractorDetailsUpdated] =
@@ -110,16 +113,16 @@ case class InsufficientSubcontractorUpdate(
 
 object InsufficientSubcontractorUpdate {
 
-  implicit val reads: Reads[InsufficientSubcontractorUpdate] = (
+  private val reads: Reads[InsufficientSubcontractorUpdate] = (
     (__ \ "detail").read[String] and
       (__ \ "previous").readNullable[String] and
       (__ \ "updated").readNullable[String] and
       (__ \ "missingValueKey").readWithDefault(
         "insufficientSubcontractorDetailsUpdated.noneProvided"
       )
-  )(InsufficientSubcontractorUpdate.apply)
+    )(InsufficientSubcontractorUpdate.apply)
 
-  implicit val writes: OWrites[InsufficientSubcontractorUpdate] =
+  private val writes: OWrites[InsufficientSubcontractorUpdate] =
     Json.writes[InsufficientSubcontractorUpdate]
 
   implicit val format: OFormat[InsufficientSubcontractorUpdate] =

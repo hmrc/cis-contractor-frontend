@@ -114,7 +114,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery when CIS ID is missing" in {
+    "must redirect to unauthorised organisation when CIS ID is missing" in {
 
       val userAnswers =
         emptyUserAnswers
@@ -138,7 +138,7 @@ class InsufficientSubcontractorDetailsUpdatedControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
       }
     }
 

@@ -316,6 +316,28 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
       )
     }
 
+    "must not render updates heading or table when there are no updates" in {
+
+      implicit val request =
+        FakeRequest(GET, "/")
+
+      val document =
+        Jsoup.parse(
+          view(
+            rows = Seq.empty,
+            subcontractorName = Some(subcontractorName),
+            returnUrl = "#",
+            returnTextKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+            showBeforeYouGo = false
+          ).toString()
+        )
+
+      document.text() must not include
+        msgs("insufficientSubcontractorDetailsUpdated.updatesMade.h2")
+
+      document.select("table").isEmpty mustBe true
+    }
+
     "must render the no-name message when subcontractor name is not available" in {
 
       implicit val request =
@@ -333,7 +355,7 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
         )
 
       document.text() must include(
-        msgs("verify.noName")
+        msgs("insufficientSubcontractorDetailsUpdated.noName")
       )
 
       document.text() must not include (
