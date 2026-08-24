@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -388,6 +388,87 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ex.getMessage must include("writes-failed")
 
       verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+  }
+
+  "VerificationService.getLastSubmittedVerificationBatch" - {
+
+    val instanceId = "INST-123"
+
+    val response =
+      GetLastSubmittedVerificationBatchResponse(
+        scheme = None,
+        subcontractors = Nil,
+        verifications = Nil,
+        verificationBatch = None,
+        submission = None
+      )
+
+    "must fetch last submitted verification batch, store in UserAnswers, persist to session repo, and return updated answers" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.getLastSubmittedVerificationBatch(ua).futureValue
+
+      result.get(LastSubmittedVerificationBatchResponsePage) mustBe Some(response)
+
+      verify(mockConnector).getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+
+      verify(mockRepo).set(
+        org.mockito.ArgumentMatchers.argThat { (saved: UserAnswers) =>
+          saved.get(LastSubmittedVerificationBatchResponsePage).contains(response)
+        }
+      )
+
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must fail when CisIdQuery (instance id) is missing and not call connector nor repo" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ex = service.getLastSubmittedVerificationBatch(emptyUserAnswers).failed.futureValue
+      ex.getMessage must include("InstanceIdQuery not found in session data")
+
+      verify(mockConnector, never()).getLastSubmittedVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must propagate connector failure and not write to session repo" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = service.getLastSubmittedVerificationBatch(ua).failed.futureValue
+      ex.getMessage must include("boom")
+
+      verify(mockConnector).getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
       verify(mockRepo, never()).set(any[UserAnswers])
       verifyNoMoreInteractions(mockConnector)
     }

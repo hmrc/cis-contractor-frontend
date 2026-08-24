@@ -26,15 +26,21 @@ object SubmissionStatusCheckResult {
   case object Continue extends SubmissionStatusCheckResult
 
   case object ShowPendingVerificationWarning extends SubmissionStatusCheckResult
+
+  case object CheckUnmatchedSubcontractors extends SubmissionStatusCheckResult
 }
 
 object CheckLatestSubmissionStatusService {
 
   def check(status: Option[VerificationBatchStatus]): SubmissionStatusCheckResult =
     status match {
-      case None | Some(Started) | Some(Validated) =>
+      case None | Some(Started) | Some(Validated) | Some(FatalError) | Some(DepartmentalError) =>
         SubmissionStatusCheckResult.Continue
-      case Some(Pending) | Some(Accepted)         =>
+
+      case Some(Pending) | Some(Accepted) =>
         SubmissionStatusCheckResult.ShowPendingVerificationWarning
+
+      case Some(Submitted) | Some(SubmittedNoReceipt) =>
+        SubmissionStatusCheckResult.CheckUnmatchedSubcontractors
     }
 }

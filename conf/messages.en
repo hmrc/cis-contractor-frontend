@@ -426,6 +426,7 @@ amendConfirmation.beforeYouGo.p1                                                
 amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
 amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
 amendConfirmation.table.content.none                                                =  None provided
+amendConfirmation.table.selectContent.none                                          =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
@@ -490,7 +491,7 @@ noUnmatchedSubcontractors.backTo                                                
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
 # Partnership
-addPartnershipContactMethodsYesNo.title                            = Do you want to add contact details for this partnership?
+addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
 addPartnershipContactMethodsYesNo.error.required                   =  Select yes if you want to add contact details for this partnership
 addPartnershipContactMethodsYesNo.checkYourAnswersLabel            =  Add contact details?
@@ -1111,6 +1112,12 @@ verify.verificationResults.verificationNumber                           =  Verif
 verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
+
+verify.verificationResults.status.matched                               = Verified
+verify.verificationResults.status.unmatched                             = Unmatched
+verify.verificationResults.taxTreatment.net                             = Standard rate
+verify.verificationResults.taxTreatment.gross                           = Gross
+verify.verificationResults.taxTreatment.unmatched                       = Higher rate
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details

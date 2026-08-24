@@ -19,11 +19,18 @@ package controllers.add.partnership
 import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.{PartnershipNominatedPartnerNamePage, PartnershipNominatedPartnerUtrPage, PartnershipNominatedPartnerUtrYesNoPage}
+import pages.amend.ShowVerificationDetailsPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
+import play.api.inject.bind
+
+import scala.concurrent.Future
 
 class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with MockitoSugar {
 
@@ -37,6 +44,9 @@ class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with Mockito
 
   lazy private val nominatedPartnerUtrRoute =
     controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(NormalMode).url
+
+  lazy private val nominatedPartnerUtrAmendRoute =
+    controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(AmendMode).url
 
   "PartnershipNominatedPartnerUtrController" - {
 
@@ -208,6 +218,102 @@ class PartnershipNominatedPartnerUtrControllerSpec extends SpecBase with Mockito
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nominatedPartnerUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a Post when subcontractor is verified" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, nominatedPartnerUtrRoute)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when subcontractor is unverified in amend mode" in {
+
+      val userAnswers =
+        uaWithName
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, nominatedPartnerUtrAmendRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[views.html.add.partnership.PartnershipNominatedPartnerUtrView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to the AmendPartnershipCheckYourAnswers page when valid data is submitted when subcontractor is unverified in amend mode" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, nominatedPartnerUtrAmendRoute)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
   }
