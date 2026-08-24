@@ -73,7 +73,7 @@ object InsufficientSubcontractorDetailsUpdated {
       (__ \ "returnTo").readWithDefault(
         InsufficientSubcontractorDetailsUpdatedReturnTo.CannotVerifyAllSubcontractors
       )
-    )(InsufficientSubcontractorDetailsUpdated.apply)
+  )(InsufficientSubcontractorDetailsUpdated.apply)
 
   private val writes: OWrites[InsufficientSubcontractorDetailsUpdated] =
     Json.writes[InsufficientSubcontractorDetailsUpdated]
@@ -120,7 +120,7 @@ object InsufficientSubcontractorUpdate {
       (__ \ "missingValueKey").readWithDefault(
         "insufficientSubcontractorDetailsUpdated.noneProvided"
       )
-    )(InsufficientSubcontractorUpdate.apply)
+  )(InsufficientSubcontractorUpdate.apply)
 
   private val writes: OWrites[InsufficientSubcontractorUpdate] =
     Json.writes[InsufficientSubcontractorUpdate]
