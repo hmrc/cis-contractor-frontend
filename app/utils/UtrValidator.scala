@@ -22,7 +22,7 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 //
 //import scala.concurrent.ExecutionContext
 
-object UtrValidator 
+object UtrValidator
 // @Inject() (subcontractorService: SubcontractorService)
 {
 
@@ -33,8 +33,8 @@ object UtrValidator
       .filter(_.trim.nonEmpty)
       .flatMap { utr =>
         Option.when(
-          !UTR.isValidUTR(utr) 
-            //|| SubcontractorService.isDuplicateUTR(request.userAnswers, utr)
+          !UTR.isValidUTR(utr)
+          // || SubcontractorService.isDuplicateUTR(request.userAnswers, utr)
         ) {
           FieldValidationFailure(
             field = SubcontractorValidationField.Utr,

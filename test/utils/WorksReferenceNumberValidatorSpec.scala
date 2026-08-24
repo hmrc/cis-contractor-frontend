@@ -53,7 +53,6 @@ class WorksReferenceNumberValidatorSpec extends AnyWordSpec with Matchers {
         ) mustBe None
     }
 
-
     "return a failure when the WRN exceeds the maximum length" in {
       val wrn = "A12323452345#@[]{}$%^&£~"
 

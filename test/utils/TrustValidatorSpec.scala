@@ -59,7 +59,6 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
 
       val utr = "12345A7890"
 
-
       TrustValidator.validate(
         worksReferenceNumber = Some(worksReferenceNumber),
         tradingName = Some(tradingName),

@@ -21,13 +21,13 @@ import models.validation.FieldValidationFailure
 object TrustValidator {
 
   def validate(
-                worksReferenceNumber: Option[String],
-                utr: Option[String],
-                tradingName: Option[String]
-              ): List[FieldValidationFailure] =
-      WorksReferenceNumberValidator
-        .validate(worksReferenceNumber)
-        .toList ++
+    worksReferenceNumber: Option[String],
+    utr: Option[String],
+    tradingName: Option[String]
+  ): List[FieldValidationFailure] =
+    WorksReferenceNumberValidator
+      .validate(worksReferenceNumber)
+      .toList ++
       UtrValidator
         .validate(utr)
         .toList ++
@@ -35,4 +35,3 @@ object TrustValidator {
         .validate(tradingName)
         .toList
 }
-

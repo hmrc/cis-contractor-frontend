@@ -27,14 +27,13 @@ class TradingNameValidatorSpec extends AnyWordSpec with Matchers {
     "return failure when the trading name is empty" in {
       val tradingName = ""
       TradingNameValidator
-        .validate(Some("")) mustBe   Some(
+        .validate(Some("")) mustBe Some(
         FieldValidationFailure(
           field = SubcontractorValidationField.TradingName,
           value = Some(tradingName)
         )
       )
     }
-
 
     "return no failure for a valid trading name" in {
       TradingNameValidator

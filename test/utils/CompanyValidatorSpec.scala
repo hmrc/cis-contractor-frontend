@@ -63,7 +63,6 @@ class CompanyValidatorSpec extends AnyWordSpec with Matchers {
 
       val utr = "12345A7890"
 
-
       CompanyValidator.validate(
         crn = Some(crn),
         worksReferenceNumber = Some(worksReferenceNumber),

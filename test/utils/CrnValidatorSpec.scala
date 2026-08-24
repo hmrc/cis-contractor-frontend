@@ -53,7 +53,6 @@ class CrnValidatorSpec extends AnyWordSpec with Matchers {
         ) mustBe None
     }
 
-
     "return a failure when the CRN exceeds the maximum length" in {
       val crn = "5860920998"
 
@@ -101,4 +100,3 @@ class CrnValidatorSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-

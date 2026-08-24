@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import models.SubcontractorCurrentVerification
 import models.validation.{FieldValidationFailure, SubcontractorValidationFailure}
-import models.validation.SubcontractorValidationField.{WorksReferenceNumber,TradingName,Utr}
+import models.validation.SubcontractorValidationField.{TradingName, Utr, WorksReferenceNumber}
 
 class SubcontractorTrustValidatorSpec extends SpecBase {
 
@@ -64,7 +64,6 @@ class SubcontractorTrustValidatorSpec extends SpecBase {
           )
         )
     }
-
 
     "return a subcontractor containing an invalid TradingName" in {
       val invalidTradingName =
@@ -123,8 +122,8 @@ class SubcontractorTrustValidatorSpec extends SpecBase {
   }
 
   private def subcontractor(
-                             subcontractorId: Long
-                           ): SubcontractorCurrentVerification =
+    subcontractorId: Long
+  ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = subcontractorId,
       subbieResourceRef = Some(

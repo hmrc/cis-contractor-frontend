@@ -46,7 +46,6 @@ class UtrValidatorSpec extends AnyWordSpec with Matchers {
         ) mustBe None
     }
 
-
     "return a failure when the UTR exceeds the maximum length" in {
       val utr = "1234567890"
 
@@ -94,4 +93,3 @@ class UtrValidatorSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-

@@ -27,8 +27,8 @@ import javax.inject.Singleton
 class SubcontractorTrustValidator {
 
   def validate(
-                subcontractors: Seq[SubcontractorCurrentVerification]
-              ): List[SubcontractorValidationFailure] =
+    subcontractors: Seq[SubcontractorCurrentVerification]
+  ): List[SubcontractorValidationFailure] =
     subcontractors.toList.flatMap { subcontractor =>
       val failedFields =
         TrustValidator.validate(
@@ -45,4 +45,3 @@ class SubcontractorTrustValidator {
       }
     }
 }
-
