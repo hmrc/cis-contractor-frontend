@@ -34,7 +34,7 @@ import views.html.verify.VerificationResultsView
 
 import scala.concurrent.Future
 
-class VerificationResultsControllerSpec extends SpecBase with MockitoSugar{
+class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
 
   private val subcontractor = SubcontractorLastVerification(
     subcontractorId = 1L,
@@ -55,7 +55,7 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar{
     actionIndicator = Some("verify")
   )
 
-  private val batchResponse = GetLastSubmittedVerificationBatchResponse(
+  private val batchResponse           = GetLastSubmittedVerificationBatchResponse(
     scheme = None,
     subcontractors = Seq(subcontractor),
     verifications = Seq(verification),

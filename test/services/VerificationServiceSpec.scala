@@ -1103,8 +1103,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     "must create a new verification batch using only unmatched subcontractors when no current batch exists" in {
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
 
       val currentResponse =
         GetCurrentVerificationBatchResponse(
@@ -1272,8 +1272,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     "must replace the current verification batch with unmatched subcontractors when a current batch exists" in {
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
 
       val currentResponse =
         GetCurrentVerificationBatchResponse(
@@ -1362,8 +1362,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     "must ignore matched verifications and only recreate unmatched subcontractors" in {
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
 
       val currentResponse =
         GetCurrentVerificationBatchResponse(
@@ -1414,7 +1414,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     "must fail when LastSubmittedVerificationBatchResponsePage is missing" in {
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
+      val mockRepo      = mock[SessionRepository]
 
       val service =
         buildService(
@@ -1456,6 +1456,60 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       verify(mockRepo, never())
         .set(any[UserAnswers])
+    }
+  }
+
+  "VerificationService.anyUnmatchedSubcontractorsStillPresent" - {
+
+    "must return true when any unmatched subcontractorId is still in the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(
+              Seq(SubcontractorListItem(11L), SubcontractorListItem(22L))
+            )
+          )
+        )
+
+      val result =
+        service.anyUnmatchedSubcontractorsStillPresent("900063", Set(22L, 99L)).futureValue
+
+      result mustBe true
+      verify(mockConnector).getSubcontractorList(eqTo("900063"))(any[HeaderCarrier])
+    }
+
+    "must return false when unmatched subcontractorIds are not in the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L)))
+          )
+        )
+
+      val result =
+        service.anyUnmatchedSubcontractorsStillPresent("900063", Set(22L)).futureValue
+
+      result mustBe false
+    }
+
+    "must return false without calling the connector when unmatched ids are empty" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val result =
+        service.anyUnmatchedSubcontractorsStillPresent("900063", Set.empty).futureValue
+
+      result mustBe false
+      verify(mockConnector, never()).getSubcontractorList(any[String])(any[HeaderCarrier])
     }
   }
 }

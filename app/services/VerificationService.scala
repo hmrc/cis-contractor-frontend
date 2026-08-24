@@ -318,11 +318,12 @@ class VerificationService @Inject() (
         val refs = unmatchedSubcontractorRefs(lastSubmitted)
 
         if (refs.nonEmpty) Future.successful(refs)
-        else Future.failed(
-          new RuntimeException(
-            "No unmatched subcontractor references found in LastSubmittedVerificationBatchResponsePage"
+        else
+          Future.failed(
+            new RuntimeException(
+              "No unmatched subcontractor references found in LastSubmittedVerificationBatchResponsePage"
+            )
           )
-        )
       }
 
       refreshedUa <- getCurrentVerificationBatch(userAnswers)
@@ -392,17 +393,17 @@ class VerificationService @Inject() (
     } yield afterNewest
 
   private def unmatchedSubcontractorRefs(
-                                            response: GetLastSubmittedVerificationBatchResponse
-                                          ): Seq[Long] = {
-      val unmatchedIds =
-        response.verifications
-          .filterNot(_.matched.contains("Y"))
-          .flatMap(_.subcontractorId)
-          .distinct
-
-      response.subcontractors
-        .filter(sub => unmatchedIds.contains(sub.subcontractorId))
-        .flatMap(_.subbieResourceRef)
+    response: GetLastSubmittedVerificationBatchResponse
+  ): Seq[Long] = {
+    val unmatchedIds =
+      response.verifications
+        .filterNot(_.matched.contains("Y"))
+        .flatMap(_.subcontractorId)
         .distinct
-    }
+
+    response.subcontractors
+      .filter(sub => unmatchedIds.contains(sub.subcontractorId))
+      .flatMap(_.subbieResourceRef)
+      .distinct
+  }
 }

@@ -41,7 +41,8 @@ class VerificationResultsController @Inject() (
   view: VerificationResultsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport with Logging {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {
@@ -58,12 +59,11 @@ class VerificationResultsController @Inject() (
 
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       verificationService
         .recreateCurrentBatchFromUnmatchedVerifications(request.userAnswers)
         .map { _ =>
           Redirect(
-            //ToDo: This should be changed to the review unmatched subcontractors page once it is implemented
+            // ToDo: This should be changed to the review unmatched subcontractors page once it is implemented
             controllers.verify.routes.VerificationResultsController
               .onPageLoad()
           )
