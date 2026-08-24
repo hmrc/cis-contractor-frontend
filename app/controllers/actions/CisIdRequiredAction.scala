@@ -25,10 +25,10 @@ import play.api.Logging
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CisIdRequiredAction @Inject() (
-                                      implicit val executionContext: ExecutionContext
-                                    ) extends ActionRefiner[DataRequest, CisIdDataRequest]
-  with Logging {
+class CisIdRequiredAction @Inject() (implicit
+  val executionContext: ExecutionContext
+) extends ActionRefiner[DataRequest, CisIdDataRequest]
+    with Logging {
 
   override protected def refine[A](
     request: DataRequest[A]
