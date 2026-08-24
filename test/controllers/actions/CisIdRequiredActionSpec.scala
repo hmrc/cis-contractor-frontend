@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 class CisIdRequiredActionSpec extends SpecBase {
 
-  private class TestCisIdRequiredAction extends CisIdRequiredActionImpl {
+  private class TestCisIdRequiredAction extends CisIdRequiredAction {
 
     def testRefine[A](
       request: DataRequest[A]
