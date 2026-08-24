@@ -1074,7 +1074,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         verificationNumber = None,
         taxTreatment = None,
         subcontractorName = None,
-        subcontractorId = Some(22L)
+        subcontractorId = Some(22L),
+        actionIndicator = Some("match")
       )
 
     val matchedVerification =
@@ -1086,7 +1087,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         verificationNumber = None,
         taxTreatment = None,
         subcontractorName = None,
-        subcontractorId = Some(33L)
+        subcontractorId = Some(33L),
+        actionIndicator = Some("verify")
       )
 
     val lastSubmittedResponse =
