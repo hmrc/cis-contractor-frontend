@@ -74,14 +74,14 @@ class ClientListCheckPolicyResolverSpec extends SpecBase {
       ) mustBe Exempt
     }
 
-    "must return Exempt for an unmatched GET route" in {
+    "must return GroupA for an unmatched GET route" in {
       resolver.resolve(
         request(
           "GET",
           "controllers.SomeController",
           "onSubmit"
         )
-      ) mustBe Exempt
+      ) mustBe GroupA
     }
   }
 }
