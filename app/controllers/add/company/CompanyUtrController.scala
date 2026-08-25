@@ -42,6 +42,7 @@ class CompanyUtrController @Inject() (
   formProvider: CompanyUtrFormProvider,
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -59,28 +60,29 @@ class CompanyUtrController @Inject() (
       navigator.nextPage(CompanyUtrPage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val yesOrNoPage       = CompanyUtrYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
+      val yesOrNoPage       = CompanyUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
 
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          val result = Ok(view(preparedForm, mode, companyName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-        val result = Ok(view(preparedForm, mode, companyName))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(CompanyNamePage)
         .map { companyName =>
@@ -113,5 +115,5 @@ class CompanyUtrController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }
