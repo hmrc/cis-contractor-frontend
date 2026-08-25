@@ -74,7 +74,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                 view(
                   preparedForm,
                   mode,
-                  subcontractor.displayName(),
+                  subcontractor.displayName,
                   subcontractorId
                 )
               )
@@ -141,7 +141,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
         }
       result.recover { case ex =>
         logger.error(
-          s"[DeleteAmendedNilMonthlyReturnController][onSubmit] Failed to proceed insufficient verification for subcontractorId=$subcontractorId",
+          s"[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] Failed to proceed insufficient verification for subcontractorId=$subcontractorId",
           ex
         )
         recoveryRedirect
