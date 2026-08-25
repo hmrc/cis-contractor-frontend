@@ -71,7 +71,9 @@ class ViewOnlyPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mo
       subcontractorType = Partnership
     )
 
-  private val routeUrl = "/subcontractor/viewOnly/partnership/partnership-information-read-only"
+  private lazy val routeUrl = controllers.viewOnly.partnership.routes.ViewOnlyPartnershipCheckYourAnswersController
+    .onPageLoad()
+    .url
 
   "ViewOnlyPartnershipCheckYourAnswersController" - {
 

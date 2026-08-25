@@ -63,7 +63,9 @@ class ViewOnlyTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoS
       subcontractorType = Trust
     )
 
-  private val routeUrl = "/subcontractor/viewOnly/trust/trust-information-read-only"
+  private lazy val routeUrl = controllers.viewOnly.trust.routes.ViewOnlyTrustCheckYourAnswersController
+    .onPageLoad()
+    .url
 
   "ViewOnlyTrustCheckYourAnswersController" - {
 

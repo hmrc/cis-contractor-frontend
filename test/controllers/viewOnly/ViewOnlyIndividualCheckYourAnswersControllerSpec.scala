@@ -74,7 +74,7 @@ class ViewOnlyIndividualCheckYourAnswersControllerSpec extends SpecBase with Moc
       subcontractorType = Individualorsoletrader
     )
 
-  private val viewOnlyRoute =
+  private lazy val viewOnlyRoute =
     controllers.viewOnly.routes.ViewOnlyIndividualCheckYourAnswersController
       .onPageLoad()
       .url

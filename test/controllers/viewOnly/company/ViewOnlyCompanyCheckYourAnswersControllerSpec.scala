@@ -65,7 +65,9 @@ class ViewOnlyCompanyCheckYourAnswersControllerSpec extends SpecBase with Mockit
       subcontractorType = Limitedcompany
     )
 
-  private val routeUrl = "/subcontractor/viewOnly/company/company-information-read-only"
+  private lazy val routeUrl = controllers.viewOnly.company.routes.ViewOnlyCompanyCheckYourAnswersController
+    .onPageLoad()
+    .url
 
   "ViewOnlyCompanyCheckYourAnswersController" - {
 
