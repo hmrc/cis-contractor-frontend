@@ -638,10 +638,16 @@ GET   /verify/verification-status/reverification-decision                control
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-POST   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
+POST  /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
+
+GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.UnmatchedSubcontractorsController.onPageLoad()
+
+GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
@@ -679,6 +685,3 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
-
-GET   /subcontractor/verify/unmatched-subcontractors-exist                       controllers.UnmatchedSubcontractorsController.onPageLoad()
-GET   /subcontractor/verify/no-unmatched-subcontractors                      controllers.NoUnmatchedSubcontractorsController.onPageLoad()
