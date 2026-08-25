@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package models
+package models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-case class VerificationLastVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  verificationResourceRef: Option[Long],
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  subcontractorName: Option[String],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String]
+final case class GetSubcontractorListResponse(
+  subcontractors: Seq[SubcontractorListItem]
 )
 
-object VerificationLastVerification {
-  given format: OFormat[VerificationLastVerification] = Json.format[VerificationLastVerification]
+object GetSubcontractorListResponse {
+  given format: OFormat[GetSubcontractorListResponse] =
+    Json.format[GetSubcontractorListResponse]
+}
+
+final case class SubcontractorListItem(
+  subcontractorId: Long
+)
+
+object SubcontractorListItem {
+  given format: OFormat[SubcontractorListItem] =
+    Json.format[SubcontractorListItem]
 }
