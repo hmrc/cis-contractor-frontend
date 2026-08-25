@@ -27,6 +27,7 @@ import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
 import java.time.LocalDateTime
+import utils.DateTimeFormats
 import java.time.format.DateTimeFormatter
 
 class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerSuite {
@@ -50,7 +51,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages(
           "verify.verificationRequestSubmitted.submittedAt",
           submittedAt.format(DateTimeFormatter.ofPattern("HH:mm")),
-          submittedAt.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+          submittedAt.format(DateTimeFormats.dateTimeFormat()(messages.lang))
         )
       )
 
