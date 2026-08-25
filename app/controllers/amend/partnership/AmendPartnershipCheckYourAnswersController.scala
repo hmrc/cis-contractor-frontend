@@ -57,29 +57,31 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val ua = request.userAnswers
 
-    ValidatedPartnership.build(ua) match {
-      case Right(_) =>
-        val isVerified      = ua.get(ShowVerificationDetailsPage)
-        val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+      ValidatedPartnership.build(ua) match {
+        case Right(_) =>
+          val isVerified      = ua.get(ShowVerificationDetailsPage)
+          val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
-        val subcontractorInformationList =
-          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+          val subcontractorInformationList =
+            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-        val detailsList =
-          SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+          val detailsList =
+            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit()
-        val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
+          val submitUrl =
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit(subbieResourceRef)
+          val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
 
-        Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
+          Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
 
-      case Left(error) =>
-        logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+        case Left(error) =>
+          logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
   private def subcontractorInformationRows(
@@ -161,7 +163,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       )
   }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
 
@@ -197,7 +199,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
         case Right(_) =>
           subcontractorService
-            .updateSubcontractor(request.userAnswers)
+            .updateSubcontractor(request.userAnswers, submittedSubbieResourceRef(subbieResourceRef))
             .flatMap { _ =>
               Future
                 .fromTry(
@@ -230,6 +232,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
             }
       }
     }
+
+  private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
+    Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

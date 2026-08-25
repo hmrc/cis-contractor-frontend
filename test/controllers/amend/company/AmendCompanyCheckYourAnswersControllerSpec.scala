@@ -39,7 +39,6 @@ import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AmendmentHelper
 import config.FrontendAppConfig
-import models.response.UpdateSubcontractorResponse
 
 import scala.concurrent.Future
 
@@ -334,14 +333,11 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
-        Future.successful(
-          UpdateSubcontractorResponse(
-            version = 2
-          )
-        )
+        Future.successful(())
       )
       when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
       val application              =
@@ -366,7 +362,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
 
       verify(mockSessionRepository).set(captor.capture())
@@ -467,7 +464,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
         Future.failed(
@@ -497,7 +495,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
     }
 
@@ -536,7 +535,8 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         mockSubcontractorService,
         never()
       ).updateSubcontractor(
-        any[UserAnswers]
+        any[UserAnswers],
+        any[Option[Long]]
       )(any[HeaderCarrier])
     }
 

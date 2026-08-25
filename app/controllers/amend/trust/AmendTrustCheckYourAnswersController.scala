@@ -57,29 +57,31 @@ class AmendTrustCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val ua = request.userAnswers
 
-    ValidatedTrust.build(ua) match {
-      case Right(_) =>
-        val isVerified = ua.get(ShowVerificationDetailsPage)
-        val trustName  = ua.get(TrustNamePage).getOrElse("")
+      ValidatedTrust.build(ua) match {
+        case Right(_) =>
+          val isVerified = ua.get(ShowVerificationDetailsPage)
+          val trustName  = ua.get(TrustNamePage).getOrElse("")
 
-        val subcontractorInformationList =
-          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+          val subcontractorInformationList =
+            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-        val detailsList =
-          SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+          val detailsList =
+            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
-        val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
+          val submitUrl =
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
+          val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
-        Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
+          Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
 
-      case Left(error) =>
-        logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+        case Left(error) =>
+          logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
   private def subcontractorInformationRows(
@@ -156,7 +158,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       )
   }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedTrust.build(request.userAnswers) match {
 
@@ -194,7 +196,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
         case Right(_) =>
           subcontractorService
-            .updateSubcontractor(request.userAnswers)
+            .updateSubcontractor(request.userAnswers, submittedSubbieResourceRef(subbieResourceRef))
             .flatMap { _ =>
               Future
                 .fromTry(
@@ -227,6 +229,9 @@ class AmendTrustCheckYourAnswersController @Inject() (
             }
       }
     }
+
+  private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
+    Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

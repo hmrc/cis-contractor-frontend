@@ -42,7 +42,6 @@ import config.FrontendAppConfig
 import queries.CisIdQuery
 import utils.AmendmentHelper
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
-import models.response.UpdateSubcontractorResponse
 
 class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -372,14 +371,11 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
-        Future.successful(
-          UpdateSubcontractorResponse(
-            version = 2
-          )
-        )
+        Future.successful(())
       )
       when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
       val application              =
@@ -406,7 +402,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
@@ -507,7 +504,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
         Future.failed(
@@ -537,7 +535,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
     }
 
@@ -576,7 +575,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         mockSubcontractorService,
         never()
       ).updateSubcontractor(
-        any[UserAnswers]
+        any[UserAnswers],
+        any[Option[Long]]
       )(any[HeaderCarrier])
     }
 

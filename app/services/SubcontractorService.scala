@@ -28,7 +28,7 @@ import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
-import queries.{CisIdQuery, OriginalSubcontractorQuery}
+import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -185,12 +185,14 @@ class SubcontractorService @Inject() (
     cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
 
   def updateSubcontractor(
-    userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[UpdateSubcontractorResponse] =
+    userAnswers: UserAnswers,
+    subbieResourceRef: Option[Long] = None
+  )(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       cisId             <- getCisId(userAnswers)
       subcontractorType <- getSubcontractorType(userAnswers)
       original          <- getOriginalSubcontractor(userAnswers)
+      _                 <- validateAmendSubbieResourceRef(userAnswers, original, subbieResourceRef)
 
       subcontractor =
         updateSubcontractorFromUserAnswers(
@@ -207,6 +209,30 @@ class SubcontractorService @Inject() (
           )
         )
     } yield response
+
+  private def validateAmendSubbieResourceRef(
+    userAnswers: UserAnswers,
+    original: SubcontractorResponse,
+    submittedSubbieResourceRef: Option[Long]
+  ): Future[Unit] =
+    submittedSubbieResourceRef match {
+      case Some(expectedRef) =>
+        val storedRef   = userAnswers.get(AmendSubbieResourceRefQuery)
+        val originalRef = original.subbieResourceRef
+
+        if (storedRef.contains(expectedRef) && originalRef.contains(expectedRef)) {
+          Future.successful(())
+        } else {
+          Future.failed(
+            new RuntimeException(
+              s"Stale amend session for subbieResourceRef=$expectedRef"
+            )
+          )
+        }
+
+      case None =>
+        Future.successful(())
+    }
 
   private def getOriginalSubcontractor(
     userAnswers: UserAnswers
@@ -308,16 +334,19 @@ class SubcontractorService @Inject() (
     val address =
       userAnswers.get(CompanyAddressPage)
 
+    val removeAddress =
+      userAnswers.get(CompanyAddressYesNoPage).contains(false)
+
     existing.copy(
       utr = userAnswers.get(CompanyUtrPage),
       crn = userAnswers.get(CompanyCrnPage),
       tradingName = userAnswers.get(CompanyNamePage),
-      addressLine1 = address.map(_.addressLine1),
-      addressLine2 = address.flatMap(_.addressLine2),
-      addressLine3 = address.flatMap(_.addressLine3),
-      addressLine4 = address.flatMap(_.addressLine4),
-      country = address.flatMap(_.country).flatMap(_.name),
-      postcode = address.flatMap(_.postcode),
+      addressLine1 = updatedAddressField(address.map(_.addressLine1), existing.addressLine1, removeAddress),
+      addressLine2 = updatedAddressField(address.flatMap(_.addressLine2), existing.addressLine2, removeAddress),
+      addressLine3 = updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress),
+      addressLine4 = updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress),
+      country = updatedAddressField(address.flatMap(_.country).flatMap(_.name), existing.country, removeAddress),
+      postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress),
       emailAddress = userAnswers.get(CompanyEmailAddressPage),
       phoneNumber = userAnswers.get(CompanyPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(CompanyMobileNumberPage),
@@ -326,7 +355,9 @@ class SubcontractorService @Inject() (
   }
 
   private def updatePartnership(existing: SubcontractorRequest, userAnswers: UserAnswers): SubcontractorRequest = {
-    val address = userAnswers.get(PartnershipAddressPage)
+    val address       = userAnswers.get(PartnershipAddressPage)
+    val removeAddress =
+      userAnswers.get(PartnershipAddressYesNoPage).contains(false)
 
     existing.copy(
       utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
@@ -335,14 +366,15 @@ class SubcontractorService @Inject() (
       tradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
       nino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
       crn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
-      addressLine1 = address.map(_.addressLine1),
-      addressLine2 = address.flatMap(_.addressLine2),
-      addressLine3 = address.flatMap(_.addressLine3),
-      addressLine4 = address.flatMap(_.addressLine4),
+      addressLine1 = updatedAddressField(address.map(_.addressLine1), existing.addressLine1, removeAddress),
+      addressLine2 = updatedAddressField(address.flatMap(_.addressLine2), existing.addressLine2, removeAddress),
+      addressLine3 = updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress),
+      addressLine4 = updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress),
       country = address
         .flatMap(_.country)
-        .flatMap(_.name),
-      postcode = address.flatMap(_.postcode),
+        .flatMap(_.name)
+        .orElse(if (removeAddress) None else existing.country),
+      postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress),
       emailAddress = userAnswers.get(
         PartnershipEmailAddressPage
       ),
@@ -366,17 +398,21 @@ class SubcontractorService @Inject() (
     val address =
       userAnswers.get(TrustAddressPage)
 
+    val removeAddress =
+      userAnswers.get(TrustAddressYesNoPage).contains(false)
+
     existing.copy(
       utr = userAnswers.get(TrustUtrPage),
       tradingName = userAnswers.get(TrustNamePage),
-      addressLine1 = address.map(_.addressLine1),
-      addressLine2 = address.flatMap(_.addressLine2),
-      addressLine3 = address.flatMap(_.addressLine3),
-      addressLine4 = address.flatMap(_.addressLine4),
+      addressLine1 = updatedAddressField(address.map(_.addressLine1), existing.addressLine1, removeAddress),
+      addressLine2 = updatedAddressField(address.flatMap(_.addressLine2), existing.addressLine2, removeAddress),
+      addressLine3 = updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress),
+      addressLine4 = updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress),
       country = address
         .flatMap(_.country)
-        .flatMap(_.name),
-      postcode = address.flatMap(_.postcode),
+        .flatMap(_.name)
+        .orElse(if (removeAddress) None else existing.country),
+      postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress),
       emailAddress = userAnswers.get(TrustEmailAddressPage),
       phoneNumber = userAnswers.get(TrustPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
@@ -395,10 +431,16 @@ class SubcontractorService @Inject() (
     val address =
       userAnswers.get(AddressOfSubcontractorPage)
 
+    val removeName =
+      name.isEmpty && userAnswers.get(SubTradingNameYesNoPage).contains(true)
+
+    val removeAddress =
+      userAnswers.get(SubAddressYesNoPage).contains(false)
+
     existing.copy(
-      firstName = name.map(_.firstName),
-      secondName = name.flatMap(_.middleName),
-      surname = name.map(_.lastName),
+      firstName = if (removeName) None else name.map(_.firstName).orElse(existing.firstName),
+      secondName = if (removeName) None else name.fold(existing.secondName)(_.middleName),
+      surname = if (removeName) None else name.map(_.lastName).orElse(existing.surname),
       tradingName = userAnswers.get(
         TradingNameOfSubcontractorPage
       ),
@@ -408,14 +450,15 @@ class SubcontractorService @Inject() (
       utr = userAnswers.get(
         SubcontractorsUniqueTaxpayerReferencePage
       ),
-      addressLine1 = address.map(_.addressLine1),
-      addressLine2 = address.flatMap(_.addressLine2),
-      addressLine3 = address.flatMap(_.addressLine3),
-      addressLine4 = address.flatMap(_.addressLine4),
+      addressLine1 = updatedAddressField(address.map(_.addressLine1), existing.addressLine1, removeAddress),
+      addressLine2 = updatedAddressField(address.flatMap(_.addressLine2), existing.addressLine2, removeAddress),
+      addressLine3 = updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress),
+      addressLine4 = updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress),
       country = address
         .flatMap(_.country)
-        .flatMap(_.name),
-      postcode = address.flatMap(_.postcode),
+        .flatMap(_.name)
+        .orElse(if (removeAddress) None else existing.country),
+      postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress),
       emailAddress = userAnswers.get(
         IndividualEmailAddressPage
       ),
@@ -430,5 +473,12 @@ class SubcontractorService @Inject() (
       )
     )
   }
+
+  private def updatedAddressField(
+    amended: Option[String],
+    existing: Option[String],
+    removeAddress: Boolean
+  ): Option[String] =
+    if (removeAddress) None else amended.orElse(existing)
 
 }

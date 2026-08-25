@@ -43,7 +43,6 @@ import pages.amend.AmendCheckYourAnswersSubmittedPage
 import queries.CisIdQuery
 import utils.AmendmentHelper
 import config.FrontendAppConfig
-import models.response.UpdateSubcontractorResponse
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -325,14 +324,11 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
-        Future.successful(
-          UpdateSubcontractorResponse(
-            version = 2
-          )
-        )
+        Future.successful(())
       )
       when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
 
@@ -358,7 +354,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
@@ -459,7 +456,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       when(
         mockSubcontractorService.updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
       ).thenReturn(
         Future.failed(
@@ -489,7 +487,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       verify(mockSubcontractorService)
         .updateSubcontractor(
-          any[UserAnswers]
+          any[UserAnswers],
+          any[Option[Long]]
         )(any[HeaderCarrier])
     }
 
@@ -528,7 +527,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         mockSubcontractorService,
         never()
       ).updateSubcontractor(
-        any[UserAnswers]
+        any[UserAnswers],
+        any[Option[Long]]
       )(any[HeaderCarrier])
     }
 

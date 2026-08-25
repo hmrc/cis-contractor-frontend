@@ -36,8 +36,8 @@ import org.mockito.ArgumentCaptor
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.*
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
-import models.response.{SubcontractorResponse, UpdateSubcontractorResponse}
-import queries.OriginalSubcontractorQuery
+import models.response.SubcontractorResponse
+import queries.{AmendSubbieResourceRefQuery, OriginalSubcontractorQuery}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -1339,11 +1339,6 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
           pendingVerifications = Some(0)
         )
 
-      val updateResponse =
-        UpdateSubcontractorResponse(
-          version = 5
-        )
-
       def baseUpdateAnswers(
         subcontractorType: TypeOfSubcontractor
       ): UserAnswers =
@@ -1458,12 +1453,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.successful(updateResponse)
+          Future.successful(())
         )
 
         service
           .updateSubcontractor(userAnswers)
-          .futureValue mustBe updateResponse
+          .futureValue mustBe (())
 
         verify(mockConnector)
           .updateSubcontractor(
@@ -1590,12 +1585,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.successful(updateResponse)
+          Future.successful(())
         )
 
         service
           .updateSubcontractor(userAnswers)
-          .futureValue mustBe updateResponse
+          .futureValue mustBe (())
 
         val captor =
           ArgumentCaptor.forClass(
@@ -1735,12 +1730,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.successful(updateResponse)
+          Future.successful(())
         )
 
         service
           .updateSubcontractor(userAnswers)
-          .futureValue mustBe updateResponse
+          .futureValue mustBe (())
 
         val captor =
           ArgumentCaptor.forClass(
@@ -1909,12 +1904,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.successful(updateResponse)
+          Future.successful(())
         )
 
         service
           .updateSubcontractor(userAnswers)
-          .futureValue mustBe updateResponse
+          .futureValue mustBe (())
 
         val captor =
           ArgumentCaptor.forClass(
@@ -1960,7 +1955,171 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should return the UpdateSubcontractorResponse returned by the connector" in {
+      "should preserve original individual name and address when amend pages are missing" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val originalIndividual =
+          originalSubcontractor.copy(
+            subcontractorType = Some("soletrader")
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, updateCisId)
+            .success
+            .value
+            .set(
+              TypeOfSubcontractorPage,
+              TypeOfSubcontractor.Individualorsoletrader
+            )
+            .success
+            .value
+            .set(
+              OriginalSubcontractorQuery,
+              originalIndividual
+            )
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(())
+        )
+
+        service
+          .updateSubcontractor(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue.subcontractor
+
+        sent.firstName mustBe Some("Original")
+        sent.secondName mustBe Some("Middle")
+        sent.surname mustBe Some("Name")
+        sent.addressLine1 mustBe Some("Old address 1")
+        sent.addressLine2 mustBe Some("Old address 2")
+        sent.addressLine3 mustBe Some("Old city")
+        sent.addressLine4 mustBe Some("Old county")
+        sent.country mustBe Some("United Kingdom")
+        sent.postcode mustBe Some("OLD 1AA")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should clear original individual address when address has been explicitly removed" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val originalIndividual =
+          originalSubcontractor.copy(
+            subcontractorType = Some("soletrader")
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, updateCisId)
+            .success
+            .value
+            .set(
+              TypeOfSubcontractorPage,
+              TypeOfSubcontractor.Individualorsoletrader
+            )
+            .success
+            .value
+            .set(
+              OriginalSubcontractorQuery,
+              originalIndividual
+            )
+            .success
+            .value
+            .set(SubAddressYesNoPage, false)
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(())
+        )
+
+        service
+          .updateSubcontractor(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue.subcontractor
+
+        sent.addressLine1 mustBe None
+        sent.addressLine2 mustBe None
+        sent.addressLine3 mustBe None
+        sent.addressLine4 mustBe None
+        sent.country mustBe None
+        sent.postcode mustBe None
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when the submitted amend ref does not match the current original subcontractor" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(AmendSubbieResourceRefQuery, 1001L)
+            .success
+            .value
+
+        val exception =
+          service
+            .updateSubcontractor(userAnswers, Some(2002L))
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "Stale amend session for subbieResourceRef=2002"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should return Unit when the connector succeeds" in {
 
         val mockConnector =
           mock[ConstructionIndustrySchemeConnector]
@@ -1982,19 +2141,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
-          Future.successful(
-            UpdateSubcontractorResponse(
-              version = 10
-            )
-          )
+          Future.successful(())
         )
 
         service
           .updateSubcontractor(userAnswers)
-          .futureValue mustBe
-          UpdateSubcontractorResponse(
-            version = 10
-          )
+          .futureValue mustBe (())
 
         verify(mockConnector, times(1))
           .updateSubcontractor(
