@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.*
-import pages.amend.AmendIndividualRemoveDetailYesNoPage
+import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -61,6 +61,9 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             .success
             .value
             .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, false)
             .success
             .value
 
@@ -100,6 +103,9 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             .success
             .value
             .set(UniqueTaxpayerReferenceYesNoPage, true)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, false)
             .success
             .value
 
@@ -208,6 +214,9 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
       .success
       .value
       .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+      .success
+      .value
+      .set(ShowVerificationDetailsPage, false)
       .success
       .value
 
@@ -441,10 +450,37 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
           }
         }
+
+        "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())).thenReturn(
+            Future.failed(new RuntimeException(s"\"Failed to save remove detail answer for '$subcontractorDetail'\""))
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
       }
     }
 
-    "when subcontractorDetail is subcontractor-name " - {
+    "when subcontractorDetail is subcontractor-name" - {
       val form = formProvider()
 
       val subcontractorName = "John Smith"
@@ -664,6 +700,76 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(
+          Future.failed(new RuntimeException("Failed to save remove detail answer for subcontractor-name"))
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithSubcontractorNameAndDetail))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      val verifiedSubcontractorUa =
+        emptyUserAnswers
+          .set(SubTradingNameYesNoPage, true)
+          .success
+          .value
+          .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+
+      "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery for a POST when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
     }
 
     "when subcontractorDetail is trading-name" - {
@@ -885,6 +991,121 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
+      "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(
+          Future.failed(new RuntimeException("Failed to save remove detail answer for trading-name"))
+        )
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithTradingNameAndDetail(selectedDetail)))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      val verifiedSubcontractorUa =
+        emptyUserAnswers
+          .set(SubTradingNameYesNoPage, false)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "subcontractorTradingName")
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+
+      "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery for a POST when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    "when contractorDetail is utr" - {
+      lazy val removeDetailYesNoUtrRoute: String =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("utr").url
+
+      val verifiedSubcontractorUa =
+        uaWithTradingName
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "7777777777")
+          .success
+          .value
+          .set(UniqueTaxpayerReferenceYesNoPage, true)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+
+      "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery for a POST when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoUtrRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
 
     "when subcontractorDetail is neither 'subcontractor-name', 'trading-name', 'address', 'contact-details', 'unique-taxpayer-reference' or 'works-reference-number'" - {

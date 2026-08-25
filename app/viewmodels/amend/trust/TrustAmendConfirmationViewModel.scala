@@ -24,7 +24,7 @@ import pages.QuestionPage
 import pages.add.*
 import pages.add.trust.*
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 
 object TrustAmendConfirmationViewModel {
@@ -68,7 +68,7 @@ object TrustAmendConfirmationViewModel {
       Option.when(
         original.address != currentAddress
       ) {
-        row(
+        htmlRow(
           messages("trustAddress.checkYourAnswersLabel"),
           original.address.map(formatAddress).getOrElse(missingValue),
           currentAddress.map(formatAddress).getOrElse(missingValue)
@@ -93,7 +93,7 @@ object TrustAmendConfirmationViewModel {
       Option.when(
         original.trustContactMethod != currentMethods
       ) {
-        row(
+        htmlRow(
           messages("trustContactMethodOptions.checkYourAnswersLabel"),
           formatContactMethods(original.trustContactMethod),
           formatContactMethods(currentMethods)
@@ -124,9 +124,9 @@ object TrustAmendConfirmationViewModel {
     methods: Set[ContactMethodOptions]
   )(implicit messages: Messages): String =
     if (methods.isEmpty) {
-      missingValue
+      missingSelect
     } else {
-      ContactMethodOptions
+      val contactOptions = ContactMethodOptions
         .ordered(methods)
         .map {
           case ContactMethodOptions.Email  =>
@@ -136,7 +136,14 @@ object TrustAmendConfirmationViewModel {
           case ContactMethodOptions.Mobile =>
             messages("trustContactMethodOptions.mobile")
         }
-        .mkString(", ")
+
+      if (contactOptions.size > 1) {
+        contactOptions
+          .map(item => s"<li>$item</li>")
+          .mkString("<ul class=\"govuk-list govuk-list--bullet\">", "", "</ul>")
+      } else {
+        contactOptions.mkString
+      }
     }
 
   private def worksReferenceRows(original: OriginalTrustAnswers, current: UserAnswers)(implicit
@@ -184,7 +191,7 @@ object TrustAmendConfirmationViewModel {
       a.addressLine5,
       a.postcode,
       a.country.flatMap(_.name)
-    ).flatten.mkString(", ")
+    ).flatten.mkString("</br>")
 
   private def yesNoRow(
     page: QuestionPage[Boolean],
@@ -210,15 +217,16 @@ object TrustAmendConfirmationViewModel {
     page: QuestionPage[String],
     label: String,
     original: Option[String],
-    current: UserAnswers
+    current: UserAnswers,
+    missingValue: Messages => String = missingValue
   )(implicit messages: Messages): Option[Seq[TableRow]] = {
     val currentVal = current.get(page)
 
     Option.when(original != currentVal) {
       row(
         label,
-        original.getOrElse(missingValue),
-        currentVal.getOrElse(missingValue)
+        original.getOrElse(missingValue(messages)),
+        currentVal.getOrElse(missingValue(messages))
       )
     }
   }
@@ -230,6 +238,16 @@ object TrustAmendConfirmationViewModel {
       TableRow(Text(updated))
     )
 
+  private def htmlRow(label: String, previous: String, updated: String): Seq[TableRow] =
+    Seq(
+      TableRow(content = HtmlContent(label), classes = "govuk-!-font-weight-bold"),
+      TableRow(HtmlContent(previous)),
+      TableRow(HtmlContent(updated))
+    )
+
   private def missingValue(implicit messages: Messages): String =
     messages("amendConfirmation.table.content.none")
+
+  private def missingSelect(implicit messages: Messages): String =
+    messages("amendConfirmation.table.selectContent.none")
 }

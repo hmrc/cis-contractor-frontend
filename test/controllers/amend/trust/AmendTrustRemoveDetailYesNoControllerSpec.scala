@@ -28,6 +28,7 @@ import org.mockito.Mockito.{verify, when}
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.*
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -90,6 +91,9 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             .success
             .value
             .set(TrustUtrYesNoPage, true)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, false)
             .success
             .value
 
@@ -162,7 +166,7 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
     Seq(
       ("address", "address"),
       ("contact-details", "contact-details"),
-      ("unique-taxpayer-reference", "utr"),
+      ("utr", "utr"),
       ("works-reference-number", "works-reference-number")
     ).foreach { case (subcontractorDetail, selectedDetail) =>
       s"when contractorDetail is '$subcontractorDetail'" - {
@@ -380,6 +384,80 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
           }
+        }
+
+        "must redirect to the JourneyRecovery when failed to save remove detail answer in session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          when(mockSessionRepository.set(any())).thenReturn(
+            Future.failed(new RuntimeException(s"Failed to save remove detail answer for '$subcontractorDetail'"))
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(uaWithNameAndDetail(selectedDetail)))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, removeDetailYesNoRoute)
+                .withFormUrlEncodedBody(("value", "true"))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+      }
+    }
+
+    "when contractorDetail is utr" - {
+      lazy val removeDetailYesNoUtrRoute: String =
+        controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
+
+      val verifiedSubcontractorUa =
+        uaWithName
+          .set(TrustUtrPage, "7777777777")
+          .success
+          .value
+          .set(TrustUtrYesNoPage, true)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+
+      "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery for a POST when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoUtrRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

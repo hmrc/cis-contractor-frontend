@@ -43,9 +43,11 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
       doc.select(".govuk-button").text() mustBe messages("verify.verifyCheckYourAnswers.confirm")
     }
 
-    "not render an h2 subheading in the main content" in new Setup {
+    "render the declaration heading" in new Setup {
       val doc = Jsoup.parse(view(SummaryList()).toString())
-      doc.select("main h2").size() mustBe 0
+
+      doc.select("main h2").text() mustBe
+        messages("verify.verificationDeclaration.heading")
     }
 
     "render summary list rows when present" in new Setup {
@@ -76,8 +78,8 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "render a bullet list for multiple subcontractors" in new Setup {
-      val list = SummaryList(rows =
-        Seq(
+      val list = SummaryList(
+        rows = Seq(
           SummaryListRow(
             key = Key(Text("Subcontractors to verify")),
             value = Value(
@@ -91,7 +93,9 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
 
       val doc = Jsoup.parse(view(list).toString())
 
-      val bullets = doc.select(".govuk-list--bullet li")
+      val subRow  = doc.select(".govuk-summary-list__row").first()
+      val bullets = subRow.select(".govuk-list--bullet li")
+
       bullets.size() mustBe 2
       bullets.get(0).text() mustBe "Brody, Martin"
       bullets.get(1).text() mustBe "Hooper And Associates"
@@ -100,6 +104,22 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
     "render no rows for an empty summary list" in new Setup {
       val doc = Jsoup.parse(view(SummaryList()).toString())
       doc.select(".govuk-summary-list__row").size() mustBe 0
+    }
+
+    "render the declaration before the confirm button" in new Setup {
+
+      val doc = Jsoup.parse(view(SummaryList()).toString())
+
+      val mainContent = doc.select("main").text()
+
+      val declarationText =
+        messages("verify.verificationDeclaration.heading")
+
+      val confirmText =
+        messages("verify.verifyCheckYourAnswers.confirm")
+
+      mainContent.indexOf(declarationText) must be <
+        mainContent.indexOf(confirmText)
     }
   }
 

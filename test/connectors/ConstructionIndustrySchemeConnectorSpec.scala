@@ -19,7 +19,7 @@ package connectors
 import models.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorResponse}
+import models.response.{GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorListResponse, GetSubcontractorResponse, SubcontractorListItem}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -226,6 +226,75 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
 
       urlCaptor.getValue.toString must include("/cis/verification-batch/current/INST-123")
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.getLastSubmittedVerificationBatch" should {
+
+    "return GetLastSubmittedVerificationBatchResponse when CIS returns a valid response" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+      when(http.get(any())(any())).thenReturn(rb)
+
+      val expected =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Nil,
+          verificationBatch = None,
+          submission = None
+        )
+
+      when(rb.execute[GetLastSubmittedVerificationBatchResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val instanceId = "INST-123"
+      val result     = connector.getLastSubmittedVerificationBatch(instanceId).futureValue
+
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString must include("/cis/verification-batch/last/INST-123")
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.getSubcontractorList" should {
+
+    "return GetSubcontractorListResponse when CIS returns a valid response" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+      when(http.get(any())(any())).thenReturn(rb)
+
+      val expected =
+        GetSubcontractorListResponse(
+          Seq(SubcontractorListItem(11L), SubcontractorListItem(22L))
+        )
+
+      when(rb.execute[GetSubcontractorListResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val result = connector.getSubcontractorList("900063").futureValue
+
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString must include("/cis/subcontractors/900063")
     }
   }
 
