@@ -43,7 +43,7 @@ class ClientListCheckEnforcer @Inject() (
                 case None         => block(request)
               }
           }
-          
+
         case ClientListCheckPolicy.Exempt =>
           block(request)
       }

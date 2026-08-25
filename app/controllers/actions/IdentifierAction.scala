@@ -80,7 +80,7 @@ class AuthenticatedIdentifierAction @Inject() (
             .map { agentReference =>
               val identifierRequest =
                 IdentifierRequest(request, internalId, None, Some(agentReference), true)
-                
+
               clientListCheckEnforcer(identifierRequest)(block)
             }
             .getOrElse(

@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ClientListCheckPolicyResolver @Inject() extends Logging {
-  
+
   private val exemptControllers: Set[String] =
     Set(
       "controllers.SystemErrorController",
@@ -37,35 +37,30 @@ class ClientListCheckPolicyResolver @Inject() extends Logging {
       "controllers.UnauthorisedIndividualAffinityController",
       "controllers.UnauthorisedOrganisationAffinityController",
       "controllers.UnauthorisedWrongRoleController"
+      // AgentLostAccessController when implemented
     )
-  
+
   def resolve(request: RequestHeader): ClientListCheckPolicy = {
 
-    val route =
-      request.attrs
-        .get(Router.Attrs.HandlerDef)
-        .map { handler =>
-          handler.controller -> handler.method
-        }
+    val handlerDef = request.attrs.get(Router.Attrs.HandlerDef)
 
     val policy =
       if request.method != "GET" then Exempt
       else
-        route match {
+        handlerDef match {
 
-          case Some((controller, _)) if exemptControllers.contains(controller) =>
+          case Some(handler) if exemptControllers.contains(handler.controller) =>
             Exempt
 
-          case Some((_, "onPageLoad")) =>
+          case Some(_) =>
             GroupA
 
-          case _ =>
+          case None =>
             Exempt
         }
 
     val handler =
-      request.attrs
-        .get(Router.Attrs.HandlerDef)
+      handlerDef
         .map(h => s"${h.controller}.${h.method}")
         .getOrElse("UnknownHandler")
 

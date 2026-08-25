@@ -52,7 +52,7 @@ class CisManageService @Inject() (
   def startClientListRetrieval(using HeaderCarrier): Future[ClientListStatus] =
     cisConnector.startClientList
       .map(_.result)
-  
+
   def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     cisConnector.hasClient(taxOfficeNumber, taxOfficeReference)
 

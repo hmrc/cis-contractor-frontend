@@ -48,9 +48,9 @@ class AgentIdentifierActionSpec extends SpecBase {
   private val id: String                       = UUID.randomUUID().toString
 
   private val mockPolicyResolver: ClientListCheckPolicyResolver = mock[ClientListCheckPolicyResolver]
-  private val mockClientListStatusGuard: ClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard: HasClientGuard = mock[HasClientGuard]
-  private val clientListCheckEnforcer: ClientListCheckEnforcer =
+  private val mockClientListStatusGuard: ClientListStatusGuard  = mock[ClientListStatusGuard]
+  private val mockHasClientGuard: HasClientGuard                = mock[HasClientGuard]
+  private val clientListCheckEnforcer: ClientListCheckEnforcer  =
     new ClientListCheckEnforcer(
       mockPolicyResolver,
       mockClientListStatusGuard,
@@ -217,7 +217,8 @@ class AgentIdentifierActionSpec extends SpecBase {
                 Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None)
               )
             running(application) {
-              val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
+              val authAction =
+                new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
 
@@ -232,7 +233,8 @@ class AgentIdentifierActionSpec extends SpecBase {
             when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
               .thenReturn(Future.successful(Some(id) ~ emptyEnrolments ~ Some(Agent) ~ None))
             running(application) {
-              val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
+              val authAction =
+                new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
 
@@ -262,7 +264,8 @@ class AgentIdentifierActionSpec extends SpecBase {
                 Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None)
               )
             running(application) {
-              val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
+              val authAction =
+                new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
               status(result) mustBe SEE_OTHER

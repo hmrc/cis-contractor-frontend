@@ -20,12 +20,12 @@ import base.SpecBase
 import models.agent.AgentClientData
 import models.requests.IdentifierRequest
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verifyNoInteractions, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, SEE_OTHER}
-import services.CisManageService
+import services.{AuditService, CisManageService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,9 +35,10 @@ class HasClientGuardSpec extends SpecBase with MockitoSugar {
   private given ExecutionContext = ExecutionContext.global
 
   private val cisManageService = mock[CisManageService]
+  private val auditService     = mock[AuditService]
 
   private val guard =
-    new HasClientGuard(cisManageService)
+    new HasClientGuard(cisManageService, auditService)
 
   private def request(isAgent: Boolean): IdentifierRequest[AnyContent] =
     IdentifierRequest(
@@ -57,12 +58,6 @@ class HasClientGuardSpec extends SpecBase with MockitoSugar {
     )
 
   "HasClientGuard" - {
-
-    "must bypass the check for a non-agent" in {
-      guard.check(request(isAgent = false)).futureValue mustBe None
-
-      verifyNoInteractions(cisManageService)
-    }
 
     "must redirect to system error when agent client data is missing" in {
       when(

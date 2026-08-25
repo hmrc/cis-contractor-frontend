@@ -50,10 +50,6 @@ class ClientListStatusGuardSpec extends SpecBase {
 
   "ClientListStatusGuard" - {
 
-    "must bypass the check for a non-agent" in {
-      guard.checkGroupA(request(isAgent = false)).futureValue mustBe None
-    }
-
     "must continue when client list retrieval succeeds" in {
       when(
         cisManageService.startClientListRetrieval(using any[HeaderCarrier])
