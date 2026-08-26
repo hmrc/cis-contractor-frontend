@@ -328,8 +328,8 @@ class AddressDetailsValidatorSpec extends AnyWordSpec with Matchers {
     "return an address-line-1 failure when both postcode and country exist" in {
       val address = createAddress(
         addressLine1 = "",
-        postcode     = Some("NE1 1AA"),
-        country      = Some(Country(code = Some("GB"), name = Some("United Kingdom")))
+        postcode = Some("NE1 1AA"),
+        country = Some(Country(code = Some("GB"), name = Some("United Kingdom")))
       )
       AddressDetailsValidator.validate(Some(address)) mustBe List(
         FieldValidationFailure(field = SubcontractorValidationField.AddressLine1, value = None)
