@@ -23,7 +23,7 @@ import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
+class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase {
 
   private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
 
@@ -68,7 +68,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
       submission = None
     )
 
-  "ReviewUnmatchedSubcontractorsController" - {
+  "ReviewUnmatchedSubcontractorsRoutingController" - {
 
     "AC2: must redirect to UnmatchedSubcontractors when unmatched resource ref matches a subcontractor" in {
       val response    = batchResponse(
