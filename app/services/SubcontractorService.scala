@@ -19,6 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.address.Address
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.GetSubcontractorResponse
 import pages.add.*
@@ -26,7 +27,7 @@ import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
-import queries.CisIdQuery
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery, OriginalIndividualAnswersQuery, OriginalPartnershipAnswersQuery, OriginalTrustAnswersQuery}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -84,7 +85,12 @@ class SubcontractorService @Inject() (
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): PartnershipPayload =
+  ): PartnershipPayload = {
+    val address = addressFields(
+      currentAddress = userAnswers.get(PartnershipAddressPage),
+      originalAddress = userAnswers.get(OriginalPartnershipAnswersQuery).flatMap(_.address)
+    )
+
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -94,23 +100,29 @@ class SubcontractorService @Inject() (
       partnerTradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
       partnerNino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
       partnerCrn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
-      addressLine1 = userAnswers.get(PartnershipAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(PartnershipAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(PartnershipAddressPage).flatMap(_.country).flatMap(_.name),
+      addressLine1 = address.addressLine1,
+      addressLine2 = address.addressLine2,
+      city = address.city,
+      county = address.county,
+      postcode = address.postcode,
+      country = address.country,
       emailAddress = userAnswers.get(PartnershipEmailAddressPage),
       phoneNumber = userAnswers.get(PartnershipPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(PartnershipMobileNumberPage),
       worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
     )
+  }
 
   private def individualOrSoleTraderPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): IndividualOrSoleTraderPayload =
+  ): IndividualOrSoleTraderPayload = {
+    val address = addressFields(
+      currentAddress = userAnswers.get(AddressOfSubcontractorPage),
+      originalAddress = userAnswers.get(OriginalIndividualAnswersQuery).flatMap(_.address)
+    )
+
     IndividualOrSoleTraderPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -118,12 +130,12 @@ class SubcontractorService @Inject() (
       secondName = userAnswers.get(SubcontractorNamePage).flatMap(_.middleName),
       surname = userAnswers.get(SubcontractorNamePage).map(_.lastName),
       tradingName = userAnswers.get(TradingNameOfSubcontractorPage),
-      addressLine1 = userAnswers.get(AddressOfSubcontractorPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine2),
-      city = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine3),
-      county = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.postcode),
-      country = userAnswers.get(AddressOfSubcontractorPage).flatMap(_.country).flatMap(_.name),
+      addressLine1 = address.addressLine1,
+      addressLine2 = address.addressLine2,
+      city = address.city,
+      county = address.county,
+      postcode = address.postcode,
+      country = address.country,
       nino = userAnswers.get(SubNationalInsuranceNumberPage),
       utr = userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
       worksReferenceNumber = userAnswers.get(WorksReferenceNumberPage),
@@ -131,51 +143,91 @@ class SubcontractorService @Inject() (
       phoneNumber = userAnswers.get(IndividualPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(IndividualMobileNumberPage)
     )
+  }
 
   private def companyPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): CompanyPayload =
+  ): CompanyPayload = {
+    val address = addressFields(
+      currentAddress = userAnswers.get(CompanyAddressPage),
+      originalAddress = userAnswers.get(OriginalCompanyAnswersQuery).flatMap(_.address)
+    )
+
     CompanyPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
       utr = userAnswers.get(CompanyUtrPage),
       crn = userAnswers.get(CompanyCrnPage),
       tradingName = userAnswers.get(CompanyNamePage),
-      addressLine1 = userAnswers.get(CompanyAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(CompanyAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(CompanyAddressPage).flatMap(_.country).flatMap(_.name),
+      addressLine1 = address.addressLine1,
+      addressLine2 = address.addressLine2,
+      city = address.city,
+      county = address.county,
+      postcode = address.postcode,
+      country = address.country,
       emailAddress = userAnswers.get(CompanyEmailAddressPage),
       phoneNumber = userAnswers.get(CompanyPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(CompanyMobileNumberPage),
       worksReferenceNumber = userAnswers.get(CompanyWorksReferencePage)
     )
+  }
 
   private def trustPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers
-  ): TrustPayload =
+  ): TrustPayload = {
+    val address = addressFields(
+      currentAddress = userAnswers.get(TrustAddressPage),
+      originalAddress = userAnswers.get(OriginalTrustAnswersQuery).flatMap(_.address)
+    )
+
     TrustPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
       trustTradingName = userAnswers.get(TrustNamePage),
       utr = userAnswers.get(TrustUtrPage),
-      addressLine1 = userAnswers.get(TrustAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(TrustAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(TrustAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(TrustAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(TrustAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(TrustAddressPage).flatMap(_.country).flatMap(_.name),
+      addressLine1 = address.addressLine1,
+      addressLine2 = address.addressLine2,
+      city = address.city,
+      county = address.county,
+      postcode = address.postcode,
+      country = address.country,
       emailAddress = userAnswers.get(TrustEmailAddressPage),
       phoneNumber = userAnswers.get(TrustPhoneNumberPage),
       mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
       worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
     )
+  }
+
+  private case class AddressFields(
+    addressLine1: Option[String],
+    addressLine2: Option[String],
+    city: Option[String],
+    county: Option[String],
+    postcode: Option[String],
+    country: Option[String]
+  )
+
+  private def addressFields(
+    currentAddress: Option[Address],
+    originalAddress: Option[Address]
+  ): AddressFields = {
+    def field(currentValue: Option[String], originalValue: Option[String]): Option[String] =
+      currentValue.orElse(originalValue.map(_ => ""))
+
+    AddressFields(
+      addressLine1 = currentAddress.map(_.addressLine1).orElse(originalAddress.map(_ => "")),
+      addressLine2 = field(currentAddress.flatMap(_.addressLine2), originalAddress.flatMap(_.addressLine2)),
+      city = field(currentAddress.flatMap(_.addressLine3), originalAddress.flatMap(_.addressLine3)),
+      county = field(currentAddress.flatMap(_.addressLine4), originalAddress.flatMap(_.addressLine4)),
+      postcode = field(currentAddress.flatMap(_.postcode), originalAddress.flatMap(_.postcode)),
+      country =
+        field(currentAddress.flatMap(_.country).flatMap(_.name), originalAddress.flatMap(_.country).flatMap(_.name))
+    )
+  }
 
   def getSubcontractor(
     cisId: String,
