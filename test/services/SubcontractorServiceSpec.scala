@@ -2083,12 +2083,88 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val sent =
           captor.getValue.subcontractor
 
-        sent.addressLine1 mustBe None
-        sent.addressLine2 mustBe None
-        sent.addressLine3 mustBe None
-        sent.addressLine4 mustBe None
-        sent.country mustBe None
-        sent.postcode mustBe None
+        sent.addressLine1 mustBe Some("")
+        sent.addressLine2 mustBe Some("")
+        sent.addressLine3 mustBe Some("")
+        sent.addressLine4 mustBe Some("")
+        sent.country mustBe Some("")
+        sent.postcode mustBe Some("")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should send empty strings when optional company fields are explicitly removed" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val address =
+          Address(
+            addressLine1 = "New company address 1"
+          )
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyAddressYesNoPage, true)
+            .success
+            .value
+            .set(CompanyAddressPage, address)
+            .success
+            .value
+            .set(CompanyUtrYesNoPage, false)
+            .success
+            .value
+            .set(CompanyCrnYesNoPage, false)
+            .success
+            .value
+            .set(AddCompanyContactMethodsYesNoPage, false)
+            .success
+            .value
+            .set(CompanyWorksReferenceYesNoPage, false)
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(())
+        )
+
+        service
+          .updateSubcontractor(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue.subcontractor
+
+        sent.utr mustBe Some("")
+        sent.crn mustBe Some("")
+        sent.tradingName mustBe Some("Original Trading Name")
+        sent.addressLine1 mustBe Some("New company address 1")
+        sent.addressLine2 mustBe Some("")
+        sent.addressLine3 mustBe Some("")
+        sent.addressLine4 mustBe Some("")
+        sent.country mustBe Some("")
+        sent.postcode mustBe Some("")
+        sent.emailAddress mustBe Some("")
+        sent.phoneNumber mustBe Some("")
+        sent.mobilePhoneNumber mustBe Some("")
+        sent.worksReferenceNumber mustBe Some("")
 
         verifyNoMoreInteractions(mockConnector)
       }
