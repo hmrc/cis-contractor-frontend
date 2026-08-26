@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import models.verify.ReverificationDecision
-import models.{Subcontractor, Verification}
+import models.{Subcontractor, Verification, VerificationLastVerification}
 
 class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
 
@@ -360,6 +360,40 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = Some(11L),
+          isUnmatched = true,
+          considerForReverification = true
+        )
+      )
+    }
+  }
+
+  "CheckUnmatchedSubcontractorsService.reverificationDecisionsFromLastSubmitted" - {
+
+    "must match last-submitted verifications to live subcontractors by resource ref" in {
+      val result =
+        CheckUnmatchedSubcontractorsService.reverificationDecisionsFromLastSubmitted(
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1L,
+              verificationBatchId = Some(10L),
+              verificationResourceRef = Some(1001L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          liveSubcontractors = Seq(
+            models.response.SubcontractorListItem(22L, Some(1001L))
+          )
+        )
+
+      result mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = Some(22L),
           isUnmatched = true,
           considerForReverification = true
         )

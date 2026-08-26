@@ -22,9 +22,8 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
-import services.VerificationService
+import services.{CheckUnmatchedSubcontractorsService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.verify.VerificationResultsViewModel
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,18 +47,15 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
         request.userAnswers.get(CisIdQuery)
       ) match {
         case (Some(response), Some(cisId)) =>
-          val unmatchedIds = VerificationResultsViewModel.unmatchedSubcontractorIds(response)
-          val hasUnmatched = VerificationResultsViewModel.hasUnmatchedVerifications(response)
+          val hasUnmatched = response.verifications.exists(CheckUnmatchedSubcontractorsService.isUnmatched)
 
           if (!hasUnmatched) {
             Future.successful(Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad()))
-          } else if (unmatchedIds.isEmpty) {
-            Future.successful(Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad()))
           } else {
             verificationService
-              .anyUnmatchedSubcontractorsStillPresent(cisId, unmatchedIds)
-              .map { stillPresent =>
-                if (stillPresent) {
+              .getUnmatchedReverificationDecisions(cisId, response)
+              .map { decisions =>
+                if (decisions.exists(_.considerForReverification)) {
                   Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
                 } else {
                   Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
