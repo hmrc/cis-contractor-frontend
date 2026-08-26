@@ -1112,12 +1112,11 @@ verify.verificationResults.verificationNumber                           =  Verif
 verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
-
-verify.verificationResults.status.matched                               = Verified
-verify.verificationResults.status.unmatched                             = Unmatched
-verify.verificationResults.taxTreatment.net                             = Standard rate
-verify.verificationResults.taxTreatment.gross                           = Gross
-verify.verificationResults.taxTreatment.unmatched                       = Higher rate
+verify.verificationResults.status.matched                               =  Verified
+verify.verificationResults.status.unmatched                             =  Unmatched
+verify.verificationResults.taxTreatment.net                             =  Standard rate
+verify.verificationResults.taxTreatment.gross                           =  Gross
+verify.verificationResults.taxTreatment.unmatched                       =  Higher rate
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details

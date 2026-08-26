@@ -18,8 +18,6 @@ package utils
 
 import models.SubcontractorCurrentVerification
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
-import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 
 object UtrValidator {
   def validate(

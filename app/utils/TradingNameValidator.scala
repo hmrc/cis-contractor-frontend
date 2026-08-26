@@ -23,16 +23,23 @@ object TradingNameValidator {
   def validate(
     value: Option[String]
   ): Option[FieldValidationFailure] =
-    value
-      .flatMap { tradingName =>
-        Option.when(
-          !TradingName.isLengthInRange(tradingName) ||
-            !TradingName.isValid(tradingName) || tradingName.isEmpty || tradingName.isBlank
-        ) {
+    value match {
+      case None =>
+        Some(
+          FieldValidationFailure(
+            field = SubcontractorValidationField.TradingName,
+            value = None
+          )
+        )
+      case Some(tradingName)
+          if tradingName.isBlank || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
+        Some(
           FieldValidationFailure(
             field = SubcontractorValidationField.TradingName,
             value = Some(tradingName)
           )
-        }
-      }
+        )
+      case _    =>
+        None
+    }
 }

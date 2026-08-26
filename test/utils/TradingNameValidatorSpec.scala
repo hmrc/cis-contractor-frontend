@@ -35,6 +35,17 @@ class TradingNameValidatorSpec extends AnyWordSpec with Matchers {
       )
     }
 
+    "return failure when the trading name is None" in {
+      val tradingName = None
+      TradingNameValidator
+        .validate(tradingName) mustBe Some(
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
+          value = None
+        )
+      )
+    }
+
     "return no failure for a valid trading name" in {
       TradingNameValidator
         .validate(

@@ -16,7 +16,7 @@
 
 package services
 
-import models.{Subcontractor, SubcontractorCurrentVerification}
+import models.SubcontractorCurrentVerification
 import models.validation.SubcontractorValidationFailure
 import utils.CompanyValidator
 

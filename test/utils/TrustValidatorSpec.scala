@@ -17,6 +17,7 @@
 package utils
 
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
+import models.SubcontractorCurrentVerification
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -26,75 +27,205 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
 
     "return no failures when all common details are missing" in {
       TrustValidator.validate(
-        worksReferenceNumber = None,
-        tradingName = None,
-        utr = None
+        subcontactorToValidate = subcontractorEmpty,
+        allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
       ) mustBe Nil
     }
 
-    "return the works reference number failure" in {
-      val worksReferenceNumber =
-        "A12323452345#@[]{}$%^&£~"
+    "return no failures for when all valid" in {
 
       TrustValidator.validate(
-        worksReferenceNumber = Some(worksReferenceNumber),
-        tradingName = None,
-        utr = None
-      ) mustBe
-        List(
-          FieldValidationFailure(
-            field = SubcontractorValidationField.WorksReferenceNumber,
-            value = Some(worksReferenceNumber)
-          )
-        )
+        subcontactorToValidate = subcontractorValid,
+        allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
+      ) mustBe Nil
     }
 
     "return every failure" in {
 
-      val worksReferenceNumber =
-        "A12323452345#@[]{}$%^&£~"
-
-      val tradingName =
-        "12345678901234567890123456789012345678901234567890<>"
-
-      val utr = "12345A7890"
-
       TrustValidator.validate(
-        worksReferenceNumber = Some(worksReferenceNumber),
-        tradingName = Some(tradingName),
-        utr = Some(utr)
+        subcontactorToValidate = subcontractorInvalid,
+        allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty)
       ) mustBe
         List(
           FieldValidationFailure(
             field = SubcontractorValidationField.WorksReferenceNumber,
-            value = Some(worksReferenceNumber)
+            value = subcontractorInvalid.worksReferenceNumber
           ),
           FieldValidationFailure(
             field = SubcontractorValidationField.Utr,
-            value = Some(utr)
+            value = subcontractorInvalid.utr
           ),
           FieldValidationFailure(
             field = SubcontractorValidationField.TradingName,
-            value = Some(tradingName)
+            value = subcontractorInvalid.tradingName
           )
         )
     }
 
-    "retain valid fields while returning only invalid fields" in {
-      val invalidWorksReferenceNumber =
-        "A12323452345#@[]{}$%^&£~"
+    "retain valid fields while returning only invalid fields - wrn is invalid" in {
 
       TrustValidator.validate(
-        worksReferenceNumber = Some(invalidWorksReferenceNumber),
-        tradingName = Some("Test Trading Name 1234@"),
-        utr = None
+        subcontactorToValidate = subcontractorSomeValid,
+        allSubcontractors = Seq(subcontractorSomeValid, subcontractorInvalid, subcontractorEmpty)
       ) mustBe
         List(
           FieldValidationFailure(
             field = SubcontractorValidationField.WorksReferenceNumber,
-            value = Some(invalidWorksReferenceNumber)
+            value = subcontractorSomeValid.worksReferenceNumber
           )
         )
     }
   }
+
+  private def subcontractorEmpty: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 1L,
+      subbieResourceRef = Some(
+        1L * 10
+      ),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = Some("Trading Name"),
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("trust"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorValid: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 1L,
+      subbieResourceRef = Some(
+        1L * 10
+      ),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = Some("Trading Name"),
+      utr = Some("5860920998"),
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("trust"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorSomeValid: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 1L,
+      subbieResourceRef = Some(
+        1L * 10
+      ),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = Some("Test Trading Name 1234@"),
+      utr = Some("5860920998"),
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("trust"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = Some("A12323452345#@[]{}$%^&£~"),
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorInvalid: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 2L,
+      subbieResourceRef = Some(
+        2L * 10
+      ),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = Some("12345678901234567890123456789012345678901234567890<>"),
+      utr = Some("12345A7890"),
+      nino = None,
+      crn = Some("invalid-number"),
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("trust"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = Some("A12323452345#@[]{}$%^&£~"),
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
 }
