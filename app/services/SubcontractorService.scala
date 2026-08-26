@@ -364,39 +364,39 @@ class SubcontractorService @Inject() (
         updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress, address.isDefined),
       addressLine4 =
         updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress, address.isDefined),
-      country =
-        updatedAddressField(address.flatMap(_.country).flatMap(_.name), existing.country, removeAddress, address.isDefined),
+      country = updatedAddressField(
+        address.flatMap(_.country).flatMap(_.name),
+        existing.country,
+        removeAddress,
+        address.isDefined
+      ),
       postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress, address.isDefined),
-      emailAddress =
-        updatedContactField(
-          userAnswers.get(CompanyEmailAddressPage),
-          existing.emailAddress,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Email
-        ),
-      phoneNumber =
-        updatedContactField(
-          userAnswers.get(CompanyPhoneNumberPage),
-          existing.phoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Phone
-        ),
-      mobilePhoneNumber =
-        updatedContactField(
-          userAnswers.get(CompanyMobileNumberPage),
-          existing.mobilePhoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Mobile
-        ),
-      worksReferenceNumber =
-        updatedOptionalField(
-          userAnswers.get(CompanyWorksReferencePage),
-          existing.worksReferenceNumber,
-          userAnswers.get(CompanyWorksReferenceYesNoPage).contains(false)
-        )
+      emailAddress = updatedContactField(
+        userAnswers.get(CompanyEmailAddressPage),
+        existing.emailAddress,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Email
+      ),
+      phoneNumber = updatedContactField(
+        userAnswers.get(CompanyPhoneNumberPage),
+        existing.phoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Phone
+      ),
+      mobilePhoneNumber = updatedContactField(
+        userAnswers.get(CompanyMobileNumberPage),
+        existing.mobilePhoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Mobile
+      ),
+      worksReferenceNumber = updatedOptionalField(
+        userAnswers.get(CompanyWorksReferencePage),
+        existing.worksReferenceNumber,
+        userAnswers.get(CompanyWorksReferenceYesNoPage).contains(false)
+      )
     )
   }
 
@@ -442,33 +442,34 @@ class SubcontractorService @Inject() (
         updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress, address.isDefined),
       addressLine4 =
         updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress, address.isDefined),
-      country =
-        updatedAddressField(address.flatMap(_.country).flatMap(_.name), existing.country, removeAddress, address.isDefined),
+      country = updatedAddressField(
+        address.flatMap(_.country).flatMap(_.name),
+        existing.country,
+        removeAddress,
+        address.isDefined
+      ),
       postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress, address.isDefined),
-      emailAddress =
-        updatedContactField(
-          userAnswers.get(PartnershipEmailAddressPage),
-          existing.emailAddress,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Email
-        ),
-      phoneNumber =
-        updatedContactField(
-          userAnswers.get(PartnershipPhoneNumberPage),
-          existing.phoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Phone
-        ),
-      mobilePhoneNumber =
-        updatedContactField(
-          userAnswers.get(PartnershipMobileNumberPage),
-          existing.mobilePhoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Mobile
-        ),
+      emailAddress = updatedContactField(
+        userAnswers.get(PartnershipEmailAddressPage),
+        existing.emailAddress,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Email
+      ),
+      phoneNumber = updatedContactField(
+        userAnswers.get(PartnershipPhoneNumberPage),
+        existing.phoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Phone
+      ),
+      mobilePhoneNumber = updatedContactField(
+        userAnswers.get(PartnershipMobileNumberPage),
+        existing.mobilePhoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Mobile
+      ),
       worksReferenceNumber = updatedOptionalField(
         userAnswers.get(PartnershipWorksReferenceNumberPage),
         existing.worksReferenceNumber,
@@ -509,39 +510,39 @@ class SubcontractorService @Inject() (
         updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress, address.isDefined),
       addressLine4 =
         updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress, address.isDefined),
-      country =
-        updatedAddressField(address.flatMap(_.country).flatMap(_.name), existing.country, removeAddress, address.isDefined),
+      country = updatedAddressField(
+        address.flatMap(_.country).flatMap(_.name),
+        existing.country,
+        removeAddress,
+        address.isDefined
+      ),
       postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress, address.isDefined),
-      emailAddress =
-        updatedContactField(
-          userAnswers.get(TrustEmailAddressPage),
-          existing.emailAddress,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Email
-        ),
-      phoneNumber =
-        updatedContactField(
-          userAnswers.get(TrustPhoneNumberPage),
-          existing.phoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Phone
-        ),
-      mobilePhoneNumber =
-        updatedContactField(
-          userAnswers.get(TrustMobileNumberPage),
-          existing.mobilePhoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Mobile
-        ),
-      worksReferenceNumber =
-        updatedOptionalField(
-          userAnswers.get(TrustWorksReferencePage),
-          existing.worksReferenceNumber,
-          userAnswers.get(TrustWorksReferenceYesNoPage).contains(false)
-        )
+      emailAddress = updatedContactField(
+        userAnswers.get(TrustEmailAddressPage),
+        existing.emailAddress,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Email
+      ),
+      phoneNumber = updatedContactField(
+        userAnswers.get(TrustPhoneNumberPage),
+        existing.phoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Phone
+      ),
+      mobilePhoneNumber = updatedContactField(
+        userAnswers.get(TrustMobileNumberPage),
+        existing.mobilePhoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Mobile
+      ),
+      worksReferenceNumber = updatedOptionalField(
+        userAnswers.get(TrustWorksReferencePage),
+        existing.worksReferenceNumber,
+        userAnswers.get(TrustWorksReferenceYesNoPage).contains(false)
+      )
     )
   }
 
@@ -572,24 +573,21 @@ class SubcontractorService @Inject() (
       firstName = updatedGroupedField(name.map(_.firstName), existing.firstName, removeName, name.isDefined),
       secondName = updatedGroupedField(name.flatMap(_.middleName), existing.secondName, removeName, name.isDefined),
       surname = updatedGroupedField(name.map(_.lastName), existing.surname, removeName, name.isDefined),
-      tradingName =
-        updatedOptionalField(
-          userAnswers.get(TradingNameOfSubcontractorPage),
-          existing.tradingName,
-          userAnswers.get(SubTradingNameYesNoPage).contains(false)
-        ),
-      nino =
-        updatedOptionalField(
-          userAnswers.get(SubNationalInsuranceNumberPage),
-          existing.nino,
-          userAnswers.get(NationalInsuranceNumberYesNoPage).contains(false)
-        ),
-      utr =
-        updatedOptionalField(
-          userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
-          existing.utr,
-          userAnswers.get(UniqueTaxpayerReferenceYesNoPage).contains(false)
-        ),
+      tradingName = updatedOptionalField(
+        userAnswers.get(TradingNameOfSubcontractorPage),
+        existing.tradingName,
+        userAnswers.get(SubTradingNameYesNoPage).contains(false)
+      ),
+      nino = updatedOptionalField(
+        userAnswers.get(SubNationalInsuranceNumberPage),
+        existing.nino,
+        userAnswers.get(NationalInsuranceNumberYesNoPage).contains(false)
+      ),
+      utr = updatedOptionalField(
+        userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage),
+        existing.utr,
+        userAnswers.get(UniqueTaxpayerReferenceYesNoPage).contains(false)
+      ),
       addressLine1 =
         updatedAddressField(address.map(_.addressLine1), existing.addressLine1, removeAddress, address.isDefined),
       addressLine2 =
@@ -598,39 +596,39 @@ class SubcontractorService @Inject() (
         updatedAddressField(address.flatMap(_.addressLine3), existing.addressLine3, removeAddress, address.isDefined),
       addressLine4 =
         updatedAddressField(address.flatMap(_.addressLine4), existing.addressLine4, removeAddress, address.isDefined),
-      country =
-        updatedAddressField(address.flatMap(_.country).flatMap(_.name), existing.country, removeAddress, address.isDefined),
+      country = updatedAddressField(
+        address.flatMap(_.country).flatMap(_.name),
+        existing.country,
+        removeAddress,
+        address.isDefined
+      ),
       postcode = updatedAddressField(address.flatMap(_.postcode), existing.postcode, removeAddress, address.isDefined),
-      emailAddress =
-        updatedContactField(
-          userAnswers.get(IndividualEmailAddressPage),
-          existing.emailAddress,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Email
-        ),
-      phoneNumber =
-        updatedContactField(
-          userAnswers.get(IndividualPhoneNumberPage),
-          existing.phoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Phone
-        ),
-      mobilePhoneNumber =
-        updatedContactField(
-          userAnswers.get(IndividualMobileNumberPage),
-          existing.mobilePhoneNumber,
-          contactMethodsYesNo,
-          contactMethods,
-          ContactMethodOptions.Mobile
-        ),
-      worksReferenceNumber =
-        updatedOptionalField(
-          userAnswers.get(WorksReferenceNumberPage),
-          existing.worksReferenceNumber,
-          userAnswers.get(WorksReferenceNumberYesNoPage).contains(false)
-        )
+      emailAddress = updatedContactField(
+        userAnswers.get(IndividualEmailAddressPage),
+        existing.emailAddress,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Email
+      ),
+      phoneNumber = updatedContactField(
+        userAnswers.get(IndividualPhoneNumberPage),
+        existing.phoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Phone
+      ),
+      mobilePhoneNumber = updatedContactField(
+        userAnswers.get(IndividualMobileNumberPage),
+        existing.mobilePhoneNumber,
+        contactMethodsYesNo,
+        contactMethods,
+        ContactMethodOptions.Mobile
+      ),
+      worksReferenceNumber = updatedOptionalField(
+        userAnswers.get(WorksReferenceNumberPage),
+        existing.worksReferenceNumber,
+        userAnswers.get(WorksReferenceNumberYesNoPage).contains(false)
+      )
     )
   }
 
