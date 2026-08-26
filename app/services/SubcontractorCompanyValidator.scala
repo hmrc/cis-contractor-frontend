@@ -31,7 +31,8 @@ class SubcontractorCompanyValidator {
     subcontractors.toList.flatMap { subcontractor =>
       val failedFields =
         CompanyValidator.validate(
-          subcontactorToValidate = subcontractor, allSubcontractors = subcontractors
+          subcontactorToValidate = subcontractor,
+          allSubcontractors = subcontractors
         )
 
       Option.when(failedFields.nonEmpty) {

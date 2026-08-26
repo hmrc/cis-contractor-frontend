@@ -22,8 +22,8 @@ import models.validation.FieldValidationFailure
 object TrustValidator {
 
   def validate(
-                subcontactorToValidate : SubcontractorCurrentVerification,
-                allSubcontractors: Seq[SubcontractorCurrentVerification]
+    subcontactorToValidate: SubcontractorCurrentVerification,
+    allSubcontractors: Seq[SubcontractorCurrentVerification]
   ): List[FieldValidationFailure] =
     WorksReferenceNumberValidator
       .validate(subcontactorToValidate.worksReferenceNumber)

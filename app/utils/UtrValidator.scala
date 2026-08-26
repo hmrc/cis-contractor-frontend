@@ -21,19 +21,17 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 
-object UtrValidator
-{
+object UtrValidator {
   def validate(
     value: Option[String],
     subcontractors: Seq[SubcontractorCurrentVerification]
-              
   ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
       .flatMap { utr =>
         Option.when(
           !UTR.isValidUTR(utr)
-           || isDuplicateUTR(subcontractors, utr)
+            || isDuplicateUTR(subcontractors, utr)
         ) {
           FieldValidationFailure(
             field = SubcontractorValidationField.Utr,
@@ -42,7 +40,7 @@ object UtrValidator
         }
       }
 
-  private def isDuplicateUTR(subcontractors: Seq[SubcontractorCurrentVerification], utr: String) : Boolean =
-         subcontractors.count(_.utr.contains(utr)) > 1
-  
+  private def isDuplicateUTR(subcontractors: Seq[SubcontractorCurrentVerification], utr: String): Boolean =
+    subcontractors.count(_.utr.contains(utr)) > 1
+
 }
