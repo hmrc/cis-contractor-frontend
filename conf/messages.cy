@@ -110,7 +110,7 @@ tradingNameOfSubcontractor.error.length                                         
 tradingNameOfSubcontractor.error.invalidCharacters                                  =  Nodwch enw masnachu, fel Adeiladu ABC Cyf
 
 subAddressYesNo.heading                                                             =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
-subAddressYesNo.hint                                                                =  YGallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
+subAddressYesNo.hint                                                                =  Gallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
 subAddressYesNo.checkYourAnswersLabel                                               =  Ychwanegu manylion cysylltu?
 subAddressYesNo.error.required                                                      =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer yr is-gontractwr hwn
 
