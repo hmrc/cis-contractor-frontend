@@ -20,18 +20,19 @@ import base.SpecBase
 import controllers.routes
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.response.DeleteVerificationResponse
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.VerificationService
 import utils.SubcontractorNameExtractor
 import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -49,8 +50,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
   private val mode =
     NormalMode
 
-  private def onwardRoute: Call =
-    Call("GET", "/foo")
+  private val verificationResourceRef = 12345L
 
   private lazy val removeInsufficientSubcontractorNameYesNoRoute =
     controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
@@ -154,13 +154,147 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must call delete verification and redirect back to review page when remaining insufficient subcontractors exist" in {
 
       val mockSessionRepository =
         mock[SessionRepository]
 
       val mockSubcontractorNameExtractor =
         mock[SubcontractorNameExtractor]
+
+      val mockVerificationService =
+        mock[VerificationService]
+
+      when(
+        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      ).thenReturn(Some(subcontractorName))
+
+      when(
+        mockSessionRepository.set(any())
+      ).thenReturn(Future.successful(true))
+
+      when(
+        mockVerificationService.deleteVerification(
+          any[UserAnswers],
+          eqTo(verificationResourceRef)
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(DeleteVerificationResponse(Some(1L)))
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[VerificationService]
+              .toInstance(mockVerificationService),
+            bind[SubcontractorNameExtractor]
+              .toInstance(mockSubcontractorNameExtractor)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onSubmit(verificationResourceRef)
+              .url
+          )
+            .withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+
+        verify(mockVerificationService)
+          .deleteVerification(any[UserAnswers], eqTo(verificationResourceRef))(any[HeaderCarrier])
+      }
+    }
+
+    "must call delete verification and redirect to readiness check when no insufficient subcontractors remain" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockSubcontractorNameExtractor =
+        mock[SubcontractorNameExtractor]
+
+      val mockVerificationService =
+        mock[VerificationService]
+
+      when(
+        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      ).thenReturn(Some(subcontractorName))
+
+      when(
+        mockSessionRepository.set(any())
+      ).thenReturn(Future.successful(true))
+
+      when(
+        mockVerificationService.deleteVerification(
+          any[UserAnswers],
+          eqTo(verificationResourceRef)
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(DeleteVerificationResponse(Some(0L)))
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[VerificationService]
+              .toInstance(mockVerificationService),
+            bind[SubcontractorNameExtractor]
+              .toInstance(mockSubcontractorNameExtractor)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onSubmit(verificationResourceRef)
+              .url
+          )
+            .withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness(NormalMode)
+            .url
+      }
+    }
+
+    "must redirect back to review page without deleting when user selects no" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockSubcontractorNameExtractor =
+        mock[SubcontractorNameExtractor]
+
+      val mockVerificationService =
+        mock[VerificationService]
 
       when(
         mockSubcontractorNameExtractor.getSubcontractorName(any())
@@ -173,10 +307,10 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator]
-              .toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository]
               .toInstance(mockSessionRepository),
+            bind[VerificationService]
+              .toInstance(mockVerificationService),
             bind[SubcontractorNameExtractor]
               .toInstance(mockSubcontractorNameExtractor)
           )
@@ -187,10 +321,12 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         val request =
           FakeRequest(
             POST,
-            removeInsufficientSubcontractorNameYesNoRoute
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onSubmit(verificationResourceRef)
+              .url
           )
             .withFormUrlEncodedBody(
-              "value" -> "true"
+              "value" -> "false"
             )
 
         val result =
@@ -198,7 +334,11 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+
+        verify(mockVerificationService, never())
+          .deleteVerification(any[UserAnswers], any[Long])(any[HeaderCarrier])
       }
     }
 

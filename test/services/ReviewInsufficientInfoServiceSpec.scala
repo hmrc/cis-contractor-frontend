@@ -76,12 +76,15 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       pendingVerifications = None
     )
 
-  private def mkVerification(subcontractorId: Long): VerificationCurrentVerification =
+  private def mkVerification(
+    subcontractorId: Long,
+    verificationResourceRef: Option[Long] = None
+  ): VerificationCurrentVerification =
     VerificationCurrentVerification(
       verificationId = subcontractorId,
       verificationBatchId = None,
       subcontractorId = Some(subcontractorId),
-      verificationResourceRef = None,
+      verificationResourceRef = verificationResourceRef,
       subcontractorName = None,
       verificationNumber = None,
       taxTreatment = None,
@@ -222,16 +225,27 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase {
       vm.missing.head.name mustBe messages("verify.noName")
     }
 
-    "must use placeholder '#' urls for the name and action links (not yet wired)" in {
+    "must use a real remove url when verification resource ref is present" in {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val row = build(sub).missing.head
+      val row =
+        service
+          .buildViewModel(
+            GetCurrentVerificationBatchResponse(
+              subcontractors = Seq(sub),
+              verificationBatch = None,
+              verifications = Seq(mkVerification(sub.subcontractorId, Some(1111L)))
+            )
+          )
+          .missing
+          .head
 
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"
       row.proceedLink.url mustBe "#"
-      row.removeLink.url mustBe "#"
+      row.removeLink.url mustBe
+        controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(1111L).url
     }
 
     "must return empty lists for an empty batch" in {
