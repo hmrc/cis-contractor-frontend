@@ -44,14 +44,21 @@
 
         <ul class="govuk-pagination__list">
         @paginationViewModel.items.map { item =>
-            <li class="govuk-pagination__item@if(item.current){ govuk-pagination__item--current}">
-                <button type="submit" name="gotoPage" value="@item.number"
-                class="govuk-pagination__link govuk-pagination__link--number govuk-pagination__link--button"
-                    @if(item.current){aria-current="page"}
-                aria-label="Page @item.number">
-                @item.number
-                </button>
-            </li>
+                @if(item.ellipsis == false) {
+                    <li class="govuk-pagination__item@if(item.current){ govuk-pagination__item--current}">
+                        <button type="submit" name="gotoPage" value="@item.number"
+                        class="govuk-pagination__link govuk-pagination__link--number govuk-pagination__link--button"
+                            @if(item.current){aria-current="page"}
+                        aria-label="Page @item.number">
+                        @item.number
+                        </button>
+                    </li>
+                } else {
+                    <li class="govuk-pagination__item govuk-pagination__item--ellipsis">
+                        ...
+                    </li>
+                }
+
         }
         </ul>
 
