@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import models.TypeOfSubcontractor
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -174,8 +174,8 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
 
     def viewOnlyAnswers(
       address: Option[Address]
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = None,

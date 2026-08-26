@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import models.contact.ContactMethodOptions
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -53,7 +53,7 @@ object TrustContactMethodOptionsSummary {
     }
 
   def row(
-    answers: ViewOnlyTrustAnswers
+    answers: TrustAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     Option.when(answers.trustContactMethod.nonEmpty) {
 

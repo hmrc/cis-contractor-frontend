@@ -28,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -126,7 +126,7 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncod
 
     "must return a SummaryListRow when the partnership name exists with no actions" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = Some("Acme Partners"),
@@ -169,7 +169,7 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncod
 
     "must return None when the partnership name does not exist" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -199,7 +199,7 @@ class PartnershipNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncod
 
     "must HTML-escape special characters correctly in ViewOnly row" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = Some("O'Reilly & Partners"),

@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
@@ -40,7 +40,7 @@ object TrustNameSummary {
     }
 
   def row(
-    answers: ViewOnlyTrustAnswers
+    answers: TrustAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.trustName.map { answer =>
       SummaryListRowViewModel(

@@ -24,7 +24,7 @@ import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -135,7 +135,7 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     "must return a SummaryListRow with 'Yes' when utrYesNo is true" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -174,7 +174,7 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     "must return a SummaryListRow with 'No' when utrYesNo is false" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -213,7 +213,7 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
     "must return None when utrYesNo is not set in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

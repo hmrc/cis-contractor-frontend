@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -147,7 +147,7 @@ class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
     "must return a SummaryListRow when email exists in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -187,7 +187,7 @@ class TrustEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
     "must return None when email does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

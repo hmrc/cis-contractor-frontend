@@ -27,7 +27,7 @@ import pages.add.WorksReferenceNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -112,7 +112,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
     "must return a SummaryListRow when works reference exists" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -154,7 +154,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
     "must return None when works reference does not exist" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -184,7 +184,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
       val worksReference = "WRN & Ref'01"
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

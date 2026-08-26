@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 object CompanyUtrYesNoSummary {
 
@@ -51,7 +51,7 @@ object CompanyUtrYesNoSummary {
     }
 
   def row(
-    answers: ViewOnlyCompanyAnswers
+    answers: CompanyAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.utrYesNo.map { answer =>
 

@@ -27,7 +27,7 @@ import pages.add.TradingNameOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -110,7 +110,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
     "must return a SummaryListRow when the trading name exists" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = Some(true),
@@ -155,7 +155,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
     "must return None when the trading name does not exist" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = Some(false),
@@ -183,7 +183,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
     "must HTML-escape special characters correctly for ViewOnly trading name" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = Some(true),

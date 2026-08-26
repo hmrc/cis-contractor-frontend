@@ -29,7 +29,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
 
@@ -89,8 +89,8 @@ class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matche
 
     def viewOnlyAnswers(
       nominatedPartnerNino: Option[String]
-    ): ViewOnlyPartnershipAnswers =
-      ViewOnlyPartnershipAnswers(
+    ): PartnershipAnswers =
+      PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

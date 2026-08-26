@@ -26,7 +26,7 @@ import org.scalatest.matchers.should.Matchers
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -121,7 +121,7 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
     "must return a SummaryListRow when trust name exists in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = Some("Acme Trust"),
@@ -160,7 +160,7 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
     "must return None when trust name does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

@@ -28,7 +28,7 @@ import pages.add.UniqueTaxpayerReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -127,7 +127,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
     "must return a SummaryListRow with 'Yes' when utrYesNo is true" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -171,7 +171,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
     "must return a SummaryListRow with 'No' when utrYesNo is false" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -211,7 +211,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
     "must return None when utrYesNo is not set" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

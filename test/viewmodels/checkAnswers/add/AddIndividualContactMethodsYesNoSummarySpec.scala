@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import models.amend.AmendIndividualRemoveDetail
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -128,8 +128,8 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
     def viewOnlyAnswers(
       contactMethodsYesNo: Option[Boolean]
-    ): ViewOnlyIndividualAnswers =
-      ViewOnlyIndividualAnswers(
+    ): IndividualAnswers =
+      IndividualAnswers(
         subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
         showVerificationDetails = false,
         usesTradingName = None,

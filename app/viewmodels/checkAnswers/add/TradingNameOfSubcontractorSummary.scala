@@ -23,7 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 object TradingNameOfSubcontractorSummary {
 
@@ -44,7 +44,7 @@ object TradingNameOfSubcontractorSummary {
     }
 
   def row(
-    answers: ViewOnlyIndividualAnswers
+    answers: IndividualAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.tradingName.map { answer =>
       SummaryListRowViewModel(

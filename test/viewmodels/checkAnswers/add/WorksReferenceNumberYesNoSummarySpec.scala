@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -145,7 +145,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'Yes' for ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -189,7 +189,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'No' for ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -233,7 +233,7 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when worksReferenceYesNo is missing in ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

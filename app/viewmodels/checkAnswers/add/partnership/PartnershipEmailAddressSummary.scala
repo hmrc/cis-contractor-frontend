@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipEmailAddressPage
 import play.api.i18n.Messages
@@ -43,7 +43,7 @@ object PartnershipEmailAddressSummary {
     }
 
   def row(
-    answers: ViewOnlyPartnershipAnswers
+    answers: PartnershipAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.email.map { answer =>
       SummaryListRowViewModel(

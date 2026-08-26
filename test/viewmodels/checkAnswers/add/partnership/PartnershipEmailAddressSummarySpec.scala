@@ -29,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -146,7 +146,7 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
 
     "must return a SummaryListRow when the email exists with no actions" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -189,7 +189,7 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
 
     "must return None when the email does not exist" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -221,7 +221,7 @@ class PartnershipEmailAddressSummarySpec extends AnyFreeSpec with Matchers with 
 
       val email = "partners+o'reilly&co@test.com"
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

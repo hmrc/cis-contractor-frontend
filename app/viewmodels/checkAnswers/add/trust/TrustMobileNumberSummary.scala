@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustMobileNumberPage
 import play.api.i18n.Messages
@@ -43,7 +43,7 @@ object TrustMobileNumberSummary {
     }
 
   def row(
-    answers: ViewOnlyTrustAnswers
+    answers: TrustAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.mobile.map { answer =>
       SummaryListRowViewModel(

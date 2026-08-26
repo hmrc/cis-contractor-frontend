@@ -27,7 +27,7 @@ import pages.add.partnership.PartnershipNominatedPartnerCrnPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNominatedPartnerCrnSummarySpec
     extends AnyFreeSpec
@@ -134,8 +134,8 @@ class PartnershipNominatedPartnerCrnSummarySpec
 
     def viewOnlyAnswers(
       nominatedPartnerCrn: Option[String]
-    ): ViewOnlyPartnershipAnswers =
-      ViewOnlyPartnershipAnswers(
+    ): PartnershipAnswers =
+      PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.address.{Address, Country}
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -237,7 +237,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
       )
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -286,7 +286,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
     "return None when address is missing" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -323,7 +323,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
       )
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

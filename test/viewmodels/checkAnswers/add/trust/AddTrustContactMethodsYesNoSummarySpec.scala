@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -172,7 +172,7 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'Yes' for ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -210,7 +210,7 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return a SummaryListRow with 'No' for ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -248,7 +248,7 @@ class AddTrustContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when trustContactMethodsYesNo is missing in ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

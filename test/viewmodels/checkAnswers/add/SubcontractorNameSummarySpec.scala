@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.add.SubcontractorName
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -160,7 +160,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       )
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -211,7 +211,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       )
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -250,7 +250,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
     "must return None when subcontractor name does not exist" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -284,7 +284,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
       )
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

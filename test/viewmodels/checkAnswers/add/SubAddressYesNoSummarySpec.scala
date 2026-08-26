@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import models.amend.AmendIndividualRemoveDetail
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -126,7 +126,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'Yes' for ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -172,7 +172,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'No' for ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -213,7 +213,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when addressYesNo is missing in ViewOnlyIndividualAnswers" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

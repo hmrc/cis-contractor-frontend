@@ -26,7 +26,7 @@ import pages.add.trust.TrustWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -147,7 +147,7 @@ class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'Yes' when worksReferenceYesNo is true" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -186,7 +186,7 @@ class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'No' when worksReferenceYesNo is false" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -225,7 +225,7 @@ class TrustWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when worksReferenceYesNo is not set in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

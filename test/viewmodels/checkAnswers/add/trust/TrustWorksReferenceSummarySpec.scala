@@ -27,7 +27,7 @@ import pages.add.trust.TrustWorksReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -135,7 +135,7 @@ class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaE
     "must return a SummaryListRow when works reference exists in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -174,7 +174,7 @@ class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaE
     "must return None when works reference does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

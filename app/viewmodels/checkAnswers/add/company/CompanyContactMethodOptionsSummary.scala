@@ -26,7 +26,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 object CompanyContactMethodOptionsSummary {
 
@@ -53,7 +53,7 @@ object CompanyContactMethodOptionsSummary {
     }
 
   def row(
-    answers: ViewOnlyCompanyAnswers
+    answers: CompanyAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     Option.when(answers.companyContactMethod.nonEmpty) {
 

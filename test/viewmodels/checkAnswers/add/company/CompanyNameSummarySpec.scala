@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import controllers.add.company.routes
 import helpers.CyaEncodingSpecHelper
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -128,8 +128,8 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
 
     def viewOnlyAnswers(
       companyName: Option[String] = None
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = companyName,

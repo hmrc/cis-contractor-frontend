@@ -27,7 +27,7 @@ import pages.add.SubNationalInsuranceNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -128,7 +128,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
     "must return a SummaryListRow when NINO exists" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -170,7 +170,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
     "must return None when NINO does not exist" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -200,7 +200,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
       val nino = "AB123456C & Ref'01"
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

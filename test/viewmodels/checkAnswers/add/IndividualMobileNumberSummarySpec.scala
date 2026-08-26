@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -127,7 +127,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
     "must return a SummaryListRow when mobile number exists" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -170,7 +170,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
     "must return None when mobile number does not exist" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -200,7 +200,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
       val mobile = "07700 900000 & ext'45"
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

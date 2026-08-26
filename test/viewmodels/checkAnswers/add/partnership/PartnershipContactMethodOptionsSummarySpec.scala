@@ -22,7 +22,7 @@ import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
@@ -111,7 +111,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
 
     "must return a row with multiple selected options and no actions" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = models.TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -164,7 +164,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
 
     "must return a row with a single selected option and no actions" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = models.TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -207,7 +207,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
 
     "must return a row with empty value and no actions when no contact methods are selected" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = models.TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.amend.partnership.AmendPartnershipRemoveDetail
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.Messages
@@ -51,7 +51,7 @@ object PartnershipAddressYesNoSummary {
     }
 
   def row(
-    answers: ViewOnlyPartnershipAnswers
+    answers: PartnershipAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.addressYesNo.map { answer =>
 

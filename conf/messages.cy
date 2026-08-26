@@ -1,12 +1,16 @@
-site.back                                 =  Yn ôl
-site.no                                   =  Na
-site.yes                                  =  Iawn
-site.continue                             =  Parhau
-site.change                               =  Newid
-site.saveAndContinue                      =  Cadw a pharhau
-service.name                              =  Cynllun y Diwydiant Adeiladu
-site.govuk                                =  GOV.UK
-error.title.prefix                        =  Error:
+# Infrastructure
+site.back             =  Yn ôl
+site.no               =  Na
+site.yes              =  Iawn
+site.continue         =  Parhau
+site.change           =  Newid
+site.saveAndContinue  =  Cadw a pharhau
+
+service.name          =  Cynllun y Diwydiant Adeiladu
+
+site.govuk            =  GOV.UK
+
+error.title.prefix    =  Error:
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Manylion y contractwr
@@ -37,7 +41,6 @@ contractordetails.schemeName.error.length                                      =
 contractordetails.schemeName.error.invalidCharacters                           =  Rydych wedi nodi enw’r cynllun yn y fformat anghywir
 contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
 contractordetails.schemeName.change.hidden                                     =  enw’r Cynllun
-
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.heading                                 =  A ydych am nodi cyfeiriad e-bost y contractwr?
@@ -76,4 +79,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  enw’r cynllun
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
-

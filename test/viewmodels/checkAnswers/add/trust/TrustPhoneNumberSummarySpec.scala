@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -125,7 +125,7 @@ class TrustPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnco
     "must return a SummaryListRow when phone exists in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -164,7 +164,7 @@ class TrustPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnco
     "must return None when phone does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

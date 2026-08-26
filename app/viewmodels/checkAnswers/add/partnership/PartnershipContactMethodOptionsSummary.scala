@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.contact.ContactMethodOptions
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -53,7 +53,7 @@ object PartnershipContactMethodOptionsSummary {
     }
 
   def row(
-    answers: ViewOnlyPartnershipAnswers
+    answers: PartnershipAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     Some {
       val options =

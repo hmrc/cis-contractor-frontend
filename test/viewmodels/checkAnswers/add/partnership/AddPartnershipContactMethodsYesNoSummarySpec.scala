@@ -27,7 +27,7 @@ import pages.add.partnership.AddPartnershipContactMethodsYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
@@ -159,7 +159,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
   "ViewOnly - AddPartnershipContactMethodsYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -201,7 +201,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -243,7 +243,7 @@ class AddPartnershipContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matc
     }
 
     "must return None when the answer does not exist" in {
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

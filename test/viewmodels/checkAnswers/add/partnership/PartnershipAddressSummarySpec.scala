@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -185,7 +185,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
         country = Some(Country(Some("GB"), Some("United Kingdom")))
       )
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -235,7 +235,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
     "return None when the address does not exist" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -274,7 +274,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
         country = Some(Country(Some("GB"), Some("UK")))
       )
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

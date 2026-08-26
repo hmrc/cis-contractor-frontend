@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.amend.AmendIndividualRemoveDetail
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.AddIndividualContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -51,7 +51,7 @@ object AddIndividualContactMethodsYesNoSummary {
     }
 
   def row(
-    answers: ViewOnlyIndividualAnswers
+    answers: IndividualAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.individualContactMethodsYesNo.map { answer =>
 

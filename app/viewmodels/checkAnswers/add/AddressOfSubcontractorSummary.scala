@@ -20,7 +20,7 @@ import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 object AddressOfSubcontractorSummary {
 
@@ -40,7 +40,7 @@ object AddressOfSubcontractorSummary {
     }
 
   def row(
-    answers: ViewOnlyIndividualAnswers
+    answers: IndividualAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.address.map { address =>
       AddressSummaryRow.viewOnlyRow(

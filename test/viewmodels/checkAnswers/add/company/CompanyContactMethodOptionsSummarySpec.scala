@@ -23,7 +23,7 @@ import org.scalatest.matchers.must.Matchers
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
 import models.TypeOfSubcontractor
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
@@ -164,8 +164,8 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
     def viewOnlyAnswers(
       companyContactMethod: Set[ContactMethodOptions]
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = None,

@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 object PartnershipWorksReferenceNumberYesNoSummary {
 
@@ -51,7 +51,7 @@ object PartnershipWorksReferenceNumberYesNoSummary {
     }
 
   def row(
-    answers: ViewOnlyPartnershipAnswers
+    answers: PartnershipAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.nominatedPartnerWorksReferenceYesNo.map { answer =>
 

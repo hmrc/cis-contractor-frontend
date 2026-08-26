@@ -30,7 +30,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 import models.TypeOfSubcontractor
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -131,8 +131,8 @@ class CompanyCrnSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
 
     def viewOnlyAnswers(
       crn: Option[String]
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = None,

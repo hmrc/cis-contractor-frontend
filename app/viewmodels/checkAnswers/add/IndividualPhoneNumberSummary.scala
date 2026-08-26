@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 object IndividualPhoneNumberSummary {
 
@@ -43,7 +43,7 @@ object IndividualPhoneNumberSummary {
     }
 
   def row(
-    answers: ViewOnlyIndividualAnswers
+    answers: IndividualAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.phone.map { answer =>
       SummaryListRowViewModel(

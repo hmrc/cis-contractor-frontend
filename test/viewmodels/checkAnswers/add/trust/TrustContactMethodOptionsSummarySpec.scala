@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import models.{CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.trust.TrustContactMethodOptionsPage
@@ -117,7 +117,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return a row with multiple selected options for ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -164,7 +164,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return a row with a single selected option for ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -200,7 +200,7 @@ class TrustContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return None when no contact methods are selected in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

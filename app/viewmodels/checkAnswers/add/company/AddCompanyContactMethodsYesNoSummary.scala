@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import models.amend.company.AmendCompanyRemoveDetail
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -51,7 +51,7 @@ object AddCompanyContactMethodsYesNoSummary {
     }
 
   def row(
-    answers: ViewOnlyCompanyAnswers
+    answers: CompanyAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.companyContactMethodsYesNo.map { answer =>
 

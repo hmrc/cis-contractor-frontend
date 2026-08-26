@@ -90,15 +90,15 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
 
-GET   /subcontractor/viewOnly/start/:cisId/:subbieResourceRef  controllers.viewOnly.ViewOnlySubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
+GET   /subcontractor/info/start/:cisId/:subbieResourceRef  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
-GET   /subcontractor/viewOnly/partnership/subcontractor-information-read-only  controllers.viewOnly.partnership.ViewOnlyPartnershipCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/partnership/subcontractor-information-read-only  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad()
 
-GET   /subcontractor/viewOnly/company/subcontractor-information-read-only  controllers.viewOnly.company.ViewOnlyCompanyCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/company/subcontractor-information-read-only  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad()
 
-GET   /subcontractor/viewOnly/trust/subcontractor-information-read-only  controllers.viewOnly.trust.ViewOnlyTrustCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad()
 
-GET   /subcontractor/viewOnly/subcontractor-information-read-only  controllers.viewOnly.ViewOnlyIndividualCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
@@ -580,8 +580,10 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 GET   /subcontractor/verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/change  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
 
-GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
-GET   /subcontractor/verify/check-results                     controllers.verify.CheckVerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+
+GET   /subcontractor/verify/check-results  controllers.verify.CheckVerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current         controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = NormalMode)
@@ -650,6 +652,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
@@ -661,6 +664,7 @@ GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatched
 
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
+
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
 

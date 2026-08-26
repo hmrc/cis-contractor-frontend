@@ -25,7 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -156,7 +156,7 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
     "must return a SummaryListRow with 'Yes' for ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -196,7 +196,7 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
     "must return a SummaryListRow with 'No' for ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -236,7 +236,7 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
     "must return None when addressYesNo is missing in ViewOnlyTrustAnswers" in {
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

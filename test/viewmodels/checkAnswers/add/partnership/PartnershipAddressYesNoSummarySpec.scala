@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -157,7 +157,7 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
 
     "return a row with value = yes and no change action when the answer is true" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -202,7 +202,7 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
 
     "return a row with value = no and no change action when the answer is false" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -247,7 +247,7 @@ class PartnershipAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSui
 
     "return None when addressYesNo is not set" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

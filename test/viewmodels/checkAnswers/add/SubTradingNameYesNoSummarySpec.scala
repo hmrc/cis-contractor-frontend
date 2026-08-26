@@ -26,7 +26,7 @@ import pages.add.SubTradingNameYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 
 class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
   implicit val messages: Messages = stubMessages()
@@ -122,7 +122,7 @@ class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'Yes' when usesTradingName is true" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = Some(true),
@@ -167,7 +167,7 @@ class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return a SummaryListRow with 'No' when usesTradingName is false" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = Some(false),
@@ -207,7 +207,7 @@ class SubTradingNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when usesTradingName is not set" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

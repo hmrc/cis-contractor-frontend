@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.TypeOfSubcontractor
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -155,8 +155,8 @@ class CompanyAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
     def viewOnlyAnswers(
       addressYesNo: Option[Boolean]
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = None,

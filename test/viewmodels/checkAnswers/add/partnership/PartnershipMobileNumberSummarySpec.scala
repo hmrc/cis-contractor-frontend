@@ -29,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -130,7 +130,7 @@ class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with 
 
     "must return a SummaryListRow when the mobile number exists with no actions" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -173,7 +173,7 @@ class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with 
 
     "must return None when the mobile number does not exist" in {
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
@@ -205,7 +205,7 @@ class PartnershipMobileNumberSummarySpec extends AnyFreeSpec with Matchers with 
 
       val mobile = "07700 900000 & ext'45"
 
-      val answers = ViewOnlyPartnershipAnswers(
+      val answers = PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

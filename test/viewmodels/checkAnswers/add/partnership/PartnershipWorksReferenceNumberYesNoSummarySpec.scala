@@ -29,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -163,8 +163,8 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
 
     def viewOnlyAnswers(
       nominatedPartnerWorksReferenceYesNo: Option[Boolean]
-    ): ViewOnlyPartnershipAnswers =
-      ViewOnlyPartnershipAnswers(
+    ): PartnershipAnswers =
+      PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,

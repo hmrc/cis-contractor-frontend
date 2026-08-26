@@ -28,7 +28,7 @@ import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 
 class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -151,7 +151,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
     "must return a SummaryListRow with the normal label when UTR exists and is not verified" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -192,7 +192,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
     "must return a SummaryListRow with the verified label when UTR exists and is verified" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -233,7 +233,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
     "must return None when UTR does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,
@@ -257,7 +257,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
     "must HTML-escape special characters correctly in ViewOnly row" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = None,

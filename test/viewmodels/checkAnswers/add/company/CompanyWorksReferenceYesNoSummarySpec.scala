@@ -29,7 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.TypeOfSubcontractor
-import models.viewOnly.company.ViewOnlyCompanyAnswers
+import models.info.company.CompanyAnswers
 
 class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -129,8 +129,8 @@ class CompanyWorksReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     def viewOnlyAnswers(
       worksReferenceYesNo: Option[Boolean] = None
-    ): ViewOnlyCompanyAnswers =
-      ViewOnlyCompanyAnswers(
+    ): CompanyAnswers =
+      CompanyAnswers(
         subcontractorType = TypeOfSubcontractor.Limitedcompany,
         showVerificationDetails = false,
         companyName = None,

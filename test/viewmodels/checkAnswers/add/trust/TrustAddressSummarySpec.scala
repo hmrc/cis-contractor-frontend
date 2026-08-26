@@ -20,7 +20,7 @@ import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
 import models.{AmendMode, UserAnswers}
 import models.address.{Address, Country}
-import models.viewOnly.trust.ViewOnlyTrustAnswers
+import models.info.trust.TrustAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -185,7 +185,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       )
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = Some("Test Trust"),
@@ -229,7 +229,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
     "return None when address is missing in ViewOnlyTrustAnswers" in {
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = Some("Test Trust"),
@@ -262,7 +262,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       )
 
       val answers =
-        ViewOnlyTrustAnswers(
+        TrustAnswers(
           subcontractorType = models.TypeOfSubcontractor.Trust,
           showVerificationDetails = false,
           trustName = Some("Test Trust"),

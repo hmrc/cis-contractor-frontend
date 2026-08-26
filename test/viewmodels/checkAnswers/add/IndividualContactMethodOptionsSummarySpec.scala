@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
-import models.viewOnly.ViewOnlyIndividualAnswers
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.IndividualContactMethodOptionsPage
@@ -178,7 +178,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return a row with multiple selected options" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -230,7 +230,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return a row with a single selected option" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,
@@ -272,7 +272,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return None when no contact methods are selected" in {
 
       val answers =
-        ViewOnlyIndividualAnswers(
+        IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
           usesTradingName = None,

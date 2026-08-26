@@ -29,7 +29,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
 import models.TypeOfSubcontractor
-import models.viewOnly.partnership.ViewOnlyPartnershipAnswers
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -158,8 +158,8 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
 
     def viewOnlyAnswers(
       nominatedPartnerUtr: Option[String]
-    ): ViewOnlyPartnershipAnswers =
-      ViewOnlyPartnershipAnswers(
+    ): PartnershipAnswers =
+      PartnershipAnswers(
         subcontractorType = TypeOfSubcontractor.Partnership,
         showVerificationDetails = false,
         partnershipName = None,
