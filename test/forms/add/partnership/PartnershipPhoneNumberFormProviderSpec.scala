@@ -22,13 +22,10 @@ import play.api.data.FormError
 
 class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey     = "partnershipPhoneNumber.error.required"
-  val lengthKey       = "partnershipPhoneNumber.error.length"
-  val invalidKey      = "partnershipPhoneNumber.error.invalid"
-  val minSixDigitsKey = "partnershipPhoneNumber.error.minSixDigits"
-  val maxLength       = 35
-
-//  val phoneRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
+  val requiredKey = "partnershipPhoneNumber.error.required"
+  val lengthKey   = "partnershipPhoneNumber.error.length"
+  val invalidKey  = "partnershipPhoneNumber.error.invalid"
+  val maxLength   = 35
 
   val form = new PartnershipPhoneNumberFormProvider()()
 
@@ -68,18 +65,20 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
     }
 
     "must reject invalid phone number formats" in {
-      val result =
-        form.bind(
-          Map("value" -> "0191/1234567")
-        )
+      invalidPhoneNumber.foreach { invalidTelephone =>
+        val result =
+          form.bind(
+            Map(fieldName -> invalidTelephone)
+          )
 
-      result.errors must contain(
-        FormError(
-          "value",
-          "partnershipPhoneNumber.error.invalid",
-          Seq(phoneRegex)
+        result.errors must contain(
+          FormError(
+            fieldName,
+            invalidKey,
+            Seq(phoneRegex)
+          )
         )
-      )
+      }
     }
 
     "must accept valid telephone formats" in {

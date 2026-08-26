@@ -22,11 +22,10 @@ import play.api.data.FormError
 
 class CompanyPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey     = "companyPhoneNumber.error.required"
-  val lengthKey       = "companyPhoneNumber.error.length"
-  val invalidKey      = "companyPhoneNumber.error.invalid"
-  val minSixDigitsKey = "companyPhoneNumber.error.minSixDigits"
-  val maxLength       = 35
+  val requiredKey = "companyPhoneNumber.error.required"
+  val lengthKey   = "companyPhoneNumber.error.length"
+  val invalidKey  = "companyPhoneNumber.error.invalid"
+  val maxLength   = 35
 
   val form = new CompanyPhoneNumberFormProvider()()
 
