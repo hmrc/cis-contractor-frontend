@@ -32,9 +32,7 @@ class SubcontractorTrustValidator {
     subcontractors.toList.flatMap { subcontractor =>
       val failedFields =
         TrustValidator.validate(
-          worksReferenceNumber = subcontractor.worksReferenceNumber,
-          utr = subcontractor.utr,
-          tradingName = subcontractor.tradingName
+          subcontactorToValidate = subcontractor, allSubcontractors = subcontractors
         )
 
       Option.when(failedFields.nonEmpty) {

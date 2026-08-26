@@ -16,25 +16,24 @@
 
 package utils
 
+import models.SubcontractorCurrentVerification
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
-//import services.SubcontractorService
-//
-//
-//import scala.concurrent.ExecutionContext
+import services.SubcontractorService
+import uk.gov.hmrc.http.HeaderCarrier
 
 object UtrValidator
-// @Inject() (subcontractorService: SubcontractorService)
 {
-
   def validate(
-    value: Option[String]
+    value: Option[String],
+    subcontractors: Seq[SubcontractorCurrentVerification]
+              
   ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
       .flatMap { utr =>
         Option.when(
           !UTR.isValidUTR(utr)
-          // || SubcontractorService.isDuplicateUTR(request.userAnswers, utr)
+           || isDuplicateUTR(subcontractors, utr)
         ) {
           FieldValidationFailure(
             field = SubcontractorValidationField.Utr,
@@ -42,4 +41,8 @@ object UtrValidator
           )
         }
       }
+
+  private def isDuplicateUTR(subcontractors: Seq[SubcontractorCurrentVerification], utr: String) : Boolean =
+         subcontractors.count(_.utr.contains(utr)) > 1
+  
 }
