@@ -156,7 +156,7 @@ subNationalInsuranceNumber.error.invalidCharacters                              
 subNationalInsuranceNumber.change.hidden                                            =  Rhif Yswiriant Gwladol
 
 worksReferenceNumber.heading                                                        =  Beth yw cyfeirnod y gwaith sy’n gysylltiedig â {0}?
-worksReferenceNumber.hint                                                           =  TMae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
+worksReferenceNumber.hint                                                           =  Mae hwn yn unigryw i’r prosiect neu’r gwaith adeiladu.
 worksReferenceNumber.checkYourAnswersLabel                                          =  Cyfeirnod y gwaith
 worksReferenceNumber.error.required                                                 =  Nodwch gyfeirnod y gwaith
 worksReferenceNumber.error.invalid                                                  =  Nodwch gyfeirnod y gwaith dilys
