@@ -198,7 +198,7 @@ subcontractorsUniqueTaxpayerReference.error.duplicate                           
 subcontractorsUniqueTaxpayerReference.change.hidden                                 =  UTR
 
 individualMobileNumber.heading                                                      =  Beth yw’r rhif ffôn symudol ar gyfer {0}?
-individualMobileNumber.hint                                                         =  HMRC will never use this mobile number to contact this subcontractor
+individualMobileNumber.hint                                                         =  Ni fydd CThEF yn defnyddio’r rhif ffôn symudol hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
 individualMobileNumber.checkYourAnswersLabel                                        =  Rhif ffôn symudol
 individualMobileNumber.error.required                                               =  Nodwch rif ffôn symudol
 individualMobileNumber.error.length                                                 =  Nodwch rif ffôn symudol dilys, fel 07700 900 982 neu +44 07700 900 999
