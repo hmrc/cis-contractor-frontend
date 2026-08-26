@@ -32,7 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.OriginalTrustAnswersQuery
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -321,6 +321,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
@@ -330,6 +331,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -348,6 +350,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       verify(mockSubcontractorService)
         .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockAuditService).amendSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
       captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
@@ -362,11 +365,13 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .value
 
       val mockSubcontractorService = mock[SubcontractorService]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SubcontractorService].toInstance(mockSubcontractorService)
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -398,6 +403,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -412,6 +418,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           )
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -444,6 +451,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -452,6 +460,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -482,11 +491,13 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(invalidUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()

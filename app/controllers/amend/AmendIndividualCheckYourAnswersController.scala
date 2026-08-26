@@ -29,7 +29,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -47,6 +47,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
   appConfig: FrontendAppConfig
@@ -219,6 +220,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           subcontractorService
             .createAndUpdateSubcontractor(request.userAnswers)
             .flatMap { _ =>
+              auditService.amendSubcontractorEvent(request.userAnswers)
               Future
                 .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
                 .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
