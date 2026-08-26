@@ -16,9 +16,9 @@
 
 package services
 
-import models.response.SubcontractorListItem
+import models.response.GetLastSubmittedVerificationBatchResponse
 import models.verify.ReverificationDecision
-import models.{Subcontractor, Verification, VerificationLastVerification}
+import models.{Subcontractor, SubcontractorLastVerification, Verification, VerificationLastVerification}
 
 object CheckUnmatchedSubcontractorsService {
 
@@ -48,13 +48,12 @@ object CheckUnmatchedSubcontractorsService {
     }
   }
 
-  def reverificationDecisionsFromLastSubmitted(
-    verifications: Seq[VerificationLastVerification],
-    liveSubcontractors: Seq[SubcontractorListItem]
+  def reverificationDecisions(
+    response: GetLastSubmittedVerificationBatchResponse
   ): Seq[ReverificationDecision] =
     reverificationDecisions(
-      verifications.map(toVerification),
-      liveSubcontractors.map(toSubcontractor)
+      response.verifications.map(toVerification),
+      response.subcontractors.map(toSubcontractor)
     )
 
   def isUnmatched(verification: VerificationLastVerification): Boolean =
@@ -90,9 +89,9 @@ object CheckUnmatchedSubcontractorsService {
       verificationResourceRef = verification.verificationResourceRef
     )
 
-  private def toSubcontractor(item: SubcontractorListItem): Subcontractor =
+  private def toSubcontractor(subcontractor: SubcontractorLastVerification): Subcontractor =
     Subcontractor(
-      subcontractorId = item.subcontractorId,
+      subcontractorId = subcontractor.subcontractorId,
       firstName = None,
       secondName = None,
       surname = None,
@@ -104,9 +103,9 @@ object CheckUnmatchedSubcontractorsService {
       verificationDate = None,
       lastMonthlyReturnDate = None,
       createDate = None,
-      subcontractorType = None,
-      subbieResourceRef = item.subbieResourceRef,
-      utr = None,
+      subcontractorType = subcontractor.subcontractorType,
+      subbieResourceRef = subcontractor.subbieResourceRef,
+      utr = subcontractor.utr,
       partnerUtr = None,
       crn = None,
       nino = None

@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import models.verify.ReverificationDecision
-import models.{Subcontractor, Verification, VerificationLastVerification}
+import models.{Subcontractor, SubcontractorLastVerification, Verification, VerificationLastVerification}
 
 class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
 
@@ -367,16 +367,25 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
     }
   }
 
-  "CheckUnmatchedSubcontractorsService.reverificationDecisionsFromLastSubmitted" - {
+  "CheckUnmatchedSubcontractorsService.reverificationDecisions for last-submitted batch" - {
 
-    "must match last-submitted verifications to live subcontractors by resource ref" in {
-      val result =
-        CheckUnmatchedSubcontractorsService.reverificationDecisionsFromLastSubmitted(
+    "AC2: must consider for reverification when unmatched verificationResourceRef matches subbieResourceRef" in {
+      val response =
+        models.response.GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq(
+            SubcontractorLastVerification(
+              subcontractorId = 22L,
+              subbieResourceRef = Some(10L),
+              subcontractorType = Some("soletrader"),
+              utr = Some("1111111111")
+            )
+          ),
           verifications = Seq(
             VerificationLastVerification(
               verificationId = 1L,
               verificationBatchId = Some(10L),
-              verificationResourceRef = Some(1001L),
+              verificationResourceRef = Some(10L),
               matched = None,
               verificationNumber = None,
               taxTreatment = None,
@@ -385,17 +394,55 @@ class CheckUnmatchedSubcontractorsServiceSpec extends SpecBase {
               actionIndicator = Some("verify")
             )
           ),
-          liveSubcontractors = Seq(
-            models.response.SubcontractorListItem(22L, Some(1001L))
-          )
+          verificationBatch = None,
+          submission = None
         )
 
-      result mustBe Seq(
+      CheckUnmatchedSubcontractorsService.reverificationDecisions(response) mustBe Seq(
         ReverificationDecision(
           verificationId = 1L,
           subcontractorId = Some(22L),
           isUnmatched = true,
           considerForReverification = true
+        )
+      )
+    }
+
+    "AC3: must not consider for reverification when verificationResourceRef does not match subbieResourceRef" in {
+      val response =
+        models.response.GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq(
+            SubcontractorLastVerification(
+              subcontractorId = 22L,
+              subbieResourceRef = Some(10L),
+              subcontractorType = Some("soletrader"),
+              utr = Some("1111111111")
+            )
+          ),
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1L,
+              verificationBatchId = Some(10L),
+              verificationResourceRef = Some(12345L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      CheckUnmatchedSubcontractorsService.reverificationDecisions(response) mustBe Seq(
+        ReverificationDecision(
+          verificationId = 1L,
+          subcontractorId = None,
+          isUnmatched = true,
+          considerForReverification = false
         )
       )
     }

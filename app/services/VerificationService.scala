@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -198,17 +198,6 @@ class VerificationService @Inject() (
         error => Future.failed(new RuntimeException(error)),
         request => Future.successful(request)
       )
-
-  def getUnmatchedReverificationDecisions(
-    cisId: String,
-    response: GetLastSubmittedVerificationBatchResponse
-  )(implicit hc: HeaderCarrier): Future[Seq[ReverificationDecision]] =
-    cisConnector.getSubcontractorList(cisId).map { listResponse =>
-      CheckUnmatchedSubcontractorsService.reverificationDecisionsFromLastSubmitted(
-        response.verifications,
-        listResponse.subcontractors
-      )
-    }
 
   private def resolveEmployerReference(
     userId: String,

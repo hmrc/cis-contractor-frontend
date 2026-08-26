@@ -18,60 +18,38 @@ package controllers.verify
 
 import controllers.actions.*
 import pages.verify.LastSubmittedVerificationBatchResponsePage
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.CisIdQuery
-import services.{CheckUnmatchedSubcontractorsService, VerificationService}
+import services.CheckUnmatchedSubcontractorsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReviewUnmatchedSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
-  verificationService: VerificationService
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+  val controllerComponents: MessagesControllerComponents
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      (
-        request.userAnswers.get(LastSubmittedVerificationBatchResponsePage),
-        request.userAnswers.get(CisIdQuery)
-      ) match {
-        case (Some(response), Some(cisId)) =>
-          val hasUnmatched = response.verifications.exists(CheckUnmatchedSubcontractorsService.isUnmatched)
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {
+        case Some(response) =>
+          val decisions = CheckUnmatchedSubcontractorsService.reverificationDecisions(response)
 
-          if (!hasUnmatched) {
-            Future.successful(Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad()))
+          if (!decisions.exists(_.isUnmatched)) {
+            Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad())
+          } else if (decisions.exists(_.considerForReverification)) {
+            Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
           } else {
-            verificationService
-              .getUnmatchedReverificationDecisions(cisId, response)
-              .map { decisions =>
-                if (decisions.exists(_.considerForReverification)) {
-                  Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
-                } else {
-                  Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
-                }
-              }
-              .recover { case t =>
-                logger.error(
-                  "[ReviewUnmatchedSubcontractorsController.onPageLoad] Failed to check live subcontractors",
-                  t
-                )
-                Redirect(controllers.routes.SystemErrorController.onPageLoad())
-              }
+            Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
           }
 
-        case _ =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case None =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 }

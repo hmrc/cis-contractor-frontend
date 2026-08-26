@@ -22,7 +22,7 @@ import generators.ModelGenerators
 import models.*
 import models.response.*
 import models.requests.*
-import models.verify.{ChrisVerificationRequestBuilder, ReverificationDecision, SubmissionStatus, VerificationSubmissionDetails}
+import models.verify.{ChrisVerificationRequestBuilder, SubmissionStatus, VerificationSubmissionDetails}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -913,104 +913,6 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ex.getMessage mustBe "Poll URL missing in submission details"
 
       verify(mockConnector, never()).getSubmissionStatus(any[String], any[String])(any[HeaderCarrier])
-    }
-  }
-
-  "VerificationService.getUnmatchedReverificationDecisions" - {
-
-    "must map last-submitted verifications against the live list by resource ref" in {
-      val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo      = mock[SessionRepository]
-      val service       = buildService(mockConnector, mockRepo)
-
-      val lastSubmitted =
-        GetLastSubmittedVerificationBatchResponse(
-          scheme = None,
-          subcontractors = Nil,
-          verifications = Seq(
-            VerificationLastVerification(
-              verificationId = 1001L,
-              verificationBatchId = Some(99L),
-              verificationResourceRef = Some(12345L),
-              matched = None,
-              verificationNumber = None,
-              taxTreatment = Some("unmatched"),
-              subcontractorName = Some("John Smith"),
-              subcontractorId = Some(22L),
-              actionIndicator = Some("verify")
-            )
-          ),
-          verificationBatch = None,
-          submission = None
-        )
-
-      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
-        .thenReturn(
-          Future.successful(
-            GetSubcontractorListResponse(
-              Seq(SubcontractorListItem(22L, Some(12345L)))
-            )
-          )
-        )
-
-      val result =
-        service.getUnmatchedReverificationDecisions("900063", lastSubmitted).futureValue
-
-      result mustBe Seq(
-        ReverificationDecision(
-          verificationId = 1001L,
-          subcontractorId = Some(22L),
-          isUnmatched = true,
-          considerForReverification = true
-        )
-      )
-      verify(mockConnector).getSubcontractorList(eqTo("900063"))(any[HeaderCarrier])
-    }
-
-    "must not consider for reverification when live list has no matching resource ref" in {
-      val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo      = mock[SessionRepository]
-      val service       = buildService(mockConnector, mockRepo)
-
-      val lastSubmitted =
-        GetLastSubmittedVerificationBatchResponse(
-          scheme = None,
-          subcontractors = Nil,
-          verifications = Seq(
-            VerificationLastVerification(
-              verificationId = 1001L,
-              verificationBatchId = Some(99L),
-              verificationResourceRef = Some(12345L),
-              matched = None,
-              verificationNumber = None,
-              taxTreatment = Some("unmatched"),
-              subcontractorName = Some("John Smith"),
-              subcontractorId = Some(22L),
-              actionIndicator = Some("verify")
-            )
-          ),
-          verificationBatch = None,
-          submission = None
-        )
-
-      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
-        .thenReturn(
-          Future.successful(
-            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L, Some(999L))))
-          )
-        )
-
-      val result =
-        service.getUnmatchedReverificationDecisions("900063", lastSubmitted).futureValue
-
-      result mustBe Seq(
-        ReverificationDecision(
-          verificationId = 1001L,
-          subcontractorId = None,
-          isUnmatched = true,
-          considerForReverification = false
-        )
-      )
     }
   }
 }
