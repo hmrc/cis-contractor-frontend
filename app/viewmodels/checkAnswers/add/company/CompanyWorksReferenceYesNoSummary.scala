@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.company.CompanyAnswers
 
 object CompanyWorksReferenceYesNoSummary {
 
@@ -46,6 +47,20 @@ object CompanyWorksReferenceYesNoSummary {
             .withVisuallyHiddenText(messages("companyWorksReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-works-reference")
         )
+      )
+    }
+
+  def row(
+    answers: CompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.worksReferenceYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "companyWorksReferenceYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }
