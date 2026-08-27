@@ -273,7 +273,7 @@ individualMobileNumber.error.invalid                                            
 individualPhoneNumber.heading                                                       =  Beth yw’r rhif ffôn ar gyfer {0}?
 individualPhoneNumber.hint                                                          =  Ni fydd CThEF yn defnyddio’r rhif ffôn hwn i gysylltu â’r is-gontractwr hwn ar unrhyw adeg
 individualPhoneNumber.checkYourAnswersLabel                                         =  Rhif ffôn
-individualPhoneNumber.error.required                                                =  ENodwch rif ffôn
+individualPhoneNumber.error.required                                                =  Nodwch rif ffôn
 individualPhoneNumber.error.length                                                  =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
 individualPhoneNumber.error.invalid                                                 =  Nodwch rif ffôn dilys, fel 01632 960 001 Ar gyfer rhifau rhyngwladol, dylech gynnwys cod y wlad.
 
