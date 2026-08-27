@@ -100,11 +100,11 @@ GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers
 
 GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
 
-GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 
-GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
@@ -114,12 +114,12 @@ GET   /subcontractor/amend/partnership/subcontractor-details-updated  controller
 
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
 
-GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
-GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/company/cancel                     controllers.amend.company.AmendCompanyCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amend.trust.AmendTrustConfirmationController.onPageLoad()
