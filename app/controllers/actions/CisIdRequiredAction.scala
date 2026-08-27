@@ -18,7 +18,6 @@ package controllers.actions
 
 import javax.inject.Inject
 import models.requests.{CisIdDataRequest, DataRequest}
-import pages.CisIdPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 import queries.CisIdQuery

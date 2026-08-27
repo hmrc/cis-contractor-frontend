@@ -42,6 +42,7 @@ class CisIdRequiredActionSpec extends SpecBase {
   "CisIdRequiredAction" - {
 
     "return a CisIdDataRequest when CIS ID is present" in {
+
       val userAnswers =
         emptyUserAnswers
           .set(CisIdQuery, "12345")

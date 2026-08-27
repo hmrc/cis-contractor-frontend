@@ -27,9 +27,9 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Failure
 
 final case class HasClientResponse(hasClient: Boolean)
 
@@ -140,6 +140,25 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
 
+  def getLastSubmittedVerificationBatch(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetLastSubmittedVerificationBatchResponse] =
+    http
+      .get(url"$cisBaseUrl/verification-batch/last/$instanceId")
+      .execute[GetLastSubmittedVerificationBatchResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][getLastSubmittedVerificationBatch] instanceId=$instanceId - Response received"
+        )
+        response
+      }
+      .andThen { case Failure(ex) =>
+        logger.error(
+          s"[ConstructionIndustrySchemeConnector][getLastSubmittedVerificationBatch] instanceId=$instanceId - Request failed",
+          ex
+        )
+      }
+
   def createVerificationBatchAndVerifications(
     request: CreateVerificationBatchAndVerificationsRequest
   )(implicit hc: HeaderCarrier): Future[CreateVerificationBatchAndVerificationsResponse] =
@@ -231,4 +250,39 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def getSubcontractorList(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] = {
+    logger.debug(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
+
+    http
+      .get(url"$cisBaseUrl/subcontractors/$cisId")
+      .execute[GetSubcontractorListResponse]
+      .map { response =>
+        logger.debug(
+          s"[ConstructionIndustrySchemeConnector][getSubcontractorList] " +
+            s"Retrieved ${response.subcontractors.size} subcontractors for cisId=$cisId"
+        )
+        response
+      }
+  }
+
+  def proceedInsufficientVerification(
+    request: ProceedInsufficientVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+            )
+        }
+      }
 }

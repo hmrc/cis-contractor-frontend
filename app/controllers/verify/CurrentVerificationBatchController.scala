@@ -18,15 +18,18 @@ package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.Mode
+import models.response.GetCurrentVerificationBatchResponse
+import pages.validation.SubcontractorValidationFailuresPage
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.VerificationService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import repositories.SessionRepository
+import services.{SubcontractorDetailsValidator, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CurrentVerificationBatchController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,7 +37,9 @@ class CurrentVerificationBatchController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationBatchService: VerificationService
+  verificationBatchService: VerificationService,
+  subcontractorDetailsValidator: SubcontractorDetailsValidator,
+  sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -43,35 +48,70 @@ class CurrentVerificationBatchController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
-        .getCurrentVerificationBatch(request.userAnswers)
-        .map { updatedAnswers =>
-          updatedAnswers.get(CurrentVerificationBatchResponsePage) match {
+        .getCurrentVerificationBatch(
+          request.userAnswers
+        )
+        .flatMap { updatedAnswers =>
+          updatedAnswers
+            .get(CurrentVerificationBatchResponsePage)
+            .map { response =>
+              val validationFailures =
+                subcontractorDetailsValidator.validate(
+                  response.subcontractors
+                )
 
-            case Some(response)
-                if response.verificationBatch.nonEmpty ||
-                  response.verifications.nonEmpty =>
-              Redirect(
-                controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                  .modifyVerificationBatch(mode)
-              )
-            case Some(_) =>
-              Redirect(
-                controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-                  .onSubmit(mode)
-              )
+              for {
+                answersWithFailures <-
+                  Future.fromTry(
+                    updatedAnswers.set(
+                      SubcontractorValidationFailuresPage,
+                      validationFailures
+                    )
+                  )
 
-            case None =>
-              Redirect(
-                controllers.routes.JourneyRecoveryController.onPageLoad()
+                _ <- sessionRepository.set(
+                       answersWithFailures
+                     )
+              } yield redirectFor(response, mode)
+            }
+            .getOrElse {
+              Future.successful(
+                Redirect(
+                  controllers.routes.JourneyRecoveryController
+                    .onPageLoad()
+                )
               )
-          }
+            }
         }
-        .recover { case t =>
+        .recover { case throwable =>
           logger.error(
-            "[CurrentVerificationBatchController.onPageLoad] Failed to refresh current verification batch",
-            t
+            "[CurrentVerificationBatchController.onPageLoad] Failed to refresh, validate or persist the current verification batch",
+            throwable
           )
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+          Redirect(
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+          )
         }
+    }
+
+  private def redirectFor(
+    response: GetCurrentVerificationBatchResponse,
+    mode: Mode
+  ): Result =
+    if (
+      response.verificationBatch.nonEmpty ||
+      response.verifications.nonEmpty
+    ) {
+      Redirect(
+        controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+          .modifyVerificationBatch(mode)
+      )
+    } else {
+      Redirect(
+        controllers.verify.routes.CreateVerificationBatchAndVerificationsController
+          .onSubmit(mode)
+      )
     }
 }

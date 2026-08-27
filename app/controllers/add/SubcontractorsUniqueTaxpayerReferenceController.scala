@@ -43,6 +43,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   formProvider: UtrFormProvider,
   subcontractorService: SubcontractorService,
   subcontractorNameExtractor: SubcontractorNameExtractor,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: SubcontractorsUniqueTaxpayerReferenceView
@@ -68,7 +69,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
     )
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
       val yesOrNoPage       = UniqueTaxpayerReferenceYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(UniqueTaxpayerReferenceYesNoPage)
@@ -82,7 +83,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers)
         .fold(Future.successful(recoveryRedirect)) { subcontractorName =>

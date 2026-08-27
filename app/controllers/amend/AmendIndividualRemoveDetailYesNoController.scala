@@ -21,7 +21,7 @@ import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
 import models.{AmendMode, UserAnswers}
 import models.amend.AmendIndividualRemoveDetail
 import pages.add.*
-import pages.amend.AmendIndividualRemoveDetailYesNoPage
+import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -75,12 +75,24 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
       case AmendIndividualRemoveDetail.TradingName =>
         userAnswers
           .get(SubTradingNameYesNoPage)
+          .contains(false) &&
+        userAnswers
+          .get(TradingNameOfSubcontractorPage)
+          .isDefined &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
           .contains(false)
 
       case AmendIndividualRemoveDetail.SubcontractorName =>
         userAnswers
           .get(SubTradingNameYesNoPage)
-          .contains(true)
+          .contains(true) &&
+        userAnswers
+          .get(SubcontractorNamePage)
+          .isDefined &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers
@@ -95,7 +107,10 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
       case AmendIndividualRemoveDetail.Utr =>
         userAnswers
           .get(UniqueTaxpayerReferenceYesNoPage)
-          .contains(true)
+          .contains(true) &&
+        userAnswers
+          .get(ShowVerificationDetailsPage)
+          .contains(false)
 
       case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
         userAnswers
