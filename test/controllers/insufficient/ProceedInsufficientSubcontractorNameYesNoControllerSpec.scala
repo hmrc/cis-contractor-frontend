@@ -109,7 +109,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         VerificationCurrentVerification(
           verificationId = 1L,
           verificationBatchId = Some(999L),
-          subcontractorId = Some(10L),
+          subcontractorId = Some(subcontractorId),
           verificationResourceRef = Some(1111L),
           subcontractorName = None,
           verificationNumber = None,
@@ -149,13 +149,13 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered NO" in {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
-        .set(ProceedInsufficientSubcontractorNameYesNoPage, true)
+        .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), false)
         .success
         .value
 
@@ -173,11 +173,39 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
         contentAsString(result) mustEqual
           view(
-            form.fill(true),
+            form.fill(false),
             mode,
             subcontractorName,
             subcontractorId
           )(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page on a GET when the question has previously been answered YES" in {
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+        .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), true)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
       }
     }
 
@@ -371,7 +399,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       }
     }
 
-    "must redirect to Journey Recovery for a POST if subcontractorId is found" in {
+    "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
 
       val userAnswers = emptyUserAnswers
         .set(CisIdQuery, "1")

@@ -42,25 +42,25 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def normalRoutes: Page => UserAnswers => Call = {
 
-    case ContractorEmailConfirmationNotStoredPage      =>
+    case ContractorEmailConfirmationNotStoredPage         =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorPage                       =>
+    case SelectSubcontractorPage                          =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
-    case VerifyYourSubcontractorsYesNoPage             =>
+    case VerifyYourSubcontractorsYesNoPage                =>
       userAnswers => navigatorFromVerifyYourSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ReverifyExistingSubcontractorsYesNoPage       =>
+    case ReverifyExistingSubcontractorsYesNoPage          =>
       userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ContractorEmailConfirmationStoredPage         =>
+    case ContractorEmailConfirmationStoredPage            =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorsToReverifyPage            =>
+    case SelectSubcontractorsToReverifyPage               =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
-    case EmailAddressPage                              =>
+    case EmailAddressPage                                 =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case VerificationDeclarationPage                   =>
+    case VerificationDeclarationPage                      =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case ProceedInsufficientSubcontractorNameYesNoPage =>
+    case ProceedInsufficientSubcontractorNameYesNoPage(_) =>
       _ => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-    case _                                             => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+    case _                                                => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
   private def checkRouteMap: Page => UserAnswers => Call = {

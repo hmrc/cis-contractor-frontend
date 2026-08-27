@@ -375,11 +375,11 @@ class VerifyNavigatorSpec extends SpecBase {
         "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is true" in {
 
           val ua = emptyUserAnswers
-            .set(ProceedInsufficientSubcontractorNameYesNoPage, true)
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), true)
             .success
             .value
 
-          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, NormalMode, ua) mustBe
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
             controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
               .onPageLoad()
         }
@@ -387,11 +387,11 @@ class VerifyNavigatorSpec extends SpecBase {
         "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is false" in {
 
           val ua = emptyUserAnswers
-            .set(ProceedInsufficientSubcontractorNameYesNoPage, false)
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), false)
             .success
             .value
 
-          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage, NormalMode, ua) mustBe
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
             controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
               .onPageLoad()
         }
