@@ -20,8 +20,8 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object SecondNameValidator {
   def validate(
-                value: Option[String]
-              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     value match {
       case None =>
         Some(
@@ -31,14 +31,15 @@ object SecondNameValidator {
           )
         )
       case Some(secondName)
-        if secondName.isBlank || !FirstMiddleName.isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName) =>
+          if secondName.isBlank || !FirstMiddleName
+            .isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName) =>
         Some(
           FieldValidationFailure(
             field = SubcontractorValidationField.FirstName,
             value = Some(secondName)
           )
         )
-      case _ =>
+      case _    =>
         None
     }
 }

@@ -21,25 +21,24 @@ import uk.gov.hmrc.domain.Nino
 
 object NinoValidator {
   def validate(
-                value: Option[String]
-              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     value match {
-      case None =>
+      case None                             =>
         Some(
           FieldValidationFailure(
             field = SubcontractorValidationField.Nino,
             value = None
           )
         )
-      case Some(nino)
-        if (Nino.isValid(nino)) =>
-          Some(
-            FieldValidationFailure(
-              field = SubcontractorValidationField.Nino,
-              value = Some(nino)
-            )
+      case Some(nino) if Nino.isValid(nino) =>
+        Some(
+          FieldValidationFailure(
+            field = SubcontractorValidationField.Nino,
+            value = Some(nino)
           )
-      case _ =>
+        )
+      case _                                =>
         None
     }
 }
