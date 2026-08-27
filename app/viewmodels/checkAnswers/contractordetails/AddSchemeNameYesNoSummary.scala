@@ -31,7 +31,7 @@ object AddSchemeNameYesNoSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       val changeUrl =
-        if (ContractorSchemePage.hasExistingUtr(answers)) {
+        if (answer && ContractorSchemePage.hasExistingUtr(answers)) {
           controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("scheme-name").url
         } else {
           controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url

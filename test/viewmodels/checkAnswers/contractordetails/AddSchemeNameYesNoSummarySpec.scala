@@ -31,6 +31,21 @@ class AddSchemeNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
 
+  private val answersWithExistingUtr = UserAnswers("test-id")
+    .set(
+      ContractorSchemePage,
+      Scheme(
+        schemeId = 1,
+        instanceId = "cisId",
+        accountsOfficeReference = "123 PA 87654321",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "45678",
+        utr = Some("1234567890")
+      )
+    )
+    .success
+    .value
+
   "AddSchemeNameYesNoSummary.row" - {
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
@@ -84,20 +99,8 @@ class AddSchemeNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
       AddSchemeNameYesNoSummary.row(answers) shouldBe None
     }
 
-    "must link Change to the remove scheme name page when a scheme UTR already exists" in {
-      val scheme = Scheme(
-        schemeId = 1,
-        instanceId = "cisId",
-        accountsOfficeReference = "123 PA 87654321",
-        taxOfficeNumber = "123",
-        taxOfficeReference = "45678",
-        utr = Some("1234567890")
-      )
-
-      val answers = UserAnswers("test-id")
-        .set(ContractorSchemePage, scheme)
-        .success
-        .value
+    "must link Change to the remove scheme name page when a scheme UTR already exists and the answer is Yes" in {
+      val answers = answersWithExistingUtr
         .set(AddSchemeNameYesNoPage, true)
         .success
         .value
@@ -105,6 +108,17 @@ class AddSchemeNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val row = AddSchemeNameYesNoSummary.row(answers).value
       row.actions.value.items.head.href shouldBe
         controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("scheme-name").url
+    }
+
+    "must link Change to the add scheme name page when a scheme UTR already exists and the answer is No" in {
+      val answers = answersWithExistingUtr
+        .set(AddSchemeNameYesNoPage, false)
+        .success
+        .value
+
+      val row = AddSchemeNameYesNoSummary.row(answers).value
+      row.actions.value.items.head.href shouldBe
+        controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
     }
   }
 }
