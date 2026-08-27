@@ -70,7 +70,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RemoveSubcontractorVerifyRequestPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(RemoveSubcontractorVerifyRequestPage("TODO"), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

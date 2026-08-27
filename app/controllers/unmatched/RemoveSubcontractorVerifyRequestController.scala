@@ -49,7 +49,7 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(RemoveSubcontractorVerifyRequestPage) match {
+    val preparedForm = request.userAnswers.get(RemoveSubcontractorVerifyRequestPage("TODO")) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
@@ -65,9 +65,10 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, subcontractorName = subcontractorName))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveSubcontractorVerifyRequestPage, value))
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(RemoveSubcontractorVerifyRequestPage("TODO"), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveSubcontractorVerifyRequestPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(RemoveSubcontractorVerifyRequestPage("TODO"), mode, updatedAnswers))
         )
   }
 }
