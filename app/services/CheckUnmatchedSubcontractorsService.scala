@@ -16,8 +16,9 @@
 
 package services
 
+import models.response.GetLastSubmittedVerificationBatchResponse
 import models.verify.ReverificationDecision
-import models.{Subcontractor, Verification}
+import models.{Subcontractor, SubcontractorLastVerification, Verification, VerificationLastVerification}
 
 object CheckUnmatchedSubcontractorsService {
 
@@ -36,20 +37,29 @@ object CheckUnmatchedSubcontractorsService {
           subcontractorsByResourceRef.get
         )
 
-      val isUnmatched = determineIsUnmatched(verification)
+      val unmatched = isUnmatched(verification)
 
       ReverificationDecision(
         verificationId = verification.verificationId,
         subcontractorId = associatedSubcontractor.map(_.subcontractorId),
-        isUnmatched = isUnmatched,
-        considerForReverification = isUnmatched && associatedSubcontractor.isDefined
+        isUnmatched = unmatched,
+        considerForReverification = unmatched && associatedSubcontractor.isDefined
       )
     }
   }
 
-  private def determineIsUnmatched(
-    verification: Verification
-  ): Boolean = {
+  def reverificationDecisions(
+    response: GetLastSubmittedVerificationBatchResponse
+  ): Seq[ReverificationDecision] =
+    reverificationDecisions(
+      response.verifications.map(toVerification),
+      response.subcontractors.map(toSubcontractor)
+    )
+
+  def isUnmatched(verification: VerificationLastVerification): Boolean =
+    isUnmatched(toVerification(verification))
+
+  def isUnmatched(verification: Verification): Boolean = {
     val verificationNumberExists =
       normalise(verification.verificationNumber).isDefined
 
@@ -66,6 +76,40 @@ object CheckUnmatchedSubcontractorsService {
         !matched.contains("Y")
     )
   }
+
+  private def toVerification(verification: VerificationLastVerification): Verification =
+    Verification(
+      verificationId = verification.verificationId,
+      matched = verification.matched,
+      verificationNumber = verification.verificationNumber,
+      taxTreatment = verification.taxTreatment,
+      verificationBatchId = verification.verificationBatchId,
+      subcontractorId = verification.subcontractorId,
+      actionIndicator = verification.actionIndicator,
+      verificationResourceRef = verification.verificationResourceRef
+    )
+
+  private def toSubcontractor(subcontractor: SubcontractorLastVerification): Subcontractor =
+    Subcontractor(
+      subcontractorId = subcontractor.subcontractorId,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      partnershipTradingName = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      lastMonthlyReturnDate = None,
+      createDate = None,
+      subcontractorType = subcontractor.subcontractorType,
+      subbieResourceRef = subcontractor.subbieResourceRef,
+      utr = subcontractor.utr,
+      partnerUtr = None,
+      crn = None,
+      nino = None
+    )
 
   private def normalise(value: Option[String]): Option[String] =
     value.map(_.trim.toUpperCase).filter(_.nonEmpty)
