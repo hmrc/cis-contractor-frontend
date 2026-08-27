@@ -151,6 +151,28 @@ class VerificationService @Inject() (
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
 
+  def deleteVerification(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.deleteVerification(
+                    DeleteVerificationRequest(
+                      instanceId = instanceId,
+                      verificationResourceRef = verificationResourceRef
+                    )
+                  )
+
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield response
+
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],
     hc: HeaderCarrier
