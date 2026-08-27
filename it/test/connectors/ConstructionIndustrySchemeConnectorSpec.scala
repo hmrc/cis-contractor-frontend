@@ -18,6 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
+import models.agent.ClientListStatus
 import models.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
@@ -235,6 +236,24 @@ class ConstructionIndustrySchemeConnectorSpec
       result.getMessage must include("Something broke")
     }
 
+  }
+
+  "startClientList" should {
+
+    "POST /cis/agent/client-list/retrieval/start and return succeeded" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{ "result": "succeeded" }""")
+          )
+      )
+
+      connector.startClientList.futureValue.result mustBe
+        ClientListStatus.Succeeded
+    }
   }
   
   "hasClient(taxOfficeNumber, taxOfficeReference)" should {
