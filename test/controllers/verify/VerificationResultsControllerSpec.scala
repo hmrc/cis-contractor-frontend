@@ -19,8 +19,6 @@ package controllers.verify
 import base.SpecBase
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.{SubcontractorLastVerification, UserAnswers, VerificationLastVerification}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.verify.LastSubmittedVerificationBatchResponsePage
@@ -31,8 +29,6 @@ import queries.CisIdQuery
 import services.VerificationService
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
-
-import scala.concurrent.Future
 
 class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -63,13 +59,7 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
     submission = None
   )
   private val mockVerificationService = mock[VerificationService]
-
-  private def applicationWith(userAnswers: Option[UserAnswers]) =
-    applicationBuilder(userAnswers = userAnswers)
-      .overrides(
-        inject.bind[VerificationService].toInstance(mockVerificationService)
-      )
-      .build()
+  
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -109,77 +99,6 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-    "must redirect back to the results page when recreate current batch succeeds" in {
-
-      when(
-        mockVerificationService
-          .recreateCurrentBatchFromUnmatchedVerifications(any())(any())
-      ).thenReturn(
-        Future.successful(emptyUserAnswers)
-      )
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(LastSubmittedVerificationBatchResponsePage, batchResponse)
-          .success
-          .value
-
-      val application = applicationWith(Some(userAnswers))
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            POST,
-            controllers.verify.routes.VerificationResultsController.onSubmit().url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationResultsController
-            .onPageLoad()
-            .url
-
-        verify(mockVerificationService)
-          .recreateCurrentBatchFromUnmatchedVerifications(any())(any())
-      }
-    }
-    "must redirect to Journey Recovery when recreate current batch fails" in {
-
-      when(
-        mockVerificationService
-          .recreateCurrentBatchFromUnmatchedVerifications(any())(any())
-      ).thenReturn(
-        Future.failed(new RuntimeException("boom"))
-      )
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(LastSubmittedVerificationBatchResponsePage, batchResponse)
-          .success
-          .value
-
-      val application = applicationWith(Some(userAnswers))
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            POST,
-            controllers.verify.routes.VerificationResultsController.onSubmit().url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }

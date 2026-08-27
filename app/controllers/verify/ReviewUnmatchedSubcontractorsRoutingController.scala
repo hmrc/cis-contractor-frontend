@@ -54,12 +54,26 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
           } else {
             verificationService
               .anyUnmatchedResourceRefsStillPresent(cisId, response)
-              .map { stillPresent =>
-                if (stillPresent) {
-                  Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
-                } else {
-                  Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
-                }
+              .flatMap {
+                case true =>
+                  verificationService
+                    .recreateCurrentBatchFromUnmatchedVerifications(
+                      request.userAnswers
+                    )
+                    .map { _ =>
+                      Redirect(
+                        controllers.routes.UnmatchedSubcontractorsController
+                          .onPageLoad()
+                      )
+                    }
+
+                case false =>
+                  Future.successful(
+                    Redirect(
+                      controllers.routes.NoUnmatchedSubcontractorsController
+                        .onPageLoad()
+                    )
+                  )
               }
               .recover { case t =>
                 logger.error(
