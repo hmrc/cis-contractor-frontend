@@ -56,7 +56,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
               .anyUnmatchedResourceRefsStillPresent(cisId, response)
               .map { stillPresent =>
                 if (stillPresent) {
-                  Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
+                  Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
                 } else {
                   Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
                 }

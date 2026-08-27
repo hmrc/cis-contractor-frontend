@@ -67,7 +67,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
 
   "ReviewUnmatchedSubcontractorsRoutingController" - {
 
-    "AC2: must redirect to UnmatchedSubcontractors when unmatched resource refs are still on the live list" in {
+    "AC2: must redirect to ReviewUnmatchedSubcontractors screen when unmatched resource refs are still on the live list" in {
       val mockService = mock[VerificationService]
       val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
       val userAnswers = emptyUserAnswers
@@ -89,7 +89,9 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
         verify(mockService).anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier])
       }
     }
