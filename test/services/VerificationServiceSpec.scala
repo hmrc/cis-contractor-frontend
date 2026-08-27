@@ -338,6 +338,52 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       ex.getMessage must include("Submitted verification request page cannot be accessed")
     }
+
+    "must fail when the latest response has no submission" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors.copy(submission = None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+
+    "must fail when the latest submission has no status" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
   }
 
   "VerificationService.getCurrentVerificationBatch" - {
