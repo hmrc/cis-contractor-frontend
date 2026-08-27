@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.libs.json.{Json, OFormat}
+import forms.Validation.companyRegNumberRegex
 
-case class VerificationLastVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  verificationResourceRef: Option[Long],
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  subcontractorName: Option[String],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String]
-)
+object CRN {
+  private val length = 8
 
-object VerificationLastVerification {
-  given format: OFormat[VerificationLastVerification] = Json.format[VerificationLastVerification]
+  def isValid(crn: String): Boolean = crn != null && crn.matches(companyRegNumberRegex)
+
+  def isLengthInRange(crn: String): Boolean = crn != null && (crn.length <= length)
 }

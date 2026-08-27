@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.libs.json.{Json, OFormat}
+import forms.Validation.firstMiddleNameRegex
+import forms.Validation.firstCharLetterRegex
 
-case class VerificationLastVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  verificationResourceRef: Option[Long],
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  subcontractorName: Option[String],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String]
-)
+object FirstMiddleName {
 
-object VerificationLastVerification {
-  given format: OFormat[VerificationLastVerification] = Json.format[VerificationLastVerification]
+  private val length = 35
+
+  def isValid(name: String): Boolean =
+    name != null && name.matches(firstMiddleNameRegex) && name.matches(firstCharLetterRegex)
+
+  def isLengthInRange(name: String): Boolean = name != null && (name.length <= length)
 }

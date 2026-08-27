@@ -67,6 +67,7 @@
         <div>
             @govukButton(
                 ButtonViewModel(messages("verify.verificationResults.reviewUnmatchedSubcontractors.button"))
+                    .asLink(controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url)
             )
         </div>
     } else {
