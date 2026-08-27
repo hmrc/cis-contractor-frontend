@@ -1,0 +1,59 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.verify
+
+import controllers.actions.*
+import models.NormalMode
+import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ReviewInsufficientInfoService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.verify.ReviewInsufficientInfoSubcontractorsView
+
+import javax.inject.Inject
+
+class ReviewInsufficientInfoSubcontractorsController @Inject() (
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  reviewInsufficientInfoService: ReviewInsufficientInfoService,
+  val controllerComponents: MessagesControllerComponents,
+  view: ReviewInsufficientInfoSubcontractorsView
+) extends FrontendBaseController
+    with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      case Some(batch) =>
+        val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
+        if (viewModel.hasMissing || viewModel.hasReady) {
+          Ok(view(viewModel))
+        } else {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+
+      case None =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+  }
+
+  // TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { _ =>
+    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
+  }
+}

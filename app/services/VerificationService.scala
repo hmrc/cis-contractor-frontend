@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -86,6 +86,18 @@ class VerificationService @Inject() (
 
       response <- cisConnector.getCurrentVerificationBatch(instanceId)
       updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
+      _        <- sessionRepository.set(updated)
+    } yield updated
+
+  def getLastSubmittedVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.getLastSubmittedVerificationBatch(instanceId)
+      updated  <- Future.fromTry(userAnswers.set(LastSubmittedVerificationBatchResponsePage, response))
       _        <- sessionRepository.set(updated)
     } yield updated
 
@@ -211,6 +223,26 @@ class VerificationService @Inject() (
         error => Future.failed(new RuntimeException(error)),
         request => Future.successful(request)
       )
+
+  def anyUnmatchedResourceRefsStillPresent(
+    cisId: String,
+    response: GetLastSubmittedVerificationBatchResponse
+  )(implicit hc: HeaderCarrier): Future[Boolean] = {
+    val unmatchedResourceRefs =
+      response.verifications
+        .filter(CheckUnmatchedSubcontractorsService.isUnmatched)
+        .flatMap(_.verificationResourceRef)
+        .toSet
+
+    if (unmatchedResourceRefs.isEmpty) {
+      Future.successful(false)
+    } else {
+      cisConnector.getSubcontractorList(cisId).map { listResponse =>
+        val liveResourceRefs = listResponse.subcontractors.flatMap(_.subbieResourceRef).toSet
+        unmatchedResourceRefs.exists(liveResourceRefs.contains)
+      }
+    }
+  }
 
   private def resolveEmployerReference(
     userId: String,

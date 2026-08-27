@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.AddTrustContactMethodsYesNoPage
 import play.api.i18n.Messages
@@ -43,6 +44,19 @@ object AddTrustContactMethodsYesNoSummary {
             .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: TrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.trustContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addTrustContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value)
       )
     }
 }
