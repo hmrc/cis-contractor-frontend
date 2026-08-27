@@ -493,6 +493,9 @@ noUnmatchedSubcontractors.p2                                                    
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
+info.CheckYourAnswers.backTo                                                        =  Back to
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1115,12 +1118,11 @@ verify.verificationResults.verificationNumber                           =  Verif
 verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
-
-verify.verificationResults.status.matched                               = Verified
-verify.verificationResults.status.unmatched                             = Unmatched
-verify.verificationResults.taxTreatment.net                             = Standard rate
-verify.verificationResults.taxTreatment.gross                           = Gross
-verify.verificationResults.taxTreatment.unmatched                       = Higher rate
+verify.verificationResults.status.matched                               =  Verified
+verify.verificationResults.status.unmatched                             =  Unmatched
+verify.verificationResults.taxTreatment.net                             =  Standard rate
+verify.verificationResults.taxTreatment.gross                           =  Gross
+verify.verificationResults.taxTreatment.unmatched                       =  Higher rate
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details

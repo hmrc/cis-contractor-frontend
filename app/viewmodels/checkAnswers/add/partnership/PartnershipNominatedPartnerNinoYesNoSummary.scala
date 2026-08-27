@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.info.partnership.PartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNinoYesNoPage
 import play.api.i18n.Messages
@@ -46,6 +47,20 @@ object PartnershipNominatedPartnerNinoYesNoSummary {
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerNinoYesNo.change.hidden"))
             .withAttribute("id" -> "add-nominated-partner-nino")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerNinoYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }
