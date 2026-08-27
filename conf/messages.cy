@@ -46,7 +46,6 @@ contractordetails.schemeName.error.invalidCharacters                           =
 contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
 contractordetails.schemeName.change.hidden                                     =  enw’r Cynllun
 
-
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.heading                                 =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Ychwanegu cyfeiriad e-bost?

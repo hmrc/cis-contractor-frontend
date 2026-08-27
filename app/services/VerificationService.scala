@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -199,18 +199,25 @@ class VerificationService @Inject() (
         request => Future.successful(request)
       )
 
-  def anyUnmatchedSubcontractorsStillPresent(
+  def anyUnmatchedResourceRefsStillPresent(
     cisId: String,
-    unmatchedSubcontractorIds: Set[Long]
-  )(implicit hc: HeaderCarrier): Future[Boolean] =
-    if (unmatchedSubcontractorIds.isEmpty) {
+    response: GetLastSubmittedVerificationBatchResponse
+  )(implicit hc: HeaderCarrier): Future[Boolean] = {
+    val unmatchedResourceRefs =
+      response.verifications
+        .filter(CheckUnmatchedSubcontractorsService.isUnmatched)
+        .flatMap(_.verificationResourceRef)
+        .toSet
+
+    if (unmatchedResourceRefs.isEmpty) {
       Future.successful(false)
     } else {
-      cisConnector.getSubcontractorList(cisId).map { response =>
-        val liveIds = response.subcontractors.map(_.subcontractorId).toSet
-        unmatchedSubcontractorIds.exists(liveIds.contains)
+      cisConnector.getSubcontractorList(cisId).map { listResponse =>
+        val liveResourceRefs = listResponse.subcontractors.flatMap(_.subbieResourceRef).toSet
+        unmatchedResourceRefs.exists(liveResourceRefs.contains)
       }
     }
+  }
 
   private def resolveEmployerReference(
     userId: String,

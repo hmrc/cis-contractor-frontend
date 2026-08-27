@@ -24,6 +24,7 @@ import play.api.i18n.{Lang, Messages, MessagesImpl}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.info.trust.TrustAnswers
 
 class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -126,6 +127,111 @@ class TrustUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
     "return None when the answer is not set" in {
       TrustUtrYesNoSummary.row(emptyUserAnswers) mustBe None
+    }
+  }
+
+  "ViewOnly - TrustUtrYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' when utrYesNo is true" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustUtrYesNoSummary.row(answers)
+
+      maybeRow mustBe defined
+
+      val row = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(messages("trustUtrYesNo.checkYourAnswersLabel"))
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.yes"))
+      )
+
+      row.actions mustBe None
+    }
+
+    "must return a SummaryListRow with 'No' when utrYesNo is false" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(false),
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustUtrYesNoSummary.row(answers)
+
+      maybeRow mustBe defined
+
+      val row = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(messages("trustUtrYesNo.checkYourAnswersLabel"))
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.no"))
+      )
+
+      row.actions mustBe None
+    }
+
+    "must return None when utrYesNo is not set in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustUtrYesNoSummary.row(answers) mustBe None
     }
   }
 }

@@ -59,4 +59,3 @@ case class CisIdDataRequest[A](
   isAgent: Boolean = false,
   agentCode: Option[String] = None
 ) extends WrappedRequest[A](request)
-    with DataRequestFields[A]
