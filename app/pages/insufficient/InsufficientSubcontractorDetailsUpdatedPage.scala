@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package pages.insufficient
 
-import play.api.libs.json.{Json, OFormat}
+import models.insufficient.InsufficientSubcontractorDetailsUpdated
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class VerificationLastVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  verificationResourceRef: Option[Long],
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  subcontractorName: Option[String],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String]
-)
+case object InsufficientSubcontractorDetailsUpdatedPage extends QuestionPage[InsufficientSubcontractorDetailsUpdated] {
 
-object VerificationLastVerification {
-  given format: OFormat[VerificationLastVerification] = Json.format[VerificationLastVerification]
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "insufficientSubcontractorDetailsUpdated"
 }

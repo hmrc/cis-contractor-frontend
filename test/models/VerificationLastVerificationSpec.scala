@@ -30,7 +30,8 @@ class VerificationLastVerificationSpec extends SpecBase {
         verificationNumber = Some("V1234567890"),
         taxTreatment = Some("net"),
         subcontractorName = Some("ABC Construction"),
-        subcontractorId = Some(99L)
+        subcontractorId = Some(99L),
+        actionIndicator = Some("verify")
       )
       val json         = Json.toJson(verification)
       (json \ "verificationId").as[Long] mustBe 1L
@@ -41,6 +42,7 @@ class VerificationLastVerificationSpec extends SpecBase {
       (json \ "taxTreatment").as[String] mustBe "net"
       (json \ "subcontractorName").as[String] mustBe "ABC Construction"
       (json \ "subcontractorId").as[Long] mustBe 99L
+      (json \ "actionIndicator").as[String] mustBe "verify"
     }
 
     "deserialize from JSON correctly" in {
@@ -53,7 +55,8 @@ class VerificationLastVerificationSpec extends SpecBase {
            | "verificationNumber": "V1234567890",
            | "taxTreatment": "net",
            | "subcontractorName": "ABC Construction",
-           | "subcontractorId": 99
+           | "subcontractorId": 99,
+           | "actionIndicator": "verify"
            |}""".stripMargin
       )
       val result = json.as[VerificationLastVerification]
@@ -65,6 +68,7 @@ class VerificationLastVerificationSpec extends SpecBase {
       result.taxTreatment mustBe Some("net")
       result.subcontractorName mustBe Some("ABC Construction")
       result.subcontractorId mustBe Some(99L)
+      result.actionIndicator mustBe Some("verify")
     }
 
     "round-trip serialize and deserialize correctly" in {
@@ -76,7 +80,8 @@ class VerificationLastVerificationSpec extends SpecBase {
         verificationNumber = Some("V1234567890"),
         taxTreatment = Some("net"),
         subcontractorName = Some("ABC Construction"),
-        subcontractorId = Some(99L)
+        subcontractorId = Some(99L),
+        actionIndicator = Some("verify")
       )
       val json         = Json.toJson(verification)
       val result       = json.as[VerificationLastVerification]
