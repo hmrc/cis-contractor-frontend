@@ -16,7 +16,7 @@
 
 package models.validation
 
-import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, Reads, Writes}
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, Reads, Writes, __}
 
 sealed trait SubcontractorValidationField {
   def value: String
@@ -60,6 +60,22 @@ object SubcontractorValidationField {
     override val value: String = "country"
   }
 
+  case object TradingName extends SubcontractorValidationField {
+    override val value: String = "tradingName"
+  }
+
+  case object WorksReferenceNumber extends SubcontractorValidationField {
+    override val value: String = "worksReferenceNumber"
+  }
+
+  case object Crn extends SubcontractorValidationField {
+    override val value: String = "crn"
+  }
+
+  case object Utr extends SubcontractorValidationField {
+    override val value: String = "utr"
+  }
+
   val values: List[SubcontractorValidationField] =
     List(
       EmailAddress,
@@ -70,7 +86,11 @@ object SubcontractorValidationField {
       AddressLine3,
       AddressLine4,
       Postcode,
-      Country
+      Country,
+      TradingName,
+      WorksReferenceNumber,
+      Crn,
+      Utr
     )
 
   private def fromString(
