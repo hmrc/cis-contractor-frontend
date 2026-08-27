@@ -184,6 +184,73 @@ addressLookup.individualQuestionsAddress.confirmPage.submitLabel                
 addressLookup.individualQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
 addressLookup.individualQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
 
+addressLookup.trustQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
+addressLookup.trustQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
+addressLookup.trustQuestionsAddress.lookupPage.submitLabel                     =  Parhau
+addressLookup.trustQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
+
+addressLookup.trustQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
+addressLookup.trustQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
+addressLookup.trustQuestionsAddress.selectPage.submitLabel                     =  Parhau
+
+addressLookup.trustQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
+addressLookup.trustQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
+addressLookup.trustQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
+addressLookup.trustQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
+addressLookup.trustQuestionsAddress.editPage.postcodeLabel                     =  Cod post
+addressLookup.trustQuestionsAddress.editPage.countryLabel                      =  Gwlad
+addressLookup.trustQuestionsAddress.editPage.submitLabel                       =  Parhau
+addressLookup.trustQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
+addressLookup.trustQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
+addressLookup.trustQuestionsAddress.confirmPage.submitLabel                    =  Parhau
+addressLookup.trustQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
+addressLookup.trustQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
+
+addressLookup.companyQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
+addressLookup.companyQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
+addressLookup.companyQuestionsAddress.lookupPage.submitLabel                     =  Parhau
+addressLookup.companyQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
+
+addressLookup.companyQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
+addressLookup.companyQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
+addressLookup.companyQuestionsAddress.selectPage.submitLabel                     =  Parhau
+
+addressLookup.companyQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
+addressLookup.companyQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
+addressLookup.companyQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
+addressLookup.companyQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
+addressLookup.companyQuestionsAddress.editPage.postcodeLabel                     =  Cod post
+addressLookup.companyQuestionsAddress.editPage.countryLabel                      =  Gwlad
+addressLookup.companyQuestionsAddress.editPage.submitLabel                       =  Parhau
+addressLookup.companyQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
+addressLookup.companyQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
+addressLookup.companyQuestionsAddress.confirmPage.submitLabel                    =  Parhau
+addressLookup.companyQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
+addressLookup.companyQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
+
+addressLookup.partnershipQuestionsAddress.lookupPage.heading                         =  Chwiliwch am y cyfeiriad ar gyfer {0}
+addressLookup.partnershipQuestionsAddress.lookupPage.filterLabel                     =  Enw neu rif yr eiddo (dewisol)
+addressLookup.partnershipQuestionsAddress.lookupPage.submitLabel                     =  Parhau
+addressLookup.partnershipQuestionsAddress.lookupPage.manualAddressLinkText           =  Nodwch y cyfeiriad â llaw
+
+addressLookup.partnershipQuestionsAddress.selectPage.heading                         =  Dewiswch y cyfeiriad ar gyfer {0}
+addressLookup.partnershipQuestionsAddress.selectPage.editAddressLinkText             =  Nodwch y cyfeiriad â llaw
+addressLookup.partnershipQuestionsAddress.selectPage.submitLabel                     =  Parhau
+
+addressLookup.partnershipQuestionsAddress.editPage.heading                           =  Beth yw’r cyfeiriad ar gyfer {0}?
+addressLookup.partnershipQuestionsAddress.editPage.line1Label                        =  Cyfeiriad – llinell 1
+addressLookup.partnershipQuestionsAddress.editPage.line2Label                        =  Cyfeiriad – llinell 2
+addressLookup.partnershipQuestionsAddress.editPage.line3Label                        =  Cyfeiriad – llinell 3
+addressLookup.partnershipQuestionsAddress.editPage.postcodeLabel                     =  Cod post
+addressLookup.partnershipQuestionsAddress.editPage.countryLabel                      =  Gwlad
+addressLookup.partnershipQuestionsAddress.editPage.submitLabel                       =  Parhau
+addressLookup.partnershipQuestionsAddress.confirmPage.heading                        =  Adolygwch y cyfeiriad ar gyfer {0}
+addressLookup.partnershipQuestionsAddress.confirmPage.changeLinkText                 =  Golygwch y cyfeiriad hwn
+addressLookup.partnershipQuestionsAddress.confirmPage.submitLabel                    =  Parhau
+addressLookup.partnershipQuestionsAddress.countryPicker.title                        =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
+addressLookup.partnershipQuestionsAddress.countryPicker.countryLabel                 =  Dewiswch y wlad neu’r diriogaeth
+
+
 subcontractorsUniqueTaxpayerReference.title                                         =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad
 subcontractorsUniqueTaxpayerReference.heading                                       =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer Hunanasesiad
 subcontractorsUniqueTaxpayerReference.p1                                            =  Bydd yr UTR i’w weld ar Ffurflenni Treth a dogfennau eraill gan CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
