@@ -25,14 +25,6 @@ class SubcontractorNameExtractor {
   def getSubcontractorName(userAnswers: UserAnswers): Option[String] =
     userAnswers
       .get(SubcontractorNamePage)
-      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim)
-      .filter(_.nonEmpty)
-      .orElse(
-        userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty)
-      )
-
-  def displaySubcontractorName(ua: UserAnswers)(implicit messages: Messages): String =
-    ua.get(SubcontractorNamePage)
       .flatMap { name =>
         val firstName = name.firstName.trim
         val lastName  = name.lastName.trim
@@ -43,6 +35,9 @@ class SubcontractorNameExtractor {
           case _             => None
         }
       }
-      .orElse(ua.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty))
+      .orElse(userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty))
+
+  def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
+    getSubcontractorName(userAnswers)
       .getOrElse(messages("verify.noName"))
 }
