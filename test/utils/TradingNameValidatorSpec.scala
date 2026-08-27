@@ -75,5 +75,18 @@ class TradingNameValidatorSpec extends AnyWordSpec with Matchers {
           )
         )
     }
+
+    "return a failure against the requested field" in {
+      TradingNameValidator
+        .validate(
+          None,
+          SubcontractorValidationField.PartnershipTradingName
+        ) mustBe Some(
+        FieldValidationFailure(
+          field = SubcontractorValidationField.PartnershipTradingName,
+          value = None
+        )
+      )
+    }
   }
 }
