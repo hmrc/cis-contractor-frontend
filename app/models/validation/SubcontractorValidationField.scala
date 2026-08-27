@@ -76,6 +76,22 @@ object SubcontractorValidationField {
     override val value: String = "utr"
   }
 
+  case object Surname extends SubcontractorValidationField {
+    override val value: String = "surname"
+  }
+
+  case object FirstName extends SubcontractorValidationField {
+    override val value: String = "firstName"
+  }
+
+  case object SecondName extends SubcontractorValidationField {
+    override val value: String = "secondName"
+  }
+
+  case object Nino extends SubcontractorValidationField {
+    override val value: String = "nino"
+  }
+
   val values: List[SubcontractorValidationField] =
     List(
       EmailAddress,
@@ -90,7 +106,11 @@ object SubcontractorValidationField {
       TradingName,
       WorksReferenceNumber,
       Crn,
-      Utr
+      Utr,
+      Surname,
+      FirstName,
+      SecondName,
+      Nino
     )
 
   private def fromString(
