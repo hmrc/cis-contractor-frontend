@@ -486,6 +486,9 @@ noUnmatchedSubcontractors.p2                                                    
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
+info.CheckYourAnswers.backTo                                                        =  Back to
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+
 individualNamesOptions.title                                                        =  Which names do you want to add for this subcontractor?
 individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
 individualNamesOptions.subcontractorName                                            =  Subcontractor name

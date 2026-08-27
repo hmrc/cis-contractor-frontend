@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustEmailAddressPage
 import play.api.i18n.Messages
@@ -38,6 +39,17 @@ object TrustEmailAddressSummary {
             .withVisuallyHiddenText(messages("trustEmailAddress.change.hidden"))
             .withAttribute("id" -> "trust-email-address")
         )
+      )
+    }
+
+  def row(
+    answers: TrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.email.map { answer =>
+      SummaryListRowViewModel(
+        key = "trustEmailAddress.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

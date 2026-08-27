@@ -44,8 +44,8 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address         = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val methods         = SubcontractorPopulatorUtils.contactMethods(subcontractor)
 
       val name =
         Option.when(
@@ -142,8 +142,11 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address =
+        SubcontractorPopulatorUtils.toAddress(subcontractor)
+
+      val methods =
+        SubcontractorPopulatorUtils.contactMethods(subcontractor)
 
       val original =
         originalAnswers(
@@ -216,8 +219,11 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address =
+        SubcontractorPopulatorUtils.toAddress(subcontractor)
+
+      val methods =
+        SubcontractorPopulatorUtils.contactMethods(subcontractor)
 
       val trustName =
         subcontractor.tradingName.orElse(
@@ -283,8 +289,11 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address              = toAddress(subcontractor)
-      val methods              = contactMethods(subcontractor)
+      val address =
+        SubcontractorPopulatorUtils.toAddress(subcontractor)
+
+      val methods              =
+        SubcontractorPopulatorUtils.contactMethods(subcontractor)
       val nominatedPartnerName = subcontractor.tradingName
       val partnershipName      = subcontractor.partnershipTradingName
 
@@ -357,27 +366,4 @@ object AmendSubcontractorPopulator {
         verificationNumber = subcontractor.verificationNumber
       )
   }
-
-  private def toAddress(
-    subcontractor: SubcontractorResponse
-  ): Option[Address] =
-    subcontractor.addressLine1.map { line1 =>
-      Address(
-        addressLine1 = line1,
-        addressLine2 = subcontractor.addressLine2,
-        addressLine3 = subcontractor.addressLine3,
-        addressLine4 = subcontractor.addressLine4,
-        postcode = subcontractor.postcode,
-        country = subcontractor.country.map(name => Country(None, Some(name)))
-      )
-    }
-
-  private def contactMethods(
-    subcontractor: SubcontractorResponse
-  ): Set[ContactMethodOptions] =
-    Set(
-      subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
-      subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
-      subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
-    ).flatten
 }
