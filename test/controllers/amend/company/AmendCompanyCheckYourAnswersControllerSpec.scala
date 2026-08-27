@@ -462,6 +462,9 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
 
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
       when(
         mockSubcontractorService.updateSubcontractor(
           any[UserAnswers],
@@ -498,6 +501,38 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
+    }
+
+    "must redirect to Journey Recovery and not update subcontractor when saving submitted marker fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.failed(new RuntimeException("session write failed")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when POST validation fails" in {

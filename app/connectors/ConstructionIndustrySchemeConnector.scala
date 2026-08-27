@@ -290,7 +290,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             Future.successful(())
 
           case other =>
-            Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other"))
+            Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other: ${response.body}"))
         }
       }
   }

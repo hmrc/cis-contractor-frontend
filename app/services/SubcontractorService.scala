@@ -29,7 +29,7 @@ import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
-import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
+import queries.{AmendIndividualSubcontractorNameRemovedQuery, AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -558,7 +558,7 @@ class SubcontractorService @Inject() (
       userAnswers.get(AddressOfSubcontractorPage)
 
     val removeName =
-      name.isEmpty && userAnswers.get(SubTradingNameYesNoPage).contains(true)
+      userAnswers.get(AmendIndividualSubcontractorNameRemovedQuery).contains(true)
 
     val removeAddress =
       userAnswers.get(SubAddressYesNoPage).contains(false)

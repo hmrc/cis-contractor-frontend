@@ -489,7 +489,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         original.address mustBe None
       }
 
-      "must keep address answer true when partial backend address data is returned without address line 1" in {
+      "must set address answer to false when partial backend address data is returned without address line 1" in {
         val subcontractor =
           baseSubcontractor.copy(
             addressLine1 = None,
@@ -505,12 +505,12 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
             .populate(emptyUserAnswers, cisId, subcontractor)
             .get
 
-        answers.get(TrustAddressYesNoPage).value mustBe true
+        answers.get(TrustAddressYesNoPage).value mustBe false
         answers.get(TrustAddressPage) mustBe None
 
         val original = answers.get(OriginalTrustAnswersQuery).value
 
-        original.addressYesNo mustBe Some(true)
+        original.addressYesNo mustBe Some(false)
         original.address mustBe None
       }
 

@@ -198,20 +198,19 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          subcontractorService
-            .updateSubcontractor(request.userAnswers, submittedSubbieResourceRef(subbieResourceRef))
-            .flatMap { _ =>
-              Future
-                .fromTry(
-                  request.userAnswers.set(
-                    AmendCheckYourAnswersSubmittedPage,
-                    true
-                  )
-                )
-                .flatMap { updated =>
-                  sessionRepository
-                    .set(updated)
-                    .map(_ => ())
+          Future
+            .fromTry(
+              request.userAnswers.set(
+                AmendCheckYourAnswersSubmittedPage,
+                true
+              )
+            )
+            .flatMap { updated =>
+              sessionRepository
+                .set(updated)
+                .flatMap { _ =>
+                  subcontractorService
+                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
                 }
                 .map { _ =>
                   Redirect(
@@ -222,7 +221,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
             }
             .recover { case t =>
               logger.error(
-                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
                 t
               )
 

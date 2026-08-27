@@ -497,7 +497,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
       val ex = connector.updateSubcontractor(request).failed.futureValue
-      ex.getMessage mustBe s"Update subcontractor failed, returned $INTERNAL_SERVER_ERROR"
+      ex.getMessage mustBe s"Update subcontractor failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 

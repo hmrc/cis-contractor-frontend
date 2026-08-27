@@ -37,7 +37,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.*
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
 import models.response.SubcontractorResponse
-import queries.{AmendSubbieResourceRefQuery, OriginalSubcontractorQuery}
+import queries.{AmendIndividualSubcontractorNameRemovedQuery, AmendSubbieResourceRefQuery, OriginalSubcontractorQuery}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -2020,6 +2020,149 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         sent.addressLine4 mustBe Some("Old county")
         sent.country mustBe Some("United Kingdom")
         sent.postcode mustBe Some("OLD 1AA")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should preserve original individual name when trading name yes is re-submitted without explicit name removal" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val originalIndividual =
+          originalSubcontractor.copy(
+            subcontractorType = Some("soletrader")
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, updateCisId)
+            .success
+            .value
+            .set(
+              TypeOfSubcontractorPage,
+              TypeOfSubcontractor.Individualorsoletrader
+            )
+            .success
+            .value
+            .set(
+              OriginalSubcontractorQuery,
+              originalIndividual
+            )
+            .success
+            .value
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "Original Trading Name")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(())
+        )
+
+        service
+          .updateSubcontractor(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue.subcontractor
+
+        sent.firstName mustBe Some("Original")
+        sent.secondName mustBe Some("Middle")
+        sent.surname mustBe Some("Name")
+        sent.tradingName mustBe Some("Original Trading Name")
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should clear original individual name when the name has been explicitly removed" in {
+
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val originalIndividual =
+          originalSubcontractor.copy(
+            subcontractorType = Some("soletrader")
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, updateCisId)
+            .success
+            .value
+            .set(
+              TypeOfSubcontractorPage,
+              TypeOfSubcontractor.Individualorsoletrader
+            )
+            .success
+            .value
+            .set(
+              OriginalSubcontractorQuery,
+              originalIndividual
+            )
+            .success
+            .value
+            .set(SubTradingNameYesNoPage, true)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "Original Trading Name")
+            .success
+            .value
+            .set(AmendIndividualSubcontractorNameRemovedQuery, true)
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(())
+        )
+
+        service
+          .updateSubcontractor(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue.subcontractor
+
+        sent.firstName mustBe Some("")
+        sent.secondName mustBe Some("")
+        sent.surname mustBe Some("")
+        sent.tradingName mustBe Some("Original Trading Name")
 
         verifyNoMoreInteractions(mockConnector)
       }

@@ -358,7 +358,7 @@ object AmendSubcontractorPopulator {
   private def toAddress(
     subcontractor: SubcontractorResponse
   ): Option[Address] =
-    subcontractor.addressLine1.map { line1 =>
+    subcontractor.addressLine1.filter(_.trim.nonEmpty).map { line1 =>
       Address(
         addressLine1 = line1,
         addressLine2 = subcontractor.addressLine2,
@@ -372,14 +372,7 @@ object AmendSubcontractorPopulator {
   private def addressFieldsExist(
     subcontractor: SubcontractorResponse
   ): Boolean =
-    Seq(
-      subcontractor.addressLine1,
-      subcontractor.addressLine2,
-      subcontractor.addressLine3,
-      subcontractor.addressLine4,
-      subcontractor.country,
-      subcontractor.postcode
-    ).flatten.exists(_.trim.nonEmpty)
+    toAddress(subcontractor).isDefined
 
   private def setOptionalQuery[A: Writes](
     userAnswers: UserAnswers,
