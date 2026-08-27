@@ -90,6 +90,16 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
 
+GET   /subcontractor/info/start/:cisId/:subbieResourceRef  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
+
+GET   /subcontractor/info/partnership/subcontractor-information-read-only  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/company/subcontractor-information-read-only  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
+
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
 
@@ -642,6 +652,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
@@ -687,3 +698,6 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
+
+#Insufficient
+GET   /subcontractor/insufficient/subcontractor-details-updated   controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()

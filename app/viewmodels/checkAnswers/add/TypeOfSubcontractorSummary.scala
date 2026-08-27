@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
 import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -59,4 +59,25 @@ object TypeOfSubcontractorSummary {
         actions = actions
       )
     }
+
+  def row(
+    subcontractorType: TypeOfSubcontractor
+  )(implicit messages: Messages): Option[SummaryListRow] = {
+
+    val value = ValueViewModel(
+      HtmlContent(
+        HtmlFormat.escape(
+          messages(s"typeOfSubcontractor.$subcontractorType")
+        )
+      )
+    )
+
+    Some(
+      SummaryListRowViewModel(
+        key = "typeOfSubcontractor.checkYourAnswersLabel",
+        value = value,
+        actions = Seq.empty
+      )
+    )
+  }
 }

@@ -915,4 +915,110 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockConnector, never()).getSubmissionStatus(any[String], any[String])(any[HeaderCarrier])
     }
   }
+
+  "VerificationService.anyUnmatchedResourceRefsStillPresent" - {
+
+    "must return true when an unmatched verificationResourceRef is still on the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(22L, Some(10L))))
+          )
+        )
+
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe true
+      verify(mockConnector).getSubcontractorList(eqTo("900063"))(any[HeaderCarrier])
+    }
+
+    "must return false when unmatched verificationResourceRefs are not on the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L, Some(999L))))
+          )
+        )
+
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe false
+    }
+
+    "must return false without calling the connector when unmatched has no resource refs" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = None,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe false
+      verify(mockConnector, never()).getSubcontractorList(any[String])(any[HeaderCarrier])
+    }
+  }
 }
