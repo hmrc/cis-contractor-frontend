@@ -22,19 +22,19 @@ import models.SubcontractorCurrentVerification
 object CompanyValidator {
 
   def validate(
-    subcontactorToValidate: SubcontractorCurrentVerification,
+    subcontractorToValidate: SubcontractorCurrentVerification,
     allSubcontractors: Seq[SubcontractorCurrentVerification]
   ): List[FieldValidationFailure] =
     CrnValidator
-      .validate(subcontactorToValidate.crn)
+      .validate(subcontractorToValidate.crn)
       .toList ++
       WorksReferenceNumberValidator
-        .validate(subcontactorToValidate.worksReferenceNumber)
+        .validate(subcontractorToValidate.worksReferenceNumber)
         .toList ++
       UtrValidator
-        .validate(subcontactorToValidate.utr, allSubcontractors)
+        .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
       TradingNameValidator
-        .validate(subcontactorToValidate.tradingName)
+        .validate(subcontractorToValidate.tradingName)
         .toList
 }

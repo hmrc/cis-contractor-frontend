@@ -22,16 +22,16 @@ import models.validation.FieldValidationFailure
 object TrustValidator {
 
   def validate(
-    subcontactorToValidate: SubcontractorCurrentVerification,
+    subcontractorToValidate: SubcontractorCurrentVerification,
     allSubcontractors: Seq[SubcontractorCurrentVerification]
   ): List[FieldValidationFailure] =
     WorksReferenceNumberValidator
-      .validate(subcontactorToValidate.worksReferenceNumber)
+      .validate(subcontractorToValidate.worksReferenceNumber)
       .toList ++
       UtrValidator
-        .validate(subcontactorToValidate.utr, allSubcontractors)
+        .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
       TradingNameValidator
-        .validate(subcontactorToValidate.tradingName)
+        .validate(subcontractorToValidate.tradingName)
         .toList
 }
