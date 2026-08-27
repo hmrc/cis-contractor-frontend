@@ -18,7 +18,7 @@ package controllers.helpers
 
 import base.SpecBase
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
@@ -106,7 +106,10 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         val answers = result.get
 
         answers.get(TypeOfSubcontractorPage).value mustBe Individualorsoletrader
-        answers.get(SubTradingNameYesNoPage).value mustBe true
+        answers.get(IndividualNamesOptionsPage).value mustBe Set(
+          IndividualNamesOptions.SubcontractorName,
+          IndividualNamesOptions.TradingName
+        )
         answers.get(TradingNameOfSubcontractorPage).value mustBe "Test Trading Name"
 
         answers.get(SubcontractorNamePage).value mustBe SubcontractorName(
@@ -137,7 +140,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         answers.get(CisIdQuery).value mustBe cisId
 
         answers.get(OriginalIndividualAnswersQuery).value mustBe OriginalIndividualAnswers(
-          usesTradingName = Some(true),
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
           tradingName = Some("Test Trading Name"),
           subcontractorName = Some(
             SubcontractorName(
@@ -163,7 +166,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         )
       }
 
-      "must set trading name answer to false when trading name is missing" in {
+      "must set IndividualNamesOptionsPage answer to SubcontractorName when trading name is missing" in {
         val subcontractor =
           baseSubcontractor.copy(
             tradingName = None
@@ -174,17 +177,42 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
             .populate(emptyUserAnswers, cisId, subcontractor)
             .get
 
-        answers.get(SubTradingNameYesNoPage).value mustBe false
+        answers.get(IndividualNamesOptionsPage).value mustBe Set(IndividualNamesOptions.SubcontractorName)
         answers.get(TradingNameOfSubcontractorPage) mustBe None
 
-        answers.get(OriginalIndividualAnswersQuery).value.usesTradingName mustBe Some(false)
+        answers.get(OriginalIndividualAnswersQuery).value.individualNamesOptions mustBe Set(
+          IndividualNamesOptions.SubcontractorName
+        )
         answers.get(OriginalIndividualAnswersQuery).value.tradingName mustBe None
       }
 
-      "must not populate subcontractor name when first name or surname is missing" in {
+      "must set IndividualNamesOptionsPage answer to TradingName when subcontractor name is missing" in {
         val subcontractor =
           baseSubcontractor.copy(
             firstName = None,
+            secondName = None,
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor)
+            .get
+
+        answers.get(IndividualNamesOptionsPage).value mustBe Set(IndividualNamesOptions.TradingName)
+        answers.get(SubcontractorNamePage) mustBe None
+
+        answers.get(OriginalIndividualAnswersQuery).value.individualNamesOptions mustBe Set(
+          IndividualNamesOptions.TradingName
+        )
+        answers.get(OriginalIndividualAnswersQuery).value.subcontractorName mustBe None
+      }
+
+      "must populate subcontractor name when only surname is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = None,
+            secondName = None,
             surname = Some("Smith")
           )
 
@@ -193,8 +221,48 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
             .populate(emptyUserAnswers, cisId, subcontractor)
             .get
 
-        answers.get(SubcontractorNamePage) mustBe None
-        answers.get(OriginalIndividualAnswersQuery).value.subcontractorName mustBe None
+        answers.get(SubcontractorNamePage) mustBe Some(SubcontractorName("", None, "Smith"))
+        answers.get(OriginalIndividualAnswersQuery).value.subcontractorName mustBe Some(
+          SubcontractorName("", None, "Smith")
+        )
+      }
+
+      "must populate subcontractor name when only firstName is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = Some("John"),
+            secondName = None,
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor)
+            .get
+
+        answers.get(SubcontractorNamePage) mustBe Some(SubcontractorName("John", None, ""))
+        answers.get(OriginalIndividualAnswersQuery).value.subcontractorName mustBe Some(
+          SubcontractorName("John", None, "")
+        )
+      }
+
+      "must populate subcontractor name when only secondName is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = None,
+            secondName = Some("Middle"),
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor)
+            .get
+
+        answers.get(SubcontractorNamePage) mustBe Some(SubcontractorName("", Some("Middle"), ""))
+        answers.get(OriginalIndividualAnswersQuery).value.subcontractorName mustBe Some(
+          SubcontractorName("", Some("Middle"), "")
+        )
       }
     }
 

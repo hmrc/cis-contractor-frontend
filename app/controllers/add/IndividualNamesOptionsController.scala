@@ -18,9 +18,12 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.IndividualNamesOptionsFormProvider
-import models.Mode
+import models.add.IndividualNamesOptions
+import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.IndividualNamesOptionsPage
+import pages.QuestionPage
+import pages.add.{IndividualNamesOptionsPage, SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import pages.amend.IndividualNamesOptionsAmendPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -63,8 +66,18 @@ class IndividualNamesOptionsController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
+
+            val ua = request.userAnswers
+
+            val pageToUpdate: QuestionPage[Set[IndividualNamesOptions]] =
+              (mode, ua.get(SubcontractorNamePage), ua.get(TradingNameOfSubcontractorPage)) match {
+                case (AmendMode, Some(_), Some(_)) if value.size == 1 => IndividualNamesOptionsAmendPage
+                case _                                                =>
+                  IndividualNamesOptionsPage
+              }
+
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualNamesOptionsPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(pageToUpdate, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage, mode, updatedAnswers))
         )

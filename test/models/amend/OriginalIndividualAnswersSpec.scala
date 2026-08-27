@@ -16,7 +16,7 @@
 
 package models.amend
 
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.scalatest.matchers.should.Matchers
@@ -42,7 +42,7 @@ class OriginalIndividualAnswersSpec extends AnyWordSpec with Matchers {
 
   private val model =
     OriginalIndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(
         SubcontractorName(

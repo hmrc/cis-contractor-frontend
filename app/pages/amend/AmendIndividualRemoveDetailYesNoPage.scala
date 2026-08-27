@@ -17,6 +17,7 @@
 package pages.amend
 
 import models.UserAnswers
+import models.add.IndividualNamesOptions
 import models.amend.AmendIndividualRemoveDetail
 import models.amend.AmendIndividualRemoveDetail.*
 import pages.QuestionPage
@@ -37,20 +38,24 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndivi
       case TradingName if value.contains(true) =>
         userAnswers
           .remove(TradingNameOfSubcontractorPage)
-          .flatMap(_.set(SubTradingNameYesNoPage, false))
 
       case TradingName if value.contains(false) =>
         userAnswers
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
 
       case SubcontractorName if value.contains(true) =>
         userAnswers
           .remove(SubcontractorNamePage)
-          .flatMap(_.set(SubTradingNameYesNoPage, true))
 
       case SubcontractorName if value.contains(false) =>
         userAnswers
-          .set(SubTradingNameYesNoPage, false)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
 
       case Address if value.contains(true) =>
         userAnswers

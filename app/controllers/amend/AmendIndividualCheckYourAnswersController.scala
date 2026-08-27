@@ -22,7 +22,6 @@ import controllers.routes
 import models.add.ValidatedSubcontractor
 import models.amend.OriginalIndividualAnswers
 import models.{AmendMode, UserAnswers}
-import pages.add.*
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -33,7 +32,7 @@ import services.SubcontractorService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.AmendmentHelper
+import utils.{AmendmentHelper, SubcontractorNameExtractor}
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
@@ -49,7 +48,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  subcontractorNameExtractor: SubcontractorNameExtractor
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -74,7 +74,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           view(
             subcontractorInformationList,
             detailsList,
-            displayName(ua),
+            subcontractorNameExtractor.displaySubcontractorName(ua),
             controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit(),
             controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()
           )
@@ -129,7 +129,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     val nameRows =
       if (!isVerified.contains(true)) {
         Seq(
-          SubTradingNameYesNoSummary.row(ua, AmendMode),
+          IndividualNamesOptionsSummary.row(ua, AmendMode),
           SubcontractorNameSummary.row(ua, AmendMode),
           TradingNameOfSubcontractorSummary.row(ua, AmendMode)
         )
@@ -172,12 +172,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     nameRows ++ addressRows ++ contactRows ++ utrRows ++ additionalRows
   }
-
-  private def displayName(ua: UserAnswers): String =
-    ua.get(SubcontractorNamePage)
-      .map(n => s"${n.firstName} ${n.lastName}")
-      .orElse(ua.get(TradingNameOfSubcontractorPage))
-      .getOrElse("")
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

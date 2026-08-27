@@ -19,7 +19,7 @@ package controllers.helpers
 import controllers.amend.AmendControllerUtils.{setOptional, shouldShowVerificationDetails}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
-import models.add.{IndividualContactMethodOptions, SubcontractorName}
+import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
@@ -47,28 +47,35 @@ object AmendSubcontractorPopulator {
       val address = toAddress(subcontractor)
       val methods = contactMethods(subcontractor)
 
-      val name = for {
-        firstName <- subcontractor.firstName
-        surname   <- subcontractor.surname
-      } yield SubcontractorName(
-        firstName = firstName,
-        middleName = subcontractor.secondName,
-        lastName = surname
-      )
+      val name =
+        Option.when(
+          subcontractor.firstName.exists(_.trim.nonEmpty)
+            || subcontractor.surname.exists(
+              _.trim.nonEmpty
+            ) || subcontractor.secondName.exists(_.trim.nonEmpty)
+        ) {
+          SubcontractorName(
+            firstName = subcontractor.firstName.getOrElse(""),
+            middleName = subcontractor.secondName,
+            lastName = subcontractor.surname.getOrElse("")
+          )
+        }
 
-      val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
+      val hasName: Boolean                                    = name.isDefined
+      val hasTradingName: Boolean                             = subcontractor.tradingName.exists(_.trim.nonEmpty)
+      val individualNamesOptions: Set[IndividualNamesOptions] = namesOptions(hasName, hasTradingName)
 
       val original = originalAnswers(
         subcontractor = subcontractor,
         address = address,
         methods = methods,
-        name = name,
-        usesTradingName = usesTradingName
+        individualNamesOptions = individualNamesOptions,
+        name = name
       )
 
       for {
         updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
-        updated <- updated.set(SubTradingNameYesNoPage, usesTradingName)
+        updated <- updated.set(IndividualNamesOptionsPage, individualNamesOptions)
         updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
         updated <- setOptional(updated, SubcontractorNamePage, name)
         updated <- updated.set(SubAddressYesNoPage, address.isDefined)
@@ -95,11 +102,11 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse,
       address: Option[Address],
       methods: Set[IndividualContactMethodOptions],
-      name: Option[SubcontractorName],
-      usesTradingName: Boolean
+      individualNamesOptions: Set[IndividualNamesOptions],
+      name: Option[SubcontractorName]
     ): OriginalIndividualAnswers =
       OriginalIndividualAnswers(
-        usesTradingName = Some(usesTradingName),
+        individualNamesOptions = individualNamesOptions,
         tradingName = subcontractor.tradingName,
         subcontractorName = name,
         addressYesNo = Some(address.isDefined),
@@ -117,6 +124,15 @@ object AmendSubcontractorPopulator {
         worksReference = subcontractor.worksReferenceNumber,
         verificationNumber = subcontractor.verificationNumber
       )
+
+    private def namesOptions(
+      hasName: Boolean,
+      hasTradingName: Boolean
+    ): Set[IndividualNamesOptions] =
+      Set(
+        Option.when(hasName)(IndividualNamesOptions.SubcontractorName),
+        Option.when(hasTradingName)(IndividualNamesOptions.TradingName)
+      ).flatten
   }
 
   object CompanyPopulator {
@@ -364,5 +380,4 @@ object AmendSubcontractorPopulator {
       subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
       subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
     ).flatten
-
 }

@@ -16,16 +16,15 @@
 
 package pages.amend
 
+import models.add.IndividualNamesOptions
 import pages.behaviours.PageBehaviours
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+class IndividualNamesOptionsAmendPageSpec extends PageBehaviours {
+  "IndividualNamesOptionsAmendPage" - {
+    beRetrievable[Set[IndividualNamesOptions]](IndividualNamesOptionsAmendPage)
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+    beSettable[Set[IndividualNamesOptions]](IndividualNamesOptionsAmendPage)
 
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
+    beRemovable[Set[IndividualNamesOptions]](IndividualNamesOptionsAmendPage)
   }
 }

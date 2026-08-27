@@ -21,9 +21,11 @@ import controllers.routes
 import forms.add.IndividualNamesOptionsFormProvider
 import models.add.IndividualNamesOptions
 import models.add.SubcontractorName
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.amend.AmendIndividualRemoveDetail
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalactic.Prettifier.default
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{IndividualNamesOptionsPage, SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.inject.bind
@@ -294,6 +296,49 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
           .onPageLoad(CheckMode)
+          .url
+      }
+    }
+
+    "must redirect to the AmendIndividualRemoveDetailYesNo page in AmendMode when one option is selected, SubcontractorName and TradingName are answered" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val userAnswers = emptyUserAnswers
+        .set(
+          IndividualNamesOptionsPage,
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
+        .success
+        .value
+        .set(SubcontractorNamePage, subcontractorName)
+        .success
+        .value
+        .set(TradingNameOfSubcontractorPage, tradingName)
+        .success
+        .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.IndividualNamesOptionsController.onPageLoad(AmendMode).url
+          )
+            .withFormUrlEncodedBody(
+              ("value[0]", IndividualNamesOptions.SubcontractorName.toString)
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+          .onPageLoad(AmendIndividualRemoveDetail.TradingName.key)
           .url
       }
     }

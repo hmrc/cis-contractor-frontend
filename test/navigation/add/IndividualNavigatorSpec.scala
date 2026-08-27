@@ -421,84 +421,214 @@ class IndividualNavigatorSpec extends SpecBase {
         ) mustBe AmendCYA
       }
 
-      "must go from SubTradingNameYesNoPage to  AmendIndividualRemoveDetailYesNo Page (trading-name) when answer is No and name is missing" in {
-        val ua =
-          emptyUserAnswers
-            .set(SubTradingNameYesNoPage, false)
-            .success
-            .value
+      val name        = SubcontractorName("John", Some("Paul"), "Smith")
+      val tradingName = "ABC Ltd"
 
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          AmendMode,
-          ua
-        ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("trading-name")
+      "must go from IndividualNamesOptions" - {
+
+        "to AmendIndividualRemoveDetailYesNo Page (trading-name) when answer is SubcontractorName and SubcontractorName and TradingName are answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName)
+              )
+              .success
+              .value
+              .set(SubcontractorNamePage, name)
+              .success
+              .value
+              .set(TradingNameOfSubcontractorPage, tradingName)
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("trading-name")
+        }
+
+        "to AmendIndividualRemoveDetailYesNo Page (subcontractor-name) when answer is TradingName and SubcontractorName and TradingName are answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.TradingName)
+              )
+              .success
+              .value
+              .set(SubcontractorNamePage, name)
+              .success
+              .value
+              .set(TradingNameOfSubcontractorPage, tradingName)
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name")
+        }
+
+        "to Amend CYA when answer is SubcontractorName and subcontractor name already answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName)
+              )
+              .success
+              .value
+              .set(SubcontractorNamePage, name)
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe AmendCYA
+        }
+
+        "to Amend CYA when answer is TradingName and trading name already answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.TradingName)
+              )
+              .success
+              .value
+              .set(TradingNameOfSubcontractorPage, tradingName)
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe AmendCYA
+        }
+
+        "to SubcontractorNamePage when answer is SubcontractorName and subcontractor name is not answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName)
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+        }
+
+        "to SubcontractorNamePage when both name options are selected and subcontractor name is not answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+        }
+
+        "to TradingNameOfSubcontractor when answer is TradingName and trading name is not answered" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.TradingName)
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            ua
+          ) mustBe controllers.add.routes.TradingNameOfSubcontractorController
+            .onPageLoad(AmendMode)
+        }
+
+        "to JourneyRecovery when IndividualNamesOptionsPage answer is missing" in {
+          navigator.nextPage(
+            IndividualNamesOptionsPage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
       }
 
-      "must go from SubTradingNameYesNoPage to Amend CYA when answer is No and subcontractor name already exists" in {
-        val ua =
-          emptyUserAnswers
-            .set(SubTradingNameYesNoPage, false)
-            .success
-            .value
-            .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Doe"))
-            .success
-            .value
-
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          AmendMode,
-          ua
-        ) mustBe AmendCYA
-      }
-
-      "must go from SubTradingNameYesNoPage to AmendIndividualRemoveDetailYesNo Page (subcontractor-name) when answer is Yes and trading name is missing" in {
-        val ua =
-          emptyUserAnswers
-            .set(SubTradingNameYesNoPage, true)
-            .success
-            .value
-
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          AmendMode,
-          ua
-        ) mustBe controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onPageLoad("subcontractor-name")
-      }
-
-      "must go from SubTradingNameYesNoPage to Amend CYA when answer is Yes and trading name already exists" in {
-        val ua =
-          emptyUserAnswers
-            .set(SubTradingNameYesNoPage, true)
-            .success
-            .value
-            .set(TradingNameOfSubcontractorPage, "ACME Construction")
-            .success
-            .value
-
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          AmendMode,
-          ua
-        ) mustBe AmendCYA
-      }
-
-      "must go from SubTradingNameYesNoPage to JourneyRecovery when SubTradingNameYesNoPage answer is missing" in {
-        navigator.nextPage(
-          SubTradingNameYesNoPage,
-          AmendMode,
-          emptyUserAnswers
-        ) mustBe journeyRecovery
-      }
-
-      "must go from SubcontractorNamePage to Amend CYA" in {
-        navigator.nextPage(
-          SubcontractorNamePage,
-          AmendMode,
-          emptyUserAnswers.setOrException(
+      "must go from SubcontractorNamePage" - {
+        "to Amend CYA when IndividualNamesOptionsPage only selected SubcontractorName" in {
+          navigator.nextPage(
             SubcontractorNamePage,
-            SubcontractorName(firstName = "Jane", middleName = None, lastName = "Doe")
-          )
+            AmendMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName)
+              )
+          ) mustBe AmendCYA
+        }
+
+        "to Amend CYA when both name options are selected in IndividualNamesOptionsPage and trading name is answered" in {
+          navigator.nextPage(
+            SubcontractorNamePage,
+            AmendMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+              )
+              .setOrException(
+                TradingNameOfSubcontractorPage,
+                tradingName
+              )
+          ) mustBe AmendCYA
+        }
+
+        "to TradingNameOfSubcontractor page when both name options are selected in IndividualNamesOptionsPage and trading name is not answered" in {
+          navigator.nextPage(
+            SubcontractorNamePage,
+            AmendMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage,
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+              )
+          ) mustBe controllers.add.routes.TradingNameOfSubcontractorController
+            .onPageLoad(AmendMode)
+        }
+
+        "to JourneyRecovery when IndividualNamesOptionsPage answer is missing" in {
+          navigator.nextPage(
+            SubcontractorNamePage,
+            AmendMode,
+            emptyUserAnswers
+          ) mustBe journeyRecovery
+        }
+      }
+
+      "must go from TradingNameOfSubcontractor to Amend CYA" in {
+        navigator.nextPage(
+          TradingNameOfSubcontractorPage,
+          AmendMode,
+          emptyUserAnswers
         ) mustBe AmendCYA
       }
 

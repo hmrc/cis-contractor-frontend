@@ -31,10 +31,16 @@ object IndividualNamesOptionsSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(IndividualNamesOptionsPage).map { selectedMethods =>
+
       val options =
-        IndividualNamesOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+        if (selectedMethods.isEmpty) {
+          Seq(HtmlFormat.escape(messages("individualNamesOptions.noSelection")).toString)
+        } else {
+          IndividualNamesOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+        }
+
       SummaryListRowViewModel(
         key = "individualNamesOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper

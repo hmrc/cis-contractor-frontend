@@ -543,10 +543,13 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user said yes to SubTradingNameYesNoPage but TradingNameOfSubcontractorPage is missing" in {
+      "when user select TradingName to IndividualNamesOptionsPage but TradingNameOfSubcontractorPage is missing" in {
         val answers =
           minRequired
-            .set(SubTradingNameYesNoPage, true)
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.TradingName)
+            )
             .success
             .value
             .remove(TradingNameOfSubcontractorPage)

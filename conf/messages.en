@@ -123,13 +123,6 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Select how the subcontractor is operating
 typeOfSubcontractor.change.hidden                                                   =  type
 
-subTradingNameYesNo.title                                                           =  Does the subcontractor use a trading name?
-subTradingNameYesNo.heading                                                         =  Does the subcontractor use a trading name?
-subTradingNameYesNo.hint                                                            =  This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel                                           =  Does subcontractor use a trading name?
-subTradingNameYesNo.error.required                                                  =  Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden                                                   =  does subcontractor use a trading name?
-
 tradingNameOfSubcontractor.title                                                    =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading                                                  =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Subcontractor trading name
@@ -494,6 +487,7 @@ individualNamesOptions.title                                                    
 individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
 individualNamesOptions.subcontractorName                                            =  Subcontractor name
 individualNamesOptions.tradingName                                                  =  Trading name
+individualNamesOptions.noSelection                                                  =  None selected
 individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
 individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
 individualNamesOptions.checkYourAnswersLabel                                        =  Names

@@ -18,7 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import models.UserAnswers
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.amend.OriginalIndividualAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -53,7 +53,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
   private val original =
     OriginalIndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(subcontractorName),
       addressYesNo = None,

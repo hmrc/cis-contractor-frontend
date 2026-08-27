@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package forms.add
+package pages.amend
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.add.IndividualNamesOptions
+import pages.QuestionPage
+import pages.add.IndividualJourney
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object IndividualNamesOptionsAmendPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
+  override def path: JsPath = JsPath \ toString
 
-class SubTradingNameYesNoFormProvider @Inject() extends Mappings {
+  override def toString: String = "individualNamesOptions"
 
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("subTradingNameYesNo.error.required")
-    )
 }
