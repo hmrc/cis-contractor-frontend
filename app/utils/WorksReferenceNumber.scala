@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package utils
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.Validation.worksRefRegex
 
-case class ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId: String) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
+object WorksReferenceNumber {
+
+  private val length = 20
+
+  def isValid(wrn: String): Boolean = wrn != null && wrn.matches(worksRefRegex)
+
+  def isLengthInRange(wrn: String): Boolean = wrn != null && (wrn.length <= length)
+
 }

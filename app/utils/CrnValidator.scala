@@ -14,11 +14,26 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package utils
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-case class ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId: String) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
+object CrnValidator {
+
+  def validate(
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
+    value
+      .filter(_.trim.nonEmpty)
+      .flatMap { crn =>
+        Option.when(
+          !CRN.isLengthInRange(crn) ||
+            !CRN.isValid(crn)
+        ) {
+          FieldValidationFailure(
+            field = SubcontractorValidationField.Crn,
+            value = Some(crn)
+          )
+        }
+      }
 }
