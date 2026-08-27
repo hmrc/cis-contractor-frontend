@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package models.requests
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId: String) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
+case class ProceedInsufficientVerificationRequest(
+  instanceId: String,
+  verificationBatchResourceRef: Long,
+  verificationResourceRef: Long,
+  proceed: String
+)
+
+object ProceedInsufficientVerificationRequest {
+  given OFormat[ProceedInsufficientVerificationRequest] = Json.format
 }

@@ -265,4 +265,24 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def proceedInsufficientVerification(
+    request: ProceedInsufficientVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+            )
+        }
+      }
 }
