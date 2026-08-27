@@ -278,7 +278,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetSubcontractorListResponse(
-          Seq(SubcontractorListItem(11L), SubcontractorListItem(22L))
+          Seq(SubcontractorListItem(11L, Some(111L)), SubcontractorListItem(22L, Some(222L)))
         )
 
       when(rb.execute[GetSubcontractorListResponse](any(), any()))

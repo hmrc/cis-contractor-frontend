@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package models.response
+package pages.insufficient
 
-import play.api.libs.json.{Json, OFormat}
+import models.insufficient.InsufficientSubcontractorDetailsUpdated
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class GetSubcontractorListResponse(
-  subcontractors: Seq[SubcontractorListItem]
-)
+case object InsufficientSubcontractorDetailsUpdatedPage extends QuestionPage[InsufficientSubcontractorDetailsUpdated] {
 
-object GetSubcontractorListResponse {
-  given format: OFormat[GetSubcontractorListResponse] =
-    Json.format[GetSubcontractorListResponse]
-}
+  override def path: JsPath =
+    JsPath \ toString
 
-final case class SubcontractorListItem(
-  subcontractorId: Long,
-  subbieResourceRef: Option[Long]
-)
-
-object SubcontractorListItem {
-  given format: OFormat[SubcontractorListItem] =
-    Json.format[SubcontractorListItem]
+  override def toString: String =
+    "insufficientSubcontractorDetailsUpdated"
 }
