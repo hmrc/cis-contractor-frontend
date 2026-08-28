@@ -9,12 +9,11 @@ site.continue                             =  Parhau
 site.update                               =  Diweddaru
 site.saveAndContinue                      =  Cadw a pharhau
 site.govuk                                =  GOV.UK
+error.title.prefix                        =  Error:
 
 site.pagination.previous                  =  Blaenorol
 site.pagination.next                      =  Nesaf
 site.pagination.landmark                  =  Rhifo tudalennau
-
-error.title.prefix                        =  Error:
 
 amendPartnershipRemoveDetailYesNo.heading                                           =  Ydych chi’n siŵr eich bod chi am dynnu’r {0} o gofnod {1}?
 amendPartnershipRemoveDetailYesNo.error.required                                    =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
