@@ -16,7 +16,7 @@
 
 package models.validation
 
-import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, Reads, Writes, __}
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, Reads, Writes}
 
 sealed trait SubcontractorValidationField {
   def value: String
