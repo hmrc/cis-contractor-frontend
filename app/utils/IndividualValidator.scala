@@ -36,10 +36,10 @@ object IndividualValidator {
         .toList ++
       TradingNameValidator
         .validate(subcontractorToValidate.tradingName)
-        .toList
-    UtrValidator
-      .validate(subcontractorToValidate.utr, allSubcontractors)
-      .toList ++
+        .toList ++
+      UtrValidator
+        .validate(subcontractorToValidate.utr, allSubcontractors)
+        .toList ++
       NinoValidator
         .validate(subcontractorToValidate.nino)
         .toList ++
