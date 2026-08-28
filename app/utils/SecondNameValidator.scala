@@ -20,10 +20,12 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object SecondNameValidator {
   def validate(
-                value: Option[String]
-              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     value.flatMap { secondName =>
-      Option.when(secondName.isBlank || !FirstMiddleName.isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName)) {
+      Option.when(
+        secondName.isBlank || !FirstMiddleName.isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName)
+      ) {
         FieldValidationFailure(
           field = SubcontractorValidationField.SecondName,
           value = Some(secondName)
