@@ -1156,9 +1156,9 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
   "VerificationService.resetUserAnswers" - {
 
     "must reset UserAnswers keeping only CisIdQuery and persist them" in {
-      val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockConnector     = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo          = mock[SessionRepository]
+      val service           = buildService(mockConnector, mockRepo)
       val submissionDetails =
         VerificationSubmissionDetails(
           submissionId = "13602",
@@ -1198,8 +1198,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
     "must fail when CisIdQuery is missing and not persist UserAnswers" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
 
       val ex =
         service
@@ -1214,8 +1214,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
     "must silently consume session repository failure" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
-      val mockRepo = mock[SessionRepository]
-      val service = buildService(mockConnector, mockRepo)
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
 
       val userAnswers =
         emptyUserAnswers
@@ -1226,7 +1226,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.failed(new RuntimeException("session save failed")))
 
-      service.resetUserAnswers(userAnswers).futureValue mustBe()
+      service.resetUserAnswers(userAnswers).futureValue mustBe ()
 
       verify(mockRepo).set(any[UserAnswers])
     }

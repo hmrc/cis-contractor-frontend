@@ -98,15 +98,16 @@ class SubmissionSendingController @Inject() (
     }
 
   private def redirectForPollSubmissionStatus(
-                                               status: SubmissionStatus,
-                                               pollInterval: Int
-                                             )(implicit request: DataRequest[_]): Future[Result] =
+    status: SubmissionStatus,
+    pollInterval: Int
+  )(implicit request: DataRequest[_]): Future[Result] =
     status match {
       case PENDING | SubmissionStatus.ACCEPTED =>
         Future.successful(Ok(view()).withHeaders("Refresh" -> pollInterval.toString))
 
       case SUBMITTED =>
-        verificationService.resetUserAnswers(request.userAnswers)
+        verificationService
+          .resetUserAnswers(request.userAnswers)
           .map { _ =>
             Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
           }
