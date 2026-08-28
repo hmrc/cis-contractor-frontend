@@ -126,7 +126,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val unmatchedCompany =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = build(Seq(unmatchedCompany))
+      val vm = build(Seq(unmatchedCompany), Seq(mkVerification(subcontractorId = 2L)))
 
       vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
@@ -135,7 +135,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     }
 
     "must split a mixed batch into unmatched and ready" in {
-      val unmatched    =
+      val unmatched      =
         mkSub(
           id = 1L,
           surname = Some("Brody"),
@@ -143,11 +143,12 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
           subcontractorType = Some("soletrader"),
           utr = None
         )
-      val ready        =
+      val ready          =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
-      val verification = mkVerification(subcontractorId = 2L, proceed = Some("Y"))
+      val unmatchedVerif = mkVerification(subcontractorId = 1L)
+      val readyVerif     = mkVerification(subcontractorId = 2L, proceed = Some("Y"))
 
-      val vm = build(Seq(unmatched, ready), Seq(verification))
+      val vm = build(Seq(unmatched, ready), Seq(unmatchedVerif, readyVerif))
 
       vm.unmatched.map(_.name) mustBe Seq("Brody, Martin")
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
@@ -188,7 +189,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val unmatched =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = build(Seq(unmatched))
+      val vm = build(Seq(unmatched), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.utr mustBe messages("verify.reviewUnmatched.noneProvided")
     }
@@ -203,7 +204,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
           utr = None
         )
 
-      val vm = build(Seq(sub))
+      val vm = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.name mustBe "Brody, Martin"
     }
@@ -211,7 +212,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 
-      val vm = build(Seq(sub))
+      val vm = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.name mustBe messages("verify.noName")
     }
@@ -220,7 +221,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val row = build(Seq(sub)).unmatched.head
+      val row = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L))).unmatched.head
 
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"

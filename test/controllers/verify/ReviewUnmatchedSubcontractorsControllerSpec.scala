@@ -24,7 +24,7 @@ import pages.verify.CurrentVerificationBatchResponsePage
 
 class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
 
-  private val endpointUrl = "/subcontractor/verify/unmatched-subcontractors"
+  private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
 
   private val currentBatchResponse: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
