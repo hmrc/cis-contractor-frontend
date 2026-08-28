@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SubmissionCreatedPage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -837,7 +837,13 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         any[HeaderCarrier]
       )
       verify(mockConnector).submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier])
-      verify(mockRepo, times(2)).set(any[UserAnswers])
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockRepo, times(3)).set(captor.capture())
+
+      val updatedAnswers = captor.getAllValues.get(1)
+
+      updatedAnswers.get(SubmissionCreatedPage) mustBe Some(true)
     }
   }
 

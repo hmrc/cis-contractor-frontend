@@ -408,6 +408,21 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must redirect to Journey Recovery when submission has already been created" in {
+        val ua = emptyUserAnswers
+          .setOrException(SubmissionCreatedPage, true)
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(POST, onSubmitRoute)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
     }
   }
 }
