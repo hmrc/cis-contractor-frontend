@@ -104,7 +104,7 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
       surname = Some("Smith"),
       tradingName = Some("Trading Name"),
       utr = None,
-      nino = Some("AA12356"),
+      nino = None,
       crn = None,
       partnerUtr = None,
       partnershipTradingName = None,
