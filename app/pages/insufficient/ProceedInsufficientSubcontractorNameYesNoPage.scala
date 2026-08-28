@@ -19,9 +19,6 @@ package pages.insufficient
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ProceedInsufficientSubcontractorNameYesNoPage extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "proceedInsufficientSubcontractorNameYesNo"
+case class ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId: String) extends QuestionPage[Boolean] {
+  override def path: JsPath = JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
 }

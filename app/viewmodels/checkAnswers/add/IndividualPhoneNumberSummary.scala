@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.IndividualAnswers
 
 object IndividualPhoneNumberSummary {
 
@@ -38,6 +39,17 @@ object IndividualPhoneNumberSummary {
             .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
             .withAttribute("id" -> "individual-phone-number")
         )
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.phone.map { answer =>
+      SummaryListRowViewModel(
+        key = "individualPhoneNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }
