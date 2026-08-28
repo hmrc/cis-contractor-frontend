@@ -77,7 +77,9 @@ class SubmissionSendingController @Inject() (
 
           verificationService
             .pollStatusAndPersist(request.userAnswers, submissionDetails)
-            .map(response => redirectForPollSubmissionStatus(response.status, pollInterval))
+            .flatMap { response =>
+              redirectForPollSubmissionStatus(response.status, pollInterval)
+            }
             .recover { case ex =>
               logger.error("[SubmissionSendingController.onPollAndRedirect] Verification poll failed", ex)
               recovery
@@ -95,25 +97,36 @@ class SubmissionSendingController @Inject() (
         recovery
     }
 
-  private def redirectForPollSubmissionStatus(status: SubmissionStatus, pollInterval: Int)(implicit
-    request: DataRequest[_]
-  ): Result =
+  private def redirectForPollSubmissionStatus(
+                                               status: SubmissionStatus,
+                                               pollInterval: Int
+                                             )(implicit request: DataRequest[_]): Future[Result] =
     status match {
       case PENDING | SubmissionStatus.ACCEPTED =>
-        Ok(view()).withHeaders("Refresh" -> pollInterval.toString)
-      case SUBMITTED                           =>
-        Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-      case SUBMITTED_NO_RECEIPT                => // TODO: matching screen not found
-        recovery
-      case DEPARTMENTAL_ERROR                  =>
-        Redirect(controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad())
-      case FATAL_ERROR                         =>
-        Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
-      case SEND_ERROR                          =>
-        Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad())
-      case TIMED_OUT                           =>
-        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
-      case _                                   =>
-        recovery
+        Future.successful(Ok(view()).withHeaders("Refresh" -> pollInterval.toString))
+
+      case SUBMITTED =>
+        verificationService.resetUserAnswers(request.userAnswers)
+          .map { _ =>
+            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+          }
+
+      case SUBMITTED_NO_RECEIPT =>
+        Future.successful(recovery)
+
+      case DEPARTMENTAL_ERROR =>
+        Future.successful(Redirect(controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad()))
+
+      case FATAL_ERROR =>
+        Future.successful(Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad()))
+
+      case SEND_ERROR =>
+        Future.successful(Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad()))
+
+      case TIMED_OUT =>
+        Future.successful(Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad()))
+
+      case _ =>
+        Future.successful(recovery)
     }
 }
