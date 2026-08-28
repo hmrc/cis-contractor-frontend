@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -406,4 +406,43 @@ class VerificationService @Inject() (
       .flatMap(_.subbieResourceRef)
       .distinct
   }
+
+  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
+    implicit hc: HeaderCarrier
+  ): Future[Unit] =
+    proceedVerification(cisId, subcontractorId, batch, cisConnector.proceedInsufficientVerification)
+
+  def proceedUnmatchedVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
+    implicit hc: HeaderCarrier
+  ): Future[Unit] =
+    proceedVerification(cisId, subcontractorId, batch, cisConnector.proceedUnmatchedVerification)
+
+  private def proceedVerification(
+    cisId: String,
+    subcontractorId: Long,
+    batch: GetCurrentVerificationBatchResponse,
+    proceed: ProceedVerificationRequest => Future[Unit]
+  ): Future[Unit] =
+    (
+      for {
+        verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
+        verificationResourceRef      <- batch.verifications
+                                          .find(_.subcontractorId.contains(subcontractorId))
+                                          .flatMap(_.verificationResourceRef)
+      } yield ProceedVerificationRequest(
+        instanceId = cisId,
+        verificationBatchResourceRef = verificationBatchResourceRef,
+        verificationResourceRef = verificationResourceRef
+      )
+    ) match {
+      case Some(request) =>
+        proceed(request)
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            s"Unable to proceed verification. Missing resource refs for subcontractorId=$subcontractorId"
+          )
+        )
+    }
 }
