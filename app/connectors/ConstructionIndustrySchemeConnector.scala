@@ -251,8 +251,8 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def updateContractorDetails(
-                               request: UpdateContractorSchemeParams
-                             )(implicit hc: HeaderCarrier): Future[Unit] = {
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
 
     logger.info(
       s"[ConstructionIndustrySchemeConnector][updateContractorDetails] Submitting contractor details for schemeId=${request.schemeId}"

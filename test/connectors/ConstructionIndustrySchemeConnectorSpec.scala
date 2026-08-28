@@ -741,7 +741,6 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
 
-
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
       val request =
@@ -782,8 +781,8 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
     "return success when the API returns OK" in {
 
       val config = mock[ServicesConfig]
-      val http = mock[HttpClientV2]
-      val rb = mock[RequestBuilder]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
 
       when(config.baseUrl("construction-industry-scheme"))
         .thenReturn("http://cis-host")
