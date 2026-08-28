@@ -23,6 +23,7 @@ import models.amend.AmendIndividualRemoveDetail.*
 import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.JsPath
+import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 // All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
 
@@ -49,6 +50,7 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndivi
       case SubcontractorName if value.contains(true) =>
         userAnswers
           .remove(SubcontractorNamePage)
+          .flatMap(_.set(AmendIndividualSubcontractorNameRemovedQuery, true))
 
       case SubcontractorName if value.contains(false) =>
         userAnswers
@@ -56,6 +58,7 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndivi
             IndividualNamesOptionsPage,
             Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
           )
+          .flatMap(_.remove(AmendIndividualSubcontractorNameRemovedQuery))
 
       case Address if value.contains(true) =>
         userAnswers

@@ -22,6 +22,7 @@ import models.amend.AmendIndividualRemoveDetail
 import models.contact.ContactMethodOptions
 import pages.add.*
 import pages.behaviours.PageBehaviours
+import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
 
@@ -146,7 +147,7 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(AddIndividualContactMethodsYesNoPage) mustBe Some(true)
     }
 
-    "cleanup: must remove SubcontractorNamePage userAnswers when Yes is selected" in {
+    "cleanup: must remove SubcontractorNamePage userAnswers and record name removal when Yes is selected" in {
       val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
       val userAnswers = emptyUserAnswers
@@ -161,10 +162,11 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           .value
 
       updatedUserAnswers.get(SubcontractorNamePage) mustBe None
+      updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe Some(true)
     }
 
     "cleanup: must retain SubcontractorNamePage userAnswers and update " +
-      "IndividualNamesOptionsPage SubcontractorName and TradingName selected when No is selected" in {
+      "IndividualNamesOptionsPage SubcontractorName and TradingName selected and clear name removal when No is selected" in {
         val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
         val userAnswers = emptyUserAnswers
@@ -175,6 +177,9 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           .success
           .value
           .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+          .set(AmendIndividualSubcontractorNameRemovedQuery, true)
           .success
           .value
 
@@ -188,6 +193,7 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
         updatedUserAnswers.get(IndividualNamesOptionsPage) mustBe Some(
           Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
         )
+        updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe None
       }
 
     Seq(
