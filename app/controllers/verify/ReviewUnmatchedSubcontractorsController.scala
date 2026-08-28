@@ -48,7 +48,7 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
       }
     }
 
-  //TODO: This is a temporary redirect until DTR-5226 is implemented to handle the next step in the journey
+  // TODO: This is a temporary redirect until DTR-5226 is implemented to handle the next step in the journey
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
       Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
