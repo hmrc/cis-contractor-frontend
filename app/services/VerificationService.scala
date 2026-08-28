@@ -18,10 +18,10 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
 import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
+import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
@@ -283,6 +283,24 @@ class VerificationService @Inject() (
         error => Future.failed(error),
         updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
       )
+
+  def resetUserAnswers(userAnswers: UserAnswers): Future[Unit] =
+    userAnswers.get(CisIdQuery) match {
+      case None =>
+        Future.failed(new RuntimeException("CisId not found in session data"))
+
+      case Some(cisId) =>
+        UserAnswers(userAnswers.id)
+          .set(CisIdQuery, cisId)
+          .fold(
+            _ => Future.successful(()),
+            resetUserAnswers =>
+              sessionRepository
+                .set(resetUserAnswers)
+                .map(_ => ())
+                .recover { case _ => () }
+          )
+    }
 
   private def required[A](value: Option[A], errorMsg: String): Future[A] =
     value match {
