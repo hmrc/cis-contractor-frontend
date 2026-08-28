@@ -37,20 +37,20 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
     batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewUnmatchedViewModel = {
     val batchSubs =
-      batch.verifications.flatMap { verification =>
-        batch.subcontractors
-          .find(sub => verification.subcontractorId.contains(sub.subcontractorId))
-          .map(sub => (sub, verification))
+      batch.subcontractors.map { sub =>
+        val verification =
+          batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
+        (sub, verification)
       }
 
     val (readySubs, unmatchedSubs) =
       batchSubs.partition { case (_, verification) =>
-        UnmatchedBatchReadiness.isVerificationReady(Some(verification))
+        UnmatchedBatchReadiness.isVerificationReady(verification)
       }
 
     ReviewUnmatchedViewModel(
-      unmatched = unmatchedSubs.map { case (sub, verification) => toUnmatchedRow(sub, Some(verification)) },
-      ready = readySubs.map { case (sub, verification) => toReadyRow(sub, Some(verification)) }
+      unmatched = unmatchedSubs.map { case (sub, verification) => toUnmatchedRow(sub, verification) },
+      ready = readySubs.map { case (sub, verification) => toReadyRow(sub, verification) }
     )
   }
 

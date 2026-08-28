@@ -22,20 +22,7 @@ import play.api.i18n.Messages
 object SubcontractorDisplay {
 
   def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
-    nameFor(sub).getOrElse(messages("verify.noName"))
-
-  def nameFor(sub: SubcontractorCurrentVerification): Option[String] = {
-    val first              = sub.firstName.map(_.trim).filter(_.nonEmpty)
-    val surname            = sub.surname.map(_.trim).filter(_.nonEmpty)
-    val trading            = sub.tradingName.map(_.trim).filter(_.nonEmpty)
-    val partnershipTrading = sub.partnershipTradingName.map(_.trim).filter(_.nonEmpty)
-
-    val individualName = surname.map { s =>
-      first.map(f => s"$s, $f").getOrElse(s)
-    }
-
-    partnershipTrading.orElse(trading).orElse(individualName)
-  }
+    sub.displayName
 
   def utrDisplay(sub: SubcontractorCurrentVerification, noneProvidedKey: String)(implicit messages: Messages): String =
     sub.utr

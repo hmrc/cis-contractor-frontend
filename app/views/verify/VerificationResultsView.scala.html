@@ -20,6 +20,7 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     govukTable: GovukTable,
     govukButton: GovukButton,
     h1: components.H1,
@@ -64,12 +65,11 @@
     )
 
     @if(verificationResults.exists(_.isUnmatched)) {
-        <div>
+        @formHelper(action = controllers.verify.routes.VerificationResultsController.onSubmit()) {
             @govukButton(
                 ButtonViewModel(messages("verify.verificationResults.reviewUnmatchedSubcontractors.button"))
-                    .asLink(controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url)
             )
-        </div>
+        }
     } else {
             @link(
                 linkTextKey = "verify.verificationResults.manageYourSubcontractors.link",

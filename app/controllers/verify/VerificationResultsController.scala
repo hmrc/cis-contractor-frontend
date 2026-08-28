@@ -63,8 +63,7 @@ class VerificationResultsController @Inject() (
         .recreateCurrentBatchFromUnmatchedVerifications(request.userAnswers)
         .map { _ =>
           Redirect(
-            // ToDo: This should be changed to the review unmatched subcontractors page once it is implemented
-            controllers.verify.routes.VerificationResultsController
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
               .onPageLoad()
           )
         }
