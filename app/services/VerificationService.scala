@@ -156,13 +156,13 @@ class VerificationService @Inject() (
     hc: HeaderCarrier
   ): Future[ChrisSubmissionResponse] =
     for {
-      latestUa      <- getCurrentVerificationBatch(request.userAnswers)
-      createRequest <- buildCreateSubmissionRequest(latestUa)
-      submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
+      latestUa       <- getCurrentVerificationBatch(request.userAnswers)
+      createRequest  <- buildCreateSubmissionRequest(latestUa)
+      submissionId   <- createSubmissionForVerification(createRequest).map(_.submissionId)
       updatedAnswers <- Future.fromTry(latestUa.set(SubmissionCreatedPage, true))
-      _             <- sessionRepository.set(updatedAnswers)
-      response      <- submitVerificationToChris(submissionId, updatedAnswers)
-      updatedUa     <- saveVerificationSubmissionDetailsToSession(updatedAnswers, response)
+      _              <- sessionRepository.set(updatedAnswers)
+      response       <- submitVerificationToChris(submissionId, updatedAnswers)
+      updatedUa      <- saveVerificationSubmissionDetailsToSession(updatedAnswers, response)
     } yield response
 
   def pollStatusAndPersist(
