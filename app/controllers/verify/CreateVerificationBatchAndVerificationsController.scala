@@ -91,7 +91,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
 
             case Right(selectedIds) =>
               ua.get(CurrentVerificationBatchResponsePage) match {
-                
+
                 case Some(_) if hasCurrentBatch(ua) =>
                   Future.successful(
                     Redirect(
