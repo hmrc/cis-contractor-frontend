@@ -35,7 +35,7 @@ object SecondNameValidator {
             .isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName) =>
         Some(
           FieldValidationFailure(
-            field = SubcontractorValidationField.FirstName,
+            field = SubcontractorValidationField.SecondName,
             value = Some(secondName)
           )
         )
