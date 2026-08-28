@@ -493,6 +493,45 @@ noUnmatchedSubcontractors.p2                                                    
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
+unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.heading                              =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.p1                                   =  You have updated the subcontractor details for {0}.
+unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2                       =  Updates made
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details                    =  Details
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous                   =  Previous
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  Updated
+unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  None provided
+unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  None selected
+unmatched.unmatchedSubcontractorDetailsUpdated.backTo                               =  Back to
+unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  Cannot verify all subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  Before you go
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  Your feedback helps us make our service better.
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey         =  Take a short survey
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback            =  to share your feedback on this service.
+unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  Review unmatched subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  Your subcontractors
+
+info.CheckYourAnswers.backTo                                                        =  Back to
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+
+insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
+insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
+insufficientSubcontractorDetailsUpdated.updatesMade.h2                              =  Updates made
+insufficientSubcontractorDetailsUpdated.table.hdr.details                           =  Details
+insufficientSubcontractorDetailsUpdated.table.hdr.previous                          =  Previous
+insufficientSubcontractorDetailsUpdated.table.hdr.updated                           =  Updated
+insufficientSubcontractorDetailsUpdated.noneProvided                                =  None provided
+insufficientSubcontractorDetailsUpdated.noneSelected                                =  None selected
+insufficientSubcontractorDetailsUpdated.noName                                      =  No name provided
+insufficientSubcontractorDetailsUpdated.backTo                                      =  Back to
+insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  Before you go
+insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  Your feedback helps us make our service better.
+insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  Take a short survey
+insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                   =  to share your feedback on this service.
+insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  Review unmatched subcontractors
+insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
+insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1115,12 +1154,11 @@ verify.verificationResults.verificationNumber                           =  Verif
 verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
-
-verify.verificationResults.status.matched                               = Verified
-verify.verificationResults.status.unmatched                             = Unmatched
-verify.verificationResults.taxTreatment.net                             = Standard rate
-verify.verificationResults.taxTreatment.gross                           = Gross
-verify.verificationResults.taxTreatment.unmatched                       = Higher rate
+verify.verificationResults.status.matched                               =  Verified
+verify.verificationResults.status.unmatched                             =  Unmatched
+verify.verificationResults.taxTreatment.net                             =  Standard rate
+verify.verificationResults.taxTreatment.gross                           =  Gross
+verify.verificationResults.taxTreatment.unmatched                       =  Higher rate
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details

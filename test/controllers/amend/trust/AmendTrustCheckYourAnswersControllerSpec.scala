@@ -322,8 +322,14 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
+      when(
+        mockSubcontractorService.updateSubcontractor(
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(())
+      )
       when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
 
       val application =
@@ -347,7 +353,10 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+        .updateSubcontractor(
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
       captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
@@ -445,8 +454,19 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
 
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockSubcontractorService.updateSubcontractor(
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(minUa))
@@ -469,7 +489,42 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+        .updateSubcontractor(
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+    }
+
+    "must redirect to Journey Recovery and not update subcontractor when saving submitted marker fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.failed(new RuntimeException("session write failed")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when POST validation fails" in {
@@ -503,8 +558,13 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService, never())
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(
+        mockSubcontractorService,
+        never()
+      ).updateSubcontractor(
+        any[UserAnswers],
+        any[Option[Long]]
+      )(any[HeaderCarrier])
     }
 
     "must clear answers and redirect to your subcontractor page on cancel" in {
