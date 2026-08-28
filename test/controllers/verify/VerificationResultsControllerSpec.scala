@@ -59,7 +59,7 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
     submission = None
   )
   private val mockVerificationService = mock[VerificationService]
-  
+
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {

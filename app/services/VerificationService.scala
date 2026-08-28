@@ -395,14 +395,18 @@ class VerificationService @Inject() (
   private def unmatchedSubcontractorRefs(
     response: GetLastSubmittedVerificationBatchResponse
   ): Seq[Long] = {
-    val unmatchedIds =
+
+    val unmatchedSubcontractorIds =
       response.verifications
-        .filterNot(_.matched.contains("Y"))
-        .flatMap(_.subcontractorId)
+        .collect {
+          case verification if CheckUnmatchedSubcontractorsService.isUnmatched(verification) =>
+            verification.subcontractorId
+        }
+        .flatten
         .distinct
 
     response.subcontractors
-      .filter(sub => unmatchedIds.contains(sub.subcontractorId))
+      .filter(sub => unmatchedSubcontractorIds.contains(sub.subcontractorId))
       .flatMap(_.subbieResourceRef)
       .distinct
   }
