@@ -130,7 +130,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -176,7 +176,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -217,7 +217,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,

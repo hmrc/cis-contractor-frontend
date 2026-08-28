@@ -143,6 +143,8 @@ POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unma
 GET   /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = AmendMode)
 
+GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -652,6 +654,7 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
@@ -698,6 +701,3 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
-
-#Insufficient
-GET   /subcontractor/insufficient/subcontractor-details-updated   controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()

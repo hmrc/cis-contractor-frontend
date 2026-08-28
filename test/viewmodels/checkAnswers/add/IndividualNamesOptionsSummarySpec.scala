@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add
 import base.SpecBase
 import models.add.IndividualNamesOptions
 import models.{AmendMode, CheckMode, UserAnswers}
+import models.info.IndividualAnswers
 import org.scalatest.matchers.must.Matchers
 import pages.add.IndividualNamesOptionsPage
 import play.api.test.Helpers.stubMessages
@@ -159,5 +160,147 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
+  }
+
+  "ViewOnly - IndividualNamesOptionsSummary.row" - {
+    "must return a row with both names options selected" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualNamesOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with a single selected option" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualNamesOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return None selected when no contact methods are selected" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set.empty,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualNamesOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("individualNamesOptions.noSelection")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+  }
+
+  "return None when the answer is not set" in {
+    IndividualNamesOptionsSummary.row(emptyUserAnswers) mustBe None
   }
 }

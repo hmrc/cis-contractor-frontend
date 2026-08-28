@@ -113,7 +113,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = Some(true),
+          individualNamesOptions = Set.empty,
           tradingName = Some("O'Reilly & Co <UK>"),
           subcontractorName = None,
           addressYesNo = None,
@@ -158,7 +158,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = Some(false),
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -186,7 +186,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = Some(true),
+          individualNamesOptions = Set.empty,
           tradingName = Some("O'Reilly & Co <UK>"),
           subcontractorName = None,
           addressYesNo = None,

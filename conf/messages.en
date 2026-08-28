@@ -499,6 +499,24 @@ individualNamesOptions.error.required                                           
 individualNamesOptions.checkYourAnswersLabel                                        =  Names
 individualNamesOptions.change.hidden                                                =  names
 
+insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
+insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
+insufficientSubcontractorDetailsUpdated.updatesMade.h2                              =  Updates made
+insufficientSubcontractorDetailsUpdated.table.hdr.details                           =  Details
+insufficientSubcontractorDetailsUpdated.table.hdr.previous                          =  Previous
+insufficientSubcontractorDetailsUpdated.table.hdr.updated                           =  Updated
+insufficientSubcontractorDetailsUpdated.noneProvided                                =  None provided
+insufficientSubcontractorDetailsUpdated.noneSelected                                =  None selected
+insufficientSubcontractorDetailsUpdated.noName                                      =  No name provided
+insufficientSubcontractorDetailsUpdated.backTo                                      =  Back to
+insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  Before you go
+insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  Your feedback helps us make our service better.
+insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  Take a short survey
+insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                   =  to share your feedback on this service.
+insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  Review unmatched subcontractors
+insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
+insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1197,54 +1215,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-amendCheckYourAnswers.title                                                    = Subcontractor information
-amendCheckYourAnswers.heading.subcontractorInformation.h2                      = Subcontractor information
-amendCheckYourAnswers.heading.moreDetails.h2                                   = More details
-amendCheckYourAnswers.confirm.h2                                               = Confirm changes
-amendCheckYourAnswers.confirm.p1                                               = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
-amendCheckYourAnswers.confirm                                                  = Confirm
-amendCheckYourAnswers.cancelChanges                                            = Cancel changes
-amendCheckYourAnswers.verificationNumber.label                                 = Verification number
-
-insufficientSubcontractorDetailsUpdated.title                                  = Subcontractor details updated
-insufficientSubcontractorDetailsUpdated.p1                                     = You have updated the subcontractor details for {0}.
-insufficientSubcontractorDetailsUpdated.updatesMade.h2                         = Updates made
-insufficientSubcontractorDetailsUpdated.table.hdr.details                      = Details
-insufficientSubcontractorDetailsUpdated.table.hdr.previous                     = Previous
-insufficientSubcontractorDetailsUpdated.table.hdr.updated                      = Updated
-insufficientSubcontractorDetailsUpdated.noneProvided                           = None provided
-insufficientSubcontractorDetailsUpdated.noneSelected                           = None selected
-insufficientSubcontractorDetailsUpdated.noName                                 = No name provided
-insufficientSubcontractorDetailsUpdated.backTo                                 = Back to
-insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                         = Before you go
-insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                         = Your feedback helps us make our service better.
-insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey           = Take a short survey
-insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback              = to share your feedback on this service.
-insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors          = Review unmatched subcontractors
-insufficientSubcontractorDetailsUpdated.yourSubcontractors                     = Your subcontractors
-insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors          = Cannot verify all subcontractors
-
-verify.verificationResults.title                                               = Verification results
-verify.verificationResults.heading                                             = Verification results
-verify.verificationResults.paragraph                                           = Here are the verification results from your most recent verification request.
-verify.verificationResults.name                                                = Name
-verify.verificationResults.status                                              = Verification status
-verify.verificationResults.taxTreatment                                        = Tax treatment
-verify.verificationResults.verificationNumber                                  = Verification number
-verify.verificationResults.reviewUnmatchedSubcontractors.button                = Review unmatched subcontractors
-verify.verificationResults.backTo                                              = Back to
-verify.verificationResults.manageYourSubcontractors.link                       = Manage your subcontractors
-
-unmatchedSubcontractors.title                                                  = You have unmatched subcontractors
-unmatchedSubcontractors.heading                                                = You have unmatched subcontractors
-unmatchedSubcontractors.p1                                                     = Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC.
-unmatchedSubcontractors.p2                                                     = You cannot create a new verification request until you have reviewed and fixed these unmatched results.
-unmatchedSubcontractors.verificationResults.link                               = Check your latest verification results
-
-noUnmatchedSubcontractors.title                                                = No unmatched subcontractors
-noUnmatchedSubcontractors.heading                                              = No unmatched subcontractors
-noUnmatchedSubcontractors.p1                                                   = The subcontractors marked as unmatched in your most recent verification results have been deleted.
-noUnmatchedSubcontractors.p2                                                   = You can now verify any of your other subcontractors by creating a new verification request.
-noUnmatchedSubcontractors.backTo                                               = Back to
-noUnmatchedSubcontractors.manageYourSubcontractors.link                        = Manage your subcontractors

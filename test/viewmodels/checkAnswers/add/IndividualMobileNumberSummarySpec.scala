@@ -130,7 +130,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -173,7 +173,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -203,7 +203,7 @@ class IndividualMobileNumberSummarySpec extends AnyFreeSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,

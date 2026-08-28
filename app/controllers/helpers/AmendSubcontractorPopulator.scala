@@ -20,7 +20,7 @@ import controllers.amend.AmendControllerUtils.{setOptional, shouldShowVerificati
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
 import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
-import models.address.{Address, Country}
+import models.address.Address
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
@@ -44,26 +44,15 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address         = SubcontractorPopulatorUtils.toAddress(subcontractor)
-      val methods         = SubcontractorPopulatorUtils.contactMethods(subcontractor)
+      val address = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val methods = SubcontractorPopulatorUtils.contactMethods(subcontractor)
 
-      val name =
-        Option.when(
-          subcontractor.firstName.exists(_.trim.nonEmpty)
-            || subcontractor.surname.exists(
-              _.trim.nonEmpty
-            ) || subcontractor.secondName.exists(_.trim.nonEmpty)
-        ) {
-          SubcontractorName(
-            firstName = subcontractor.firstName.getOrElse(""),
-            middleName = subcontractor.secondName,
-            lastName = subcontractor.surname.getOrElse("")
-          )
-        }
+      val name = SubcontractorPopulatorUtils.individualName(subcontractor)
 
       val hasName: Boolean                                    = name.isDefined
-      val hasTradingName: Boolean                             = subcontractor.tradingName.exists(_.trim.nonEmpty)
-      val individualNamesOptions: Set[IndividualNamesOptions] = namesOptions(hasName, hasTradingName)
+      val hasTradingName: Boolean                             = SubcontractorPopulatorUtils.hasTradingName(subcontractor)
+      val individualNamesOptions: Set[IndividualNamesOptions] =
+        SubcontractorPopulatorUtils.individualNamesOptions(hasName, hasTradingName)
 
       val original = originalAnswers(
         subcontractor = subcontractor,
@@ -124,15 +113,6 @@ object AmendSubcontractorPopulator {
         worksReference = subcontractor.worksReferenceNumber,
         verificationNumber = subcontractor.verificationNumber
       )
-
-    private def namesOptions(
-      hasName: Boolean,
-      hasTradingName: Boolean
-    ): Set[IndividualNamesOptions] =
-      Set(
-        Option.when(hasName)(IndividualNamesOptions.SubcontractorName),
-        Option.when(hasTradingName)(IndividualNamesOptions.TradingName)
-      ).flatten
   }
 
   object CompanyPopulator {

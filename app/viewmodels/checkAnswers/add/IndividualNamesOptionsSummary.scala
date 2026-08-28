@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import models.add.IndividualNamesOptions
+import models.info.IndividualAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.IndividualNamesOptionsPage
 import play.api.i18n.Messages
@@ -56,4 +57,27 @@ object IndividualNamesOptionsSummary {
         )
       )
     }
+
+  def row(answers: IndividualAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+
+    val selectedMethods = answers.individualNamesOptions
+
+    val options =
+      if (selectedMethods.isEmpty) {
+        Seq(HtmlFormat.escape(messages("individualNamesOptions.noSelection")).toString)
+      } else {
+        IndividualNamesOptions
+          .ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+      }
+
+    Some(
+      SummaryListRowViewModel(
+        key = "individualNamesOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq.empty
+      )
+    )
 }
