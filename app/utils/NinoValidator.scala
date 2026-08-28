@@ -16,29 +16,27 @@
 
 package utils
 
+import forms.Validation.ninoRegex
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
-import uk.gov.hmrc.domain.Nino
 
 object NinoValidator {
+
+  private val length = 9
+
   def validate(
     value: Option[String]
   ): Option[FieldValidationFailure] =
-    value match {
-      case None                             =>
-        Some(
-          FieldValidationFailure(
-            field = SubcontractorValidationField.Nino,
-            value = None
-          )
-        )
-      case Some(nino) if Nino.isValid(nino) =>
-        Some(
+    value
+      .filter(_.trim.nonEmpty)
+      .flatMap { nino =>
+        Option.when(
+          nino.length > length ||
+            !nino.matches(ninoRegex)
+        ) {
           FieldValidationFailure(
             field = SubcontractorValidationField.Nino,
             value = Some(nino)
           )
-        )
-      case _                                =>
-        None
-    }
+        }
+      }
 }
