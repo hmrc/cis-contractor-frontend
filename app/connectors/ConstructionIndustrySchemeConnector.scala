@@ -265,6 +265,57 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def proceedInsufficientVerification(
+    request: ProceedInsufficientVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+            )
+        }
+      }
+
+  def updateSubcontractor(
+    request: UpdateSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+        s"cisId=${request.cisId}, " +
+        s"subcontractorId=${request.subcontractor.subcontractorId}, " +
+        s"subbieResourceRef=${request.subcontractor.subbieResourceRef}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/subcontractor/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+                s"Updated subcontractor"
+            )
+            Future.successful(())
+
+          case other =>
+            Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other: ${response.body}"))
+        }
+      }
+  }
+
   def deleteVerification(
     request: DeleteVerificationRequest
   )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =

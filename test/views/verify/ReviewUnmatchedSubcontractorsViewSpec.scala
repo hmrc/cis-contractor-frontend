@@ -70,7 +70,7 @@ class ReviewUnmatchedSubcontractorsViewSpec extends SpecBase {
     "must render the guidance link opening in a new tab" in {
       val document = doc(ReviewUnmatchedViewModel(unmatched = Seq(unmatchedRow), ready = Nil))
 
-      val whatYouNeed = document.select("a[href$='what-you-must-do-as-a-cis-contractor#2']")
+      val whatYouNeed = document.select("a[href$='what-you-must-do-as-a-cis-contractor']")
       whatYouNeed.size() mustBe 1
       whatYouNeed.attr("target") mustBe "_blank"
       whatYouNeed.text must include(messagesImpl("verify.reviewUnmatched.whatYouNeed.link"))
