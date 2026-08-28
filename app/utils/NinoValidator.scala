@@ -16,31 +16,27 @@
 
 package utils
 
-import models.SubcontractorCurrentVerification
+import forms.Validation.ninoRegex
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-object UtrValidator {
+object NinoValidator {
+
+  private val length = 9
+
   def validate(
-    value: Option[String],
-    subcontractors: Seq[SubcontractorCurrentVerification],
-    field: SubcontractorValidationField = SubcontractorValidationField.Utr,
-    checkDuplicate: Boolean = true
+    value: Option[String]
   ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
-      .flatMap { utr =>
+      .flatMap { nino =>
         Option.when(
-          !UTR.isValidUTR(utr)
-            || (checkDuplicate && isDuplicateUTR(subcontractors, utr))
+          nino.length > length ||
+            !nino.matches(ninoRegex)
         ) {
           FieldValidationFailure(
-            field = field,
-            value = Some(utr)
+            field = SubcontractorValidationField.Nino,
+            value = Some(nino)
           )
         }
       }
-
-  private def isDuplicateUTR(subcontractors: Seq[SubcontractorCurrentVerification], utr: String): Boolean =
-    subcontractors.count(_.utr.contains(utr)) > 1
-
 }
