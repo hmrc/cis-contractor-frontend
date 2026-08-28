@@ -38,12 +38,7 @@ class SecondNameValidatorSpec extends AnyWordSpec with Matchers {
     "return failure when the secondName is None" in {
       val secondName = None
       SecondNameValidator
-        .validate(secondName) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.SecondName,
-          value = None
-        )
-      )
+        .validate(secondName) mustBe None
     }
 
     "return no failure for a valid secondName" in {
