@@ -51,8 +51,8 @@ object AmendSubcontractorPopulator {
 
       val name = SubcontractorPopulatorUtils.individualName(subcontractor)
 
-      val hasName: Boolean = name.isDefined
-      val hasTradingName: Boolean = SubcontractorPopulatorUtils.hasTradingName(subcontractor)
+      val hasName: Boolean                                    = name.isDefined
+      val hasTradingName: Boolean                             = SubcontractorPopulatorUtils.hasTradingName(subcontractor)
       val individualNamesOptions: Set[IndividualNamesOptions] =
         SubcontractorPopulatorUtils.individualNamesOptions(hasName, hasTradingName)
 

@@ -71,15 +71,15 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           val detailsList =
             SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        Ok(
-          view(
-            subcontractorInformationList,
-            detailsList,
-            subcontractorNameExtractor.displaySubcontractorName(ua),
-            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit(),
-            controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()
+          Ok(
+            view(
+              subcontractorInformationList,
+              detailsList,
+              subcontractorNameExtractor.displaySubcontractorName(ua),
+              controllers.amend.routes.AmendIndividualCheckYourAnswersController.onSubmit(),
+              controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel()
+            )
           )
-        )
 
         case Left(error) =>
           logger.error(s"[AmendIndividualCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
