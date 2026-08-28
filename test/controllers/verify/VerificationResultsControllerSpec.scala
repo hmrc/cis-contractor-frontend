@@ -113,7 +113,7 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-    "must redirect back to the results page when recreate current batch succeeds" in {
+    "must redirect to the review unmatched subcontractors page when recreate current batch succeeds" in {
 
       when(
         mockVerificationService
@@ -143,7 +143,7 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationResultsController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsController
             .onPageLoad()
             .url
 
