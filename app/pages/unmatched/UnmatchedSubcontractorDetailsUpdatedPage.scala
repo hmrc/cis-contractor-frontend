@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package pages.unmatched
 
-import play.api.libs.json.*
+import models.unmatched.UnmatchedSubcontractorDetailsUpdated
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-object CisIdPage extends QuestionPage[String] {
-  override def path: JsPath     = JsPath \ toString
-  override def toString: String = "cisId"
+case object UnmatchedSubcontractorDetailsUpdatedPage extends QuestionPage[UnmatchedSubcontractorDetailsUpdated] {
+
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "unmatchedSubcontractorDetailsUpdated"
 }
