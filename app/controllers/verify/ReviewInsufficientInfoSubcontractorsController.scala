@@ -18,14 +18,16 @@ package controllers.verify
 
 import controllers.actions.*
 import models.NormalMode
-import pages.verify.CurrentVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.ReviewInsufficientInfoService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReviewInsufficientInfoSubcontractorsController @Inject() (
   identify: IdentifierAction,
@@ -33,22 +35,28 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   requireData: DataRequiredAction,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
   val controllerComponents: MessagesControllerComponents,
+  sessionRepository: SessionRepository,
   view: ReviewInsufficientInfoSubcontractorsView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
       case Some(batch) =>
         val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
         if (viewModel.hasMissing || viewModel.hasReady) {
-          Ok(view(viewModel))
+          for {
+            updatedAnswers <-
+              Future.fromTry(request.userAnswers.set(VerificationBatchReadinessPage, viewModel.allReady))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Ok(view(viewModel))
         } else {
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
 
       case None =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 

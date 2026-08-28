@@ -255,6 +255,137 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
+  "VerificationService.refreshSubmittedVerificationRequest" - {
+
+    def responseWithSubmissionStatus(status: Option[String]): GetNewestVerificationBatchResponse =
+      responseWithSubcontractors.copy(
+        submission = Some(
+          Submission(
+            submissionId = 1L,
+            activeObjectId = Some(1L),
+            submissionRequestDate = Some(LocalDateTime.parse("2026-06-15T03:30:52")),
+            status = status
+          )
+        )
+      )
+
+    "must return updated answers when the latest submission status is SUBMITTED" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must return updated answers when the latest submission status is SUBMITTED_NO_RECEIPT" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED_NO_RECEIPT"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must fail when the latest submission status is not submitted" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(Some("PENDING"))))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage must include("Submitted verification request page cannot be accessed")
+    }
+
+    "must fail when the latest response has no submission" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors.copy(submission = None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+
+    "must fail when the latest submission has no status" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+  }
+
   "VerificationService.getCurrentVerificationBatch" - {
 
     val instanceId = "INST-123"
