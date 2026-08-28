@@ -18,7 +18,7 @@ package models.audit
 
 import base.SpecBase
 import models.address.{Address, Country}
-import play.api.libs.json.{JsObject, Json, OWrites}
+import play.api.libs.json.{JsObject, Json}
 
 class AuditEventModelSpec extends SpecBase {
 

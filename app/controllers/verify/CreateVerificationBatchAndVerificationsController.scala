@@ -91,10 +91,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
 
             case Right(selectedIds) =>
               ua.get(CurrentVerificationBatchResponsePage) match {
-
-                case None =>
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
+                
                 case Some(_) if hasCurrentBatch(ua) =>
                   Future.successful(
                     Redirect(
@@ -123,6 +120,9 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                       )
                       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     }
+
+                case _ =>
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               }
           }
         }
