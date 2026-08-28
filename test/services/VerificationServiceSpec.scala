@@ -255,6 +255,137 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
+  "VerificationService.refreshSubmittedVerificationRequest" - {
+
+    def responseWithSubmissionStatus(status: Option[String]): GetNewestVerificationBatchResponse =
+      responseWithSubcontractors.copy(
+        submission = Some(
+          Submission(
+            submissionId = 1L,
+            activeObjectId = Some(1L),
+            submissionRequestDate = Some(LocalDateTime.parse("2026-06-15T03:30:52")),
+            status = status
+          )
+        )
+      )
+
+    "must return updated answers when the latest submission status is SUBMITTED" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must return updated answers when the latest submission status is SUBMITTED_NO_RECEIPT" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED_NO_RECEIPT"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must fail when the latest submission status is not submitted" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(Some("PENDING"))))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage must include("Submitted verification request page cannot be accessed")
+    }
+
+    "must fail when the latest response has no submission" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors.copy(submission = None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+
+    "must fail when the latest submission has no status" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+  }
+
   "VerificationService.getCurrentVerificationBatch" - {
 
     val instanceId = "INST-123"
@@ -916,56 +1047,108 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
-  "VerificationService.anyUnmatchedSubcontractorsStillPresent" - {
+  "VerificationService.anyUnmatchedResourceRefsStillPresent" - {
 
-    "must return true when any unmatched subcontractorId is still in the live list" in {
+    "must return true when an unmatched verificationResourceRef is still on the live list" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
 
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
       when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
         .thenReturn(
           Future.successful(
-            GetSubcontractorListResponse(
-              Seq(SubcontractorListItem(11L), SubcontractorListItem(22L))
-            )
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(22L, Some(10L))))
           )
         )
 
-      val result =
-        service.anyUnmatchedSubcontractorsStillPresent("900063", Set(22L, 99L)).futureValue
-
-      result mustBe true
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe true
       verify(mockConnector).getSubcontractorList(eqTo("900063"))(any[HeaderCarrier])
     }
 
-    "must return false when unmatched subcontractorIds are not in the live list" in {
+    "must return false when unmatched verificationResourceRefs are not on the live list" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
 
       when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
         .thenReturn(
           Future.successful(
-            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L)))
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L, Some(999L))))
           )
         )
 
-      val result =
-        service.anyUnmatchedSubcontractorsStillPresent("900063", Set(22L)).futureValue
-
-      result mustBe false
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe false
     }
 
-    "must return false without calling the connector when unmatched ids are empty" in {
+    "must return false without calling the connector when unmatched has no resource refs" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
 
-      val result =
-        service.anyUnmatchedSubcontractorsStillPresent("900063", Set.empty).futureValue
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = None,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
 
-      result mustBe false
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe false
       verify(mockConnector, never()).getSubcontractorList(any[String])(any[HeaderCarrier])
     }
   }

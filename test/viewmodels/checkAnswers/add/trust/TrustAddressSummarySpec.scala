@@ -20,6 +20,7 @@ import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
 import models.{AmendMode, UserAnswers}
 import models.address.{Address, Country}
+import models.info.trust.TrustAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -123,7 +124,9 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       val action = row.actions.value.items.head
 
       action.href shouldBe
-        controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup().url
+        routes.TrustAddressController
+          .redirectToAmendAddressLookup()
+          .url
 
       action.visuallyHiddenText.value shouldBe
         messages("trustAddress.change.hidden")
@@ -138,7 +141,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       TrustAddressSummary.row(userAnswers) shouldBe None
     }
 
-    "must render address safely without double encoding and preserve line breaks" in {
+    "must HTML-escape special characters correctly (single encoding only)" in {
 
       val address = Address(
         addressLine1 = "10 O'Reilly & Co",
@@ -165,6 +168,134 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
       assertHasBreaks(html)
 
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "TrustAddressSummary.row for ViewOnlyTrustAnswers" should {
+
+    "return a SummaryListRow when address exists" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = Some("Test Trust"),
+          addressYesNo = Some(true),
+          address = Some(address),
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result = TrustAddressSummary.row(answers)
+
+      result shouldBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustAddress.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "return None when address is missing in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = Some("Test Trust"),
+          addressYesNo = Some(false),
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustAddressSummary.row(answers) shouldBe None
+    }
+
+    "render the ViewOnly address safely without double encoding" in {
+
+      val address = Address(
+        addressLine1 = "10 O'Reilly & Co",
+        addressLine2 = Some("Building & Sons"),
+        addressLine3 = Some("Main Street"),
+        addressLine4 = Some("London"),
+        postcode = Some("AB1 2CD"),
+        country = Some(Country(Some("GB"), Some("UK")))
+      )
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = Some("Test Trust"),
+          addressYesNo = Some(true),
+          address = Some(address),
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow = TrustAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertRaw(html, "10 O&#x27;Reilly &amp; Co")
+      assertRaw(html, "Building &amp; Sons")
+
+      assertHasBreaks(html)
+      assertNoDoubleEncoding(html)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

@@ -19,6 +19,7 @@ package viewmodels.verify
 import models.VerificationLastVerification
 import models.response.GetLastSubmittedVerificationBatchResponse
 import play.api.i18n.Messages
+import services.CheckUnmatchedSubcontractorsService
 
 case class VerificationResultsViewModel(
   name: String,
@@ -30,59 +31,18 @@ case class VerificationResultsViewModel(
 
 object VerificationResultsViewModel {
 
-  private val ActionEdit   = "edit"
-  private val ActionMatch  = "match"
-  private val ActionVerify = "verify"
-
   def from(
     response: GetLastSubmittedVerificationBatchResponse
   )(implicit messages: Messages): Seq[VerificationResultsViewModel] =
     response.verifications.map { verification =>
-      val verified = isVerified(verification)
+      val unmatched = CheckUnmatchedSubcontractorsService.isUnmatched(verification)
       VerificationResultsViewModel(
         name = verification.subcontractorName.getOrElse(messages("verify.noName")),
-        verificationStatus = verificationStatusFor(verified),
-        taxTreatment = taxTreatmentFor(verification, verified),
+        verificationStatus = verificationStatusFor(!unmatched),
+        taxTreatment = taxTreatmentFor(verification, !unmatched),
         verificationNumber = verification.verificationNumber.getOrElse(""),
-        isUnmatched = !verified
+        isUnmatched = unmatched
       )
-    }
-
-  def unmatchedSubcontractorIds(response: GetLastSubmittedVerificationBatchResponse): Set[Long] =
-    response.verifications
-      .collect {
-        case verification if !isVerified(verification) =>
-          verification.subcontractorId
-      }
-      .flatten
-      .toSet
-
-  def hasUnmatchedVerifications(response: GetLastSubmittedVerificationBatchResponse): Boolean =
-    response.verifications.exists(!isVerified(_))
-
-  private def isVerified(verification: VerificationLastVerification): Boolean = {
-    val hasVerificationNumber =
-      verification.verificationNumber.exists(_.trim.nonEmpty)
-
-    if (!hasVerificationNumber) {
-      false
-    } else {
-      val action = verification.actionIndicator.map(_.trim.toLowerCase)
-      action match {
-        case Some(ActionEdit)                                                          =>
-          false
-        case Some(ActionMatch) | Some(ActionVerify) if isMatched(verification.matched) =>
-          true
-        case _                                                                         =>
-          false
-      }
-    }
-  }
-
-  private def isMatched(matched: Option[String]): Boolean =
-    matched.exists { value =>
-      val normalised = value.trim.toUpperCase
-      normalised == "Y" || normalised == "MATCHED"
     }
 
   private def verificationStatusFor(verified: Boolean)(implicit messages: Messages): String =
