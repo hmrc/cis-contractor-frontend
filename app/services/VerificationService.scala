@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -57,6 +57,25 @@ class VerificationService @Inject() (
 
       _ <- sessionRepository.set(updated)
     } yield updated
+
+  def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
+      val status =
+        updatedAnswers
+          .get(NewestVerificationBatchResponsePage)
+          .flatMap(_.submission)
+          .flatMap(_.status)
+
+      if (status.exists(isSubmittedStatus)) {
+        Future.successful(updatedAnswers)
+      } else {
+        Future.failed(
+          new IllegalStateException(
+            s"Submitted verification request page cannot be accessed for submission status: ${status.getOrElse("missing")}"
+          )
+        )
+      }
+    }
 
   def getCurrentVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
@@ -140,6 +159,12 @@ class VerificationService @Inject() (
   private def isUnverified(sub: Subcontractor): Boolean =
     !sub.verified.contains("Y")
 
+  private def isSubmittedStatus(status: String): Boolean =
+    SubmissionStatus.fromString(status) match {
+      case SubmissionStatus.SUBMITTED | SubmissionStatus.SUBMITTED_NO_RECEIPT => true
+      case _                                                                  => false
+    }
+
   def modifyVerificationBatchAndVerifications(
     userAnswers: UserAnswers,
     request: ModifyVerificationsRequest
@@ -198,6 +223,26 @@ class VerificationService @Inject() (
         error => Future.failed(new RuntimeException(error)),
         request => Future.successful(request)
       )
+
+  def anyUnmatchedResourceRefsStillPresent(
+    cisId: String,
+    response: GetLastSubmittedVerificationBatchResponse
+  )(implicit hc: HeaderCarrier): Future[Boolean] = {
+    val unmatchedResourceRefs =
+      response.verifications
+        .filter(CheckUnmatchedSubcontractorsService.isUnmatched)
+        .flatMap(_.verificationResourceRef)
+        .toSet
+
+    if (unmatchedResourceRefs.isEmpty) {
+      Future.successful(false)
+    } else {
+      cisConnector.getSubcontractorList(cisId).map { listResponse =>
+        val liveResourceRefs = listResponse.subcontractors.flatMap(_.subbieResourceRef).toSet
+        unmatchedResourceRefs.exists(liveResourceRefs.contains)
+      }
+    }
+  }
 
   private def resolveEmployerReference(
     userId: String,

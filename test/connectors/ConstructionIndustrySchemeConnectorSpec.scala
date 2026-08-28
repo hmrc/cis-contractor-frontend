@@ -19,7 +19,7 @@ package connectors
 import models.TypeOfSubcontractor
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.{GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorResponse}
+import models.response.{GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorListResponse, GetSubcontractorResponse, SubcontractorListItem}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -32,7 +32,7 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.requests.ModifyVerificationsRequest
+import models.requests.{ModifyVerificationsRequest, SubcontractorRequest, UpdateSubcontractorRequest}
 import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
 import models.response.CreateSubmissionForVerificationResponse
 
@@ -266,6 +266,38 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
     }
   }
 
+  "ConstructionIndustrySchemeConnector.getSubcontractorList" should {
+
+    "return GetSubcontractorListResponse when CIS returns a valid response" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+      when(http.get(any())(any())).thenReturn(rb)
+
+      val expected =
+        GetSubcontractorListResponse(
+          Seq(SubcontractorListItem(11L, Some(111L)), SubcontractorListItem(22L, Some(222L)))
+        )
+
+      when(rb.execute[GetSubcontractorListResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val result = connector.getSubcontractorList("900063").futureValue
+
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString must include("/cis/subcontractors/900063")
+    }
+  }
+
   "return Unit when CIS responds with NO_CONTENT (204) for TrustPayload" in {
     val config = mock[ServicesConfig]
     val http   = mock[HttpClientV2]
@@ -367,6 +399,105 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val ex = connector.modifyVerificationBatch(req).failed.futureValue
       ex.getMessage mustBe s"Modify verification batch failed, returned $INTERNAL_SERVER_ERROR"
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateSubcontractor" should {
+
+    val request =
+      UpdateSubcontractorRequest(
+        cisId = "INST-123",
+        subcontractor = SubcontractorRequest(
+          subcontractorId = 123L,
+          utr = None,
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = None,
+          nino = None,
+          secondName = None,
+          surname = None,
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = None,
+          lastUpdate = None,
+          subbieResourceRef = Some(1001L),
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      )
+
+    "return Unit when CIS responds with NO_CONTENT (204)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateSubcontractor(request).futureValue mustBe (())
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "return Unit when CIS responds with OK (200)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(OK, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateSubcontractor(request).futureValue mustBe (())
+    }
+
+    "fail when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "boom")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val ex = connector.updateSubcontractor(request).failed.futureValue
+      ex.getMessage mustBe s"Update subcontractor failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 
