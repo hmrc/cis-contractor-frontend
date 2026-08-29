@@ -39,6 +39,7 @@ class SubmissionSendingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   val controllerComponents: MessagesControllerComponents,
   appConfig: FrontendAppConfig,
   view: SubmissionSendingView,
@@ -52,7 +53,7 @@ class SubmissionSendingController @Inject() (
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       verificationService.createSubmitAndPersistVerificationSubmission
@@ -64,7 +65,7 @@ class SubmissionSendingController @Inject() (
     }
 
   def onPollAndRedirect: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       request.userAnswers.get(VerificationSubmissionDetailsPage) match {
