@@ -42,7 +42,9 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
   private def userAnswersWithId =
     emptyUserAnswers.set(CisIdQuery, cisId).success.value
 
-  private def contractorRequest(implicit ua: models.UserAnswers = userAnswersWithId): DataRequest[AnyContentAsEmpty.type] =
+  private def contractorRequest(implicit
+    ua: models.UserAnswers = userAnswersWithId
+  ): DataRequest[AnyContentAsEmpty.type] =
     DataRequest(
       request = FakeRequest(),
       userId = userAnswersId,
@@ -153,7 +155,9 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe
         controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
-      verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
+      verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(
+        any[HeaderCarrier]
+      )
     }
 
     "must redirect when tax office details cannot be resolved" in {
@@ -167,7 +171,9 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
       status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe
         controllers.routes.UnauthorisedAgentAffinityController.onPageLoad().url
-      verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
+      verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(
+        any[HeaderCarrier]
+      )
     }
   }
 }
