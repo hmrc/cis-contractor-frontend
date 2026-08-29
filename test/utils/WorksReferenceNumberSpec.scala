@@ -18,32 +18,32 @@ package utils
 
 import base.SpecBase
 
-class WorkReferenceNumberSpec extends SpecBase {
+class WorksReferenceNumberSpec extends SpecBase {
 
-  import WorkReferenceNumber.isValid
-  import WorkReferenceNumber.isLengthInRange
+  import WorksReferenceNumber.isValid
+  import WorksReferenceNumber.isLengthInRange
 
-  "The WorkReferenceNumber utility object" - {
+  "The WorksReferenceNumber utility object" - {
 
-    "returns false for a known invalid WorkReferenceNumber & invalid length" in {
+    "returns false for a known invalid WorksReferenceNumber & invalid length" in {
       val invalidWRN = "A12323452345#@[]{}$%^&£~"
       isValid(invalidWRN) mustBe false
       isLengthInRange(invalidWRN) mustBe false
     }
 
-    "returns true for a known valid WorkReferenceNumber length & format" in {
+    "returns true for a known valid WorksReferenceNumber length & format" in {
       val validWRN = "Work Reference No."
       isValid(validWRN) mustBe true
       isLengthInRange(validWRN) mustBe true
     }
 
-    "returns true for a known valid WorkReferenceNumber format & length" in {
+    "returns true for a known valid WorksReferenceNumber format & length" in {
       val validWRN = "Work Ref No 1234@"
       isValid(validWRN) mustBe true
       isLengthInRange(validWRN) mustBe true
     }
 
-    "returns false for a known invalid WorkReferenceNumber format but valid length" in {
+    "returns false for a known invalid WorksReferenceNumber format but valid length" in {
       val invalidWRN = "WRN No <>"
       isValid(invalidWRN) mustBe false
       isLengthInRange(invalidWRN) mustBe true

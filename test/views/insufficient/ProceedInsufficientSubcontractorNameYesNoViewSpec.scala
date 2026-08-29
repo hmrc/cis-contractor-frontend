@@ -46,63 +46,40 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
         view(
           form,
           NormalMode,
-          subcontractorName
+          subcontractorName,
+          subcontractorId
         )
 
-      val doc: Document =
-        Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
-      doc
-        .select("title")
-        .text() must include(
-        messages("proceedInsufficientSubcontractorNameYesNo.title")
-      )
+      doc.select("title").text() must include(messages("proceedInsufficientSubcontractorNameYesNo.title"))
 
-      val legend: Elements =
-        doc.select("fieldset legend")
+      val legend: Elements = doc.select("fieldset legend")
 
-      legend
-        .text() mustBe
-        messages(
-          "proceedInsufficientSubcontractorNameYesNo.heading",
-          subcontractorName
-        )
+      legend.text() mustBe messages("proceedInsufficientSubcontractorNameYesNo.heading", subcontractorName)
 
-      legend
-        .hasClass("govuk-fieldset__legend--l") mustBe true
+      legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      doc
-        .select(".govuk-hint")
-        .text() mustBe
-        messages("proceedInsufficientSubcontractorNameYesNo.hint")
+      doc.select(".govuk-hint").text() mustBe messages("proceedInsufficientSubcontractorNameYesNo.hint")
 
-      val radios: Elements =
-        doc.select(".govuk-radios__input")
+      val radios: Elements = doc.select(".govuk-radios__input")
 
-      radios
-        .size() mustBe 2
+      radios.size() mustBe 2
 
-      val labels: util.List[String] =
-        doc.select(".govuk-radios__label").eachText()
+      val labels: util.List[String] = doc.select(".govuk-radios__label").eachText()
 
       labels must contain("Yes")
       labels must contain("No")
 
       doc
         .select("form")
-        .attr("action") mustBe
-        controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-          .onSubmit()
-          .url
+        .attr("action") mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+        .onSubmit(subcontractorId)
+        .url
 
-      doc
-        .select("form")
-        .attr("autocomplete") mustBe "off"
+      doc.select("form").attr("autocomplete") mustBe "off"
 
-      doc
-        .select(".govuk-button")
-        .text() mustBe
-        messages("site.continue")
+      doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
@@ -117,7 +94,8 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
         view(
           errorForm,
           NormalMode,
-          subcontractorName
+          subcontractorName,
+          subcontractorId
         )
 
       val doc: Document =
@@ -145,23 +123,17 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
 
   trait Setup {
 
-    val formProvider =
-      new ProceedInsufficientSubcontractorNameYesNoFormProvider()
+    val formProvider = new ProceedInsufficientSubcontractorNameYesNoFormProvider()
 
-    val form: Form[Boolean] =
-      formProvider()
+    val form: Form[Boolean] = formProvider()
 
-    val subcontractorName =
-      "Test Subcontractor"
+    val subcontractorName = "Test Subcontractor"
 
-    implicit val request: Request[_] =
-      FakeRequest()
+    val subcontractorId = 10L
 
-    implicit val messages: Messages =
-      MessagesImpl(
-        Lang.defaultLang,
-        app.injector.instanceOf[MessagesApi]
-      )
+    implicit val request: Request[_] = FakeRequest()
+
+    implicit val messages: Messages = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
 
     val view: ProceedInsufficientSubcontractorNameYesNoView =
       app.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]

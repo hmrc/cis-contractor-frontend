@@ -22,6 +22,8 @@ import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
+import models.TypeOfSubcontractor
+import models.info.company.CompanyAnswers
 
 class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
@@ -155,6 +157,113 @@ class CompanyContactMethodOptionsSummarySpec extends SpecBase with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       CompanyContactMethodOptionsSummary.row(answers) mustBe None
+    }
+  }
+
+  "CompanyContactMethodOptionsSummary.row(ViewOnlyCompanyAnswers)" - {
+
+    def viewOnlyAnswers(
+      companyContactMethod: Set[ContactMethodOptions]
+    ): CompanyAnswers =
+      CompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = companyContactMethod,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        crnYesNo = None,
+        crn = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a row with multiple selected options" in {
+
+      val answers =
+        viewOnlyAnswers(
+          Set(
+            ContactMethodOptions.Email,
+            ContactMethodOptions.Phone,
+            ContactMethodOptions.Mobile
+          )
+        )
+
+      val result =
+        CompanyContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("companyContactMethodOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with a single selected option" in {
+
+      val answers =
+        viewOnlyAnswers(Set(ContactMethodOptions.Email))
+
+      val result =
+        CompanyContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return None when no contact method is selected" in {
+
+      val answers =
+        viewOnlyAnswers(Set.empty)
+
+      CompanyContactMethodOptionsSummary.row(answers) mustBe None
+    }
+
+    "must HTML-escape special characters correctly" in {
+      val answers =
+        viewOnlyAnswers(Set(ContactMethodOptions.Email))
+
+      val result =
+        CompanyContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+
+      row.value.content.asHtml.toString must include("Email address")
     }
   }
 }
