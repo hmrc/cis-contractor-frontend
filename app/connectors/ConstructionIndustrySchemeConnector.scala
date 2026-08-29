@@ -20,6 +20,7 @@ import models.Scheme
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
+import models.finalvalidation.FinalValidationHandoffPayload
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json, OFormat}
@@ -27,6 +28,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -264,5 +266,13 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
   }
+
+  def getFinalValidationJourneyHandoff(
+    journeyType: String,
+    handoffId: String
+  )(using hc: HeaderCarrier): Future[Option[FinalValidationHandoffPayload]] =
+    http
+      .get(url"$cisBaseUrl/journey-handoffs/$journeyType/$handoffId")
+      .execute[Option[FinalValidationHandoffPayload]]
 
 }

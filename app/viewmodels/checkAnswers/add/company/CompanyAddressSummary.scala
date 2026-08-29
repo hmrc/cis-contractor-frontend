@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +32,7 @@ object CompanyAddressSummary {
         changeCall = if (mode == AmendMode) {
           controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
         } else {
-          controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change"))
+          controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode, Some("change"))
         },
         hiddenTextKey = "companyAddress.change.hidden",
         id = "address-of-company"

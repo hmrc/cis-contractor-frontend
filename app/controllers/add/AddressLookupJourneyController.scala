@@ -54,10 +54,10 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   protected def subcontractorName(userAnswers: UserAnswers): Option[String]
 
   /** Callback ALF returns to for the standard (non-change) flow. */
-  protected def standardCallback: Call
+  protected def standardCallback(mode: Mode): Call
 
   /** Callback ALF returns to when amending an existing answer. */
-  protected def changeCallback: Call
+  protected def changeCallback(mode: Mode): Call
 
   /** Where to go after the address is saved in the standard flow. */
   protected def onCompletion(mode: Mode): Call
@@ -78,7 +78,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val callback = if (changeRoute.isDefined) changeCallback else standardCallback
+      val callback = if (changeRoute.isDefined) changeCallback(mode) else standardCallback(mode)
       subcontractorName(request.userAnswers) match {
         case Some(name) =>
           addressLookupService

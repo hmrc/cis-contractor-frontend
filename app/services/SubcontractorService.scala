@@ -21,6 +21,8 @@ import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.GetSubcontractorResponse
+import models.finalvalidation.FinalValidationChangeTarget
+import models.add.SubcontractorName
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
@@ -31,6 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Try}
 
 @Singleton
 class SubcontractorService @Inject() (
@@ -182,4 +185,31 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] =
     cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
+
+  def populateFinalValidationUserAnswers(
+    userAnswers: UserAnswers,
+    instanceId: String,
+    response: GetSubcontractorResponse,
+    changeTarget: FinalValidationChangeTarget
+  ): Try[UserAnswers] =
+    // TODO: UserAnswers population logic to be enriched
+    response.subcontractor match {
+      case Some(subcontractor) =>
+        for {
+          withCisId <- userAnswers.set(CisIdQuery, instanceId)
+          withName  <- withCisId.set(
+                         SubcontractorNamePage,
+                         SubcontractorName(
+                           firstName = subcontractor.firstName.getOrElse(""),
+                           middleName = subcontractor.secondName,
+                           lastName = subcontractor.surname.getOrElse("")
+                         )
+                       )
+          result    <- withName.set(UniqueTaxpayerReferenceYesNoPage, true)
+        } yield result
+
+      case None =>
+        Failure(new RuntimeException("Subcontractor not found in response"))
+    }
+
 }

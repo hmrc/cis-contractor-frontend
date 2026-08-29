@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -31,7 +31,7 @@ object AddressOfSubcontractorSummary {
         changeCall = if (mode == AmendMode) {
           controllers.add.routes.AddressOfSubcontractorController.redirectToAmendAddressLookup()
         } else {
-          controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))
+          controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(NormalMode, Some("change"))
         },
         hiddenTextKey = "addressOfSubcontractor.change.hidden",
         id = "address-of-subcontractor"
