@@ -22,7 +22,6 @@ import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import pages.verify.*
-import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 import scala.util.Try
 
@@ -39,7 +38,6 @@ object SubcontractorCleanup {
       .flatMap(_.remove(IndividualPhoneNumberPage))
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
       .flatMap(_.remove(SubAddressYesNoPage))
-      .flatMap(_.remove(AmendIndividualSubcontractorNameRemovedQuery))
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
       .flatMap(_.remove(SubNationalInsuranceNumberPage))

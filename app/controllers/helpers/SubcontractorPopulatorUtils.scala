@@ -26,7 +26,7 @@ object SubcontractorPopulatorUtils {
   def toAddress(
     subcontractor: SubcontractorResponse
   ): Option[Address] =
-    subcontractor.addressLine1.map { line1 =>
+    subcontractor.addressLine1.filter(_.trim.nonEmpty).map { line1 =>
       Address(
         addressLine1 = line1,
         addressLine2 = subcontractor.addressLine2,
@@ -37,6 +37,11 @@ object SubcontractorPopulatorUtils {
       )
     }
 
+  def addressFieldsExist(
+                            subcontractor: SubcontractorResponse
+                          ): Boolean =
+      toAddress(subcontractor).isDefined
+  
   def contactMethods(
     subcontractor: SubcontractorResponse
   ): Set[ContactMethodOptions] =

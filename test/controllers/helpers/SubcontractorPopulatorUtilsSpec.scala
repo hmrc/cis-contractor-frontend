@@ -119,6 +119,37 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
     }
   }
 
+  "SubcontractorPopulatorUtils.addressFieldsExist" - {
+
+    "must return true when subcontractor has address" in {
+      SubcontractorPopulatorUtils.addressFieldsExist(subcontractor) mustBe true
+    }
+
+    "must return false when subcontractor do not has address" in {
+
+      val response =
+        subcontractor.copy(
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          postcode = None,
+          country = None
+        )
+
+      SubcontractorPopulatorUtils.addressFieldsExist(response) mustBe false
+    }
+    
+    "must return false when address line 1 is missing" in {
+      val response =
+        subcontractor.copy(
+          addressLine1 = None
+        )
+
+      SubcontractorPopulatorUtils.addressFieldsExist(response) mustBe false
+    }
+  }
+
   "SubcontractorPopulatorUtils.contactMethods" - {
 
     "must return all available contact methods" in {

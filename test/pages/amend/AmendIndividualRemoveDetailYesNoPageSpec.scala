@@ -22,7 +22,6 @@ import models.amend.AmendIndividualRemoveDetail
 import models.contact.ContactMethodOptions
 import pages.add.*
 import pages.behaviours.PageBehaviours
-import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
 
@@ -162,7 +161,6 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           .value
 
       updatedUserAnswers.get(SubcontractorNamePage) mustBe None
-      updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe Some(true)
     }
 
     "cleanup: must retain SubcontractorNamePage userAnswers and update " +
@@ -179,9 +177,6 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           .set(SubcontractorNamePage, subContractorName)
           .success
           .value
-          .set(AmendIndividualSubcontractorNameRemovedQuery, true)
-          .success
-          .value
 
         val updatedUserAnswers =
           userAnswers
@@ -193,7 +188,6 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
         updatedUserAnswers.get(IndividualNamesOptionsPage) mustBe Some(
           Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
         )
-        updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe None
       }
 
     Seq(
