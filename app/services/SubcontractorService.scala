@@ -572,15 +572,21 @@ class SubcontractorService @Inject() (
 
     existing.copy(
       firstName = updateNameField(
-        name.map(_.firstName), existing.firstName, individualNamesOptions,
+        name.map(_.firstName),
+        existing.firstName,
+        individualNamesOptions,
         IndividualNamesOptions.SubcontractorName
       ),
       secondName = updateNameField(
-        name.flatMap(_.middleName), existing.secondName, individualNamesOptions,
+        name.flatMap(_.middleName),
+        existing.secondName,
+        individualNamesOptions,
         IndividualNamesOptions.SubcontractorName
       ),
       surname = updateNameField(
-        name.map(_.lastName), existing.surname, individualNamesOptions,
+        name.map(_.lastName),
+        existing.surname,
+        individualNamesOptions,
         IndividualNamesOptions.SubcontractorName
       ),
       tradingName = updateNameField(
@@ -659,9 +665,9 @@ class SubcontractorService @Inject() (
     namesOptions match {
       case Some(selectedMethods) if selectedMethods.contains(namesOption) =>
         amended.orElse(existing.map(_ => ""))
-      case Some(_)                                                          =>
+      case Some(_)                                                        =>
         existing.map(_ => "")
-      case None                                                             =>
+      case None                                                           =>
         amended.orElse(existing)
     }
 

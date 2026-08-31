@@ -350,7 +350,7 @@ object AmendSubcontractorPopulator {
         verificationNumber = subcontractor.verificationNumber
       )
   }
-  
+
   private def setOptionalQuery[A: Writes](
     userAnswers: UserAnswers,
     query: Settable[A],

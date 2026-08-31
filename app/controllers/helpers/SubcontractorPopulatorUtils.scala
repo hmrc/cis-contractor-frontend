@@ -38,10 +38,10 @@ object SubcontractorPopulatorUtils {
     }
 
   def addressFieldsExist(
-                            subcontractor: SubcontractorResponse
-                          ): Boolean =
-      toAddress(subcontractor).isDefined
-  
+    subcontractor: SubcontractorResponse
+  ): Boolean =
+    toAddress(subcontractor).isDefined
+
   def contactMethods(
     subcontractor: SubcontractorResponse
   ): Set[ContactMethodOptions] =

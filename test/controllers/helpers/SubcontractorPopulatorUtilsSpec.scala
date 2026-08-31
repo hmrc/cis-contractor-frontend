@@ -139,7 +139,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
 
       SubcontractorPopulatorUtils.addressFieldsExist(response) mustBe false
     }
-    
+
     "must return false when address line 1 is missing" in {
       val response =
         subcontractor.copy(
