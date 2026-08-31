@@ -65,9 +65,9 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private def mockInitialSubmission(
-                                     mockService: VerificationService,
-                                     response: ChrisSubmissionResponse
-                                   ): Unit =
+    mockService: VerificationService,
+    response: ChrisSubmissionResponse
+  ): Unit =
     when(
       mockService.createSubmitAndPersistVerificationSubmission(
         any[DataRequest[AnyContent]],
@@ -76,9 +76,9 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     ).thenReturn(Future.successful(response))
 
   private def mockPollResponse(
-                                mockService: VerificationService,
-                                response: ChrisPollResponse
-                              ): Unit =
+    mockService: VerificationService,
+    response: ChrisPollResponse
+  ): Unit =
     when(
       mockService.pollStatusAndPersist(
         any[UserAnswers],
@@ -87,9 +87,9 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     ).thenReturn(Future.successful(response))
 
   private def pollResponse(
-                            status: SubmissionStatus,
-                            govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus] = None
-                          ): ChrisPollResponse =
+    status: SubmissionStatus,
+    govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus] = None
+  ): ChrisPollResponse =
     ChrisPollResponse(
       status = status,
       correlationId = "corr-id",
@@ -128,9 +128,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.SubmissionSendingController
-            .onPollAndRedirect
-            .url
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
 
         verify(mockService).createSubmitAndPersistVerificationSubmission(
           any[DataRequest[AnyContent]],

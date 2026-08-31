@@ -37,16 +37,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionSendingController @Inject() (
-                                              override val messagesApi: MessagesApi,
-                                              identify: IdentifierAction,
-                                              getData: DataRetrievalAction,
-                                              requireData: DataRequiredAction,
-                                              val controllerComponents: MessagesControllerComponents,
-                                              appConfig: FrontendAppConfig,
-                                              view: SubmissionSendingView,
-                                              verificationService: VerificationService
-                                            )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  appConfig: FrontendAppConfig,
+  view: SubmissionSendingView,
+  verificationService: VerificationService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -87,9 +87,7 @@ class SubmissionSendingController @Inject() (
 
           verificationService
             .pollStatusAndPersist(request.userAnswers, submissionDetails)
-            .map(response =>
-              redirectForPollSubmissionResponse(response, pollInterval)
-            )
+            .map(response => redirectForPollSubmissionResponse(response, pollInterval))
             .recover { case ex =>
               logger.error(
                 "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
@@ -101,18 +99,16 @@ class SubmissionSendingController @Inject() (
     }
 
   private def redirectForInitialSubmissionResponse(
-                                                    response: ChrisSubmissionResponse
-                                                  ): Result =
+    response: ChrisSubmissionResponse
+  ): Result =
     SubmissionStatus.fromString(response.status) match {
 
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
         Redirect(
-          controllers.verify.routes.SubmissionSendingController
-            .onPollAndRedirect
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
         )
 
-      case DEPARTMENTAL_ERROR
-        if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case DEPARTMENTAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -124,8 +120,7 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case FATAL_ERROR
-        if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case FATAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -142,9 +137,9 @@ class SubmissionSendingController @Inject() (
     }
 
   private def redirectForPollSubmissionResponse(
-                                                 response: ChrisPollResponse,
-                                                 pollInterval: Int
-                                               )(implicit request: DataRequest[_]): Result =
+    response: ChrisPollResponse,
+    pollInterval: Int
+  )(implicit request: DataRequest[_]): Result =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
         Ok(view())
@@ -193,8 +188,8 @@ class SubmissionSendingController @Inject() (
     }
 
   private def isSubmitAgainError(
-                                  govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
-                                ): Boolean =
+    govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
+  ): Boolean =
     govTalkErrorStatus.exists {
       case FatalError(errorCode, _) =>
         errorCode == SubmitAgainErrorCode
