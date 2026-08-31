@@ -52,5 +52,25 @@ class VerificationBatchStatusSpec extends SpecBase {
 
       VerificationBatchStatus.from("") mustEqual None
     }
+
+    "must return Submitted when value is SUBMITTED" in {
+
+      VerificationBatchStatus.from("SUBMITTED") mustEqual Some(Submitted)
+    }
+
+    "must return SubmittedNoReceipt when value is SUBMITTED_NO_RECEIPT" in {
+
+      VerificationBatchStatus.from("SUBMITTED_NO_RECEIPT") mustEqual Some(SubmittedNoReceipt)
+    }
+
+    "must return FatalError when value is FATAL_ERROR" in {
+
+      VerificationBatchStatus.from("FATAL_ERROR") mustEqual Some(FatalError)
+    }
+
+    "must return DepartmentalError when value is DEPARTMENTAL_ERROR" in {
+
+      VerificationBatchStatus.from("DEPARTMENTAL_ERROR") mustEqual Some(DepartmentalError)
+    }
   }
 }

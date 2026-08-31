@@ -39,25 +39,29 @@ class VerificationResultsViewSpec extends SpecBase {
           "Brody, Martin",
           "Verified",
           "Higher rate",
-          "V0004528765/A"
+          "V0004528765/A",
+          false
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
           "Verified",
           "Standard rate",
-          "V0004528765"
+          "V0004528765",
+          false
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
           "Verified",
           "Higher rate",
-          "V0004528765/B"
+          "V0004528765/B",
+          false
         ),
         VerificationResultsViewModel(
           "The Kintner Group",
           "Verified",
           "Higher rate",
-          "V0004528765/C"
+          "V0004528765/C",
+          false
         )
       )
       val manageSubcontractorsUrl     = "/manage-subcontractors/1"
@@ -100,25 +104,29 @@ class VerificationResultsViewSpec extends SpecBase {
           "Brody, Martin",
           "Unmatched",
           "Higher rate",
-          "V0004528765/A"
+          "V0004528765/A",
+          true
         ),
         VerificationResultsViewModel(
           "Hooper and Associates",
           "Verified",
           "Standard rate",
-          "V0004528765"
+          "V0004528765",
+          false
         ),
         VerificationResultsViewModel(
           "Quint Transportation",
           "Unmatched",
           "Higher rate",
-          "V0004528765/B"
+          "V0004528765/B",
+          true
         ),
         VerificationResultsViewModel(
           "The Kintner Group",
           "Verified",
           "Higher rate",
-          "V0004528765/C"
+          "V0004528765/C",
+          false
         )
       )
       val manageSubcontractorsUrl     = "/manage-subcontractors/1"
@@ -147,8 +155,10 @@ class VerificationResultsViewSpec extends SpecBase {
         )
       }
 
-      doc.select("button").text() mustBe
+      doc.select(".govuk-button").text() mustBe
         messages("verify.verificationResults.reviewUnmatchedSubcontractors.button")
+      doc.select(".govuk-button").attr("href") mustBe
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
     }
 
   }
