@@ -34,7 +34,7 @@ private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObj
 case class AddSubcontractorAuditEventModel(
   cisId: Option[String],
   typeOfSubcontractor: String,
-  subTradingNameYesNo: Option[Boolean],
+  individualNamesOptions: Option[Seq[String]],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -57,7 +57,7 @@ object AddSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
       (__ \ "typeOfSubcontractor").write[String] and
-      (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
+      (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and
@@ -208,7 +208,7 @@ object AddTrustSubcontractorAuditEventModel {
 }
 
 case class IndividualSubcontractorDetails(
-  subTradingNameYesNo: Option[Boolean],
+  individualNamesOptions: Option[Seq[String]],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -227,7 +227,7 @@ case class IndividualSubcontractorDetails(
 
 object IndividualSubcontractorDetails {
   implicit val writes: OWrites[IndividualSubcontractorDetails] = (
-    (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
+    (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and

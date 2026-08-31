@@ -19,6 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import models.TypeOfSubcontractor
 import models.UserAnswers
+import models.add.IndividualNamesOptions
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
@@ -64,7 +65,9 @@ class AuditService @Inject() (
     AddSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
+      individualNamesOptions = ua
+        .get(IndividualNamesOptionsPage)
+        .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
       tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
       subAddressYesNo = ua.get(SubAddressYesNoPage),
       addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -159,7 +162,9 @@ class AuditService @Inject() (
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalIndividualAnswersQuery).map(toIndividualDetails),
       updatedDetails = IndividualSubcontractorDetails(
-        subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
+        individualNamesOptions = ua
+          .get(IndividualNamesOptionsPage)
+          .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
         tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
         subAddressYesNo = ua.get(SubAddressYesNoPage),
         addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -181,7 +186,10 @@ class AuditService @Inject() (
 
   private def toIndividualDetails(original: OriginalIndividualAnswers): IndividualSubcontractorDetails =
     IndividualSubcontractorDetails(
-      subTradingNameYesNo = original.usesTradingName,
+      individualNamesOptions =
+        if (original.individualNamesOptions.nonEmpty)
+          Some(IndividualNamesOptions.ordered(original.individualNamesOptions).map(_.toString))
+        else None,
       tradingNameOfSubcontractor = original.tradingName,
       subAddressYesNo = original.addressYesNo,
       addressOfSubcontractor = original.address,

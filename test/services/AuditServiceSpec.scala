@@ -18,6 +18,7 @@ package services
 
 import base.SpecBase
 import models.TypeOfSubcontractor
+import models.add.IndividualNamesOptions
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -66,7 +67,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
       (detail \ "cisId").toOption mustBe None
-      (detail \ "subTradingNameYesNo").toOption mustBe None
+      (detail \ "individualNamesOptions").toOption mustBe None
     }
 
     "must include all fields in the audit event when full individual answers are provided" in {
@@ -83,7 +84,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
         .value
-        .set(SubTradingNameYesNoPage, true)
+        .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
         .success
         .value
         .set(TradingNameOfSubcontractorPage, "TradingName")
@@ -136,7 +137,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
-      (detail \ "subTradingNameYesNo").as[Boolean] mustBe true
+      (detail \ "individualNamesOptions").as[Seq[String]] mustBe Seq("tradingName")
       (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
       (detail \ "subAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"

@@ -37,7 +37,7 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
-        subTradingNameYesNo = None,
+        individualNamesOptions = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -60,7 +60,7 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = Some("1"),
         typeOfSubcontractor = "soletrader",
-        subTradingNameYesNo = Some(true),
+        individualNamesOptions = Some(Seq("tradingName")),
         tradingNameOfSubcontractor = Some("TradingName"),
         subAddressYesNo = Some(true),
         addressOfSubcontractor = Some(address),
@@ -79,7 +79,7 @@ class AuditEventModelSpec extends SpecBase {
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                 -> "1",
         "typeOfSubcontractor"                   -> "soletrader",
-        "subTradingNameYesNo"                   -> true,
+        "individualNamesOptions"                -> Json.arr("tradingName"),
         "tradingNameOfSubcontractor"            -> "TradingName",
         "subAddressYesNo"                       -> true,
         "addressOfSubcontractor"                -> Json.toJson(address),
@@ -101,7 +101,7 @@ class AuditEventModelSpec extends SpecBase {
       AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
-        subTradingNameYesNo = None,
+        individualNamesOptions = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -264,7 +264,7 @@ class AuditEventModelSpec extends SpecBase {
   }
 
   private val baseIndividualDetails = IndividualSubcontractorDetails(
-    subTradingNameYesNo = Some(false),
+    individualNamesOptions = Some(Seq("subcontractorName")),
     tradingNameOfSubcontractor = None,
     subAddressYesNo = Some(true),
     addressOfSubcontractor = Some(address),
