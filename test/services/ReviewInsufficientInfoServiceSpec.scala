@@ -17,6 +17,10 @@
 package services
 
 import base.SpecBase
+import connectors.ConstructionIndustrySchemeConnector
+import models.amend.AmendJourneyType
+import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.requests.ProceedInsufficientVerificationRequest
 import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import org.scalatest.BeforeAndAfterEach
@@ -51,7 +55,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = Some(100L),
       firstName = firstName,
       secondName = None,
       surname = surname,
@@ -250,7 +254,13 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           .head
 
       row.nameLink.url mustBe "#"
-      row.editLink.url mustBe "#"
+      row.editLink.url mustBe
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            100L,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
       row.proceedLink.url mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
         .onPageLoad(1L)
         .url

@@ -18,6 +18,9 @@ package services
 
 import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
+import connectors.ConstructionIndustrySchemeConnector
+import models.amend.AmendJourneyType
+import models.requests.ProceedInsufficientVerificationRequest
 import models.verify.VerificationBatchReadiness
 import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
 import play.api.Logging
@@ -69,7 +72,15 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
       utr = utrDisplay(sub),
-      editLink = LinkViewModel(dummyUrl, name),
+      editLink = LinkViewModel(
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.getOrElse(0L),
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url,
+        name
+      ),
       proceedLink = LinkViewModel(
         controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
           .onPageLoad(sub.subcontractorId)

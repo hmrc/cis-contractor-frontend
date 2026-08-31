@@ -28,7 +28,7 @@ import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -39,6 +39,7 @@ import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.AmendmentHelper
 import config.FrontendAppConfig
+import models.amend.AmendJourneyType
 
 import scala.concurrent.Future
 
@@ -142,6 +143,12 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
           nominatedPartnerWorksReference = Some("WRN-1"),
           verificationNumber = None
         )
+      )
+      .success
+      .value
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.Standard
       )
       .success
       .value
@@ -385,7 +392,8 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       val mockAuditService         = mock[AuditService]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -418,7 +426,8 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -532,7 +541,8 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
         .thenReturn(Future.successful(true))
 
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -567,7 +577,8 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -605,6 +616,49 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       }
 
       verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing on submit" in {
+
+      val ua =
+        minUa
+          .remove(AmendJourneyTypePage)
+          .success
+          .value
+
+      val mockSubcontractorService =
+        mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService]
+              .toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
       verifyNoInteractions(mockSubcontractorService)
     }
 
