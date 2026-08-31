@@ -20,11 +20,12 @@ import base.SpecBase
 import models.UserAnswers
 import models.requests.DataRequest
 import models.response.*
+import models.verify.GovTalkErrorStatus.FatalError
 import models.verify.{SubmissionStatus, VerificationSubmissionDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.*
+import pages.verify.VerificationSubmissionDetailsPage
 import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -57,22 +58,101 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       timedOut = false
     )
 
+  private def userAnswersWithSubmissionDetails: UserAnswers =
+    emptyUserAnswers
+      .set(VerificationSubmissionDetailsPage, submissionDetails)
+      .success
+      .value
+
+  private def mockInitialSubmission(
+                                     mockService: VerificationService,
+                                     response: ChrisSubmissionResponse
+                                   ): Unit =
+    when(
+      mockService.createSubmitAndPersistVerificationSubmission(
+        any[DataRequest[AnyContent]],
+        any[HeaderCarrier]
+      )
+    ).thenReturn(Future.successful(response))
+
+  private def mockPollResponse(
+                                mockService: VerificationService,
+                                response: ChrisPollResponse
+                              ): Unit =
+    when(
+      mockService.pollStatusAndPersist(
+        any[UserAnswers],
+        any[VerificationSubmissionDetails]
+      )(any[HeaderCarrier])
+    ).thenReturn(Future.successful(response))
+
+  private def pollResponse(
+                            status: SubmissionStatus,
+                            govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus] = None
+                          ): ChrisPollResponse =
+    ChrisPollResponse(
+      status = status,
+      correlationId = "corr-id",
+      pollUrl = None,
+      pollInterval = None,
+      error = None,
+      irMarkReceived = None,
+      lastMessageDate = None,
+      acceptedTime = None,
+      govTalkErrorStatus = govTalkErrorStatus
+    )
+
   "SubmissionSendingController.onPageLoad" - {
 
     "must redirect to poll page when initial submission returns ACCEPTED" in {
       val mockService = mock[VerificationService]
 
-      when(
-        mockService.createSubmitAndPersistVerificationSubmission(
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "ACCEPTED",
+          hmrcMarkGenerated = "hmrc-mark"
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionSendingController
+            .onPollAndRedirect
+            .url
+
+        verify(mockService).createSubmitAndPersistVerificationSubmission(
           any[DataRequest[AnyContent]],
           any[HeaderCarrier]
         )
-      ).thenReturn(
-        Future.successful(
-          ChrisSubmissionResponse(
-            submissionId = "13602",
-            status = "ACCEPTED",
-            hmrcMarkGenerated = "hmrc-mark"
+      }
+    }
+
+    "must redirect to Submission Unsuccessful when initial submission returns FATAL_ERROR with error code 3000" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "FATAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "3000",
+              errorText = "Fatal error"
+            )
           )
         )
       )
@@ -83,16 +163,82 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
 
-        verify(mockService).createSubmitAndPersistVerificationSubmission(
-          any[DataRequest[AnyContent]],
-          any[HeaderCarrier]
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionUnsuccessfulController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Verification Not Submitted Warning when initial submission returns FATAL_ERROR with another error code" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "FATAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "9999",
+              errorText = "Fatal error"
+            )
+          )
         )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationNotSubmittedWarningController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Verification Not Submitted Warning when initial submission returns FATAL_ERROR without GovTalk error details" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "FATAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = None
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationNotSubmittedWarningController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -112,11 +258,15 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
 
         status(result) mustBe SEE_OTHER
+
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
   }
@@ -126,39 +276,21 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     "must render polling page with Refresh header when poll returns ACCEPTED" in {
       val mockService = mock[VerificationService]
 
-      val ua =
-        emptyUserAnswers
-          .set(VerificationSubmissionDetailsPage, submissionDetails)
-          .success
-          .value
-
-      when(
-        mockService.pollStatusAndPersist(
-          any[UserAnswers],
-          any[VerificationSubmissionDetails]
-        )(any[HeaderCarrier])
-      ).thenReturn(
-        Future.successful(
-          ChrisPollResponse(
-            status = SubmissionStatus.ACCEPTED,
-            correlationId = "corr-id",
-            pollUrl = None,
-            pollInterval = None,
-            error = None,
-            irMarkReceived = None,
-            lastMessageDate = None,
-            acceptedTime = None
-          )
-        )
+      mockPollResponse(
+        mockService,
+        pollResponse(SubmissionStatus.ACCEPTED)
       )
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPollRoute)).value
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe OK
         headers(result).get("Refresh").value mustBe "5"
@@ -168,43 +300,131 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to submitted page when poll returns SUBMITTED" in {
       val mockService = mock[VerificationService]
 
-      val ua =
-        emptyUserAnswers
-          .set(VerificationSubmissionDetailsPage, submissionDetails)
-          .success
-          .value
+      mockPollResponse(
+        mockService,
+        pollResponse(SubmissionStatus.SUBMITTED)
+      )
 
-      when(
-        mockService.pollStatusAndPersist(
-          any[UserAnswers],
-          any[VerificationSubmissionDetails]
-        )(any[HeaderCarrier])
-      ).thenReturn(
-        Future.successful(
-          ChrisPollResponse(
-            status = SubmissionStatus.SUBMITTED,
-            correlationId = "corr-id",
-            pollUrl = None,
-            pollInterval = None,
-            error = None,
-            irMarkReceived = None,
-            lastMessageDate = None,
-            acceptedTime = None
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Submission Unsuccessful when poll returns FATAL_ERROR with error code 3000" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.FATAL_ERROR,
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "3000",
+              errorText = "Fatal error"
+            )
           )
         )
       )
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPollRoute)).value
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe SEE_OTHER
+
         redirectLocation(result).value mustBe
-          controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad().url
+          controllers.verify.routes.SubmissionUnsuccessfulController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Verification Not Submitted Warning when poll returns FATAL_ERROR with another error code" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.FATAL_ERROR,
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "9999",
+              errorText = "Fatal error"
+            )
+          )
+        )
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationNotSubmittedWarningController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Verification Not Submitted Warning when poll returns FATAL_ERROR without GovTalk error details" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.FATAL_ERROR,
+          govTalkErrorStatus = None
+        )
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationNotSubmittedWarningController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -217,16 +437,50 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val result = route(application, FakeRequest(GET, onPollRoute)).value
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe SEE_OTHER
+
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
 
         verify(mockService, never()).pollStatusAndPersist(
           any[UserAnswers],
           any[VerificationSubmissionDetails]
         )(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to recovery when polling service fails" in {
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubmissionDetails)
+        )
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
   }
