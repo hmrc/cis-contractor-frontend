@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.UtrFormProvider
-import models.{AmendMode, Mode}
+import models.{AmendMode, FinalValidationMode, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.{SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
@@ -95,7 +95,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                 val prevValue = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
 
                 mode match {
-                  case AmendMode if prevValue.contains(value) =>
+                  case AmendMode | FinalValidationMode if prevValue.contains(value) =>
                     saveAndContinue(mode, value)
 
                   case _ =>

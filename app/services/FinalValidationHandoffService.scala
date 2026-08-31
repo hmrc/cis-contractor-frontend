@@ -31,51 +31,43 @@ import scala.concurrent.{ExecutionContext, Future}
 class FinalValidationHandoffService @Inject() (
   connector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository,
-  subcontractorService: SubcontractorService
+  subcontractorService: SubcontractorService,
+  finalValidationSubcontractorService: FinalValidationSubcontractorService
 )(using ec: ExecutionContext)
     extends Logging {
+
+  def getPayload(handoffId: String)(implicit hc: HeaderCarrier): Future[Option[FinalValidationHandoffPayload]] =
+    connector.getFinalValidationJourneyHandoff(JourneyHandoffTypes.FinalValidation, handoffId)
 
   def prepareMonthlyReturnJourney(
     userAnswers: UserAnswers,
     handoffId: String
   )(implicit hc: HeaderCarrier): Future[Option[(UserAnswers, FinalValidationHandoffPayload)]] =
-    connector
-      .getFinalValidationJourneyHandoff(
-        JourneyHandoffTypes.FinalValidation,
-        handoffId
-      )
-      .flatMap {
+    getPayload(handoffId).flatMap {
 
-        case None =>
-          Future.successful(None)
+      case None =>
+        Future.successful(None)
 
-        case Some(payload) =>
-          logger.info(
-            s"[FinalValidationHandoffService] " +
-              s"handoff payload: " +
-              s"subcontractorId=${payload.subcontractorId}, " +
-              s"subbieResourceRef=${payload.subbieResourceRef}, " +
-              s"field=${payload.field.key}"
-          )
-          for {
-            subcontractor    <- subcontractorService.getSubcontractor(payload.instanceId, payload.subbieResourceRef)
-            populatedAnswers <- Future.fromTry(
-                                  subcontractorService.populateFinalValidationUserAnswers(
-                                    userAnswers = userAnswers,
-                                    instanceId = payload.instanceId,
-                                    response = subcontractor,
-                                    changeTarget = payload.changeTarget
-                                  )
+      case Some(payload) =>
+        for {
+          subcontractor    <- subcontractorService.getSubcontractor(payload.instanceId, payload.subbieResourceRef)
+          populatedAnswers <- Future.fromTry(
+                                finalValidationSubcontractorService.populateFinalValidationUserAnswers(
+                                  userAnswers = userAnswers,
+                                  instanceId = payload.instanceId,
+                                  response = subcontractor,
+                                  changeTarget = payload.changeTarget
                                 )
-            withContext      <-
-              Future.fromTry(populatedAnswers.set(FinalValidationContextPage, FinalValidationContext.MonthlyReturn))
-            updatedAnswers   <- Future.fromTry(withContext.set(FinalValidationHandoffPage, handoffId))
-            stored           <- sessionRepository.set(updatedAnswers)
-            _                <- if (stored) {
-                                  Future.unit
-                                } else {
-                                  Future.failed(new RuntimeException(s"Failed to store updated UserAnswers for handoffId: $handoffId"))
-                                }
-          } yield Some((updatedAnswers, payload))
-      }
+                              )
+          withContext      <-
+            Future.fromTry(populatedAnswers.set(FinalValidationContextPage, FinalValidationContext.MonthlyReturn))
+          updatedAnswers   <- Future.fromTry(withContext.set(FinalValidationHandoffPage, handoffId))
+          stored           <- sessionRepository.set(updatedAnswers)
+          _                <- if (stored) {
+                                Future.unit
+                              } else {
+                                Future.failed(new RuntimeException(s"Failed to store updated UserAnswers for handoffId: $handoffId"))
+                              }
+        } yield Some((updatedAnswers, payload))
+    }
 }

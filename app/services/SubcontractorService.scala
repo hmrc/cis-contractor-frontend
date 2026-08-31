@@ -17,17 +17,18 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.address.Address
+import models.add.SubcontractorName as AddSubcontractorName
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
-import models.finalvalidation.FinalValidationChangeTarget
-import models.add.SubcontractorName
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
+import pages.QuestionPage
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
@@ -35,7 +36,6 @@ import queries.{AmendIndividualSubcontractorNameRemovedQuery, AmendSubbieResourc
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Try}
 
 @Singleton
 class SubcontractorService @Inject() (
@@ -187,33 +187,6 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorResponse] =
     cisConnector.getSubcontractor(cisId = cisId, subbieResourceRef = subbieResourceRef)
-
-  def populateFinalValidationUserAnswers(
-    userAnswers: UserAnswers,
-    instanceId: String,
-    response: GetSubcontractorResponse,
-    changeTarget: FinalValidationChangeTarget
-  ): Try[UserAnswers] =
-    // TODO: UserAnswers population logic to be enriched
-    response.subcontractor match {
-      case Some(subcontractor) =>
-        for {
-          withCisId <- userAnswers.set(CisIdQuery, instanceId)
-          withName  <- withCisId.set(
-                         SubcontractorNamePage,
-                         SubcontractorName(
-                           firstName = subcontractor.firstName.getOrElse(""),
-                           middleName = subcontractor.secondName,
-                           lastName = subcontractor.surname.getOrElse("")
-                         )
-                       )
-          result    <- withName.set(UniqueTaxpayerReferenceYesNoPage, true)
-        } yield result
-
-      case None =>
-        Failure(new RuntimeException("Subcontractor not found in response"))
-    }
-
 
   def updateSubcontractor(
     userAnswers: UserAnswers,

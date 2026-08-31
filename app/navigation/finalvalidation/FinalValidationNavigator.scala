@@ -24,9 +24,8 @@ import models.{FinalValidationMode, Mode, UserAnswers}
 import models.finalvalidation.FinalValidationChangeTarget
 import models.finalvalidation.FinalValidationChangeTarget.*
 import models.TypeOfSubcontractor.*
-import models.finalvalidation.FinalValidationChangeTarget.{MobilePhoneNumber, NinoYesNo}
 import navigation.NavigatorForJourney
-import pages.add.{TypeOfSubcontractorPage, UniqueTaxpayerReferenceYesNoPage}
+import pages.add.TypeOfSubcontractorPage
 import pages.Page
 import play.api.mvc.Call
 

@@ -20,7 +20,7 @@ import models.Scheme
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
-import models.finalvalidation.FinalValidationHandoffPayload
+import models.finalvalidation.{FinalValidationHandoffPayload, FinalValidationUpdateSubcontractorRequest}
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json, OFormat}
@@ -295,6 +295,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             )
         }
       }
+    
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
@@ -321,6 +322,25 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
           case other =>
             Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other: ${response.body}"))
+        }
+      }
+  }
+
+  def updateSubcontractorForFinalValidation(
+    request: FinalValidationUpdateSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    http
+      .post(url"$cisBaseUrl/subcontractor/final-validation/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            Future.successful(())
+
+          case other =>
+            Future.failed(new RuntimeException(s"Update subcontractor for final validation failed, returned $other: ${response.body}"))
         }
       }
   }

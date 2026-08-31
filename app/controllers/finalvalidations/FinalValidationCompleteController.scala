@@ -17,12 +17,12 @@
 package controllers.finalvalidations
 
 import config.FrontendAppConfig
-import models.finalvalidation.FinalValidationContext.{MonthlyReturn, VerifySubcontractors}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import services.SubcontractorService
+import services.{FinalValidationHandoffService, FinalValidationSubcontractorService}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.finalvalidation.{FinalValidationContextPage, FinalValidationHandoffPage}
+import models.finalvalidation.FinalValidationUpdateRequestBuilder
+import pages.finalvalidation.FinalValidationHandoffPage
 import play.api.Logging
 
 import javax.inject.{Inject, Singleton}
@@ -33,7 +33,9 @@ class FinalValidationCompleteController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  subcontractorService: SubcontractorService,
+  finalValidationHandoffService: FinalValidationHandoffService,
+  finalValidationSubcontractorService: FinalValidationSubcontractorService,
+  updateRequestBuilder: FinalValidationUpdateRequestBuilder,
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(using ec: ExecutionContext)
@@ -41,26 +43,33 @@ class FinalValidationCompleteController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    (request.userAnswers.get(FinalValidationContextPage), request.userAnswers.get(FinalValidationHandoffPage)) match {
+    request.userAnswers.get(FinalValidationHandoffPage) match {
 
-      case (Some(MonthlyReturn), Some(handoffId)) =>
-//        subcontractorService.createAndUpdateSubcontractor(request.userAnswers) // TODO: need to create a new method dedicated to update Subcontractor
-//          .map { _ =>
-//          Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
-//          }
-//        .recover { case NonFatal(ex) =>
-//          logger.error(s"[FinalValidationCompleteController] Error creating subcontractor", ex)
-//          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-//        }
-        Future.successful(Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId)))
+      case Some(handoffId) =>
+        finalValidationHandoffService.getPayload(handoffId).flatMap {
+          case Some(payload) =>
+            Future.fromTry(updateRequestBuilder.build(request.userAnswers, payload))
+              .flatMap{
+                case Some(updateRequest) =>
+                  finalValidationSubcontractorService.updateSubcontractorForFinalValidation(updateRequest)
+                case None =>
+                  Future.unit
+              }
+            .map { _ =>
+              Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
+            }
+          
+          case None =>
+            Future.successful(
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            )
+        }
 
-      case (Some(VerifySubcontractors), _) => // TODO: to be updated for verify subcontractor journey
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
-      case _ =>
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case None =>  
+        Future.successful(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
     }
-
   }
 
 }
