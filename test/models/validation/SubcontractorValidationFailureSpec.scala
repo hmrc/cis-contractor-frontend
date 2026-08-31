@@ -149,4 +149,100 @@ class SubcontractorValidationFailureSpec extends AnyWordSpec with Matchers {
         .isError mustBe true
     }
   }
+
+  "SubcontractorValidationFailure.merge" must {
+
+    "combine failed fields for the same subcontractor" in {
+      SubcontractorValidationFailure.merge(
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 101L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid@email")
+              )
+            )
+          )
+        ),
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 101L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = AddressLine1,
+                value = None
+              )
+            )
+          )
+        )
+      ) mustBe
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 101L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid@email")
+              ),
+              FieldValidationFailure(
+                field = AddressLine1,
+                value = None
+              )
+            )
+          )
+        )
+    }
+
+    "keep separate subcontractors as separate entries" in {
+      SubcontractorValidationFailure.merge(
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 101L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid@email")
+              )
+            )
+          )
+        ),
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 102L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = AddressLine1,
+                value = None
+              )
+            )
+          )
+        )
+      ) mustBe
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 101L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid@email")
+              )
+            )
+          ),
+          SubcontractorValidationFailure(
+            subcontractorId = 102L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = AddressLine1,
+                value = None
+              )
+            )
+          )
+        )
+    }
+
+    "return an empty list when there are no failures" in {
+      SubcontractorValidationFailure.merge(Nil, Nil) mustBe Nil
+    }
+  }
 }

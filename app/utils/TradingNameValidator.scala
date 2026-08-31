@@ -21,13 +21,14 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 object TradingNameValidator {
 
   def validate(
-    value: Option[String]
+    value: Option[String],
+    field: SubcontractorValidationField = SubcontractorValidationField.TradingName
   ): Option[FieldValidationFailure] =
     value match {
       case None =>
         Some(
           FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
+            field = field,
             value = None
           )
         )
@@ -35,7 +36,7 @@ object TradingNameValidator {
           if tradingName.isBlank || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
         Some(
           FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
+            field = field,
             value = Some(tradingName)
           )
         )
