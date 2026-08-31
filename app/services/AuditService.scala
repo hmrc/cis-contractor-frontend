@@ -64,6 +64,9 @@ class AuditService @Inject() (
     AddSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
+      firstName = ua.get(SubcontractorNamePage).map(_.firstName),
+      middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
+      surname = ua.get(SubcontractorNamePage).map(_.lastName),
       subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
       tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
       subAddressYesNo = ua.get(SubAddressYesNoPage),
@@ -159,6 +162,9 @@ class AuditService @Inject() (
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalIndividualAnswersQuery).map(toIndividualDetails),
       updatedDetails = IndividualSubcontractorDetails(
+        firstName = ua.get(SubcontractorNamePage).map(_.firstName),
+        middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
+        surname = ua.get(SubcontractorNamePage).map(_.lastName),
         subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
         tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
         subAddressYesNo = ua.get(SubAddressYesNoPage),
@@ -181,6 +187,9 @@ class AuditService @Inject() (
 
   private def toIndividualDetails(original: OriginalIndividualAnswers): IndividualSubcontractorDetails =
     IndividualSubcontractorDetails(
+      firstName = original.subcontractorName.map(_.firstName),
+      middleName = original.subcontractorName.flatMap(_.middleName),
+      surname = original.subcontractorName.map(_.lastName),
       subTradingNameYesNo = original.usesTradingName,
       tradingNameOfSubcontractor = original.tradingName,
       subAddressYesNo = original.addressYesNo,

@@ -18,6 +18,7 @@ package services
 
 import base.SpecBase
 import models.TypeOfSubcontractor
+import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -131,11 +132,17 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(WorksReferenceNumberPage, "WORKREF-001")
         .success
         .value
+        .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
+      (detail \ "firstName").as[String] mustBe "John"
+      (detail \ "middleName").as[String] mustBe "Paul"
+      (detail \ "surname").as[String] mustBe "Smith"
       (detail \ "subTradingNameYesNo").as[Boolean] mustBe true
       (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
       (detail \ "subAddressYesNo").as[Boolean] mustBe true
