@@ -37,12 +37,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 import org.mockito.ArgumentCaptor
-import pages.amend.AmendCheckYourAnswersSubmittedPage
 import queries.CisIdQuery
 import utils.AmendmentHelper
 import config.FrontendAppConfig
+import models.amend.AmendJourneyType
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -114,6 +114,12 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           worksReference = Some("WRN-1"),
           verificationNumber = None
         )
+      )
+      .success
+      .value
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.Standard
       )
       .success
       .value
@@ -317,14 +323,15 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect back to amend CYA after successful submit" in {
+    "must redirect to AmendTrustConfirmationController after successful submit" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
       val mockAuditService         = mock[AuditService]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -355,7 +362,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -466,7 +474,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         .thenReturn(Future.successful(true))
 
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -498,7 +507,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])

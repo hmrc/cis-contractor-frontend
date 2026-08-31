@@ -18,6 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
+import models.amend.AmendJourneyType
 import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.requests.ProceedInsufficientVerificationRequest
 import models.response.GetCurrentVerificationBatchResponse
@@ -62,7 +63,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = Some(100L),
       firstName = firstName,
       secondName = None,
       surname = surname,
@@ -241,17 +242,27 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       vm.missing.head.name mustBe messages("verify.noName")
     }
 
-    "must use placeholder '#' urls for the name and action links (not yet wired)" in {
+    "must build amend and proceed links while using placeholder links for remaining actions" in {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
       val row = build(sub).missing.head
 
       row.nameLink.url mustBe "#"
-      row.editLink.url mustBe "#"
-      row.proceedLink.url mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-        .onPageLoad(1L)
-        .url
+
+      row.editLink.url mustBe
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            100L,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
+
+      row.proceedLink.url mustBe
+        controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+          .onPageLoad(1L)
+          .url
+
       row.removeLink.url mustBe "#"
     }
 

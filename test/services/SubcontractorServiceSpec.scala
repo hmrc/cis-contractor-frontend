@@ -22,6 +22,7 @@ import models.{TypeOfSubcontractor, UserAnswers}
 import models.add.SubcontractorName
 import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
+import models.amend.AmendJourneyType
 import pages.add.company.*
 import models.requests.CreateAndUpdateSubcontractorPayload
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
@@ -1295,63 +1296,65 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
     }
+    val updateCisId = "200"
+
+    val originalSubcontractor =
+      SubcontractorResponse(
+        subcontractorId = 123L,
+        utr = Some("1111111111"),
+        pageVisited = Some(1),
+        partnerUtr = Some("2222222222"),
+        crn = Some("OLD-CRN"),
+        firstName = Some("Original"),
+        nino = Some("AA123456A"),
+        secondName = Some("Middle"),
+        surname = Some("Name"),
+        partnershipTradingName = Some("Original Partnership"),
+        tradingName = Some("Original Trading Name"),
+        subcontractorType = Some("company"),
+        addressLine1 = Some("Old address 1"),
+        addressLine2 = Some("Old address 2"),
+        addressLine3 = Some("Old city"),
+        addressLine4 = Some("Old county"),
+        country = Some("United Kingdom"),
+        postcode = Some("OLD 1AA"),
+        emailAddress = Some("old@example.com"),
+        phoneNumber = Some("02070000000"),
+        mobilePhoneNumber = Some("07000000000"),
+        worksReferenceNumber = Some("OLD-WRN"),
+        createDate = None,
+        lastUpdate = None,
+        subbieResourceRef = Some(1001L),
+        matched = Some("Y"),
+        autoVerified = Some("N"),
+        verified = Some("Y"),
+        verificationNumber = Some("V123456"),
+        taxTreatment = Some("Gross"),
+        verificationDate = None,
+        version = Some(4),
+        updatedTaxTreatment = Some("Gross"),
+        lastMonthlyReturnDate = None,
+        pendingVerifications = Some(0)
+      )
+
+    def baseUpdateAnswers(
+      subcontractorType: TypeOfSubcontractor
+    ): UserAnswers =
+      emptyUserAnswers
+        .set(CisIdQuery, updateCisId)
+        .success
+        .value
+        .set(TypeOfSubcontractorPage, subcontractorType)
+        .success
+        .value
+        .set(OriginalSubcontractorQuery, originalSubcontractor)
+        .success
+        .value
+        .set(AmendSubbieResourceRefQuery, 1001L)
+        .success
+        .value
 
     "updateSubcontractor" - {
-
-      val updateCisId = "200"
-
-      val originalSubcontractor =
-        SubcontractorResponse(
-          subcontractorId = 123L,
-          utr = Some("1111111111"),
-          pageVisited = Some(1),
-          partnerUtr = Some("2222222222"),
-          crn = Some("OLD-CRN"),
-          firstName = Some("Original"),
-          nino = Some("AA123456A"),
-          secondName = Some("Middle"),
-          surname = Some("Name"),
-          partnershipTradingName = Some("Original Partnership"),
-          tradingName = Some("Original Trading Name"),
-          subcontractorType = Some("company"),
-          addressLine1 = Some("Old address 1"),
-          addressLine2 = Some("Old address 2"),
-          addressLine3 = Some("Old city"),
-          addressLine4 = Some("Old county"),
-          country = Some("United Kingdom"),
-          postcode = Some("OLD 1AA"),
-          emailAddress = Some("old@example.com"),
-          phoneNumber = Some("02070000000"),
-          mobilePhoneNumber = Some("07000000000"),
-          worksReferenceNumber = Some("OLD-WRN"),
-          createDate = None,
-          lastUpdate = None,
-          subbieResourceRef = Some(1001L),
-          matched = Some("Y"),
-          autoVerified = Some("N"),
-          verified = Some("Y"),
-          verificationNumber = Some("V123456"),
-          taxTreatment = Some("Gross"),
-          verificationDate = None,
-          version = Some(4),
-          updatedTaxTreatment = Some("Gross"),
-          lastMonthlyReturnDate = None,
-          pendingVerifications = Some(0)
-        )
-
-      def baseUpdateAnswers(
-        subcontractorType: TypeOfSubcontractor
-      ): UserAnswers =
-        emptyUserAnswers
-          .set(CisIdQuery, updateCisId)
-          .success
-          .value
-          .set(TypeOfSubcontractorPage, subcontractorType)
-          .success
-          .value
-          .set(OriginalSubcontractorQuery, originalSubcontractor)
-          .success
-          .value
 
       "should update a company using amended values while preserving original metadata" in {
 
@@ -2493,6 +2496,335 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         verify(mockConnector)
           .updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+    }
+
+    "updateSubcontractorForEdit" - {
+
+      "should build the amended subcontractor and call the edit connector" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val address =
+          Address(
+            addressLine1 = "New company address 1",
+            addressLine2 = Some("New company address 2"),
+            addressLine3 = Some("London"),
+            addressLine4 = Some("Greater London"),
+            postcode = Some("E1 1AA"),
+            country = Some(
+              Country(
+                code = Some("GB"),
+                name = Some("United Kingdom")
+              )
+            )
+          )
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company Ltd")
+            .success
+            .value
+            .set(CompanyUtrPage, "9999999999")
+            .success
+            .value
+            .set(CompanyCrnPage, "NEW-CRN")
+            .success
+            .value
+            .set(CompanyAddressPage, address)
+            .success
+            .value
+            .set(CompanyEmailAddressPage, "new@example.com")
+            .success
+            .value
+            .set(CompanyPhoneNumberPage, "02071234567")
+            .success
+            .value
+            .set(CompanyMobileNumberPage, "07123456789")
+            .success
+            .value
+            .set(CompanyWorksReferencePage, "NEW-WRN")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(Future.successful(()))
+
+        service
+          .updateSubcontractorForEdit(userAnswers)
+          .futureValue mustBe (())
+
+        val captor =
+          ArgumentCaptor.forClass(
+            classOf[UpdateSubcontractorRequest]
+          )
+
+        verify(mockConnector)
+          .updateSubcontractorForEdit(
+            captor.capture()
+          )(any[HeaderCarrier])
+
+        val sent =
+          captor.getValue
+
+        sent.cisId mustBe updateCisId
+
+        sent.subcontractor.subcontractorId mustBe 123L
+        sent.subcontractor.subbieResourceRef mustBe Some(1001L)
+        sent.subcontractor.subcontractorType mustBe Some("company")
+
+        sent.subcontractor.utr mustBe Some("9999999999")
+        sent.subcontractor.crn mustBe Some("NEW-CRN")
+        sent.subcontractor.tradingName mustBe Some("Updated Company Ltd")
+
+        sent.subcontractor.addressLine1 mustBe Some("New company address 1")
+        sent.subcontractor.addressLine2 mustBe Some("New company address 2")
+        sent.subcontractor.addressLine3 mustBe Some("London")
+        sent.subcontractor.addressLine4 mustBe Some("Greater London")
+        sent.subcontractor.country mustBe Some("United Kingdom")
+        sent.subcontractor.postcode mustBe Some("E1 1AA")
+
+        sent.subcontractor.emailAddress mustBe Some("new@example.com")
+        sent.subcontractor.phoneNumber mustBe Some("02071234567")
+        sent.subcontractor.mobilePhoneNumber mustBe Some("07123456789")
+        sent.subcontractor.worksReferenceNumber mustBe Some("NEW-WRN")
+
+        sent.subcontractor.matched mustBe Some("Y")
+        sent.subcontractor.autoVerified mustBe Some("N")
+        sent.subcontractor.verified mustBe Some("Y")
+        sent.subcontractor.verificationNumber mustBe Some("V123456")
+        sent.subcontractor.taxTreatment mustBe Some("Gross")
+        sent.subcontractor.updatedTaxTreatment mustBe Some("Gross")
+        sent.subcontractor.version mustBe Some(4)
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when the submitted amend ref does not match the original subcontractor" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(AmendSubbieResourceRefQuery, 1001L)
+            .success
+            .value
+
+        val exception =
+          service
+            .updateSubcontractorForEdit(
+              userAnswers,
+              Some(2002L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "Stale amend session for subbieResourceRef=2002"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should propagate an exception from the edit connector call" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.failed(
+            new RuntimeException(
+              "update subcontractor for edit failed"
+            )
+          )
+        )
+
+        val exception =
+          service
+            .updateSubcontractorForEdit(userAnswers)
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "update subcontractor for edit failed"
+
+        verify(mockConnector)
+          .updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+    }
+
+    "submitAmendSubcontractor" - {
+
+      "should use the normal update for a standard amend journey" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(Future.successful(()))
+
+        service
+          .submitAmendSubcontractor(
+            AmendJourneyType.Standard,
+            userAnswers,
+            Some(1001L)
+          )
+          .futureValue mustBe (())
+
+        verify(mockConnector)
+          .updateSubcontractor(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should use the edit update for an insufficient information amend journey" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(Future.successful(()))
+
+        service
+          .submitAmendSubcontractor(
+            AmendJourneyType.InsufficientInfo,
+            userAnswers,
+            Some(1001L)
+          )
+          .futureValue mustBe ()
+
+        verify(mockConnector)
+          .updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should use the edit update for an unmatched information amend journey" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(Future.successful(()))
+
+        service
+          .submitAmendSubcontractor(
+            AmendJourneyType.UnmatchedInfo,
+            userAnswers,
+            Some(1001L)
+          )
+          .futureValue mustBe (())
+
+        verify(mockConnector)
+          .updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should propagate a failure from the selected update operation" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+
+        when(
+          mockConnector.updateSubcontractorForEdit(
+            any[UpdateSubcontractorRequest]
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.failed(
+            new RuntimeException("edit update failed")
+          )
+        )
+
+        val exception =
+          service
+            .submitAmendSubcontractor(
+              AmendJourneyType.InsufficientInfo,
+              userAnswers,
+              Some(1001L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe "edit update failed"
+
+        verify(mockConnector)
+          .updateSubcontractorForEdit(
             any[UpdateSubcontractorRequest]
           )(any[HeaderCarrier])
 

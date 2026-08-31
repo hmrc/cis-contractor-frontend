@@ -19,6 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.amend.AmendJourneyType
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
@@ -210,6 +211,52 @@ class SubcontractorService @Inject() (
           )
         )
     } yield response
+
+  def updateSubcontractorForEdit(
+    userAnswers: UserAnswers,
+    subbieResourceRef: Option[Long] = None
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    for {
+      cisId             <- getCisId(userAnswers)
+      subcontractorType <- getSubcontractorType(userAnswers)
+      original          <- getOriginalSubcontractor(userAnswers)
+      _                 <- validateAmendSubbieResourceRef(userAnswers, original, subbieResourceRef)
+
+      subcontractor =
+        updateSubcontractorFromUserAnswers(
+          original = original,
+          subcontractorType = subcontractorType,
+          userAnswers = userAnswers
+        )
+
+      response <-
+        cisConnector.updateSubcontractorForEdit(
+          UpdateSubcontractorRequest(
+            cisId = cisId,
+            subcontractor = subcontractor
+          )
+        )
+    } yield response
+
+  def submitAmendSubcontractor(
+    amendJourneyType: AmendJourneyType,
+    userAnswers: UserAnswers,
+    subbieResourceRef: Option[Long] = None
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    amendJourneyType match {
+
+      case AmendJourneyType.Standard =>
+        updateSubcontractor(
+          userAnswers,
+          subbieResourceRef
+        )
+
+      case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+        updateSubcontractorForEdit(
+          userAnswers,
+          subbieResourceRef
+        )
+    }
 
   private def validateAmendSubbieResourceRef(
     userAnswers: UserAnswers,

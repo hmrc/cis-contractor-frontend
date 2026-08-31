@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.SubcontractorName
 import models.address.{Address, Country}
-import models.amend.OriginalIndividualAnswers
+import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
@@ -35,13 +35,14 @@ import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import config.FrontendAppConfig
 import queries.CisIdQuery
 import utils.AmendmentHelper
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 
 class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -136,6 +137,12 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           worksReference = Some("WRN-1"),
           verificationNumber = None
         )
+      )
+      .success
+      .value
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.Standard
       )
       .success
       .value
@@ -371,7 +378,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       val mockAuditService         = mock[AuditService]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -402,11 +410,20 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
             .url
       }
 
+      val journeyCaptor =
+        ArgumentCaptor.forClass(
+          classOf[AmendJourneyType]
+        )
+
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          journeyCaptor.capture(),
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
+
+      journeyCaptor.getValue mustBe
+        AmendJourneyType.Standard
       verify(mockAuditService).amendSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
@@ -514,7 +531,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         .thenReturn(Future.successful(true))
 
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -546,7 +564,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -581,6 +600,49 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       }
 
       verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing on submit" in {
+
+      val ua =
+        minUa
+          .remove(AmendJourneyTypePage)
+          .success
+          .value
+
+      val mockSubcontractorService =
+        mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService]
+              .toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
       verifyNoInteractions(mockSubcontractorService)
     }
 
