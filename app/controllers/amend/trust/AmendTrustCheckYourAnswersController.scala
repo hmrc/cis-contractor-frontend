@@ -24,7 +24,7 @@ import pages.add.*
 import pages.add.trust.TrustNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
@@ -36,7 +36,9 @@ import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 import controllers.routes
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import models.amend.AmendJourneyType
+import models.requests.DataRequest
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 import utils.AmendmentHelper
 
 import javax.inject.Inject
@@ -196,39 +198,85 @@ class AmendTrustCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          Future
-            .fromTry(
-              request.userAnswers.set(
-                AmendCheckYourAnswersSubmittedPage,
-                true
-              )
-            )
-            .flatMap { updated =>
-              sessionRepository
-                .set(updated)
-                .flatMap { _ =>
-                  subcontractorService
-                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
-                }
-                .map { _ =>
-                  auditService.amendSubcontractorEvent(request.userAnswers)
-                  Redirect(
-                    controllers.amend.trust.routes.AmendTrustConfirmationController
-                      .onPageLoad()
-                  )
-                }
-            }
-            .recover { case t =>
-              logger.error(
-                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
-                t
-              )
-
-              Redirect(
-                routes.JourneyRecoveryController.onPageLoad()
-              )
-            }
+          submitAmendJourney(
+            request.userAnswers,
+            subbieResourceRef
+          )
       }
+    }
+
+  private def submitAmendJourney(
+    userAnswers: UserAnswers,
+    subbieResourceRef: Long
+  )(implicit request: DataRequest[AnyContent]): Future[Result] =
+    userAnswers
+      .get(AmendJourneyTypePage)
+      .fold {
+        logger.error(
+          "[AmendTrustCheckYourAnswersController.onSubmit] Missing AmendJourneyTypePage"
+        )
+
+        Future.successful(
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        )
+      } { journeyType =>
+        Future
+          .fromTry(
+            userAnswers.set(
+              AmendCheckYourAnswersSubmittedPage,
+              true
+            )
+          )
+          .flatMap { updated =>
+            sessionRepository
+              .set(updated)
+              .flatMap { _ =>
+                subcontractorService.submitAmendSubcontractor(
+                  journeyType,
+                  updated,
+                  submittedSubbieResourceRef(subbieResourceRef)
+                )
+              }
+              .map { _ =>
+                auditService.amendSubcontractorEvent(updated)
+
+                confirmationRedirect(journeyType)
+              }
+          }
+          .recover { case t =>
+            logger.error(
+              "[AmendTrustCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
+              t
+            )
+
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+      }
+
+  private def confirmationRedirect(
+    journeyType: AmendJourneyType
+  ): Result =
+    journeyType match {
+
+      case AmendJourneyType.Standard =>
+        Redirect(
+          controllers.amend.trust.routes.AmendTrustConfirmationController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.InsufficientInfo =>
+        Redirect(
+          controllers.insufficient.routes.InsufficientSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.UnmatchedInfo =>
+        Redirect(
+          controllers.unmatched.routes.UnmatchedSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
     }
 
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =

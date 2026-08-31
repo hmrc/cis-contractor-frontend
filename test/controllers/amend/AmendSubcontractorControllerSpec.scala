@@ -20,6 +20,7 @@ import base.SpecBase
 import generators.ModelGenerators
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
+import models.amend.AmendJourneyType
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -27,6 +28,7 @@ import org.mockito.Mockito.{atLeastOnce, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages.add.TypeOfSubcontractorPage
+import pages.amend.AmendJourneyTypePage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
@@ -50,7 +52,10 @@ class AmendSubcontractorControllerSpec
 
   private lazy val amendSubcontractorRoute =
     controllers.amend.routes.AmendSubcontractorController
-      .onPageLoad(subbieResourceRef)
+      .onPageLoad(
+        subbieResourceRef,
+        "standard"
+      )
       .url
 
   private val baseSubcontractor =
@@ -507,6 +512,98 @@ class AmendSubcontractorControllerSpec
           captor.getAllValues.asScala.exists(
             _.get(TypeOfSubcontractorPage).isDefined
           ) mustBe false
+        }
+      }
+
+      "must redirect to JourneyRecovery when journey type is invalid" in {
+
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val invalidRoute =
+          controllers.amend.routes.AmendSubcontractorController
+            .onPageLoad(
+              subbieResourceRef,
+              "invalid-journey-type"
+            )
+            .url
+
+        val application =
+          applicationWith(mockService, mockSessionRepository).build()
+
+        running(application) {
+
+          val result =
+            route(
+              application,
+              FakeRequest(GET, invalidRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+        }
+      }
+
+      "must save AmendJourneyTypePage as Standard when started from the standard amend journey" in {
+
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val captor                = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val subcontractor =
+          baseSubcontractor.copy(
+            subcontractorType = Some("soletrader")
+          )
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(
+            responseWith(Some(subcontractor))
+          )
+        )
+
+        when(
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(
+          Future.successful(true)
+        )
+
+        val application =
+          applicationWith(
+            mockService,
+            mockSessionRepository
+          ).build()
+
+        running(application) {
+
+          val result =
+            route(
+              application,
+              FakeRequest(
+                GET,
+                amendSubcontractorRoute
+              )
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          verify(mockSessionRepository, atLeastOnce())
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getAllValues.asScala.toSeq
+
+          savedAnswers.exists(
+            _.get(AmendJourneyTypePage).contains(AmendJourneyType.Standard)
+          ) mustBe true
         }
       }
 
