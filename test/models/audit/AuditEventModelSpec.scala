@@ -387,6 +387,22 @@ class AuditEventModelSpec extends SpecBase {
       (json \ "updatedDetails" \ "worksReferenceNumber").as[String] mustBe "WR-999"
     }
 
+    "must include original value in originalDetails when a field is removed in the update" in {
+      val updated = baseIndividualDetails.copy(worksReferenceNumberYesNo = Some(false), worksReferenceNumber = None)
+      val model   = AmendSubcontractorAuditEventModel(
+        cisId = Some("1"),
+        subbieResourceRef = None,
+        typeOfSubcontractor = "soletrader",
+        originalDetails = Some(baseIndividualDetails),
+        updatedDetails = updated
+      )
+      val json    = Json.toJson(model)
+      (json \ "originalDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe true
+      (json \ "originalDetails" \ "worksReferenceNumber").as[String] mustBe "WR-123"
+      (json \ "updatedDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe false
+      (json \ "updatedDetails" \ "worksReferenceNumber").toOption mustBe None
+    }
+
     "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = Some("1"),

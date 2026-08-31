@@ -25,7 +25,8 @@ trait AuditEvent {
 }
 
 private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObject) = {
-  val changedKeys = updated.keys.filter(k => (original \ k).toOption != (updated \ k).toOption)
+  val allKeys     = original.keys ++ updated.keys
+  val changedKeys = allKeys.filter(k => (original \ k).toOption != (updated \ k).toOption)
   val origDiff    = JsObject(changedKeys.flatMap(k => (original \ k).toOption.map(k -> _)).toSeq)
   val updDiff     = JsObject(changedKeys.flatMap(k => (updated \ k).toOption.map(k -> _)).toSeq)
   (origDiff, updDiff)
