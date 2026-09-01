@@ -260,7 +260,7 @@ object IndividualSubcontractorDetails {
 
 case class AmendSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[IndividualSubcontractorDetails],
   updatedDetails: IndividualSubcontractorDetails
@@ -323,7 +323,7 @@ object CompanySubcontractorDetails {
 
 case class AmendCompanySubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[CompanySubcontractorDetails],
   updatedDetails: CompanySubcontractorDetails
@@ -396,7 +396,7 @@ object PartnershipSubcontractorDetails {
 
 case class AmendPartnershipSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[PartnershipSubcontractorDetails],
   updatedDetails: PartnershipSubcontractorDetails
@@ -455,7 +455,7 @@ object TrustSubcontractorDetails {
 
 case class AmendTrustSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[TrustSubcontractorDetails],
   updatedDetails: TrustSubcontractorDetails

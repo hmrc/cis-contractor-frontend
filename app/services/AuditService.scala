@@ -31,7 +31,7 @@ import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
 import play.api.libs.json.{Json, OWrites}
-import queries.{SubbieResourceRefQuery, *}
+import queries.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
@@ -161,7 +161,7 @@ class AuditService @Inject() (
   private def buildAmendIndividualModel(ua: UserAnswers): AmendSubcontractorAuditEventModel =
     AmendSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalIndividualAnswersQuery).map(toIndividualDetails),
       updatedDetails = IndividualSubcontractorDetails(
@@ -221,7 +221,7 @@ class AuditService @Inject() (
   private def buildAmendCompanyModel(ua: UserAnswers): AmendCompanySubcontractorAuditEventModel =
     AmendCompanySubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalCompanyAnswersQuery).map(toCompanyDetails),
       updatedDetails = CompanySubcontractorDetails(
@@ -268,7 +268,7 @@ class AuditService @Inject() (
   private def buildAmendPartnershipModel(ua: UserAnswers): AmendPartnershipSubcontractorAuditEventModel =
     AmendPartnershipSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalPartnershipAnswersQuery).map(toPartnershipDetails),
       updatedDetails = PartnershipSubcontractorDetails(
@@ -325,7 +325,7 @@ class AuditService @Inject() (
   private def buildAmendTrustModel(ua: UserAnswers): AmendTrustSubcontractorAuditEventModel =
     AmendTrustSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalTrustAnswersQuery).map(toTrustDetails),
       updatedDetails = TrustSubcontractorDetails(

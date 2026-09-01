@@ -430,7 +430,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = Some("1"),
-        subbieResourceRef = Some(42),
+        subbieResourceRef = Some(42L),
         typeOfSubcontractor = "soletrader",
         originalDetails = None,
         updatedDetails = baseIndividualDetails
@@ -492,7 +492,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendCompanySubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(7),
+        subbieResourceRef = Some(7L),
         typeOfSubcontractor = "company",
         originalDetails = None,
         updatedDetails = baseCompanyDetails
@@ -545,7 +545,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendPartnershipSubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(3),
+        subbieResourceRef = Some(3L),
         typeOfSubcontractor = "partnership",
         originalDetails = None,
         updatedDetails = basePartnershipDetails
@@ -596,7 +596,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendTrustSubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(99),
+        subbieResourceRef = Some(99L),
         typeOfSubcontractor = "trust",
         originalDetails = None,
         updatedDetails = baseTrustDetails
