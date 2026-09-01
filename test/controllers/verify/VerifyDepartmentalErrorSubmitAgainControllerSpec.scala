@@ -21,16 +21,16 @@ import config.FrontendAppConfig
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
-import views.html.verify.SubmissionUnsuccessfulView
+import views.html.verify.VerifyDepartmentalErrorSubmitAgainView
 
 class VerifyDepartmentalErrorSubmitAgainControllerSpec extends SpecBase {
 
   private lazy val onPageLoadRoute =
-    controllers.verify.routes.SubmissionUnsuccessfulController
+    controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
       .onPageLoad()
       .url
 
-  "SubmissionUnsuccessfulController" - {
+  "verifyDepartmentalErrorSubmitAgainController" - {
 
     "must return OK and render the view when CisIdQuery exists" in {
 
@@ -56,7 +56,7 @@ class VerifyDepartmentalErrorSubmitAgainControllerSpec extends SpecBase {
 
         val view =
           application.injector
-            .instanceOf[SubmissionUnsuccessfulView]
+            .instanceOf[VerifyDepartmentalErrorSubmitAgainView]
 
         val appConfig =
           application.injector

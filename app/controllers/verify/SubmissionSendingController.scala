@@ -160,6 +160,12 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
+      case DEPARTMENTAL_ERROR =>
+        Redirect(
+          controllers.verify.routes.VerifyDepartmentalErrorController
+            .onPageLoad()
+        )
+
       case FATAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController

@@ -23,7 +23,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.verify.SubmissionUnsuccessfulView
+import views.html.verify.VerifyDepartmentalErrorSubmitAgainView
 
 class VerifyDepartmentalErrorSubmitAgainViewSpec extends SpecBase {
 
@@ -46,7 +46,7 @@ class VerifyDepartmentalErrorSubmitAgainViewSpec extends SpecBase {
 
       val view =
         application.injector
-          .instanceOf[SubmissionUnsuccessfulView]
+          .instanceOf[VerifyDepartmentalErrorSubmitAgainView]
 
       Jsoup.parse(
         view(manageSubcontractorsUrl).toString
@@ -54,7 +54,7 @@ class VerifyDepartmentalErrorSubmitAgainViewSpec extends SpecBase {
     }
   }
 
-  "SubmissionUnsuccessfulView" - {
+  "verifyDepartmentalErrorSubmitAgainView" - {
 
     "must display the correct browser title" in {
 

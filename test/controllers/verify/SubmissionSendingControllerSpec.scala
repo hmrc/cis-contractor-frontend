@@ -20,7 +20,7 @@ import base.SpecBase
 import models.UserAnswers
 import models.requests.DataRequest
 import models.response.*
-import models.verify.GovTalkErrorStatus.FatalError
+import models.verify.GovTalkErrorStatus.{DepartmentalError, FatalError}
 import models.verify.{SubmissionStatus, VerificationSubmissionDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
@@ -102,6 +102,14 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       govTalkErrorStatus = govTalkErrorStatus
     )
 
+  private def applicationWith(
+    mockService: VerificationService,
+    userAnswers: UserAnswers = emptyUserAnswers
+  ) =
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(bind[VerificationService].toInstance(mockService))
+      .build()
+
   "SubmissionSendingController.onPageLoad" - {
 
     "must redirect to poll page when initial submission returns ACCEPTED" in {
@@ -116,10 +124,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+      val application = applicationWith(mockService)
 
       running(application) {
         val result =
@@ -137,7 +142,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Submission Unsuccessful when initial submission returns FATAL_ERROR with error code 3000" in {
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns FATAL_ERROR with error code 3000" in {
       val mockService = mock[VerificationService]
 
       mockInitialSubmission(
@@ -155,10 +160,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+      val application = applicationWith(mockService)
 
       running(application) {
         val result =
@@ -167,7 +169,73 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.SubmissionUnsuccessfulController
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns DEPARTMENTAL_ERROR with error code 3000" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "DEPARTMENTAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            DepartmentalError(
+              errorCode = "3000",
+              errorText = "Departmental error"
+            )
+          )
+        )
+      )
+
+      val application = applicationWith(mockService)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to departmental error page when initial submission returns DEPARTMENTAL_ERROR with error code 3001" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "DEPARTMENTAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            DepartmentalError(
+              errorCode = "3001",
+              errorText = "Departmental error"
+            )
+          )
+        )
+      )
+
+      val application = applicationWith(mockService)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorController
             .onPageLoad()
             .url
       }
@@ -191,10 +259,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+      val application = applicationWith(mockService)
 
       running(application) {
         val result =
@@ -222,10 +287,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+      val application = applicationWith(mockService)
 
       running(application) {
         val result =
@@ -250,10 +312,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         )
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+      val application = applicationWith(mockService)
 
       running(application) {
         val result =
@@ -280,11 +339,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
@@ -304,11 +362,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
@@ -323,7 +380,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Submission Unsuccessful when poll returns FATAL_ERROR with error code 3000" in {
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when poll returns FATAL_ERROR with error code 3000" in {
       val mockService = mock[VerificationService]
 
       mockPollResponse(
@@ -340,11 +397,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
@@ -353,7 +409,77 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.SubmissionUnsuccessfulController
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to SM-09 when poll returns DEPARTMENTAL_ERROR with error code 3000" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.DEPARTMENTAL_ERROR,
+          govTalkErrorStatus = Some(
+            DepartmentalError(
+              errorCode = "3000",
+              errorText = "Departmental error"
+            )
+          )
+        )
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to departmental error page when poll returns DEPARTMENTAL_ERROR with error code 3001" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.DEPARTMENTAL_ERROR,
+          govTalkErrorStatus = Some(
+            DepartmentalError(
+              errorCode = "3001",
+              errorText = "Departmental error"
+            )
+          )
+        )
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorController
             .onPageLoad()
             .url
       }
@@ -376,11 +502,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
@@ -407,11 +532,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       )
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
@@ -426,13 +550,65 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to send error page when poll returns SEND_ERROR" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(SubmissionStatus.SEND_ERROR)
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifySendErrorController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to in progress page when poll returns TIMED_OUT" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(SubmissionStatus.TIMED_OUT)
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+            .url
+      }
+    }
+
     "must redirect to recovery when VerificationSubmissionDetailsPage is missing" in {
       val mockService = mock[VerificationService]
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
+        applicationWith(mockService)
 
       running(application) {
         val result =
@@ -463,11 +639,10 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubmissionDetails)
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
         )
-          .overrides(bind[VerificationService].toInstance(mockService))
-          .build()
 
       running(application) {
         val result =
