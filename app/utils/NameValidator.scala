@@ -16,7 +16,6 @@
 
 package utils
 
-import models.validation.SubcontractorValidationField.FirstName
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object NameValidator {
