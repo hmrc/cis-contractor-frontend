@@ -68,6 +68,9 @@ class AuditService @Inject() (
       individualNamesOptions = ua
         .get(IndividualNamesOptionsPage)
         .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
+      firstName = ua.get(SubcontractorNamePage).map(_.firstName),
+      middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
+      surname = ua.get(SubcontractorNamePage).map(_.lastName),
       tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
       subAddressYesNo = ua.get(SubAddressYesNoPage),
       addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -165,6 +168,9 @@ class AuditService @Inject() (
         individualNamesOptions = ua
           .get(IndividualNamesOptionsPage)
           .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
+        firstName = ua.get(SubcontractorNamePage).map(_.firstName),
+        middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
+        surname = ua.get(SubcontractorNamePage).map(_.lastName),
         tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
         subAddressYesNo = ua.get(SubAddressYesNoPage),
         addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -190,6 +196,9 @@ class AuditService @Inject() (
         if (original.individualNamesOptions.nonEmpty)
           Some(IndividualNamesOptions.ordered(original.individualNamesOptions).map(_.toString))
         else None,
+      firstName = original.subcontractorName.map(_.firstName),
+      middleName = original.subcontractorName.flatMap(_.middleName),
+      surname = original.subcontractorName.map(_.lastName),
       tradingNameOfSubcontractor = original.tradingName,
       subAddressYesNo = original.addressYesNo,
       addressOfSubcontractor = original.address,

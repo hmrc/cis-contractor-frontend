@@ -25,7 +25,8 @@ trait AuditEvent {
 }
 
 private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObject) = {
-  val changedKeys = updated.keys.filter(k => (original \ k).toOption != (updated \ k).toOption)
+  val allKeys     = original.keys ++ updated.keys
+  val changedKeys = allKeys.filter(k => (original \ k).toOption != (updated \ k).toOption)
   val origDiff    = JsObject(changedKeys.flatMap(k => (original \ k).toOption.map(k -> _)).toSeq)
   val updDiff     = JsObject(changedKeys.flatMap(k => (updated \ k).toOption.map(k -> _)).toSeq)
   (origDiff, updDiff)
@@ -35,6 +36,9 @@ case class AddSubcontractorAuditEventModel(
   cisId: Option[String],
   typeOfSubcontractor: String,
   individualNamesOptions: Option[Seq[String]],
+  firstName: Option[String],
+  middleName: Option[String],
+  surname: Option[String],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -58,6 +62,9 @@ object AddSubcontractorAuditEventModel {
     (__ \ "cisId").writeNullable[String] and
       (__ \ "typeOfSubcontractor").write[String] and
       (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
+      (__ \ "firstName").writeNullable[String] and
+      (__ \ "middleName").writeNullable[String] and
+      (__ \ "surname").writeNullable[String] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and
@@ -209,6 +216,9 @@ object AddTrustSubcontractorAuditEventModel {
 
 case class IndividualSubcontractorDetails(
   individualNamesOptions: Option[Seq[String]],
+  firstName: Option[String],
+  middleName: Option[String],
+  surname: Option[String],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -228,6 +238,9 @@ case class IndividualSubcontractorDetails(
 object IndividualSubcontractorDetails {
   implicit val writes: OWrites[IndividualSubcontractorDetails] = (
     (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
+    (__ \ "firstName").writeNullable[String] and
+      (__ \ "middleName").writeNullable[String] and
+      (__ \ "surname").writeNullable[String] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and

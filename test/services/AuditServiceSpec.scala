@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import models.TypeOfSubcontractor
-import models.add.IndividualNamesOptions
+import models.add.{SubcontractorName, IndividualNamesOptions}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -84,7 +84,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
         .value
-        .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
+        .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName))
         .success
         .value
         .set(TradingNameOfSubcontractorPage, "TradingName")
@@ -132,12 +132,18 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(WorksReferenceNumberPage, "WORKREF-001")
         .success
         .value
+        .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+        .success
+        .value
 
       service.addSubcontractorEvent(ua)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
-      (detail \ "individualNamesOptions").as[Seq[String]] mustBe Seq("tradingName")
+      (detail \ "individualNamesOptions").as[Seq[String]] mustBe Seq("subcontractorName", "tradingName")
+      (detail \ "firstName").as[String] mustBe "John"
+      (detail \ "middleName").as[String] mustBe "Paul"
+      (detail \ "surname").as[String] mustBe "Smith"
       (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
       (detail \ "subAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"

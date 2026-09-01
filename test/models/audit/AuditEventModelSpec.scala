@@ -38,6 +38,9 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         typeOfSubcontractor = "soletrader",
         individualNamesOptions = None,
+        firstName = None,
+        middleName = None,
+        surname = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -60,7 +63,10 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = Some("1"),
         typeOfSubcontractor = "soletrader",
-        individualNamesOptions = Some(Seq("tradingName")),
+        individualNamesOptions = Some(Seq("subcontractorName", "tradingName")),
+        firstName = Some("John"),
+        middleName = Some("Paul"),
+        surname = Some("Smith"),
         tradingNameOfSubcontractor = Some("TradingName"),
         subAddressYesNo = Some(true),
         addressOfSubcontractor = Some(address),
@@ -79,7 +85,10 @@ class AuditEventModelSpec extends SpecBase {
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                 -> "1",
         "typeOfSubcontractor"                   -> "soletrader",
-        "individualNamesOptions"                -> Json.arr("tradingName"),
+        "individualNamesOptions"                -> Json.arr("subcontractorName", "tradingName"),
+        "firstName"                             -> "John",
+        "middleName"                            -> "Paul",
+        "surname"                               -> "Smith",
         "tradingNameOfSubcontractor"            -> "TradingName",
         "subAddressYesNo"                       -> true,
         "addressOfSubcontractor"                -> Json.toJson(address),
@@ -102,6 +111,9 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         typeOfSubcontractor = "soletrader",
         individualNamesOptions = None,
+        firstName = None,
+        middleName = None,
+        surname = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -265,6 +277,9 @@ class AuditEventModelSpec extends SpecBase {
 
   private val baseIndividualDetails = IndividualSubcontractorDetails(
     individualNamesOptions = Some(Seq("subcontractorName")),
+    firstName = Some("John"),
+    middleName = Some("Paul"),
+    surname = Some("Smith"),
     tradingNameOfSubcontractor = None,
     subAddressYesNo = Some(true),
     addressOfSubcontractor = Some(address),
@@ -370,6 +385,22 @@ class AuditEventModelSpec extends SpecBase {
       (json \ "updatedDetails" \ "individualEmailAddress").as[String] mustBe "new@example.com"
       (json \ "originalDetails" \ "worksReferenceNumber").as[String] mustBe "WR-123"
       (json \ "updatedDetails" \ "worksReferenceNumber").as[String] mustBe "WR-999"
+    }
+
+    "must include original value in originalDetails when a field is removed in the update" in {
+      val updated = baseIndividualDetails.copy(worksReferenceNumberYesNo = Some(false), worksReferenceNumber = None)
+      val model   = AmendSubcontractorAuditEventModel(
+        cisId = Some("1"),
+        subbieResourceRef = None,
+        typeOfSubcontractor = "soletrader",
+        originalDetails = Some(baseIndividualDetails),
+        updatedDetails = updated
+      )
+      val json    = Json.toJson(model)
+      (json \ "originalDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe true
+      (json \ "originalDetails" \ "worksReferenceNumber").as[String] mustBe "WR-123"
+      (json \ "updatedDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe false
+      (json \ "updatedDetails" \ "worksReferenceNumber").toOption mustBe None
     }
 
     "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
