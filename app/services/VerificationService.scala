@@ -361,7 +361,7 @@ class VerificationService @Inject() (
                      )
                    )
 
-      hasCurrentBatch = current.verificationBatch.nonEmpty || current.verifications.nonEmpty
+      hasCurrentBatch = current.verificationBatch.nonEmpty
 
       _ <-
         if (!hasCurrentBatch) {
