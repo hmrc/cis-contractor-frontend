@@ -273,6 +273,46 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
+    "must redirect to Journey Recovery for a POST when api failed" in {
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.deleteVerification(any(), any())(any())
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, removeSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
     "must redirect to the Journey Recovery on a POST when delete verification fails and answer = YES" in {
       val userAnswers = emptyUserAnswers
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
