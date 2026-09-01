@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -49,6 +49,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
   appConfig: FrontendAppConfig
@@ -210,6 +211,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
                     .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
                 }
                 .map { _ =>
+                  auditService.amendSubcontractorEvent(request.userAnswers)
                   Redirect(
                     controllers.amend.trust.routes.AmendTrustConfirmationController
                       .onPageLoad()
