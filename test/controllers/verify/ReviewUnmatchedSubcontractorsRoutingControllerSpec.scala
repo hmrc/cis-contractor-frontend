@@ -88,6 +88,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
 
       when(
         mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
           eqTo(userAnswers)
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(userAnswers))
@@ -109,6 +110,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
 
         verify(mockService)
           .recreateCurrentBatchFromUnmatchedVerifications(
+            eqTo("900063"),
             eqTo(userAnswers)
           )(any[HeaderCarrier])
       }
@@ -141,6 +143,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
 
       when(
         mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
           eqTo(userAnswers)
         )(any[HeaderCarrier])
       ).thenReturn(Future.failed(new RuntimeException("boom")))
@@ -266,7 +269,14 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
     }
 
     "must redirect to JourneyRecovery when session data is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "900063")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value

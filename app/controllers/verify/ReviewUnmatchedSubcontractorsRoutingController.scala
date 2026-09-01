@@ -33,6 +33,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  cisIdRequired: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService
 )(implicit ec: ExecutionContext)
@@ -41,7 +42,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen cisIdRequired).async { implicit request =>
       (
         request.userAnswers.get(LastSubmittedVerificationBatchResponsePage),
         request.userAnswers.get(CisIdQuery)
@@ -58,6 +59,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
                 case true =>
                   verificationService
                     .recreateCurrentBatchFromUnmatchedVerifications(
+                      request.cisId,
                       request.userAnswers
                     )
                     .map { _ =>

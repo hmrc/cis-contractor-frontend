@@ -291,18 +291,10 @@ class VerificationService @Inject() (
     }
 
   def recreateCurrentBatchFromUnmatchedVerifications(
+    cisId: String,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(
-                        Future.failed(
-                          new RuntimeException("InstanceIdQuery not found in session data")
-                        )
-                      )
-
       lastSubmitted <- userAnswers
                          .get(LastSubmittedVerificationBatchResponsePage)
                          .map(Future.successful)
@@ -346,7 +338,7 @@ class VerificationService @Inject() (
 
           cisConnector.createVerificationBatchAndVerifications(
             CreateVerificationBatchAndVerificationsRequest(
-              instanceId = instanceId,
+              instanceId = cisId,
               verificationResourceReferences = submittedSubbieRefs,
               actionIndicator = None
             )
@@ -370,7 +362,7 @@ class VerificationService @Inject() (
 
           val modifyRequest =
             ModifyVerificationsRequest(
-              instanceId = instanceId,
+              instanceId = cisId,
               deleteVerifications =
                 if (existingVerificationRefs.nonEmpty)
                   Some(DeleteVerifications(existingVerificationRefs))

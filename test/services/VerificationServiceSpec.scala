@@ -1265,7 +1265,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
 
       service
-        .recreateCurrentBatchFromUnmatchedVerifications(userAnswers)
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId,userAnswers)
         .futureValue
 
       verify(mockConnector)
@@ -1372,7 +1372,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
 
       service
-        .recreateCurrentBatchFromUnmatchedVerifications(userAnswers)
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
         .futureValue
 
       verify(mockConnector)
@@ -1465,7 +1465,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
 
       service
-        .recreateCurrentBatchFromUnmatchedVerifications(userAnswers)
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
         .futureValue
 
       verify(mockConnector)
@@ -1604,7 +1604,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
 
       service
-        .recreateCurrentBatchFromUnmatchedVerifications(userAnswers)
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
         .futureValue
 
       verify(mockConnector)
@@ -1633,6 +1633,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       val exception =
         recoverToExceptionIf[RuntimeException] {
           service.recreateCurrentBatchFromUnmatchedVerifications(
+            instanceId,
             userAnswers
           )
         }.futureValue
