@@ -25,12 +25,11 @@ class SurnameValidatorSpec extends AnyWordSpec with Matchers {
   "SurnameValidator - validate surname " must {
 
     "return failure when the surname is empty" in {
-      val surname = ""
       SurnameValidator
         .validate(Some("")) mustBe Some(
         FieldValidationFailure(
           field = SubcontractorValidationField.Surname,
-          value = Some(surname)
+          value = Some("")
         )
       )
     }

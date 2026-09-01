@@ -25,12 +25,11 @@ class FirstNameValidatorSpec extends AnyWordSpec with Matchers {
   "FirstNameValidator - validate firstName " must {
 
     "return failure when the firstName is empty" in {
-      val firstName = ""
       FirstNameValidator
         .validate(Some("")) mustBe Some(
         FieldValidationFailure(
           field = SubcontractorValidationField.FirstName,
-          value = Some(firstName)
+          value = Some("")
         )
       )
     }

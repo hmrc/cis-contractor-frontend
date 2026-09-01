@@ -32,6 +32,13 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
       ) mustBe Nil
     }
 
+    "return no failures when trading name is supplied but first name and surname are absent" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoFirstNameSurname,
+        allSubcontractors = Seq(subcontractorNoFirstNameSurname)
+      ) mustBe Nil
+    }
+
     "return name failures when trading name and all names are absent" in {
       IndividualValidator.validate(
         subcontractorToValidate = subcontractorNoNames,
@@ -39,6 +46,10 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
       ) mustBe List(
         FieldValidationFailure(
           field = SubcontractorValidationField.FirstName,
+          value = None
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
           value = None
         ),
         FieldValidationFailure(
@@ -238,6 +249,42 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
       secondName = None,
       surname = Some("Smith"),
       tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorNoFirstNameSurname: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 3L,
+      subbieResourceRef = Some(3L * 10),
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = Some("Trading Name LTD"),
       utr = None,
       nino = None,
       crn = None,
