@@ -97,6 +97,20 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
       )
     }
 
+    "return a surname failure when first name is provided but surname is absent (trading name present)" in {
+      NameValidator.validate(
+        firstName = Some("John"),
+        secondName = None,
+        surname = None,
+        tradingName = Some("Acme Ltd")
+      ) shouldBe Seq(
+        FieldValidationFailure(
+          field = SubcontractorValidationField.Surname,
+          value = None
+        )
+      )
+    }
+
     "return a first name failure when second name is provided without first name" in {
       NameValidator.validate(
         firstName = None,

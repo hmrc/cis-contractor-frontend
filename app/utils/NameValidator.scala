@@ -21,11 +21,11 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 object NameValidator {
 
   def validate(
-    firstName: Option[String],
-    secondName: Option[String],
-    surname: Option[String],
-    tradingName: Option[String]
-  ): Seq[FieldValidationFailure] = {
+                firstName: Option[String],
+                secondName: Option[String],
+                surname: Option[String],
+                tradingName: Option[String]
+              ): Seq[FieldValidationFailure] = {
 
     val firstNameBlank   = firstName.forall(_.isBlank)
     val secondNameBlank  = secondName.forall(_.isBlank)
@@ -34,22 +34,23 @@ object NameValidator {
 
     val failures = Seq.newBuilder[FieldValidationFailure]
 
-    if (tradingNameBlank) {
-      if (firstNameBlank) {
-        failures += FieldValidationFailure(
-          field = SubcontractorValidationField.FirstName,
-          value = firstName
-        )
-      }
-
-      if (surnameBlank) {
-        failures += FieldValidationFailure(
-          field = SubcontractorValidationField.Surname,
-          value = surname
-        )
-      }
+    // validateFirstNameOrTradingNameRequired
+    if (tradingNameBlank && firstNameBlank) {
+      failures += FieldValidationFailure(
+        field = SubcontractorValidationField.FirstName,
+        value = firstName
+      )
     }
 
+    // validateSurnameRequiredAsNoTradingName / validateSurnameRequiredForFirstName
+    if (surnameBlank && (tradingNameBlank || !firstNameBlank)) {
+      failures += FieldValidationFailure(
+        field = SubcontractorValidationField.Surname,
+        value = surname
+      )
+    }
+
+    // validateFirstNameFieldNeeded
     if (!secondNameBlank && firstNameBlank) {
       failures += FieldValidationFailure(
         field = SubcontractorValidationField.SecondName,

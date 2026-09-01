@@ -20,24 +20,16 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object SurnameValidator {
   def validate(
-    value: Option[String]
-  ): Option[FieldValidationFailure] =
-    value match {
-      case None                                                                                               =>
-        Some(
-          FieldValidationFailure(
-            field = SubcontractorValidationField.Surname,
-            value = None
-          )
+                value: Option[String]
+              ): Option[FieldValidationFailure] =
+    value.flatMap { surname =>
+      Option.when(
+        surname.isBlank || !Surname.isLengthInRange(surname) || !Surname.isValid(surname)
+      ) {
+        FieldValidationFailure(
+          field = SubcontractorValidationField.Surname,
+          value = Some(surname)
         )
-      case Some(surname) if surname.isBlank || !Surname.isLengthInRange(surname) || !Surname.isValid(surname) =>
-        Some(
-          FieldValidationFailure(
-            field = SubcontractorValidationField.Surname,
-            value = Some(surname)
-          )
-        )
-      case _                                                                                                  =>
-        None
+      }
     }
 }

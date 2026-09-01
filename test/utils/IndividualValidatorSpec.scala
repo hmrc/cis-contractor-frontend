@@ -25,6 +25,29 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
 
   "IndividualValidator.validate" must {
 
+    "return no failures when trading name is absent but first name and surname are provided" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoTradingName,
+        allSubcontractors = Seq(subcontractorNoTradingName)
+      ) mustBe Nil
+    }
+
+    "return name failures when trading name and all names are absent" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoNames,
+        allSubcontractors = Seq(subcontractorNoNames)
+      ) mustBe List(
+        FieldValidationFailure(
+          field = SubcontractorValidationField.FirstName,
+          value = None
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.Surname,
+          value = None
+        )
+      )
+    }
+
     "return no failures when all common details are missing" in {
       IndividualValidator.validate(
         subcontractorToValidate = subcontractorEmpty,
@@ -195,6 +218,78 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
       phoneNumber = Some("0191 123 4567"),
       mobilePhoneNumber = Some("07700 900123"),
       worksReferenceNumber = Some("A12323452345#@[]{}$%^&£~"),
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorNoTradingName: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 3L,
+      subbieResourceRef = Some(3L * 10),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorNoNames: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 4L,
+      subbieResourceRef = Some(4L * 10),
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
       matched = None,
       autoVerified = None,
       verified = None,

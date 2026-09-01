@@ -35,15 +35,9 @@ class FirstNameValidatorSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "return failure when the firstName is None" in {
-      val firstName = None
+    "return no failure when the firstName is None" in {
       FirstNameValidator
-        .validate(firstName) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.FirstName,
-          value = None
-        )
-      )
+        .validate(None) mustBe None
     }
 
     "return no failure for a valid firstName" in {

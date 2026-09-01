@@ -35,15 +35,9 @@ class SurnameValidatorSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "return failure when the surname is None" in {
-      val surname = None
+    "return no failure when the surname is None" in {
       SurnameValidator
-        .validate(surname) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.Surname,
-          value = None
-        )
-      )
+        .validate(None) mustBe None
     }
 
     "return no failure for a valid surname" in {

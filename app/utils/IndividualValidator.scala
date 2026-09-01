@@ -22,20 +22,28 @@ import models.SubcontractorCurrentVerification
 object IndividualValidator {
 
   def validate(
-    subcontractorToValidate: SubcontractorCurrentVerification,
-    allSubcontractors: Seq[SubcontractorCurrentVerification]
-  ): List[FieldValidationFailure] =
-    SurnameValidator
-      .validate(subcontractorToValidate.surname)
+                subcontractorToValidate: SubcontractorCurrentVerification,
+                allSubcontractors: Seq[SubcontractorCurrentVerification]
+              ): List[FieldValidationFailure] =
+    NameValidator
+      .validate(
+        firstName = subcontractorToValidate.firstName,
+        secondName = subcontractorToValidate.secondName,
+        surname = subcontractorToValidate.surname,
+        tradingName = subcontractorToValidate.tradingName
+      )
       .toList ++
+      SurnameValidator
+        .validate(subcontractorToValidate.surname)
+        .toList ++
       FirstNameValidator
         .validate(subcontractorToValidate.firstName)
         .toList ++
       SecondNameValidator
         .validate(subcontractorToValidate.secondName)
         .toList ++
-      TradingNameValidator
-        .validate(subcontractorToValidate.tradingName)
+      subcontractorToValidate.tradingName
+        .flatMap(t => TradingNameValidator.validate(Some(t)))
         .toList ++
       UtrValidator
         .validate(subcontractorToValidate.utr, allSubcontractors)
