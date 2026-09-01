@@ -61,4 +61,3 @@ object NameValidator {
     failures.result()
   }
 }
-

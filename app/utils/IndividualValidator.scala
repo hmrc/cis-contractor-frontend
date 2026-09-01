@@ -55,4 +55,3 @@ object IndividualValidator {
         .validate(subcontractorToValidate.worksReferenceNumber)
         .toList
 }
-
