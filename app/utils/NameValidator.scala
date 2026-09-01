@@ -16,6 +16,7 @@
 
 package utils
 
+import models.validation.SubcontractorValidationField.FirstName
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object NameValidator {
@@ -42,6 +43,14 @@ object NameValidator {
       )
     }
 
+    // validateTradingNameRequiredasNoSurname
+    if(tradingNameBlank && surnameBlank) {
+      failures += FieldValidationFailure(
+        field = SubcontractorValidationField.TradingName,
+        value = tradingName
+      )
+    }
+
     // validateSurnameRequiredAsNoTradingName / validateSurnameRequiredForFirstName
     if (surnameBlank && (tradingNameBlank || !firstNameBlank)) {
       failures += FieldValidationFailure(
@@ -53,8 +62,8 @@ object NameValidator {
     // validateFirstNameFieldNeeded
     if (!secondNameBlank && firstNameBlank) {
       failures += FieldValidationFailure(
-        field = SubcontractorValidationField.SecondName,
-        value = secondName
+        field = SubcontractorValidationField.FirstName,
+        value = firstName
       )
     }
 

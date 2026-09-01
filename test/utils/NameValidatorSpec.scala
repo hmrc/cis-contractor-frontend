@@ -65,7 +65,7 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
       )
     }
 
-    "return a surname failure when trading name and surname are blank" in {
+    "return a trading name & surname failure when trading name and surname are blank" in {
       NameValidator.validate(
         firstName = Some("John"),
         secondName = None,
@@ -73,13 +73,17 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
         tradingName = None
       ) shouldBe Seq(
         FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
+          value = None
+        ),
+        FieldValidationFailure(
           field = SubcontractorValidationField.Surname,
           value = None
         )
       )
     }
 
-    "return first name and surname failures when all required names are blank" in {
+    "return first name, surname & trading name failures when all required names are blank" in {
       NameValidator.validate(
         firstName = None,
         secondName = None,
@@ -88,6 +92,10 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
       ) shouldBe Seq(
         FieldValidationFailure(
           field = SubcontractorValidationField.FirstName,
+          value = None
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
           value = None
         ),
         FieldValidationFailure(
@@ -119,21 +127,25 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
         tradingName = Some("Acme Ltd")
       ) shouldBe Seq(
         FieldValidationFailure(
-          field = SubcontractorValidationField.SecondName,
-          value = Some("James")
+          field = SubcontractorValidationField.FirstName,
+          value = None
         )
       )
     }
 
-    "return a second name failure when second name is provided as blank and first name is blank" in {
+    "return a first name failure when second name is provided as blank and first name is blank" in {
       NameValidator.validate(
-        firstName = None,
+        firstName = Some(" "),
         secondName = Some("James"),
         surname = None,
         tradingName = None
       ) shouldBe Seq(
         FieldValidationFailure(
           field = SubcontractorValidationField.FirstName,
+          value = Some(" ")
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
           value = None
         ),
         FieldValidationFailure(
@@ -141,8 +153,8 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
           value = None
         ),
         FieldValidationFailure(
-          field = SubcontractorValidationField.SecondName,
-          value = Some("James")
+          field = SubcontractorValidationField.FirstName,
+          value = Some(" ")
         )
       )
     }
@@ -156,6 +168,10 @@ class NameValidatorSpec extends AnyWordSpec with Matchers {
       ) shouldBe Seq(
         FieldValidationFailure(
           field = SubcontractorValidationField.FirstName,
+          value = Some(" ")
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
           value = Some(" ")
         ),
         FieldValidationFailure(
