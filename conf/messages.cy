@@ -33,12 +33,6 @@ typeOfSubcontractor.checkYourAnswersLabel                                   =  M
 typeOfSubcontractor.error.required                                          =  Dewiswch sut mae’r is-gontractwr yn gweithredu
 typeOfSubcontractor.change.hidden                                           =  Math
 
-subTradingNameYesNo.title                                                   =  Ydy’r busnes yn defnyddio enw masnachu?
-subTradingNameYesNo.heading                                                 =  Ydy’r busnes yn defnyddio enw masnachu?
-subTradingNameYesNo.hint                                                    =  Dyma enw’r busnes, sy’n wahanol i’w enw ei hun.
-subTradingNameYesNo.checkYourAnswersLabel                                   =  Ydy’r is-gontractwr yn defnyddio enw masnachu?
-subTradingNameYesNo.error.required                                          =  Dewiswch p’un a yw’r is-gontractwr hwn yn defnyddio enw masnachu
-
 tradingNameOfSubcontractor.title                                            =  Beth yw enw masnachu’r is-gontractwr?
 tradingNameOfSubcontractor.heading                                          =  Beth yw enw masnachu’r is-gontractwr?
 tradingNameOfSubcontractor.checkYourAnswersLabel                            =  Enw masnachu’r is-gontractwr
