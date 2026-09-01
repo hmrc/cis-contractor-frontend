@@ -32,7 +32,10 @@
    alphaBanner: StandardAlphaBanner,
    hmrcStandardPage: HmrcStandardPage,
    twoThirdsMainContent: TwoThirdsMainContent,
-   fullWidthMainContent: FullWidthMainContent
+   fullWidthMainContent: FullWidthMainContent,
+   govukLayout: GovukLayout,
+   hmrcInternalHead: HmrcInternalHead,
+   hmrcInternalHeader: HmrcInternalHeader
  )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, isFullWidth: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
@@ -61,7 +64,7 @@
         language            = Some(messages.lang.code)
       )
     )
-} else
+} else 
     @stylesheets()
 }
 
