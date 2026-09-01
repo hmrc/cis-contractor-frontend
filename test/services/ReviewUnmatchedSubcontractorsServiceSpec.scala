@@ -226,7 +226,9 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"
       row.proceedLink.url mustBe "#"
-      row.removeLink.url mustBe "#"
+      row.removeLink.url mustBe controllers.unmatched.routes.RemoveSubcontractorVerifyRequestController
+        .onPageLoad(1L)
+        .url
     }
 
     "must return empty lists for an empty batch" in {
