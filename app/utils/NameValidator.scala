@@ -44,7 +44,7 @@ object NameValidator {
     }
 
     // validateTradingNameRequiredasNoSurname
-    if(tradingNameBlank && surnameBlank) {
+    if (tradingNameBlank && surnameBlank) {
       failures += FieldValidationFailure(
         field = SubcontractorValidationField.TradingName,
         value = tradingName
