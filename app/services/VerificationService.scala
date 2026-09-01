@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class VerificationService @Inject() (
@@ -195,8 +196,31 @@ class VerificationService @Inject() (
 
       afterCurrent <- getCurrentVerificationBatch(userAnswers)
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
-      _            <- sessionRepository.set(afterNewest)
+      updated      <- Future.fromTry(withVerificationBatchReadiness(afterNewest))
+      _            <- sessionRepository.set(updated)
     } yield response
+
+  private def withVerificationBatchReadiness(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers
+      .get(CurrentVerificationBatchResponsePage)
+      .map { batch =>
+        val remainingVerifications =
+          batch.verifications.flatMap { verification =>
+            verification.subcontractorId.flatMap { subcontractorId =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map(subcontractor => (subcontractor, verification))
+            }
+          }
+
+        val batchReady =
+          remainingVerifications.forall { case (subcontractor, verification) =>
+            VerificationBatchReadiness.isSubcontractorReady(subcontractor, Some(verification))
+          }
+
+        userAnswers.set(VerificationBatchReadinessPage, batchReady)
+      }
+      .getOrElse(userAnswers.remove(VerificationBatchReadinessPage))
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],

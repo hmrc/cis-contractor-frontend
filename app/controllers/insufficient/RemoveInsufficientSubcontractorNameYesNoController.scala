@@ -55,9 +55,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   private def recoveryRedirect =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  private def preparedForm(implicit request: DataRequest[?]) =
+  private def preparedForm(verificationResourceRef: Long)(implicit request: DataRequest[?]) =
     request.userAnswers
-      .get(RemoveInsufficientSubcontractorNameYesNoPage)
+      .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef))
       .fold(form)(form.fill)
 
   def onPageLoad(verificationResourceRef: Long = -1L, mode: Mode = NormalMode): Action[AnyContent] =
@@ -66,7 +66,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         .fold(recoveryRedirect) { subcontractorName =>
           Ok(
             view(
-              preparedForm,
+              preparedForm(verificationResourceRef),
               mode,
               subcontractorName,
               verificationResourceRef
@@ -98,7 +98,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                   updatedAnswers <-
                     Future.fromTry(
                       request.userAnswers.set(
-                        RemoveInsufficientSubcontractorNameYesNoPage,
+                        RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
                         value
                       )
                     )

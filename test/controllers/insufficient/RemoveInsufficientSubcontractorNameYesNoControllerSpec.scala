@@ -107,7 +107,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       val userAnswers =
         UserAnswers(userAnswersId)
           .set(
-            RemoveInsufficientSubcontractorNameYesNoPage,
+            RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
             true
           )
           .success
@@ -133,7 +133,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         val request =
           FakeRequest(
             GET,
-            removeInsufficientSubcontractorNameYesNoRoute
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onPageLoad(verificationResourceRef)
+              .url
           )
 
         val result =
@@ -149,7 +151,65 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           view(
             form.fill(true),
             mode,
-            subcontractorName
+            subcontractorName,
+            verificationResourceRef
+          )(request, messages(application)).toString
+      }
+    }
+
+    "must not populate the view with an answer saved for a different subcontractor" in {
+
+      val otherVerificationResourceRef = 67890L
+
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(
+            RemoveInsufficientSubcontractorNameYesNoPage(otherVerificationResourceRef),
+            false
+          )
+          .success
+          .value
+
+      val mockSubcontractorNameExtractor =
+        mock[SubcontractorNameExtractor]
+
+      when(
+        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      ).thenReturn(Some(subcontractorName))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorNameExtractor]
+              .toInstance(mockSubcontractorNameExtractor)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onPageLoad(verificationResourceRef)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        val view =
+          application.injector
+            .instanceOf[RemoveInsufficientSubcontractorNameYesNoView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(
+            form,
+            mode,
+            subcontractorName,
+            verificationResourceRef
           )(request, messages(application)).toString
       }
     }

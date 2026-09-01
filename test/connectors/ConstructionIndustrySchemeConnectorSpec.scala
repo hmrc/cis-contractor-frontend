@@ -278,7 +278,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetSubcontractorListResponse(
-          Seq(SubcontractorListItem(11L), SubcontractorListItem(22L))
+          Seq(SubcontractorListItem(11L, None), SubcontractorListItem(22L, Some(222L)))
         )
 
       when(rb.execute[GetSubcontractorListResponse](any(), any()))
@@ -288,7 +288,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val result = connector.getSubcontractorList("900063").futureValue
 
-      result mustBe expected
+      assert(result == expected)
 
       val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
 

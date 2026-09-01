@@ -61,8 +61,23 @@ class CheckVerificationBatchReadinessController @Inject() (
       val batchReadyOpt =
         ua.get(CurrentVerificationBatchResponsePage)
           .filter(_ => selectedIds.nonEmpty)
-          .map { batchResponse =>
-            VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse)
+          .flatMap { batchResponse =>
+            val currentSubcontractorIds =
+              batchResponse.verifications
+                .flatMap(_.subcontractorId)
+                .map(_.toString)
+                .toSet
+
+            val remainingSelectedIds =
+              selectedIds.intersect(currentSubcontractorIds)
+
+            if (batchResponse.verifications.isEmpty) {
+              Some(true)
+            } else {
+              Option.when(remainingSelectedIds.nonEmpty) {
+                VerificationBatchReadiness.isBatchReady(remainingSelectedIds, batchResponse)
+              }
+            }
           }
 
       batchReadyOpt match {
