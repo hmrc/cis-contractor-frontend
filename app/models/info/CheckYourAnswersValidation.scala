@@ -109,9 +109,9 @@ object CheckYourAnswersValidation {
     yesNo.exists {
       case true =>
         selectedMethods.nonEmpty &&
-          (!selectedMethods.contains(ContactMethodOptions.Email) || nonBlank(email)) &&
-          (!selectedMethods.contains(ContactMethodOptions.Phone) || nonBlank(phone)) &&
-          (!selectedMethods.contains(ContactMethodOptions.Mobile) || nonBlank(mobile))
+        (!selectedMethods.contains(ContactMethodOptions.Email) || nonBlank(email)) &&
+        (!selectedMethods.contains(ContactMethodOptions.Phone) || nonBlank(phone)) &&
+        (!selectedMethods.contains(ContactMethodOptions.Mobile) || nonBlank(mobile))
 
       case false =>
         selectedMethods.isEmpty
