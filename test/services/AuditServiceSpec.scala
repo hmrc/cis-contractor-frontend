@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import models.TypeOfSubcontractor
-import models.add.{SubcontractorName, IndividualNamesOptions}
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -84,7 +84,10 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
         .value
-        .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName))
+        .set(
+          IndividualNamesOptionsPage,
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
         .success
         .value
         .set(TradingNameOfSubcontractorPage, "TradingName")

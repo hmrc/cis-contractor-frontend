@@ -238,7 +238,7 @@ case class IndividualSubcontractorDetails(
 object IndividualSubcontractorDetails {
   implicit val writes: OWrites[IndividualSubcontractorDetails] = (
     (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
-    (__ \ "firstName").writeNullable[String] and
+      (__ \ "firstName").writeNullable[String] and
       (__ \ "middleName").writeNullable[String] and
       (__ \ "surname").writeNullable[String] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
