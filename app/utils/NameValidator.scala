@@ -21,11 +21,11 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 object NameValidator {
 
   def validate(
-                firstName: Option[String],
-                secondName: Option[String],
-                surname: Option[String],
-                tradingName: Option[String]
-              ): Seq[FieldValidationFailure] = {
+    firstName: Option[String],
+    secondName: Option[String],
+    surname: Option[String],
+    tradingName: Option[String]
+  ): Seq[FieldValidationFailure] = {
 
     val firstNameBlank   = firstName.forall(_.isBlank)
     val secondNameBlank  = secondName.forall(_.isBlank)

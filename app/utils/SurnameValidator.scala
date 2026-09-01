@@ -20,8 +20,8 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object SurnameValidator {
   def validate(
-                value: Option[String]
-              ): Option[FieldValidationFailure] =
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
     value.flatMap { surname =>
       Option.when(
         surname.isBlank || !Surname.isLengthInRange(surname) || !Surname.isValid(surname)

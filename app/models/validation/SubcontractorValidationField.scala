@@ -100,7 +100,6 @@ object SubcontractorValidationField {
     override val value: String = "secondName"
   }
 
-
   val values: List[SubcontractorValidationField] =
     List(
       EmailAddress,

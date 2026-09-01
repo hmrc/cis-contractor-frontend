@@ -22,9 +22,9 @@ import models.SubcontractorCurrentVerification
 object IndividualValidator {
 
   def validate(
-                subcontractorToValidate: SubcontractorCurrentVerification,
-                allSubcontractors: Seq[SubcontractorCurrentVerification]
-              ): List[FieldValidationFailure] =
+    subcontractorToValidate: SubcontractorCurrentVerification,
+    allSubcontractors: Seq[SubcontractorCurrentVerification]
+  ): List[FieldValidationFailure] =
     NameValidator
       .validate(
         firstName = subcontractorToValidate.firstName,
