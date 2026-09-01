@@ -90,11 +90,21 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
 
-GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit()
+GET   /subcontractor/info/start/:cisId/:subbieResourceRef  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
 
-GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit()
+GET   /subcontractor/info/partnership/subcontractor-information-read-only  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/company/subcontractor-information-read-only  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
+
+GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
+
+GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/company/remove/information/:subcontractorDetail  controllers.amend.company.AmendCompanyRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
@@ -104,12 +114,12 @@ GET   /subcontractor/amend/partnership/subcontractor-details-updated  controller
 
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
 
-GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/trust/subcontractor-information  controllers.amend.trust.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/trust/cancel                     controllers.amend.trust.AmendTrustCheckYourAnswersController.onCancel()
 
-GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit()
+GET   /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/company/subcontractor-information  controllers.amend.company.AmendCompanyCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/company/cancel                     controllers.amend.company.AmendCompanyCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amend.trust.AmendTrustConfirmationController.onPageLoad()
@@ -117,8 +127,8 @@ GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amen
 GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
@@ -127,11 +137,15 @@ GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAns
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
+GET   /subcontractor/unmatched/subcontractor-details-updated  controllers.unmatched.UnmatchedSubcontractorDetailsUpdatedController.onPageLoad()
+
 GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
 
 GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -570,8 +584,10 @@ GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcon
 GET   /subcontractor/verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/change  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
 
-GET   /subcontractor/verify/newest                            controllers.verify.NewestVerificationBatchController.onPageLoad()
-GET   /subcontractor/verify/check-results                     controllers.verify.CheckVerificationResultsController.onPageLoad()
+GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
+
+GET   /subcontractor/verify/check-results  controllers.verify.CheckVerificationResultsController.onPageLoad()
+
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
 GET   /subcontractor/verify/current         controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = NormalMode)
@@ -640,7 +656,8 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
-GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
+
+GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
@@ -651,6 +668,7 @@ GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatched
 
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
+
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
 

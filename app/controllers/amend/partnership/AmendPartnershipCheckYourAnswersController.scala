@@ -29,7 +29,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -49,6 +49,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
   appConfig: FrontendAppConfig
@@ -57,29 +58,31 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val ua = request.userAnswers
 
-    ValidatedPartnership.build(ua) match {
-      case Right(_) =>
-        val isVerified      = ua.get(ShowVerificationDetailsPage)
-        val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+      ValidatedPartnership.build(ua) match {
+        case Right(_) =>
+          val isVerified      = ua.get(ShowVerificationDetailsPage)
+          val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
 
-        val subcontractorInformationList =
-          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+          val subcontractorInformationList =
+            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-        val detailsList =
-          SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+          val detailsList =
+            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit()
-        val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
+          val submitUrl =
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmit(subbieResourceRef)
+          val cancelUrl = controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancel()
 
-        Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
+          Ok(view(subcontractorInformationList, detailsList, partnershipName, submitUrl, cancelUrl))
 
-      case Left(error) =>
-        logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+        case Left(error) =>
+          logger.error(s"[AmendPartnershipCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
   private def subcontractorInformationRows(
@@ -161,7 +164,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       )
   }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
 
@@ -196,27 +199,43 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .flatMap { _ =>
-              Future
-                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+          Future
+            .fromTry(
+              request.userAnswers.set(
+                AmendCheckYourAnswersSubmittedPage,
+                true
+              )
+            )
+            .flatMap { updated =>
+              sessionRepository
+                .set(updated)
+                .flatMap { _ =>
+                  subcontractorService
+                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
+                }
                 .map { _ =>
+                  auditService.amendSubcontractorEvent(request.userAnswers)
                   Redirect(
-                    controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad()
+                    controllers.amend.partnership.routes.AmendPartnershipConfirmationController
+                      .onPageLoad()
                   )
                 }
             }
             .recover { case t =>
               logger.error(
-                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
                 t
               )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+              Redirect(
+                routes.JourneyRecoveryController.onPageLoad()
+              )
             }
       }
     }
+
+  private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
+    Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

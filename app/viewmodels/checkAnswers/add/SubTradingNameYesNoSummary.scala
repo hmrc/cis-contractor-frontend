@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.IndividualAnswers
 
 object SubTradingNameYesNoSummary {
 
@@ -41,6 +42,20 @@ object SubTradingNameYesNoSummary {
             .withVisuallyHiddenText(messages("subTradingNameYesNo.change.hidden"))
             .withAttribute("id" -> "sub-trading-name-yes-no")
         )
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.usesTradingName.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "subTradingNameYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }
