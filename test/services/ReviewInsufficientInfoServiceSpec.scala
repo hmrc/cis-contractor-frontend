@@ -400,5 +400,22 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
         any[HeaderCarrier]
       )
     }
+    "must fail when subbieResourceRef is missing" in {
+
+      val sub =
+        mkSub(
+          id = 1L,
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None
+        ).copy(
+          subbieResourceRef = None
+        )
+
+      intercept[IllegalStateException] {
+        build(sub)
+      }
+    }
+
   }
 }

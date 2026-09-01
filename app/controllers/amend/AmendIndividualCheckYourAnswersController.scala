@@ -21,14 +21,14 @@ import controllers.actions.*
 import controllers.routes
 import models.add.ValidatedSubcontractor
 import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
-import models.requests.DataRequest
+import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
+import play.api.mvc.*
+import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text, Value}
@@ -51,7 +51,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  cisIdRequiredAction: CisIdRequiredAction
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -207,7 +208,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     }
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
+
       ValidatedSubcontractor.build(request.userAnswers) match {
 
         case Left(error) =>
@@ -220,17 +222,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           )
 
         case Right(_)
-            if request.userAnswers
-              .get(AmendCheckYourAnswersSubmittedPage)
-              .contains(true) =>
+          if request.userAnswers
+            .get(AmendCheckYourAnswersSubmittedPage)
+            .contains(true) =>
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           )
 
         case Right(_)
-            if !AmendmentHelper.individualHasChanges(
-              request.userAnswers
-            ) =>
+          if !AmendmentHelper.individualHasChanges(
+            request.userAnswers
+          ) =>
           handleNoChanges()
 
         case Right(_) =>
@@ -242,9 +244,9 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     }
 
   private def submitAmendJourney(
-    userAnswers: UserAnswers,
-    subbieResourceRef: Long
-  )(implicit request: DataRequest[AnyContent]): Future[Result] =
+                                  userAnswers: UserAnswers,
+                                  subbieResourceRef: Long
+                                )(implicit request: CisIdDataRequest[AnyContent]): Future[Result] =
     userAnswers
       .get(AmendJourneyTypePage)
       .fold {
@@ -292,64 +294,68 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
 
   private def handleNoChanges()(implicit
-    request: DataRequest[AnyContent]
-  ): Future[Result] =
-    request.userAnswers.get(CisIdQuery) match {
+                                request: CisIdDataRequest[AnyContent]
+  ): Future[Result] = {
 
-      case Some(cisId) =>
-        sessionRepository
-          .set(UserAnswers(request.userAnswers.id))
-          .map(_ =>
-            Redirect(
-              appConfig.manageYourSubcontractorsUrl(cisId)
-            )
+    val redirectCall =
+      request.userAnswers.get(AmendJourneyTypePage) match {
+
+        case Some(AmendJourneyType.InsufficientInfo) =>
+          controllers.verify.routes
+            .ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+
+        case Some(AmendJourneyType.UnmatchedInfo) =>
+          controllers.verify.routes
+            .ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+
+        case _ =>
+          Call(
+            "GET",
+            appConfig.manageYourSubcontractorsUrl(request.cisId)
           )
-          .recover { case t =>
-            logger.error(
-              s"[AmendIndividualCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
-              t
-            )
+      }
 
-            Redirect(
-              routes.JourneyRecoveryController.onPageLoad()
-            )
-          }
-
-      case None =>
+    sessionRepository
+      .set(UserAnswers(request.userAnswers.id))
+      .map(_ => Redirect(redirectCall))
+      .recover { case t =>
         logger.error(
-          "[AmendIndividualCheckYourAnswersController.onSubmit] Missing CisIdQuery"
+          s"[AmendIndividualCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+          t
         )
 
-        Future.successful(
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        Redirect(
+          routes.JourneyRecoveryController.onPageLoad()
         )
-    }
+      }
+  }
 
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdQuery) match {
-        case Some(cisId) =>
-          sessionRepository
-            .set(UserAnswers(request.userAnswers.id))
-            .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
-            .recover { case t =>
-              logger.error(
-                s"[AmendIndividualCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
-                t
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
 
-        case None =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map { _ =>
+          Redirect(
+            appConfig.manageYourSubcontractorsUrl(
+              request.cisId
+            )
+          )
+        }
+        .recover { case t =>
           logger.error(
-            "[AmendIndividualCheckYourAnswersController.onCancel] Missing CisIdQuery"
+            s"[AmendIndividualCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            t
           )
-          Future.successful(
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+          Redirect(
+            routes.JourneyRecoveryController.onPageLoad()
           )
-      }
+        }
     }
 }
