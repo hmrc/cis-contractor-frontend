@@ -20,39 +20,107 @@ import base.SpecBase
 import controllers.routes
 import controllers.unmatched.routes as unmatchedRoutes
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
-import models.UserAnswers
-import navigation.{FakeNavigator, Navigator}
+import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
+import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.unmatched.RemoveSubcontractorVerifyRequestPage
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.VerificationService
 import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
 import scala.concurrent.Future
 
 class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
-
   val formProvider = new RemoveSubcontractorVerifyRequestFormProvider()
-  val form         = formProvider()
+  private val form = formProvider()
 
   val subcontractorName       = "Test Subcontractor"
-  private val subcontractorId = 12345L
+  private val subcontractorId = 10L
 
-  lazy val removeSubcontractorVerifyRequestRoute =
+  private val unmappedSubcontractorId = 999999L
+
+  private val mode = NormalMode
+
+  private lazy val removeSubcontractorVerifyRequestRoute =
     unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId).url
+
+  private lazy val removeSubcontractorVerifyRequestUnmappedSubcontractorIdRoute =
+    unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(unmappedSubcontractorId).url
+
+  private val currentBatchResponse: GetCurrentVerificationBatchResponse =
+    GetCurrentVerificationBatchResponse(
+      subcontractors = Seq(
+        SubcontractorCurrentVerification(
+          subcontractorId = subcontractorId,
+          subbieResourceRef = Some(1111L),
+          firstName = None,
+          secondName = None,
+          surname = None,
+          tradingName = Some(subcontractorName),
+          utr = None,
+          nino = None,
+          crn = None,
+          partnerUtr = None,
+          partnershipTradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      ),
+      verificationBatch = Some(
+        VerificationBatchCurrentVerification(
+          verificationBatchId = 999L,
+          verifBatchResourceRef = Some(7777L)
+        )
+      ),
+      verifications = Seq(
+        VerificationCurrentVerification(
+          verificationId = 1L,
+          verificationBatchId = Some(999L),
+          subcontractorId = Some(subcontractorId),
+          verificationResourceRef = Some(1111L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
+        )
+      )
+    )
 
   "RemoveSubcontractorVerifyRequest Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, removeSubcontractorVerifyRequestRoute)
@@ -69,10 +137,13 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered NO" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), true)
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+        .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), false)
         .success
         .value
 
@@ -86,42 +157,202 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), subcontractorName, subcontractorId)(
+        contentAsString(result) mustEqual view(form.fill(false), subcontractorName, subcontractorId)(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must populate the view correctly on a GET when the question has previously been answered YES" in {
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+        .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), true)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, removeSubcontractorVerifyRequestRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to the ReviewUnmatchedSubcontractorsController on a POST and delete verification when valid data is submitted and answer = YES" in {
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.deleteVerification(any(), any())(any())
+      ).thenReturn(Future.successful(DeleteVerificationResponse(verificationsCounter = Some(5L))))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, removeSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to the CheckVerificationBatchReadinessController on a POST and delete verification when valid data is submitted and answer = YES" in {
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.deleteVerification(any(), any())(any())
+      ).thenReturn(Future.successful(DeleteVerificationResponse(verificationsCounter = Some(0L))))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, removeSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.CheckVerificationBatchReadinessController
+          .checkVerificationBatchReadiness(mode)
+          .url
+      }
+    }
+
+    "must redirect to the Journey Recovery on a POST when delete verification fails and answer = YES" in {
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.deleteVerification(any(), any())(any())
+      ).thenReturn(Future.successful(DeleteVerificationResponse(verificationsCounter = None)))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[VerificationService].toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, removeSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to the ReviewUnmatchedSubcontractorsController when valid data is submitted and answer = NO" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, removeSubcontractorVerifyRequestRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -156,9 +387,27 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
+    "must redirect to Journey Recovery for a GET if subcontractorId is not found" in {
+
+      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, removeSubcontractorVerifyRequestUnmappedSubcontractorIdRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -169,6 +418,32 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, removeSubcontractorVerifyRequestUnmappedSubcontractorIdRoute).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
   }
