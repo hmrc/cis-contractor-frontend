@@ -338,5 +338,35 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .url
       }
     }
+
+    "must redirect to Journey Recovery when required TrustAnswers are missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustAnswersQuery, answers.copy(worksReferenceYesNo = Some(true), worksReference = None))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
   }
 }
