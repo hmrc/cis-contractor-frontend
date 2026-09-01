@@ -93,6 +93,13 @@ class ReviewInsufficientInfoService @Inject() (
     sub: SubcontractorCurrentVerification,
     verification: VerificationCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
+    val name = displayName(sub)
+    val subbieResourceRef =
+      sub.subbieResourceRef.getOrElse {
+        throw new IllegalStateException(
+          s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
+        )
+      }
     val name      = displayName(sub)
     val removeUrl =
       verification.verificationResourceRef
@@ -108,7 +115,7 @@ class ReviewInsufficientInfoService @Inject() (
       editLink = LinkViewModel(
         controllers.amend.routes.AmendSubcontractorController
           .onPageLoad(
-            sub.subbieResourceRef.getOrElse(0L),
+            subbieResourceRef,
             AmendJourneyType.InsufficientInfo.routeValue
           )
           .url,
