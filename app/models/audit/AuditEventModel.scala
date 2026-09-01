@@ -25,7 +25,8 @@ trait AuditEvent {
 }
 
 private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObject) = {
-  val changedKeys = updated.keys.filter(k => (original \ k).toOption != (updated \ k).toOption)
+  val allKeys     = original.keys ++ updated.keys
+  val changedKeys = allKeys.filter(k => (original \ k).toOption != (updated \ k).toOption)
   val origDiff    = JsObject(changedKeys.flatMap(k => (original \ k).toOption.map(k -> _)).toSeq)
   val updDiff     = JsObject(changedKeys.flatMap(k => (updated \ k).toOption.map(k -> _)).toSeq)
   (origDiff, updDiff)
@@ -34,6 +35,9 @@ private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObj
 case class AddSubcontractorAuditEventModel(
   cisId: Option[String],
   typeOfSubcontractor: String,
+  firstName: Option[String],
+  middleName: Option[String],
+  surname: Option[String],
   subTradingNameYesNo: Option[Boolean],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
@@ -57,6 +61,9 @@ object AddSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
       (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "firstName").writeNullable[String] and
+      (__ \ "middleName").writeNullable[String] and
+      (__ \ "surname").writeNullable[String] and
       (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
@@ -208,6 +215,9 @@ object AddTrustSubcontractorAuditEventModel {
 }
 
 case class IndividualSubcontractorDetails(
+  firstName: Option[String],
+  middleName: Option[String],
+  surname: Option[String],
   subTradingNameYesNo: Option[Boolean],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
@@ -227,7 +237,10 @@ case class IndividualSubcontractorDetails(
 
 object IndividualSubcontractorDetails {
   implicit val writes: OWrites[IndividualSubcontractorDetails] = (
-    (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
+    (__ \ "firstName").writeNullable[String] and
+      (__ \ "middleName").writeNullable[String] and
+      (__ \ "surname").writeNullable[String] and
+      (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and
