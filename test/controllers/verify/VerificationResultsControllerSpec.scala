@@ -18,15 +18,12 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.GetLastSubmittedVerificationBatchResponse
-import models.{SubcontractorLastVerification, UserAnswers, VerificationLastVerification}
+import models.{SubcontractorLastVerification, VerificationLastVerification}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.verify.LastSubmittedVerificationBatchResponsePage
-import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
-import services.VerificationService
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
@@ -51,14 +48,13 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
     actionIndicator = Some("verify")
   )
 
-  private val batchResponse           = GetLastSubmittedVerificationBatchResponse(
+  private val batchResponse = GetLastSubmittedVerificationBatchResponse(
     scheme = None,
     subcontractors = Seq(subcontractor),
     verifications = Seq(verification),
     verificationBatch = None,
     submission = None
   )
-  private val mockVerificationService = mock[VerificationService]
 
   "VerificationResults Controller" - {
 
@@ -103,6 +99,5 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
   }
 }

@@ -228,18 +228,20 @@ class VerificationService @Inject() (
     cisId: String,
     response: GetLastSubmittedVerificationBatchResponse
   )(implicit hc: HeaderCarrier): Future[Boolean] = {
-    val unmatchedResourceRefs =
-      response.verifications
-        .filter(CheckUnmatchedSubcontractorsService.isUnmatched)
-        .flatMap(_.verificationResourceRef)
-        .toSet
 
-    if (unmatchedResourceRefs.isEmpty) {
+    val unmatchedIds =
+      unmatchedSubcontractorIds(response).toSet
+
+    if (unmatchedIds.isEmpty) {
       Future.successful(false)
     } else {
       cisConnector.getSubcontractorList(cisId).map { listResponse =>
-        val liveResourceRefs = listResponse.subcontractors.flatMap(_.subbieResourceRef).toSet
-        unmatchedResourceRefs.exists(liveResourceRefs.contains)
+        val liveIds =
+          listResponse.subcontractors
+            .map(_.subcontractorId)
+            .toSet
+
+        unmatchedIds.exists(liveIds.contains)
       }
     }
   }
@@ -331,51 +333,43 @@ class VerificationService @Inject() (
                      )
                    )
 
-      hasCurrentBatch = current.verificationBatch.nonEmpty || current.verifications.nonEmpty
+      verificationBatchRefOpt =
+        current.verificationBatch.flatMap(_.verifBatchResourceRef)
 
       _ <-
-        if (!hasCurrentBatch) {
+        verificationBatchRefOpt match {
 
-          cisConnector.createVerificationBatchAndVerifications(
-            CreateVerificationBatchAndVerificationsRequest(
-              instanceId = cisId,
-              verificationResourceReferences = submittedSubbieRefs,
-              actionIndicator = None
-            )
-          )
-
-        } else {
-
-          val existingVerificationRefs =
-            current.verifications
-              .flatMap(_.verificationResourceRef)
-              .distinct
-
-          val verificationBatchRef =
-            current.verificationBatch
-              .flatMap(_.verifBatchResourceRef)
-              .getOrElse(
-                throw new RuntimeException(
-                  "Missing verifBatchResourceRef in current verification batch"
-                )
-              )
-
-          val modifyRequest =
-            ModifyVerificationsRequest(
-              instanceId = cisId,
-              deleteVerifications =
-                if (existingVerificationRefs.nonEmpty)
-                  Some(DeleteVerifications(existingVerificationRefs))
-                else None,
-              createVerifications = Some(
-                CreateVerifications(
-                  verificationBatchRef,
-                  submittedSubbieRefs
-                )
+          case None =>
+            cisConnector.createVerificationBatchAndVerifications(
+              CreateVerificationBatchAndVerificationsRequest(
+                instanceId = cisId,
+                verificationResourceReferences = submittedSubbieRefs,
+                actionIndicator = None
               )
             )
 
-          cisConnector.modifyVerificationBatch(modifyRequest)
+          case Some(verificationBatchRef) =>
+            val existingVerificationRefs =
+              current.verifications
+                .flatMap(_.verificationResourceRef)
+                .distinct
+
+            val modifyRequest =
+              ModifyVerificationsRequest(
+                instanceId = cisId,
+                deleteVerifications =
+                  if (existingVerificationRefs.nonEmpty)
+                    Some(DeleteVerifications(existingVerificationRefs))
+                  else None,
+                createVerifications = Some(
+                  CreateVerifications(
+                    verificationBatchRef,
+                    submittedSubbieRefs
+                  )
+                )
+              )
+
+            cisConnector.modifyVerificationBatch(modifyRequest)
         }
 
       afterCurrent <- getCurrentVerificationBatch(refreshedUa)
@@ -388,18 +382,21 @@ class VerificationService @Inject() (
     response: GetLastSubmittedVerificationBatchResponse
   ): Seq[Long] = {
 
-    val unmatchedSubcontractorIds =
-      response.verifications
-        .collect {
-          case verification if CheckUnmatchedSubcontractorsService.isUnmatched(verification) =>
-            verification.subcontractorId
-        }
-        .flatten
-        .distinct
+    val ids = unmatchedSubcontractorIds(response)
 
     response.subcontractors
-      .filter(sub => unmatchedSubcontractorIds.contains(sub.subcontractorId))
+      .filter(sub => ids.contains(sub.subcontractorId))
       .flatMap(_.subbieResourceRef)
       .distinct
   }
+
+  private def unmatchedSubcontractorIds(
+    response: GetLastSubmittedVerificationBatchResponse
+  ): Seq[Long] =
+    response.verifications.collect {
+      case verification
+          if CheckUnmatchedSubcontractorsService.isUnmatched(verification) &&
+            verification.subcontractorId.isDefined =>
+        verification.subcontractorId.get
+    }.distinct
 }
