@@ -49,7 +49,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
     userAnswers: UserAnswers,
     finalValidationService: ContractorDetailsFinalValidationService
   ) = {
-    val mockCisManageService = mock[CisManageService]
+    val mockCisManageService  = mock[CisManageService]
     val mockSessionRepository = mock[SessionRepository]
 
     when(mockCisManageService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))

@@ -163,7 +163,7 @@ class ContractorDetailsFinalValidationController @Inject() (
 
   private def finalTaskTitleKey(target: ContractorDetailsValidationTarget): String =
     target match {
-      case FileMonthlyReturn | FileNilReturn =>
+      case FileMonthlyReturn | FileNilReturn                    =>
         "finalValidations.reviewContractorDetails.task.fileReturn"
       case VerifySubcontractors | ReviewUnmatchedSubcontractors =>
         "finalValidations.reviewContractorDetails.task.verifySubcontractors"

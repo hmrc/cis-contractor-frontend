@@ -58,30 +58,30 @@ class ContractorDetailsFinalValidationService @Inject() (
 
   def updateSchemeFromAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
     for {
-      scheme <- required(userAnswers.get(ContractorSchemePage), "ContractorSchemePage not found in session data")
-      _      <- if (validate(userAnswers).allComplete) Future.successful(())
-                else Future.failed(new RuntimeException("Contractor details final validations are incomplete"))
+      scheme          <- required(userAnswers.get(ContractorSchemePage), "ContractorSchemePage not found in session data")
+      _               <- if (validate(userAnswers).allComplete) Future.successful(())
+                         else Future.failed(new RuntimeException("Contractor details final validations are incomplete"))
       versionResponse <- contractorDetailsService.updateSchemeVersion(
                            UpdateSchemeVersionRequest(
                              currentVersion = scheme.version.getOrElse(0),
                              instanceId = scheme.instanceId
                            )
                          )
-      _ <- contractorDetailsService.updateScheme(
-             UpdateSchemeRequest(
-               schemeId = scheme.schemeId,
-               instanceId = scheme.instanceId,
-               taxOfficeNumber = scheme.taxOfficeNumber,
-               taxOfficeReference = scheme.taxOfficeReference,
-               accountsOfficeReference = scheme.accountsOfficeReference,
-               prePopCount = scheme.prePopCount.getOrElse(0),
-               prePopSuccessful = scheme.prePopSuccessful.getOrElse(""),
-               uniqueTaxReference = userAnswers.get(ContractorUtrPage).getOrElse(""),
-               name = userAnswers.get(SchemeNamePage).getOrElse(""),
-               emailAddress = userAnswers.get(EnterContractorEmailAddressPage).getOrElse(""),
-               version = versionResponse.newVersion
-             )
-           )
+      _               <- contractorDetailsService.updateScheme(
+                           UpdateSchemeRequest(
+                             schemeId = scheme.schemeId,
+                             instanceId = scheme.instanceId,
+                             taxOfficeNumber = scheme.taxOfficeNumber,
+                             taxOfficeReference = scheme.taxOfficeReference,
+                             accountsOfficeReference = scheme.accountsOfficeReference,
+                             prePopCount = scheme.prePopCount.getOrElse(0),
+                             prePopSuccessful = scheme.prePopSuccessful.getOrElse(""),
+                             uniqueTaxReference = userAnswers.get(ContractorUtrPage).getOrElse(""),
+                             name = userAnswers.get(SchemeNamePage).getOrElse(""),
+                             emailAddress = userAnswers.get(EnterContractorEmailAddressPage).getOrElse(""),
+                             version = versionResponse.newVersion
+                           )
+                         )
     } yield ()
 
   private def populate(
