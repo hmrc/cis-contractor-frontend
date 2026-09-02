@@ -225,7 +225,9 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
 
       row.nameLink.url mustBe "#"
       row.editLink.url mustBe "#"
-      row.proceedLink.url mustBe "#"
+      row.proceedLink.url mustBe controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
+        .onPageLoad(1L)
+        .url
       row.removeLink.url mustBe "#"
     }
 

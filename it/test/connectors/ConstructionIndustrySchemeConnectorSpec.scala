@@ -620,11 +620,10 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "proceedInsufficientVerification" should {
 
-    val request = ProceedInsufficientVerificationRequest(
+    val request = ProceedVerificationRequest(
       instanceId = "1",
       verificationBatchResourceRef = 10L,
-      verificationResourceRef = 9L,
-      proceed = "Y"
+      verificationResourceRef = 9L
     )
 
     "successfully proceed verification when BE returns 204" in {
@@ -650,4 +649,34 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "proceedUnmatchedVerification" should {
+
+    val request = ProceedVerificationRequest(
+      instanceId = "1",
+      verificationBatchResourceRef = 10L,
+      verificationResourceRef = 9L
+    )
+
+    "successfully proceed verification when BE returns 204" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-unmatched-data")).willReturn(
+          aResponse().withStatus(NO_CONTENT)
+        )
+      )
+
+      connector.proceedUnmatchedVerification(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate upstream error on non-2xx (e.g. 500)" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-unmatched-data"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.proceedUnmatchedVerification(request).failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
 }
