@@ -28,7 +28,6 @@ import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
-import pages.QuestionPage
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}

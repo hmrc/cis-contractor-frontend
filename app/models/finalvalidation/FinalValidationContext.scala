@@ -22,7 +22,7 @@ sealed trait FinalValidationContext
 
 object FinalValidationContext {
   case object MonthlyReturn extends FinalValidationContext
-  case object VerifySubcontractors extends FinalValidationContext
+  case object VerifySubcontractor extends FinalValidationContext
 
   given Format[FinalValidationContext] = new Format[FinalValidationContext] {
 
@@ -30,14 +30,14 @@ object FinalValidationContext {
       JsString(
         context match {
           case MonthlyReturn        => "MonthlyReturn"
-          case VerifySubcontractors => "VerifySubcontractors"
+          case VerifySubcontractor => "VerifySubcontractor"
         }
       )
 
     override def reads(json: JsValue): JsResult[FinalValidationContext] =
       json.validate[String].flatMap {
         case "MonthlyReturn"        => JsSuccess(MonthlyReturn)
-        case "VerifySubcontractors" => JsSuccess(VerifySubcontractors)
+        case "VerifySubcontractor" => JsSuccess(VerifySubcontractor)
         case other                  => JsError(s"Unknown FinalValidationContext: $other")
       }
   }

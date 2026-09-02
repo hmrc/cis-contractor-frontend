@@ -17,12 +17,13 @@
 package controllers.finalvalidations
 
 import config.FrontendAppConfig
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import services.{FinalValidationHandoffService, FinalValidationSubcontractorService}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.finalvalidation.FinalValidationUpdateRequestBuilder
-import pages.finalvalidation.FinalValidationHandoffPage
+import models.finalvalidation.{FinalValidationContext, FinalValidationUpdateRequestBuilder}
+import models.requests.DataRequest
+import pages.finalvalidation.{FinalValidationContextPage, FinalValidationHandoffPage, VerifyFinalValidationPayloadPage}
 import play.api.Logging
 
 import javax.inject.{Inject, Singleton}
@@ -38,34 +39,62 @@ class FinalValidationCompleteController @Inject() (
   updateRequestBuilder: FinalValidationUpdateRequestBuilder,
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
-)(using ec: ExecutionContext)
+)(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    request.userAnswers.get(FinalValidationHandoffPage) match {
+    request.userAnswers.get(FinalValidationContextPage) match {
+      case Some(FinalValidationContext.VerifySubcontractor) =>
+        request.userAnswers.get(VerifyFinalValidationPayloadPage) match {
 
-      case Some(handoffId) =>
-        finalValidationHandoffService.getPayload(handoffId).flatMap {
           case Some(payload) =>
             Future.fromTry(updateRequestBuilder.build(request.userAnswers, payload))
-              .flatMap{
+              .flatMap {
                 case Some(updateRequest) =>
                   finalValidationSubcontractorService.updateSubcontractorForFinalValidation(updateRequest)
                 case None =>
                   Future.unit
               }
             .map { _ =>
-              Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
+              Redirect(
+                controllers.finalvalidations.routes.UpdateSubcontractorDetailsController.onPageLoad(payload.subcontractorId)
+              )
             }
-          
+
+          case None =>
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+
+      case _ =>
+        completeMonthlyReturn()
+    }
+  }
+  
+  private def completeMonthlyReturn()(implicit request: DataRequest[?]): Future[Result] = {
+    request.userAnswers.get(FinalValidationHandoffPage) match {
+
+      case Some(handoffId) =>
+        finalValidationHandoffService.getPayload(handoffId).flatMap {
+          case Some(payload) =>
+            Future.fromTry(updateRequestBuilder.build(request.userAnswers, payload))
+              .flatMap {
+                case Some(updateRequest) =>
+                  finalValidationSubcontractorService.updateSubcontractorForFinalValidation(updateRequest)
+                case None =>
+                  Future.unit
+              }
+              .map { _ =>
+                Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
+              }
+
           case None =>
             Future.successful(
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             )
         }
 
-      case None =>  
+      case None =>
         Future.successful(
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         )

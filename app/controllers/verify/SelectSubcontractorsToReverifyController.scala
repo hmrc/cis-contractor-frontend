@@ -18,6 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
@@ -30,9 +31,10 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.PaginationToReverifyService
+import services.{PaginationToReverifyService, VerifyFinalValidationService}
 import models.requests.DataRequest
 import models.verify.*
+import pages.finalvalidation.{FinalValidationContextPage, FinalValidationErrorPage, VerifyFinalValidationSourcePage}
 import pages.verify.*
 import play.api.data.Form
 import rules.verify.ReverificationRules
@@ -50,6 +52,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  verifyFinalValidationService: VerifyFinalValidationService,
   formProvider: SelectSubcontractorsToReverifyFormProvider,
   paginationToReverifyService: PaginationToReverifyService,
   clock: Clock,
@@ -190,7 +194,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
     }
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       val allRows: Seq[SubcontractorReverifyRow] =
         request.userAnswers
@@ -279,8 +283,24 @@ class SelectSubcontractorsToReverifyController @Inject() (
           boundForm.fold(
             formWithErrors => Future.successful(renderForm(formWithErrors)),
             _ =>
-              saveSelectionsAndRedirect { updatedAnswers =>
-                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
+              for {
+                withSelections <- Future.fromTry(request.userAnswers
+                                    .set(SelectSubcontractorsToReverifyPage, mergedSelections))
+                withContext    <- Future.fromTry(withSelections
+                                    .set(FinalValidationContextPage, FinalValidationContext.VerifySubcontractor))
+                withSource     <- Future.fromTry(withContext.set(
+                                    VerifyFinalValidationSourcePage,
+                                    VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                  ))
+                failures       <- verifyFinalValidationService.validate(request.cisId, withSource)
+                finalAnswers   <- Future.fromTry(withSource.set(FinalValidationErrorPage, failures))
+                _              <- sessionRepository.set(finalAnswers)
+              } yield {
+                if (failures.nonEmpty) {
+                  Redirect(controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad())
+                } else {
+                  Redirect(navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, finalAnswers))
+                }
               }
           )
       }

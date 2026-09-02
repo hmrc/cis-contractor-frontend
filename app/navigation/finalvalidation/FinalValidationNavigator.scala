@@ -24,15 +24,21 @@ import models.{FinalValidationMode, Mode, UserAnswers}
 import models.finalvalidation.FinalValidationChangeTarget
 import models.finalvalidation.FinalValidationChangeTarget.*
 import models.TypeOfSubcontractor.*
+import models.contact.ContactMethodOptions
 import navigation.NavigatorForJourney
-import pages.add.TypeOfSubcontractorPage
+import pages.add.*
+import pages.add.company.*
+import pages.add.partnership.*
+import pages.add.trust.*
 import pages.Page
+import pages.finalvalidation.FinalValidationChangeTargetPage
+import play.api.Logging
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class FinalValidationNavigator @Inject() extends NavigatorForJourney {
+class FinalValidationNavigator @Inject() extends NavigatorForJourney with Logging {
 
   def startPage(target: FinalValidationChangeTarget, userAnswers: UserAnswers): Call =
     userAnswers.get(TypeOfSubcontractorPage) match {
@@ -40,11 +46,403 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney {
       case Some(Limitedcompany)         => companyStartPage(target)
       case Some(Partnership)            => partnershipStartPage(target)
       case Some(Trust)                  => trustStartPage(target)
-      case None                         => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case None                         => recovery
     }
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    val target =
+      userAnswers.get(FinalValidationChangeTargetPage)
+
+    logger.info(
+      s"[FinalValidationNavigator][nextPage] " +
+        s"page=$page mode=$mode target=$target"
+    )
+    
+    mode match {
+      case FinalValidationMode =>
+        userAnswers.get(FinalValidationChangeTargetPage) match {
+          case Some(AddressYesNo) =>
+            addressYesNoNextPage(page, userAnswers)
+          case Some(ContactDetailsYesNo) =>
+            contactDetailsYesNoNextPage(page, userAnswers)
+          case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(WorksReferenceNumberYesNo) =>
+            identifierYesNoNextPage(page, userAnswers)
+          case Some(_) =>
+            complete
+          case None =>
+            logger.warn(
+              "[FinalValidationNavigator][nextPage] " +
+                "FinalValidationChangeTargetPage missing"
+            )
+            recovery
+        }
+      case _                   =>
+        logger.warn(
+          s"[FinalValidationNavigator][nextPage] " +
+            s"Unexpected mode=$mode"
+        )
+        recovery
+    }
+    
+  private def complete: Call =  
     controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+    
+  private def recovery: Call =
+    controllers.routes.JourneyRecoveryController.onPageLoad()
+    
+  private def yesNoNextPage(
+    answer: Option[Boolean],
+    onYes: => Call
+  ): Call =
+    answer match {
+      case Some(true) => onYes
+      case Some(false) => complete
+      case None => recovery
+    }
+
+  private def identifierYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
+    page match {
+      // Individual / sole trader
+      case UniqueTaxpayerReferenceYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(UniqueTaxpayerReferenceYesNoPage),
+          soleTraderRoutes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(FinalValidationMode)
+        )
+      case NationalInsuranceNumberYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(NationalInsuranceNumberYesNoPage),
+          soleTraderRoutes.SubNationalInsuranceNumberController.onPageLoad(FinalValidationMode)
+        )
+      case WorksReferenceNumberYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(WorksReferenceNumberYesNoPage),
+          soleTraderRoutes.WorksReferenceNumberController.onPageLoad(FinalValidationMode)
+        )
+
+      // company
+      case CompanyUtrYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(CompanyUtrYesNoPage),
+          companyRoutes.CompanyUtrController.onPageLoad(FinalValidationMode)
+        )
+      case CompanyCrnYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(CompanyCrnYesNoPage),
+          companyRoutes.CompanyCrnController.onPageLoad(FinalValidationMode)
+        )
+      case CompanyWorksReferenceYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(CompanyWorksReferenceYesNoPage),
+          companyRoutes.CompanyWorksReferenceController.onPageLoad(FinalValidationMode)
+        )
+
+      // Trust
+      case TrustUtrYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(TrustUtrYesNoPage),
+          trustRoutes.TrustUtrController.onPageLoad(FinalValidationMode)
+        )
+      case TrustWorksReferenceYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(TrustWorksReferenceYesNoPage),
+          trustRoutes.TrustWorksReferenceController.onPageLoad(FinalValidationMode)
+        )
+
+      // Partnership
+      case PartnershipHasUtrYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipHasUtrYesNoPage),
+          partnershipRoutes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(FinalValidationMode)
+        )
+      case PartnershipNominatedPartnerUtrYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage),
+          partnershipRoutes.PartnershipNominatedPartnerUtrController.onPageLoad(FinalValidationMode)
+        )
+      case PartnershipNominatedPartnerNinoYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage),
+          partnershipRoutes.PartnershipNominatedPartnerNinoController.onPageLoad(FinalValidationMode)
+        )
+      case PartnershipNominatedPartnerCrnYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage),
+          partnershipRoutes.PartnershipNominatedPartnerCrnController.onPageLoad(FinalValidationMode)
+        )
+      case PartnershipWorksReferenceNumberYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipWorksReferenceNumberYesNoPage),
+          partnershipRoutes.PartnershipWorksReferenceNumberController.onPageLoad(FinalValidationMode)
+        )
+      case _ =>
+        complete
+    }
+
+  private def addressYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
+    page match {
+      case SubAddressYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(SubAddressYesNoPage),
+          soleTraderRoutes.AddressOfSubcontractorController.redirectToAddressLookup(FinalValidationMode, None)
+        )
+      case CompanyAddressYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(CompanyAddressYesNoPage),
+          companyRoutes.CompanyAddressController.redirectToAddressLookup(FinalValidationMode, None)
+        )
+      case PartnershipAddressYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipAddressYesNoPage),
+          partnershipRoutes.PartnershipAddressController.redirectToAddressLookup(FinalValidationMode, None)
+        )
+      case TrustAddressYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(TrustAddressYesNoPage),
+          trustRoutes.TrustAddressController.redirectToAddressLookup(FinalValidationMode, None)
+        )
+      case _ =>
+        recovery
+    }
+
+  private def contactDetailsYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
+    page match {
+      // Individual / sole trader
+      case AddIndividualContactMethodsYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(AddIndividualContactMethodsYesNoPage),
+          soleTraderRoutes.IndividualContactMethodOptionsController.onPageLoad(FinalValidationMode)
+        )
+      case IndividualContactMethodOptionsPage =>
+        nextSelectedIndividualContactMethodPageAfter(
+          current = None,
+          userAnswers
+        )
+      case IndividualEmailAddressPage =>
+        nextSelectedIndividualContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Email),
+          userAnswers
+        )
+      case IndividualPhoneNumberPage =>
+        nextSelectedIndividualContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Phone),
+          userAnswers
+        )
+      case IndividualMobileNumberPage =>
+        nextSelectedIndividualContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Mobile),
+          userAnswers
+        )
+
+      // company
+      case AddCompanyContactMethodsYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(AddCompanyContactMethodsYesNoPage),
+          companyRoutes.CompanyContactMethodOptionsController.onPageLoad(FinalValidationMode)
+        )
+      case CompanyContactMethodOptionsPage =>
+        nextSelectedCompanyContactMethodPageAfter(
+          current = None,
+          userAnswers
+        )
+      case CompanyEmailAddressPage =>
+        nextSelectedCompanyContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Email),
+          userAnswers
+        )
+      case CompanyPhoneNumberPage =>
+        nextSelectedCompanyContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Phone),
+          userAnswers
+        )
+      case CompanyMobileNumberPage =>
+        nextSelectedCompanyContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Mobile),
+          userAnswers
+        )
+
+      // Partnership
+      case AddPartnershipContactMethodsYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(AddPartnershipContactMethodsYesNoPage),
+          partnershipRoutes.PartnershipContactMethodOptionsController.onPageLoad(FinalValidationMode)
+        )
+      case PartnershipContactMethodOptionsPage =>
+        nextSelectedPartnershipContactMethodPageAfter(
+          current = None,
+          userAnswers
+        )
+      case PartnershipEmailAddressPage =>
+        nextSelectedPartnershipContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Email),
+          userAnswers
+        )
+      case PartnershipPhoneNumberPage =>
+        nextSelectedPartnershipContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Phone),
+          userAnswers
+        )
+      case PartnershipMobileNumberPage =>
+        nextSelectedPartnershipContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Mobile),
+          userAnswers
+        )
+
+      // Trust
+      case AddTrustContactMethodsYesNoPage =>
+        yesNoNextPage(
+          userAnswers.get(AddTrustContactMethodsYesNoPage),
+          trustRoutes.TrustContactMethodOptionsController.onPageLoad(FinalValidationMode)
+        )
+      case TrustContactMethodOptionsPage =>
+        nextSelectedTrustContactMethodPageAfter(
+          current = None,
+          userAnswers
+        )
+      case TrustEmailAddressPage =>
+        nextSelectedTrustContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Email),
+          userAnswers
+        )
+      case TrustPhoneNumberPage =>
+        nextSelectedTrustContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Phone),
+          userAnswers
+        )
+      case TrustMobileNumberPage =>
+        nextSelectedTrustContactMethodPageAfter(
+          current = Some(ContactMethodOptions.Mobile),
+          userAnswers
+        )
+      case _ =>
+        recovery
+    }
+
+  private def nextSelectedContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    selectedContactMethods: Option[Seq[ContactMethodOptions]]
+  )(contactMethodPageCall: ContactMethodOptions => Call): Call =
+    navigateFromContactMethodPage(current, selectedContactMethods) { remaining =>
+      remaining.headOption.fold {
+        complete
+      } { contactMethod =>
+        contactMethodPageCall(contactMethod)
+      }
+    }
+
+  private def navigateFromContactMethodPage(
+    current: Option[ContactMethodOptions],
+    selectedContactMethods: Option[Seq[ContactMethodOptions]]
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
+    selectedContactMethods.filter(_.nonEmpty).fold(recovery) { selected =>
+      current match {
+        case Some(currentContactMethod)
+          if !selected.contains(currentContactMethod) =>
+          recovery
+        case _ =>
+          val remaining =
+            current match {
+              case None =>
+                selected
+              case Some(currentContactMethod) =>
+                val currentIndex = selected.indexWhere(_ == currentContactMethod)
+                selected.drop(currentIndex + 1)
+            }
+
+          terminalStep(remaining)
+      }
+    }
+
+  private def nextSelectedIndividualContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      selectedIndividualContactMethodsInOrder(userAnswers)
+    )(
+      individualContactMethodPageCall
+    )
+
+  private def selectedIndividualContactMethodsInOrder(userAnswers: UserAnswers): Option[Seq[ContactMethodOptions]] =
+    userAnswers
+      .get(IndividualContactMethodOptionsPage)
+      .map(ContactMethodOptions.ordered)
+
+  private def individualContactMethodPageCall(contactMethod: ContactMethodOptions): Call=
+    contactMethod match {
+      case ContactMethodOptions.Email  => soleTraderRoutes.IndividualEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  => soleTraderRoutes.IndividualPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile => soleTraderRoutes.IndividualMobileNumberController.onPageLoad(FinalValidationMode)
+    }
+
+  private def nextSelectedCompanyContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      selectedCompanyContactMethodsInOrder(userAnswers)
+    )(
+      companyContactMethodPageCall
+    )
+
+  private def selectedCompanyContactMethodsInOrder(userAnswers: UserAnswers): Option[Seq[ContactMethodOptions]] =
+    userAnswers
+      .get(CompanyContactMethodOptionsPage)
+      .map(ContactMethodOptions.ordered)
+
+  private def companyContactMethodPageCall(contactMethod: ContactMethodOptions): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  => companyRoutes.CompanyEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  => companyRoutes.CompanyPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile => companyRoutes.CompanyMobileNumberController.onPageLoad(FinalValidationMode)
+    }
+
+  private def nextSelectedPartnershipContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      selectedPartnershipContactMethodsInOrder(userAnswers)
+    )(
+      partnershipContactMethodPageCall
+    )
+
+  private def selectedPartnershipContactMethodsInOrder(userAnswers: UserAnswers): Option[Seq[ContactMethodOptions]] =
+    userAnswers
+      .get(PartnershipContactMethodOptionsPage)
+      .map(ContactMethodOptions.ordered)
+
+  private def partnershipContactMethodPageCall(contactMethod: ContactMethodOptions): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  => partnershipRoutes.PartnershipEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  => partnershipRoutes.PartnershipPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile => partnershipRoutes.PartnershipMobileNumberController.onPageLoad(FinalValidationMode)
+    }
+
+  private def nextSelectedTrustContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      selectedTrustContactMethodsInOrder(userAnswers)
+    )(
+      trustContactMethodPageCall
+    )
+
+  private def selectedTrustContactMethodsInOrder(userAnswers: UserAnswers): Option[Seq[ContactMethodOptions]] =
+    userAnswers
+      .get(TrustContactMethodOptionsPage)
+      .map(ContactMethodOptions.ordered)
+
+  private def trustContactMethodPageCall(contactMethod: ContactMethodOptions): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  => trustRoutes.TrustEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  => trustRoutes.TrustPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile => trustRoutes.TrustMobileNumberController.onPageLoad(FinalValidationMode)
+    }
 
   private def soleTraderStartPage(target: FinalValidationChangeTarget): Call =
     target match {
@@ -65,7 +463,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney {
       case WorksReferenceNumberYesNo =>
         soleTraderRoutes.WorksReferenceNumberYesNoController.onPageLoad(FinalValidationMode)
       case WorksReferenceNumber      => soleTraderRoutes.WorksReferenceNumberController.onPageLoad(FinalValidationMode)
-      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _                         => recovery
     }
 
   private def companyStartPage(target: FinalValidationChangeTarget): Call =
@@ -84,7 +482,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney {
       case WorksReferenceNumberYesNo =>
         companyRoutes.CompanyWorksReferenceYesNoController.onPageLoad(FinalValidationMode)
       case WorksReferenceNumber      => companyRoutes.CompanyWorksReferenceController.onPageLoad(FinalValidationMode)
-      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _                         => recovery
     }
 
   private def trustStartPage(target: FinalValidationChangeTarget): Call =
@@ -100,7 +498,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney {
       case Utr                       => trustRoutes.TrustUtrController.onPageLoad(FinalValidationMode)
       case WorksReferenceNumberYesNo => trustRoutes.TrustWorksReferenceYesNoController.onPageLoad(FinalValidationMode)
       case WorksReferenceNumber      => trustRoutes.TrustWorksReferenceController.onPageLoad(FinalValidationMode)
-      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _                         => recovery
     }
 
   private def partnershipStartPage(target: FinalValidationChangeTarget): Call =
@@ -127,7 +525,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney {
         partnershipRoutes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(FinalValidationMode)
       case WorksReferenceNumber      =>
         partnershipRoutes.PartnershipWorksReferenceNumberController.onPageLoad(FinalValidationMode)
-      case _                         => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _                         => recovery
     }
 
 }

@@ -31,6 +31,7 @@ import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -55,12 +56,13 @@ class FinalValidationSubcontractorService @Inject() (
     changeTarget: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     for {
-      subcontractor <- getFinalValidationSubcontractor(response)
+      subcontractor     <- getFinalValidationSubcontractor(response)
       subcontractorType <- getFinalValidationSubcontractorType(subcontractor)
-      withCisId <- userAnswers.set(CisIdQuery, instanceId)
-      withType <- withCisId.set(TypeOfSubcontractorPage, subcontractorType)
-      withName <- populateFinalValidationName(withType, subcontractorType, subcontractor)
-      result <- populateFinalValidationTarget(withName, subcontractorType, subcontractor, changeTarget)
+      withCisId         <- userAnswers.set(CisIdQuery, instanceId)
+      withType          <- withCisId.set(TypeOfSubcontractorPage, subcontractorType)
+      withName          <- populateFinalValidationName(withType, subcontractorType, subcontractor)
+      withTarget        <- withName.set(FinalValidationChangeTargetPage, changeTarget)
+      result            <- populateFinalValidationTarget(withTarget, subcontractorType, subcontractor, changeTarget)
     } yield result
 
   private def getFinalValidationSubcontractor(response: GetSubcontractorResponse): Try[SubcontractorResponse] =
@@ -130,11 +132,11 @@ class FinalValidationSubcontractorService @Inject() (
       case TradingName =>
         subcontractorType match {
           case Individualorsoletrader =>
-            setStringIfPresent(userAnswers, TradingNameOfSubcontractorPage, subcontractor.tradingName)
+            setStringOrRemove(userAnswers, TradingNameOfSubcontractorPage, subcontractor.tradingName)
           case Limitedcompany | Trust =>
             Success(userAnswers)
           case Partnership =>
-            setStringIfPresent(userAnswers, PartnershipNominatedPartnerNamePage, subcontractor.tradingName)
+            setStringOrRemove(userAnswers, PartnershipNominatedPartnerNamePage, subcontractor.tradingName)
         }
 
       case _ =>
@@ -149,41 +151,113 @@ class FinalValidationSubcontractorService @Inject() (
   ): Try[UserAnswers] =
     target match {
       case UtrYesNo =>
-        val (yesNoPage, _) = utrPages(subcontractorType)
-        userAnswers.set(yesNoPage, hasValue(subcontractor.utr))
+        val (yesNoPage, valuePage) = utrPages(subcontractorType)
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = subcontractor.utr,
+          forceYes = false
+        )
       case Utr =>
-        val (_, valuePage) = utrPages(subcontractorType)
-        setStringIfPresent(userAnswers, valuePage, subcontractor.utr)
+        val (yesNoPage, valuePage) = utrPages(subcontractorType)
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = subcontractor.utr,
+          forceYes = true
+        )
       case PartnerUtrYesNo if subcontractorType == Partnership =>
-        userAnswers.set(PartnershipNominatedPartnerUtrYesNoPage, hasValue(subcontractor.partnerUtr))
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
+          valuePage = PartnershipNominatedPartnerUtrPage,
+          value = subcontractor.partnerUtr,
+          forceYes = true
+        )
       case PartnerUtr if subcontractorType == Partnership =>
-        setStringIfPresent(userAnswers, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
+          valuePage = PartnershipNominatedPartnerUtrPage,
+          value = subcontractor.partnerUtr,
+          forceYes = false
+        )
       case NinoYesNo =>
-        ninoPages(subcontractorType).flatMap { case (yesNoPage, _) =>
-          userAnswers.set(yesNoPage, hasValue(subcontractor.nino))
+        ninoPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = subcontractor.nino,
+            forceYes = false
+          )
         }
       case Nino =>
-        ninoPages(subcontractorType).flatMap { case (_, valuePage) =>
-          setStringIfPresent(userAnswers, valuePage, subcontractor.nino)
+        ninoPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = subcontractor.nino,
+            forceYes = true
+          )
         }
       case CrnYesNo =>
-        crnPages(subcontractorType).flatMap { case (yesNoPage, _) =>
-          userAnswers.set(yesNoPage, hasValue(subcontractor.crn))
+        crnPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = subcontractor.crn,
+            forceYes = false
+          )
         }
       case Crn =>
-        crnPages(subcontractorType).flatMap { case (_, valuePage) =>
-          setStringIfPresent(userAnswers, valuePage, subcontractor.crn)
+        crnPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = subcontractor.crn,
+            forceYes = true
+          )
         }
       case WorksReferenceNumberYesNo =>
-        val (yesNoPage, _) = worksReferenceNumberPages(subcontractorType)
-        userAnswers.set(yesNoPage, hasValue(subcontractor.worksReferenceNumber))
+        val (yesNoPage, valuePage) = worksReferenceNumberPages(subcontractorType)
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = subcontractor.worksReferenceNumber,
+          forceYes = false
+        )
       case WorksReferenceNumber =>
-        val (_, valuePage) = worksReferenceNumberPages(subcontractorType)
-        setStringIfPresent(userAnswers, valuePage, subcontractor.worksReferenceNumber)
+        val (yesNoPage, valuePage) = worksReferenceNumberPages(subcontractorType)
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = subcontractor.worksReferenceNumber,
+          forceYes = true
+        )
       case _ =>
         Failure(new RuntimeException(s"Unexpected target for identifier population: $target"))
     }
 
+  private def populateStringYesNoPair(
+    userAnswers: UserAnswers,
+    yesNoPage: QuestionPage[Boolean],
+    valuePage: QuestionPage[String],
+    value: Option[String],
+    forceYes: Boolean
+  ): Try[UserAnswers] =
+    for {
+      withYesNo <- userAnswers.set(yesNoPage, if (forceYes) true else hasValue(value))
+      result    <- setStringOrRemove(withYesNo, valuePage, value)
+    } yield result
+  
   private def populateAddressTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
@@ -191,14 +265,17 @@ class FinalValidationSubcontractorService @Inject() (
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, addressPage) = addressPages(subcontractorType)
-    target match {
-      case AddressYesNo =>
-        userAnswers.set(yesNoPage, hasAddress(subcontractor))
-      case AddressTarget =>
-        setAddressIfPresent(userAnswers, addressPage, toAddress(subcontractor))
-      case _ =>
-        Failure(new RuntimeException(s"Unexpected target for address population: $target"))
+    val yesNoValue = target match {
+      case AddressYesNo  => hasAddress(subcontractor)
+      case AddressTarget => true
+      case _             => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
     }
+    
+    for {
+      withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
+      result    <- setAddressOrRemove(withYesNo, addressPage, toAddress(subcontractor))
+    } yield result
+    
   }
 
   private def populateContactTarget(
@@ -208,19 +285,19 @@ class FinalValidationSubcontractorService @Inject() (
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, emailPage, phonePage, mobilePage) = contactPages(subcontractorType)
-
-    target match {
-      case ContactDetailsYesNo =>
-        userAnswers.set(yesNoPage, hasAnyContact(subcontractor))
-      case EmailAddress =>
-        setStringIfPresent(userAnswers, emailPage, subcontractor.emailAddress)
-      case PhoneNumber =>
-        setStringIfPresent(userAnswers, phonePage, subcontractor.phoneNumber)
-      case MobilePhoneNumber =>
-        setStringIfPresent(userAnswers, mobilePage, subcontractor.mobilePhoneNumber)
-      case _ =>
-        Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
-    }
+    val yesNoValue =
+      target match {
+        case ContactDetailsYesNo => hasAnyContact(subcontractor)
+        case EmailAddress | PhoneNumber | MobilePhoneNumber => true
+        case _ => return Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
+      }
+      
+    for {
+      withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
+      withEmail <- setStringOrRemove(withYesNo, emailPage, subcontractor.emailAddress)
+      withPhone <- setStringOrRemove(withEmail, phonePage, subcontractor.phoneNumber)
+      result    <- setStringOrRemove(withPhone, mobilePage, subcontractor.mobilePhoneNumber)
+    } yield result
   }
 
   private def utrPages(subcontractorType: TypeOfSubcontractor): (QuestionPage[Boolean], QuestionPage[String]) =
@@ -298,7 +375,7 @@ class FinalValidationSubcontractorService @Inject() (
       )
     }
 
-  private def setStringIfPresent(
+  private def setStringOrRemove(
     userAnswers: UserAnswers,
     page: QuestionPage[String],
     value: Option[String]
@@ -307,10 +384,10 @@ class FinalValidationSubcontractorService @Inject() (
       case Some(answer) =>
         userAnswers.set(page, answer)
       case None =>
-        Success(userAnswers)
+        userAnswers.remove(page)
     }
 
-  private def setAddressIfPresent(
+  private def setAddressOrRemove(
     userAnswers: UserAnswers,
     page: QuestionPage[Address],
     address: Option[Address]
@@ -319,7 +396,7 @@ class FinalValidationSubcontractorService @Inject() (
       case Some(address) =>
         userAnswers.set(page, address)
       case None =>
-        Success(userAnswers)
+        userAnswers.remove(page)
     }
 
   private def nonBlank(value: Option[String]): Option[String] =
