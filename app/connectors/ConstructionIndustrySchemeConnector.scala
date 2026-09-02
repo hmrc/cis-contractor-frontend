@@ -297,7 +297,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         resp.status match {
           case NO_CONTENT =>
             logger.info(
-              s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
+              s"[ConstructionIndustrySchemeConnector][proceedUnmatchedVerification] instanceId=${request.instanceId}"
             )
             Future.successful(())
           case other      =>
