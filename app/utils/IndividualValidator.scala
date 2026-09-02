@@ -17,26 +17,43 @@
 package utils
 
 import models.validation.FieldValidationFailure
-import models.SubcontractorCurrentVerification
-import models.TypeOfSubcontractor.Limitedcompany
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.TypeOfSubcontractor.Individualorsoletrader
 import models.validation.SubcontractorValidationField.TradingName
 
-object CompanyValidator {
+object IndividualValidator {
 
   def validate(
     subcontractorToValidate: SubcontractorCurrentVerification,
     allSubcontractors: Seq[SubcontractorCurrentVerification]
   ): List[FieldValidationFailure] =
-    CrnValidator
-      .validate(subcontractorToValidate.crn)
+    NameValidator
+      .validate(
+        firstName = subcontractorToValidate.firstName,
+        secondName = subcontractorToValidate.secondName,
+        surname = subcontractorToValidate.surname,
+        tradingName = subcontractorToValidate.tradingName
+      )
       .toList ++
-      WorksReferenceNumberValidator
-        .validate(subcontractorToValidate.worksReferenceNumber)
+      SurnameValidator
+        .validate(subcontractorToValidate.surname)
+        .toList ++
+      FirstNameValidator
+        .validate(subcontractorToValidate.firstName)
+        .toList ++
+      SecondNameValidator
+        .validate(subcontractorToValidate.secondName)
+        .toList ++
+      TradingNameValidator
+        .validate(subcontractorToValidate.tradingName, TradingName, Individualorsoletrader)
         .toList ++
       UtrValidator
         .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
-      TradingNameValidator
-        .validate(subcontractorToValidate.tradingName, TradingName, Limitedcompany)
+      NinoValidator
+        .validate(subcontractorToValidate.nino)
+        .toList ++
+      WorksReferenceNumberValidator
+        .validate(subcontractorToValidate.worksReferenceNumber)
         .toList
 }

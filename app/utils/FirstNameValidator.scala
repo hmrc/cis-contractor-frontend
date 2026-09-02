@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package pages.contractordetails
+package utils
 
-import models.{Scheme, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-case object ContractorSchemePage extends QuestionPage[Scheme] {
-
-  override def path: JsPath =
-    JsPath \ "contractordetails" \ toString
-
-  def hasExistingUtr(answers: UserAnswers): Boolean =
-    answers.get(this).flatMap(_.utr).exists(_.trim.nonEmpty)
+object FirstNameValidator {
+  def validate(
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
+    value.flatMap { firstName =>
+      Option.when(
+        !FirstMiddleName.isLengthInRange(firstName) || !FirstMiddleName.isValid(firstName)
+      ) {
+        FieldValidationFailure(
+          field = SubcontractorValidationField.FirstName,
+          value = Some(firstName)
+        )
+      }
+    }
 }

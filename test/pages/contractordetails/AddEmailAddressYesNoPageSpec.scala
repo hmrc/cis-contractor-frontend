@@ -35,5 +35,27 @@ class AddEmailAddressYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](AddEmailAddressYesNoPage)
 
     beRemovable[Boolean](AddEmailAddressYesNoPage)
+
+    "must remove the email address when the answer is No" in {
+      val answers = emptyUserAnswers
+        .set(EnterContractorEmailAddressPage, "test@example.com")
+        .success
+        .value
+
+      val result = answers.set(AddEmailAddressYesNoPage, false).success.value
+
+      result.get(EnterContractorEmailAddressPage) mustBe empty
+    }
+
+    "must keep the email address when the answer is Yes" in {
+      val answers = emptyUserAnswers
+        .set(EnterContractorEmailAddressPage, "test@example.com")
+        .success
+        .value
+
+      val result = answers.set(AddEmailAddressYesNoPage, true).success.value
+
+      result.get(EnterContractorEmailAddressPage) mustBe Some("test@example.com")
+    }
   }
 }
