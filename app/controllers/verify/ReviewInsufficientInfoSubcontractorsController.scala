@@ -18,11 +18,13 @@ package controllers.verify
 
 import controllers.actions.*
 import models.NormalMode
+import models.contractordetails.ContractorDetailsValidationTarget
 import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.i18n.I18nSupport
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfoService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
@@ -34,30 +36,49 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
+  contractorDetailsFinalValidationService: ContractorDetailsFinalValidationService,
   val controllerComponents: MessagesControllerComponents,
   sessionRepository: SessionRepository,
   view: ReviewInsufficientInfoSubcontractorsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
-      case Some(batch) =>
-        val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
-        if (viewModel.hasMissing || viewModel.hasReady) {
-          for {
-            updatedAnswers <-
-              Future.fromTry(request.userAnswers.set(VerificationBatchReadinessPage, viewModel.allReady))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Ok(view(viewModel))
+    contractorDetailsFinalValidationService
+      .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+      .flatMap { case (validatedAnswers, validation) =>
+        if (!validation.allComplete) {
+          Future.successful(
+            Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad())
+          )
         } else {
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
+          validatedAnswers.get(CurrentVerificationBatchResponsePage) match {
+            case Some(batch) =>
+              val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
+              if (viewModel.hasMissing || viewModel.hasReady) {
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(validatedAnswers.set(VerificationBatchReadinessPage, viewModel.allReady))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Ok(view(viewModel))
+              } else {
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              }
 
-      case None =>
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    }
+            case None =>
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+        }
+      }
+      .recover { case t =>
+        logger.error(
+          "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed final contractor validation",
+          t
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
   // TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey

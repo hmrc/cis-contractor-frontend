@@ -19,8 +19,9 @@ package navigation.contractordetails
 import base.SpecBase
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
+import models.contractordetails.ContractorDetailsValidationTarget
 import pages.Page
-import pages.contractordetails.{ContractorDetailsJourney, ContractorUtrPage}
+import pages.contractordetails.{ContractorDetailsJourney, ContractorDetailsValidationTargetPage, ContractorUtrPage}
 
 class ContractorDetailsNavigatorSpec extends SpecBase {
 
@@ -39,6 +40,17 @@ class ContractorDetailsNavigatorSpec extends SpecBase {
       "must go to IndexController from ContractorUtrPage" in {
         navigator.nextPage(ContractorUtrPage, NormalMode, emptyUserAnswers) mustBe
           routes.IndexController.onPageLoad()
+      }
+
+      "must go to review contractor details from ContractorUtrPage when final validations are active" in {
+        val userAnswers =
+          emptyUserAnswers
+            .set(ContractorDetailsValidationTargetPage, ContractorDetailsValidationTarget.FileMonthlyReturn)
+            .success
+            .value
+
+        navigator.nextPage(ContractorUtrPage, NormalMode, userAnswers) mustBe
+          controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
       }
     }
 

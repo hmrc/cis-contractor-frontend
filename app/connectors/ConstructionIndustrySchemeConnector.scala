@@ -211,6 +211,30 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/scheme/$instanceId")
       .execute[Scheme]
 
+  def updateSchemeVersion(
+    request: UpdateSchemeVersionRequest
+  )(implicit hc: HeaderCarrier): Future[UpdateSchemeVersionResponse] =
+    http
+      .post(url"$cisBaseUrl/scheme/version-update")
+      .withBody(Json.toJson(request))
+      .execute[UpdateSchemeVersionResponse]
+
+  def updateScheme(
+    request: UpdateSchemeRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/scheme/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            Future.successful(())
+          case other           =>
+            Future.failed(new RuntimeException(s"Update scheme failed, returned $other: ${response.body}"))
+        }
+      }
+
   def submitVerificationToChris(
     submissionId: Long,
     request: ChrisVerificationRequest

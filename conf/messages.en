@@ -1230,3 +1230,15 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+# Final contractor validations
+finalValidations.reviewContractorDetails.title                                 =  Review contractor details
+finalValidations.reviewContractorDetails.heading                               =  Review contractor details
+finalValidations.reviewContractorDetails.task.utr                              =  Unique Taxpayer Reference
+finalValidations.reviewContractorDetails.task.schemeName                       =  Scheme name
+finalValidations.reviewContractorDetails.task.email                            =  Email address
+finalValidations.reviewContractorDetails.task.fileReturn                       =  File a return
+finalValidations.reviewContractorDetails.task.verifySubcontractors             =  Verify subcontractors
+finalValidations.reviewContractorDetails.status.complete                       =  Complete
+finalValidations.reviewContractorDetails.status.incomplete                     =  Incomplete
+finalValidations.reviewContractorDetails.status.cannotStart                    =  Cannot start yet

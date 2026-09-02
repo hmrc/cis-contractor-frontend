@@ -666,6 +666,13 @@ GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.Unmatche
 
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
+# Final validations
+GET   /final-validations/file-monthly-return             controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileMonthlyReturn()
+GET   /final-validations/file-nil-return                 controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileNilReturn()
+GET   /final-validations/verify-subcontractors           controllers.finalvalidations.ContractorDetailsFinalValidationController.startVerifySubcontractors()
+GET   /final-validations/review-contractor-details       controllers.finalvalidations.ContractorDetailsFinalValidationController.onPageLoad()
+GET   /final-validations/review-contractor-details/next  controllers.finalvalidations.ContractorDetailsFinalValidationController.onContinue()
+
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
 
@@ -674,11 +681,15 @@ POST  /contractor-details/introduction  controllers.contractordetails.Contractor
 
 GET   /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
@@ -688,6 +699,8 @@ GET   /contractor-details/contractor-details-added  controllers.contractordetail
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 
