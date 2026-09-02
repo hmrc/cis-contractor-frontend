@@ -46,7 +46,7 @@ class GovTalkErrorStatusSpec extends SpecBase {
 
     "must write DepartmentalError to JSON" in {
       val json = Json.toJson[GovTalkErrorStatus](
-        DepartmentalError("3000", "Departmental error")
+        DepartmentalError(Some("3000"), "Departmental error")
       )
 
       (json \ "kind").as[String] mustBe "DepartmentalError"
@@ -61,16 +61,17 @@ class GovTalkErrorStatusSpec extends SpecBase {
         "errorText" -> "Departmental error"
       )
 
-      json.as[GovTalkErrorStatus] mustBe DepartmentalError("3000", "Departmental error")
+      json.as[GovTalkErrorStatus] mustBe DepartmentalError(Some("3000"), "Departmental error")
     }
 
-    "must fail to read DepartmentalError when errorCode is missing" in {
+    "must read DepartmentalError when errorCode is missing" in {
       val json = Json.obj(
         "kind"      -> "DepartmentalError",
         "errorText" -> "Departmental error"
       )
 
-      json.validate[GovTalkErrorStatus].isError mustBe true
+      json.as[GovTalkErrorStatus] mustBe
+        DepartmentalError(None, "Departmental error")
     }
 
     "must write and read NoResponse" in {

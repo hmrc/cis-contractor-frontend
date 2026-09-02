@@ -186,7 +186,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = "hmrc-mark",
           govTalkErrorStatus = Some(
             DepartmentalError(
-              errorCode = "3000",
+              errorCode = Some("3000"),
               errorText = "Departmental error"
             )
           )
@@ -219,7 +219,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = "hmrc-mark",
           govTalkErrorStatus = Some(
             DepartmentalError(
-              errorCode = "3001",
+              errorCode = Some("3001"),
               errorText = "Departmental error"
             )
           )
@@ -424,7 +424,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           status = SubmissionStatus.DEPARTMENTAL_ERROR,
           govTalkErrorStatus = Some(
             DepartmentalError(
-              errorCode = "3000",
+              errorCode = Some("3000"),
               errorText = "Departmental error"
             )
           )
@@ -459,7 +459,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           status = SubmissionStatus.DEPARTMENTAL_ERROR,
           govTalkErrorStatus = Some(
             DepartmentalError(
-              errorCode = "3001",
+              errorCode = Some("3001"),
               errorText = "Departmental error"
             )
           )

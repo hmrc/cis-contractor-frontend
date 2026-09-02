@@ -98,17 +98,13 @@ class SubmissionSendingController @Inject() (
       }
     }
 
-  private def redirectForInitialSubmissionResponse(
-    response: ChrisSubmissionResponse
+  private def redirectForErrorStatus(
+    status: SubmissionStatus,
+    govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
   ): Result =
-    SubmissionStatus.fromString(response.status) match {
+    status match {
 
-      case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Redirect(
-          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
-        )
-
-      case DEPARTMENTAL_ERROR if isSubmitAgainError(DEPARTMENTAL_ERROR, response.govTalkErrorStatus) =>
+      case DEPARTMENTAL_ERROR if isSubmitAgainError(govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -120,7 +116,7 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case FATAL_ERROR if isSubmitAgainError(FATAL_ERROR, response.govTalkErrorStatus) =>
+      case FATAL_ERROR if isSubmitAgainError(govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -131,6 +127,23 @@ class SubmissionSendingController @Inject() (
           controllers.verify.routes.VerificationNotSubmittedWarningController
             .onPageLoad()
         )
+
+      case _ =>
+        recovery
+    }
+
+  private def redirectForInitialSubmissionResponse(
+    response: ChrisSubmissionResponse
+  ): Result =
+    SubmissionStatus.fromString(response.status) match {
+
+      case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
+        Redirect(
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
+        )
+
+      case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
+        redirectForErrorStatus(status, response.govTalkErrorStatus)
 
       case _ =>
         recovery
@@ -151,32 +164,11 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case SUBMITTED_NO_RECEIPT =>
+      case SUBMITTED_NO_RECEIPT => // TODO: matching screen not found
         recovery
 
-      case DEPARTMENTAL_ERROR if isSubmitAgainError(DEPARTMENTAL_ERROR, response.govTalkErrorStatus) =>
-        Redirect(
-          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
-            .onPageLoad()
-        )
-
-      case DEPARTMENTAL_ERROR =>
-        Redirect(
-          controllers.verify.routes.VerifyDepartmentalErrorController
-            .onPageLoad()
-        )
-
-      case FATAL_ERROR if isSubmitAgainError(FATAL_ERROR, response.govTalkErrorStatus) =>
-        Redirect(
-          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
-            .onPageLoad()
-        )
-
-      case FATAL_ERROR =>
-        Redirect(
-          controllers.verify.routes.VerificationNotSubmittedWarningController
-            .onPageLoad()
-        )
+      case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
+        redirectForErrorStatus(status, response.govTalkErrorStatus)
 
       case SEND_ERROR =>
         Redirect(
@@ -194,15 +186,13 @@ class SubmissionSendingController @Inject() (
     }
 
   private def isSubmitAgainError(
-    submissionStatus: SubmissionStatus,
     govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
   ): Boolean =
-    (submissionStatus, govTalkErrorStatus) match {
-
-      case (FATAL_ERROR, Some(FatalError(errorCode, _))) =>
+    govTalkErrorStatus.exists {
+      case FatalError(errorCode, _) =>
         errorCode == SubmitAgainErrorCode
 
-      case (DEPARTMENTAL_ERROR, Some(DepartmentalError(errorCode, _))) =>
+      case DepartmentalError(Some(errorCode), _) =>
         errorCode == SubmitAgainErrorCode
 
       case _ =>
