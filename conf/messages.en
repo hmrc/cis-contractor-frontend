@@ -1230,3 +1230,10 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+verify.verifyDepartmentalErrorSubmitAgainController.title                                            =  There was a problem with your verification request
+verify.verifyDepartmentalErrorSubmitAgainController.heading                                          =  There was a problem with your verification request
+verify.verifyDepartmentalErrorSubmitAgainController.p1                                               =  The subcontractors that you selected have not been verified and your request has not been saved.
+verify.verifyDepartmentalErrorSubmitAgainController.p2                                               =  To verify these subcontractors, you need to start again with a new verification request.
+verify.verifyDepartmentalErrorSubmitAgainController.backTo                                           =  Back to
+verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link                    =  Manage your subcontractors

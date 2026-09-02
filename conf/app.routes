@@ -628,6 +628,8 @@ POST  /subcontractor/verify/no-new-subcontractors-to-verify  controllers.verify.
 
 GET   /subcontractor/verify/problem-with-verification-warning  controllers.verify.VerifyDepartmentalErrorController.onPageLoad()
 
+GET   /subcontractor/verify/problem-with-verification-warning-submit-again   controllers.verify.VerifyDepartmentalErrorSubmitAgainController.onPageLoad()
+
 GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.InactiveSchemeWarningController.onPageLoad()
 
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
