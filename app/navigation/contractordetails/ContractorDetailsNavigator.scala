@@ -20,6 +20,7 @@ import controllers.routes
 import models.{Mode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
+import pages.contractordetails.{ContractorDetailsValidationTargetPage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 
 import javax.inject.{Inject, Singleton}
 
@@ -27,5 +28,14 @@ import javax.inject.{Inject, Singleton}
 class ContractorDetailsNavigator @Inject() () extends NavigatorForJourney {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers) =
-    routes.IndexController.onPageLoad()
+    if (userAnswers.get(ContractorDetailsValidationTargetPage).isDefined && finalValidationPage(page)) {
+      controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
+    } else {
+      routes.IndexController.onPageLoad()
+    }
+
+  private def finalValidationPage(page: Page): Boolean =
+    page == ContractorUtrPage ||
+      page == SchemeNamePage ||
+      page == EnterContractorEmailAddressPage
 }

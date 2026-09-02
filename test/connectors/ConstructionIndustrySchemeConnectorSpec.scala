@@ -32,9 +32,10 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.requests.{ModifyVerificationsRequest, SubcontractorRequest, UpdateSubcontractorRequest}
+import models.requests.{ModifyVerificationsRequest, SubcontractorRequest, UpdateSchemeRequest, UpdateSchemeVersionRequest, UpdateSubcontractorRequest}
 import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
 import models.response.CreateSubmissionForVerificationResponse
+import models.response.UpdateSchemeVersionResponse
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -191,6 +192,90 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
 
       urlCaptor.getValue.toString must include("/cis/verification-batch/newest/INST-123")
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateSchemeVersion" should {
+
+    "POST /cis/scheme/version-update with the request body and return the new version" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+
+      val request  = UpdateSchemeVersionRequest(currentVersion = 3, instanceId = "INST-123")
+      val response = UpdateSchemeVersionResponse(newVersion = 4)
+
+      when(rb.execute[UpdateSchemeVersionResponse](any(), any()))
+        .thenReturn(Future.successful(response))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateSchemeVersion(request).futureValue mustBe response
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateScheme" should {
+
+    val request =
+      UpdateSchemeRequest(
+        schemeId = 1,
+        instanceId = "INST-123",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "AB456",
+        accountsOfficeReference = "AO123",
+        prePopCount = 2,
+        prePopSuccessful = "Y",
+        uniqueTaxReference = "1234567890",
+        name = "Scheme name",
+        emailAddress = "test@example.com",
+        version = 4
+      )
+
+    "POST /cis/scheme/update with the request body and return Unit for 204" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateScheme(request).futureValue mustBe (())
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "fail with the response body when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "boom")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val ex = connector.updateScheme(request).failed.futureValue
+      ex.getMessage mustBe s"Update scheme failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 

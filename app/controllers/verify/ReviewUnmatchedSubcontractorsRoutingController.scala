@@ -17,12 +17,13 @@
 package controllers.verify
 
 import controllers.actions.*
+import models.contractordetails.ContractorDetailsValidationTarget
 import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
-import services.{CheckUnmatchedSubcontractorsService, VerificationService}
+import services.{CheckUnmatchedSubcontractorsService, ContractorDetailsFinalValidationService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -34,7 +35,8 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  verificationService: VerificationService
+  verificationService: VerificationService,
+  contractorDetailsFinalValidationService: ContractorDetailsFinalValidationService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -42,36 +44,53 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      (
-        request.userAnswers.get(LastSubmittedVerificationBatchResponsePage),
-        request.userAnswers.get(CisIdQuery)
-      ) match {
-        case (Some(response), Some(cisId)) =>
-          val hasUnmatched = response.verifications.exists(CheckUnmatchedSubcontractorsService.isUnmatched)
-
-          if (!hasUnmatched) {
-            Future.successful(Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad()))
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.ReviewUnmatchedSubcontractors)
+        .flatMap { case (updatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad())
+            )
           } else {
-            verificationService
-              .anyUnmatchedResourceRefsStillPresent(cisId, response)
-              .map { stillPresent =>
-                if (stillPresent) {
-                  Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
-                } else {
-                  Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
-                }
-              }
-              .recover { case t =>
-                logger.error(
-                  "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoad] Failed to check live subcontractors",
-                  t
-                )
-                Redirect(controllers.routes.SystemErrorController.onPageLoad())
-              }
-          }
+            (
+              updatedAnswers.get(LastSubmittedVerificationBatchResponsePage),
+              updatedAnswers.get(CisIdQuery)
+            ) match {
+              case (Some(response), Some(cisId)) =>
+                val hasUnmatched = response.verifications.exists(CheckUnmatchedSubcontractorsService.isUnmatched)
 
-        case _ =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+                if (!hasUnmatched) {
+                  Future.successful(Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad()))
+                } else {
+                  verificationService
+                    .anyUnmatchedResourceRefsStillPresent(cisId, response)
+                    .map { stillPresent =>
+                      if (stillPresent) {
+                        Redirect(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
+                      } else {
+                        Redirect(controllers.routes.NoUnmatchedSubcontractorsController.onPageLoad())
+                      }
+                    }
+                    .recover { case t =>
+                      logger.error(
+                        "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoad] Failed to check live subcontractors",
+                        t
+                      )
+                      Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                    }
+                }
+
+              case _ =>
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            }
+          }
+        }
+        .recover { case t =>
+          logger.error(
+            "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoad] Failed final contractor validation",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 }
