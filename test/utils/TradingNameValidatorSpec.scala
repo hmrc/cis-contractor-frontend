@@ -51,13 +51,18 @@ class TradingNameValidatorSpec extends SpecBase {
 
         "return failure when the trading name is None" in {
           val tradingName = None
-          TradingNameValidator
-            .validate(tradingName, SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe Some(
-            FieldValidationFailure(
-              field = SubcontractorValidationField.TradingName,
-              value = None
+          if (typeOfSubcontractor == Individualorsoletrader) {
+            TradingNameValidator
+              .validate(Some(""), SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe None
+          } else {
+            TradingNameValidator
+              .validate(tradingName, SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe Some(
+              FieldValidationFailure(
+                field = SubcontractorValidationField.TradingName,
+                value = None
+              )
             )
-          )
+          }
         }
 
         "return no failure for a valid trading name" in {
@@ -98,8 +103,8 @@ class TradingNameValidatorSpec extends SpecBase {
 
       }
     }
-
   }
+
   "return a failure against the requested field" in {
     TradingNameValidator
       .validate(

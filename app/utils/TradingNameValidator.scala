@@ -28,6 +28,9 @@ object TradingNameValidator {
     subcontractorType: TypeOfSubcontractor
   ): Option[FieldValidationFailure] =
     value match {
+      case None if subcontractorType == Individualorsoletrader =>
+        None
+
       case None =>
         Some(
           FieldValidationFailure(
@@ -35,16 +38,20 @@ object TradingNameValidator {
             value = None
           )
         )
+
       case Some(tradingName)
-          if (tradingName.isBlank && subcontractorType != Individualorsoletrader)
-            || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
+          if (tradingName.isBlank && subcontractorType != Individualorsoletrader) ||
+            !TradingName.isLengthInRange(tradingName) ||
+            !TradingName.isValid(tradingName) =>
         Some(
           FieldValidationFailure(
             field = field,
             value = Some(tradingName)
           )
         )
-      case _    =>
+
+      case _ =>
         None
     }
+
 }

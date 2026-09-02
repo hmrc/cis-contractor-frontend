@@ -55,10 +55,6 @@ class IndividualValidatorSpec extends AnyWordSpec with Matchers {
         FieldValidationFailure(
           field = SubcontractorValidationField.Surname,
           value = None
-        ),
-        FieldValidationFailure(
-          field = SubcontractorValidationField.TradingName,
-          value = None
         )
       )
     }
