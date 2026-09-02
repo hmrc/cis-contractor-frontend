@@ -40,7 +40,9 @@ class CheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
         view(
           informationList,
           detailsList,
-          subcontractorName
+          subcontractorName,
+          backToUrl,
+          backToMessage
         )
 
       val doc: Document =
@@ -72,18 +74,18 @@ class CheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       doc.select(".govuk-summary-list").size() mustBe 2
 
-      val backLink: Elements =
-        doc.select("a.govuk-link[href='#']")
-
-      backLink.size() mustBe 1
+      val backLink =
+        doc.select("main a").first()
 
       backLink.text() mustBe
         messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
 
-      backLink.attr("href") mustBe "#"
+      backLink.attr("href") mustBe controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+        .onPageLoad()
+        .url
 
       val backLinkContainer =
-        backLink.first().parent()
+        backLink.parent()
 
       backLinkContainer.text() mustBe
         s"${messages("info.CheckYourAnswers.backTo")} " +
@@ -131,5 +133,11 @@ class CheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
           )
         )
       )
+
+    val backToUrl: String = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+      .onPageLoad()
+      .url
+
+    val backToMessage: String = messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
   }
 }

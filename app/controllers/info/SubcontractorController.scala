@@ -44,7 +44,8 @@ class SubcontractorController @Inject() (
 
   def onPageLoad(
     cisId: String,
-    subbieResourceRef: Long
+    subbieResourceRef: Long,
+    journeyType: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorService
@@ -77,7 +78,8 @@ class SubcontractorController @Inject() (
                   handleSubcontractor(
                     subcontractorType = subcontractorType,
                     userAnswers = request.userAnswers,
-                    subcontractor = subcontractor
+                    subcontractor = subcontractor,
+                    journeyType = journeyType
                   )
                 }
           }
@@ -96,7 +98,8 @@ class SubcontractorController @Inject() (
   private def handleSubcontractor(
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers,
-    subcontractor: SubcontractorResponse
+    subcontractor: SubcontractorResponse,
+    journeyType: String
   ): Future[Result] =
     populateUserAnswers(
       subcontractorType,
@@ -115,7 +118,7 @@ class SubcontractorController @Inject() (
       updatedAnswers =>
         sessionRepository
           .set(updatedAnswers)
-          .map(_ => Redirect(onwardRoute(subcontractorType)))
+          .map(_ => Redirect(onwardRoute(subcontractorType, journeyType)))
     )
 
   private def populateUserAnswers(
@@ -130,26 +133,26 @@ class SubcontractorController @Inject() (
     )
 
   private def onwardRoute(
-    subcontractorType: TypeOfSubcontractor
+    subcontractorType: TypeOfSubcontractor,
+    journeyType: String
   ): Call =
     subcontractorType match {
 
-      // TODO- update logic so view shows dynamic content+URL for back to link at the bottom of page to VF-07-03 or INSF-07-03
       case Individualorsoletrader =>
         controllers.info.routes.IndividualCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(journeyType)
 
       case Limitedcompany =>
         controllers.info.company.routes.CompanyCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(journeyType)
 
       case Partnership =>
         controllers.info.partnership.routes.PartnershipCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(journeyType)
 
       case Trust =>
         controllers.info.trust.routes.TrustCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(journeyType)
     }
 
   private def recovery: Result =

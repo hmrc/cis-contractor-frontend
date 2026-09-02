@@ -19,6 +19,7 @@ package controllers.info.trust
 import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
+import models.amend.AmendJourneyType
 import models.info.trust.TrustAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -44,7 +45,7 @@ class TrustCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(journeyType: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(TrustAnswersQuery) match {
 
@@ -59,13 +60,38 @@ class TrustCheckYourAnswersController @Inject() (
               rows = detailsRows(answers).flatten
             )
 
-          Ok(
-            view(
-              subcontractorInformationList,
-              detailsList,
-              answers.trustName.getOrElse("")
-            )
-          )
+          val messages = request.messages
+
+          AmendJourneyType.fromString(journeyType) match {
+            case Some(AmendJourneyType.InsufficientInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  answers.trustName.getOrElse(""),
+                  controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+                )
+              )
+
+            case Some(AmendJourneyType.UnmatchedInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  answers.trustName.getOrElse(""),
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+                )
+              )
+
+            case _ =>
+              logger.error(
+                "[TrustCheckYourAnswersController.onPageLoad] " +
+                  "journeyType is invalid"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
 
         case None =>
           logger.error(
