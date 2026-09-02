@@ -48,7 +48,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = Some(1L),
       firstName = firstName,
       secondName = None,
       surname = surname,
