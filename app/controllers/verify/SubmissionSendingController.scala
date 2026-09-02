@@ -108,7 +108,7 @@ class SubmissionSendingController @Inject() (
           controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
         )
 
-      case DEPARTMENTAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case DEPARTMENTAL_ERROR if isSubmitAgainError(DEPARTMENTAL_ERROR, response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -120,7 +120,7 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case FATAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case FATAL_ERROR if isSubmitAgainError(FATAL_ERROR, response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -154,7 +154,7 @@ class SubmissionSendingController @Inject() (
       case SUBMITTED_NO_RECEIPT =>
         recovery
 
-      case DEPARTMENTAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case DEPARTMENTAL_ERROR if isSubmitAgainError(DEPARTMENTAL_ERROR, response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -166,7 +166,7 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case FATAL_ERROR if isSubmitAgainError(response.govTalkErrorStatus) =>
+      case FATAL_ERROR if isSubmitAgainError(FATAL_ERROR, response.govTalkErrorStatus) =>
         Redirect(
           controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
             .onPageLoad()
@@ -194,13 +194,15 @@ class SubmissionSendingController @Inject() (
     }
 
   private def isSubmitAgainError(
+    submissionStatus: SubmissionStatus,
     govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
   ): Boolean =
-    govTalkErrorStatus.exists {
-      case FatalError(errorCode, _) =>
+    (submissionStatus, govTalkErrorStatus) match {
+
+      case (FATAL_ERROR, Some(FatalError(errorCode, _))) =>
         errorCode == SubmitAgainErrorCode
 
-      case DepartmentalError(errorCode, _) =>
+      case (DEPARTMENTAL_ERROR, Some(DepartmentalError(errorCode, _))) =>
         errorCode == SubmitAgainErrorCode
 
       case _ =>
