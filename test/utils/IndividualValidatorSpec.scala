@@ -16,17 +16,51 @@
 
 package utils
 
-import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import models.SubcontractorCurrentVerification
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class TrustValidatorSpec extends AnyWordSpec with Matchers {
+class IndividualValidatorSpec extends AnyWordSpec with Matchers {
 
-  "TrustValidator.validate" must {
+  "IndividualValidator.validate" must {
+
+    "return no failures when trading name is absent but first name and surname are provided" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoTradingName,
+        allSubcontractors = Seq(subcontractorNoTradingName)
+      ) mustBe Nil
+    }
+
+    "return no failures when trading name is supplied but first name and surname are absent" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoFirstNameSurname,
+        allSubcontractors = Seq(subcontractorNoFirstNameSurname)
+      ) mustBe Nil
+    }
+
+    "return name failures when trading name and all names are absent" in {
+      IndividualValidator.validate(
+        subcontractorToValidate = subcontractorNoNames,
+        allSubcontractors = Seq(subcontractorNoNames)
+      ) mustBe List(
+        FieldValidationFailure(
+          field = SubcontractorValidationField.FirstName,
+          value = None
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.TradingName,
+          value = None
+        ),
+        FieldValidationFailure(
+          field = SubcontractorValidationField.Surname,
+          value = None
+        )
+      )
+    }
 
     "return no failures when all common details are missing" in {
-      TrustValidator.validate(
+      IndividualValidator.validate(
         subcontractorToValidate = subcontractorEmpty,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
       ) mustBe Nil
@@ -34,7 +68,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
 
     "return no failures for when all valid" in {
 
-      TrustValidator.validate(
+      IndividualValidator.validate(
         subcontractorToValidate = subcontractorValid,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
       ) mustBe Nil
@@ -42,29 +76,45 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
 
     "return every failure" in {
 
-      TrustValidator.validate(
+      IndividualValidator.validate(
         subcontractorToValidate = subcontractorInvalid,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty)
       ) mustBe
         List(
           FieldValidationFailure(
-            field = SubcontractorValidationField.WorksReferenceNumber,
-            value = subcontractorInvalid.worksReferenceNumber
+            field = SubcontractorValidationField.Surname,
+            value = subcontractorInvalid.surname
+          ),
+          FieldValidationFailure(
+            field = SubcontractorValidationField.FirstName,
+            value = subcontractorInvalid.firstName
+          ),
+          FieldValidationFailure(
+            field = SubcontractorValidationField.SecondName,
+            value = subcontractorInvalid.secondName
+          ),
+          FieldValidationFailure(
+            field = SubcontractorValidationField.TradingName,
+            value = subcontractorInvalid.tradingName
           ),
           FieldValidationFailure(
             field = SubcontractorValidationField.Utr,
             value = subcontractorInvalid.utr
           ),
           FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
-            value = subcontractorInvalid.tradingName
+            field = SubcontractorValidationField.Nino,
+            value = subcontractorInvalid.nino
+          ),
+          FieldValidationFailure(
+            field = SubcontractorValidationField.WorksReferenceNumber,
+            value = subcontractorInvalid.worksReferenceNumber
           )
         )
     }
 
-    "retain valid fields while returning only invalid fields - wrn is invalid" in {
+    "retain valid fields while returning only invalid fields (wrn)" in {
 
-      TrustValidator.validate(
+      IndividualValidator.validate(
         subcontractorToValidate = subcontractorSomeValid,
         allSubcontractors = Seq(subcontractorSomeValid, subcontractorInvalid, subcontractorEmpty)
       ) mustBe
@@ -92,7 +142,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
       crn = None,
       partnerUtr = None,
       partnershipTradingName = None,
-      subcontractorType = Some("trust"),
+      subcontractorType = Some("company"),
       addressLine1 = Some("1 High Street"),
       addressLine2 = Some("Newcastle"),
       addressLine3 = None,
@@ -125,12 +175,12 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
       secondName = None,
       surname = Some("Smith"),
       tradingName = Some("Trading Name"),
-      utr = Some("5860920998"),
-      nino = None,
+      utr = None,
+      nino = Some("AA123456"),
       crn = None,
       partnerUtr = None,
       partnershipTradingName = None,
-      subcontractorType = Some("trust"),
+      subcontractorType = Some("company"),
       addressLine1 = Some("1 High Street"),
       addressLine2 = Some("Newcastle"),
       addressLine3 = None,
@@ -140,7 +190,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
       emailAddress = Some("subcontractor@example.com"),
       phoneNumber = Some("0191 123 4567"),
       mobilePhoneNumber = Some("07700 900123"),
-      worksReferenceNumber = None,
+      worksReferenceNumber = Some("WRN123"),
       matched = None,
       autoVerified = None,
       verified = None,
@@ -164,11 +214,11 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
       surname = Some("Smith"),
       tradingName = Some("Test Trading Name 1234@"),
       utr = Some("5860920998"),
-      nino = None,
-      crn = None,
+      nino = Some("AA123456"),
+      crn = Some("ABC5860"),
       partnerUtr = None,
       partnershipTradingName = None,
-      subcontractorType = Some("trust"),
+      subcontractorType = Some("company"),
       addressLine1 = Some("1 High Street"),
       addressLine2 = Some("Newcastle"),
       addressLine3 = None,
@@ -191,22 +241,130 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
       pendingVerifications = None
     )
 
+  private def subcontractorNoTradingName: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 3L,
+      subbieResourceRef = Some(3L * 10),
+      firstName = Some("John"),
+      secondName = None,
+      surname = Some("Smith"),
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorNoFirstNameSurname: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 3L,
+      subbieResourceRef = Some(3L * 10),
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = Some("Trading Name LTD"),
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
+  private def subcontractorNoNames: SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = 4L,
+      subbieResourceRef = Some(4L * 10),
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = None,
+      utr = None,
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("individual"),
+      addressLine1 = Some("1 High Street"),
+      addressLine2 = Some("Newcastle"),
+      addressLine3 = None,
+      addressLine4 = None,
+      country = Some("GB"),
+      postcode = Some("NE1 1AA"),
+      emailAddress = Some("subcontractor@example.com"),
+      phoneNumber = Some("0191 123 4567"),
+      mobilePhoneNumber = Some("07700 900123"),
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+
   private def subcontractorInvalid: SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = 2L,
       subbieResourceRef = Some(
         2L * 10
       ),
-      firstName = Some("John"),
-      secondName = None,
-      surname = Some("Smith"),
+      firstName = Some("invalid&"),
+      secondName = Some("invalid&"),
+      surname = None,
       tradingName = Some("12345678901234567890123456789012345678901234567890<>"),
       utr = Some("12345A7890"),
-      nino = None,
+      nino = Some("invalid-nino"),
       crn = Some("invalid-number"),
       partnerUtr = None,
       partnershipTradingName = None,
-      subcontractorType = Some("trust"),
+      subcontractorType = Some("company"),
       addressLine1 = Some("1 High Street"),
       addressLine2 = Some("Newcastle"),
       addressLine3 = None,

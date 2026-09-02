@@ -18,19 +18,19 @@ package services
 
 import models.SubcontractorCurrentVerification
 import models.validation.SubcontractorValidationFailure
-import utils.CompanyValidator
+import utils.IndividualValidator
 
 import javax.inject.Singleton
 
 @Singleton
-class SubcontractorCompanyValidator {
+class SubcontractorIndividualValidator {
 
   def validate(
     subcontractors: Seq[SubcontractorCurrentVerification]
   ): List[SubcontractorValidationFailure] =
     subcontractors.toList.flatMap { subcontractor =>
       val failedFields =
-        CompanyValidator.validate(
+        IndividualValidator.validate(
           subcontractorToValidate = subcontractor,
           allSubcontractors = subcontractors
         )

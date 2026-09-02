@@ -17,26 +17,35 @@
 package controllers.contractordetails
 
 import controllers.actions.*
+import models.{NormalMode, UserAnswers}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.ContractorDetailsView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class ContractorDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = identify { implicit request =>
     Ok(view())
   }
 
-  def onSubmit: Action[AnyContent] = identify { implicit request =>
-    Redirect(controllers.contractordetails.routes.ContractorDetailsController.onPageLoad())
+  def onSubmit: Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    val answers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+    sessionRepository.set(answers).map { _ =>
+      Redirect(routes.ContractorUtrController.onPageLoad(NormalMode))
+    }
   }
 }

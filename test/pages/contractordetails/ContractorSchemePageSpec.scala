@@ -16,10 +16,19 @@
 
 package pages.contractordetails
 
+import models.Scheme
 import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
 class ContractorSchemePageSpec extends PageBehaviours {
+
+  private val scheme = Scheme(
+    schemeId = 1,
+    instanceId = "cisId",
+    accountsOfficeReference = "123 PA 87654321",
+    taxOfficeNumber = "123",
+    taxOfficeReference = "45678"
+  )
 
   "ContractorSchemePage" - {
 
@@ -33,5 +42,38 @@ class ContractorSchemePageSpec extends PageBehaviours {
       ContractorSchemePage.toString mustBe "ContractorSchemePage"
     }
 
+    "hasExistingUtr" - {
+
+      "must be true when the scheme has a UTR" in {
+        val answers = emptyUserAnswers
+          .set(ContractorSchemePage, scheme.copy(utr = Some("1234567890")))
+          .success
+          .value
+
+        ContractorSchemePage.hasExistingUtr(answers) mustBe true
+      }
+
+      "must be false when the scheme UTR is blank" in {
+        val answers = emptyUserAnswers
+          .set(ContractorSchemePage, scheme.copy(utr = Some("  ")))
+          .success
+          .value
+
+        ContractorSchemePage.hasExistingUtr(answers) mustBe false
+      }
+
+      "must be false when the scheme has no UTR" in {
+        val answers = emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+
+        ContractorSchemePage.hasExistingUtr(answers) mustBe false
+      }
+
+      "must be false when the scheme is missing" in {
+        ContractorSchemePage.hasExistingUtr(emptyUserAnswers) mustBe false
+      }
+    }
   }
 }
