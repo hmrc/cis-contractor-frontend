@@ -18,6 +18,8 @@ package utils
 
 import models.SubcontractorCurrentVerification
 import models.validation.FieldValidationFailure
+import models.TypeOfSubcontractor
+import models.validation.SubcontractorValidationField.TradingName
 
 object TrustValidator {
 
@@ -32,6 +34,6 @@ object TrustValidator {
         .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
       TradingNameValidator
-        .validate(subcontractorToValidate.tradingName)
+        .validate(subcontractorToValidate.tradingName, TradingName, TypeOfSubcontractor.Trust)
         .toList
 }

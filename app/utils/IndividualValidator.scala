@@ -17,7 +17,9 @@
 package utils
 
 import models.validation.FieldValidationFailure
-import models.SubcontractorCurrentVerification
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.TypeOfSubcontractor.Individualorsoletrader
+import models.validation.SubcontractorValidationField.TradingName
 
 object IndividualValidator {
 
@@ -42,8 +44,8 @@ object IndividualValidator {
       SecondNameValidator
         .validate(subcontractorToValidate.secondName)
         .toList ++
-      subcontractorToValidate.tradingName
-        .flatMap(t => TradingNameValidator.validate(Some(t)))
+      TradingNameValidator
+        .validate(subcontractorToValidate.tradingName, TradingName, Individualorsoletrader)
         .toList ++
       UtrValidator
         .validate(subcontractorToValidate.utr, allSubcontractors)

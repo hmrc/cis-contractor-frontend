@@ -17,12 +17,15 @@
 package utils
 
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.Individualorsoletrader
 
 object TradingNameValidator {
 
   def validate(
     value: Option[String],
-    field: SubcontractorValidationField = SubcontractorValidationField.TradingName
+    field: SubcontractorValidationField = SubcontractorValidationField.TradingName,
+    subcontractorType: TypeOfSubcontractor
   ): Option[FieldValidationFailure] =
     value match {
       case None =>
@@ -33,7 +36,8 @@ object TradingNameValidator {
           )
         )
       case Some(tradingName)
-          if tradingName.isBlank || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
+          if (tradingName.isBlank && subcontractorType != Individualorsoletrader)
+            || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
         Some(
           FieldValidationFailure(
             field = field,
