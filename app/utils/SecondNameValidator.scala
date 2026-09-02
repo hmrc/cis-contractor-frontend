@@ -24,7 +24,7 @@ object SecondNameValidator {
   ): Option[FieldValidationFailure] =
     value.flatMap { secondName =>
       Option.when(
-        secondName.isBlank || !FirstMiddleName.isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName)
+        !FirstMiddleName.isLengthInRange(secondName) || !FirstMiddleName.isValid(secondName)
       ) {
         FieldValidationFailure(
           field = SubcontractorValidationField.SecondName,
