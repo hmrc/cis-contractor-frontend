@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import models.SubcontractorCurrentVerification
 import models.VerificationCurrentVerification
+import models.VerificationBatchCurrentVerification
 import models.response.GetCurrentVerificationBatchResponse
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
@@ -81,29 +82,33 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     subcontractorId: Long,
     subcontractorName: Option[String] = None,
     proceed: Option[String] = None,
-    actionIndicator: Option[String] = None
+    actionIndicator: Option[String] = None,
+    verificationNumber: Option[String] = None,
+    matched: Option[String] = None,
+    verificationBatchId: Option[Long] = None
   ): VerificationCurrentVerification =
     VerificationCurrentVerification(
       verificationId = subcontractorId,
-      verificationBatchId = None,
+      verificationBatchId = verificationBatchId,
       subcontractorId = Some(subcontractorId),
       verificationResourceRef = None,
       subcontractorName = subcontractorName,
-      verificationNumber = None,
+      verificationNumber = verificationNumber,
       taxTreatment = None,
       actionIndicator = actionIndicator,
       proceed = proceed,
-      matched = None
+      matched = matched
     )
 
   private def build(
     subs: Seq[SubcontractorCurrentVerification],
-    verifications: Seq[VerificationCurrentVerification] = Nil
+    verifications: Seq[VerificationCurrentVerification] = Nil,
+    batchId: Option[Long] = None
   ) =
     service.buildViewModel(
       GetCurrentVerificationBatchResponse(
         subcontractors = subs,
-        verificationBatch = None,
+        verificationBatch = batchId.map(id => VerificationBatchCurrentVerification(id, None)),
         verifications = verifications
       )
     )
@@ -235,6 +240,50 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       vm.unmatched mustBe empty
       vm.ready mustBe empty
       vm.allReady mustBe false
+    }
+
+    "must exclude a matched/verified subcontractor (verificationNumber set, matched = 'Y', actionIndicator = 'VERIFY')" in {
+      val verified     =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
+      val verification =
+        mkVerification(
+          subcontractorId = 1L,
+          actionIndicator = Some("VERIFY"),
+          verificationNumber = Some("V1000000009"),
+          matched = Some("Y")
+        )
+
+      val vm = build(Seq(verified), Seq(verification))
+
+      vm.unmatched mustBe empty
+      vm.ready mustBe empty
+    }
+
+    "must exclude a subcontractor that has no verification in the batch" in {
+      val withVerification    =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+      val withoutVerification =
+        mkSub(id = 2L, tradingName = Some("Beta Ltd"), subcontractorType = Some("company"), utr = None)
+
+      val vm = build(Seq(withVerification, withoutVerification), Seq(mkVerification(subcontractorId = 1L)))
+
+      vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
+      vm.ready mustBe empty
+    }
+
+    "must only consider verifications from the current batch when a batch id is present" in {
+      val currentSub    =
+        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+      val otherBatchSub =
+        mkSub(id = 2L, tradingName = Some("Beta Ltd"), subcontractorType = Some("company"), utr = None)
+
+      val currentVerif    = mkVerification(subcontractorId = 1L, verificationBatchId = Some(10910L))
+      val otherBatchVerif = mkVerification(subcontractorId = 2L, verificationBatchId = Some(13297L))
+
+      val vm = build(Seq(currentSub, otherBatchSub), Seq(currentVerif, otherBatchVerif), batchId = Some(10910L))
+
+      vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
+      vm.ready mustBe empty
     }
   }
 }

@@ -23,20 +23,24 @@
     h1: components.H1,
     h2: components.H2,
     link: components.Link,
+    formHelper: FormWithCSRF
 )
 
 @(accountsOfficeReference: String, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
-    @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
-    @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference))
+    @formHelper(action = controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-    @govukSummaryList(SummaryListViewModel(summaryRows))
+        @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
+        @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference))
 
-    @govukButton(
-        ButtonViewModel(messages("site.saveAndContinue"))
-    )
+        @govukSummaryList(SummaryListViewModel(summaryRows))
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
 
     @link("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link", appConfig.cisReturnDashboardUrl)
 }

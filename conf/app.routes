@@ -628,6 +628,8 @@ POST  /subcontractor/verify/no-new-subcontractors-to-verify  controllers.verify.
 
 GET   /subcontractor/verify/problem-with-verification-warning  controllers.verify.VerifyDepartmentalErrorController.onPageLoad()
 
+GET   /subcontractor/verify/problem-with-verification-warning-submit-again   controllers.verify.VerifyDepartmentalErrorSubmitAgainController.onPageLoad()
+
 GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.InactiveSchemeWarningController.onPageLoad()
 
 GET   /subcontractor/verify/verification-not-submitted-warning  controllers.verify.VerificationNotSubmittedWarningController.onPageLoad()
@@ -656,8 +658,8 @@ GET   /verify/verification-status/select-subcontractors                  control
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
-POST  /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onSubmit()
-GET   /subcontractor/verify/unmatched-subcontractors controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
+
+GET   /subcontractor/verify/unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
 GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onSubmit()
@@ -688,6 +690,7 @@ POST  /contractor-details/change-contractor-email-address  controllers.contracto
 GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
 
 GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad()
+POST  /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onSubmit()
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)

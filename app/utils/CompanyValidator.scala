@@ -18,23 +18,25 @@ package utils
 
 import models.validation.FieldValidationFailure
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor.Limitedcompany
+import models.validation.SubcontractorValidationField.TradingName
 
 object CompanyValidator {
 
   def validate(
-    subcontactorToValidate: SubcontractorCurrentVerification,
+    subcontractorToValidate: SubcontractorCurrentVerification,
     allSubcontractors: Seq[SubcontractorCurrentVerification]
   ): List[FieldValidationFailure] =
     CrnValidator
-      .validate(subcontactorToValidate.crn)
+      .validate(subcontractorToValidate.crn)
       .toList ++
       WorksReferenceNumberValidator
-        .validate(subcontactorToValidate.worksReferenceNumber)
+        .validate(subcontractorToValidate.worksReferenceNumber)
         .toList ++
       UtrValidator
-        .validate(subcontactorToValidate.utr, allSubcontractors)
+        .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
       TradingNameValidator
-        .validate(subcontactorToValidate.tradingName)
+        .validate(subcontractorToValidate.tradingName, TradingName, Limitedcompany)
         .toList
 }

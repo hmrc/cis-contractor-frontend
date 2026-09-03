@@ -17,29 +17,41 @@
 package utils
 
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.Individualorsoletrader
 
 object TradingNameValidator {
 
   def validate(
-    value: Option[String]
+    value: Option[String],
+    field: SubcontractorValidationField = SubcontractorValidationField.TradingName,
+    subcontractorType: TypeOfSubcontractor
   ): Option[FieldValidationFailure] =
     value match {
+      case None if subcontractorType == Individualorsoletrader =>
+        None
+
       case None =>
         Some(
           FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
+            field = field,
             value = None
           )
         )
+
       case Some(tradingName)
-          if tradingName.isBlank || !TradingName.isLengthInRange(tradingName) || !TradingName.isValid(tradingName) =>
+          if (tradingName.isBlank && subcontractorType != Individualorsoletrader) ||
+            !TradingName.isLengthInRange(tradingName) ||
+            !TradingName.isValid(tradingName) =>
         Some(
           FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
+            field = field,
             value = Some(tradingName)
           )
         )
-      case _    =>
+
+      case _ =>
         None
     }
+
 }

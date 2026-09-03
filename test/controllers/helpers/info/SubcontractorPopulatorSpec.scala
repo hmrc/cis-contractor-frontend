@@ -17,7 +17,6 @@
 package controllers.helpers.info
 
 import base.SpecBase
-import controllers.helpers.info.SubcontractorPopulator
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.address.{Address, Country}

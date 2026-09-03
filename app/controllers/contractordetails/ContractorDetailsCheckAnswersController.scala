@@ -64,4 +64,9 @@ class ContractorDetailsCheckAnswersController @Inject() (
           )
       }
     }
+
+  def onSubmit: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { _ =>
+      Redirect(routes.ContractorDetailsUpdatedController.onPageLoad())
+    }
 }
