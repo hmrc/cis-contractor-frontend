@@ -124,9 +124,7 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
                                 )
                               } else if (deleteResponse.verificationsCounter.contains(0L)) {
-                                val redirectUrl =
-                                  s"${appConfig.subcontractorListUrl}/${request.cisId}/your-subcontractors"
-                                Redirect(redirectUrl)
+                                Redirect(appConfig.manageYourSubcontractorsUrl(request.cisId))
                               } else {
                                 recoveryRedirect
                               }

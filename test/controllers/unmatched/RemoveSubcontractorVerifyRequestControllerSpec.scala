@@ -23,7 +23,7 @@ import controllers.unmatched.routes as unmatchedRoutes
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
 import models.{SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.unmatched.RemoveSubcontractorVerifyRequestPage
@@ -258,7 +258,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
       val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-      when(mockFrontendAppConfig.subcontractorListUrl).thenReturn("some-url")
+      when(mockFrontendAppConfig.manageYourSubcontractorsUrl(eqTo(cisId))).thenReturn("some-url")
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -278,7 +278,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual s"some-url/$cisId/your-subcontractors"
+        redirectLocation(result).value mustEqual "some-url"
       }
     }
 
