@@ -18,6 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import models.verify.ValidatedVerify
+import pages.verify.SubmissionCreatedPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -62,25 +63,37 @@ class VerifyCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      ValidatedVerify.build(request.userAnswers) match {
+      if (request.userAnswers.get(SubmissionCreatedPage).getOrElse(false)) {
+        logger.info(
+          "[VerifyCheckYourAnswersController] Submission is already created; redirecting to journey recovery"
+        )
 
-        case Right(_) =>
-          Future.successful(
-            Redirect(
-              controllers.verify.routes.SubmissionSendingController.onPageLoad()
-            )
+        Future.successful(
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
           )
+        )
+      } else {
+        ValidatedVerify.build(request.userAnswers) match {
 
-        case Left(error) =>
-          logger.error(
-            s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
-          )
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
+          case Right(_) =>
+            Future.successful(
+              Redirect(
+                controllers.verify.routes.SubmissionSendingController.onPageLoad()
+              )
             )
-          )
+
+          case Left(error) =>
+            logger.error(
+              s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
+            )
+
+            Future.successful(
+              Redirect(
+                controllers.routes.JourneyRecoveryController.onPageLoad()
+              )
+            )
+        }
       }
     }
-
 }
