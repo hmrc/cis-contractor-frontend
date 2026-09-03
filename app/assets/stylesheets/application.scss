@@ -33,7 +33,8 @@
     white-space: nowrap !important;
   }
   #subcontractor-table td {
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
   }
 }
 

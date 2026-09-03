@@ -23,7 +23,7 @@ import viewmodels.govuk.PaginationFluency._
 class PaginationToReverifyService @Inject() () {
 
   private val defaultRecordsPerPage = 6
-  private val maxVisiblePages       = 6
+  private val maxVisiblePages       = 2
 
   case class PaginatedResult[T](
     items: Seq[T],
@@ -103,20 +103,14 @@ class PaginationToReverifyService @Inject() () {
         val leftEllipsis =
           if (start > 2)
             Seq(
-              PaginationItemViewModel(
-                number = "...",
-                href = "#"
-              )
+              PaginationItemViewModel.ellipsis()
             )
           else Seq()
 
         val rightEllipsis =
           if (end < totalPages - 1)
             Seq(
-              PaginationItemViewModel(
-                number = "...",
-                href = "#"
-              )
+              PaginationItemViewModel.ellipsis()
             )
           else Seq()
 

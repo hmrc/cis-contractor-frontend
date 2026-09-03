@@ -112,6 +112,20 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__item button[name=gotoPage][value=3]").size() mustBe 1
     }
 
+    "must render ellipsis items as non-clickable with govuk-pagination__item--ellipsis class" in new Setup {
+      val pagination    = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1"),
+          PaginationItemViewModel.ellipsis(),
+          PaginationItemViewModel("5", "/test?page=5").withCurrent(true)
+        )
+      )
+      val doc           = parse(pageNavigator(pagination, page = 5))
+      val ellipsisItems = doc.select(".govuk-pagination__item--ellipsis")
+      ellipsisItems.size() mustBe 1
+      ellipsisItems.select("button").size() mustBe 0
+    }
+
     "must use the landmark label from the view model" in new Setup {
       val pagination = PaginationViewModel(
         items = Seq(PaginationItemViewModel("1", "/test?page=1")),
