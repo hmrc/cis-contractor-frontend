@@ -16,15 +16,13 @@
 
 package forms.add
 
+import forms.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class TradingNameOfSubcontractorFormProvider @Inject() extends Mappings {
-
-  private val allowedCharsRegex =
-    """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
 
   def apply(): Form[String] =
     Form(
@@ -33,7 +31,7 @@ class TradingNameOfSubcontractorFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             maxLength(56, "tradingNameOfSubcontractor.error.length"),
-            regexp(allowedCharsRegex, "tradingNameOfSubcontractor.error.invalidCharacters")
+            regexp(Validation.nameRegex, "tradingNameOfSubcontractor.error.invalidCharacters")
           )
         )
     )

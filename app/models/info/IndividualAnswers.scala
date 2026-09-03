@@ -17,15 +17,14 @@
 package models.info
 
 import models.TypeOfSubcontractor
-import models.add.SubcontractorName
+import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
 import models.address.Address
-import models.add.IndividualContactMethodOptions
 import play.api.libs.json.{Json, OFormat}
 
 case class IndividualAnswers(
   subcontractorType: TypeOfSubcontractor,
   showVerificationDetails: Boolean,
-  usesTradingName: Option[Boolean],
+  individualNamesOptions: Set[IndividualNamesOptions],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   addressYesNo: Option[Boolean],

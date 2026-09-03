@@ -17,7 +17,7 @@
 package viewmodels.amend
 
 import models.UserAnswers
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.Address
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
@@ -33,102 +33,12 @@ object IndividualAmendedViewModel {
     original: OriginalIndividualAnswers,
     current: UserAnswers
   )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    tradingNameRows(original, current) ++
+    namesRows(original, current) ++
       addressRows(original, current) ++
       contactRows(original, current) ++
       utrRows(original, current) ++
       ninoRows(original, current) ++
       worksReferenceRows(original, current)
-
-  private def tradingNameRows(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
-
-    val originalUsesTrading = original.usesTradingName.contains(true)
-    val currentUsesTrading  = current.get(SubTradingNameYesNoPage).contains(true)
-
-    val yesNoRows =
-      Seq(
-        tradingNameYesNoRow(original, current)
-      ).flatten
-
-    val nameRows =
-      if (originalUsesTrading == currentUsesTrading) {
-        Seq(nameRow(original, current)).flatten
-      } else if (originalUsesTrading) {
-        Seq(
-          row(
-            messages("tradingNameOfSubcontractor.checkYourAnswersLabel"),
-            original.tradingName.getOrElse(missingValue),
-            missingValue
-          ),
-          row(
-            messages("subcontractorName.checkYourAnswersLabel"),
-            missingValue,
-            current.get(SubcontractorNamePage).map(formatName).getOrElse(missingValue)
-          )
-        )
-      } else {
-        Seq(
-          row(
-            messages("subcontractorName.checkYourAnswersLabel"),
-            original.subcontractorName.map(formatName).getOrElse(missingValue),
-            missingValue
-          ),
-          row(
-            messages("tradingNameOfSubcontractor.checkYourAnswersLabel"),
-            missingValue,
-            current.get(TradingNameOfSubcontractorPage).getOrElse(missingValue)
-          )
-        )
-      }
-
-    yesNoRows ++ nameRows
-  }
-
-  private def nameRow(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] = {
-
-    val currentUsesTradingName = current.get(SubTradingNameYesNoPage)
-    val currentTradingName     = current.get(TradingNameOfSubcontractorPage)
-    val currentName            = current.get(SubcontractorNamePage)
-
-    Option.when(
-      originalNameDisplay(original) != currentNameDisplay(
-        currentUsesTradingName,
-        currentTradingName,
-        currentName
-      )
-    ) {
-      row(
-        label =
-          if (currentUsesTradingName.contains(true))
-            messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
-          else
-            messages("subcontractorName.checkYourAnswersLabel"),
-        previous = originalNameDisplay(original).getOrElse(missingValue),
-        updated = currentNameDisplay(
-          currentUsesTradingName,
-          currentTradingName,
-          currentName
-        ).getOrElse(missingValue)
-      )
-    }
-  }
-
-  private def tradingNameYesNoRow(
-    original: OriginalIndividualAnswers,
-    current: UserAnswers
-  )(implicit messages: Messages): Option[Seq[TableRow]] =
-    yesNoRow(
-      SubTradingNameYesNoPage,
-      messages("subTradingNameYesNo.checkYourAnswersLabel"),
-      original.usesTradingName,
-      current
-    )
 
   private def addressRows(
     original: OriginalIndividualAnswers,
@@ -163,6 +73,58 @@ object IndividualAmendedViewModel {
         original.address.map(formatAddress).getOrElse(missingValue),
         currentAddress.map(formatAddress).getOrElse(missingValue)
       )
+    }
+
+  private def namesRows(
+    original: OriginalIndividualAnswers,
+    current: UserAnswers
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentNamesOptions = current.get(IndividualNamesOptionsPage).getOrElse(Set.empty)
+    Seq(
+      Option.when(original.individualNamesOptions != currentNamesOptions) {
+        htmlRow(
+          messages("individualNamesOptions.checkYourAnswersLabel"),
+          formatNameOptions(original.individualNamesOptions),
+          formatNameOptions(currentNamesOptions)
+        )
+      },
+      fieldNameRow(
+        SubcontractorNamePage,
+        messages("subcontractorName.checkYourAnswersLabel"),
+        original.subcontractorName,
+        current
+      ),
+      fieldRow(
+        TradingNameOfSubcontractorPage,
+        messages("tradingNameOfSubcontractor.checkYourAnswersLabel"),
+        original.tradingName,
+        current
+      )
+    ).flatten
+  }
+
+  private def formatNameOptions(
+    namesOptions: Set[IndividualNamesOptions]
+  )(implicit messages: Messages): String =
+    if (namesOptions.isEmpty) {
+      missingSelect
+    } else {
+      val individualNamesOptions = IndividualNamesOptions
+        .ordered(namesOptions)
+        .map {
+          case IndividualNamesOptions.SubcontractorName =>
+            messages("individualNamesOptions.subcontractorName")
+          case IndividualNamesOptions.TradingName       =>
+            messages("individualNamesOptions.tradingName")
+        }
+
+      if (individualNamesOptions.size > 1) {
+        individualNamesOptions
+          .map(item => s"<li>$item</li>")
+          .mkString("<ul class=\"govuk-list govuk-list--bullet\">", "", "</ul>")
+      } else {
+        individualNamesOptions.mkString
+      }
     }
 
   private def contactRows(
@@ -289,24 +251,6 @@ object IndividualAmendedViewModel {
       )
     ).flatten
 
-  private def originalNameDisplay(original: OriginalIndividualAnswers): Option[String] =
-    if (original.usesTradingName.contains(true)) {
-      original.tradingName
-    } else {
-      original.subcontractorName.map(formatName)
-    }
-
-  private def currentNameDisplay(
-    currentUsesTradingName: Option[Boolean],
-    currentTradingName: Option[String],
-    currentName: Option[SubcontractorName]
-  ): Option[String] =
-    if (currentUsesTradingName.contains(true)) {
-      currentTradingName
-    } else {
-      currentName.map(formatName)
-    }
-
   private def formatName(n: SubcontractorName): String =
     Seq(Some(n.firstName), n.middleName, Some(n.lastName)).flatten.mkString(" ")
 
@@ -356,6 +300,24 @@ object IndividualAmendedViewModel {
         label,
         original.getOrElse(missingValue(messages)),
         currentVal.getOrElse(missingValue(messages))
+      )
+    }
+  }
+
+  private def fieldNameRow(
+    page: QuestionPage[SubcontractorName],
+    label: String,
+    original: Option[SubcontractorName],
+    current: UserAnswers,
+    missingValue: Messages => String = missingValue
+  )(implicit messages: Messages): Option[Seq[TableRow]] = {
+    val currentVal = current.get(page)
+
+    Option.when(original != currentVal) {
+      row(
+        label,
+        original.map(formatName).getOrElse(missingValue(messages)),
+        currentVal.map(formatName).getOrElse(missingValue(messages))
       )
     }
   }

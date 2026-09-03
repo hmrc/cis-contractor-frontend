@@ -240,7 +240,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(true),
@@ -289,7 +289,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(false),
@@ -326,7 +326,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(true),

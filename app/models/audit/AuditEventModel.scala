@@ -35,10 +35,10 @@ private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObj
 case class AddSubcontractorAuditEventModel(
   cisId: Option[String],
   typeOfSubcontractor: String,
+  individualNamesOptions: Option[Seq[String]],
   firstName: Option[String],
   middleName: Option[String],
   surname: Option[String],
-  subTradingNameYesNo: Option[Boolean],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -61,10 +61,10 @@ object AddSubcontractorAuditEventModel {
   implicit val writes: OWrites[AddSubcontractorAuditEventModel] = (
     (__ \ "cisId").writeNullable[String] and
       (__ \ "typeOfSubcontractor").write[String] and
+      (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
       (__ \ "firstName").writeNullable[String] and
       (__ \ "middleName").writeNullable[String] and
       (__ \ "surname").writeNullable[String] and
-      (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and
@@ -215,10 +215,10 @@ object AddTrustSubcontractorAuditEventModel {
 }
 
 case class IndividualSubcontractorDetails(
+  individualNamesOptions: Option[Seq[String]],
   firstName: Option[String],
   middleName: Option[String],
   surname: Option[String],
-  subTradingNameYesNo: Option[Boolean],
   tradingNameOfSubcontractor: Option[String],
   subAddressYesNo: Option[Boolean],
   addressOfSubcontractor: Option[Address],
@@ -237,10 +237,10 @@ case class IndividualSubcontractorDetails(
 
 object IndividualSubcontractorDetails {
   implicit val writes: OWrites[IndividualSubcontractorDetails] = (
-    (__ \ "firstName").writeNullable[String] and
+    (__ \ "individualNamesOptions").writeNullable[Seq[String]] and
+      (__ \ "firstName").writeNullable[String] and
       (__ \ "middleName").writeNullable[String] and
       (__ \ "surname").writeNullable[String] and
-      (__ \ "subTradingNameYesNo").writeNullable[Boolean] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
       (__ \ "subAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable[Address] and
@@ -260,7 +260,7 @@ object IndividualSubcontractorDetails {
 
 case class AmendSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[IndividualSubcontractorDetails],
   updatedDetails: IndividualSubcontractorDetails
@@ -323,7 +323,7 @@ object CompanySubcontractorDetails {
 
 case class AmendCompanySubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[CompanySubcontractorDetails],
   updatedDetails: CompanySubcontractorDetails
@@ -396,7 +396,7 @@ object PartnershipSubcontractorDetails {
 
 case class AmendPartnershipSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[PartnershipSubcontractorDetails],
   updatedDetails: PartnershipSubcontractorDetails
@@ -455,7 +455,7 @@ object TrustSubcontractorDetails {
 
 case class AmendTrustSubcontractorAuditEventModel(
   cisId: Option[String],
-  subbieResourceRef: Option[Int],
+  subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
   originalDetails: Option[TrustSubcontractorDetails],
   updatedDetails: TrustSubcontractorDetails

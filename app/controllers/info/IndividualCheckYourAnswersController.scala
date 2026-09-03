@@ -117,7 +117,7 @@ class IndividualCheckYourAnswersController @Inject() (
     val nameRows =
       if (!answers.showVerificationDetails) {
         Seq(
-          SubTradingNameYesNoSummary.row(answers),
+          IndividualNamesOptionsSummary.row(answers),
           SubcontractorNameSummary.row(answers),
           TradingNameOfSubcontractorSummary.row(answers)
         )
@@ -167,15 +167,18 @@ class IndividualCheckYourAnswersController @Inject() (
 
   private def displayName(
     answers: IndividualAnswers
-  ): String =
+  )(implicit messages: Messages): String =
     answers.subcontractorName
-      .map { name =>
-        Seq(
-          Some(name.firstName),
-          name.middleName,
-          Some(name.lastName)
-        ).flatten.mkString(" ")
+      .flatMap { name =>
+        val firstName = name.firstName.trim
+        val lastName  = name.lastName.trim
+
+        (firstName.nonEmpty, lastName.nonEmpty) match {
+          case (true, true)  => Some(s"$firstName $lastName")
+          case (false, true) => Some(lastName)
+          case _             => None
+        }
       }
-      .orElse(answers.tradingName)
-      .getOrElse("")
+      .orElse(answers.tradingName.map(_.trim).filter(_.nonEmpty))
+      .getOrElse(messages("verify.noName"))
 }

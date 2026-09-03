@@ -1,5 +1,5 @@
 @*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,34 @@
  * limitations under the License.
  *@
 
+@import models.add.IndividualNamesOptions
+@import viewmodels.LegendSize.Large
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukRadios: GovukRadios,
+    govukCheckboxes: GovukCheckboxes,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subTradingNameYesNo.title"))) {
+@layout(pageTitle = title(form, messages("individualNamesOptions.title"))) {
 
-    @formHelper(action = controllers.add.routes.SubTradingNameYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.add.routes.IndividualNamesOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field  = form("value"),
-                legend = LegendViewModel(messages("subTradingNameYesNo.heading")).asPageHeading().withCssClass("govuk-fieldset__legend--l"),
-            ).withHint(Hint(
-                content = Messages("subTradingNameYesNo.hint"))
-            )
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form   = form,
+                name   = "value",
+                legend = LegendViewModel(messages("individualNamesOptions.heading")).asPageHeading(Large),
+                items  = IndividualNamesOptions.checkboxItems
+            ).withHint(HintViewModel(messages("individualNamesOptions.hint")))
         )
 
         @govukButton(

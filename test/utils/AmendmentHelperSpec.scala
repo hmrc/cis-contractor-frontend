@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 import models.UserAnswers
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
@@ -171,7 +171,7 @@ class AmendmentHelperSpec extends SpecBase {
 
   private val originalIndividual =
     OriginalIndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(
         SubcontractorName(
@@ -201,7 +201,10 @@ class AmendmentHelperSpec extends SpecBase {
       .set(OriginalIndividualAnswersQuery, originalIndividual)
       .success
       .value
-      .set(SubTradingNameYesNoPage, false)
+      .set(
+        IndividualNamesOptionsPage,
+        Set(IndividualNamesOptions.SubcontractorName)
+      )
       .success
       .value
       .set(
