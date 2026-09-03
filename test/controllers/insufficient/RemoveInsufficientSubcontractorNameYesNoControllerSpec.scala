@@ -18,9 +18,11 @@ package controllers.insufficient
 
 import base.SpecBase
 import controllers.routes
+import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import models.response.DeleteVerificationResponse
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -214,7 +216,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       }
     }
 
-    "must call delete verification and redirect back to review page when remaining insufficient subcontractors exist" in {
+    "must call delete verification and redirect to newest verification batch when remaining insufficient subcontractors exist" in {
 
       val mockSessionRepository =
         mock[SessionRepository]
@@ -225,6 +227,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       val mockVerificationService =
         mock[VerificationService]
 
+      val mockCheckVerificationBatchReadinessController =
+        mock[CheckVerificationBatchReadinessController]
+
       when(
         mockSubcontractorNameExtractor.getSubcontractorName(any())
       ).thenReturn(Some(subcontractorName))
@@ -232,6 +237,10 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       when(
         mockSessionRepository.set(any())
       ).thenReturn(Future.successful(true))
+
+      when(
+        mockSessionRepository.get(eqTo(userAnswersId))
+      ).thenReturn(Future.successful(Some(emptyUserAnswers)))
 
       when(
         mockVerificationService.deleteVerification(
@@ -242,6 +251,10 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         Future.successful(DeleteVerificationResponse(Some(1L)))
       )
 
+      when(
+        mockCheckVerificationBatchReadinessController.updateVerificationBatchReadiness(any[UserAnswers])
+      ).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
@@ -249,6 +262,8 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               .toInstance(mockSessionRepository),
             bind[VerificationService]
               .toInstance(mockVerificationService),
+            bind[CheckVerificationBatchReadinessController]
+              .toInstance(mockCheckVerificationBatchReadinessController),
             bind[SubcontractorNameExtractor]
               .toInstance(mockSubcontractorNameExtractor)
           )
@@ -273,14 +288,26 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+          controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
 
         verify(mockVerificationService)
           .deleteVerification(any[UserAnswers], eqTo(verificationResourceRef))(any[HeaderCarrier])
+
+        verify(mockCheckVerificationBatchReadinessController)
+          .updateVerificationBatchReadiness(any[UserAnswers])
+
+        val savedAnswersCaptor =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository)
+          .set(savedAnswersCaptor.capture())
+
+        savedAnswersCaptor.getValue
+          .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)) mustBe None
       }
     }
 
-    "must call delete verification and redirect to readiness check when no insufficient subcontractors remain" in {
+    "must call delete verification and redirect to newest verification batch when no insufficient subcontractors remain" in {
 
       val mockSessionRepository =
         mock[SessionRepository]
@@ -290,6 +317,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
 
       val mockVerificationService =
         mock[VerificationService]
+
+      val mockCheckVerificationBatchReadinessController =
+        mock[CheckVerificationBatchReadinessController]
 
       when(
         mockSubcontractorNameExtractor.getSubcontractorName(any())
@@ -315,6 +345,8 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               .toInstance(mockSessionRepository),
             bind[VerificationService]
               .toInstance(mockVerificationService),
+            bind[CheckVerificationBatchReadinessController]
+              .toInstance(mockCheckVerificationBatchReadinessController),
             bind[SubcontractorNameExtractor]
               .toInstance(mockSubcontractorNameExtractor)
           )
@@ -339,9 +371,10 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CheckVerificationBatchReadinessController
-            .checkVerificationBatchReadiness(NormalMode)
-            .url
+          controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
+
+        verify(mockCheckVerificationBatchReadinessController, never())
+          .updateVerificationBatchReadiness(any[UserAnswers])
       }
     }
 

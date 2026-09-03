@@ -17,6 +17,7 @@
 package controllers.insufficient
 
 import controllers.actions.*
+import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.TypeOfSubcontractor.*
@@ -39,6 +40,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   verificationService: VerificationService,
+  checkVerificationBatchReadinessController: CheckVerificationBatchReadinessController,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -102,12 +104,17 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                         value
                       )
                     )
+                  cleanedAnswers <- Future.fromTry(
+                                      updatedAnswers.remove(
+                                        RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
+                                      )
+                                    )
 
-                  _ <- sessionRepository.set(updatedAnswers)
+                  _ <- sessionRepository.set(cleanedAnswers)
 
                   redirect <-
                     if (value) {
-                      deleteAndRedirect(updatedAnswers, verificationResourceRef, mode)
+                      deleteAndRedirect(cleanedAnswers, verificationResourceRef)
                     } else {
                       Future.successful(
                         Redirect(
@@ -122,30 +129,44 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
   private def deleteAndRedirect(
     userAnswers: models.UserAnswers,
-    verificationResourceRef: Long,
-    mode: Mode
+    verificationResourceRef: Long
   )(implicit request: DataRequest[?]): Future[play.api.mvc.Result] =
     if (verificationResourceRef < 0) {
       Future.successful(recoveryRedirect)
     } else {
       verificationService
         .deleteVerification(userAnswers, verificationResourceRef)
-        .map {
+        .flatMap {
           case response if response.verificationsCounter.exists(_ > 0) =>
-            Redirect(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
+            checkVerificationBatchReadiness().map {
+              case Some(_) =>
+                Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad())
+
+              case None =>
+                recoveryRedirect
+            }
 
           case response if response.verificationsCounter.contains(0L) =>
-            Redirect(
-              controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode)
-            )
+            Future.successful(Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad()))
 
           case _ =>
-            recoveryRedirect
+            Future.successful(recoveryRedirect)
         }
         .recover { case _ =>
           recoveryRedirect
         }
     }
+
+  private def checkVerificationBatchReadiness()(implicit request: DataRequest[?]): Future[Option[models.UserAnswers]] =
+    sessionRepository
+      .get(request.userId)
+      .flatMap {
+        case Some(updatedAnswers) =>
+          checkVerificationBatchReadinessController.updateVerificationBatchReadiness(updatedAnswers)
+
+        case None =>
+          Future.successful(None)
+      }
 
   private def subcontractorName(request: DataRequest[?], verificationResourceRef: Long): Option[String] =
     nameFromCurrentBatch(request, verificationResourceRef)
