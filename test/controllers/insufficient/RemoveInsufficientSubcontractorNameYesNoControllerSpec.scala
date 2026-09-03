@@ -20,13 +20,14 @@ import base.SpecBase
 import controllers.routes
 import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, Subcontractor, UserAnswers}
 import models.response.DeleteVerificationResponse
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
+import pages.verify.UnverifiedSubcontractorsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -53,6 +54,28 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
     NormalMode
 
   private val verificationResourceRef = 12345L
+
+  private val unverifiedSubcontractor =
+    Subcontractor(
+      subcontractorId = 1L,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = Some("Subcontractor Ltd"),
+      partnershipTradingName = None,
+      verified = Some("N"),
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      lastMonthlyReturnDate = None,
+      createDate = None,
+      subcontractorType = None,
+      subbieResourceRef = Some(1L),
+      utr = None,
+      partnerUtr = None,
+      crn = None,
+      nino = None
+    )
 
   private lazy val removeInsufficientSubcontractorNameYesNoRoute =
     controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
@@ -314,7 +337,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       }
     }
 
-    "must call delete verification and redirect to newest verification batch when no insufficient subcontractors remain" in {
+    "must call newest batch service and redirect to select subcontractors to reverify when no insufficient subcontractors and no unverified subcontractors remain" in {
 
       val mockSessionRepository =
         mock[SessionRepository]
@@ -344,6 +367,16 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       ).thenReturn(
         Future.successful(DeleteVerificationResponse(Some(0L)))
       )
+
+      val refreshedAnswers =
+        emptyUserAnswers
+          .set(UnverifiedSubcontractorsPage, Seq.empty[Subcontractor])
+          .success
+          .value
+
+      when(
+        mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(refreshedAnswers))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -378,12 +411,96 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
+          controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
 
         verify(mockCheckVerificationBatchReadinessController, never())
           .updateVerificationBatchReadiness(any[UserAnswers])
 
-        verify(mockVerificationService, never())
+        verify(mockVerificationService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      }
+    }
+
+    "must call newest batch service and redirect to select subcontractors to verify when no insufficient subcontractors remain and unverified subcontractors exist" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockSubcontractorNameExtractor =
+        mock[SubcontractorNameExtractor]
+
+      val mockVerificationService =
+        mock[VerificationService]
+
+      val mockCheckVerificationBatchReadinessController =
+        mock[CheckVerificationBatchReadinessController]
+
+      when(
+        mockSubcontractorNameExtractor.getSubcontractorName(any())
+      ).thenReturn(Some(subcontractorName))
+
+      when(
+        mockSessionRepository.set(any())
+      ).thenReturn(Future.successful(true))
+
+      when(
+        mockVerificationService.deleteVerification(
+          any[UserAnswers],
+          eqTo(verificationResourceRef)
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(DeleteVerificationResponse(Some(0L)))
+      )
+
+      val refreshedAnswers =
+        emptyUserAnswers
+          .set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor))
+          .success
+          .value
+
+      when(
+        mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(refreshedAnswers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[VerificationService]
+              .toInstance(mockVerificationService),
+            bind[CheckVerificationBatchReadinessController]
+              .toInstance(mockCheckVerificationBatchReadinessController),
+            bind[SubcontractorNameExtractor]
+              .toInstance(mockSubcontractorNameExtractor)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+              .onSubmit(verificationResourceRef)
+              .url
+          )
+            .withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+
+        verify(mockCheckVerificationBatchReadinessController, never())
+          .updateVerificationBatchReadiness(any[UserAnswers])
+
+        verify(mockVerificationService)
           .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
       }
     }

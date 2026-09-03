@@ -23,7 +23,7 @@ import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcont
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
-import pages.verify.CurrentVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -153,7 +153,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
             }
 
           case response if response.verificationsCounter.contains(0L) =>
-            Future.successful(Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad()))
+            refreshNewestBatchAndRedirectToVerificationSelection(userAnswers)
 
           case _ =>
             Future.successful(recoveryRedirect)
@@ -173,6 +173,22 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
         case None =>
           Future.successful(None)
+      }
+
+  private def refreshNewestBatchAndRedirectToVerificationSelection(
+    userAnswers: models.UserAnswers
+  )(implicit request: DataRequest[?]): Future[play.api.mvc.Result] =
+    verificationService
+      .refreshNewestVerificationBatch(userAnswers)
+      .map { updatedAnswers =>
+        val redirect =
+          if (updatedAnswers.get(UnverifiedSubcontractorsPage).exists(_.nonEmpty)) {
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode)
+          } else {
+            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode)
+          }
+
+        Redirect(redirect)
       }
 
   private def subcontractorName(request: DataRequest[?], verificationResourceRef: Long): Option[String] =
