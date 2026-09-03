@@ -78,8 +78,20 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         .success
         .value
 
-      when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
+      when(
+        mockService.anyUnmatchedResourceRefsStillPresent(
+          eqTo("900063"),
+          eqTo(response)
+        )(any[HeaderCarrier])
+      )
         .thenReturn(Future.successful(true))
+
+      when(
+        mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
+          eqTo(userAnswers)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(userAnswers))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
@@ -90,7 +102,65 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url
-        verify(mockService).anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier])
+        verify(mockService)
+          .anyUnmatchedResourceRefsStillPresent(
+            eqTo("900063"),
+            eqTo(response)
+          )(any[HeaderCarrier])
+
+        verify(mockService)
+          .recreateCurrentBatchFromUnmatchedVerifications(
+            eqTo("900063"),
+            eqTo(userAnswers)
+          )(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to SystemError when recreating the current batch fails" in {
+      val mockService = mock[VerificationService]
+
+      val response = batchResponse(
+        verification(
+          verificationNumber = None,
+          verificationResourceRef = Some(10L)
+        )
+      )
+
+      val userAnswers = emptyUserAnswers
+        .set(LastSubmittedVerificationBatchResponsePage, response)
+        .success
+        .value
+        .set(CisIdQuery, "900063")
+        .success
+        .value
+
+      when(
+        mockService.anyUnmatchedResourceRefsStillPresent(
+          eqTo("900063"),
+          eqTo(response)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(true))
+
+      when(
+        mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
+          eqTo(userAnswers)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
 
@@ -199,7 +269,14 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
     }
 
     "must redirect to JourneyRecovery when session data is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "900063")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
