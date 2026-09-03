@@ -17,11 +17,12 @@
 package controllers.unmatched
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.routes
 import controllers.unmatched.routes as unmatchedRoutes
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
-import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.{SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,6 +31,7 @@ import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
 import services.VerificationService
 import views.html.unmatched.RemoveSubcontractorVerifyRequestView
@@ -38,6 +40,8 @@ import scala.concurrent.Future
 
 class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with MockitoSugar {
 
+  private val cisId = "12345"
+
   val formProvider = new RemoveSubcontractorVerifyRequestFormProvider()
   private val form = formProvider()
 
@@ -45,8 +49,6 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
   private val subcontractorId = 10L
 
   private val unmappedSubcontractorId = 999999L
-
-  private val mode = NormalMode
 
   private lazy val removeSubcontractorVerifyRequestRoute =
     unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId).url
@@ -193,6 +195,9 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must redirect to the ReviewUnmatchedSubcontractorsController on a POST and delete verification when valid data is submitted and answer = YES" in {
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -232,8 +237,11 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must redirect to the CheckVerificationBatchReadinessController on a POST and delete verification when valid data is submitted and answer = YES" in {
+    "must redirect to the ManageSubcontractorList Page on a POST and delete verification when valid data is submitted and answer = YES" in {
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -248,11 +256,16 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
+      val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
+
+      when(mockFrontendAppConfig.subcontractorListUrl).thenReturn("some-url")
+
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[VerificationService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockService),
+            bind[FrontendAppConfig].toInstance(mockFrontendAppConfig)
           )
           .build()
 
@@ -265,16 +278,15 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(
-          result
-        ).value mustEqual controllers.verify.routes.CheckVerificationBatchReadinessController
-          .checkVerificationBatchReadiness(mode)
-          .url
+        redirectLocation(result).value mustEqual s"some-url/$cisId/your-subcontractors"
       }
     }
 
     "must redirect to Journey Recovery for a POST when api failed" in {
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -315,6 +327,9 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must redirect to the Journey Recovery on a POST when delete verification fails and answer = YES" in {
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -356,6 +371,9 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
     "must redirect to the ReviewUnmatchedSubcontractorsController when valid data is submitted and answer = NO" in {
 
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -388,6 +406,9 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
@@ -447,7 +468,12 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -463,6 +489,9 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
       val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, cisId)
+        .success
+        .value
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value

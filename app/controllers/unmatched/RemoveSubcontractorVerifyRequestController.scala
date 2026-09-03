@@ -16,6 +16,7 @@
 
 package controllers.unmatched
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.Mode
@@ -38,11 +39,12 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   formProvider: RemoveSubcontractorVerifyRequestFormProvider,
   verificationService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: RemoveSubcontractorVerifyRequestView
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -90,7 +92,7 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
     }
 
   def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       val result =
         request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
@@ -122,10 +124,9 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
                                 )
                               } else if (deleteResponse.verificationsCounter.contains(0L)) {
-                                Redirect(
-                                  controllers.verify.routes.CheckVerificationBatchReadinessController
-                                    .checkVerificationBatchReadiness(mode)
-                                )
+                                val redirectUrl =
+                                  s"${appConfig.subcontractorListUrl}/${request.cisId}/your-subcontractors"
+                                Redirect(redirectUrl)
                               } else {
                                 recoveryRedirect
                               }
