@@ -91,9 +91,9 @@ verify.verifyDepartmentalError.manageSubcontractors.p1.link             =  Rheol
 
 verify.verificationNotSubmittedWarning.title                            =  Nid oes modd cyflwyno’ch cais dilysu
 verify.verificationNotSubmittedWarning.heading                          =  Nid oes modd cyflwyno’ch cais dilysu
-verify.verificationNotSubmittedWarning.link1.prefix                     =  Mae’n rhaid
+verify.verificationNotSubmittedWarning.link1.prefix                     =  Mae’n rhaid i chi
 verify.verificationNotSubmittedWarning.link1.text                       =  gysylltu â CThEF
-verify.verificationNotSubmittedWarning.link1.suffix                     =  rhagor o help.
+verify.verificationNotSubmittedWarning.link1.suffix                     =  i gael rhagor o help.
 verify.verificationNotSubmittedWarning.link2.text                       =  Rheoli’ch is-gontractwyr
 verify.verificationNotSubmittedWarning.link2.prefix                     =  Yn ôl i
 
@@ -162,7 +162,7 @@ verify.verificationRequestSubmitted.needHelp.contactHMRC.link           =  cysyl
 verify.verificationRequestSubmitted.needHelp.p1                         =  Os oes gennych unrhyw gwestiynau am eich cais dilysu,
 verify.verificationRequestSubmitted.needHelp.p2                         =  Bydd angen cyfeirnod y cais dilysu arnoch.
 verify.verificationRequestSubmitted.needHelp.p3                         =  Yn ôl i
-verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link  =  Rheoli’ch is-gontractwyr.
+verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link  =  Rheoli’ch is-gontractwyr
 verify.verificationRequestSubmitted.feedback.subHeading                 =  Cyn i chi fynd
 verify.verificationRequestSubmitted.feedback.p1                         =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
 verify.verificationRequestSubmitted.feedback.p2                         =  i rannu’ch adborth am y gwasanaeth hwn.
@@ -186,6 +186,13 @@ verify.verifyDepartmentalError.p1                                       =  Nid y
 verify.verifyDepartmentalError.contactHMRC.p1                           =  rhagor o help.
 verify.verifyDepartmentalError.manageSubcontractors.p1                  =  Yn ôl i
 verify.verifyDepartmentalError.manageSubcontractors.p1.link             =  Rheoli’ch is-gontractwyr
+
+verify.verifyDepartmentalErrorSubmitAgainController.title                                            =  Mae problem gyda’ch cais dilysu
+verify.verifyDepartmentalErrorSubmitAgainController.heading                                          =  Mae problem gyda’ch cais dilysu
+verify.verifyDepartmentalErrorSubmitAgainController.p1                                               =  TNid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
+verify.verifyDepartmentalErrorSubmitAgainController.p2                                               =  I ddilysu’r is-gontractwyr hyn, mae angen i chi ddechrau eto gyda chais dilysu newydd.
+verify.verifyDepartmentalErrorSubmitAgainController.backTo                                           =  Yn ôl i
+verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link                    =  Rheoli’ch is-gontractwyr
 
 checkYourAnswers.heading                                                =  Gwiriwch eich atebion cyn ychwanegu’r unigolyn hwn
 checkYourAnswers.heading.sub.h2                                         =  Manylion yr is-gontractwr
