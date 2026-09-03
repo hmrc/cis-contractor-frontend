@@ -22,9 +22,6 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import views.html.helper.CSPNonce
 @import views.html.components.FullWidthMainContent
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcInternalHead
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcInternalHeader
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.internalheader.InternalHeader
 
 @this(
    appConfig: FrontendAppConfig,
@@ -35,10 +32,7 @@
    alphaBanner: StandardAlphaBanner,
    hmrcStandardPage: HmrcStandardPage,
    twoThirdsMainContent: TwoThirdsMainContent,
-   fullWidthMainContent: FullWidthMainContent,
-   govukLayout: GovukLayout,
-   hmrcInternalHead: HmrcInternalHead,
-   hmrcInternalHeader: HmrcInternalHeader
+   fullWidthMainContent: FullWidthMainContent
  )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, isFullWidth: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
