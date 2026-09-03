@@ -27,9 +27,9 @@ object Validation {
     "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\\\£\\€]*"
   final val worksRefRegex         =
     "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\\\\\£\\€]+"
-  final val mobileRegex           = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
-  final val phoneRegex            = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
-  final val addressRegex          = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
+  final val mobileRegex           = """^[0-9\(\)\-\s]*$"""
+  final val phoneRegex            = """^[0-9\(\)\-\s]*$"""
+  final val addressRegex          = """[A-Za-z0-9"\~\!\@\#\$\%\*\+\:\;\=\?\s,\.\[\]\_\{\}\(\)/\&\'\-\^\\\£\€]*"""
   final val regexSchemeName       =
     "^[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\£€]+$"
 
@@ -44,6 +44,9 @@ object Validation {
 
   final val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
+
+  final val ninoRegex =
+    """^[ABCEGHJKLMNOPRSTWXYZabceghjklmnoprstwxyz][ABCEGHJKLMNPRSTWXYZabceghjklmnprstwxyz][0-9]{6}[ABCDabcd ]*$"""
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {

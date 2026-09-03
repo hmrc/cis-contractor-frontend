@@ -27,8 +27,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.verify.SubmissionSendingView
 
 import javax.inject.Inject
@@ -49,6 +49,8 @@ class SubmissionSendingController @Inject() (
     with I18nSupport
     with Logging {
 
+  private val SubmitAgainErrorCode = "3000"
+
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
@@ -57,9 +59,12 @@ class SubmissionSendingController @Inject() (
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       verificationService.createSubmitAndPersistVerificationSubmission
-        .map(response => redirectForInitialSubmissionStatus(response.status))
+        .map(redirectForInitialSubmissionResponse)
         .recover { case ex =>
-          logger.error("[SubmissionSendingController.onPageLoad] Failed to create submission", ex)
+          logger.error(
+            "[SubmissionSendingController.onPageLoad] Failed to create submission",
+            ex
+          )
           recovery
         }
     }
@@ -74,47 +79,120 @@ class SubmissionSendingController @Inject() (
 
         case Some(submissionDetails) =>
           val pollInterval =
-            submissionDetails.pollIntervalSeconds.getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
+            submissionDetails.pollIntervalSeconds
+              .getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
 
           verificationService
             .pollStatusAndPersist(request.userAnswers, submissionDetails)
-            .map(response => redirectForPollSubmissionStatus(response.status, pollInterval))
+            .map(response => redirectForPollSubmissionResponse(response, pollInterval))
             .recover { case ex =>
-              logger.error("[SubmissionSendingController.onPollAndRedirect] Verification poll failed", ex)
+              logger.error(
+                "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
+                ex
+              )
               recovery
             }
       }
     }
 
-  private def redirectForInitialSubmissionStatus(status: String): Result =
-    SubmissionStatus.fromString(status) match {
-      case PENDING | SubmissionStatus.ACCEPTED =>
-        Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
-      case FATAL_ERROR                         =>
-        Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
-      case _                                   =>
+  private def redirectForErrorStatus(
+    status: SubmissionStatus,
+    govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
+  ): Result =
+    status match {
+
+      case DEPARTMENTAL_ERROR if isSubmitAgainError(govTalkErrorStatus) =>
+        Redirect(
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+        )
+
+      case DEPARTMENTAL_ERROR =>
+        Redirect(
+          controllers.verify.routes.VerifyDepartmentalErrorController
+            .onPageLoad()
+        )
+
+      case FATAL_ERROR if isSubmitAgainError(govTalkErrorStatus) =>
+        Redirect(
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+        )
+
+      case FATAL_ERROR =>
+        Redirect(
+          controllers.verify.routes.VerificationNotSubmittedWarningController
+            .onPageLoad()
+        )
+
+      case _ =>
         recovery
     }
 
-  private def redirectForPollSubmissionStatus(status: SubmissionStatus, pollInterval: Int)(implicit
-    request: DataRequest[_]
+  private def redirectForInitialSubmissionResponse(
+    response: ChrisSubmissionResponse
   ): Result =
-    status match {
-      case PENDING | SubmissionStatus.ACCEPTED =>
-        Ok(view()).withHeaders("Refresh" -> pollInterval.toString)
-      case SUBMITTED                           =>
-        Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-      case SUBMITTED_NO_RECEIPT                => // TODO: matching screen not found
+    SubmissionStatus.fromString(response.status) match {
+
+      case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
+        Redirect(
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
+        )
+
+      case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
+        redirectForErrorStatus(status, response.govTalkErrorStatus)
+
+      case _ =>
         recovery
-      case DEPARTMENTAL_ERROR                  =>
-        Redirect(controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad())
-      case FATAL_ERROR                         =>
-        Redirect(controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad())
-      case SEND_ERROR                          =>
-        Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad())
-      case TIMED_OUT                           =>
-        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
-      case _                                   =>
+    }
+
+  private def redirectForPollSubmissionResponse(
+    response: ChrisPollResponse,
+    pollInterval: Int
+  )(implicit request: DataRequest[_]): Result =
+    response.status match {
+      case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
+        Ok(view())
+          .withHeaders("Refresh" -> pollInterval.toString)
+
+      case SUBMITTED =>
+        Redirect(
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoad()
+        )
+
+      case SUBMITTED_NO_RECEIPT => // TODO: matching screen not found
         recovery
+
+      case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
+        redirectForErrorStatus(status, response.govTalkErrorStatus)
+
+      case SEND_ERROR =>
+        Redirect(
+          controllers.verify.routes.VerifySendErrorController.onPageLoad()
+        )
+
+      case TIMED_OUT =>
+        Redirect(
+          controllers.verify.routes.VerificationRequestInProgressController
+            .onPageLoad()
+        )
+
+      case _ =>
+        recovery
+    }
+
+  private def isSubmitAgainError(
+    govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus]
+  ): Boolean =
+    govTalkErrorStatus.exists {
+      case FatalError(errorCode, _) =>
+        errorCode == SubmitAgainErrorCode
+
+      case DepartmentalError(Some(errorCode), _) =>
+        errorCode == SubmitAgainErrorCode
+
+      case _ =>
+        false
     }
 }

@@ -124,5 +124,30 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         body must include("123 PA 87654321")
       }
     }
+
+    "must redirect to contractor details updated on a POST" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+
+      val application = applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController.onSubmit().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.ContractorDetailsUpdatedController.onPageLoad().url
+      }
+    }
   }
 }

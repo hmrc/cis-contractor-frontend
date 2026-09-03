@@ -22,7 +22,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import pages.CisIdPage
+import queries.CisIdQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,7 +45,7 @@ class CisIdRequiredActionSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdPage, "12345")
+          .set(CisIdQuery, "12345")
           .success
           .value
 
@@ -67,8 +67,7 @@ class CisIdRequiredActionSpec extends SpecBase {
       cisIdRequest.userId mustBe "user-id"
     }
 
-    "redirect to Unauthorised Organisation Affinity when CIS ID is missing" in {
-
+    "redirect to Unauthorised ORG when CIS ID is missing & User is ORG role" in {
       val request =
         DataRequest(
           request = FakeRequest(GET, "/"),
@@ -84,6 +83,29 @@ class CisIdRequiredActionSpec extends SpecBase {
         case Left(redirect) =>
           redirect mustBe Redirect(
             controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()
+          )
+
+        case Right(_) =>
+          fail("Expected a redirect but got a successful result")
+      }
+    }
+    "redirect to Unauthorised AGENT when CIS ID is missing & User is AGENT role" in {
+      val request =
+        DataRequest(
+          request = FakeRequest(GET, "/"),
+          userId = "user-id",
+          userAnswers = emptyUserAnswers,
+          isAgent = true
+        )
+
+      val result = action.testRefine(request).futureValue
+
+      result mustBe a[Left[?, ?]]
+
+      result match {
+        case Left(redirect) =>
+          redirect mustBe Redirect(
+            controllers.routes.UnauthorisedAgentAffinityController.onPageLoad()
           )
 
         case Right(_) =>

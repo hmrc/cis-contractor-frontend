@@ -17,11 +17,19 @@
 package controllers.contractordetails
 
 import base.SpecBase
+import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import views.html.contractordetails.ContractorDetailsView
 
-class ContractorDetailsControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class ContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   "ContractorDetails Controller" - {
 
@@ -39,6 +47,49 @@ class ContractorDetailsControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+
+    "must create user answers and redirect to enter contractor UTR on a POST" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(
+        additionalBindings = Seq(bind[SessionRepository].toInstance(mockSessionRepository))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.contractordetails.routes.ContractorDetailsController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.contractordetails.routes.ContractorUtrController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must keep existing user answers and redirect to enter contractor UTR on a POST" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(bind[SessionRepository].toInstance(mockSessionRepository))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.contractordetails.routes.ContractorDetailsController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.contractordetails.routes.ContractorUtrController.onPageLoad(NormalMode).url
       }
     }
   }
