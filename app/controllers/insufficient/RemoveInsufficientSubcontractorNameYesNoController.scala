@@ -158,7 +158,11 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
           case _ =>
             Future.successful(recoveryRedirect)
         }
-        .recover { case _ =>
+        .recover { case e =>
+          logger.warn(
+            s"[RemoveInsufficientSubcontractorNameYesNoController.deleteAndRedirect] Failed to delete verificationResourceRef=$verificationResourceRef",
+            e
+          )
           recoveryRedirect
         }
     }
