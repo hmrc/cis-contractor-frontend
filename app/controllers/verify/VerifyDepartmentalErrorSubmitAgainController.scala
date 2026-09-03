@@ -18,39 +18,37 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import pages.verify.LastSubmittedVerificationBatchResponsePage
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.verify.VerificationResultsViewModel
-import views.html.verify.VerificationResultsView
+import views.html.verify.VerifyDepartmentalErrorSubmitAgainView
 
 import javax.inject.Inject
 
-class VerificationResultsController @Inject() (
+class VerifyDepartmentalErrorSubmitAgainController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: VerificationResultsView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+  view: VerifyDepartmentalErrorSubmitAgainView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {
-      case Some(response) =>
-        request.userAnswers.get(CisIdQuery) match {
-          case Some(cisId) =>
-            val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-            Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
-          case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-      case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers.get(CisIdQuery) match {
+
+        case Some(cisId) =>
+          val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          Ok(view(manageSubcontractorsUrl))
+
+        case None =>
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
     }
-  }
 }
