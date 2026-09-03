@@ -226,7 +226,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     sub.subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
       case Some(Individualorsoletrader) => individualName.orElse(trading)
       case Some(Limitedcompany)         => trading
-      case Some(Trust)                  => trading.orElse(partnershipTrading)
+      case Some(Trust)                  => trading
       case Some(Partnership)            => partnershipTrading.orElse(trading)
       case _                            => partnershipTrading.orElse(trading).orElse(individualName)
     }
