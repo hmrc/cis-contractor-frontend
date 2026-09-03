@@ -22,6 +22,7 @@ import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import utils.DateTimeFormats
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,7 +39,6 @@ import play.api.data.Form
 import rules.verify.ReverificationRules
 
 import java.time.{Clock, LocalDate}
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,7 +60,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
     with I18nSupport {
 
   private def dateFmt(implicit messages: Messages) =
-    DateTimeFormatter.ofPattern("d MMM yyyy", messages.lang.locale)
+    DateTimeFormats.shortDateFormat()(messages.lang)
 
   private def recovery =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
