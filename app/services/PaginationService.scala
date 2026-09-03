@@ -51,7 +51,7 @@ class PaginationService(val config: PaginationConfig) {
     val pageEnd   = pageStart + config.recordsPerPage
     val pageItems = allItems.slice(pageStart, pageEnd)
 
-    val windowSize = config.maxVisiblePages / 2
+    val windowSize      = config.maxVisiblePages / 2
     val paginationStart = (page - windowSize).max(2)
     val paginationEnd   = (page + windowSize).min(totalPages - 1)
 
