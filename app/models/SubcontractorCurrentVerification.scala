@@ -16,6 +16,8 @@
 
 package models
 
+import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import play.api.i18n.Messages
 import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
@@ -53,7 +55,28 @@ case class SubcontractorCurrentVerification(
   updatedTaxTreatment: Option[String],
   lastMonthlyReturnDate: Option[LocalDateTime],
   pendingVerifications: Option[Int]
-)
+) {
+  def displayName(implicit messages: Messages): String =
+    name.getOrElse(messages("verify.noName"))
+
+  private def name: Option[String] = {
+    val first              = firstName.map(_.trim).filter(_.nonEmpty)
+    val surnameValue       = surname.map(_.trim).filter(_.nonEmpty)
+    val trading            = tradingName.map(_.trim).filter(_.nonEmpty)
+    val partnershipTrading = partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+    val individualName =
+      surnameValue.map(s => first.map(f => s"$s, $f").getOrElse(s))
+
+    subcontractorType.flatMap(TypeOfSubcontractor.enumerable.withName) match {
+      case Some(Individualorsoletrader) => individualName.orElse(trading)
+      case Some(Limitedcompany)         => trading
+      case Some(Trust)                  => trading
+      case Some(Partnership)            => partnershipTrading.orElse(trading)
+      case _                            => partnershipTrading.orElse(trading).orElse(individualName)
+    }
+  }
+}
 
 object SubcontractorCurrentVerification {
   given format: OFormat[SubcontractorCurrentVerification] = Json.format[SubcontractorCurrentVerification]

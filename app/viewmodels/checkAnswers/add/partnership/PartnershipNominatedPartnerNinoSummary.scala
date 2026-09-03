@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNinoPage
@@ -38,6 +39,17 @@ object PartnershipNominatedPartnerNinoSummary {
           ).withVisuallyHiddenText(messages("partnershipNominatedPartnerNino.change.hidden"))
             .withAttribute("id" -> "nominated-partner-nino")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerNino.map { value =>
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerNino.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

@@ -17,7 +17,9 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
+import models.info.IndividualAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -28,6 +30,7 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 
 class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
+
   implicit val messages: Messages = stubMessages()
 
   "WorksReferenceNumberYesNoSummary.row" - {
@@ -38,26 +41,35 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = WorksReferenceNumberYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] =
+        WorksReferenceNumberYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
+
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction       = actions.head
+      val changeAction = actions.head
+
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.WorksReferenceNumberYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("worksReferenceNumberYesNo.change.hidden")
+      val expectedHref       =
+        routes.WorksReferenceNumberYesNoController
+          .onPageLoad(CheckMode)
+          .url
+      val expectedHiddenText =
+        messages("worksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
@@ -70,25 +82,33 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = WorksReferenceNumberYesNoSummary.row(answers, AmendMode)
+      val maybeRow =
+        WorksReferenceNumberYesNoSummary.row(answers, AmendMode)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
       row.value.content.asHtml.toString should include(expectedValue)
 
       row.actions shouldBe defined
+
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction       = actions.head
+      val changeAction = actions.head
+
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.WorksReferenceNumberYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+          .onPageLoad(AmendIndividualRemoveDetail.WorksReferenceNumber.key)
+          .url
       val expectedHiddenText = messages("worksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
@@ -102,16 +122,139 @@ class WorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = WorksReferenceNumberYesNoSummary.row(answers)
+      val maybeRow =
+        WorksReferenceNumberYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row           = maybeRow.value
+      val row = maybeRow.value
+
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+
+      WorksReferenceNumberYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - WorksReferenceNumberYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' for ViewOnlyIndividualAnswers" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("WRN-12345"),
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        WorksReferenceNumberYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' for ViewOnlyIndividualAnswers" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = Some(false),
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        WorksReferenceNumberYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("worksReferenceNumberYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when worksReferenceYesNo is missing in ViewOnlyIndividualAnswers" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
       WorksReferenceNumberYesNoSummary.row(answers) shouldBe None
     }
   }

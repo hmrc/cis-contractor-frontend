@@ -27,6 +27,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.*
+import pages.amend.ShowVerificationDetailsPage
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -89,6 +90,9 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             .success
             .value
             .set(CompanyUtrYesNoPage, true)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, false)
             .success
             .value
 
@@ -429,6 +433,53 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
           }
+        }
+      }
+    }
+
+    "when contractorDetail is utr" - {
+      lazy val removeDetailYesNoUtrRoute: String =
+        controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController.onPageLoad("utr").url
+
+      val verifiedSubcontractorUa =
+        uaWithName
+          .set(CompanyUtrPage, "7777777777")
+          .success
+          .value
+          .set(CompanyUtrYesNoPage, true)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+
+      "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to JourneyRecovery for a POST when subcontractor is verified" in {
+
+        val application = applicationBuilder(userAnswers = Some(verifiedSubcontractorUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoUtrRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }

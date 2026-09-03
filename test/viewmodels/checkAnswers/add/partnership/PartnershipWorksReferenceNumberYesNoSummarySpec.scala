@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import controllers.add.partnership.routes
+import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -27,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -91,7 +94,9 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+        .onPageLoad(AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
+        .url
       val expectedHiddenText = messages("partnershipWorksReferenceNumberYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
@@ -150,6 +155,93 @@ class PartnershipWorksReferenceNumberYesNoSummarySpec extends AnyFreeSpec with M
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      PartnershipWorksReferenceNumberYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "PartnershipWorksReferenceNumberYesNoSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      nominatedPartnerWorksReferenceYesNo: Option[Boolean]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = nominatedPartnerWorksReferenceYesNo,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' when the nominated partner works reference answer is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some(true))
+
+      val maybeRow =
+        PartnershipWorksReferenceNumberYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when the nominated partner works reference answer is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some(false))
+
+      val maybeRow =
+        PartnershipWorksReferenceNumberYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the nominated partner works reference answer does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
       PartnershipWorksReferenceNumberYesNoSummary.row(answers) shouldBe None
     }
   }

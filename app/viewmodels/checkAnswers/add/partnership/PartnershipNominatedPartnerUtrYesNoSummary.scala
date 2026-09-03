@@ -16,7 +16,9 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.info.partnership.PartnershipAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerUtrYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,11 +38,29 @@ object PartnershipNominatedPartnerUtrYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
+                .url
+            else controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-nominated-partner-utr")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerUtrYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

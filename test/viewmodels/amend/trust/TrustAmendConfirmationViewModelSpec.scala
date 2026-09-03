@@ -22,7 +22,7 @@ import models.amend.trust.OriginalTrustAnswers
 import models.contact.ContactMethodOptions
 import pages.add.trust.*
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 
 class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
@@ -144,9 +144,9 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      addressRow.head.content mustBe Text(msgs("trustAddress.checkYourAnswersLabel"))
-      addressRow(1).content mustBe Text("1 Test Street, Newcastle, SA1 1AA, England")
-      addressRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      addressRow.head.content mustBe HtmlContent(msgs("trustAddress.checkYourAnswersLabel"))
+      addressRow(1).content mustBe HtmlContent("1 Test Street</br>Newcastle</br>SA1 1AA</br>England")
+      addressRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return an address row when the address changes" in {
@@ -170,9 +170,9 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("trustAddress.checkYourAnswersLabel"))
-      row(1).content mustBe Text("1 Test Street, Newcastle, SA1 1AA, England")
-      row(2).content mustBe Text("10 Test Street, Newcastle, SA1 1AA, England")
+      row.head.content mustBe HtmlContent(msgs("trustAddress.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent("1 Test Street</br>Newcastle</br>SA1 1AA</br>England")
+      row(2).content mustBe HtmlContent("10 Test Street</br>Newcastle</br>SA1 1AA</br>England")
     }
 
     "must display all populated address lines when an address changes" in {
@@ -198,8 +198,8 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row(2).content mustBe Text(
-        "10 Test Street, Building A, Business Park, Leeds, West Yorkshire, LS1 1AA, England"
+      row(2).content mustBe HtmlContent(
+        "10 Test Street</br>Building A</br>Business Park</br>Leeds</br>West Yorkshire</br>LS1 1AA</br>England"
       )
     }
 
@@ -230,9 +230,9 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      methodRow.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      methodRow.head.content mustBe HtmlContent(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.selectContent.none"))
 
       emailRow.head.content mustBe Text(msgs("trustEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("trust@test.com")
@@ -261,12 +261,12 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
-      row(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      row(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, " +
-          s"${msgs("trustContactMethodOptions.phone")}, " +
-          msgs("trustContactMethodOptions.mobile")
+      row.head.content mustBe HtmlContent(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      row(2).content mustBe HtmlContent(
+        s"<ul class=\"govuk-list govuk-list--bullet\"><li>${msgs("trustContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("trustContactMethodOptions.phone")}</li>" +
+          s"<li>${msgs("trustContactMethodOptions.mobile")}</li></ul>"
       )
     }
 
@@ -296,9 +296,9 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val emailRow  = result(1)
       val phoneRow  = result(2)
 
-      methodRow.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("trustContactMethodOptions.phone"))
+      methodRow.head.content mustBe HtmlContent(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("trustContactMethodOptions.phone"))
 
       emailRow.head.content mustBe Text(msgs("trustEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("trust@test.com")
@@ -450,10 +450,11 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       val methodRow = result.head
       val phoneRow  = result(1)
 
-      methodRow.head.content mustBe Text(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("trustContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(
-        s"${msgs("trustContactMethodOptions.email")}, ${msgs("trustContactMethodOptions.phone")}"
+      methodRow.head.content mustBe HtmlContent(msgs("trustContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("trustContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(
+        s"<ul class=\"govuk-list govuk-list--bullet\"><li>${msgs("trustContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("trustContactMethodOptions.phone")}</li></ul>"
       )
 
       phoneRow.head.content mustBe Text(msgs("trustPhoneNumber.checkYourAnswersLabel"))
@@ -574,7 +575,7 @@ class TrustAmendConfirmationViewModelSpec extends SpecBase {
       result must have size 3
 
       result(0).head.content mustBe Text(msgs("trustName.checkYourAnswersLabel"))
-      result(1).head.content mustBe Text(msgs("trustAddress.checkYourAnswersLabel"))
+      result(1).head.content mustBe HtmlContent(msgs("trustAddress.checkYourAnswersLabel"))
       result(2).head.content mustBe Text(msgs("trustUtr.checkYourAnswersLabel"))
     }
   }

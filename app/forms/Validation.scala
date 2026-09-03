@@ -21,23 +21,32 @@ import uk.gov.hmrc.domain.Nino
 
 object Validation {
 
-  final val companyRegNumberRegex = """^([A-Za-z]{2}[0-9]{1,6}|[0-9]{1,8})$"""
-  final val emailRegex            = """^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)$"""
-  final val nameRegex             = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
-  final val worksRefRegex         = """^[A-Za-z0-9 ~!@#$%&'()*+,-./:;=?_{}£€]+$"""
-  final val mobileRegex           = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
-  final val phoneRegex            = """^(?=(?:.*\d){6,})[0-9()+\- ]*$"""
-  final val addressRegex          = """^[A-Za-z0-9"~!@#\$%*+:\;=\?\s,\.\[\]_\\\{\}\(\)/&'\-\^\u00A3\u20AC]+$"""
+  final val companyRegNumberRegex = "[A-Za-z]{2}[0-9]{1,6}|[0-9]{1,8}"
+  final val emailRegex            = """^[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+@[A-Za-z0-9!#$%&*+-/=?^_`{|}~.]+$"""
+  final val nameRegex             =
+    "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\\\£\\€]*"
+  final val worksRefRegex         =
+    "[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\\\\\£\\€]+"
+  final val mobileRegex           = """^[0-9\(\)\-\s]*$"""
+  final val phoneRegex            = """^[0-9\(\)\-\s]*$"""
+  final val addressRegex          = """[A-Za-z0-9"\~\!\@\#\$\%\*\+\:\;\=\?\s,\.\[\]\_\{\}\(\)/\&\'\-\^\\\£\€]*"""
   final val regexSchemeName       =
     "^[A-Za-z0-9\"\\~\\!\\@\\#\\$\\%\\*\\+\\:\\;\\=\\?\\s,\\.\\[\\]\\_\\{\\}\\(\\)/\\&\\'\\-\\^\\\\£€]+$"
 
   final val firstCharLetterRegex =
     """^[A-Za-z].*"""
 
+  final val firstMiddleNameRegex = "[A-Za-z\\'\\-]+"
+
+  final val surnameFormat = "[A-Za-z0-9\\s,\\.\\(\\)/\\&\\'\\-]+"
+
   final val firstCharLetterOrDigitRegex = """^[A-Za-z0-9].*"""
 
   final val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
+
+  final val ninoRegex =
+    """^[ABCEGHJKLMNOPRSTWXYZabceghjklmnoprstwxyz][ABCEGHJKLMNPRSTWXYZabceghjklmnprstwxyz][0-9]{6}[ABCDabcd ]*$"""
 
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {

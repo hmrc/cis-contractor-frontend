@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add
 import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.address.{Address, Country}
+import models.info.IndividualAnswers
 import models.{AmendMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -219,6 +220,147 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
       assertHasBreaks(html)
 
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - AddressOfSubcontractorSummary.row" should {
+
+    "return a SummaryListRow when address is present" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = Some("Greater London"),
+        postcode = Some("SW1A 2AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = Some(true),
+          address = Some(address),
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        AddressOfSubcontractorSummary.row(answers)
+
+      result shouldBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString should include(
+        messages("addressOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "Greater London<br/>" +
+          "SW1A 2AA<br/>" +
+          "United Kingdom"
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "return None when address is missing" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = Some(false),
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      AddressOfSubcontractorSummary.row(answers) shouldBe None
+    }
+
+    "render the address without a country line when country is None" in {
+
+      val address = Address(
+        addressLine1 = "10 Downing Street",
+        addressLine2 = Some("Westminster"),
+        addressLine3 = Some("London"),
+        addressLine4 = None,
+        postcode = Some("SW1A 2AA"),
+        country = None
+      )
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = Some(true),
+          address = Some(address),
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        AddressOfSubcontractorSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.value.content shouldBe HtmlContent(
+        "10 Downing Street<br/>" +
+          "Westminster<br/>" +
+          "London<br/>" +
+          "SW1A 2AA"
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
     }
   }
 }

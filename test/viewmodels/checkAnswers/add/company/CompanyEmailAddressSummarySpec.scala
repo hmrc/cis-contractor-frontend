@@ -28,6 +28,8 @@ import pages.add.company.CompanyEmailAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.info.company.CompanyAnswers
 
 class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -125,6 +127,75 @@ class CompanyEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaE
           .value
 
       val row = CompanyEmailAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "o&#x27;reilly+test&amp;co@example.com")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "CompanyEmailAddressSummary.row with ViewOnlyCompanyAnswers" - {
+    def viewOnlyAnswers(
+      email: Option[String] = None
+    ): CompanyAnswers =
+      CompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = email,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+    "must return a SummaryListRow when the email exists" in {
+
+      val answers = viewOnlyAnswers(Some("test@example.com"))
+
+      val maybeRow = CompanyEmailAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyEmailAddress.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("test@example.com")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the email does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyEmailAddressSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val email = "o'reilly+test&co@example.com"
+
+      val answers = viewOnlyAnswers(Some(email))
+
+      val maybeRow = CompanyEmailAddressSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
 
       val html = extractHtml(row)
 

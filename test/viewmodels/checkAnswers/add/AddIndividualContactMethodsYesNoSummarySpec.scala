@@ -17,6 +17,8 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
+import models.amend.AmendIndividualRemoveDetail
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -90,7 +92,10 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.AddIndividualContactMethodsYesNoController.onPageLoad(AmendMode).url
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+          .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+          .url
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
@@ -115,6 +120,83 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+      AddIndividualContactMethodsYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "ViewOnly - AddIndividualContactMethodsYesNoSummary.row" - {
+
+    def viewOnlyAnswers(
+      contactMethodsYesNo: Option[Boolean]
+    ): IndividualAnswers =
+      IndividualAnswers(
+        subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+        showVerificationDetails = false,
+        usesTradingName = None,
+        tradingName = None,
+        subcontractorName = None,
+        addressYesNo = None,
+        address = None,
+        individualContactMethodsYesNo = contactMethodsYesNo,
+        individualContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = None,
+        utr = None,
+        ninoYesNo = None,
+        nino = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' for ViewOnlyIndividualAnswers" in {
+
+      val answers = viewOnlyAnswers(Some(true))
+
+      val maybeRow =
+        AddIndividualContactMethodsYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' for ViewOnlyIndividualAnswers" in {
+
+      val answers = viewOnlyAnswers(Some(false))
+
+      val maybeRow =
+        AddIndividualContactMethodsYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when individualContactMethodsYesNo is missing in ViewOnlyIndividualAnswers" in {
+
+      val answers = viewOnlyAnswers(None)
+
       AddIndividualContactMethodsYesNoSummary.row(answers) shouldBe None
     }
   }
