@@ -216,7 +216,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       }
     }
 
-    "must call delete verification and redirect to newest verification batch when remaining insufficient subcontractors exist" in {
+    "must call readiness and refresh newest batch without redirecting to F1 when remaining insufficient subcontractors exist" in {
 
       val mockSessionRepository =
         mock[SessionRepository]
@@ -255,6 +255,10 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         mockCheckVerificationBatchReadinessController.updateVerificationBatchReadiness(any[UserAnswers])
       ).thenReturn(Future.successful(Some(emptyUserAnswers)))
 
+      when(
+        mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(emptyUserAnswers))
+
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
@@ -288,13 +292,16 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
 
         verify(mockVerificationService)
           .deleteVerification(any[UserAnswers], eqTo(verificationResourceRef))(any[HeaderCarrier])
 
         verify(mockCheckVerificationBatchReadinessController)
           .updateVerificationBatchReadiness(any[UserAnswers])
+
+        verify(mockVerificationService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
 
         val savedAnswersCaptor =
           ArgumentCaptor.forClass(classOf[UserAnswers])
@@ -375,6 +382,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
 
         verify(mockCheckVerificationBatchReadinessController, never())
           .updateVerificationBatchReadiness(any[UserAnswers])
+
+        verify(mockVerificationService, never())
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
       }
     }
 

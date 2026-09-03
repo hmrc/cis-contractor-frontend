@@ -24,6 +24,7 @@ import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
 import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -50,7 +51,8 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   view: RemoveInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private val form: Form[Boolean] = formProvider()
 
@@ -138,12 +140,16 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         .deleteVerification(userAnswers, verificationResourceRef)
         .flatMap {
           case response if response.verificationsCounter.exists(_ > 0) =>
-            checkVerificationBatchReadiness().map {
-              case Some(_) =>
-                Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad())
+            checkVerificationBatchReadiness().flatMap {
+              case Some(updatedAnswers) =>
+                verificationService
+                  .refreshNewestVerificationBatch(updatedAnswers)
+                  .map(_ =>
+                    Redirect(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
+                  )
 
               case None =>
-                recoveryRedirect
+                Future.successful(recoveryRedirect)
             }
 
           case response if response.verificationsCounter.contains(0L) =>
@@ -162,6 +168,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       .get(request.userId)
       .flatMap {
         case Some(updatedAnswers) =>
+          logger.info("Remove Insufficient verification batch readiness check")
           checkVerificationBatchReadinessController.updateVerificationBatchReadiness(updatedAnswers)
 
         case None =>
