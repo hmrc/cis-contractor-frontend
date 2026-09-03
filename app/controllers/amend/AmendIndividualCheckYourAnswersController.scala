@@ -310,11 +310,18 @@ class AmendIndividualCheckYourAnswersController @Inject() (
             .ReviewUnmatchedSubcontractorsRoutingController
             .onPageLoad()
 
-        case _ =>
+        case Some(AmendJourneyType.Standard) =>
           Call(
             "GET",
             appConfig.manageYourSubcontractorsUrl(request.cisId)
           )
+
+        case None =>
+          logger.error(
+            "[AmendIndividualCheckYourAnswersController.handleNoChanges] Missing AmendJourneyTypePage"
+          )
+
+          controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
     sessionRepository
