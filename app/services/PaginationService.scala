@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 
 case class PaginationConfig(
   recordsPerPage: Int = 6,
-  maxVisiblePages: Int = 5
+  maxVisiblePages: Int = 2
 )
 
 final case class CheckboxPaginationResult(
@@ -47,21 +47,36 @@ class PaginationService(val config: PaginationConfig) {
     val totalPages = math.ceil(allItems.size.toDouble / config.recordsPerPage).toInt.max(1)
     val page       = currentPage.max(1).min(totalPages)
 
-    val start = (page - 1) * config.recordsPerPage
-    val end   = start + config.recordsPerPage
+    val pageStart = (page - 1) * config.recordsPerPage
+    val pageEnd   = pageStart + config.recordsPerPage
+    val pageItems = allItems.slice(pageStart, pageEnd)
 
-    val pageItems = allItems.slice(start, end)
+    val windowSize = config.maxVisiblePages / 2
+    val paginationStart = (page - windowSize).max(2)
+    val paginationEnd   = (page + windowSize).min(totalPages - 1)
+
+    val pages: Seq[PaginationItemViewModel] = {
+      val firstPage     = PaginationItemViewModel("1", "").withCurrent(page == 1)
+      val lastPage      = PaginationItemViewModel(totalPages.toString, "").withCurrent(page == totalPages)
+      val middlePages   =
+        (paginationStart to paginationEnd)
+          .filter(p => p > 1 && p < totalPages)
+          .map(p => PaginationItemViewModel(p.toString, "").withCurrent(p == page))
+      val leftEllipsis  = if (paginationStart > 2) Seq(PaginationItemViewModel.ellipsis()) else Seq()
+      val rightEllipsis = if (paginationEnd < totalPages - 1) Seq(PaginationItemViewModel.ellipsis()) else Seq()
+
+      Seq(firstPage) ++
+        leftEllipsis ++
+        middlePages ++
+        rightEllipsis ++
+        (if (totalPages > 1) Seq(lastPage) else Seq())
+    }
 
     val pagination =
       if (totalPages <= 1) PaginationViewModel()
       else
         PaginationViewModel()
-          .withItems(
-            (1 to totalPages).map { p =>
-              PaginationItemViewModel(number = p.toString, href = "")
-                .withCurrent(p == page)
-            }
-          )
+          .withItems(pages)
           .copy(
             previous =
               if (page > 1) Some(PaginationLinkViewModel("").withText("site.pagination.previous"))
@@ -71,6 +86,6 @@ class PaginationService(val config: PaginationConfig) {
               else None
           )
 
-    CheckboxPaginationResult(pageItems, pagination, start + 1, allItems.size)
+    CheckboxPaginationResult(pageItems, pagination, pageStart + 1, allItems.size)
   }
 }
