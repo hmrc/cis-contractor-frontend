@@ -859,6 +859,82 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
+  "VerificationService.deleteVerification" - {
+
+    "must call delete endpoint, refresh current+newest and persist" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResp =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val request =
+        DeleteVerificationRequest(
+          instanceId = instanceId,
+          verificationResourceRef = 1111L
+        )
+
+      val deleteResponse =
+        DeleteVerificationResponse(
+          verificationsCounter = Some(1L)
+        )
+
+      when(mockConnector.deleteVerification(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(deleteResponse))
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentResp))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result =
+        service
+          .deleteVerification(ua, 1111L)
+          .futureValue
+
+      result mustBe deleteResponse
+
+      verify(mockConnector).deleteVerification(eqTo(request))(any[HeaderCarrier])
+      verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, times(3)).set(any[UserAnswers])
+    }
+
+    "must fail when instance id is missing" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ex =
+        service
+          .deleteVerification(emptyUserAnswers, 1111L)
+          .failed
+          .futureValue
+
+      ex.getMessage mustBe "InstanceIdQuery not found in session data"
+
+      verify(mockConnector, never()).deleteVerification(any[DeleteVerificationRequest])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+  }
+
   "VerificationService.createSubmitAndPersistVerificationSubmission" - {
 
     "must create, submit and save details" in {

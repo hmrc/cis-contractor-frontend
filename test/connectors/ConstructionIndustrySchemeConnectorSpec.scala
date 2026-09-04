@@ -32,9 +32,9 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.requests.{ModifyVerificationsRequest, SubcontractorRequest, UpdateSubcontractorRequest}
+import models.requests.{DeleteVerificationRequest, ModifyVerificationsRequest, SubcontractorRequest, UpdateSubcontractorRequest}
 import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
-import models.response.CreateSubmissionForVerificationResponse
+import models.response.{CreateSubmissionForVerificationResponse, DeleteVerificationResponse}
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -278,7 +278,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val expected =
         GetSubcontractorListResponse(
-          Seq(SubcontractorListItem(11L, Some(111L)), SubcontractorListItem(22L, Some(222L)))
+          Seq(SubcontractorListItem(11L, None), SubcontractorListItem(22L, Some(222L)))
         )
 
       when(rb.execute[GetSubcontractorListResponse](any(), any()))
@@ -288,7 +288,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val result = connector.getSubcontractorList("900063").futureValue
 
-      result mustBe expected
+      assert(result == expected)
 
       val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
 
@@ -498,6 +498,43 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val ex = connector.updateSubcontractor(request).failed.futureValue
       ex.getMessage mustBe s"Update subcontractor failed, returned $INTERNAL_SERVER_ERROR: boom"
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.deleteVerification" should {
+
+    "POST /cis/verification/delete with the request body and return DeleteVerificationResponse" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+
+      val expected = DeleteVerificationResponse(verificationsCounter = Some(2L))
+
+      when(rb.execute[DeleteVerificationResponse](any(), any()))
+        .thenReturn(Future.successful(expected))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val req = DeleteVerificationRequest(
+        instanceId = "INST-123",
+        verificationResourceRef = 111L
+      )
+
+      val result = connector.deleteVerification(req).futureValue
+      result mustBe expected
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+      verify(http).post(urlCaptor.capture())(any[HeaderCarrier])
+      urlCaptor.getValue.toString must include("/cis/verification/delete")
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(req)
     }
   }
 
