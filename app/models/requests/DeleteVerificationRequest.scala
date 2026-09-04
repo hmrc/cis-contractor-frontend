@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package models.requests
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
+case class DeleteVerificationRequest(
+  instanceId: String,
+  verificationResourceRef: Long
+)
 
-  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+object DeleteVerificationRequest {
+  given OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]
 }

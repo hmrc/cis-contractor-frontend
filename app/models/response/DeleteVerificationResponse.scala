@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package models.response
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
+final case class DeleteVerificationResponse(
+  verificationsCounter: Option[Long]
+)
 
-  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+object DeleteVerificationResponse {
+  given OFormat[DeleteVerificationResponse] = Json.format[DeleteVerificationResponse]
 }

@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetLastSubmittedVerificationBatchResponse}
+import models.response.*
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -175,6 +175,28 @@ class VerificationService @Inject() (
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
+
+  def deleteVerification(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.deleteVerification(
+                    DeleteVerificationRequest(
+                      instanceId = instanceId,
+                      verificationResourceRef = verificationResourceRef
+                    )
+                  )
+
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield response
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],

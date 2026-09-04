@@ -23,15 +23,12 @@ class RemoveSubcontractorVerifyRequestPageSpec extends SpecBase {
 
   "RemoveSubcontractorVerifyRequestPage" - {
 
-    "must have the correct path" in {
-      RemoveSubcontractorVerifyRequestPage.path mustBe (
-        JsPath \ "removeSubcontractorVerifyRequest"
-      )
-    }
+    val subcontractorId = 10
 
-    "must have the correct toString value" in {
-      RemoveSubcontractorVerifyRequestPage.toString mustBe
-        "removeSubcontractorVerifyRequest"
+    "must have the correct path" in {
+      RemoveSubcontractorVerifyRequestPage(subcontractorId).path mustBe (
+        JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+      )
     }
   }
 }

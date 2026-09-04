@@ -285,6 +285,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             )
         }
       }
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
@@ -314,5 +315,20 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         }
       }
   }
+
+  def deleteVerification(
+    request: DeleteVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    http
+      .post(url"$cisBaseUrl/verification/delete")
+      .withBody(Json.toJson(request))
+      .execute[DeleteVerificationResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][deleteVerification] " +
+            s"instanceId=${request.instanceId}, verificationResourceRef=${request.verificationResourceRef} - deleted verification"
+        )
+        response
+      }
 
 }
