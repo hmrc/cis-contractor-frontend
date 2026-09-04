@@ -195,8 +195,32 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           .success
           .value
 
+      val newestResponse =
+        responseWithSubcontractors.copy(
+          verifications = Seq(
+            Verification(
+              verificationId = 1L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(1L),
+              verificationResourceRef = None
+            ),
+            Verification(
+              verificationId = 2L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(2L),
+              verificationResourceRef = None
+            )
+          )
+        )
+
       when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(responseWithSubcontractors))
+        .thenReturn(Future.successful(newestResponse))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
