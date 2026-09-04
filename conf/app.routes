@@ -90,15 +90,15 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
 
-GET   /subcontractor/info/start/:cisId/:subbieResourceRef  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
+GET   /subcontractor/info/start/:cisId/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long, journeyType: String)
 
-GET   /subcontractor/info/partnership/subcontractor-information-read-only  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/partnership/subcontractor-information-read-only/:journeyType  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/company/subcontractor-information-read-only  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/company/subcontractor-information-read-only/:journeyType  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/trust/subcontractor-information-read-only/:journeyType  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/subcontractor-information-read-only/:journeyType  controllers.info.IndividualCheckYourAnswersController.onPageLoad(journeyType: String)
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)

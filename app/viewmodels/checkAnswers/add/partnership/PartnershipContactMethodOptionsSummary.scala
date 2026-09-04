@@ -55,7 +55,8 @@ object PartnershipContactMethodOptionsSummary {
   def row(
     answers: PartnershipAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
-    Some {
+    Option.when(answers.partnershipContactMethodOptions.nonEmpty) {
+
       val options =
         ContactMethodOptions
           .ordered(answers.partnershipContactMethodOptions)
