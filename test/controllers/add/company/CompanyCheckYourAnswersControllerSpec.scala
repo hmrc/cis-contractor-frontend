@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 import models.contact.ContactMethodOptions
 
@@ -209,6 +209,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect SubcontractorAdded and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
@@ -220,7 +221,8 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -238,6 +240,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
@@ -247,12 +250,14 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(submittedUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -274,6 +279,7 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -282,7 +288,8 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 

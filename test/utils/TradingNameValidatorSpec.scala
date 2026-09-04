@@ -16,77 +16,106 @@
 
 package utils
 
+import base.SpecBase
+import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 
-class TradingNameValidatorSpec extends AnyWordSpec with Matchers {
+class TradingNameValidatorSpec extends SpecBase {
 
-  "TradingNameValidator - validate tradingName " must {
+  Seq(
+    ("Trust", Trust),
+    ("Limited Company", Limitedcompany),
+    ("Partnership", Partnership),
+    ("Individual/Sole Trader", Individualorsoletrader)
+  ).foreach { case (subcontractorType, typeOfSubcontractor) =>
+    s"when the type of subcontractor is '$subcontractorType'" - {
 
-    "return failure when the trading name is empty" in {
-      val tradingName = ""
-      TradingNameValidator
-        .validate(Some("")) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.TradingName,
-          value = Some(tradingName)
-        )
+      "TradingNameValidator - validate tradingName " - {
+
+        "return failure when the trading name is empty" in {
+          val tradingName = ""
+          if (typeOfSubcontractor == Individualorsoletrader) {
+            TradingNameValidator
+              .validate(Some(""), SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe None
+          } else {
+            TradingNameValidator
+              .validate(Some(""), SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe Some(
+              FieldValidationFailure(
+                field = SubcontractorValidationField.TradingName,
+                value = Some(tradingName)
+              )
+            )
+          }
+
+        }
+
+        "return failure when the trading name is None" in {
+          val tradingName = None
+          if (typeOfSubcontractor == Individualorsoletrader) {
+            TradingNameValidator
+              .validate(Some(""), SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe None
+          } else {
+            TradingNameValidator
+              .validate(tradingName, SubcontractorValidationField.TradingName, typeOfSubcontractor) mustBe Some(
+              FieldValidationFailure(
+                field = SubcontractorValidationField.TradingName,
+                value = None
+              )
+            )
+          }
+        }
+
+        "return no failure for a valid trading name" in {
+          TradingNameValidator
+            .validate(
+              Some("trading Name"),
+              SubcontractorValidationField.TradingName,
+              typeOfSubcontractor
+            ) mustBe None
+        }
+
+        "return no failure for a valid trading name - Test Trading Name 1234@" in {
+          TradingNameValidator
+            .validate(
+              Some("Test Trading Name 1234@"),
+              SubcontractorValidationField.TradingName,
+              typeOfSubcontractor
+            ) mustBe None
+        }
+
+        "retain the original invalid trading name in the failure" in {
+          val tradingName =
+            "12345678901234567890123456789012345678901234567890<>"
+
+          TradingNameValidator
+            .validate(
+              Some(tradingName),
+              SubcontractorValidationField.TradingName,
+              typeOfSubcontractor
+            ) mustBe
+            Some(
+              FieldValidationFailure(
+                field = SubcontractorValidationField.TradingName,
+                value = Some(tradingName)
+              )
+            )
+        }
+
+      }
+    }
+  }
+
+  "return a failure against the requested field" in {
+    TradingNameValidator
+      .validate(
+        None,
+        SubcontractorValidationField.PartnershipTradingName,
+        Partnership
+      ) mustBe Some(
+      FieldValidationFailure(
+        field = SubcontractorValidationField.PartnershipTradingName,
+        value = None
       )
-    }
-
-    "return failure when the trading name is None" in {
-      val tradingName = None
-      TradingNameValidator
-        .validate(tradingName) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.TradingName,
-          value = None
-        )
-      )
-    }
-
-    "return no failure for a valid trading name" in {
-      TradingNameValidator
-        .validate(
-          Some("trading Name")
-        ) mustBe None
-    }
-
-    "return no failure for a valid trading name - Test Trading Name 1234@" in {
-      TradingNameValidator
-        .validate(
-          Some("Test Trading Name 1234@")
-        ) mustBe None
-    }
-
-    "retain the original invalid trading name in the failure" in {
-      val tradingName =
-        "12345678901234567890123456789012345678901234567890<>"
-
-      TradingNameValidator
-        .validate(
-          Some(tradingName)
-        ) mustBe
-        Some(
-          FieldValidationFailure(
-            field = SubcontractorValidationField.TradingName,
-            value = Some(tradingName)
-          )
-        )
-    }
-
-    "return a failure against the requested field" in {
-      TradingNameValidator
-        .validate(
-          None,
-          SubcontractorValidationField.PartnershipTradingName
-        ) mustBe Some(
-        FieldValidationFailure(
-          field = SubcontractorValidationField.PartnershipTradingName,
-          value = None
-        )
-      )
-    }
+    )
   }
 }

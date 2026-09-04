@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.libs.json.*
 
@@ -235,6 +235,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to SubcontractorAdded page and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
@@ -246,7 +247,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -264,6 +266,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
@@ -276,12 +279,14 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(submittedUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -303,6 +308,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -311,7 +317,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -333,6 +340,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery on submit when validation fails (Left(error)) and not call service" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val invalidUa =
         emptyUserAnswers
@@ -344,7 +352,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(invalidUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
