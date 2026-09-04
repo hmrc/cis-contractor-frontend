@@ -48,7 +48,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = Some(1L),
       firstName = firstName,
       secondName = None,
       surname = surname,
@@ -133,7 +133,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
         val service   = application.injector.instanceOf[ReviewInsufficientInfoService]
         val view      = application.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
-        val viewModel = service.buildViewModel(batchOf(missingSub, readySub))(messages(application))
+        val viewModel = service.buildViewModel(batchOf(missingSub, readySub))(messages(application)).get
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
@@ -163,7 +163,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
         val service   = application.injector.instanceOf[ReviewInsufficientInfoService]
         val view      = application.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
-        val viewModel = service.buildViewModel(batchOf(readySub))(messages(application))
+        val viewModel = service.buildViewModel(batchOf(readySub))(messages(application)).get
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual

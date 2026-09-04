@@ -18,26 +18,29 @@ package controllers.amend.trust
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
+import controllers.routes
 import models.add.trust.ValidatedTrust
+import models.amend.AmendJourneyType
+import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.trust.TrustNamePage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalTrustAnswersQuery}
+import play.api.mvc.*
+import queries.OriginalTrustAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.AmendmentHelper
 import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import controllers.routes
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
-import utils.AmendmentHelper
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +50,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  cisIdRequiredAction: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   auditService: AuditService,
@@ -64,7 +68,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
       ValidatedTrust.build(ua) match {
         case Right(_) =>
-          val isVerified = ua.get(ShowVerificationDetailsPage)
+          val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
           val trustName  = ua.get(TrustNamePage).getOrElse("")
 
           val subcontractorInformationList =
@@ -87,11 +91,11 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Seq(
           TrustUtrSummary.row(
             ua,
@@ -122,18 +126,18 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Nil
       } else {
         Seq(TrustNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Nil
       } else {
         Seq(
@@ -160,102 +164,192 @@ class AmendTrustCheckYourAnswersController @Inject() (
   }
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
       ValidatedTrust.build(request.userAnswers) match {
 
         case Left(error) =>
-          logger.error(s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error")
+          logger.error(
+            s"[AmendTrustCheckYourAnswersController.onSubmit] Validation failed: $error"
+          )
+
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           )
 
-        case Right(_) if request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true) =>
+        case Right(_)
+            if request.userAnswers
+              .get(AmendCheckYourAnswersSubmittedPage)
+              .contains(true) =>
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           )
 
         case Right(_) if !AmendmentHelper.trustHasChanges(request.userAnswers) =>
-          request.userAnswers.get(CisIdQuery) match {
-            case Some(cisId) =>
-              sessionRepository
-                .set(UserAnswers(request.userAnswers.id))
-                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
-                .recover { case t =>
-                  logger.error(
-                    s"[AmendTrustCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
-                    t
-                  )
-                  Redirect(routes.JourneyRecoveryController.onPageLoad())
-                }
-
-            case None =>
-              logger.error("[AmendTrustCheckYourAnswersController.onSubmit] Missing CisIdQuery")
-              Future.successful(
-                Redirect(routes.JourneyRecoveryController.onPageLoad())
-              )
-          }
+          handleNoChanges()
 
         case Right(_) =>
-          Future
-            .fromTry(
-              request.userAnswers.set(
-                AmendCheckYourAnswersSubmittedPage,
-                true
-              )
-            )
-            .flatMap { updated =>
-              sessionRepository
-                .set(updated)
-                .flatMap { _ =>
-                  subcontractorService
-                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
-                }
-                .map { _ =>
-                  auditService.amendSubcontractorEvent(request.userAnswers)
-                  Redirect(
-                    controllers.amend.trust.routes.AmendTrustConfirmationController
-                      .onPageLoad()
-                  )
-                }
-            }
-            .recover { case t =>
-              logger.error(
-                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
-                t
-              )
-
-              Redirect(
-                routes.JourneyRecoveryController.onPageLoad()
-              )
-            }
+          submitAmendJourney(
+            request.userAnswers,
+            subbieResourceRef
+          )
       }
+    }
+
+  private def submitAmendJourney(
+    userAnswers: UserAnswers,
+    subbieResourceRef: Long
+  )(implicit request: CisIdDataRequest[AnyContent]): Future[Result] =
+    userAnswers
+      .get(AmendJourneyTypePage)
+      .fold {
+        logger.error(
+          "[AmendTrustCheckYourAnswersController.onSubmit] Missing AmendJourneyTypePage"
+        )
+
+        Future.successful(
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        )
+      } { journeyType =>
+        Future
+          .fromTry(
+            userAnswers.set(
+              AmendCheckYourAnswersSubmittedPage,
+              true
+            )
+          )
+          .flatMap { updated =>
+            sessionRepository
+              .set(updated)
+              .flatMap { _ =>
+                subcontractorService.submitAmendSubcontractor(
+                  journeyType,
+                  updated,
+                  submittedSubbieResourceRef(subbieResourceRef)
+                )
+              }
+              .map { _ =>
+                auditService.amendSubcontractorEvent(updated)
+
+                confirmationRedirect(journeyType)
+              }
+          }
+          .recover { case t =>
+            logger.error(
+              "[AmendTrustCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
+              t
+            )
+
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+      }
+
+  private def handleNoChanges()(implicit
+    request: CisIdDataRequest[AnyContent]
+  ): Future[Result] = {
+
+    val redirectCall =
+      noChangesRedirect(
+        request.userAnswers,
+        request.cisId
+      )
+
+    sessionRepository
+      .set(UserAnswers(request.userAnswers.id))
+      .map { _ =>
+        Redirect(redirectCall)
+      }
+      .recover { case t =>
+        logger.error(
+          s"[AmendTrustCheckYourAnswersController.onSubmit] " +
+            s"Failed to clear user answers for session ${request.userAnswers.id}",
+          t
+        )
+
+        Redirect(
+          routes.JourneyRecoveryController.onPageLoad()
+        )
+      }
+  }
+
+  private def noChangesRedirect(
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call =
+    userAnswers.get(AmendJourneyTypePage) match {
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoad()
+
+      case Some(AmendJourneyType.Standard) =>
+        Call(
+          "GET",
+          appConfig.manageYourSubcontractorsUrl(cisId)
+        )
+
+      case None =>
+        logger.error(
+          "[AmendTrustCheckYourAnswersController.onSubmit] " +
+            "Missing AmendJourneyTypePage when handling no changes"
+        )
+
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def confirmationRedirect(
+    journeyType: AmendJourneyType
+  ): Result =
+    journeyType match {
+
+      case AmendJourneyType.Standard =>
+        Redirect(
+          controllers.amend.trust.routes.AmendTrustConfirmationController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.InsufficientInfo =>
+        Redirect(
+          controllers.insufficient.routes.InsufficientSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.UnmatchedInfo =>
+        Redirect(
+          controllers.unmatched.routes.UnmatchedSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
     }
 
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdQuery) match {
-        case Some(cisId) =>
-          sessionRepository
-            .set(UserAnswers(request.userAnswers.id))
-            .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
-            .recover { case t =>
-              logger.error(
-                s"[AmendTrustCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
-                t
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
-
-        case None =>
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
+      sessionRepository
+        .set(UserAnswers(request.userAnswers.id))
+        .map { _ =>
+          Redirect(
+            appConfig.manageYourSubcontractorsUrl(
+              request.cisId
+            )
+          )
+        }
+        .recover { case t =>
           logger.error(
-            "[AmendTrustCheckYourAnswersController.onCancel] Missing CisIdQuery"
+            s"[AmendTrustCheckYourAnswersController.onCancel] " +
+              s"Failed to clear user answers for session ${request.userAnswers.id}",
+            t
           )
-          Future.successful(
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+          Redirect(
+            routes.JourneyRecoveryController.onPageLoad()
           )
-      }
+        }
     }
 }

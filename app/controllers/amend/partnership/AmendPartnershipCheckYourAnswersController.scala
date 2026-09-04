@@ -18,26 +18,29 @@ package controllers.amend.partnership
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
 import controllers.routes
 import models.add.partnership.ValidatedPartnership
+import models.amend.AmendJourneyType
+import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.partnership.PartnershipNamePage
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
+import play.api.mvc.*
+import queries.OriginalPartnershipAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.AmendmentHelper
 import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
-import utils.AmendmentHelper
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +50,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  cisIdRequiredAction: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   auditService: AuditService,
@@ -64,9 +68,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
       ValidatedPartnership.build(ua) match {
         case Right(_) =>
-          val isVerified      = ua.get(ShowVerificationDetailsPage)
-          val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
+          val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
 
+          val partnershipName              = ua.get(PartnershipNamePage).getOrElse("")
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
@@ -87,12 +91,12 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
       Option
-        .when(isVerified.contains(true)) {
+        .when(isVerified) {
 
           val verificationNumberOpt =
             ua.get(OriginalPartnershipAnswersQuery)
@@ -120,18 +124,18 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Nil
       } else {
         Seq(PartnershipNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Seq(PartnershipNominatedPartnerNameSummary.row(ua, AmendMode))
       } else {
         Seq(
@@ -164,101 +168,227 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
       )
   }
 
-  def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(
+    subbieResourceRef: Long = -1L
+  ): Action[AnyContent] =
+    (
+      identify
+        andThen getData
+        andThen requireData
+        andThen cisIdRequiredAction
+    ).async { implicit request =>
       ValidatedPartnership.build(request.userAnswers) match {
 
         case Left(error) =>
-          logger.error(s"[AmendPartnershipCheckYourAnswersController.onSubmit] Validation failed: $error")
-          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-
-        case Right(_) if request.userAnswers.get(AmendCheckYourAnswersSubmittedPage).contains(true) =>
-          Future.successful(
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          logger.error(
+            s"[AmendPartnershipCheckYourAnswersController.onSubmit] " +
+              s"Validation failed: $error"
           )
 
-        case Right(_) if !AmendmentHelper.partnershipHasChanges(request.userAnswers) =>
-          request.userAnswers.get(CisIdQuery) match {
-            case Some(cisId) =>
-              sessionRepository
-                .set(UserAnswers(request.userAnswers.id))
-                .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
-                .recover { case t =>
-                  logger.error(
-                    s"[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
-                    t
-                  )
-                  Redirect(routes.JourneyRecoveryController.onPageLoad())
-                }
+          Future.successful(
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          )
 
-            case None =>
-              logger.error("[AmendPartnershipCheckYourAnswersController.onSubmit] Missing CisIdQuery")
-              Future.successful(
-                Redirect(routes.JourneyRecoveryController.onPageLoad())
-              )
-          }
+        case Right(_)
+            if request.userAnswers
+              .get(AmendCheckYourAnswersSubmittedPage)
+              .contains(true) =>
+          Future.successful(
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          )
+
+        case Right(_)
+            if !AmendmentHelper.partnershipHasChanges(
+              request.userAnswers
+            ) =>
+          handleNoChanges()
 
         case Right(_) =>
-          Future
-            .fromTry(
-              request.userAnswers.set(
-                AmendCheckYourAnswersSubmittedPage,
-                true
-              )
-            )
-            .flatMap { updated =>
-              sessionRepository
-                .set(updated)
-                .flatMap { _ =>
-                  subcontractorService
-                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
-                }
-                .map { _ =>
-                  auditService.amendSubcontractorEvent(request.userAnswers)
-                  Redirect(
-                    controllers.amend.partnership.routes.AmendPartnershipConfirmationController
-                      .onPageLoad()
-                  )
-                }
-            }
-            .recover { case t =>
-              logger.error(
-                "[AmendPartnershipCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
-                t
-              )
-
-              Redirect(
-                routes.JourneyRecoveryController.onPageLoad()
-              )
-            }
+          submitAmendJourney(
+            request.userAnswers,
+            subbieResourceRef
+          )
       }
+    }
+
+  private def submitAmendJourney(
+    userAnswers: UserAnswers,
+    subbieResourceRef: Long
+  )(implicit
+    request: CisIdDataRequest[AnyContent]
+  ): Future[Result] =
+    userAnswers
+      .get(AmendJourneyTypePage)
+      .fold {
+        logger.error(
+          "[AmendPartnershipCheckYourAnswersController.onSubmit] " +
+            "Missing AmendJourneyTypePage"
+        )
+
+        Future.successful(
+          Redirect(
+            routes.JourneyRecoveryController.onPageLoad()
+          )
+        )
+      } { journeyType =>
+        Future
+          .fromTry(
+            userAnswers.set(
+              AmendCheckYourAnswersSubmittedPage,
+              true
+            )
+          )
+          .flatMap { updated =>
+            sessionRepository
+              .set(updated)
+              .flatMap { _ =>
+                subcontractorService.submitAmendSubcontractor(
+                  journeyType,
+                  updated,
+                  submittedSubbieResourceRef(
+                    subbieResourceRef
+                  )
+                )
+              }
+              .map { _ =>
+                auditService.amendSubcontractorEvent(updated)
+
+                confirmationRedirect(journeyType)
+              }
+          }
+          .recover { case throwable =>
+            logger.error(
+              "[AmendPartnershipCheckYourAnswersController.onSubmit] " +
+                "Failed to submit amend subcontractor",
+              throwable
+            )
+
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+      }
+
+  private def handleNoChanges()(implicit
+    request: CisIdDataRequest[AnyContent]
+  ): Future[Result] = {
+
+    val redirectCall =
+      noChangesRedirect(
+        userAnswers = request.userAnswers,
+        cisId = request.cisId
+      )
+
+    sessionRepository
+      .set(
+        UserAnswers(request.userAnswers.id)
+      )
+      .map { _ =>
+        Redirect(redirectCall)
+      }
+      .recover { case throwable =>
+        logger.error(
+          s"[AmendPartnershipCheckYourAnswersController.onSubmit] " +
+            s"Failed to clear user answers for session " +
+            s"${request.userAnswers.id}",
+          throwable
+        )
+
+        Redirect(
+          routes.JourneyRecoveryController.onPageLoad()
+        )
+      }
+  }
+
+  private def noChangesRedirect(
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call =
+    userAnswers.get(AmendJourneyTypePage) match {
+
+      case Some(AmendJourneyType.Standard) =>
+        Call(
+          method = "GET",
+          url = appConfig.manageYourSubcontractorsUrl(cisId)
+        )
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoad()
+
+      case None =>
+        logger.error(
+          "[AmendPartnershipCheckYourAnswersController.onSubmit] " +
+            "Missing AmendJourneyTypePage when handling no changes"
+        )
+
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def confirmationRedirect(
+    journeyType: AmendJourneyType
+  ): Result =
+    journeyType match {
+
+      case AmendJourneyType.Standard =>
+        Redirect(
+          controllers.amend.partnership.routes.AmendPartnershipConfirmationController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.InsufficientInfo =>
+        Redirect(
+          controllers.insufficient.routes.InsufficientSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
+
+      case AmendJourneyType.UnmatchedInfo =>
+        Redirect(
+          controllers.unmatched.routes.UnmatchedSubcontractorDetailsUpdatedController
+            .onPageLoad()
+        )
     }
 
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdQuery) match {
-        case Some(cisId) =>
-          sessionRepository
-            .set(UserAnswers(request.userAnswers.id))
-            .map(_ => Redirect(appConfig.manageYourSubcontractorsUrl(cisId)))
-            .recover { case t =>
-              logger.error(
-                s"[AmendPartnershipCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
-                t
-              )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
-            }
-
-        case None =>
+    (
+      identify
+        andThen getData
+        andThen requireData
+        andThen cisIdRequiredAction
+    ).async { implicit request =>
+      sessionRepository
+        .set(
+          UserAnswers(request.userAnswers.id)
+        )
+        .map { _ =>
+          Redirect(
+            appConfig.manageYourSubcontractorsUrl(
+              request.cisId
+            )
+          )
+        }
+        .recover { case throwable =>
           logger.error(
-            "[AmendPartnershipCheckYourAnswersController.onCancel] Missing CisIdQuery"
+            s"[AmendPartnershipCheckYourAnswersController.onCancel] " +
+              s"Failed to clear user answers for session " +
+              s"${request.userAnswers.id}",
+            throwable
           )
-          Future.successful(
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+          Redirect(
+            routes.JourneyRecoveryController.onPageLoad()
           )
-      }
+        }
     }
 }
