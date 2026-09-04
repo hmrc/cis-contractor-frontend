@@ -29,16 +29,16 @@ object FinalValidationContext {
     override def writes(context: FinalValidationContext): JsValue =
       JsString(
         context match {
-          case MonthlyReturn        => "MonthlyReturn"
+          case MonthlyReturn       => "MonthlyReturn"
           case VerifySubcontractor => "VerifySubcontractor"
         }
       )
 
     override def reads(json: JsValue): JsResult[FinalValidationContext] =
       json.validate[String].flatMap {
-        case "MonthlyReturn"        => JsSuccess(MonthlyReturn)
+        case "MonthlyReturn"       => JsSuccess(MonthlyReturn)
         case "VerifySubcontractor" => JsSuccess(VerifySubcontractor)
-        case other                  => JsError(s"Unknown FinalValidationContext: $other")
+        case other                 => JsError(s"Unknown FinalValidationContext: $other")
       }
   }
 }

@@ -41,7 +41,7 @@ class FinalValidationCompleteController @Inject() (
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
@@ -65,9 +65,7 @@ class FinalValidationCompleteController @Inject() (
       request.userAnswers.get(FinalValidationDraftIdPage)
     ) match {
 
-      case (Some(payload), Some(draftId))
-        if payload.draftId == draftId =>
-
+      case (Some(payload), Some(draftId)) if payload.draftId == draftId =>
         for {
           correction <- Future.fromTry(
                           correctionBuilder.build(
@@ -101,7 +99,7 @@ class FinalValidationCompleteController @Inject() (
         )
     }
 
-  private def completeMonthlyReturn()(implicit request: DataRequest[?]): Future[Result] = {
+  private def completeMonthlyReturn()(implicit request: DataRequest[?]): Future[Result] =
     request.userAnswers.get(FinalValidationHandoffPage) match {
 
       case Some(handoffId) =>
@@ -150,6 +148,5 @@ class FinalValidationCompleteController @Inject() (
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         )
     }
-  }
 
 }

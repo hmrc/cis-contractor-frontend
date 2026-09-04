@@ -25,9 +25,9 @@ import javax.inject.{Inject, Singleton}
 class PartnershipSubcontractorFinalValidation @Inject() {
 
   def validate(
-                subcontractor: SubcontractorResponse,
-                allSubcontractors: Seq[SubcontractorResponse]
-              ): Seq[FinalValidationField] = {
+    subcontractor: SubcontractorResponse,
+    allSubcontractors: Seq[SubcontractorResponse]
+  ): Seq[FinalValidationField] = {
 
     // TODO F5 - Partnership subcontractor final validation
 

@@ -57,19 +57,21 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       s"[FinalValidationNavigator][nextPage] " +
         s"page=$page mode=$mode target=$target"
     )
-    
+
     mode match {
       case FinalValidationMode =>
         userAnswers.get(FinalValidationChangeTargetPage) match {
-          case Some(AddressYesNo) =>
+          case Some(AddressYesNo)        =>
             addressYesNoNextPage(page, userAnswers)
           case Some(ContactDetailsYesNo) =>
             contactDetailsYesNoNextPage(page, userAnswers)
-          case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(WorksReferenceNumberYesNo) =>
+          case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(
+                WorksReferenceNumberYesNo
+              ) =>
             identifierYesNoNextPage(page, userAnswers)
-          case Some(_) =>
+          case Some(_)                   =>
             complete
-          case None =>
+          case None                      =>
             logger.warn(
               "[FinalValidationNavigator][nextPage] " +
                 "FinalValidationChangeTargetPage missing"
@@ -83,78 +85,78 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
         )
         recovery
     }
-    
-  private def complete: Call =  
+
+  private def complete: Call =
     controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
-    
+
   private def recovery: Call =
     controllers.routes.JourneyRecoveryController.onPageLoad()
-    
+
   private def yesNoNextPage(
     answer: Option[Boolean],
     onYes: => Call
   ): Call =
     answer match {
-      case Some(true) => onYes
+      case Some(true)  => onYes
       case Some(false) => complete
-      case None => recovery
+      case None        => recovery
     }
 
   private def identifierYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
     page match {
       // Individual / sole trader
-      case UniqueTaxpayerReferenceYesNoPage =>
+      case UniqueTaxpayerReferenceYesNoPage         =>
         yesNoNextPage(
           userAnswers.get(UniqueTaxpayerReferenceYesNoPage),
           soleTraderRoutes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(FinalValidationMode)
         )
-      case NationalInsuranceNumberYesNoPage =>
+      case NationalInsuranceNumberYesNoPage         =>
         yesNoNextPage(
           userAnswers.get(NationalInsuranceNumberYesNoPage),
           soleTraderRoutes.SubNationalInsuranceNumberController.onPageLoad(FinalValidationMode)
         )
-      case WorksReferenceNumberYesNoPage =>
+      case WorksReferenceNumberYesNoPage            =>
         yesNoNextPage(
           userAnswers.get(WorksReferenceNumberYesNoPage),
           soleTraderRoutes.WorksReferenceNumberController.onPageLoad(FinalValidationMode)
         )
 
       // company
-      case CompanyUtrYesNoPage =>
+      case CompanyUtrYesNoPage                      =>
         yesNoNextPage(
           userAnswers.get(CompanyUtrYesNoPage),
           companyRoutes.CompanyUtrController.onPageLoad(FinalValidationMode)
         )
-      case CompanyCrnYesNoPage =>
+      case CompanyCrnYesNoPage                      =>
         yesNoNextPage(
           userAnswers.get(CompanyCrnYesNoPage),
           companyRoutes.CompanyCrnController.onPageLoad(FinalValidationMode)
         )
-      case CompanyWorksReferenceYesNoPage =>
+      case CompanyWorksReferenceYesNoPage           =>
         yesNoNextPage(
           userAnswers.get(CompanyWorksReferenceYesNoPage),
           companyRoutes.CompanyWorksReferenceController.onPageLoad(FinalValidationMode)
         )
 
       // Trust
-      case TrustUtrYesNoPage =>
+      case TrustUtrYesNoPage                        =>
         yesNoNextPage(
           userAnswers.get(TrustUtrYesNoPage),
           trustRoutes.TrustUtrController.onPageLoad(FinalValidationMode)
         )
-      case TrustWorksReferenceYesNoPage =>
+      case TrustWorksReferenceYesNoPage             =>
         yesNoNextPage(
           userAnswers.get(TrustWorksReferenceYesNoPage),
           trustRoutes.TrustWorksReferenceController.onPageLoad(FinalValidationMode)
         )
 
       // Partnership
-      case PartnershipHasUtrYesNoPage =>
+      case PartnershipHasUtrYesNoPage               =>
         yesNoNextPage(
           userAnswers.get(PartnershipHasUtrYesNoPage),
           partnershipRoutes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(FinalValidationMode)
         )
-      case PartnershipNominatedPartnerUtrYesNoPage =>
+      case PartnershipNominatedPartnerUtrYesNoPage  =>
         yesNoNextPage(
           userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage),
           partnershipRoutes.PartnershipNominatedPartnerUtrController.onPageLoad(FinalValidationMode)
@@ -164,7 +166,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
           userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage),
           partnershipRoutes.PartnershipNominatedPartnerNinoController.onPageLoad(FinalValidationMode)
         )
-      case PartnershipNominatedPartnerCrnYesNoPage =>
+      case PartnershipNominatedPartnerCrnYesNoPage  =>
         yesNoNextPage(
           userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage),
           partnershipRoutes.PartnershipNominatedPartnerCrnController.onPageLoad(FinalValidationMode)
@@ -174,18 +176,18 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
           userAnswers.get(PartnershipWorksReferenceNumberYesNoPage),
           partnershipRoutes.PartnershipWorksReferenceNumberController.onPageLoad(FinalValidationMode)
         )
-      case _ =>
+      case _                                        =>
         complete
     }
 
   private def addressYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
     page match {
-      case SubAddressYesNoPage =>
+      case SubAddressYesNoPage         =>
         yesNoNextPage(
           userAnswers.get(SubAddressYesNoPage),
           soleTraderRoutes.AddressOfSubcontractorController.redirectToAddressLookup(FinalValidationMode, None)
         )
-      case CompanyAddressYesNoPage =>
+      case CompanyAddressYesNoPage     =>
         yesNoNextPage(
           userAnswers.get(CompanyAddressYesNoPage),
           companyRoutes.CompanyAddressController.redirectToAddressLookup(FinalValidationMode, None)
@@ -195,66 +197,66 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
           userAnswers.get(PartnershipAddressYesNoPage),
           partnershipRoutes.PartnershipAddressController.redirectToAddressLookup(FinalValidationMode, None)
         )
-      case TrustAddressYesNoPage =>
+      case TrustAddressYesNoPage       =>
         yesNoNextPage(
           userAnswers.get(TrustAddressYesNoPage),
           trustRoutes.TrustAddressController.redirectToAddressLookup(FinalValidationMode, None)
         )
-      case _ =>
+      case _                           =>
         recovery
     }
 
   private def contactDetailsYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
     page match {
       // Individual / sole trader
-      case AddIndividualContactMethodsYesNoPage =>
+      case AddIndividualContactMethodsYesNoPage  =>
         yesNoNextPage(
           userAnswers.get(AddIndividualContactMethodsYesNoPage),
           soleTraderRoutes.IndividualContactMethodOptionsController.onPageLoad(FinalValidationMode)
         )
-      case IndividualContactMethodOptionsPage =>
+      case IndividualContactMethodOptionsPage    =>
         nextSelectedIndividualContactMethodPageAfter(
           current = None,
           userAnswers
         )
-      case IndividualEmailAddressPage =>
+      case IndividualEmailAddressPage            =>
         nextSelectedIndividualContactMethodPageAfter(
           current = Some(ContactMethodOptions.Email),
           userAnswers
         )
-      case IndividualPhoneNumberPage =>
+      case IndividualPhoneNumberPage             =>
         nextSelectedIndividualContactMethodPageAfter(
           current = Some(ContactMethodOptions.Phone),
           userAnswers
         )
-      case IndividualMobileNumberPage =>
+      case IndividualMobileNumberPage            =>
         nextSelectedIndividualContactMethodPageAfter(
           current = Some(ContactMethodOptions.Mobile),
           userAnswers
         )
 
       // company
-      case AddCompanyContactMethodsYesNoPage =>
+      case AddCompanyContactMethodsYesNoPage     =>
         yesNoNextPage(
           userAnswers.get(AddCompanyContactMethodsYesNoPage),
           companyRoutes.CompanyContactMethodOptionsController.onPageLoad(FinalValidationMode)
         )
-      case CompanyContactMethodOptionsPage =>
+      case CompanyContactMethodOptionsPage       =>
         nextSelectedCompanyContactMethodPageAfter(
           current = None,
           userAnswers
         )
-      case CompanyEmailAddressPage =>
+      case CompanyEmailAddressPage               =>
         nextSelectedCompanyContactMethodPageAfter(
           current = Some(ContactMethodOptions.Email),
           userAnswers
         )
-      case CompanyPhoneNumberPage =>
+      case CompanyPhoneNumberPage                =>
         nextSelectedCompanyContactMethodPageAfter(
           current = Some(ContactMethodOptions.Phone),
           userAnswers
         )
-      case CompanyMobileNumberPage =>
+      case CompanyMobileNumberPage               =>
         nextSelectedCompanyContactMethodPageAfter(
           current = Some(ContactMethodOptions.Mobile),
           userAnswers
@@ -266,54 +268,54 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
           userAnswers.get(AddPartnershipContactMethodsYesNoPage),
           partnershipRoutes.PartnershipContactMethodOptionsController.onPageLoad(FinalValidationMode)
         )
-      case PartnershipContactMethodOptionsPage =>
+      case PartnershipContactMethodOptionsPage   =>
         nextSelectedPartnershipContactMethodPageAfter(
           current = None,
           userAnswers
         )
-      case PartnershipEmailAddressPage =>
+      case PartnershipEmailAddressPage           =>
         nextSelectedPartnershipContactMethodPageAfter(
           current = Some(ContactMethodOptions.Email),
           userAnswers
         )
-      case PartnershipPhoneNumberPage =>
+      case PartnershipPhoneNumberPage            =>
         nextSelectedPartnershipContactMethodPageAfter(
           current = Some(ContactMethodOptions.Phone),
           userAnswers
         )
-      case PartnershipMobileNumberPage =>
+      case PartnershipMobileNumberPage           =>
         nextSelectedPartnershipContactMethodPageAfter(
           current = Some(ContactMethodOptions.Mobile),
           userAnswers
         )
 
       // Trust
-      case AddTrustContactMethodsYesNoPage =>
+      case AddTrustContactMethodsYesNoPage       =>
         yesNoNextPage(
           userAnswers.get(AddTrustContactMethodsYesNoPage),
           trustRoutes.TrustContactMethodOptionsController.onPageLoad(FinalValidationMode)
         )
-      case TrustContactMethodOptionsPage =>
+      case TrustContactMethodOptionsPage         =>
         nextSelectedTrustContactMethodPageAfter(
           current = None,
           userAnswers
         )
-      case TrustEmailAddressPage =>
+      case TrustEmailAddressPage                 =>
         nextSelectedTrustContactMethodPageAfter(
           current = Some(ContactMethodOptions.Email),
           userAnswers
         )
-      case TrustPhoneNumberPage =>
+      case TrustPhoneNumberPage                  =>
         nextSelectedTrustContactMethodPageAfter(
           current = Some(ContactMethodOptions.Phone),
           userAnswers
         )
-      case TrustMobileNumberPage =>
+      case TrustMobileNumberPage                 =>
         nextSelectedTrustContactMethodPageAfter(
           current = Some(ContactMethodOptions.Mobile),
           userAnswers
         )
-      case _ =>
+      case _                                     =>
         recovery
     }
 
@@ -335,13 +337,12 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
   )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
     selectedContactMethods.filter(_.nonEmpty).fold(recovery) { selected =>
       current match {
-        case Some(currentContactMethod)
-          if !selected.contains(currentContactMethod) =>
+        case Some(currentContactMethod) if !selected.contains(currentContactMethod) =>
           recovery
-        case _ =>
+        case _                                                                      =>
           val remaining =
             current match {
-              case None =>
+              case None                       =>
                 selected
               case Some(currentContactMethod) =>
                 val currentIndex = selected.indexWhere(_ == currentContactMethod)
@@ -368,11 +369,14 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       .get(IndividualContactMethodOptionsPage)
       .map(ContactMethodOptions.ordered)
 
-  private def individualContactMethodPageCall(contactMethod: ContactMethodOptions): Call=
+  private def individualContactMethodPageCall(contactMethod: ContactMethodOptions): Call =
     contactMethod match {
-      case ContactMethodOptions.Email  => soleTraderRoutes.IndividualEmailAddressController.onPageLoad(FinalValidationMode)
-      case ContactMethodOptions.Phone  => soleTraderRoutes.IndividualPhoneNumberController.onPageLoad(FinalValidationMode)
-      case ContactMethodOptions.Mobile => soleTraderRoutes.IndividualMobileNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Email  =>
+        soleTraderRoutes.IndividualEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  =>
+        soleTraderRoutes.IndividualPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        soleTraderRoutes.IndividualMobileNumberController.onPageLoad(FinalValidationMode)
     }
 
   private def nextSelectedCompanyContactMethodPageAfter(
@@ -416,9 +420,12 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
 
   private def partnershipContactMethodPageCall(contactMethod: ContactMethodOptions): Call =
     contactMethod match {
-      case ContactMethodOptions.Email  => partnershipRoutes.PartnershipEmailAddressController.onPageLoad(FinalValidationMode)
-      case ContactMethodOptions.Phone  => partnershipRoutes.PartnershipPhoneNumberController.onPageLoad(FinalValidationMode)
-      case ContactMethodOptions.Mobile => partnershipRoutes.PartnershipMobileNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Email  =>
+        partnershipRoutes.PartnershipEmailAddressController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Phone  =>
+        partnershipRoutes.PartnershipPhoneNumberController.onPageLoad(FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        partnershipRoutes.PartnershipMobileNumberController.onPageLoad(FinalValidationMode)
     }
 
   private def nextSelectedTrustContactMethodPageAfter(

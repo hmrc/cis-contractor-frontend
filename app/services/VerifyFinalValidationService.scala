@@ -40,7 +40,7 @@ class VerifyFinalValidationService @Inject() (
   trustValidation: TrustSubcontractorFinalValidation,
   addressDetailsValidation: AddressDetailsFinalValidation
 )(implicit ec: ExecutionContext) {
-  
+
   private final case class SelectedReference(
     subcontractorId: Long,
     subbieResourceRef: Long
@@ -53,27 +53,32 @@ class VerifyFinalValidationService @Inject() (
     userAnswers.get(VerifyFinalValidationSourcePage) match {
 
       case Some(source) =>
-        Future.fromTry(selectedReferences(userAnswers, source))
+        Future
+          .fromTry(selectedReferences(userAnswers, source))
           .flatMap { references =>
             Future
               .traverse(references) { reference =>
-                subcontractorService.getSubcontractor(instanceId, reference.subbieResourceRef)
+                subcontractorService
+                  .getSubcontractor(instanceId, reference.subbieResourceRef)
                   .flatMap { response =>
                     response.subcontractor match {
 
-                      case Some(subcontractor)
-                        if subcontractor.subcontractorId == reference.subcontractorId =>
+                      case Some(subcontractor) if subcontractor.subcontractorId == reference.subcontractorId =>
                         Future.successful(subcontractor)
 
                       case Some(subcontractor) =>
                         Future.failed(
-                          new IllegalStateException(s"Expected subcontractorId ${reference.subcontractorId} " +
-                            s"but got ${subcontractor.subcontractorId}")
+                          new IllegalStateException(
+                            s"Expected subcontractorId ${reference.subcontractorId} " +
+                              s"but got ${subcontractor.subcontractorId}"
+                          )
                         )
 
                       case None =>
                         Future.failed(
-                          new IllegalStateException(s"Subcontractor not found for subbieResourceRef ${reference.subbieResourceRef}")
+                          new IllegalStateException(
+                            s"Subcontractor not found for subbieResourceRef ${reference.subbieResourceRef}"
+                          )
                         )
                     }
                   }
@@ -96,8 +101,7 @@ class VerifyFinalValidationService @Inject() (
           validateDraftFields(
             subcontractor = subcontractor,
             allSubcontractors = draft.subcontractors
-          )
-            .distinct
+          ).distinct
             .map { field =>
               FinalValidationDraftIssue(
                 fieldKey = field.key,
@@ -152,14 +156,14 @@ class VerifyFinalValidationService @Inject() (
         .getOrElse(
           throw new IllegalStateException(s"Invalid subcontractorType: ${subcontractor.subcontractorType}")
         )
-    
+
     val typeSpecificFields =
       subcontractorType match {
-          case Individualorsoletrader => individualValidation.validate(subcontractor, allSubcontractors)
-          case Limitedcompany         => companyValidation.validate(subcontractor, allSubcontractors)
-          case Partnership            => partnershipValidation.validate(subcontractor, allSubcontractors)
-          case Trust                  => trustValidation.validate(subcontractor, allSubcontractors)
-        }
+        case Individualorsoletrader => individualValidation.validate(subcontractor, allSubcontractors)
+        case Limitedcompany         => companyValidation.validate(subcontractor, allSubcontractors)
+        case Partnership            => partnershipValidation.validate(subcontractor, allSubcontractors)
+        case Trust                  => trustValidation.validate(subcontractor, allSubcontractors)
+      }
 
     val addressFields = addressDetailsValidation.validate(subcontractor)
 
@@ -180,9 +184,9 @@ class VerifyFinalValidationService @Inject() (
     val typeSpecificFields =
       subcontractorType match {
         case Individualorsoletrader => individualValidation.validateDraft(subcontractor, allSubcontractors)
-        case Limitedcompany => companyValidation.validateDraft(subcontractor, allSubcontractors)
-        case Partnership => partnershipValidation.validateDraft(subcontractor, allSubcontractors)
-        case Trust => trustValidation.validateDraft(subcontractor, allSubcontractors)
+        case Limitedcompany         => companyValidation.validateDraft(subcontractor, allSubcontractors)
+        case Partnership            => partnershipValidation.validateDraft(subcontractor, allSubcontractors)
+        case Trust                  => trustValidation.validateDraft(subcontractor, allSubcontractors)
       }
 
     val addressFields = addressDetailsValidation.validateDraft(subcontractor)
@@ -190,17 +194,21 @@ class VerifyFinalValidationService @Inject() (
     (typeSpecificFields ++ addressFields).distinct
   }
 
-
-  private def selectedReferences(userAnswers: UserAnswers, source: VerifyFinalValidationSource): Try[Seq[SelectedReference]] =
+  private def selectedReferences(
+    userAnswers: UserAnswers,
+    source: VerifyFinalValidationSource
+  ): Try[Seq[SelectedReference]] =
     source match {
       case SelectSubcontractor =>
         for {
-          selected  <- userAnswers.get(SelectSubcontractorPage)
-                         .map(Success(_))
-                         .getOrElse(Failure(new IllegalStateException("SelectSubcontractorPage not found")))
-          available <- userAnswers.get(UnverifiedSubcontractorsPage)
-                         .map(Success(_))
-                         .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
+          selected    <- userAnswers
+                           .get(SelectSubcontractorPage)
+                           .map(Success(_))
+                           .getOrElse(Failure(new IllegalStateException("SelectSubcontractorPage not found")))
+          available   <- userAnswers
+                           .get(UnverifiedSubcontractorsPage)
+                           .map(Success(_))
+                           .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
           selectedIds <- ids(selected.map(_.id))
           references  <- referencesFor(
                            selectedIds,
@@ -215,12 +223,14 @@ class VerifyFinalValidationService @Inject() (
 
       case SelectSubcontractorsToReverify =>
         for {
-          selected  <- userAnswers.get(SelectSubcontractorsToReverifyPage)
-                         .map(Success(_))
-                         .getOrElse(Failure(new IllegalStateException("SelectSubcontractorsToReverifyPage not found")))
-          response  <- userAnswers.get(NewestVerificationBatchResponsePage)
-                         .map(Success(_))
-                         .getOrElse(Failure(new IllegalStateException("NewestVerificationBatchResponsePage not found")))
+          selected    <- userAnswers
+                           .get(SelectSubcontractorsToReverifyPage)
+                           .map(Success(_))
+                           .getOrElse(Failure(new IllegalStateException("SelectSubcontractorsToReverifyPage not found")))
+          response    <- userAnswers
+                           .get(NewestVerificationBatchResponsePage)
+                           .map(Success(_))
+                           .getOrElse(Failure(new IllegalStateException("NewestVerificationBatchResponsePage not found")))
           selectedIds <- ids(selected.map(_.id))
           references  <- referencesFor(
                            selectedIds,
@@ -234,10 +244,16 @@ class VerifyFinalValidationService @Inject() (
         } yield references
 
       case ReviewUnmatchedSubcontractors =>
-        Failure(new UnsupportedOperationException("ReviewUnmatchedSubcontractors FinalValidation is not implemented yet"))
+        Failure(
+          new UnsupportedOperationException("ReviewUnmatchedSubcontractors FinalValidation is not implemented yet")
+        )
 
       case ReviewInsufficientInfoSubcontractors =>
-        Failure(new UnsupportedOperationException("ReviewInsufficientInfoSubcontractors FinalValidation is not implemented yet"))
+        Failure(
+          new UnsupportedOperationException(
+            "ReviewInsufficientInfoSubcontractors FinalValidation is not implemented yet"
+          )
+        )
     }
 
   private def ids(values: Set[String]): Try[Set[Long]] =
@@ -253,14 +269,17 @@ class VerifyFinalValidationService @Inject() (
     selectedIds: Set[Long],
     available: Seq[(Long, Option[Long])]
   ): Try[Seq[SelectedReference]] =
-    Try{
+    Try {
       selectedIds.toSeq.map { subcontractorId =>
 
         val subbieResourceRef =
-          available.find(_._1 == subcontractorId)
+          available
+            .find(_._1 == subcontractorId)
             .flatMap(_._2)
             .getOrElse(
-              throw new IllegalStateException(s"Subcontractor with id $subcontractorId not found in available subcontractors")
+              throw new IllegalStateException(
+                s"Subcontractor with id $subcontractorId not found in available subcontractors"
+              )
             )
 
         SelectedReference(
@@ -275,26 +294,26 @@ class VerifyFinalValidationService @Inject() (
     subcontractor: SubcontractorResponse
   ): Option[String] =
     field match {
-      case FirstName => subcontractor.firstName
-      case SecondName => subcontractor.secondName
-      case Surname => subcontractor.surname
-      case TradingName => subcontractor.tradingName
+      case FirstName              => subcontractor.firstName
+      case SecondName             => subcontractor.secondName
+      case Surname                => subcontractor.surname
+      case TradingName            => subcontractor.tradingName
       case PartnershipTradingName => subcontractor.partnershipTradingName
-      case Utr => subcontractor.utr
-      case PartnerUtr => subcontractor.partnerUtr
-      case Nino => subcontractor.nino
-      case Crn => subcontractor.crn
-      case AddressLine1 => subcontractor.addressLine1
-      case AddressLine2 => subcontractor.addressLine2
-      case AddressLine3 => subcontractor.addressLine3
-      case AddressLine4 => subcontractor.addressLine4
-      case PostCode => subcontractor.postcode
-      case Country => subcontractor.country
-      case EmailAddress => subcontractor.emailAddress
-      case PhoneNumber => subcontractor.phoneNumber
-      case MobilePhoneNumber => subcontractor.mobilePhoneNumber
-      case WorkReferenceNumber => subcontractor.worksReferenceNumber
-      case _ => None
+      case Utr                    => subcontractor.utr
+      case PartnerUtr             => subcontractor.partnerUtr
+      case Nino                   => subcontractor.nino
+      case Crn                    => subcontractor.crn
+      case AddressLine1           => subcontractor.addressLine1
+      case AddressLine2           => subcontractor.addressLine2
+      case AddressLine3           => subcontractor.addressLine3
+      case AddressLine4           => subcontractor.addressLine4
+      case PostCode               => subcontractor.postcode
+      case Country                => subcontractor.country
+      case EmailAddress           => subcontractor.emailAddress
+      case PhoneNumber            => subcontractor.phoneNumber
+      case MobilePhoneNumber      => subcontractor.mobilePhoneNumber
+      case WorkReferenceNumber    => subcontractor.worksReferenceNumber
+      case _                      => None
     }
 
   private def valueFor(
@@ -302,25 +321,25 @@ class VerifyFinalValidationService @Inject() (
     details: FinalValidationSubcontractorDetails
   ): Option[String] =
     field match {
-      case FirstName => details.firstName
-      case SecondName => details.secondName
-      case Surname => details.surname
-      case TradingName => details.tradingName
+      case FirstName              => details.firstName
+      case SecondName             => details.secondName
+      case Surname                => details.surname
+      case TradingName            => details.tradingName
       case PartnershipTradingName => details.partnershipTradingName
-      case Utr => details.utr
-      case PartnerUtr => details.partnerUtr
-      case Nino => details.nino
-      case Crn => details.crn
-      case AddressLine1 => details.addressLine1
-      case AddressLine2 => details.addressLine2
-      case AddressLine3 => details.addressLine3
-      case AddressLine4 => details.addressLine4
-      case PostCode => details.postcode
-      case Country => details.country
-      case EmailAddress => details.emailAddress
-      case PhoneNumber => details.phoneNumber
-      case MobilePhoneNumber => details.mobilePhoneNumber
-      case WorkReferenceNumber => details.worksReferenceNumber
-      case _ => None
+      case Utr                    => details.utr
+      case PartnerUtr             => details.partnerUtr
+      case Nino                   => details.nino
+      case Crn                    => details.crn
+      case AddressLine1           => details.addressLine1
+      case AddressLine2           => details.addressLine2
+      case AddressLine3           => details.addressLine3
+      case AddressLine4           => details.addressLine4
+      case PostCode               => details.postcode
+      case Country                => details.country
+      case EmailAddress           => details.emailAddress
+      case PhoneNumber            => details.phoneNumber
+      case MobilePhoneNumber      => details.mobilePhoneNumber
+      case WorkReferenceNumber    => details.worksReferenceNumber
+      case _                      => None
     }
 }

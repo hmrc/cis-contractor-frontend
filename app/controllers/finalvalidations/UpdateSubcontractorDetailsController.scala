@@ -45,7 +45,7 @@ class UpdateSubcontractorDetailsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: UpdateSubcontractorDetailsView
 )(using ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(subcontractorId: Long): Action[AnyContent] =
@@ -57,11 +57,9 @@ class UpdateSubcontractorDetailsController @Inject() (
 
         case Some(draftId) =>
           finalValidationDraftService.get(request.cisId, draftId).map { draft =>
-
             draft.subcontractor(subcontractorId) match {
 
-              case Some(subcontractor)
-                if subcontractor.readiness == FinalValidationReadiness.Complete =>
+              case Some(subcontractor) if subcontractor.readiness == FinalValidationReadiness.Complete =>
                 Redirect(
                   controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
                 )
@@ -71,8 +69,7 @@ class UpdateSubcontractorDetailsController @Inject() (
                   pageModelBuilder.build(
                     subcontractor,
                     (field, target) =>
-                      controllers.finalvalidations.routes
-                        .FinalValidationChangeController
+                      controllers.finalvalidations.routes.FinalValidationChangeController
                         .onPageLoad(
                           subcontractorId,
                           field.key,
@@ -114,11 +111,9 @@ class UpdateSubcontractorDetailsController @Inject() (
 
         case Some(draftId) =>
           finalValidationDraftService.get(request.cisId, draftId).flatMap { draft =>
-
             draft.subcontractor(subcontractorId) match {
 
-              case Some(subcontractor)
-                if subcontractor.readiness == FinalValidationReadiness.Complete =>
+              case Some(subcontractor) if subcontractor.readiness == FinalValidationReadiness.Complete =>
                 Future.successful(
                   Redirect(
                     controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
@@ -128,17 +123,17 @@ class UpdateSubcontractorDetailsController @Inject() (
               case Some(_) =>
                 for {
                   issues <- Future.fromTry(
-                    verifyFinalValidationService.validateDraftSubcontractor(
-                      draft,
-                      subcontractorId
-                    )
-                  )
+                              verifyFinalValidationService.validateDraftSubcontractor(
+                                draft,
+                                subcontractorId
+                              )
+                            )
                   _      <- finalValidationDraftService.updateReadiness(
-                    request.cisId,
-                    draftId,
-                    subcontractorId,
-                    issues
-                  )
+                              request.cisId,
+                              draftId,
+                              subcontractorId,
+                              issues
+                            )
                 } yield Redirect(
                   controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
                 )

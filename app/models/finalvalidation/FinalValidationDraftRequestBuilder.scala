@@ -33,35 +33,34 @@ class FinalValidationDraftRequestBuilder @Inject() () {
         .toMap
 
     validation.failures
-      .foldLeft(Try(Seq.empty[CreateFinalValidationDraftSubcontractor])) {
-        case (result, failure) =>
-          for {
-            existing      <- result
-            subcontractor <- subcontractorsById
-                               .get(failure.subcontractorId)
-                               .map(Success(_))
-                               .getOrElse(
-                                 Failure(new IllegalStateException(s"Subcontractor ${failure.subcontractorId} not found"))
-                               )
-            resourceRef   <- subcontractor.subbieResourceRef
-                               .map(Success(_))
-                               .getOrElse(
-                                 Failure(
-                                   new IllegalStateException(
-                                     s"Missing subbieResourceRef for subcontractor ${failure.subcontractorId}"
-                                   )
+      .foldLeft(Try(Seq.empty[CreateFinalValidationDraftSubcontractor])) { case (result, failure) =>
+        for {
+          existing      <- result
+          subcontractor <- subcontractorsById
+                             .get(failure.subcontractorId)
+                             .map(Success(_))
+                             .getOrElse(
+                               Failure(new IllegalStateException(s"Subcontractor ${failure.subcontractorId} not found"))
+                             )
+          resourceRef   <- subcontractor.subbieResourceRef
+                             .map(Success(_))
+                             .getOrElse(
+                               Failure(
+                                 new IllegalStateException(
+                                   s"Missing subbieResourceRef for subcontractor ${failure.subcontractorId}"
                                  )
                                )
-          } yield existing :+
-            CreateFinalValidationDraftSubcontractor(
-              subcontractorId = subcontractor.subcontractorId,
-              subbieResourceRef = resourceRef,
-              baseVersion = subcontractor.version,
-              subcontractorType = subcontractor.subcontractorType,
-              displayName = subcontractor.displayName,
-              details = toDetails(subcontractor),
-              issues = failure.issues.map { issue => FinalValidationDraftIssue(issue.field.key, issue.value)}
-            )
+                             )
+        } yield existing :+
+          CreateFinalValidationDraftSubcontractor(
+            subcontractorId = subcontractor.subcontractorId,
+            subbieResourceRef = resourceRef,
+            baseVersion = subcontractor.version,
+            subcontractorType = subcontractor.subcontractorType,
+            displayName = subcontractor.displayName,
+            details = toDetails(subcontractor),
+            issues = failure.issues.map(issue => FinalValidationDraftIssue(issue.field.key, issue.value))
+          )
       }
       .map { subcontractors =>
         CreateFinalValidationDraftRequest(

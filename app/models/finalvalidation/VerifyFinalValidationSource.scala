@@ -34,20 +34,20 @@ object VerifyFinalValidationSource {
     override def writes(source: VerifyFinalValidationSource): JsValue =
       JsString(
         source match {
-          case SelectSubcontractor => "SelectSubcontractor"
-          case SelectSubcontractorsToReverify => "SelectSubcontractorsToReverify"
-          case ReviewUnmatchedSubcontractors => "ReviewUnmatchedSubcontractors"
+          case SelectSubcontractor                  => "SelectSubcontractor"
+          case SelectSubcontractorsToReverify       => "SelectSubcontractorsToReverify"
+          case ReviewUnmatchedSubcontractors        => "ReviewUnmatchedSubcontractors"
           case ReviewInsufficientInfoSubcontractors => "ReviewInsufficientInfoSubcontractors"
         }
       )
 
     override def reads(json: JsValue): JsResult[VerifyFinalValidationSource] =
       json.validate[String].flatMap {
-        case "SelectSubcontractor" => JsSuccess(SelectSubcontractor)
-        case "SelectSubcontractorsToReverify" => JsSuccess(SelectSubcontractorsToReverify)
-        case "ReviewUnmatchedSubcontractors" => JsSuccess(ReviewUnmatchedSubcontractors)
+        case "SelectSubcontractor"                  => JsSuccess(SelectSubcontractor)
+        case "SelectSubcontractorsToReverify"       => JsSuccess(SelectSubcontractorsToReverify)
+        case "ReviewUnmatchedSubcontractors"        => JsSuccess(ReviewUnmatchedSubcontractors)
         case "ReviewInsufficientInfoSubcontractors" => JsSuccess(ReviewInsufficientInfoSubcontractors)
-        case other => JsError(s"Unknown VerifyFinalValidationSource: $other")
+        case other                                  => JsError(s"Unknown VerifyFinalValidationSource: $other")
       }
   }
 }

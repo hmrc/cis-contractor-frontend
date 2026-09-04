@@ -171,9 +171,9 @@ class SelectSubcontractorController @Inject() (
                   cleanedAnswers <-
                     if (
                       mode == CheckMode &&
-                        answersWithSelections
-                          .get(RebuildVerificationFromWarningPage)
-                          .contains(true)
+                      answersWithSelections
+                        .get(RebuildVerificationFromWarningPage)
+                        .contains(true)
                     ) {
                       Future.fromTry(
                         answersWithSelections.remove(RebuildVerificationFromWarningPage)
@@ -189,45 +189,45 @@ class SelectSubcontractorController @Inject() (
                                    )
                                  )
 
-                  withSource  <- Future.fromTry(
-                    withContext.set(
-                      VerifyFinalValidationSourcePage,
-                      VerifyFinalValidationSource.SelectSubcontractor
-                    )
-                  )
+                  withSource <- Future.fromTry(
+                                  withContext.set(
+                                    VerifyFinalValidationSourcePage,
+                                    VerifyFinalValidationSource.SelectSubcontractor
+                                  )
+                                )
 
-                  validation  <- verifyFinalValidationService.validate(
-                    request.cisId,
-                    withSource
-                  )
+                  validation <- verifyFinalValidationService.validate(
+                                  request.cisId,
+                                  withSource
+                                )
 
-                  result      <-
+                  result <-
                     if (validation.hasErrors) {
                       for {
                         createRequest <- Future.fromTry(
-                          finalValidationDraftRequestBuilder.build(
-                            request.cisId,
-                            validation
-                          )
-                        )
+                                           finalValidationDraftRequestBuilder.build(
+                                             request.cisId,
+                                             validation
+                                           )
+                                         )
 
-                        draftId       <- finalValidationDraftService.create(createRequest)
+                        draftId <- finalValidationDraftService.create(createRequest)
 
-                        withDraftId   <- Future.fromTry(
-                          withSource.set(
-                            FinalValidationDraftIdPage,
-                            draftId
-                          )
-                        )
+                        withDraftId <- Future.fromTry(
+                                         withSource.set(
+                                           FinalValidationDraftIdPage,
+                                           draftId
+                                         )
+                                       )
 
-                        withMode      <- Future.fromTry(
-                          withDraftId.set(
-                            VerifyFinalValidationModePage,
-                            mode.toString
-                          )
-                        )
+                        withMode <- Future.fromTry(
+                                      withDraftId.set(
+                                        VerifyFinalValidationModePage,
+                                        mode.toString
+                                      )
+                                    )
 
-                        _             <- sessionRepository.set(withMode)
+                        _ <- sessionRepository.set(withMode)
 
                       } yield Redirect(
                         controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()

@@ -295,7 +295,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             )
         }
       }
-    
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
@@ -328,12 +328,12 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   def createFinalValidationDraft(
     request: CreateFinalValidationDraftRequest
-  )(implicit hc: HeaderCarrier): Future[CreateFinalValidationDraftResponse] = 
+  )(implicit hc: HeaderCarrier): Future[CreateFinalValidationDraftResponse] =
     http
       .post(url"$cisBaseUrl/final-validation/drafts")
       .withBody(Json.toJson(request))
       .execute[CreateFinalValidationDraftResponse]
-  
+
   def getFinalValidationDraft(
     instanceId: String,
     draftId: String
@@ -341,7 +341,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId")
       .execute[FinalValidationDraft]
-    
+
   def updateFinalValidationReadiness(
     instanceId: String,
     draftId: String,
@@ -373,7 +373,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response.status match {
           case NO_CONTENT | OK =>
             Future.successful(())
-          case _ =>
+          case _               =>
             Future.failed(UpstreamErrorResponse(response.body, response.status, response.status))
         }
       }

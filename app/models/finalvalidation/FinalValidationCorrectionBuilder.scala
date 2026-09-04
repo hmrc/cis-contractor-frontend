@@ -31,7 +31,6 @@ import models.TypeOfSubcontractor.*
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
 
-
 @Singleton
 class FinalValidationCorrectionBuilder @Inject() {
 
@@ -39,7 +38,6 @@ class FinalValidationCorrectionBuilder @Inject() {
     userAnswers: UserAnswers,
     payload: FinalValidationHandoffPayload
   ): Try[FinalValidationCorrection] =
-
     userAnswers.get(TypeOfSubcontractorPage) match {
       case Some(subcontractorType) =>
         buildPatch(subcontractorType, userAnswers, payload.changeTarget)
@@ -73,8 +71,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Individualorsoletrader, TradingName) =>
-        update(userAnswers, TradingNameOfSubcontractorPage) {
-          value => FinalValidationSubcontractorPatch(tradingName = Some(value))
+        update(userAnswers, TradingNameOfSubcontractorPage) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
       case (Individualorsoletrader, AddressYesNo) =>
@@ -99,18 +97,18 @@ class FinalValidationCorrectionBuilder @Inject() {
         )
 
       case (Individualorsoletrader, EmailAddress) =>
-        update(userAnswers, IndividualEmailAddressPage) {
-          value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        update(userAnswers, IndividualEmailAddressPage) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
       case (Individualorsoletrader, PhoneNumber) =>
-        update(userAnswers, IndividualPhoneNumberPage) {
-          value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        update(userAnswers, IndividualPhoneNumberPage) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
       case (Individualorsoletrader, MobilePhoneNumber) =>
-        update(userAnswers, IndividualMobileNumberPage) {
-          value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        update(userAnswers, IndividualMobileNumberPage) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
       case (Individualorsoletrader, UtrYesNo) =>
@@ -123,8 +121,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Individualorsoletrader, Utr) =>
-        update(userAnswers, SubcontractorsUniqueTaxpayerReferencePage) {
-          value => FinalValidationSubcontractorPatch(utr = Some(value))
+        update(userAnswers, SubcontractorsUniqueTaxpayerReferencePage) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
       case (Individualorsoletrader, NinoYesNo) =>
@@ -137,8 +135,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Individualorsoletrader, Nino) =>
-        update(userAnswers, SubNationalInsuranceNumberPage) {
-          value => FinalValidationSubcontractorPatch(nino = Some(value))
+        update(userAnswers, SubNationalInsuranceNumberPage) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
         }
 
       case (Individualorsoletrader, WorksReferenceNumberYesNo) =>
@@ -151,15 +149,14 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Individualorsoletrader, WorksReferenceNumber) =>
-        update(userAnswers, WorksReferenceNumberPage) {
-          value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        update(userAnswers, WorksReferenceNumberPage) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
-
       // Company
-      case (Limitedcompany, TradingName) =>
-        update(userAnswers, CompanyNamePage) {
-          value => FinalValidationSubcontractorPatch(tradingName = Some(value))
+      case (Limitedcompany, TradingName)                  =>
+        update(userAnswers, CompanyNamePage) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
       case (Limitedcompany, AddressYesNo) =>
@@ -182,18 +179,18 @@ class FinalValidationCorrectionBuilder @Inject() {
         )
 
       case (Limitedcompany, EmailAddress) =>
-        update(userAnswers, CompanyEmailAddressPage) {
-          value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        update(userAnswers, CompanyEmailAddressPage) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
       case (Limitedcompany, PhoneNumber) =>
-        update(userAnswers, CompanyPhoneNumberPage) {
-          value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        update(userAnswers, CompanyPhoneNumberPage) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
       case (Limitedcompany, MobilePhoneNumber) =>
-        update(userAnswers, CompanyMobileNumberPage) {
-          value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        update(userAnswers, CompanyMobileNumberPage) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
       case (Limitedcompany, UtrYesNo) =>
@@ -206,8 +203,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Limitedcompany, Utr) =>
-        update(userAnswers, CompanyUtrPage) {
-          value => FinalValidationSubcontractorPatch(utr = Some(value))
+        update(userAnswers, CompanyUtrPage) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
       case (Limitedcompany, CrnYesNo) =>
@@ -220,8 +217,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Limitedcompany, Crn) =>
-        update(userAnswers, CompanyCrnPage) {
-          value => FinalValidationSubcontractorPatch(crn = Some(value))
+        update(userAnswers, CompanyCrnPage) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
       case (Limitedcompany, WorksReferenceNumberYesNo) =>
@@ -234,15 +231,14 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Limitedcompany, WorksReferenceNumber) =>
-        update(userAnswers, CompanyWorksReferencePage) {
-          value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        update(userAnswers, CompanyWorksReferencePage) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
-
       // Trust
-      case (Trust, TradingName) =>
-        update(userAnswers, TrustNamePage) {
-          value => FinalValidationSubcontractorPatch(tradingName = Some(value))
+      case (Trust, TradingName)                   =>
+        update(userAnswers, TrustNamePage) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
       case (Trust, AddressYesNo) =>
@@ -265,18 +261,18 @@ class FinalValidationCorrectionBuilder @Inject() {
         )
 
       case (Trust, EmailAddress) =>
-        update(userAnswers, TrustEmailAddressPage) {
-          value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        update(userAnswers, TrustEmailAddressPage) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
       case (Trust, PhoneNumber) =>
-        update(userAnswers, TrustPhoneNumberPage) {
-          value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        update(userAnswers, TrustPhoneNumberPage) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
       case (Trust, MobilePhoneNumber) =>
-        update(userAnswers, TrustMobileNumberPage) {
-          value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        update(userAnswers, TrustMobileNumberPage) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
       case (Trust, UtrYesNo) =>
@@ -289,8 +285,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Trust, Utr) =>
-        update(userAnswers, TrustUtrPage) {
-          value => FinalValidationSubcontractorPatch(utr = Some(value))
+        update(userAnswers, TrustUtrPage) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
       case (Trust, WorksReferenceNumberYesNo) =>
@@ -302,21 +298,20 @@ class FinalValidationCorrectionBuilder @Inject() {
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
-      case (Trust, WorksReferenceNumber) =>
-        update(userAnswers, TrustWorksReferencePage) {
-          value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+      case (Trust, WorksReferenceNumber)         =>
+        update(userAnswers, TrustWorksReferencePage) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
-
 
       // Partnership
       case (Partnership, PartnershipTradingName) =>
-        update(userAnswers, PartnershipNamePage) {
-          value => FinalValidationSubcontractorPatch(partnershipTradingName = Some(value))
+        update(userAnswers, PartnershipNamePage) { value =>
+          FinalValidationSubcontractorPatch(partnershipTradingName = Some(value))
         }
 
       case (Partnership, TradingName) =>
-        update(userAnswers, PartnershipNominatedPartnerNamePage) {
-          value => FinalValidationSubcontractorPatch(tradingName = Some(value))
+        update(userAnswers, PartnershipNominatedPartnerNamePage) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
       case (Partnership, AddressYesNo) =>
@@ -339,22 +334,22 @@ class FinalValidationCorrectionBuilder @Inject() {
         )
 
       case (Partnership, EmailAddress) =>
-        update(userAnswers, PartnershipEmailAddressPage) {
-          value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        update(userAnswers, PartnershipEmailAddressPage) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
       case (Partnership, PhoneNumber) =>
-        update(userAnswers, PartnershipPhoneNumberPage) {
-          value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        update(userAnswers, PartnershipPhoneNumberPage) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
       case (Partnership, MobilePhoneNumber) =>
-        update(userAnswers, PartnershipMobileNumberPage) {
-          value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        update(userAnswers, PartnershipMobileNumberPage) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
       // Partnership  UTR
-      case (Partnership, UtrYesNo) =>
+      case (Partnership, UtrYesNo)          =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipHasUtrYesNoPage,
@@ -363,9 +358,9 @@ class FinalValidationCorrectionBuilder @Inject() {
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
-      case (Partnership, Utr) =>
-        update(userAnswers, PartnershipUniqueTaxpayerReferencePage) {
-          value => FinalValidationSubcontractorPatch(utr = Some(value))
+      case (Partnership, Utr)             =>
+        update(userAnswers, PartnershipUniqueTaxpayerReferencePage) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
       // Nominated partner  UTR
@@ -379,8 +374,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Partnership, PartnerUtr) =>
-        update(userAnswers, PartnershipNominatedPartnerUtrPage) {
-          value => FinalValidationSubcontractorPatch(partnerUtr = Some(value))
+        update(userAnswers, PartnershipNominatedPartnerUtrPage) { value =>
+          FinalValidationSubcontractorPatch(partnerUtr = Some(value))
         }
 
       case (Partnership, NinoYesNo) =>
@@ -393,8 +388,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Partnership, Nino) =>
-        update(userAnswers, PartnershipNominatedPartnerNinoPage) {
-          value => FinalValidationSubcontractorPatch(nino = Some(value))
+        update(userAnswers, PartnershipNominatedPartnerNinoPage) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
         }
 
       case (Partnership, CrnYesNo) =>
@@ -407,8 +402,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Partnership, Crn) =>
-        update(userAnswers, PartnershipNominatedPartnerCrnPage) {
-          value => FinalValidationSubcontractorPatch(crn = Some(value))
+        update(userAnswers, PartnershipNominatedPartnerCrnPage) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
       case (Partnership, WorksReferenceNumberYesNo) =>
@@ -421,8 +416,8 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       case (Partnership, WorksReferenceNumber) =>
-        update(userAnswers, PartnershipWorksReferenceNumberPage) {
-          value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        update(userAnswers, PartnershipWorksReferenceNumberPage) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
       case _ =>

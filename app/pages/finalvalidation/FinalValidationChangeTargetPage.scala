@@ -21,7 +21,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object FinalValidationChangeTargetPage extends QuestionPage[FinalValidationChangeTarget] {
-  
+
   override def path: JsPath = JsPath \ "finalvalidation" \ toString
 
   override def toString: String = "finalValidationChangeTarget"

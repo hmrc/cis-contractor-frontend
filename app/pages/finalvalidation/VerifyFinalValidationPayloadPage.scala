@@ -21,9 +21,9 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object VerifyFinalValidationPayloadPage extends QuestionPage[FinalValidationHandoffPayload] {
-  
+
   override def path: JsPath = JsPath \ "finalvalidations" \ toString
-  
+
   override def toString: String = "verifyFinalValidationPayload"
-  
+
 }

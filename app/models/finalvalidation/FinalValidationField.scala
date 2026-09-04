@@ -123,7 +123,7 @@ object FinalValidationField {
   )
 
   def fromKey(key: String): Option[FinalValidationField] = values.find(_.key == key)
-  
+
   given Format[FinalValidationField] = new Format[FinalValidationField] {
     override def writes(o: FinalValidationField): JsValue = JsString(o.key)
 

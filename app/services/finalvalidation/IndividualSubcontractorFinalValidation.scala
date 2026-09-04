@@ -30,9 +30,9 @@ class IndividualSubcontractorFinalValidation @Inject() {
     allSubcontractors: Seq[SubcontractorResponse]
   ): Seq[FinalValidationField] =
     // TODO F3 - Individual subcontractor final validation
-    
+
     val _ = allSubcontractors
-    
+
     // Temporary manual failure to unblock FinalValidation journey testing
     if (Set(10903L, 10904L, 10905L).contains(subcontractor.subcontractorId)) {
       Seq(Utr, Nino)

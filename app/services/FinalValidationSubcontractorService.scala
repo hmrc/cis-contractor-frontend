@@ -36,7 +36,7 @@ import scala.util.{Failure, Success, Try}
 
 @Singleton
 class FinalValidationSubcontractorService @Inject() {
-  
+
   def populateFinalValidationUserAnswers(
     userAnswers: UserAnswers,
     instanceId: String,
@@ -103,7 +103,8 @@ class FinalValidationSubcontractorService @Inject() {
       case SubcontractorNameTarget | TradingName | PartnershipTradingName =>
         populateNameTarget(userAnswers, subcontractorType, details, target)
 
-      case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn | WorksReferenceNumberYesNo | WorksReferenceNumber =>
+      case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn |
+          WorksReferenceNumberYesNo | WorksReferenceNumber =>
         populateIdentifierTarget(userAnswers, subcontractorType, details, target)
 
       case AddressYesNo | AddressTarget =>
@@ -129,7 +130,7 @@ class FinalValidationSubcontractorService @Inject() {
             setStringOrRemove(userAnswers, TradingNameOfSubcontractorPage, details.tradingName)
           case Limitedcompany | Trust =>
             Success(userAnswers)
-          case Partnership =>
+          case Partnership            =>
             setStringOrRemove(userAnswers, PartnershipNominatedPartnerNamePage, details.tradingName)
         }
 
@@ -144,7 +145,7 @@ class FinalValidationSubcontractorService @Inject() {
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     target match {
-      case UtrYesNo =>
+      case UtrYesNo                                            =>
         val (yesNoPage, valuePage) = utrPages(subcontractorType)
         populateStringYesNoPair(
           userAnswers = userAnswers,
@@ -153,7 +154,7 @@ class FinalValidationSubcontractorService @Inject() {
           value = details.utr,
           forceYes = false
         )
-      case Utr =>
+      case Utr                                                 =>
         val (yesNoPage, valuePage) = utrPages(subcontractorType)
         populateStringYesNoPair(
           userAnswers = userAnswers,
@@ -170,7 +171,7 @@ class FinalValidationSubcontractorService @Inject() {
           value = details.partnerUtr,
           forceYes = true
         )
-      case PartnerUtr if subcontractorType == Partnership =>
+      case PartnerUtr if subcontractorType == Partnership      =>
         populateStringYesNoPair(
           userAnswers = userAnswers,
           yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
@@ -178,7 +179,7 @@ class FinalValidationSubcontractorService @Inject() {
           value = details.partnerUtr,
           forceYes = false
         )
-      case NinoYesNo =>
+      case NinoYesNo                                           =>
         ninoPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
           populateStringYesNoPair(
             userAnswers = userAnswers,
@@ -188,7 +189,7 @@ class FinalValidationSubcontractorService @Inject() {
             forceYes = false
           )
         }
-      case Nino =>
+      case Nino                                                =>
         ninoPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
           populateStringYesNoPair(
             userAnswers = userAnswers,
@@ -198,7 +199,7 @@ class FinalValidationSubcontractorService @Inject() {
             forceYes = true
           )
         }
-      case CrnYesNo =>
+      case CrnYesNo                                            =>
         crnPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
           populateStringYesNoPair(
             userAnswers = userAnswers,
@@ -208,7 +209,7 @@ class FinalValidationSubcontractorService @Inject() {
             forceYes = false
           )
         }
-      case Crn =>
+      case Crn                                                 =>
         crnPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>
           populateStringYesNoPair(
             userAnswers = userAnswers,
@@ -218,7 +219,7 @@ class FinalValidationSubcontractorService @Inject() {
             forceYes = true
           )
         }
-      case WorksReferenceNumberYesNo =>
+      case WorksReferenceNumberYesNo                           =>
         val (yesNoPage, valuePage) = worksReferenceNumberPages(subcontractorType)
         populateStringYesNoPair(
           userAnswers = userAnswers,
@@ -227,7 +228,7 @@ class FinalValidationSubcontractorService @Inject() {
           value = details.worksReferenceNumber,
           forceYes = false
         )
-      case WorksReferenceNumber =>
+      case WorksReferenceNumber                                =>
         val (yesNoPage, valuePage) = worksReferenceNumberPages(subcontractorType)
         populateStringYesNoPair(
           userAnswers = userAnswers,
@@ -236,7 +237,7 @@ class FinalValidationSubcontractorService @Inject() {
           value = details.worksReferenceNumber,
           forceYes = true
         )
-      case _ =>
+      case _                                                   =>
         Failure(new RuntimeException(s"Unexpected target for identifier population: $target"))
     }
 
@@ -251,7 +252,7 @@ class FinalValidationSubcontractorService @Inject() {
       withYesNo <- userAnswers.set(yesNoPage, if (forceYes) true else hasValue(value))
       result    <- setStringOrRemove(withYesNo, valuePage, value)
     } yield result
-  
+
   private def populateAddressTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
@@ -259,17 +260,17 @@ class FinalValidationSubcontractorService @Inject() {
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, addressPage) = addressPages(subcontractorType)
-    val yesNoValue = target match {
+    val yesNoValue               = target match {
       case AddressYesNo  => hasAddress(details)
       case AddressTarget => true
       case _             => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
     }
-    
+
     for {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
       result    <- setAddressOrRemove(withYesNo, addressPage, toAddress(details))
     } yield result
-    
+
   }
 
   private def populateContactTarget(
@@ -279,13 +280,13 @@ class FinalValidationSubcontractorService @Inject() {
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, emailPage, phonePage, mobilePage) = contactPages(subcontractorType)
-    val yesNoValue =
+    val yesNoValue                                    =
       target match {
-        case ContactDetailsYesNo => hasAnyContact(details)
+        case ContactDetailsYesNo                            => hasAnyContact(details)
         case EmailAddress | PhoneNumber | MobilePhoneNumber => true
-        case _ => return Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
+        case _                                              => return Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
       }
-      
+
     for {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
       withEmail <- setStringOrRemove(withYesNo, emailPage, details.emailAddress)
@@ -297,58 +298,75 @@ class FinalValidationSubcontractorService @Inject() {
   private def utrPages(subcontractorType: TypeOfSubcontractor): (QuestionPage[Boolean], QuestionPage[String]) =
     subcontractorType match {
       case Individualorsoletrader => (UniqueTaxpayerReferenceYesNoPage, SubcontractorsUniqueTaxpayerReferencePage)
-      case Limitedcompany => (CompanyUtrYesNoPage, CompanyUtrPage)
-      case Partnership => (PartnershipHasUtrYesNoPage, PartnershipUniqueTaxpayerReferencePage)
-      case Trust => (TrustUtrYesNoPage, TrustUtrPage)
+      case Limitedcompany         => (CompanyUtrYesNoPage, CompanyUtrPage)
+      case Partnership            => (PartnershipHasUtrYesNoPage, PartnershipUniqueTaxpayerReferencePage)
+      case Trust                  => (TrustUtrYesNoPage, TrustUtrPage)
     }
 
   private def ninoPages(subcontractorType: TypeOfSubcontractor): Try[(QuestionPage[Boolean], QuestionPage[String])] =
     subcontractorType match {
       case Individualorsoletrader => Success((NationalInsuranceNumberYesNoPage, SubNationalInsuranceNumberPage))
-      case Partnership => Success((PartnershipNominatedPartnerNinoYesNoPage, PartnershipNominatedPartnerNinoPage))
-      case other => Failure(new RuntimeException(s"NINO not applicable for subocntactor type: $other"))
+      case Partnership            => Success((PartnershipNominatedPartnerNinoYesNoPage, PartnershipNominatedPartnerNinoPage))
+      case other                  => Failure(new RuntimeException(s"NINO not applicable for subocntactor type: $other"))
     }
 
   private def crnPages(subcontractorType: TypeOfSubcontractor): Try[(QuestionPage[Boolean], QuestionPage[String])] =
     subcontractorType match {
       case Limitedcompany => Success((CompanyCrnYesNoPage, CompanyCrnPage))
-      case Partnership => Success((PartnershipNominatedPartnerCrnYesNoPage, PartnershipNominatedPartnerCrnPage))
-      case other => Failure(new RuntimeException(s"CRN not applicable for subcontractor type: $other"))
+      case Partnership    => Success((PartnershipNominatedPartnerCrnYesNoPage, PartnershipNominatedPartnerCrnPage))
+      case other          => Failure(new RuntimeException(s"CRN not applicable for subcontractor type: $other"))
     }
 
-  private def worksReferenceNumberPages(subcontractorType: TypeOfSubcontractor): (QuestionPage[Boolean], QuestionPage[String]) =
+  private def worksReferenceNumberPages(
+    subcontractorType: TypeOfSubcontractor
+  ): (QuestionPage[Boolean], QuestionPage[String]) =
     subcontractorType match {
       case Individualorsoletrader => (WorksReferenceNumberYesNoPage, WorksReferenceNumberPage)
-      case Limitedcompany => (CompanyWorksReferenceYesNoPage, CompanyWorksReferencePage)
-      case Partnership => (PartnershipWorksReferenceNumberYesNoPage, PartnershipWorksReferenceNumberPage)
-      case Trust => (TrustWorksReferenceYesNoPage, TrustWorksReferencePage)
+      case Limitedcompany         => (CompanyWorksReferenceYesNoPage, CompanyWorksReferencePage)
+      case Partnership            => (PartnershipWorksReferenceNumberYesNoPage, PartnershipWorksReferenceNumberPage)
+      case Trust                  => (TrustWorksReferenceYesNoPage, TrustWorksReferencePage)
     }
 
-  private def addressPages(subcontractorType: TypeOfSubcontractor): (QuestionPage[Boolean], QuestionPage[models.address.Address]) =
+  private def addressPages(
+    subcontractorType: TypeOfSubcontractor
+  ): (QuestionPage[Boolean], QuestionPage[models.address.Address]) =
     subcontractorType match {
       case Individualorsoletrader => (SubAddressYesNoPage, AddressOfSubcontractorPage)
-      case Limitedcompany => (CompanyAddressYesNoPage, CompanyAddressPage)
-      case Partnership => (PartnershipAddressYesNoPage, PartnershipAddressPage)
-      case Trust => (TrustAddressYesNoPage, TrustAddressPage)
+      case Limitedcompany         => (CompanyAddressYesNoPage, CompanyAddressPage)
+      case Partnership            => (PartnershipAddressYesNoPage, PartnershipAddressPage)
+      case Trust                  => (TrustAddressYesNoPage, TrustAddressPage)
     }
 
   private def contactPages(subcontractorType: TypeOfSubcontractor): (
-    QuestionPage[Boolean], QuestionPage[String], QuestionPage[String], QuestionPage[String]
-    ) =
+    QuestionPage[Boolean],
+    QuestionPage[String],
+    QuestionPage[String],
+    QuestionPage[String]
+  ) =
     subcontractorType match {
       case Individualorsoletrader =>
-        (AddIndividualContactMethodsYesNoPage, IndividualEmailAddressPage, IndividualPhoneNumberPage, IndividualMobileNumberPage)
-      case Limitedcompany =>
+        (
+          AddIndividualContactMethodsYesNoPage,
+          IndividualEmailAddressPage,
+          IndividualPhoneNumberPage,
+          IndividualMobileNumberPage
+        )
+      case Limitedcompany         =>
         (AddCompanyContactMethodsYesNoPage, CompanyEmailAddressPage, CompanyPhoneNumberPage, CompanyMobileNumberPage)
-      case Partnership =>
-        (AddPartnershipContactMethodsYesNoPage, PartnershipEmailAddressPage, PartnershipPhoneNumberPage, PartnershipMobileNumberPage)
-      case Trust =>
+      case Partnership            =>
+        (
+          AddPartnershipContactMethodsYesNoPage,
+          PartnershipEmailAddressPage,
+          PartnershipPhoneNumberPage,
+          PartnershipMobileNumberPage
+        )
+      case Trust                  =>
         (AddTrustContactMethodsYesNoPage, TrustEmailAddressPage, TrustPhoneNumberPage, TrustMobileNumberPage)
     }
 
   private def hasAddress(details: FinalValidationSubcontractorDetails): Boolean =
     hasValue(details.addressLine1)
-  
+
   private def toAddress(
     details: FinalValidationSubcontractorDetails
   ): Option[Address] =
@@ -377,7 +395,7 @@ class FinalValidationSubcontractorService @Inject() {
     nonBlank(value) match {
       case Some(answer) =>
         userAnswers.set(page, answer)
-      case None =>
+      case None         =>
         userAnswers.remove(page)
     }
 
@@ -389,7 +407,7 @@ class FinalValidationSubcontractorService @Inject() {
     address match {
       case Some(address) =>
         userAnswers.set(page, address)
-      case None =>
+      case None          =>
         userAnswers.remove(page)
     }
 
@@ -412,7 +430,7 @@ class FinalValidationSubcontractorService @Inject() {
     subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString) match {
       case Some(subcontractorType) =>
         Success(subcontractorType)
-      case None =>
+      case None                    =>
         Failure(new RuntimeException(s"Unsupported subcontractor type: ${subcontractor.subcontractorType}"))
     }
 

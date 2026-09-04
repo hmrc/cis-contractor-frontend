@@ -65,7 +65,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorsToReverifyView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   private def dateFmt(implicit messages: Messages) =
@@ -293,58 +293,58 @@ class SelectSubcontractorsToReverifyController @Inject() (
             _ =>
               for {
                 withSelections <- Future.fromTry(
-                  request.userAnswers.set(
-                    SelectSubcontractorsToReverifyPage,
-                    mergedSelections
-                  )
-                )
+                                    request.userAnswers.set(
+                                      SelectSubcontractorsToReverifyPage,
+                                      mergedSelections
+                                    )
+                                  )
 
-                withContext    <- Future.fromTry(
-                  withSelections.set(
-                    FinalValidationContextPage,
-                    FinalValidationContext.VerifySubcontractor
-                  )
-                )
+                withContext <- Future.fromTry(
+                                 withSelections.set(
+                                   FinalValidationContextPage,
+                                   FinalValidationContext.VerifySubcontractor
+                                 )
+                               )
 
-                withSource     <- Future.fromTry(
-                  withContext.set(
-                    VerifyFinalValidationSourcePage,
-                    VerifyFinalValidationSource.SelectSubcontractorsToReverify
-                  )
-                )
+                withSource <- Future.fromTry(
+                                withContext.set(
+                                  VerifyFinalValidationSourcePage,
+                                  VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                )
+                              )
 
-                validation     <- verifyFinalValidationService.validate(
-                  request.cisId,
-                  withSource
-                )
+                validation <- verifyFinalValidationService.validate(
+                                request.cisId,
+                                withSource
+                              )
 
-                result         <-
+                result <-
                   if (validation.hasErrors) {
                     for {
                       createRequest <- Future.fromTry(
-                        finalValidationDraftRequestBuilder.build(
-                          request.cisId,
-                          validation
-                        )
-                      )
+                                         finalValidationDraftRequestBuilder.build(
+                                           request.cisId,
+                                           validation
+                                         )
+                                       )
 
-                      draftId       <- finalValidationDraftService.create(createRequest)
+                      draftId <- finalValidationDraftService.create(createRequest)
 
-                      withDraftId   <- Future.fromTry(
-                        withSource.set(
-                          FinalValidationDraftIdPage,
-                          draftId
-                        )
-                      )
+                      withDraftId <- Future.fromTry(
+                                       withSource.set(
+                                         FinalValidationDraftIdPage,
+                                         draftId
+                                       )
+                                     )
 
-                      withMode      <- Future.fromTry(
-                        withDraftId.set(
-                          VerifyFinalValidationModePage,
-                          mode.toString
-                        )
-                      )
+                      withMode <- Future.fromTry(
+                                    withDraftId.set(
+                                      VerifyFinalValidationModePage,
+                                      mode.toString
+                                    )
+                                  )
 
-                      _             <- sessionRepository.set(withMode)
+                      _ <- sessionRepository.set(withMode)
 
                     } yield Redirect(
                       controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()

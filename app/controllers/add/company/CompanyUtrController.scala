@@ -96,11 +96,11 @@ class CompanyUtrController @Inject() (
                 val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
-                  case AmendMode if prevValue.contains(value) =>
+                  case AmendMode if prevValue.contains(value)                                        =>
                     saveAndContinue(mode, value)
                   case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
                     saveAndContinue(mode, value)
-                  case _                                      =>
+                  case _                                                                             =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
                       case true  =>
                         val errorForm = form

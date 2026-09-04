@@ -87,7 +87,7 @@ object FinalValidationReadiness {
         case other =>
           JsError(s"Unknown FinalValidationReadiness: $other")
       }
-    }
+  }
 }
 
 case class FinalValidationDraftSubcontractor(
@@ -116,7 +116,7 @@ case class FinalValidationDraft(
 
   def allComplete: Boolean =
     subcontractors.forall(_.readiness == FinalValidationReadiness.Complete)
-    
+
 }
 
 object FinalValidationDraft {

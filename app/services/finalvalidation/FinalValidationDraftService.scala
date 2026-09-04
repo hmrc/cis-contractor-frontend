@@ -70,6 +70,5 @@ class FinalValidationDraftService @Inject() (
     )
 
   def commit(instanceId: String, draftId: String)(implicit hc: HeaderCarrier): Future[Unit] =
-    connector.commitFinalValidationDraft(instanceId, draftId
-    )
+    connector.commitFinalValidationDraft(instanceId, draftId)
 }
