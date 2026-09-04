@@ -19,7 +19,7 @@ package services
 import models.{Subcontractor, UserAnswers}
 import models.verify.VerificationBatchStatus
 import models.verify.VerificationBatchStatus.*
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
+import pages.verify.NewestVerificationBatchResponsePage
 
 import javax.inject.{Inject, Singleton}
 
@@ -28,7 +28,7 @@ class VerificationPreSelectionService @Inject() () {
 
   def preSelectedSubcontractorIds(displayedSubcontractors: Seq[Subcontractor], userAnswers: UserAnswers): Set[String] =
     if (hasOpenCurrentVerificationBatch(userAnswers)) {
-      preSelectedFromCurrentBatch(displayedSubcontractors, userAnswers)
+      preSelectedFromNewestBatch(displayedSubcontractors, userAnswers)
     } else {
       displayedSubcontractors.map(_.subcontractorId.toString).toSet
     }
@@ -44,13 +44,13 @@ class VerificationPreSelectionService @Inject() () {
         case _                   => false
       }
 
-  private def preSelectedFromCurrentBatch(
+  private def preSelectedFromNewestBatch(
     displayedSubcontractors: Seq[Subcontractor],
     userAnswers: UserAnswers
   ): Set[String] = {
     val verificationResourceRefs =
       userAnswers
-        .get(CurrentVerificationBatchResponsePage)
+        .get(NewestVerificationBatchResponsePage)
         .map(_.verifications.flatMap(_.verificationResourceRef).toSet)
         .getOrElse(Set.empty[Long])
 

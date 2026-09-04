@@ -18,8 +18,8 @@ package services
 
 import base.SpecBase
 import models.*
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
+import models.response.GetNewestVerificationBatchResponse
+import pages.verify.NewestVerificationBatchResponsePage
 
 class VerificationPreSelectionServiceSpec extends SpecBase {
 
@@ -54,63 +54,50 @@ class VerificationPreSelectionServiceSpec extends SpecBase {
       subcontractor(3L, None)
     )
 
-  private def newestBatch(status: Option[String]): GetNewestVerificationBatchResponse =
+  private def newestBatch(
+    status: Option[String],
+    verifications: Seq[Verification] = Seq.empty
+  ): GetNewestVerificationBatchResponse =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = displayedSubcontractors,
       verificationBatch = Some(
         VerificationBatch(verificationBatchId = 1L, status = status, verificationNumber = None)
       ),
-      verifications = Nil,
+      verifications = verifications,
       submission = None,
       monthlyReturn = None,
       monthlyReturnSubmission = None
     )
 
-  private val currentBatch =
-    GetCurrentVerificationBatchResponse(
-      subcontractors = Nil,
-      verificationBatch = Some(
-        VerificationBatchCurrentVerification(verificationBatchId = 1L, verifBatchResourceRef = None)
-      ),
-      verifications = Seq(
-        VerificationCurrentVerification(
-          verificationId = 1L,
-          verificationBatchId = Some(1L),
-          subcontractorId = Some(1L),
-          verificationResourceRef = Some(1001L),
-          subcontractorName = Some("Subcontractor 1"),
-          verificationNumber = None,
-          taxTreatment = None,
-          actionIndicator = None,
-          proceed = None,
-          matched = None
-        )
-      )
+  private val newestVerification =
+    Verification(
+      verificationId = 1L,
+      matched = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationBatchId = Some(1L),
+      subcontractorId = Some(1L),
+      actionIndicator = None,
+      verificationResourceRef = Some(1001L)
     )
 
   "VerificationPreSelectionService.preSelectedSubcontractorIds" - {
 
-    "must select only subcontractors whose resource reference matches a current verification when batch is STARTED" in {
+    "must select only subcontractors whose resource reference matches a newest verification when batch is STARTED" in {
       val ua =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestBatch(Some("STARTED")))
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .set(NewestVerificationBatchResponsePage, newestBatch(Some("STARTED"), Seq(newestVerification)))
           .success
           .value
 
       service.preSelectedSubcontractorIds(displayedSubcontractors, ua) mustBe Set("1")
     }
 
-    "must select only subcontractors whose resource reference matches a current verification when batch is VALIDATED" in {
+    "must select only subcontractors whose resource reference matches a newest verification when batch is VALIDATED" in {
       val ua =
         emptyUserAnswers
-          .set(NewestVerificationBatchResponsePage, newestBatch(Some("VALIDATED")))
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .set(NewestVerificationBatchResponsePage, newestBatch(Some("VALIDATED"), Seq(newestVerification)))
           .success
           .value
 
@@ -123,9 +110,6 @@ class VerificationPreSelectionServiceSpec extends SpecBase {
           .set(NewestVerificationBatchResponsePage, newestBatch(Some("ACCEPTED")))
           .success
           .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
-          .success
-          .value
 
       service.preSelectedSubcontractorIds(displayedSubcontractors, ua) mustBe Set("1", "2", "3")
     }
@@ -134,9 +118,6 @@ class VerificationPreSelectionServiceSpec extends SpecBase {
       val ua =
         emptyUserAnswers
           .set(NewestVerificationBatchResponsePage, newestBatch(None))
-          .success
-          .value
-          .set(CurrentVerificationBatchResponsePage, currentBatch)
           .success
           .value
 
