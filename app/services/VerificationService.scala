@@ -400,7 +400,6 @@ class VerificationService @Inject() (
         verification.subcontractorId.get
     }.distinct
 
-
   def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
     implicit hc: HeaderCarrier
   ): Future[Unit] =
@@ -412,23 +411,23 @@ class VerificationService @Inject() (
     proceedVerification(cisId, subcontractorId, batch, cisConnector.proceedUnmatchedVerification)
 
   private def proceedVerification(
-                                   cisId: String,
-                                   subcontractorId: Long,
-                                   batch: GetCurrentVerificationBatchResponse,
-                                   proceed: ProceedVerificationRequest => Future[Unit]
-                                 ): Future[Unit] =
+    cisId: String,
+    subcontractorId: Long,
+    batch: GetCurrentVerificationBatchResponse,
+    proceed: ProceedVerificationRequest => Future[Unit]
+  ): Future[Unit] =
     (
       for {
         verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
         verificationResourceRef      <- batch.verifications
-          .find(_.subcontractorId.contains(subcontractorId))
-          .flatMap(_.verificationResourceRef)
+                                          .find(_.subcontractorId.contains(subcontractorId))
+                                          .flatMap(_.verificationResourceRef)
       } yield ProceedVerificationRequest(
         instanceId = cisId,
         verificationBatchResourceRef = verificationBatchResourceRef,
         verificationResourceRef = verificationResourceRef
       )
-      ) match {
+    ) match {
       case Some(request) =>
         proceed(request)
 
