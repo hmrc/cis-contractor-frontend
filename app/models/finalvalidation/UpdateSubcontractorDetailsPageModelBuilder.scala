@@ -17,7 +17,6 @@
 package models.finalvalidation
 
 import models.finalvalidation.FinalValidationField.*
-import models.response.SubcontractorResponse
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import play.api.i18n.Messages
@@ -55,51 +54,53 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     )
 
   def build(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
   )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
 
-    val subcontractorType = subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString)
+    val subcontractorType =
+      subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString)
 
     val rows =
       subcontractorType match {
-        case Some(Individualorsoletrader)  => soleTraderRows(subcontractor, failure, changeUrl)
-        case Some(Limitedcompany)          => companyRows(subcontractor, failure, changeUrl)
-        case Some(Trust)                   => trustRows(subcontractor, failure, changeUrl)
-        case Some(Partnership)             => partnershipRows(subcontractor, failure, changeUrl)
-        case _                             => Seq.empty
+        case Some(Individualorsoletrader) => soleTraderRows(subcontractor, changeUrl)
+        case Some(Limitedcompany)         => companyRows(subcontractor, changeUrl)
+        case Some(Trust)                  => trustRows(subcontractor, changeUrl)
+        case Some(Partnership)            => partnershipRows(subcontractor, changeUrl)
+        case _                            => Seq.empty
       }
 
-    rows ++ sharedRows(subcontractor, failure, changeUrl)
+    rows ++ sharedRows(subcontractor, changeUrl)
   }
 
   private def soleTraderRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
-  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
+
+    val details = subcontractor.proposed
+
     Seq(
       groupedRow(
-        failure = failure,
+        subcontractor = subcontractor,
         fields = soleTraderNameFields,
         labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName",
-        value = soleTraderName(subcontractor),
+        value = soleTraderName(details),
         target = FinalValidationChangeTarget.SubcontractorName,
         changeUrl = changeUrl
       ),
       valueRow(
-        failure = failure,
+        subcontractor = subcontractor,
         field = TradingName,
         labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.tradingName",
-        value = subcontractor.tradingName,
+        value = details.tradingName,
         target = FinalValidationChangeTarget.TradingName,
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Utr,
-        value = subcontractor.utr,
+        value = details.utr,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.addUtr",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.utr",
         yesNoTarget = FinalValidationChangeTarget.UtrYesNo,
@@ -107,9 +108,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Nino,
-        value = subcontractor.nino,
+        value = details.nino,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.addNino",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.nino",
         yesNoTarget = FinalValidationChangeTarget.NinoYesNo,
@@ -117,25 +118,28 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       )
     ).flatten
+  }
 
   private def companyRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
-  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
+
+    val details = subcontractor.proposed
+
     Seq(
       valueRow(
-        failure = failure,
+        subcontractor = subcontractor,
         field = TradingName,
         labelKey = "finalvalidations.updateSubcontractorDetails.company.name",
-        value = subcontractor.tradingName,
+        value = details.tradingName,
         target = FinalValidationChangeTarget.TradingName,
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Utr,
-        value = subcontractor.utr,
+        value = details.utr,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.company.addUtr",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.company.utr",
         yesNoTarget = FinalValidationChangeTarget.UtrYesNo,
@@ -143,9 +147,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Crn,
-        value = subcontractor.crn,
+        value = details.crn,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.company.addCrn",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.company.crn",
         yesNoTarget = FinalValidationChangeTarget.CrnYesNo,
@@ -153,25 +157,28 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       )
     ).flatten
+  }
 
   private def trustRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
-  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
+
+    val details = subcontractor.proposed
+
     Seq(
       valueRow(
-        failure = failure,
+        subcontractor = subcontractor,
         field = TradingName,
         labelKey = "finalvalidations.updateSubcontractorDetails.trust.name",
-        value = subcontractor.tradingName,
+        value = details.tradingName,
         target = FinalValidationChangeTarget.TradingName,
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Utr,
-        value = subcontractor.utr,
+        value = details.utr,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.trust.addUtr",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.trust.utr",
         yesNoTarget = FinalValidationChangeTarget.UtrYesNo,
@@ -179,33 +186,36 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       )
     ).flatten
+  }
 
   private def partnershipRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
-  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
+
+    val details = subcontractor.proposed
+
     Seq(
       valueRow(
-        failure = failure,
+        subcontractor = subcontractor,
         field = PartnershipTradingName,
         labelKey = "finalvalidations.updateSubcontractorDetails.partnership.name",
-        value = subcontractor.partnershipTradingName,
+        value = details.partnershipTradingName,
         target = FinalValidationChangeTarget.PartnershipTradingName,
         changeUrl = changeUrl
       ),
       valueRow(
-        failure = failure,
+        subcontractor = subcontractor,
         field = TradingName,
         labelKey = "finalvalidations.updateSubcontractorDetails.partnership.nominatedPartner",
-        value = subcontractor.tradingName,
+        value = details.tradingName,
         target = FinalValidationChangeTarget.TradingName,
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Utr,
-        value = subcontractor.utr,
+        value = details.utr,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.addUtr",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.utr",
         yesNoTarget = FinalValidationChangeTarget.UtrYesNo,
@@ -213,9 +223,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = PartnerUtr,
-        value = subcontractor.partnerUtr,
+        value = details.partnerUtr,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.addPartnerUtr",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.partnerUtr",
         yesNoTarget = FinalValidationChangeTarget.PartnerUtrYesNo,
@@ -223,9 +233,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Nino,
-        value = subcontractor.nino,
+        value = details.nino,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.addPartnerNino",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.partnerNino",
         yesNoTarget = FinalValidationChangeTarget.NinoYesNo,
@@ -233,9 +243,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       ),
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = Crn,
-        value = subcontractor.crn,
+        value = details.crn,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.addPartnerCrn",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.partnership.partnerCrn",
         yesNoTarget = FinalValidationChangeTarget.CrnYesNo,
@@ -243,47 +253,53 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         changeUrl = changeUrl
       )
     ).flatten
+  }
 
   private def sharedRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
-  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
-    addressRows(subcontractor, failure, changeUrl) ++
-      contactRows(subcontractor, failure, changeUrl) ++
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
+
+    val details = subcontractor.proposed
+
+    addressRows(subcontractor, changeUrl) ++
+      contactRows(subcontractor, changeUrl) ++
       optionalRows(
-        failure = failure,
+        subcontractor = subcontractor,
         field = WorkReferenceNumber,
-        value = subcontractor.worksReferenceNumber,
+        value = details.worksReferenceNumber,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.worksReferenceNumber",
         yesNoTarget = FinalValidationChangeTarget.WorksReferenceNumberYesNo,
         valueTarget = FinalValidationChangeTarget.WorksReferenceNumber,
         changeUrl = changeUrl
       )
+  }
 
   private def addressRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
   )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
-    firstFailure(failure, addressFields).toSeq.flatMap { failedField =>
+    firstIssue(subcontractor, addressFields).toSeq.flatMap { failedField =>
 
-      val value = combined(
-        subcontractor.addressLine1,
-        subcontractor.addressLine2,
-        subcontractor.addressLine3,
-        subcontractor.addressLine4,
-        subcontractor.postcode,
-        subcontractor.country
-      )
+      val details = subcontractor.proposed
+
+      val value =
+        combined(
+          details.addressLine1,
+          details.addressLine2,
+          details.addressLine3,
+          details.addressLine4,
+          details.postcode,
+          details.country
+        )
 
       val typeKey =
         subcontractorType(subcontractor) match {
-          case Individualorsoletrader  => "soleTrader"
-          case Limitedcompany          => "company"
-          case Trust                   => "trust"
-          case Partnership             => "partnership"
+          case Individualorsoletrader => "soleTrader"
+          case Limitedcompany         => "company"
+          case Trust                  => "trust"
+          case Partnership            => "partnership"
         }
 
       yesNoAndValueRows(
@@ -298,14 +314,14 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     }
 
   private def contactRows(
-    subcontractor: SubcontractorResponse,
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
   )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] = {
 
+    val details = subcontractor.proposed
+
     val failedFields =
-      failure.issues
-        .map(_.field)
+      issueFields(subcontractor)
         .filter(contactFields.contains)
         .distinct
 
@@ -313,9 +329,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
 
       val hasContacts =
         Seq(
-          subcontractor.emailAddress,
-          subcontractor.phoneNumber,
-          subcontractor.mobilePhoneNumber
+          details.emailAddress,
+          details.phoneNumber,
+          details.mobilePhoneNumber
         ).exists(present)
 
       val yesNoRow =
@@ -331,38 +347,42 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         Seq(yesNoRow)
       } else {
         yesNoRow +: failedFields.flatMap {
-          case EmailAddress      =>
+          case EmailAddress =>
             presentRow(
               EmailAddress,
               "finalvalidations.updateSubcontractorDetails.emailAddress",
-              subcontractor.emailAddress,
+              details.emailAddress,
               FinalValidationChangeTarget.EmailAddress,
               changeUrl
             )
-          case PhoneNumber       =>
+
+          case PhoneNumber =>
             presentRow(
               PhoneNumber,
               "finalvalidations.updateSubcontractorDetails.phoneNumber",
-              subcontractor.phoneNumber,
+              details.phoneNumber,
               FinalValidationChangeTarget.PhoneNumber,
               changeUrl
             )
+
           case MobilePhoneNumber =>
             presentRow(
               MobilePhoneNumber,
               "finalvalidations.updateSubcontractorDetails.mobilePhoneNumber",
-              subcontractor.mobilePhoneNumber,
+              details.mobilePhoneNumber,
               FinalValidationChangeTarget.MobilePhoneNumber,
               changeUrl
             )
-          case _                 => Seq.empty
+
+          case _ =>
+            Seq.empty
         }
       }
     }
   }
 
   private def optionalRows(
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     field: FinalValidationField,
     value: Option[String],
     yesNoLabelKey: String,
@@ -371,7 +391,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     valueTarget: FinalValidationChangeTarget,
     changeUrl: ChangeUrl
   )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
-    if (hasFailure(failure, field)) {
+    if (hasIssue(subcontractor, field)) {
       yesNoAndValueRows(
         failedField = field,
         value = value,
@@ -423,28 +443,28 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
   }
 
   private def valueRow(
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     field: FinalValidationField,
     labelKey: String,
     value: Option[String],
     target: FinalValidationChangeTarget,
     changeUrl: ChangeUrl
   ): Seq[UpdateSubcontractorDetailsRow] =
-    if (hasFailure(failure, field)) {
+    if (hasIssue(subcontractor, field)) {
       Seq(row(field, labelKey, value, target, changeUrl))
     } else {
       Seq.empty
     }
 
   private def groupedRow(
-    failure: SubcontractorFinalValidationFailure,
+    subcontractor: FinalValidationDraftSubcontractor,
     fields: Set[FinalValidationField],
     labelKey: String,
     value: Option[String],
     target: FinalValidationChangeTarget,
     changeUrl: ChangeUrl
   ): Seq[UpdateSubcontractorDetailsRow] =
-    firstFailure(failure, fields).toSeq.map { failedField =>
+    firstIssue(subcontractor, fields).toSeq.map { failedField =>
       row(failedField, labelKey, value, target, changeUrl)
     }
 
@@ -475,29 +495,50 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
       changeUrl = changeUrl(field, target)
     )
 
-  private def hasFailure(
-    failure: SubcontractorFinalValidationFailure,
+  private def hasIssue(
+    subcontractor: FinalValidationDraftSubcontractor,
     field: FinalValidationField
   ): Boolean =
-    failure.issues.exists(_.field == field)
+    issueFields(subcontractor).contains(field)
 
-  private def firstFailure(
-    failure: SubcontractorFinalValidationFailure,
+  private def firstIssue(
+    subcontractor: FinalValidationDraftSubcontractor,
     fields: Set[FinalValidationField]
   ): Option[FinalValidationField] =
-    failure.issues.map(_.field).find(fields.contains)
+    issueFields(subcontractor).find(fields.contains)
+
+  private def issueFields(
+    subcontractor: FinalValidationDraftSubcontractor
+  ): Seq[FinalValidationField] =
+    subcontractor.issues.map { issue =>
+      FinalValidationField
+        .fromKey(issue.fieldKey)
+        .getOrElse(
+          throw new IllegalArgumentException(
+            s"Unknown Final Validation field key: ${issue.fieldKey}"
+          )
+        )
+    }
 
   private def present(value: Option[String]): Boolean =
     value.exists(_.trim.nonEmpty)
 
-  private def combined(values: Option[String]*): Option[String] =
-    val result = values.flatten.map(_.trim).filter(_.nonEmpty).mkString(" ")
+  private def combined(values: Option[String]*): Option[String] = {
+    val result =
+      values.flatten
+        .map(_.trim)
+        .filter(_.nonEmpty)
+        .mkString(" ")
+
     Option.when(result.nonEmpty)(result)
+  }
 
   private def yesNo(value: Boolean)(implicit messages: Messages): String =
     messages(if (value) "site.yes" else "site.no")
 
-  private def subcontractorType(subcontractor: SubcontractorResponse): TypeOfSubcontractor =
+  private def subcontractorType(
+    subcontractor: FinalValidationDraftSubcontractor
+  ): TypeOfSubcontractor =
     subcontractor.subcontractorType
       .flatMap(TypeOfSubcontractor.fromString)
       .getOrElse(
@@ -506,12 +547,15 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
         )
       )
 
-  private def soleTraderName(subcontractor: SubcontractorResponse): Option[String] = {
+  private def soleTraderName(
+    details: FinalValidationSubcontractorDetails
+  ): Option[String] = {
+
     val result =
       Seq(
-        subcontractor.firstName,
-        subcontractor.secondName,
-        subcontractor.surname
+        details.firstName,
+        details.secondName,
+        details.surname
       ).flatten
         .map(_.trim)
         .filter(_.nonEmpty)

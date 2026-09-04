@@ -1244,7 +1244,7 @@ finalValidations.verify.reviewSubcontractorDetails.backLink                     
 
 finalvalidations.updateSubcontractorDetails.title                              = {0}
 finalvalidations.updateSubcontractorDetails.heading                            = {0}
-finalvalidations.updateSubcontractorDetails.intro                              = To file your return, you must review and update the subcontractor details.
+finalvalidations.updateSubcontractorDetails.intro                              = To verify your subcontractors, you must review and update the subcontractor details.
 finalvalidations.updateSubcontractorDetails.confirmChanges.heading             = Confirm changes
 finalvalidations.updateSubcontractorDetails.confirmChanges.body                = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
 finalvalidations.updateSubcontractorDetails.acceptAndSubmit                    = Accept and submit

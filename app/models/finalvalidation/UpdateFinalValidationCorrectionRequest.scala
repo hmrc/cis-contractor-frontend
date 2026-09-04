@@ -18,15 +18,13 @@ package models.finalvalidation
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class FinalValidationHandoffPayload(
-  draftId: String,
-  instanceId: String,
+final case class UpdateFinalValidationCorrectionRequest(
   subcontractorId: Long,
-  subbieResourceRef: Long,
-  field: FinalValidationField,
-  changeTarget: FinalValidationChangeTarget
+  changeTarget: String,
+  patch: FinalValidationSubcontractorPatch
 )
 
-object FinalValidationHandoffPayload {
-  given OFormat[FinalValidationHandoffPayload] = Json.format[FinalValidationHandoffPayload]
+object UpdateFinalValidationCorrectionRequest {
+  given OFormat[UpdateFinalValidationCorrectionRequest] =
+    Json.format[UpdateFinalValidationCorrectionRequest]
 }

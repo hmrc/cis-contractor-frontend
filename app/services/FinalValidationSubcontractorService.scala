@@ -16,113 +16,107 @@
 
 package services
 
-import connectors.ConstructionIndustrySchemeConnector
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.UserAnswers
 import models.add.SubcontractorName as AddSubcontractorName
 import models.address.{Address, Country}
-import models.finalvalidation.FinalValidationChangeTarget
+import models.finalvalidation.{FinalValidationChangeTarget, FinalValidationDraftSubcontractor, FinalValidationSubcontractorDetails}
 import models.finalvalidation.FinalValidationChangeTarget.{Address as AddressTarget, SubcontractorName as SubcontractorNameTarget, *}
-import models.finalvalidation.FinalValidationUpdateSubcontractorRequest
-import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import pages.QuestionPage
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
-import pages.finalvalidation.FinalValidationChangeTargetPage
+import pages.finalvalidation.{FinalValidationBaseUtrPage, FinalValidationChangeTargetPage}
 import queries.CisIdQuery
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class FinalValidationSubcontractorService @Inject() (
-  cisConnector: ConstructionIndustrySchemeConnector
-) {
-
-  def updateSubcontractorForFinalValidation(
-    request: FinalValidationUpdateSubcontractorRequest
-  )(implicit hc: HeaderCarrier): Future[Unit] =
-    cisConnector.updateSubcontractorForFinalValidation(request)
+class FinalValidationSubcontractorService @Inject() {
   
   def populateFinalValidationUserAnswers(
     userAnswers: UserAnswers,
     instanceId: String,
-    response: GetSubcontractorResponse,
+    subcontractor: FinalValidationDraftSubcontractor,
     changeTarget: FinalValidationChangeTarget
   ): Try[UserAnswers] =
+    val details = subcontractor.proposed
+
     for {
-      subcontractor     <- getFinalValidationSubcontractor(response)
       subcontractorType <- getFinalValidationSubcontractorType(subcontractor)
       withCisId         <- userAnswers.set(CisIdQuery, instanceId)
       withType          <- withCisId.set(TypeOfSubcontractorPage, subcontractorType)
-      withName          <- populateFinalValidationName(withType, subcontractorType, subcontractor)
+      withName          <- populateFinalValidationName(withType, subcontractorType, details)
       withTarget        <- withName.set(FinalValidationChangeTargetPage, changeTarget)
-      result            <- populateFinalValidationTarget(withTarget, subcontractorType, subcontractor, changeTarget)
+      withBaseUtr       <- populateBaseUtr(withTarget, subcontractor)
+      result            <- populateFinalValidationTarget(withBaseUtr, subcontractorType, details, changeTarget)
     } yield result
 
-  private def getFinalValidationSubcontractor(response: GetSubcontractorResponse): Try[SubcontractorResponse] =
-    response.subcontractor match {
-      case Some(subcontractor) =>
-        Success(subcontractor)
+  private def populateBaseUtr(
+    userAnswers: UserAnswers,
+    subcontractor: FinalValidationDraftSubcontractor
+  ): Try[UserAnswers] =
+    subcontractor.base.utr match {
+      case Some(utr) =>
+        userAnswers.set(FinalValidationBaseUtrPage, utr)
+
       case None =>
-        Failure(new RuntimeException("Subcontractor not found in GetSubcontractorResponse"))
+        userAnswers.remove(FinalValidationBaseUtrPage)
     }
 
   private def populateFinalValidationName(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse
+    details: FinalValidationSubcontractorDetails
   ): Try[UserAnswers] =
     subcontractorType match {
       case Individualorsoletrader =>
         userAnswers.set(
           SubcontractorNamePage,
           AddSubcontractorName(
-            firstName = subcontractor.firstName.getOrElse(""),
-            middleName = subcontractor.secondName,
-            lastName = subcontractor.surname.getOrElse("")
+            firstName = details.firstName.getOrElse(""),
+            middleName = details.secondName,
+            lastName = details.surname.getOrElse("")
           )
         )
 
       case Limitedcompany =>
-        userAnswers.set(CompanyNamePage, subcontractor.tradingName.getOrElse(""))
+        userAnswers.set(CompanyNamePage, details.tradingName.getOrElse(""))
 
       case Trust =>
-        userAnswers.set(TrustNamePage, subcontractor.tradingName.getOrElse(""))
+        userAnswers.set(TrustNamePage, details.tradingName.getOrElse(""))
 
       case Partnership =>
-        userAnswers.set(PartnershipNamePage, subcontractor.partnershipTradingName.getOrElse(""))
+        userAnswers.set(PartnershipNamePage, details.partnershipTradingName.getOrElse(""))
     }
 
   private def populateFinalValidationTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse,
+    details: FinalValidationSubcontractorDetails,
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     target match {
       case SubcontractorNameTarget | TradingName | PartnershipTradingName =>
-        populateNameTarget(userAnswers, subcontractorType, subcontractor, target)
+        populateNameTarget(userAnswers, subcontractorType, details, target)
 
       case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn | WorksReferenceNumberYesNo | WorksReferenceNumber =>
-        populateIdentifierTarget(userAnswers, subcontractorType, subcontractor, target)
+        populateIdentifierTarget(userAnswers, subcontractorType, details, target)
 
       case AddressYesNo | AddressTarget =>
-        populateAddressTarget(userAnswers, subcontractorType, subcontractor, target)
+        populateAddressTarget(userAnswers, subcontractorType, details, target)
 
       case ContactDetailsYesNo | EmailAddress | PhoneNumber | MobilePhoneNumber =>
-        populateContactTarget(userAnswers, subcontractorType, subcontractor, target)
+        populateContactTarget(userAnswers, subcontractorType, details, target)
     }
 
   private def populateNameTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse,
+    details: FinalValidationSubcontractorDetails,
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     target match {
@@ -132,11 +126,11 @@ class FinalValidationSubcontractorService @Inject() (
       case TradingName =>
         subcontractorType match {
           case Individualorsoletrader =>
-            setStringOrRemove(userAnswers, TradingNameOfSubcontractorPage, subcontractor.tradingName)
+            setStringOrRemove(userAnswers, TradingNameOfSubcontractorPage, details.tradingName)
           case Limitedcompany | Trust =>
             Success(userAnswers)
           case Partnership =>
-            setStringOrRemove(userAnswers, PartnershipNominatedPartnerNamePage, subcontractor.tradingName)
+            setStringOrRemove(userAnswers, PartnershipNominatedPartnerNamePage, details.tradingName)
         }
 
       case _ =>
@@ -146,7 +140,7 @@ class FinalValidationSubcontractorService @Inject() (
   private def populateIdentifierTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse,
+    details: FinalValidationSubcontractorDetails,
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     target match {
@@ -156,7 +150,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = yesNoPage,
           valuePage = valuePage,
-          value = subcontractor.utr,
+          value = details.utr,
           forceYes = false
         )
       case Utr =>
@@ -165,7 +159,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = yesNoPage,
           valuePage = valuePage,
-          value = subcontractor.utr,
+          value = details.utr,
           forceYes = true
         )
       case PartnerUtrYesNo if subcontractorType == Partnership =>
@@ -173,7 +167,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
           valuePage = PartnershipNominatedPartnerUtrPage,
-          value = subcontractor.partnerUtr,
+          value = details.partnerUtr,
           forceYes = true
         )
       case PartnerUtr if subcontractorType == Partnership =>
@@ -181,7 +175,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
           valuePage = PartnershipNominatedPartnerUtrPage,
-          value = subcontractor.partnerUtr,
+          value = details.partnerUtr,
           forceYes = false
         )
       case NinoYesNo =>
@@ -190,7 +184,7 @@ class FinalValidationSubcontractorService @Inject() (
             userAnswers = userAnswers,
             yesNoPage = yesNoPage,
             valuePage = valuePage,
-            value = subcontractor.nino,
+            value = details.nino,
             forceYes = false
           )
         }
@@ -200,7 +194,7 @@ class FinalValidationSubcontractorService @Inject() (
             userAnswers = userAnswers,
             yesNoPage = yesNoPage,
             valuePage = valuePage,
-            value = subcontractor.nino,
+            value = details.nino,
             forceYes = true
           )
         }
@@ -210,7 +204,7 @@ class FinalValidationSubcontractorService @Inject() (
             userAnswers = userAnswers,
             yesNoPage = yesNoPage,
             valuePage = valuePage,
-            value = subcontractor.crn,
+            value = details.crn,
             forceYes = false
           )
         }
@@ -220,7 +214,7 @@ class FinalValidationSubcontractorService @Inject() (
             userAnswers = userAnswers,
             yesNoPage = yesNoPage,
             valuePage = valuePage,
-            value = subcontractor.crn,
+            value = details.crn,
             forceYes = true
           )
         }
@@ -230,7 +224,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = yesNoPage,
           valuePage = valuePage,
-          value = subcontractor.worksReferenceNumber,
+          value = details.worksReferenceNumber,
           forceYes = false
         )
       case WorksReferenceNumber =>
@@ -239,7 +233,7 @@ class FinalValidationSubcontractorService @Inject() (
           userAnswers = userAnswers,
           yesNoPage = yesNoPage,
           valuePage = valuePage,
-          value = subcontractor.worksReferenceNumber,
+          value = details.worksReferenceNumber,
           forceYes = true
         )
       case _ =>
@@ -261,19 +255,19 @@ class FinalValidationSubcontractorService @Inject() (
   private def populateAddressTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse,
+    details: FinalValidationSubcontractorDetails,
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, addressPage) = addressPages(subcontractorType)
     val yesNoValue = target match {
-      case AddressYesNo  => hasAddress(subcontractor)
+      case AddressYesNo  => hasAddress(details)
       case AddressTarget => true
       case _             => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
     }
     
     for {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
-      result    <- setAddressOrRemove(withYesNo, addressPage, toAddress(subcontractor))
+      result    <- setAddressOrRemove(withYesNo, addressPage, toAddress(details))
     } yield result
     
   }
@@ -281,22 +275,22 @@ class FinalValidationSubcontractorService @Inject() (
   private def populateContactTarget(
     userAnswers: UserAnswers,
     subcontractorType: TypeOfSubcontractor,
-    subcontractor: SubcontractorResponse,
+    details: FinalValidationSubcontractorDetails,
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] = {
     val (yesNoPage, emailPage, phonePage, mobilePage) = contactPages(subcontractorType)
     val yesNoValue =
       target match {
-        case ContactDetailsYesNo => hasAnyContact(subcontractor)
+        case ContactDetailsYesNo => hasAnyContact(details)
         case EmailAddress | PhoneNumber | MobilePhoneNumber => true
         case _ => return Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
       }
       
     for {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
-      withEmail <- setStringOrRemove(withYesNo, emailPage, subcontractor.emailAddress)
-      withPhone <- setStringOrRemove(withEmail, phonePage, subcontractor.phoneNumber)
-      result    <- setStringOrRemove(withPhone, mobilePage, subcontractor.mobilePhoneNumber)
+      withEmail <- setStringOrRemove(withYesNo, emailPage, details.emailAddress)
+      withPhone <- setStringOrRemove(withEmail, phonePage, details.phoneNumber)
+      result    <- setStringOrRemove(withPhone, mobilePage, details.mobilePhoneNumber)
     } yield result
   }
 
@@ -352,23 +346,23 @@ class FinalValidationSubcontractorService @Inject() (
         (AddTrustContactMethodsYesNoPage, TrustEmailAddressPage, TrustPhoneNumberPage, TrustMobileNumberPage)
     }
 
-  private def hasAddress(subcontractor: SubcontractorResponse): Boolean =
-    hasValue(subcontractor.addressLine1)
+  private def hasAddress(details: FinalValidationSubcontractorDetails): Boolean =
+    hasValue(details.addressLine1)
   
   private def toAddress(
-    subcontractor: SubcontractorResponse
+    details: FinalValidationSubcontractorDetails
   ): Option[Address] =
-    if (!hasAddress(subcontractor)) {
+    if (!hasAddress(details)) {
       None
     } else {
       Some(
         Address(
-          addressLine1 = nonBlank(subcontractor.addressLine1).getOrElse(""),
-          addressLine2 = nonBlank(subcontractor.addressLine2),
-          addressLine3 = nonBlank(subcontractor.addressLine3),
-          addressLine4 = nonBlank(subcontractor.addressLine4),
-          postcode = nonBlank(subcontractor.postcode),
-          country = nonBlank(subcontractor.country).map { name =>
+          addressLine1 = nonBlank(details.addressLine1).getOrElse(""),
+          addressLine2 = nonBlank(details.addressLine2),
+          addressLine3 = nonBlank(details.addressLine3),
+          addressLine4 = nonBlank(details.addressLine4),
+          postcode = nonBlank(details.postcode),
+          country = nonBlank(details.country).map { name =>
             Country(code = None, name = Some(name))
           }
         )
@@ -405,15 +399,15 @@ class FinalValidationSubcontractorService @Inject() (
   private def hasValue(value: Option[String]): Boolean =
     nonBlank(value).isDefined
 
-  private def hasAnyContact(subcontractor: SubcontractorResponse): Boolean =
+  private def hasAnyContact(details: FinalValidationSubcontractorDetails): Boolean =
     Seq(
-      subcontractor.emailAddress,
-      subcontractor.phoneNumber,
-      subcontractor.mobilePhoneNumber
+      details.emailAddress,
+      details.phoneNumber,
+      details.mobilePhoneNumber
     ).exists(hasValue)
 
   private def getFinalValidationSubcontractorType(
-    subcontractor: SubcontractorResponse
+    subcontractor: FinalValidationDraftSubcontractor
   ): Try[TypeOfSubcontractor] =
     subcontractor.subcontractorType.flatMap(TypeOfSubcontractor.fromString) match {
       case Some(subcontractorType) =>

@@ -21,6 +21,7 @@
 @this(
     layout: templates.Layout,
     govukTaskList: GovukTaskList,
+    govukButton: GovukButton,
     h1: H1,
     p: Paragraph,
     link: Link
@@ -62,27 +63,25 @@
                         status = completedStatus
                     )
                 }
-            } :+
-            (
-                if (model.canContinue) {
-                    TaskListItem(
-                        title = TaskListItemTitle(content = Text(messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor"))),
-                        href = Some("#"),
-                        status = incompleteStatus
+            }
+        ))
+
+        @if(model.canContinue) {
+            @helper.form(
+                action = controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onSubmit
+            ) {
+                @helper.CSRF.formField
+
+                @govukButton(
+                    ButtonViewModel(
+                        messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor")
                     )
-                } else {
-                    TaskListItem(
-                        title = TaskListItemTitle(content = Text(messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor"))),
-                        href = None,
-                        status = TaskListItemStatus(
-                            content = Text(messages("finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet")),
-                            classes = "govuk-task-list__status--cannot-start-yet"
-                        )
-                    )
-                }
-            )
-        )
-        )
+                )
+            }
+        } else {
+            @p("finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet")
+        }
+
         @link(
             linkTextKey = "finalValidations.verify.reviewSubcontractorDetails.backLink",
             linkUrl = model.backUrl

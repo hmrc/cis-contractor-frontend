@@ -16,7 +16,7 @@
 
 package services.finalvalidation
 
-import models.finalvalidation.FinalValidationField
+import models.finalvalidation.{FinalValidationDraftSubcontractor, FinalValidationField}
 import models.finalvalidation.FinalValidationField.*
 import models.response.SubcontractorResponse
 
@@ -34,9 +34,22 @@ class IndividualSubcontractorFinalValidation @Inject() {
     val _ = allSubcontractors
     
     // Temporary manual failure to unblock FinalValidation journey testing
-    if (subcontractor.subcontractorId == 10903L) {
+    if (Set(10903L, 10904L, 10905L).contains(subcontractor.subcontractorId)) {
       Seq(Utr, Nino)
     } else {
       Seq.empty
     }
+
+  def validateDraft(
+    subcontractor: FinalValidationDraftSubcontractor,
+    allSubcontractors: Seq[FinalValidationDraftSubcontractor]
+  ): Seq[FinalValidationField] =
+    // TODO F3 - Individual subcontractor final validation
+
+    val details =
+      subcontractor.proposed
+
+    // same F2/F3/F4/F5 rule using details
+
+    Seq.empty
 }

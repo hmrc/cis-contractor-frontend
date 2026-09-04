@@ -671,7 +671,9 @@ GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatched
 GET   /subcontractor/final-validations/handoff/:handoffId                                             controllers.finalvalidations.FinalValidationHandoffController.onPageLoad(handoffId: String)
 GET   /subcontractor/final-validations/complete                                                       controllers.finalvalidations.FinalValidationCompleteController.onPageLoad()
 GET   /subcontractor/final-validations/review-subcontractor-details                                   controllers.finalvalidations.ReviewSubcontractorDetailsController.onPageLoad()
+POST  /final-validations/review-subcontractor-details                                                 controllers.finalvalidations.ReviewSubcontractorDetailsController.onSubmit
 GET   /subcontractor/final-validations/update-subcontractor-details/:subcontractorId                  controllers.finalvalidations.UpdateSubcontractorDetailsController.onPageLoad(subcontractorId: Long)
+POST  /subcontractor/final-validations/update-subcontractor-details/:subcontractorId                  controllers.finalvalidations.UpdateSubcontractorDetailsController.onSubmit(subcontractorId: Long)
 GET   /final-validations/change/:subcontractorId/:fieldKey/:targetKey                                 controllers.finalvalidations.FinalValidationChangeController.onPageLoad(subcontractorId: Long, fieldKey: String, targetKey: String)
 
 # Final Validations - Individual / Sole trader

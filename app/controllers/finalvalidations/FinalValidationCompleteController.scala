@@ -19,12 +19,13 @@ package controllers.finalvalidations
 import config.FrontendAppConfig
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import services.{FinalValidationHandoffService, FinalValidationSubcontractorService}
+import services.FinalValidationHandoffService
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.finalvalidation.{FinalValidationContext, FinalValidationUpdateRequestBuilder}
+import models.finalvalidation.{FinalValidationContext, FinalValidationCorrectionBuilder}
 import models.requests.DataRequest
-import pages.finalvalidation.{FinalValidationContextPage, FinalValidationHandoffPage, VerifyFinalValidationPayloadPage}
+import pages.finalvalidation.{FinalValidationContextPage, FinalValidationDraftIdPage, FinalValidationHandoffPage, VerifyFinalValidationPayloadPage}
 import play.api.Logging
+import services.finalvalidation.FinalValidationDraftService
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,58 +36,108 @@ class FinalValidationCompleteController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   finalValidationHandoffService: FinalValidationHandoffService,
-  finalValidationSubcontractorService: FinalValidationSubcontractorService,
-  updateRequestBuilder: FinalValidationUpdateRequestBuilder,
+  finalValidationDraftService: FinalValidationDraftService,
+  correctionBuilder: FinalValidationCorrectionBuilder,
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(FinalValidationContextPage) match {
       case Some(FinalValidationContext.VerifySubcontractor) =>
-        request.userAnswers.get(VerifyFinalValidationPayloadPage) match {
+        completeVerify()
 
-          case Some(payload) =>
-            Future.fromTry(updateRequestBuilder.build(request.userAnswers, payload))
-              .flatMap {
-                case Some(updateRequest) =>
-                  finalValidationSubcontractorService.updateSubcontractorForFinalValidation(updateRequest)
-                case None =>
-                  Future.unit
-              }
-            .map { _ =>
-              Redirect(
-                controllers.finalvalidations.routes.UpdateSubcontractorDetailsController.onPageLoad(payload.subcontractorId)
-              )
-            }
-
-          case None =>
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
-
-      case _ =>
+      case Some(FinalValidationContext.MonthlyReturn) =>
         completeMonthlyReturn()
+
+      case None =>
+        Future.successful(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
     }
   }
-  
+
+  private def completeVerify()(implicit request: DataRequest[?]): Future[Result] =
+    (
+      request.userAnswers.get(VerifyFinalValidationPayloadPage),
+      request.userAnswers.get(FinalValidationDraftIdPage)
+    ) match {
+
+      case (Some(payload), Some(draftId))
+        if payload.draftId == draftId =>
+
+        for {
+          correction <- Future.fromTry(
+                          correctionBuilder.build(
+                            request.userAnswers,
+                            payload
+                          )
+                        )
+          _          <- finalValidationDraftService.updateCorrection(
+                          instanceId = payload.instanceId,
+                          draftId = draftId,
+                          correction = correction
+                        )
+        } yield Redirect(
+          controllers.finalvalidations.routes.UpdateSubcontractorDetailsController
+            .onPageLoad(payload.subcontractorId)
+        )
+
+      case (Some(payload), Some(draftId)) =>
+        logger.warn(
+          s"Final Validation draft ID mismatch for Verify. " +
+            s"Payload draftId: ${payload.draftId}, session draftId: $draftId"
+        )
+
+        Future.successful(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
+
+      case _ =>
+        Future.successful(
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        )
+    }
+
   private def completeMonthlyReturn()(implicit request: DataRequest[?]): Future[Result] = {
     request.userAnswers.get(FinalValidationHandoffPage) match {
 
       case Some(handoffId) =>
         finalValidationHandoffService.getPayload(handoffId).flatMap {
           case Some(payload) =>
-            Future.fromTry(updateRequestBuilder.build(request.userAnswers, payload))
-              .flatMap {
-                case Some(updateRequest) =>
-                  finalValidationSubcontractorService.updateSubcontractorForFinalValidation(updateRequest)
-                case None =>
-                  Future.unit
-              }
-              .map { _ =>
-                Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
-              }
+            request.userAnswers.get(FinalValidationDraftIdPage) match {
+
+              case Some(draftId) if payload.draftId == draftId =>
+                for {
+                  correction <- Future.fromTry(
+                                  correctionBuilder.build(request.userAnswers, payload)
+                                )
+                  _          <- finalValidationDraftService.updateCorrection(
+                                  instanceId = payload.instanceId,
+                                  draftId = draftId,
+                                  correction = correction
+                                )
+                } yield Redirect(
+                  appConfig.cisFrontendFinalValidationReturnUrl(handoffId)
+                )
+
+              case Some(draftId) =>
+                logger.warn(
+                  s"Final Validation draft ID mismatch for Monthly Return. " +
+                    s"Payload draftId: ${payload.draftId}, session draftId: $draftId"
+                )
+
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
+
+              case None =>
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
+            }
 
           case None =>
             Future.successful(

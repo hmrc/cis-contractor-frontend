@@ -33,38 +33,47 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class FinalValidationUpdateRequestBuilder @Inject() {
+class FinalValidationCorrectionBuilder @Inject() {
 
   def build(
     userAnswers: UserAnswers,
     payload: FinalValidationHandoffPayload
-  ): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
+  ): Try[FinalValidationCorrection] =
 
     userAnswers.get(TypeOfSubcontractorPage) match {
       case Some(subcontractorType) =>
-        buildFor(subcontractorType, userAnswers, payload)
+        buildPatch(subcontractorType, userAnswers, payload.changeTarget)
+          .map { patch =>
+            FinalValidationCorrection(
+              subcontractorId = payload.subcontractorId,
+              changeTarget = payload.changeTarget,
+              patch = patch
+            )
+          }
+
       case None =>
         Failure(new RuntimeException("Type of subcontractor not found"))
     }
 
-  private def buildFor(
+  private def buildPatch(
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers,
-    payload: FinalValidationHandoffPayload
-  ): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
-    (subcontractorType, payload.changeTarget) match {
+    target: FinalValidationChangeTarget
+  ): Try[FinalValidationSubcontractorPatch] =
+    (subcontractorType, target) match {
+
       // Individual or Sole Trader
       case (Individualorsoletrader, SubcontractorName) =>
-        update(userAnswers, SubcontractorNamePage, payload) { name =>
+        update(userAnswers, SubcontractorNamePage) { name =>
           FinalValidationSubcontractorPatch(
             firstName = Some(name.firstName),
-            secondName  = name.middleName,
+            secondName = name.middleName,
             surname = Some(name.lastName)
           )
         }
 
       case (Individualorsoletrader, TradingName) =>
-        update(userAnswers, TradingNameOfSubcontractorPage, payload) {
+        update(userAnswers, TradingNameOfSubcontractorPage) {
           value => FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
@@ -72,14 +81,13 @@ class FinalValidationUpdateRequestBuilder @Inject() {
         clearOnNoOrUpdateOnYes(
           userAnswers,
           SubAddressYesNoPage,
-          AddressOfSubcontractorPage,
-          payload
+          AddressOfSubcontractorPage
         ) { address =>
           addressPatch(address)
         }
 
       case (Individualorsoletrader, AddressTarget) =>
-        updateAddress(userAnswers, AddressOfSubcontractorPage, payload)
+        updateAddress(userAnswers, AddressOfSubcontractorPage)
 
       case (Individualorsoletrader, ContactDetailsYesNo) =>
         clearContactsOnNoOrUpdateOnYes(
@@ -87,22 +95,21 @@ class FinalValidationUpdateRequestBuilder @Inject() {
           AddIndividualContactMethodsYesNoPage,
           IndividualEmailAddressPage,
           IndividualPhoneNumberPage,
-          IndividualMobileNumberPage,
-          payload
+          IndividualMobileNumberPage
         )
 
       case (Individualorsoletrader, EmailAddress) =>
-        update(userAnswers, IndividualEmailAddressPage, payload) {
+        update(userAnswers, IndividualEmailAddressPage) {
           value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
       case (Individualorsoletrader, PhoneNumber) =>
-        update(userAnswers, IndividualPhoneNumberPage, payload) {
+        update(userAnswers, IndividualPhoneNumberPage) {
           value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
       case (Individualorsoletrader, MobilePhoneNumber) =>
-        update(userAnswers, IndividualMobileNumberPage, payload) {
+        update(userAnswers, IndividualMobileNumberPage) {
           value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
@@ -110,14 +117,13 @@ class FinalValidationUpdateRequestBuilder @Inject() {
         clearOnNoOrUpdateOnYes(
           userAnswers,
           UniqueTaxpayerReferenceYesNoPage,
-          SubcontractorsUniqueTaxpayerReferencePage,
-          payload
+          SubcontractorsUniqueTaxpayerReferencePage
         ) { value =>
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
       case (Individualorsoletrader, Utr) =>
-        update(userAnswers, SubcontractorsUniqueTaxpayerReferencePage, payload) {
+        update(userAnswers, SubcontractorsUniqueTaxpayerReferencePage) {
           value => FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
@@ -125,14 +131,13 @@ class FinalValidationUpdateRequestBuilder @Inject() {
         clearOnNoOrUpdateOnYes(
           userAnswers,
           NationalInsuranceNumberYesNoPage,
-          SubNationalInsuranceNumberPage,
-          payload
+          SubNationalInsuranceNumberPage
         ) { value =>
           FinalValidationSubcontractorPatch(nino = Some(value))
         }
 
       case (Individualorsoletrader, Nino) =>
-        update(userAnswers, SubNationalInsuranceNumberPage, payload) {
+        update(userAnswers, SubNationalInsuranceNumberPage) {
           value => FinalValidationSubcontractorPatch(nino = Some(value))
         }
 
@@ -140,282 +145,269 @@ class FinalValidationUpdateRequestBuilder @Inject() {
         clearOnNoOrUpdateOnYes(
           userAnswers,
           WorksReferenceNumberYesNoPage,
-          WorksReferenceNumberPage,
-          payload
+          WorksReferenceNumberPage
         ) { value =>
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
       case (Individualorsoletrader, WorksReferenceNumber) =>
-        update(userAnswers, WorksReferenceNumberPage, payload) {
+        update(userAnswers, WorksReferenceNumberPage) {
           value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
-        
+
+
       // Company
-      case (Limitedcompany, TradingName) =>  
-        update(userAnswers, CompanyNamePage, payload) {
+      case (Limitedcompany, TradingName) =>
+        update(userAnswers, CompanyNamePage) {
           value => FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
 
-      case (Limitedcompany, AddressYesNo) => 
+      case (Limitedcompany, AddressYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           CompanyAddressYesNoPage,
-          CompanyAddressPage,
-          payload
+          CompanyAddressPage
         )(addressPatch)
 
-      case (Limitedcompany, AddressTarget) => 
-        updateAddress(userAnswers, CompanyAddressPage, payload)
+      case (Limitedcompany, AddressTarget) =>
+        updateAddress(userAnswers, CompanyAddressPage)
 
-      case (Limitedcompany, ContactDetailsYesNo) => 
+      case (Limitedcompany, ContactDetailsYesNo) =>
         clearContactsOnNoOrUpdateOnYes(
           userAnswers,
           AddCompanyContactMethodsYesNoPage,
           CompanyEmailAddressPage,
           CompanyPhoneNumberPage,
-          CompanyMobileNumberPage,
-          payload
+          CompanyMobileNumberPage
         )
 
-      case (Limitedcompany, EmailAddress) => 
-        update(userAnswers, CompanyEmailAddressPage, payload) {
+      case (Limitedcompany, EmailAddress) =>
+        update(userAnswers, CompanyEmailAddressPage) {
           value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
 
-      case (Limitedcompany, PhoneNumber) => 
-        update(userAnswers, CompanyPhoneNumberPage, payload) {
+      case (Limitedcompany, PhoneNumber) =>
+        update(userAnswers, CompanyPhoneNumberPage) {
           value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
 
-      case (Limitedcompany, MobilePhoneNumber) => 
-        update(userAnswers, CompanyMobileNumberPage, payload) {
+      case (Limitedcompany, MobilePhoneNumber) =>
+        update(userAnswers, CompanyMobileNumberPage) {
           value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
 
-      case (Limitedcompany, UtrYesNo) => 
+      case (Limitedcompany, UtrYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           CompanyUtrYesNoPage,
-          CompanyUtrPage,
-          payload
-        ){ value =>
+          CompanyUtrPage
+        ) { value =>
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
-      case (Limitedcompany, Utr) => 
-        update(userAnswers, CompanyUtrPage, payload) {
+      case (Limitedcompany, Utr) =>
+        update(userAnswers, CompanyUtrPage) {
           value => FinalValidationSubcontractorPatch(utr = Some(value))
         }
-        
-      case (Limitedcompany, CrnYesNo) => 
+
+      case (Limitedcompany, CrnYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           CompanyCrnYesNoPage,
-          CompanyCrnPage,
-          payload
+          CompanyCrnPage
         ) { value =>
           FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
-      case (Limitedcompany, Crn) => 
-        update(userAnswers, CompanyCrnPage, payload) {
+      case (Limitedcompany, Crn) =>
+        update(userAnswers, CompanyCrnPage) {
           value => FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
-      case (Limitedcompany, WorksReferenceNumberYesNo) => 
+      case (Limitedcompany, WorksReferenceNumberYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           CompanyWorksReferenceYesNoPage,
-          CompanyWorksReferencePage,
-          payload
+          CompanyWorksReferencePage
         ) { value =>
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
-      case (Limitedcompany, WorksReferenceNumber) => 
-        update(userAnswers, CompanyWorksReferencePage, payload) {
+      case (Limitedcompany, WorksReferenceNumber) =>
+        update(userAnswers, CompanyWorksReferencePage) {
           value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
-      
+
+
       // Trust
       case (Trust, TradingName) =>
-        update(userAnswers, TrustNamePage, payload) {
+        update(userAnswers, TrustNamePage) {
           value => FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
-            
+
       case (Trust, AddressYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           TrustAddressYesNoPage,
-          TrustAddressPage,
-          payload
+          TrustAddressPage
         )(addressPatch)
-        
+
       case (Trust, AddressTarget) =>
-        updateAddress(userAnswers, TrustAddressPage, payload)
-        
+        updateAddress(userAnswers, TrustAddressPage)
+
       case (Trust, ContactDetailsYesNo) =>
         clearContactsOnNoOrUpdateOnYes(
           userAnswers,
           AddTrustContactMethodsYesNoPage,
           TrustEmailAddressPage,
           TrustPhoneNumberPage,
-          TrustMobileNumberPage,
-          payload
+          TrustMobileNumberPage
         )
-        
+
       case (Trust, EmailAddress) =>
-        update(userAnswers, TrustEmailAddressPage, payload) {
+        update(userAnswers, TrustEmailAddressPage) {
           value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
-          }
-            
-      case (Trust, PhoneNumber) =>  
-        update(userAnswers, TrustPhoneNumberPage, payload) {
+        }
+
+      case (Trust, PhoneNumber) =>
+        update(userAnswers, TrustPhoneNumberPage) {
           value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
-        
+
       case (Trust, MobilePhoneNumber) =>
-        update(userAnswers, TrustMobileNumberPage, payload) {
+        update(userAnswers, TrustMobileNumberPage) {
           value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
-            
+
       case (Trust, UtrYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           TrustUtrYesNoPage,
-          TrustUtrPage,
-          payload
+          TrustUtrPage
         ) { value =>
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
-        
+
       case (Trust, Utr) =>
-        update(userAnswers, TrustUtrPage, payload) {
+        update(userAnswers, TrustUtrPage) {
           value => FinalValidationSubcontractorPatch(utr = Some(value))
         }
-            
+
       case (Trust, WorksReferenceNumberYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           TrustWorksReferenceYesNoPage,
-          TrustWorksReferencePage,
-          payload
+          TrustWorksReferencePage
         ) { value =>
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
-        
+
       case (Trust, WorksReferenceNumber) =>
-        update(userAnswers, TrustWorksReferencePage, payload) {
+        update(userAnswers, TrustWorksReferencePage) {
           value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
-            
+
+
       // Partnership
       case (Partnership, PartnershipTradingName) =>
-        update(userAnswers, PartnershipNamePage, payload) {
+        update(userAnswers, PartnershipNamePage) {
           value => FinalValidationSubcontractorPatch(partnershipTradingName = Some(value))
         }
-      
+
       case (Partnership, TradingName) =>
-        update(userAnswers, PartnershipNominatedPartnerNamePage, payload) {
+        update(userAnswers, PartnershipNominatedPartnerNamePage) {
           value => FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
-        
+
       case (Partnership, AddressYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipAddressYesNoPage,
-          PartnershipAddressPage,
-          payload
+          PartnershipAddressPage
         )(addressPatch)
-        
+
       case (Partnership, AddressTarget) =>
-        updateAddress(userAnswers, PartnershipAddressPage, payload)
-        
+        updateAddress(userAnswers, PartnershipAddressPage)
+
       case (Partnership, ContactDetailsYesNo) =>
         clearContactsOnNoOrUpdateOnYes(
           userAnswers,
           AddPartnershipContactMethodsYesNoPage,
           PartnershipEmailAddressPage,
           PartnershipPhoneNumberPage,
-          PartnershipMobileNumberPage,
-          payload
+          PartnershipMobileNumberPage
         )
-        
+
       case (Partnership, EmailAddress) =>
-        update(userAnswers, PartnershipEmailAddressPage, payload) {
+        update(userAnswers, PartnershipEmailAddressPage) {
           value => FinalValidationSubcontractorPatch(emailAddress = Some(value))
         }
-            
+
       case (Partnership, PhoneNumber) =>
-        update(userAnswers, PartnershipPhoneNumberPage, payload) {
+        update(userAnswers, PartnershipPhoneNumberPage) {
           value => FinalValidationSubcontractorPatch(phoneNumber = Some(value))
         }
-        
+
       case (Partnership, MobilePhoneNumber) =>
-        update(userAnswers, PartnershipMobileNumberPage, payload) {
+        update(userAnswers, PartnershipMobileNumberPage) {
           value => FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
         }
-      
-      // Partnership  UTR  
+
+      // Partnership  UTR
       case (Partnership, UtrYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipHasUtrYesNoPage,
-          PartnershipUniqueTaxpayerReferencePage,
-          payload
+          PartnershipUniqueTaxpayerReferencePage
         ) { value =>
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
-        
+
       case (Partnership, Utr) =>
-        update(userAnswers, PartnershipUniqueTaxpayerReferencePage, payload) {
+        update(userAnswers, PartnershipUniqueTaxpayerReferencePage) {
           value => FinalValidationSubcontractorPatch(utr = Some(value))
         }
-            
+
       // Nominated partner  UTR
       case (Partnership, PartnerUtrYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipNominatedPartnerUtrYesNoPage,
-          PartnershipNominatedPartnerUtrPage,
-          payload
+          PartnershipNominatedPartnerUtrPage
         ) { value =>
           FinalValidationSubcontractorPatch(partnerUtr = Some(value))
         }
-        
+
       case (Partnership, PartnerUtr) =>
-        update(userAnswers, PartnershipNominatedPartnerUtrPage, payload) {
+        update(userAnswers, PartnershipNominatedPartnerUtrPage) {
           value => FinalValidationSubcontractorPatch(partnerUtr = Some(value))
         }
-            
+
       case (Partnership, NinoYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipNominatedPartnerNinoYesNoPage,
-          PartnershipNominatedPartnerNinoPage,
-          payload
+          PartnershipNominatedPartnerNinoPage
         ) { value =>
           FinalValidationSubcontractorPatch(nino = Some(value))
         }
-        
+
       case (Partnership, Nino) =>
-        update(userAnswers, PartnershipNominatedPartnerNinoPage, payload) {
+        update(userAnswers, PartnershipNominatedPartnerNinoPage) {
           value => FinalValidationSubcontractorPatch(nino = Some(value))
         }
-            
+
       case (Partnership, CrnYesNo) =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipNominatedPartnerCrnYesNoPage,
-          PartnershipNominatedPartnerCrnPage,
-          payload
+          PartnershipNominatedPartnerCrnPage
         ) { value =>
           FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
       case (Partnership, Crn) =>
-        update(userAnswers, PartnershipNominatedPartnerCrnPage, payload) {
+        update(userAnswers, PartnershipNominatedPartnerCrnPage) {
           value => FinalValidationSubcontractorPatch(crn = Some(value))
         }
 
@@ -423,100 +415,102 @@ class FinalValidationUpdateRequestBuilder @Inject() {
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipWorksReferenceNumberYesNoPage,
-          PartnershipWorksReferenceNumberPage,
-          payload
+          PartnershipWorksReferenceNumberPage
         ) { value =>
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
       case (Partnership, WorksReferenceNumber) =>
-        update(userAnswers, PartnershipWorksReferenceNumberPage, payload) {
+        update(userAnswers, PartnershipWorksReferenceNumberPage) {
           value => FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
       case _ =>
-        Failure(new RuntimeException(s"Unsupported combination of subcontractor type: $subcontractorType " +
-          s"and change target: ${payload.changeTarget}"))
+        Failure(
+          new RuntimeException(
+            s"Unsupported combination of subcontractor type: $subcontractorType " +
+              s"and change target: $target"
+          )
+        )
     }
 
-  private def addressPatch(address: Address): FinalValidationSubcontractorPatch =
-    FinalValidationSubcontractorPatch(
-      addressLine1 = Some(address.addressLine1),
-      addressLine2 = address.addressLine2,
-      addressLine3 = address.addressLine3,
-      addressLine4 = address.addressLine4,
-      country      = address.country.flatMap(_.name),
-      postcode     = address.postcode
-    )
+  private def answer[A: Reads](
+    userAnswers: UserAnswers,
+    page: QuestionPage[A]
+  )(toPatch: A => FinalValidationSubcontractorPatch): Try[FinalValidationSubcontractorPatch] =
+    userAnswers.get(page) match {
+      case Some(value) =>
+        Success(toPatch(value))
+
+      case None =>
+        Failure(
+          new RuntimeException(
+            s"${page.toString} not found"
+          )
+        )
+    }
 
   private def update[A: Reads](
     userAnswers: UserAnswers,
-    page: QuestionPage[A],
-    payload: FinalValidationHandoffPayload
-  )(toPatch: A => FinalValidationSubcontractorPatch): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
-    userAnswers.get(page) match {
-      case Some(answer) =>
-        Success(Some(request(payload, toPatch(answer))))
-      case None =>
-        Failure(new RuntimeException(s"${page.toString} not found"))
-    }
+    page: QuestionPage[A]
+  )(toPatch: A => FinalValidationSubcontractorPatch): Try[FinalValidationSubcontractorPatch] =
+    answer(userAnswers, page)(toPatch)
 
   private def clearOnNoOrUpdateOnYes[A: Reads](
     userAnswers: UserAnswers,
     yesNoPage: QuestionPage[Boolean],
-    valuePage: QuestionPage[A],
-    payload: FinalValidationHandoffPayload
-  )(toPatch: A => FinalValidationSubcontractorPatch): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
+    valuePage: QuestionPage[A]
+  )(toPatch: A => FinalValidationSubcontractorPatch): Try[FinalValidationSubcontractorPatch] =
     userAnswers.get(yesNoPage) match {
+      case Some(true) =>
+        update(userAnswers, valuePage)(toPatch)
+
       case Some(false) =>
-        Success(Some(request(payload, FinalValidationSubcontractorPatch())))
-      case Some(true)  =>
-        update(userAnswers, valuePage, payload)(toPatch)
-      case None        =>
-        Failure(new RuntimeException(s"${yesNoPage.toString} is required but not found"))
+        Success(FinalValidationSubcontractorPatch())
+
+      case None =>
+        Failure(new RuntimeException(s"${yesNoPage.toString} not found"))
     }
+
+  private def updateAddress(
+    userAnswers: UserAnswers,
+    page: QuestionPage[Address]
+  ): Try[FinalValidationSubcontractorPatch] =
+    update(userAnswers, page)(addressPatch)
 
   private def clearContactsOnNoOrUpdateOnYes(
     userAnswers: UserAnswers,
     yesNoPage: QuestionPage[Boolean],
     emailPage: QuestionPage[String],
     phonePage: QuestionPage[String],
-    mobilePage: QuestionPage[String],
-    payload: FinalValidationHandoffPayload
-  ): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
+    mobilePage: QuestionPage[String]
+  ): Try[FinalValidationSubcontractorPatch] =
     userAnswers.get(yesNoPage) match {
+      case Some(true) =>
+        Success(
+          FinalValidationSubcontractorPatch(
+            emailAddress = userAnswers.get(emailPage),
+            phoneNumber = userAnswers.get(phonePage),
+            mobilePhoneNumber = userAnswers.get(mobilePage)
+          )
+        )
+
       case Some(false) =>
-        Success(Some(request(payload, FinalValidationSubcontractorPatch())))
+        Success(FinalValidationSubcontractorPatch())
 
-      case Some(true)  =>
-        Success(Some(request(payload, FinalValidationSubcontractorPatch(
-          emailAddress = userAnswers.get(emailPage),
-          phoneNumber = userAnswers.get(phonePage),
-          mobilePhoneNumber = userAnswers.get(mobilePage)
-        ))))
-
-      case None        =>
-        Failure(new RuntimeException(s"${yesNoPage.toString} is required but not found"))
+      case None =>
+        Failure(new RuntimeException(s"${yesNoPage.toString} not found"))
     }
 
-
-  private def updateAddress(
-    userAnswers: UserAnswers,
-    page: QuestionPage[Address],
-    payload: FinalValidationHandoffPayload
-  ): Try[Option[FinalValidationUpdateSubcontractorRequest]] =
-    update(userAnswers, page, payload)(addressPatch)
-
-  private def request(
-    payload: FinalValidationHandoffPayload,
-    patch: FinalValidationSubcontractorPatch
-  ): FinalValidationUpdateSubcontractorRequest =
-    FinalValidationUpdateSubcontractorRequest(
-      instanceId = payload.instanceId,
-      subcontractorId = payload.subcontractorId,
-      subbieResourceRef = payload.subbieResourceRef,
-      changeTarget = payload.changeTarget.key,
-      patch = patch
+  private def addressPatch(
+    address: Address
+  ): FinalValidationSubcontractorPatch =
+    FinalValidationSubcontractorPatch(
+      addressLine1 = Some(address.addressLine1),
+      addressLine2 = address.addressLine2,
+      addressLine3 = address.addressLine3,
+      addressLine4 = address.addressLine4,
+      country = address.country.flatMap(_.name),
+      postcode = address.postcode
     )
-
 }

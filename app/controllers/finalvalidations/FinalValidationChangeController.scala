@@ -23,7 +23,8 @@ import pages.finalvalidation.*
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.{FinalValidationSubcontractorService, SubcontractorService}
+import services.finalvalidation.FinalValidationDraftService
+import services.FinalValidationSubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -37,15 +38,15 @@ class FinalValidationChangeController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
-  subcontractorService: SubcontractorService,
+  finalValidationDraftService: FinalValidationDraftService,
   finalValidationSubcontractorService: FinalValidationSubcontractorService,
   finalValidationNavigator: FinalValidationNavigator,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(using ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with Logging {
-  
+
   def onPageLoad(
     subcontractorId: Long,
     fieldKey: String,
@@ -55,52 +56,77 @@ class FinalValidationChangeController @Inject() (
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      val payload =
-        for {
-          failure           <- request.userAnswers
-                                 .get(FinalValidationErrorPage)
-                                 .flatMap(_.find(_.subcontractorId == subcontractorId))
-          issue             <- failure.issues.find(_.field.key == fieldKey)
-          target            <- FinalValidationChangeTarget.fromKey(targetKey)
-          subbieResourceRef <- failure.subbieResourceRef
-        } yield FinalValidationHandoffPayload(
-          instanceId = request.cisId,
-          subcontractorId = subcontractorId,
-          subbieResourceRef = subbieResourceRef,
-          field = issue.field,
-          changeTarget = target
-        )
-        
-      payload match {
-        case Some(finalValidationPayload) =>
-          subcontractorService.getSubcontractor(request.cisId, finalValidationPayload.subbieResourceRef).flatMap { response =>
-            val updatedAnswers =
-              for {
-                populated <- finalValidationSubcontractorService.populateFinalValidationUserAnswers(
-                              request.userAnswers,
-                              request.cisId,
-                              response,
-                              finalValidationPayload.changeTarget
-                            )
-                withPayload <- populated.set(VerifyFinalValidationPayloadPage, finalValidationPayload)
-                withContext <- withPayload.set(FinalValidationContextPage, FinalValidationContext.VerifySubcontractor)
-              } yield withContext
+      request.userAnswers.get(FinalValidationDraftIdPage) match {
 
-            Future.fromTry(updatedAnswers).flatMap { answers =>
-              val nextPage =
-                finalValidationNavigator.startPage(finalValidationPayload.changeTarget, answers)
-              sessionRepository.set(answers).map { _ =>
-                Redirect(nextPage)
-              }
+        case Some(draftId) =>
+          finalValidationDraftService.get(request.cisId, draftId).flatMap { draft =>
+
+            val payload =
+              for {
+                subcontractor <- draft.subcontractor(subcontractorId)
+                if subcontractor.readiness == FinalValidationReadiness.Incomplete
+                issue          <- subcontractor.issues.find(_.fieldKey == fieldKey)
+                field          <- FinalValidationField.fromKey(issue.fieldKey)
+                target         <- FinalValidationChangeTarget.fromKey(targetKey)
+              } yield FinalValidationHandoffPayload(
+                draftId = draftId,
+                instanceId = request.cisId,
+                subcontractorId = subcontractor.subcontractorId,
+                subbieResourceRef = subcontractor.subbieResourceRef,
+                field = field,
+                changeTarget = target
+              )
+
+            payload match {
+
+              case Some(finalValidationPayload) =>
+                draft.subcontractor(subcontractorId) match {
+
+                  case Some(subcontractor) =>
+                    val updatedAnswers =
+                      for {
+                        populated <- finalValidationSubcontractorService.populateFinalValidationUserAnswers(
+                          request.userAnswers,
+                          request.cisId,
+                          subcontractor,
+                          finalValidationPayload.changeTarget
+                        )
+                        withPayload <- populated.set(VerifyFinalValidationPayloadPage, finalValidationPayload)
+                        withContext <- withPayload.set(FinalValidationContextPage, FinalValidationContext.VerifySubcontractor)
+                      } yield withContext
+
+                    Future.fromTry(updatedAnswers).flatMap { answers =>
+                      val nextPage =
+                        finalValidationNavigator.startPage(finalValidationPayload.changeTarget, answers)
+
+                      sessionRepository.set(answers).map { _ =>
+                        Redirect(nextPage)
+                      }
+                    }
+
+                  case None =>
+                    Future.successful(
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    )
+                }
+
+              case None =>
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
             }
           }.recover { case exception =>
-            logger.error(s"[onPageLoad] Unable to start FinalValidation correction for " +
-              s"subcontractorId=${finalValidationPayload.subcontractorId}", exception)
+            logger.error(
+              s"[onPageLoad] Unable to start FinalValidation correction for subcontractorId=$subcontractorId",
+              exception
+            )
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
         case None =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
       }
     }
 

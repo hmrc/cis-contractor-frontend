@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package models.finalvalidation
+package pages.finalvalidation
 
-import play.api.libs.json.{Json, OFormat}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-final case class FinalValidationHandoffPayload(
-  draftId: String,
-  instanceId: String,
-  subcontractorId: Long,
-  subbieResourceRef: Long,
-  field: FinalValidationField,
-  changeTarget: FinalValidationChangeTarget
-)
+case object FinalValidationDraftIdPage extends QuestionPage[String] {
+  
+  override def path: JsPath = JsPath \ "finalvalidation" \ toString
+  
+  override def toString: String = "finalValidationDraftId"
 
-object FinalValidationHandoffPayload {
-  given OFormat[FinalValidationHandoffPayload] = Json.format[FinalValidationHandoffPayload]
 }

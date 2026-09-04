@@ -19,9 +19,10 @@ package controllers.add.trust
 import controllers.actions.*
 import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
-import models.{AmendMode, Mode}
+import models.{AmendMode, FinalValidationMode, Mode}
 import navigation.Navigator
 import pages.add.trust.{TrustNamePage, TrustUtrPage, TrustUtrYesNoPage}
+import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -89,9 +90,12 @@ class TrustUtrController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
               value =>
                 val prevValue = request.userAnswers.get(TrustUtrPage)
+                val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
                   case AmendMode if prevValue.contains(value) =>
+                    saveAndContinue(mode, value)
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
                     saveAndContinue(mode, value)
                   case _                                      =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {

@@ -16,7 +16,7 @@
 
 package services.finalvalidation
 
-import models.finalvalidation.FinalValidationField
+import models.finalvalidation.{FinalValidationDraftSubcontractor, FinalValidationField}
 import models.response.SubcontractorResponse
 
 import javax.inject.{Inject, Singleton}
@@ -25,13 +25,26 @@ import javax.inject.{Inject, Singleton}
 class PartnershipSubcontractorFinalValidation @Inject() {
 
   def validate(
-    subcontractor: SubcontractorResponse,
-    allSubcontractors: Seq[SubcontractorResponse]
-  ): Seq[FinalValidationField] = {
+                subcontractor: SubcontractorResponse,
+                allSubcontractors: Seq[SubcontractorResponse]
+              ): Seq[FinalValidationField] = {
 
     // TODO F5 - Partnership subcontractor final validation
 
     val _ = (subcontractor, allSubcontractors)
+    Seq.empty
+  }
+
+  def validateDraft(
+    subcontractor: FinalValidationDraftSubcontractor,
+    allSubcontractors: Seq[FinalValidationDraftSubcontractor]
+  ): Seq[FinalValidationField] = {
+
+    val details =
+      subcontractor.proposed
+
+    // same F2/F3/F4/F5 rule using details
+
     Seq.empty
   }
 }

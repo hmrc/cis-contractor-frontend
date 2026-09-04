@@ -17,17 +17,24 @@
 package controllers.finalvalidations
 
 import controllers.actions.*
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, Mode, NormalMode}
 import models.finalvalidation.VerifyFinalValidationSource.*
-import models.finalvalidation.{ReviewSubcontractorDetailsPageModel, ReviewSubcontractorDetailsRow, VerifyFinalValidationSource}
-import pages.finalvalidation.{FinalValidationErrorPage, VerifyFinalValidationSourcePage}
+import models.finalvalidation.*
+import navigation.Navigator
+import pages.finalvalidation.*
 import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.finalvalidation.FinalValidationDraftService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.finalvalidations.ReviewSubcontractorDetailsView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReviewSubcontractorDetailsController @Inject() (
@@ -35,95 +42,162 @@ class ReviewSubcontractorDetailsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  finalValidationDraftService: FinalValidationDraftService,
   val controllerComponents: MessagesControllerComponents,
   view: ReviewSubcontractorDetailsView
-) extends FrontendBaseController
+)(using ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    
-    request.userAnswers.get(VerifyFinalValidationSourcePage) match {
-      case Some(source) =>
-        selectedSubcontractors(request.userAnswers, source) match {
-          case Some(selected) =>
-            val failures = request.userAnswers.get(FinalValidationErrorPage).getOrElse(Set.empty)
-            val erroneousIds = failures.filter(_.issues.nonEmpty).map(_.subcontractorId).toSet
-            val rows = selected.map { case (subcontractorId, name) =>
-              ReviewSubcontractorDetailsRow(
-                subcontractorId = subcontractorId,
-                name = name,
-                hasErrors = erroneousIds.contains(subcontractorId)
-              )
-            }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      (
+        request.userAnswers.get(FinalValidationDraftIdPage),
+        request.userAnswers.get(VerifyFinalValidationSourcePage),
+        request.userAnswers.get(VerifyFinalValidationModePage).flatMap(modeFromString)
+      ) match {
+
+        case (Some(draftId), Some(source), Some(mode)) =>
+          finalValidationDraftService.get(request.cisId, draftId).map { draft =>
+
+            val rows =
+              draft.subcontractors.map { subcontractor =>
+                ReviewSubcontractorDetailsRow(
+                  subcontractorId = subcontractor.subcontractorId,
+                  name = subcontractor.displayName,
+                  hasErrors = subcontractor.readiness == FinalValidationReadiness.Incomplete
+                )
+              }
+
             Ok(
               view(
                 ReviewSubcontractorDetailsPageModel(
                   subcontractors = rows,
-                  canContinue = failures.isEmpty,
-                  backUrl = backUrl(source)
+                  canContinue = draft.allComplete,
+                  backUrl = backUrl(source, mode)
                 )
               )
             )
+          }
 
-          case None =>
+        case _ =>
+          Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-
-      case None =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
     }
-  }
-  
-  private def selectedSubcontractors(userAnswers: UserAnswers, source: VerifyFinalValidationSource): Option[Seq[(Long, String)]] = {
+
+  def onSubmit: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      (
+        request.userAnswers.get(FinalValidationDraftIdPage),
+        request.userAnswers.get(VerifyFinalValidationSourcePage),
+        request.userAnswers.get(VerifyFinalValidationModePage).flatMap(modeFromString)
+      ) match {
+
+        case (Some(draftId), Some(source), Some(mode)) =>
+          source match {
+
+            case SelectSubcontractor | SelectSubcontractorsToReverify =>
+              finalValidationDraftService.get(request.cisId, draftId).flatMap { draft =>
+
+                if (!draft.allComplete) {
+                  Future.successful(
+                    Redirect(
+                      controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                    )
+                  )
+                } else {
+                  finalValidationDraftService.commit(request.cisId, draftId).flatMap { _ =>
+
+                    val cleanedAnswers =
+                      for {
+                        withoutDraftId      <- request.userAnswers.remove(FinalValidationDraftIdPage)
+                        withoutSource       <- withoutDraftId.remove(VerifyFinalValidationSourcePage)
+                        withoutMode         <- withoutSource.remove(VerifyFinalValidationModePage)
+                        withoutContext      <- withoutMode.remove(FinalValidationContextPage)
+                        withoutPayload      <- withoutContext.remove(VerifyFinalValidationPayloadPage)
+                        withoutChangeTarget <- withoutPayload.remove(FinalValidationChangeTargetPage)
+                      } yield withoutChangeTarget
+
+                    Future.fromTry(cleanedAnswers).flatMap { answers =>
+                      sessionRepository.set(answers).map { _ =>
+
+                        source match {
+                          case SelectSubcontractor =>
+                            Redirect(
+                              navigator.nextPage(
+                                SelectSubcontractorPage,
+                                mode,
+                                answers
+                              )
+                            )
+
+                          case SelectSubcontractorsToReverify =>
+                            Redirect(
+                              navigator.nextPage(
+                                SelectSubcontractorsToReverifyPage,
+                                mode,
+                                answers
+                              )
+                            )
+
+                          case _ =>
+                            Redirect(
+                              controllers.routes.JourneyRecoveryController.onPageLoad()
+                            )
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+            case ReviewUnmatchedSubcontractors | ReviewInsufficientInfoSubcontractors =>
+              Future.successful(
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              )
+          }
+
+        case _ =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
+    }
+
+  private def backUrl(
+    source: VerifyFinalValidationSource,
+    mode: Mode
+  ): String =
     source match {
       case SelectSubcontractor =>
-        userAnswers.get(SelectSubcontractorPage).map {
-          _.toSeq.flatMap { selected =>
-            selected.id.toLongOption.map { id =>
-              id -> selected.name
-            }
-          }
-        }
+        controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode).url
 
       case SelectSubcontractorsToReverify =>
-        userAnswers.get(SelectSubcontractorsToReverifyPage).map {
-          _.toSeq.flatMap { selected =>
-            selected.id.toLongOption.map { id =>
-              id -> selected.name
-            }
-          }
-        }
+        controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
 
       case ReviewUnmatchedSubcontractors =>
-        None
-
-      case ReviewInsufficientInfoSubcontractors =>
-        None
-    }
-  }
-
-  private def backUrl(source: VerifyFinalValidationSource): String =
-    source match {
-      case SelectSubcontractor =>
-        controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
-
-      case SelectSubcontractorsToReverify =>
-        controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
-
-//      case ReviewUnmatchedSubcontractors =>
-//        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
+        controllers.routes.JourneyRecoveryController.onPageLoad().url
 
       case ReviewInsufficientInfoSubcontractors =>
         controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
     }
 
-//  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-//    val failures = request.userAnswers.get(FinalValidationErrorPage).getOrElse(Set.empty)
-//    if (failures.exists(_.issues.nonEmpty)) {
-//      Redirect(controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad())
-//    } else {
-//      verifyFinalValidationService.continueFromFinalValidation(request.userAnswers)
-//    }
-//  }
-  
+  private def modeFromString(value: String): Option[Mode] =
+    value match {
+      case "NormalMode" => Some(NormalMode)
+      case "CheckMode"  => Some(CheckMode)
+      case _            => None
+    }
+
 }

@@ -20,7 +20,7 @@ import models.Scheme
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
-import models.finalvalidation.{FinalValidationHandoffPayload, FinalValidationUpdateSubcontractorRequest}
+import models.finalvalidation.*
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json, OFormat}
@@ -326,23 +326,55 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
-  def updateSubcontractorForFinalValidation(
-    request: FinalValidationUpdateSubcontractorRequest
-  )(implicit hc: HeaderCarrier): Future[Unit] = {
-
+  def createFinalValidationDraft(
+    request: CreateFinalValidationDraftRequest
+  )(implicit hc: HeaderCarrier): Future[CreateFinalValidationDraftResponse] = 
     http
-      .post(url"$cisBaseUrl/subcontractor/final-validation/update")
+      .post(url"$cisBaseUrl/final-validation/drafts")
       .withBody(Json.toJson(request))
+      .execute[CreateFinalValidationDraftResponse]
+  
+  def getFinalValidationDraft(
+    instanceId: String,
+    draftId: String
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .get(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId")
+      .execute[FinalValidationDraft]
+    
+  def updateFinalValidationReadiness(
+    instanceId: String,
+    draftId: String,
+    request: UpdateFinalValidationReadinessRequest
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .put(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/readiness")
+      .withBody(Json.toJson(request))
+      .execute[FinalValidationDraft]
+
+  def updateFinalValidationCorrection(
+    instanceId: String,
+    draftId: String,
+    request: UpdateFinalValidationCorrectionRequest
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .put(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/correction")
+      .withBody(Json.toJson(request))
+      .execute[FinalValidationDraft]
+
+  def commitFinalValidationDraft(
+    instanceId: String,
+    draftId: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/commit")
       .execute[HttpResponse]
       .flatMap { response =>
         response.status match {
           case NO_CONTENT | OK =>
             Future.successful(())
-
-          case other =>
-            Future.failed(new RuntimeException(s"Update subcontractor for final validation failed, returned $other: ${response.body}"))
+          case _ =>
+            Future.failed(UpstreamErrorResponse(response.body, response.status, response.status))
         }
       }
-  }
-
 }

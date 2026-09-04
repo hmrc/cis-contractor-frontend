@@ -14,32 +14,14 @@
  * limitations under the License.
  */
 
-package services.finalvalidation
+package models.finalvalidation
 
-import models.finalvalidation.{FinalValidationDraftSubcontractor, FinalValidationField}
 import models.response.SubcontractorResponse
 
-import javax.inject.{Inject, Singleton}
+final case class VerifyFinalValidationResult(
+  subcontractors: Seq[SubcontractorResponse],
+  failures: Seq[SubcontractorFinalValidationFailure]
+) {
 
-@Singleton
-class AddressDetailsFinalValidation @Inject() {
-
-  def validate(subcontractor: SubcontractorResponse): Seq[FinalValidationField] = {
-
-    // TODO F6 - Address details final validation
-
-    val _ = subcontractor
-    Seq.empty
-  }
-
-  def validateDraft(
-    subcontractor: FinalValidationDraftSubcontractor
-  ): Seq[FinalValidationField] = {
-
-    val details = subcontractor.proposed
-
-    // same F6 rule using details
-
-    Seq.empty
-  }
+  def hasErrors: Boolean = failures.nonEmpty
 }

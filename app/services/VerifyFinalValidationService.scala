@@ -33,12 +33,12 @@ import scala.util.{Failure, Success, Try}
 
 @Singleton
 class VerifyFinalValidationService @Inject() (
-subcontractorService: SubcontractorService,
-individualValidation: IndividualSubcontractorFinalValidation,
-companyValidation: CompanySubcontractorFinalValidation,
-partnershipValidation: PartnershipSubcontractorFinalValidation,
-trustValidation: TrustSubcontractorFinalValidation,
-addressDetailsValidation: AddressDetailsFinalValidation
+  subcontractorService: SubcontractorService,
+  individualValidation: IndividualSubcontractorFinalValidation,
+  companyValidation: CompanySubcontractorFinalValidation,
+  partnershipValidation: PartnershipSubcontractorFinalValidation,
+  trustValidation: TrustSubcontractorFinalValidation,
+  addressDetailsValidation: AddressDetailsFinalValidation
 )(implicit ec: ExecutionContext) {
   
   private final case class SelectedReference(
@@ -49,7 +49,7 @@ addressDetailsValidation: AddressDetailsFinalValidation
   def validate(
     instanceId: String,
     userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[Seq[SubcontractorFinalValidationFailure]] =
+  )(implicit hc: HeaderCarrier): Future[VerifyFinalValidationResult] =
     userAnswers.get(VerifyFinalValidationSourcePage) match {
 
       case Some(source) =>
@@ -63,7 +63,7 @@ addressDetailsValidation: AddressDetailsFinalValidation
 
                       case Some(subcontractor)
                         if subcontractor.subcontractorId == reference.subcontractorId =>
-                          Future.successful(subcontractor)
+                        Future.successful(subcontractor)
 
                       case Some(subcontractor) =>
                         Future.failed(
@@ -85,26 +85,61 @@ addressDetailsValidation: AddressDetailsFinalValidation
         Future.failed(new IllegalStateException("VerifyFinalValidationSourcePage not found"))
     }
 
+  def validateDraftSubcontractor(
+    draft: FinalValidationDraft,
+    subcontractorId: Long
+  ): Try[Seq[FinalValidationDraftIssue]] =
+    draft.subcontractor(subcontractorId) match {
+
+      case Some(subcontractor) =>
+        Try {
+          validateDraftFields(
+            subcontractor = subcontractor,
+            allSubcontractors = draft.subcontractors
+          )
+            .distinct
+            .map { field =>
+              FinalValidationDraftIssue(
+                fieldKey = field.key,
+                value = valueFor(field, subcontractor.proposed)
+              )
+            }
+        }
+
+      case None =>
+        Failure(
+          new IllegalStateException(
+            s"Subcontractor $subcontractorId not found in Final Validation draft"
+          )
+        )
+    }
+
   private def validateSelectedSubcontractors(
     subcontractors: Seq[SubcontractorResponse]
-  ): Seq[SubcontractorFinalValidationFailure] = {
+  ): VerifyFinalValidationResult = {
 
     // TODO: Revisit this scope when F1 rules land
     val allSubcontractors = subcontractors
 
-    subcontractors.flatMap { subcontractor =>
-      val fields = validateFields(subcontractor, allSubcontractors)
+    val failures =
+      subcontractors.flatMap { subcontractor =>
+        val fields = validateFields(subcontractor, allSubcontractors)
 
-      Option.when(fields.nonEmpty) {
-        SubcontractorFinalValidationFailure(
-          subcontractorId = subcontractor.subcontractorId,
-          issues = fields.map { field =>
-            FinalValidationIssue(field, valueFor(field, subcontractor))
-          },
-          subbieResourceRef = subcontractor.subbieResourceRef
-        )
+        Option.when(fields.nonEmpty) {
+          SubcontractorFinalValidationFailure(
+            subcontractorId = subcontractor.subcontractorId,
+            issues = fields.map { field =>
+              FinalValidationIssue(field, valueFor(field, subcontractor))
+            },
+            subbieResourceRef = subcontractor.subbieResourceRef
+          )
+        }
       }
-    }
+
+    VerifyFinalValidationResult(
+      subcontractors = subcontractors,
+      failures = failures
+    )
   }
 
   private def validateFields(
@@ -130,6 +165,31 @@ addressDetailsValidation: AddressDetailsFinalValidation
 
     (typeSpecificFields ++ addressFields).distinct
   }
+
+  private def validateDraftFields(
+    subcontractor: FinalValidationDraftSubcontractor,
+    allSubcontractors: Seq[FinalValidationDraftSubcontractor]
+  ): Seq[FinalValidationField] = {
+    val subcontractorType =
+      subcontractor.subcontractorType
+        .flatMap(TypeOfSubcontractor.fromString)
+        .getOrElse(
+          throw new IllegalStateException(s"Invalid subcontractorType: ${subcontractor.subcontractorType}")
+        )
+
+    val typeSpecificFields =
+      subcontractorType match {
+        case Individualorsoletrader => individualValidation.validateDraft(subcontractor, allSubcontractors)
+        case Limitedcompany => companyValidation.validateDraft(subcontractor, allSubcontractors)
+        case Partnership => partnershipValidation.validateDraft(subcontractor, allSubcontractors)
+        case Trust => trustValidation.validateDraft(subcontractor, allSubcontractors)
+      }
+
+    val addressFields = addressDetailsValidation.validateDraft(subcontractor)
+
+    (typeSpecificFields ++ addressFields).distinct
+  }
+
 
   private def selectedReferences(userAnswers: UserAnswers, source: VerifyFinalValidationSource): Try[Seq[SelectedReference]] =
     source match {
@@ -237,5 +297,30 @@ addressDetailsValidation: AddressDetailsFinalValidation
       case _ => None
     }
 
-
+  private def valueFor(
+    field: FinalValidationField,
+    details: FinalValidationSubcontractorDetails
+  ): Option[String] =
+    field match {
+      case FirstName => details.firstName
+      case SecondName => details.secondName
+      case Surname => details.surname
+      case TradingName => details.tradingName
+      case PartnershipTradingName => details.partnershipTradingName
+      case Utr => details.utr
+      case PartnerUtr => details.partnerUtr
+      case Nino => details.nino
+      case Crn => details.crn
+      case AddressLine1 => details.addressLine1
+      case AddressLine2 => details.addressLine2
+      case AddressLine3 => details.addressLine3
+      case AddressLine4 => details.addressLine4
+      case PostCode => details.postcode
+      case Country => details.country
+      case EmailAddress => details.emailAddress
+      case PhoneNumber => details.phoneNumber
+      case MobilePhoneNumber => details.mobilePhoneNumber
+      case WorkReferenceNumber => details.worksReferenceNumber
+      case _ => None
+    }
 }
