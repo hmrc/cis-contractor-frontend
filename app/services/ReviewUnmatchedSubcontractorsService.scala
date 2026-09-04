@@ -36,21 +36,30 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): ReviewUnmatchedViewModel = {
-    val batchSubs =
-      batch.subcontractors.map { sub =>
-        val verification =
-          batch.verifications.find(_.subcontractorId.contains(sub.subcontractorId))
-        (sub, verification)
-      }
+    val subcontractorsById =
+      batch.subcontractors.map(sub => sub.subcontractorId -> sub).toMap
+
+    val currentBatchId = batch.verificationBatch.map(_.verificationBatchId)
+
+    // Mirror legacy VF-07-03: drive off the current batch's UNMATCHED verifications, not the full subcontractor list.
+    val unmatchedRows =
+      batch.verifications
+        .filter(v => currentBatchId.forall(id => v.verificationBatchId.contains(id)))
+        .filter(CheckUnmatchedSubcontractorsService.isUnmatched)
+        .flatMap { verification =>
+          verification.subcontractorId
+            .flatMap(subcontractorsById.get)
+            .map(sub => (sub, verification))
+        }
 
     val (readySubs, unmatchedSubs) =
-      batchSubs.partition { case (_, verification) =>
-        UnmatchedBatchReadiness.isVerificationReady(verification)
+      unmatchedRows.partition { case (_, verification) =>
+        UnmatchedBatchReadiness.isVerificationReady(Some(verification))
       }
 
     ReviewUnmatchedViewModel(
-      unmatched = unmatchedSubs.map { case (sub, verification) => toUnmatchedRow(sub, verification) },
-      ready = readySubs.map { case (sub, verification) => toReadyRow(sub, verification) }
+      unmatched = unmatchedSubs.map { case (sub, verification) => toUnmatchedRow(sub, Some(verification)) },
+      ready = readySubs.map { case (sub, verification) => toReadyRow(sub, Some(verification)) }
     )
   }
 

@@ -22,17 +22,19 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 object UtrValidator {
   def validate(
     value: Option[String],
-    subcontractors: Seq[SubcontractorCurrentVerification]
+    subcontractors: Seq[SubcontractorCurrentVerification],
+    field: SubcontractorValidationField = SubcontractorValidationField.Utr,
+    checkDuplicate: Boolean = true
   ): Option[FieldValidationFailure] =
     value
       .filter(_.trim.nonEmpty)
       .flatMap { utr =>
         Option.when(
           !UTR.isValidUTR(utr)
-            || isDuplicateUTR(subcontractors, utr)
+            || (checkDuplicate && isDuplicateUTR(subcontractors, utr))
         ) {
           FieldValidationFailure(
-            field = SubcontractorValidationField.Utr,
+            field = field,
             value = Some(utr)
           )
         }

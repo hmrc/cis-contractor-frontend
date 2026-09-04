@@ -17,14 +17,12 @@
 package controllers.verify
 
 import config.FrontendAppConfig
-import controllers.Execution.trampoline
 import controllers.actions.*
 import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
-import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
@@ -36,7 +34,6 @@ class VerificationResultsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  verificationService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
 )(implicit appConfig: FrontendAppConfig)
@@ -56,24 +53,4 @@ class VerificationResultsController @Inject() (
       case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
-  def onSubmit: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      verificationService
-        .recreateCurrentBatchFromUnmatchedVerifications(request.userAnswers)
-        .map { _ =>
-          Redirect(
-            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-              .onPageLoad()
-          )
-        }
-        .recover { case t =>
-          logger.error(
-            "[VerificationResultsController.onSubmit] Failed to create current verification batch with unmatched verifications",
-            t
-          )
-
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
 }

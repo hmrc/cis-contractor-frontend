@@ -16,13 +16,13 @@
 
 package viewmodels.checkAnswers.contractordetails
 
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Scheme, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import pages.contractordetails.AddSchemeNameYesNoPage
+import pages.contractordetails.{AddSchemeNameYesNoPage, ContractorSchemePage}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -30,6 +30,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 class AddSchemeNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
+
+  private val answersWithExistingUtr = UserAnswers("test-id")
+    .set(
+      ContractorSchemePage,
+      Scheme(
+        schemeId = 1,
+        instanceId = "cisId",
+        accountsOfficeReference = "123 PA 87654321",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "45678",
+        utr = Some("1234567890")
+      )
+    )
+    .success
+    .value
 
   "AddSchemeNameYesNoSummary.row" - {
 
@@ -82,6 +97,28 @@ class AddSchemeNameYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       AddSchemeNameYesNoSummary.row(answers) shouldBe None
+    }
+
+    "must link Change to the remove scheme name page when a scheme UTR already exists and the answer is Yes" in {
+      val answers = answersWithExistingUtr
+        .set(AddSchemeNameYesNoPage, true)
+        .success
+        .value
+
+      val row = AddSchemeNameYesNoSummary.row(answers).value
+      row.actions.value.items.head.href shouldBe
+        controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("scheme-name").url
+    }
+
+    "must link Change to the add scheme name page when a scheme UTR already exists and the answer is No" in {
+      val answers = answersWithExistingUtr
+        .set(AddSchemeNameYesNoPage, false)
+        .success
+        .value
+
+      val row = AddSchemeNameYesNoSummary.row(answers).value
+      row.actions.value.items.head.href shouldBe
+        controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
     }
   }
 }
