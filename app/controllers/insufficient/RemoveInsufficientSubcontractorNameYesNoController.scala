@@ -153,7 +153,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
             }
 
           case response if response.verificationsCounter.contains(0L) =>
-            refreshNewestBatchAndRedirectToVerificationSelection(userAnswers)
+            verificationService
+              .getCurrentVerificationBatch(userAnswers)
+              .flatMap(refreshNewestBatchAndRedirectToVerificationSelection)
 
           case _ =>
             Future.successful(recoveryRedirect)

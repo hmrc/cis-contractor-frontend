@@ -368,11 +368,18 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         Future.successful(DeleteVerificationResponse(Some(0L)))
       )
 
+      val currentAnswers =
+        emptyUserAnswers
+
       val refreshedAnswers =
         emptyUserAnswers
           .set(UnverifiedSubcontractorsPage, Seq.empty[Subcontractor])
           .success
           .value
+
+      when(
+        mockVerificationService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(currentAnswers))
 
       when(
         mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
@@ -417,6 +424,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           .updateVerificationBatchReadiness(any[UserAnswers])
 
         verify(mockVerificationService)
+          .getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+
+        verify(mockVerificationService)
           .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
       }
     }
@@ -452,11 +462,18 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         Future.successful(DeleteVerificationResponse(Some(0L)))
       )
 
+      val currentAnswers =
+        emptyUserAnswers
+
       val refreshedAnswers =
         emptyUserAnswers
           .set(UnverifiedSubcontractorsPage, Seq(unverifiedSubcontractor))
           .success
           .value
+
+      when(
+        mockVerificationService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(currentAnswers))
 
       when(
         mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
@@ -499,6 +516,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
 
         verify(mockCheckVerificationBatchReadinessController, never())
           .updateVerificationBatchReadiness(any[UserAnswers])
+
+        verify(mockVerificationService)
+          .getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
 
         verify(mockVerificationService)
           .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
