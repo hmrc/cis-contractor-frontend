@@ -21,13 +21,35 @@
 @this(
     layout: templates.Layout,
     govukTaskList: GovukTaskList,
-    govukButton: GovukButton,
     h1: H1,
     p: Paragraph,
     link: Link
 )
 
 @(model: ReviewSubcontractorDetailsPageModel)(implicit request: Request[_], messages: Messages)
+
+@verifySubcontractorSubmitLink() = {
+    <span class="app-task-list-row-submit">
+        <span class="govuk-link govuk-link--no-visited-state">
+            @messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor")
+        </span>
+
+        @helper.form(
+            action = controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onSubmit
+        ) {
+            @helper.CSRF.formField
+
+            <button
+                    type="submit"
+                    class="app-task-list-row-submit__button"
+            >
+                <span class="govuk-visually-hidden">
+                    @messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor")
+                </span>
+            </button>
+        }
+    </span>
+}
 
 @defining(
     TaskListItemStatus(
@@ -63,24 +85,39 @@
                         status = completedStatus
                     )
                 }
-            }
-        ))
-
-        @if(model.canContinue) {
-            @helper.form(
-                action = controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onSubmit
-            ) {
-                @helper.CSRF.formField
-
-                @govukButton(
-                    ButtonViewModel(
-                        messages("finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor")
+            } :+
+            (
+                if (model.canContinue) {
+                    TaskListItem(
+                        title = TaskListItemTitle(
+                            content = HtmlContent(verifySubcontractorSubmitLink())
+                        ),
+                        href = None,
+                        status = incompleteStatus,
+                        classes = "govuk-task-list__item--with-link app-task-list-row-submit-item"
                     )
-                )
-            }
-        } else {
-            @p("finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet")
-        }
+                } else {
+                    TaskListItem(
+                        title = TaskListItemTitle(
+                            content = Text(
+                                messages(
+                                    "finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor"
+                                )
+                            )
+                        ),
+                        href = None,
+                        status = TaskListItemStatus(
+                            content = Text(
+                                messages(
+                                    "finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet"
+                                )
+                            ),
+                            classes = "govuk-task-list__status--cannot-start-yet"
+                        )
+                    )
+                }
+            )
+        ))
 
         @link(
             linkTextKey = "finalValidations.verify.reviewSubcontractorDetails.backLink",
