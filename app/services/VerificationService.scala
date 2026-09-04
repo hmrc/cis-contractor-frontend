@@ -54,10 +54,43 @@ class VerificationService @Inject() (
                    userAnswers
                      .set(NewestVerificationBatchResponsePage, response)
                      .flatMap(_.set(UnverifiedSubcontractorsPage, unverified))
+                     .flatMap(cleanupSelectionsNoLongerInNewestBatch(response))
                  )
 
       _ <- sessionRepository.set(updated)
     } yield updated
+
+  private def cleanupSelectionsNoLongerInNewestBatch(
+    response: models.response.GetNewestVerificationBatchResponse
+  )(userAnswers: UserAnswers): Try[UserAnswers] = {
+    val newestSubcontractorIds =
+      response.subcontractors.map(_.subcontractorId.toString).toSet
+
+    val withSelectedSubcontractors =
+      userAnswers.get(SelectSubcontractorPage) match {
+        case Some(selected) =>
+          userAnswers.set(
+            SelectSubcontractorPage,
+            selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
+          )
+
+        case None =>
+          scala.util.Success(userAnswers)
+      }
+
+    withSelectedSubcontractors.flatMap { updatedAnswers =>
+      updatedAnswers.get(SelectSubcontractorsToReverifyPage) match {
+        case Some(selected) =>
+          updatedAnswers.set(
+            SelectSubcontractorsToReverifyPage,
+            selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
+          )
+
+        case None =>
+          scala.util.Success(updatedAnswers)
+      }
+    }
+  }
 
   def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
