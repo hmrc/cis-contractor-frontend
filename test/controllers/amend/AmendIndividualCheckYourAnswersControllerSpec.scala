@@ -929,8 +929,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .value
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
-      val mockAuditService = mock[AuditService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -961,8 +961,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes
-            .ReviewInsufficientInfoSubcontractorsController
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
             .onPageLoad()
             .url
       }
@@ -991,8 +990,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .value
 
       val mockSubcontractorService = mock[SubcontractorService]
-      val mockSessionRepository = mock[SessionRepository]
-      val mockAuditService = mock[AuditService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1023,8 +1022,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes
-            .ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
             .onPageLoad()
             .url
       }

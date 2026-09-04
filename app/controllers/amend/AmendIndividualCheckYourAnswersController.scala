@@ -25,7 +25,6 @@ import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -68,10 +67,10 @@ class AmendIndividualCheckYourAnswersController @Inject() (
         case Right(_) =>
           val originalAnswers = ua.get(OriginalIndividualAnswersQuery)
 
-          val isVerified = ua.get(ShowVerificationDetailsPage)
+          val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
 
           val subcontractorInformationList =
-            SummaryListViewModel(rows = subcontractorInformationRows(ua, originalAnswers).flatten)
+            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified, originalAnswers).flatten)
 
           val detailsList =
             SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
@@ -94,11 +93,12 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
+    isVerified: Boolean,
     originalAnswers: Option[OriginalIndividualAnswers]
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      if (ua.get(ShowVerificationDetailsPage).contains(true)) {
+      if (isVerified) {
         Seq(
           SubcontractorsUniqueTaxpayerReferenceSummary.row(
             ua,
@@ -129,11 +129,11 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (!isVerified.contains(true)) {
+      if (!isVerified) {
         Seq(
           IndividualNamesOptionsSummary.row(ua, AmendMode),
           SubcontractorNameSummary.row(ua, AmendMode),
@@ -150,7 +150,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       )
 
     val utrRows =
-      if (!isVerified.contains(true)) {
+      if (!isVerified) {
         Seq(
           UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
           SubcontractorsUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
@@ -211,7 +211,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-
       ValidatedSubcontractor.build(request.userAnswers) match {
 
         case Left(error) =>
@@ -224,17 +223,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           )
 
         case Right(_)
-          if request.userAnswers
-            .get(AmendCheckYourAnswersSubmittedPage)
-            .contains(true) =>
+            if request.userAnswers
+              .get(AmendCheckYourAnswersSubmittedPage)
+              .contains(true) =>
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           )
 
         case Right(_)
-          if !AmendmentHelper.individualHasChanges(
-            request.userAnswers
-          ) =>
+            if !AmendmentHelper.individualHasChanges(
+              request.userAnswers
+            ) =>
           handleNoChanges()
 
         case Right(_) =>
@@ -246,9 +245,9 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     }
 
   private def submitAmendJourney(
-                                  userAnswers: UserAnswers,
-                                  subbieResourceRef: Long
-                                )(implicit request: CisIdDataRequest[AnyContent]): Future[Result] =
+    userAnswers: UserAnswers,
+    subbieResourceRef: Long
+  )(implicit request: CisIdDataRequest[AnyContent]): Future[Result] =
     userAnswers
       .get(AmendJourneyTypePage)
       .fold {
@@ -296,20 +295,18 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
 
   private def handleNoChanges()(implicit
-                                request: CisIdDataRequest[AnyContent]
+    request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =
       request.userAnswers.get(AmendJourneyTypePage) match {
 
         case Some(AmendJourneyType.InsufficientInfo) =>
-          controllers.verify.routes
-            .ReviewInsufficientInfoSubcontractorsController
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
             .onPageLoad()
 
         case Some(AmendJourneyType.UnmatchedInfo) =>
-          controllers.verify.routes
-            .ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
             .onPageLoad()
 
         case Some(AmendJourneyType.Standard) =>
@@ -346,7 +343,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-
       sessionRepository
         .set(UserAnswers(request.userAnswers.id))
         .map { _ =>
