@@ -50,7 +50,7 @@ class SelectSubcontractorController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport
     with AgentClientChecks {
 
@@ -58,7 +58,6 @@ class SelectSubcontractorController @Inject() (
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-
       request.userAnswers match {
 
         case Some(userAnswers) =>
@@ -102,10 +101,10 @@ class SelectSubcontractorController @Inject() (
     }
 
   private def renderSelectSubcontractorPage(
-                                             userAnswers: UserAnswers,
-                                             mode: Mode,
-                                             page: Int
-                                           )(implicit request: Request[_]): Result =
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: Int
+  )(implicit request: Request[_]): Result =
     getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
 
       case Right(unverifiedSubcontractors) =>
@@ -219,12 +218,15 @@ class SelectSubcontractorController @Inject() (
                     answersWithSelections
                       .get(RebuildVerificationFromWarningPage)
                       .contains(true)
-                  ) Future.fromTry(
+                  )
+                    Future.fromTry(
                       answersWithSelections.remove(RebuildVerificationFromWarningPage)
-                    ) else Future.successful(answersWithSelections)
+                    )
+                  else Future.successful(answersWithSelections)
 
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(nextPage) else {
+              } yield Redirect(nextPage)
+              else {
                 val formWithErrors =
                   form
                     .fill(currentSelectedValues.map(_.id))
