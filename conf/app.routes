@@ -98,7 +98,7 @@ GET   /subcontractor/info/company/subcontractor-information-read-only/:journeyTy
 
 GET   /subcontractor/info/trust/subcontractor-information-read-only/:journeyType  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/:journeyType/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad(journeyType: String)
+GET   /subcontractor/info/subcontractor-information-read-only/:journeyType  controllers.info.IndividualCheckYourAnswersController.onPageLoad(journeyType: String)
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
