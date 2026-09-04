@@ -265,6 +265,41 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def updateContractorDetails(
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateContractorDetails] Submitting contractor details for schemeId=${request.schemeId}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/contractor-details/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - contractor details updated"
+            )
+
+            Future.successful(())
+
+          case other =>
+            logger.error(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - failed with status $other"
+            )
+
+            Future.failed(
+              new RuntimeException(
+                s"Update contractor details failed, returned $other"
+              )
+            )
+        }
+      }
+  }
+
   def getSubcontractorList(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] = {
     logger.debug(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
 
