@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -255,6 +255,137 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
+  "VerificationService.refreshSubmittedVerificationRequest" - {
+
+    def responseWithSubmissionStatus(status: Option[String]): GetNewestVerificationBatchResponse =
+      responseWithSubcontractors.copy(
+        submission = Some(
+          Submission(
+            submissionId = 1L,
+            activeObjectId = Some(1L),
+            submissionRequestDate = Some(LocalDateTime.parse("2026-06-15T03:30:52")),
+            status = status
+          )
+        )
+      )
+
+    "must return updated answers when the latest submission status is SUBMITTED" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must return updated answers when the latest submission status is SUBMITTED_NO_RECEIPT" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED_NO_RECEIPT"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers).futureValue
+
+      result.get(NewestVerificationBatchResponsePage) mustBe Some(response)
+    }
+
+    "must fail when the latest submission status is not submitted" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(Some("PENDING"))))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage must include("Submitted verification request page cannot be accessed")
+    }
+
+    "must fail when the latest response has no submission" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors.copy(submission = None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+
+    "must fail when the latest submission has no status" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubmissionStatus(None)))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val ex = service.refreshSubmittedVerificationRequest(userAnswers).failed.futureValue
+
+      ex.getMessage mustBe
+        "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+  }
+
   "VerificationService.getCurrentVerificationBatch" - {
 
     val instanceId = "INST-123"
@@ -388,6 +519,87 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ex.getMessage must include("writes-failed")
 
       verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+  }
+
+  "VerificationService.getLastSubmittedVerificationBatch" - {
+
+    val instanceId = "INST-123"
+
+    val response =
+      GetLastSubmittedVerificationBatchResponse(
+        scheme = None,
+        subcontractors = Nil,
+        verifications = Nil,
+        verificationBatch = None,
+        submission = None
+      )
+
+    "must fetch last submitted verification batch, store in UserAnswers, persist to session repo, and return updated answers" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.getLastSubmittedVerificationBatch(ua).futureValue
+
+      result.get(LastSubmittedVerificationBatchResponsePage) mustBe Some(response)
+
+      verify(mockConnector).getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+
+      verify(mockRepo).set(
+        org.mockito.ArgumentMatchers.argThat { (saved: UserAnswers) =>
+          saved.get(LastSubmittedVerificationBatchResponsePage).contains(response)
+        }
+      )
+
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must fail when CisIdQuery (instance id) is missing and not call connector nor repo" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ex = service.getLastSubmittedVerificationBatch(emptyUserAnswers).failed.futureValue
+      ex.getMessage must include("InstanceIdQuery not found in session data")
+
+      verify(mockConnector, never()).getLastSubmittedVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must propagate connector failure and not write to session repo" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockConnector.getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = service.getLastSubmittedVerificationBatch(ua).failed.futureValue
+      ex.getMessage must include("boom")
+
+      verify(mockConnector).getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
       verify(mockRepo, never()).set(any[UserAnswers])
       verifyNoMoreInteractions(mockConnector)
     }
@@ -647,6 +859,82 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
     }
   }
 
+  "VerificationService.deleteVerification" - {
+
+    "must call delete endpoint, refresh current+newest and persist" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResp =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val request =
+        DeleteVerificationRequest(
+          instanceId = instanceId,
+          verificationResourceRef = 1111L
+        )
+
+      val deleteResponse =
+        DeleteVerificationResponse(
+          verificationsCounter = Some(1L)
+        )
+
+      when(mockConnector.deleteVerification(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(deleteResponse))
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentResp))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result =
+        service
+          .deleteVerification(ua, 1111L)
+          .futureValue
+
+      result mustBe deleteResponse
+
+      verify(mockConnector).deleteVerification(eqTo(request))(any[HeaderCarrier])
+      verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, times(3)).set(any[UserAnswers])
+    }
+
+    "must fail when instance id is missing" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ex =
+        service
+          .deleteVerification(emptyUserAnswers, 1111L)
+          .failed
+          .futureValue
+
+      ex.getMessage mustBe "InstanceIdQuery not found in session data"
+
+      verify(mockConnector, never()).deleteVerification(any[DeleteVerificationRequest])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+  }
+
   "VerificationService.createSubmitAndPersistVerificationSubmission" - {
 
     "must create, submit and save details" in {
@@ -832,6 +1120,775 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ex.getMessage mustBe "Poll URL missing in submission details"
 
       verify(mockConnector, never()).getSubmissionStatus(any[String], any[String])(any[HeaderCarrier])
+    }
+  }
+
+  "VerificationService.anyUnmatchedResourceRefsStillPresent" - {
+
+    "must return true when an unmatched verificationResourceRef is still on the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(22L, Some(10L))))
+          )
+        )
+
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe true
+      verify(mockConnector).getSubcontractorList(eqTo("900063"))(any[HeaderCarrier])
+    }
+
+    "must return false when unmatched verificationResourceRefs are not on the live list" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = Some(22L),
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      when(mockConnector.getSubcontractorList(eqTo("900063"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(Seq(SubcontractorListItem(11L, Some(999L))))
+          )
+        )
+
+      service.anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted).futureValue mustBe false
+    }
+
+    "must return false without calling the connector when there are no recreatable unmatched subcontractors" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val lastSubmitted =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 1001L,
+              verificationBatchId = Some(99L),
+              verificationResourceRef = Some(10L),
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = Some("unmatched"),
+              subcontractorName = Some("John Smith"),
+              subcontractorId = None,
+              actionIndicator = Some("verify")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      service
+        .anyUnmatchedResourceRefsStillPresent("900063", lastSubmitted)
+        .futureValue mustBe false
+
+      verify(mockConnector, never())
+        .getSubcontractorList(any[String])(any[HeaderCarrier])
+    }
+  }
+
+  "VerificationService.recreateCurrentBatchFromUnmatchedVerifications" - {
+
+    val unmatchedSubcontractor =
+      SubcontractorLastVerification(
+        subcontractorId = 22L,
+        subbieResourceRef = Some(222L),
+        subcontractorType = None,
+        utr = None
+      )
+
+    val matchedSubcontractor =
+      SubcontractorLastVerification(
+        subcontractorId = 33L,
+        subbieResourceRef = Some(333L),
+        subcontractorType = None,
+        utr = None
+      )
+
+    val unmatchedVerification =
+      VerificationLastVerification(
+        verificationId = 1L,
+        verificationBatchId = Some(1L),
+        verificationResourceRef = Some(100L),
+        matched = Some("N"),
+        verificationNumber = None,
+        taxTreatment = None,
+        subcontractorName = None,
+        subcontractorId = Some(22L),
+        actionIndicator = Some("match")
+      )
+
+    val matchedVerification =
+      VerificationLastVerification(
+        verificationId = 2L,
+        verificationBatchId = Some(1L),
+        verificationResourceRef = Some(101L),
+        matched = Some("Y"),
+        verificationNumber = Some("V0000000002"),
+        taxTreatment = Some("net"),
+        subcontractorName = None,
+        subcontractorId = Some(33L),
+        actionIndicator = Some("verify")
+      )
+
+    val lastSubmittedResponse =
+      GetLastSubmittedVerificationBatchResponse(
+        scheme = None,
+        subcontractors = Seq(
+          unmatchedSubcontractor,
+          matchedSubcontractor
+        ),
+        verifications = Seq(
+          unmatchedVerification,
+          matchedVerification
+        ),
+        verificationBatch = None,
+        submission = None
+      )
+
+    "must create a new verification batch using only unmatched subcontractors when no current batch exists" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            lastSubmittedResponse
+          )
+          .success
+          .value
+
+      when(
+        mockConnector.getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(currentResponse))
+        .thenReturn(Future.successful(currentResponse))
+
+      when(
+        mockConnector.createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      when(
+        mockConnector.getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val requestCaptor =
+        ArgumentCaptor.forClass(
+          classOf[CreateVerificationBatchAndVerificationsRequest]
+        )
+
+      service
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
+        .futureValue
+
+      verify(mockConnector)
+        .createVerificationBatchAndVerifications(
+          requestCaptor.capture()
+        )(any[HeaderCarrier])
+
+      requestCaptor.getValue mustBe
+        CreateVerificationBatchAndVerificationsRequest(
+          instanceId = instanceId,
+          verificationResourceReferences = Seq(222L),
+          actionIndicator = None
+        )
+
+      verify(mockConnector, times(2))
+        .getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+
+      verify(mockConnector)
+        .getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .modifyVerificationBatch(
+          any[ModifyVerificationsRequest]
+        )(any[HeaderCarrier])
+    }
+
+    "must create a new verification batch when the current batch has no verifBatchResourceRef" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = Some(
+            VerificationBatchCurrentVerification(
+              verificationBatchId = 1L,
+              verifBatchResourceRef = None
+            )
+          ),
+          verifications = Nil
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            lastSubmittedResponse
+          )
+          .success
+          .value
+
+      val createResponse =
+        CreateVerificationBatchAndVerificationsResponse(
+          verificationBatchResourceReference = 12345L
+        )
+
+      when(
+        mockConnector.getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(currentResponse))
+        .thenReturn(Future.successful(currentResponse))
+
+      when(
+        mockConnector.createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(createResponse))
+
+      when(
+        mockConnector.getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val requestCaptor =
+        ArgumentCaptor.forClass(
+          classOf[CreateVerificationBatchAndVerificationsRequest]
+        )
+
+      service
+        .recreateCurrentBatchFromUnmatchedVerifications(
+          instanceId,
+          userAnswers
+        )
+        .futureValue
+
+      verify(mockConnector)
+        .createVerificationBatchAndVerifications(
+          requestCaptor.capture()
+        )(any[HeaderCarrier])
+
+      requestCaptor.getValue mustBe
+        CreateVerificationBatchAndVerificationsRequest(
+          instanceId = instanceId,
+          verificationResourceReferences = Seq(222L),
+          actionIndicator = None
+        )
+
+      verify(mockConnector, never())
+        .modifyVerificationBatch(
+          any[ModifyVerificationsRequest]
+        )(any[HeaderCarrier])
+    }
+
+    "must fail before refreshing the current batch when an unmatched verification has no subcontractorId" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val responseWithoutSubcontractorId =
+        lastSubmittedResponse.copy(
+          subcontractors = Seq(unmatchedSubcontractor),
+          verifications = Seq(
+            unmatchedVerification.copy(
+              subcontractorId = None
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            responseWithoutSubcontractorId
+          )
+          .success
+          .value
+
+      val exception =
+        service
+          .recreateCurrentBatchFromUnmatchedVerifications(
+            instanceId,
+            userAnswers
+          )
+          .failed
+          .futureValue
+
+      exception.getMessage mustBe
+        "No unmatched subcontractor references found in LastSubmittedVerificationBatchResponsePage"
+
+      verify(mockConnector, never())
+        .getCurrentVerificationBatch(
+          any[String]
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .modifyVerificationBatch(
+          any[ModifyVerificationsRequest]
+        )(any[HeaderCarrier])
+
+      verify(mockRepo, never())
+        .set(any[UserAnswers])
+    }
+
+    "must replace the current verification batch with unmatched subcontractors when a current batch exists" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Seq(
+            currentSubcontractor(
+              id = 22L,
+              ref = Some(222L)
+            )
+          ),
+          verificationBatch = Some(
+            VerificationBatchCurrentVerification(
+              verificationBatchId = 1L,
+              verifBatchResourceRef = Some(12345L)
+            )
+          ),
+          verifications = Seq(
+            VerificationCurrentVerification(
+              verificationId = 1L,
+              verificationBatchId = Some(1L),
+              subcontractorId = Some(22L),
+              verificationResourceRef = Some(999L),
+              subcontractorName = Some("Existing Subcontractor"),
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            lastSubmittedResponse
+          )
+          .success
+          .value
+
+      when(
+        mockConnector.getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(currentResponse))
+        .thenReturn(Future.successful(currentResponse))
+
+      when(
+        mockConnector.modifyVerificationBatch(
+          any[ModifyVerificationsRequest]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      when(
+        mockConnector.getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val requestCaptor =
+        ArgumentCaptor.forClass(
+          classOf[ModifyVerificationsRequest]
+        )
+
+      service
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
+        .futureValue
+
+      verify(mockConnector)
+        .modifyVerificationBatch(
+          requestCaptor.capture()
+        )(any[HeaderCarrier])
+
+      requestCaptor.getValue mustBe
+        ModifyVerificationsRequest(
+          instanceId = instanceId,
+          deleteVerifications = Some(
+            DeleteVerifications(
+              verificationResourceReferences = Seq(999L)
+            )
+          ),
+          createVerifications = Some(
+            CreateVerifications(
+              verificationBatchResourceRef = 12345L,
+              verificationResourceReferences = Seq(222L)
+            )
+          )
+        )
+
+      verify(mockConnector, times(2))
+        .getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+
+      verify(mockConnector)
+        .getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+    }
+
+    "must ignore matched verifications and only recreate unmatched subcontractors" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            lastSubmittedResponse
+          )
+          .success
+          .value
+
+      when(
+        mockConnector.getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(currentResponse))
+        .thenReturn(Future.successful(currentResponse))
+
+      when(
+        mockConnector.createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      when(
+        mockConnector.getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val requestCaptor =
+        ArgumentCaptor.forClass(
+          classOf[CreateVerificationBatchAndVerificationsRequest]
+        )
+
+      service
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
+        .futureValue
+
+      verify(mockConnector)
+        .createVerificationBatchAndVerifications(
+          requestCaptor.capture()
+        )(any[HeaderCarrier])
+
+      requestCaptor.getValue.verificationResourceReferences mustBe
+        Seq(222L)
+
+      requestCaptor.getValue.verificationResourceReferences must not contain
+        333L
+    }
+
+    "must use the central unmatched logic when selecting subcontractors" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val missingVerificationNumberSubcontractor =
+        SubcontractorLastVerification(
+          subcontractorId = 44L,
+          subbieResourceRef = Some(444L),
+          subcontractorType = None,
+          utr = None
+        )
+
+      val editSubcontractor =
+        SubcontractorLastVerification(
+          subcontractorId = 55L,
+          subbieResourceRef = Some(555L),
+          subcontractorType = None,
+          utr = None
+        )
+
+      val verifiedSubcontractor =
+        SubcontractorLastVerification(
+          subcontractorId = 66L,
+          subbieResourceRef = Some(666L),
+          subcontractorType = None,
+          utr = None
+        )
+
+      val response =
+        GetLastSubmittedVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq(
+            missingVerificationNumberSubcontractor,
+            editSubcontractor,
+            verifiedSubcontractor
+          ),
+          verifications = Seq(
+            VerificationLastVerification(
+              verificationId = 3L,
+              verificationBatchId = Some(1L),
+              verificationResourceRef = Some(103L),
+              matched = Some(" Y "),
+              verificationNumber = None,
+              taxTreatment = None,
+              subcontractorName = None,
+              subcontractorId = Some(44L),
+              actionIndicator = Some(" verify ")
+            ),
+            VerificationLastVerification(
+              verificationId = 4L,
+              verificationBatchId = Some(1L),
+              verificationResourceRef = Some(104L),
+              matched = Some("Y"),
+              verificationNumber = Some("V0000000004"),
+              taxTreatment = Some("net"),
+              subcontractorName = None,
+              subcontractorId = Some(55L),
+              actionIndicator = Some(" edit ")
+            ),
+            VerificationLastVerification(
+              verificationId = 5L,
+              verificationBatchId = Some(1L),
+              verificationResourceRef = Some(105L),
+              matched = Some(" y "),
+              verificationNumber = Some("V0000000005"),
+              taxTreatment = Some("net"),
+              subcontractorName = None,
+              subcontractorId = Some(66L),
+              actionIndicator = Some(" verify ")
+            )
+          ),
+          verificationBatch = None,
+          submission = None
+        )
+
+      val currentResponse =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(
+            LastSubmittedVerificationBatchResponsePage,
+            response
+          )
+          .success
+          .value
+
+      when(
+        mockConnector.getCurrentVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(currentResponse))
+        .thenReturn(Future.successful(currentResponse))
+
+      when(
+        mockConnector.createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      when(
+        mockConnector.getNewestVerificationBatch(
+          eqTo(instanceId)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val requestCaptor =
+        ArgumentCaptor.forClass(
+          classOf[CreateVerificationBatchAndVerificationsRequest]
+        )
+
+      service
+        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
+        .futureValue
+
+      verify(mockConnector)
+        .createVerificationBatchAndVerifications(
+          requestCaptor.capture()
+        )(any[HeaderCarrier])
+
+      requestCaptor.getValue.verificationResourceReferences mustBe
+        Seq(444L, 555L)
+
+      requestCaptor.getValue.verificationResourceReferences must not contain
+        666L
+    }
+
+    "must fail when LastSubmittedVerificationBatchResponsePage is missing" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val exception =
+        recoverToExceptionIf[RuntimeException] {
+          service.recreateCurrentBatchFromUnmatchedVerifications(
+            instanceId,
+            userAnswers
+          )
+        }.futureValue
+
+      exception.getMessage mustBe
+        "LastSubmittedVerificationBatchResponsePage not found in session data"
+
+      verify(mockConnector, never())
+        .getCurrentVerificationBatch(
+          any[String]
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .createVerificationBatchAndVerifications(
+          any[CreateVerificationBatchAndVerificationsRequest]
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .modifyVerificationBatch(
+          any[ModifyVerificationsRequest]
+        )(any[HeaderCarrier])
+
+      verify(mockConnector, never())
+        .getNewestVerificationBatch(
+          any[String]
+        )(any[HeaderCarrier])
+
+      verify(mockRepo, never())
+        .set(any[UserAnswers])
     }
   }
 }

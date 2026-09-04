@@ -18,6 +18,7 @@ package controllers.contractordetails
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import pages.contractordetails.ContractorSchemePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -37,17 +38,35 @@ class ContractorDetailsCheckAnswersController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val accountsOfficeReference = "123 PA 87654321"
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers.get(ContractorSchemePage) match {
 
-    val summaryRows = Seq(
-      ContractorUtrSummary.row(request.userAnswers),
-      AddSchemeNameYesNoSummary.row(request.userAnswers),
-      SchemeNameSummary.row(request.userAnswers),
-      AddEmailAddressYesNoSummary.row(request.userAnswers),
-      EnterContractorEmailAddressSummary.row(request.userAnswers)
-    ).flatten
+        case Some(scheme) =>
+          val summaryRows = Seq(
+            ContractorUtrSummary.row(request.userAnswers),
+            AddSchemeNameYesNoSummary.row(request.userAnswers),
+            SchemeNameSummary.row(request.userAnswers),
+            AddEmailAddressYesNoSummary.row(request.userAnswers),
+            EnterContractorEmailAddressSummary.row(request.userAnswers)
+          ).flatten
 
-    Ok(view(accountsOfficeReference, summaryRows))
-  }
+          Ok(
+            view(
+              scheme.accountsOfficeReference,
+              summaryRows
+            )
+          )
+
+        case None =>
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
+    }
+
+  def onSubmit: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { _ =>
+      Redirect(routes.ContractorDetailsUpdatedController.onPageLoad())
+    }
 }

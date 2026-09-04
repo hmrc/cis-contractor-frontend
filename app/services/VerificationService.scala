@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class VerificationService @Inject() (
@@ -58,6 +59,25 @@ class VerificationService @Inject() (
       _ <- sessionRepository.set(updated)
     } yield updated
 
+  def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
+      val status =
+        updatedAnswers
+          .get(NewestVerificationBatchResponsePage)
+          .flatMap(_.submission)
+          .flatMap(_.status)
+
+      if (status.exists(isSubmittedStatus)) {
+        Future.successful(updatedAnswers)
+      } else {
+        Future.failed(
+          new IllegalStateException(
+            s"Submitted verification request page cannot be accessed for submission status: ${status.getOrElse("missing")}"
+          )
+        )
+      }
+    }
+
   def getCurrentVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
       instanceId <- userAnswers
@@ -67,6 +87,18 @@ class VerificationService @Inject() (
 
       response <- cisConnector.getCurrentVerificationBatch(instanceId)
       updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
+      _        <- sessionRepository.set(updated)
+    } yield updated
+
+  def getLastSubmittedVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.getLastSubmittedVerificationBatch(instanceId)
+      updated  <- Future.fromTry(userAnswers.set(LastSubmittedVerificationBatchResponsePage, response))
       _        <- sessionRepository.set(updated)
     } yield updated
 
@@ -128,6 +160,12 @@ class VerificationService @Inject() (
   private def isUnverified(sub: Subcontractor): Boolean =
     !sub.verified.contains("Y")
 
+  private def isSubmittedStatus(status: String): Boolean =
+    SubmissionStatus.fromString(status) match {
+      case SubmissionStatus.SUBMITTED | SubmissionStatus.SUBMITTED_NO_RECEIPT => true
+      case _                                                                  => false
+    }
+
   def modifyVerificationBatchAndVerifications(
     userAnswers: UserAnswers,
     request: ModifyVerificationsRequest
@@ -138,6 +176,51 @@ class VerificationService @Inject() (
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
+
+  def deleteVerification(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.deleteVerification(
+                    DeleteVerificationRequest(
+                      instanceId = instanceId,
+                      verificationResourceRef = verificationResourceRef
+                    )
+                  )
+
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      updated      <- Future.fromTry(withVerificationBatchReadiness(afterNewest))
+      _            <- sessionRepository.set(updated)
+    } yield response
+
+  private def withVerificationBatchReadiness(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers
+      .get(CurrentVerificationBatchResponsePage)
+      .map { batch =>
+        val remainingVerifications =
+          batch.verifications.flatMap { verification =>
+            verification.subcontractorId.flatMap { subcontractorId =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map(subcontractor => (subcontractor, verification))
+            }
+          }
+
+        val batchReady =
+          remainingVerifications.forall { case (subcontractor, verification) =>
+            VerificationBatchReadiness.isSubcontractorReady(subcontractor, Some(verification))
+          }
+
+        userAnswers.set(VerificationBatchReadinessPage, batchReady)
+      }
+      .getOrElse(userAnswers.remove(VerificationBatchReadinessPage))
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],
@@ -187,6 +270,28 @@ class VerificationService @Inject() (
         request => Future.successful(request)
       )
 
+  def anyUnmatchedResourceRefsStillPresent(
+    cisId: String,
+    response: GetLastSubmittedVerificationBatchResponse
+  )(implicit hc: HeaderCarrier): Future[Boolean] = {
+
+    val unmatchedIds =
+      unmatchedSubcontractorIds(response).toSet
+
+    if (unmatchedIds.isEmpty) {
+      Future.successful(false)
+    } else {
+      cisConnector.getSubcontractorList(cisId).map { listResponse =>
+        val liveIds =
+          listResponse.subcontractors
+            .map(_.subcontractorId)
+            .toSet
+
+        unmatchedIds.exists(liveIds.contains)
+      }
+    }
+  }
+
   private def resolveEmployerReference(
     userId: String,
     isAgent: Boolean,
@@ -232,4 +337,112 @@ class VerificationService @Inject() (
       case Some(v) => Future.successful(v)
       case None    => Future.failed(new RuntimeException(errorMsg))
     }
+
+  def recreateCurrentBatchFromUnmatchedVerifications(
+    cisId: String,
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      lastSubmitted <- userAnswers
+                         .get(LastSubmittedVerificationBatchResponsePage)
+                         .map(Future.successful)
+                         .getOrElse(
+                           Future.failed(
+                             new RuntimeException(
+                               "LastSubmittedVerificationBatchResponsePage not found in session data"
+                             )
+                           )
+                         )
+
+      submittedSubbieRefs <- {
+        val refs = unmatchedSubcontractorRefs(lastSubmitted)
+
+        if (refs.nonEmpty) Future.successful(refs)
+        else
+          Future.failed(
+            new RuntimeException(
+              "No unmatched subcontractor references found in LastSubmittedVerificationBatchResponsePage"
+            )
+          )
+      }
+
+      refreshedUa <- getCurrentVerificationBatch(userAnswers)
+
+      current <- refreshedUa
+                   .get(CurrentVerificationBatchResponsePage)
+                   .map(Future.successful)
+                   .getOrElse(
+                     Future.failed(
+                       new RuntimeException(
+                         "CurrentVerificationBatchResponsePage not found in session data"
+                       )
+                     )
+                   )
+
+      verificationBatchRefOpt =
+        current.verificationBatch.flatMap(_.verifBatchResourceRef)
+
+      _ <-
+        verificationBatchRefOpt match {
+
+          case None =>
+            cisConnector.createVerificationBatchAndVerifications(
+              CreateVerificationBatchAndVerificationsRequest(
+                instanceId = cisId,
+                verificationResourceReferences = submittedSubbieRefs,
+                actionIndicator = None
+              )
+            )
+
+          case Some(verificationBatchRef) =>
+            val existingVerificationRefs =
+              current.verifications
+                .flatMap(_.verificationResourceRef)
+                .distinct
+
+            val modifyRequest =
+              ModifyVerificationsRequest(
+                instanceId = cisId,
+                deleteVerifications =
+                  if (existingVerificationRefs.nonEmpty)
+                    Some(DeleteVerifications(existingVerificationRefs))
+                  else None,
+                createVerifications = Some(
+                  CreateVerifications(
+                    verificationBatchRef,
+                    submittedSubbieRefs
+                  )
+                )
+              )
+
+            cisConnector.modifyVerificationBatch(modifyRequest)
+        }
+
+      afterCurrent <- getCurrentVerificationBatch(refreshedUa)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+
+    } yield afterNewest
+
+  private def unmatchedSubcontractorRefs(
+    response: GetLastSubmittedVerificationBatchResponse
+  ): Seq[Long] = {
+
+    val ids = unmatchedSubcontractorIds(response)
+
+    response.subcontractors
+      .filter(sub => ids.contains(sub.subcontractorId))
+      .flatMap(_.subbieResourceRef)
+      .distinct
+  }
+
+  private def unmatchedSubcontractorIds(
+    response: GetLastSubmittedVerificationBatchResponse
+  ): Seq[Long] =
+    response.verifications.collect {
+      case verification
+          if CheckUnmatchedSubcontractorsService.isUnmatched(verification) &&
+            verification.subcontractorId.isDefined =>
+        verification.subcontractorId.get
+    }.distinct
 }

@@ -1,68 +1,71 @@
 # Infrastructure
-service.name                              =  Construction Industry Scheme
+service.name                                            =  Construction Industry Scheme
 
-site.back                                 =  Back
-site.remove                               =  Remove
-site.change                               =  Change
-site.no                                   =  No
-site.yes                                  =  Yes
-site.continue                             =  Continue
-site.update                               =  Update
-site.start                                =  Start now
-site.startAgain                           =  Start again
-site.signIn                               =  Sign in
-site.govuk                                =  GOV.UK
-site.saveAndContinue                      =  Save and continue
-site.unknown                              =  Unknown
+site.back                                               =  Back
+site.remove                                             =  Remove
+site.change                                             =  Change
+site.no                                                 =  No
+site.yes                                                =  Yes
+site.continue                                           =  Continue
+site.update                                             =  Update
+site.start                                              =  Start now
+site.startAgain                                         =  Start again
+site.signIn                                             =  Sign in
+site.govuk                                              =  GOV.UK
+site.saveAndContinue                                    =  Save and continue
+site.unknown                                            =  Unknown
 
-date.day                                  =  Day
-date.month                                =  Month
-date.year                                 =  Year
-date.error.day                            =  day
-date.error.month                          =  month
-date.error.year                           =  year
+date.day                                                =  Day
+date.month                                              =  Month
+date.year                                               =  Year
+date.error.day                                          =  day
+date.error.month                                        =  month
+date.error.year                                         =  year
 
-error.boolean                             =  Please give an answer
+error.boolean                                           =  Please give an answer
 
-timeout.title                             =  You’re about to be signed out
-timeout.message                           =  For security reasons, you will be signed out of this service in
-timeout.keepAlive                         =  Stay signed in
-timeout.signOut                           =  Sign out
+timeout.title                                           =  You’re about to be signed out
+timeout.message                                         =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                                       =  Stay signed in
+timeout.signOut                                         =  Sign out
 
-error.title.prefix                        =  Error:
-error.prefix                              =  Error
-error.summary.title                       =  There is a problem
+error.title.prefix                                      =  Error:
+error.prefix                                            =  Error
+error.summary.title                                     =  There is a problem
 
-index.title                               =  Construction Industry Scheme
-index.heading                             =  Construction Industry Scheme
-index.guidance                            =  Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
+index.title                                             =  Construction Industry Scheme
+index.heading                                           =  Construction Industry Scheme
+index.guidance                                          =  Welcome to cis-contractor-frontend. Please see the README file for a guide to getting started.
 
-checkYourAnswers.title                    =  Check your answers
-checkYourAnswers.heading                  =  Check your answers before adding this individual
+checkYourAnswers.title                                  =  Check your answers
+checkYourAnswers.heading                                =  Check your answers before adding this individual
 
-journeyRecovery.continue.title            =  Sorry, there is a problem with this service
-journeyRecovery.continue.heading          =  Sorry, there is a problem with this service
-journeyRecovery.continue.guidance.p1      =  There is problem with this service. You can return to
-journeyRecovery.continue.guidance.link    =  Construction Industry Scheme
-journeyRecovery.continue.guidance.p2      =  or try again later.
-journeyRecovery.startAgain.title          =  Sorry, there is a problem with this service
-journeyRecovery.startAgain.heading        =  Sorry, there is a problem with this service
-journeyRecovery.startAgain.guidance.p1    =  There is problem with this service. You can return to
-journeyRecovery.startAgain.guidance.link  =  Construction Industry Scheme
-journeyRecovery.startAgain.guidance.p2    =  or try again later.
+journeyRecovery.continue.title                          =  Sorry, there is a problem with this service
+journeyRecovery.continue.heading                        =  Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1                    =  There is a problem with this service. You can return to
+journeyRecovery.continue.guidance.link                  =  Construction Industry Scheme
+journeyRecovery.continue.guidance.p2                    =  or try again later.
+journeyRecovery.startAgain.title                        =  There is a problem with this service
+journeyRecovery.startAgain.heading                      =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.guidance.p1                  =  Try again later.
+journeyRecovery.startAgain.guidance.p2                  =  Any information you have provided has not been saved. When the service is available, you will have to start again.
+journeyRecovery.startAgain.guidance.contactHMRC.link    =  Contact HMRC
+journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  for more help.
+journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Back to
+journeyRecovery.startAgain.guidance.cisAccount.link     =  Manage your CIS account
 
-signedOut.title                           =  For your security, we signed you out
-signedOut.heading                         =  For your security, we signed you out
-signedOut.guidance                        =  We did not save your answers.
+signedOut.title                                         =  For your security, we signed you out
+signedOut.heading                                       =  For your security, we signed you out
+signedOut.guidance                                      =  We did not save your answers.
 
-checkYourAnswers.heading.sub.h2           =  Subcontractor details
-checkYourAnswers.heading.h2               =  Now add this subcontractor
-checkYourAnswers.p1                       =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
-checkYourAnswers.addSubcontractor         =  Accept and submit
+checkYourAnswers.heading.sub.h2                         =  Subcontractor details
+checkYourAnswers.heading.h2                             =  Now add this subcontractor
+checkYourAnswers.p1                                     =  By adding this subcontractor you are confirming that, to the best of your knowledge, the details you are providing are correct.
+checkYourAnswers.addSubcontractor                       =  Accept and submit
 
-site.pagination.previous                  =  Previous
-site.pagination.next                      =  Next
-site.pagination.landmark                  =  Pagination
+site.pagination.previous                                =  Previous
+site.pagination.next                                    =  Next
+site.pagination.landmark                                =  Pagination
 
 # Errors & Auth
 pageNotFound.title                       =  Page not found
@@ -426,6 +429,7 @@ amendConfirmation.beforeYouGo.p1                                                
 amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
 amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
 amendConfirmation.table.content.none                                                =  None provided
+amendConfirmation.table.selectContent.none                                          =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                   =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                 =  Are you sure you want to remove the {1} for {0}?
@@ -488,6 +492,45 @@ noUnmatchedSubcontractors.p1                                                    
 noUnmatchedSubcontractors.p2                                                        =  You can now verify any of your other subcontractors by creating a new verification request.
 noUnmatchedSubcontractors.backTo                                                    =  Back to
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
+
+unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.heading                              =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.p1                                   =  You have updated the subcontractor details for {0}.
+unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2                       =  Updates made
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details                    =  Details
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous                   =  Previous
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  Updated
+unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  None provided
+unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  None selected
+unmatched.unmatchedSubcontractorDetailsUpdated.backTo                               =  Back to
+unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  Cannot verify all subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  Before you go
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  Your feedback helps us make our service better.
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey         =  Take a short survey
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback            =  to share your feedback on this service.
+unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  Review unmatched subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  Your subcontractors
+
+info.CheckYourAnswers.backTo                                                        =  Back to
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+
+insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
+insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
+insufficientSubcontractorDetailsUpdated.updatesMade.h2                              =  Updates made
+insufficientSubcontractorDetailsUpdated.table.hdr.details                           =  Details
+insufficientSubcontractorDetailsUpdated.table.hdr.previous                          =  Previous
+insufficientSubcontractorDetailsUpdated.table.hdr.updated                           =  Updated
+insufficientSubcontractorDetailsUpdated.noneProvided                                =  None provided
+insufficientSubcontractorDetailsUpdated.noneSelected                                =  None selected
+insufficientSubcontractorDetailsUpdated.noName                                      =  No name provided
+insufficientSubcontractorDetailsUpdated.backTo                                      =  Back to
+insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  Before you go
+insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  Your feedback helps us make our service better.
+insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  Take a short survey
+insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                   =  to share your feedback on this service.
+insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  Review unmatched subcontractors
+insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
+insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
@@ -948,7 +991,7 @@ verify.verifyYourSubcontractorsYesNo.p3                                 =  You m
 verify.verifyYourSubcontractorsYesNo.list.l1                            =  have recently changed any of their information
 verify.verifyYourSubcontractorsYesNo.list.l2                            =  have not been included on a return recently and have lost their verified status
 verify.verifyYourSubcontractorsYesNo.list.l3                            =  are about to lose their verified status
-verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to add existing subcontractors to this verification request?
+verify.verifyYourSubcontractorsYesNo.heading2                           =  Do you want to reverify any existing subcontractors?
 verify.verifyYourSubcontractorsYesNo.error.required                     =  Select yes if you want to add existing subcontractors to this verification request
 
 verify.verificationRequestInProgress.title                              =  Verification request in progress
@@ -979,6 +1022,24 @@ verify.selectSubcontractorsToReverify.taxTreatment.unmatched            =  Highe
 verify.selectSubcontractorsToReverify.taxTreatment.gross                =  Gross
 verify.selectSubcontractorsToReverify.display.noneSelected              =  None selected
 
+verify.reviewInsufficientInfo.title                                     =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.heading                                   =  Cannot verify all subcontractors
+verify.reviewInsufficientInfo.p1                                        =  Some of the subcontractors in your verification request do not have all the information we need to verify them.
+verify.reviewInsufficientInfo.p2                                        =  To fix this, you can:
+verify.reviewInsufficientInfo.bullet1                                   =  edit their information and correct any of their details
+verify.reviewInsufficientInfo.bullet2                                   =  proceed with including them in this verification request without making any changes
+verify.reviewInsufficientInfo.bullet3                                   =  remove the subcontractor from this verification request
+verify.reviewInsufficientInfo.whatYouNeed.link                          =  What you''ll need to verify subcontractors (opens in new tab)
+verify.reviewInsufficientInfo.missing.subheading                        =  Subcontractors with missing information
+verify.reviewInsufficientInfo.ready.subheading                          =  Ready for verification
+verify.reviewInsufficientInfo.name                                      =  Name
+verify.reviewInsufficientInfo.utr                                       =  UTR
+verify.reviewInsufficientInfo.noneProvided                              =  None provided
+verify.reviewInsufficientInfo.actions                                   =  Actions
+verify.reviewInsufficientInfo.action.edit                               =  Edit
+verify.reviewInsufficientInfo.action.proceed                            =  Proceed
+verify.reviewInsufficientInfo.action.remove                             =  Remove
+
 verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
@@ -1005,10 +1066,10 @@ verify.reverifyExistingSubcontractorsYesNo.p2                           =  You m
 verify.reverifyExistingSubcontractorsYesNo.list.l1                      =  have recently changed any of their information
 verify.reverifyExistingSubcontractorsYesNo.list.l2                      =  have not been included on a return recently and have lost their verified status
 verify.reverifyExistingSubcontractorsYesNo.list.l3                      =  are about to lose their verified status
-verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.subHeading                   =  Do you want to reverify any existing subcontractors?
 verify.reverifyExistingSubcontractorsYesNo.error.required               =  Select yes if you want to add existing subcontractors to this verification request
-verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to add other subcontractors to this verification request?
-verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to add other subcontractors to this verification request?
+verify.reverifyExistingSubcontractorsYesNo.checkYourAnswersLabel        =  Do you want to reverify any existing subcontractors?
+verify.reverifyExistingSubcontractorsYesNo.change.hidden                =  do you want to reverify any existing subcontractors?
 
 verify.verifyDepartmentalError.title                                    =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                  =  There was a problem with your verification request
@@ -1093,11 +1154,16 @@ verify.verificationResults.verificationNumber                           =  Verif
 verify.verificationResults.reviewUnmatchedSubcontractors.button         =  Review unmatched subcontractors
 verify.verificationResults.backTo                                       =  Back to
 verify.verificationResults.manageYourSubcontractors.link                =  Manage your subcontractors
+verify.verificationResults.status.matched                               =  Verified
+verify.verificationResults.status.unmatched                             =  Unmatched
+verify.verificationResults.taxTreatment.net                             =  Standard rate
+verify.verificationResults.taxTreatment.gross                           =  Gross
+verify.verificationResults.taxTreatment.unmatched                       =  Higher rate
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Contractor details
-contractordetails.contractorDetailsIndex.heading                               =  Contractor details
-contractordetails.contractorDetailsIndex.p1                                    =  To use the Construction Industry Scheme service, you will need the contractor’s Unique Taxpayer Reference and scheme name.
+contractordetails.contractorDetailsIndex.heading                               =  Manage contractor details
+contractordetails.contractorDetailsIndex.p1                                    =  To use the Construction Industry Scheme service, you will need the contractor's Unique Taxpayer Reference.
 
 contractordetails.schemeName.title                                             =  What is the contractor’s scheme name?
 contractordetails.schemeName.heading                                           =  What is the contractor’s scheme name?
@@ -1115,11 +1181,11 @@ contractordetails.enterContractorEmailAddress.error.length                     =
 contractordetails.enterContractorEmailAddress.error.invalid                    =  You have entered an email address in an incorrect format
 contractordetails.enterContractorEmailAddress.change.hidden                    =  email address
 
-contractordetails.contractorDetailsUpdated.title                               =  Contractor Details Updated
+contractordetails.contractorDetailsUpdated.title                               =  Contractor details updated
 contractordetails.contractorDetailsUpdated.heading                             =  Contractor details updated
 contractordetails.contractorDetailsUpdated.p1.details.prefix                   =  You have successfully changed the contractor details. You can
 contractordetails.contractorDetailsUpdated.p1.details.link                     =  view the change on your contractor details
-contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to manage your CIS account
+contractordetails.contractorDetailsUpdated.returnToDashboard.link              =  Return to CIS account
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link             =  What did you think of this service?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix           =  (takes 30 seconds)
 
@@ -1144,7 +1210,7 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  Email
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  email
 contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Add details
-contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to manage your CIS account
+contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Return to CIS account
 
 contractordetails.addEmailAddressYesNo.title                                   =  Do you want to enter the contractor’s email address?
 contractordetails.addEmailAddressYesNo.heading                                 =  Do you want to enter the contractor’s email address?
@@ -1164,3 +1230,10 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+verify.verifyDepartmentalErrorSubmitAgainController.title                                            =  There was a problem with your verification request
+verify.verifyDepartmentalErrorSubmitAgainController.heading                                          =  There was a problem with your verification request
+verify.verifyDepartmentalErrorSubmitAgainController.p1                                               =  The subcontractors that you selected have not been verified and your request has not been saved.
+verify.verifyDepartmentalErrorSubmitAgainController.p2                                               =  To verify these subcontractors, you need to start again with a new verification request.
+verify.verifyDepartmentalErrorSubmitAgainController.backTo                                           =  Back to
+verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link                    =  Manage your subcontractors

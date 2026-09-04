@@ -163,7 +163,7 @@ class AmendSubcontractorControllerSpec
 
           redirectLocation(result).value mustBe
             controllers.amend.routes.AmendIndividualCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(subbieResourceRef)
               .url
 
           verify(mockSessionRepository, times(2))
@@ -210,7 +210,7 @@ class AmendSubcontractorControllerSpec
 
           redirectLocation(result).value mustBe
             controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(subbieResourceRef)
               .url
 
           verify(mockSessionRepository, times(2))
@@ -257,7 +257,7 @@ class AmendSubcontractorControllerSpec
 
           redirectLocation(result).value mustBe
             controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(subbieResourceRef)
               .url
 
           verify(mockSessionRepository, times(2))
@@ -304,7 +304,7 @@ class AmendSubcontractorControllerSpec
 
           redirectLocation(result).value mustBe
             controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(subbieResourceRef)
               .url
 
           verify(mockSessionRepository, times(2))

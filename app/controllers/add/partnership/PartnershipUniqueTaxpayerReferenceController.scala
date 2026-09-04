@@ -42,6 +42,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   formProvider: PartnershipUtrFormProvider,
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipUniqueTaxpayerReferenceView
 )(implicit ec: ExecutionContext)
@@ -59,25 +60,26 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val yesOrNoPage       = PartnershipHasUtrYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val yesOrNoPage       = PartnershipHasUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          val result       = Ok(view(preparedForm, mode, partnershipName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
-        val result       = Ok(view(preparedForm, mode, partnershipName))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(PartnershipNamePage)
         .map { name =>
@@ -110,5 +112,5 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

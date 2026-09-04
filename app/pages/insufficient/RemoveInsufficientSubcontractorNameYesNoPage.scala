@@ -19,9 +19,8 @@ package pages.insufficient
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object RemoveInsufficientSubcontractorNameYesNoPage extends QuestionPage[Boolean] {
+case class RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef: Long) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "removeInsufficientSubcontractorNameYesNo"
+  override def path: JsPath =
+    JsPath \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
 }

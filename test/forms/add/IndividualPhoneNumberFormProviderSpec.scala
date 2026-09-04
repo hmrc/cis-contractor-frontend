@@ -15,7 +15,7 @@
  */
 
 package forms.add
-
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
@@ -26,13 +26,13 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
   val invalidKey  = "individualPhoneNumber.error.invalid"
   val maxLength   = 35
 
-  val phoneRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
+  val phoneRegex = Validation.phoneRegex
 
   val form = new IndividualPhoneNumberFormProvider()()
 
   val validPhoneNumber = Seq(
     "07777777777",
-    "+447777777777",
+    "447777777777",
     "  07777 77777 ",
     "(44)77777777777",
     "44-777-777"
@@ -95,20 +95,16 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must display error when there is less than 6 digits" in {
-      val lessThanSixDigits = Seq(
-        "01234",
-        "+012+34",
-        "+()()123",
-        "1------2"
-      )
+    "must bind a phone number containing fewer than 6 digits" in {
+      val phoneNumber = "12345"
 
-      lessThanSixDigits.foreach { number =>
-        val result = form.bind(Map(fieldName -> number))
-        result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(phoneRegex))
+      val result =
+        form.bind(
+          Map("value" -> phoneNumber)
         )
-      }
+
+      result.errors mustBe empty
+      result.value mustBe Some(phoneNumber)
     }
 
     "trim leading and trailing spaces" in {

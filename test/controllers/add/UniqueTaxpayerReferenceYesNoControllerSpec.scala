@@ -20,11 +20,12 @@ import base.SpecBase
 import controllers.routes
 import forms.add.UniqueTaxpayerReferenceYesNoFormProvider
 import models.add.SubcontractorName
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, UniqueTaxpayerReferenceYesNoPage}
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -40,6 +41,9 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
 
   private lazy val uniqueTaxpayerReferenceYesNoRoute =
     controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(NormalMode).url
+
+  private lazy val uniqueTaxpayerReferenceYesNoAmendRoute =
+    controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(AmendMode).url
 
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -225,6 +229,97 @@ class UniqueTaxpayerReferenceYesNoControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, uniqueTaxpayerReferenceYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a Post when subcontractor is verified" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, uniqueTaxpayerReferenceYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when subcontractor is unverified in amend mode" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, uniqueTaxpayerReferenceYesNoAmendRoute)
+
+        val result = route(application, request).value
+        val view   = application.injector.instanceOf[UniqueTaxpayerReferenceYesNoView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, name)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted when subcontractor is unverified in amend mode" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, uniqueTaxpayerReferenceYesNoAmendRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
+          .onPageLoad(AmendMode)
+          .url
       }
     }
   }
