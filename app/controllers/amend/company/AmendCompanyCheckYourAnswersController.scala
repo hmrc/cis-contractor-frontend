@@ -18,6 +18,7 @@ package controllers.amend.company
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
 import controllers.routes
 import models.add.company.ValidatedCompany
 import models.amend.AmendJourneyType
@@ -25,7 +26,7 @@ import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.company.CompanyNamePage
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
@@ -67,7 +68,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
       ValidatedCompany.build(ua) match {
         case Right(_) =>
-          val isVerified  = ua.get(ShowVerificationDetailsPage)
+          val isVerified  = AmendControllerUtils.isVerifiedForAmendJourney(ua)
           val companyName = ua.get(CompanyNamePage).getOrElse("")
 
           val subcontractorInformationList =
@@ -90,11 +91,11 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   private def subcontractorInformationRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val verificationRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
 
         Seq(
           CompanyUtrSummary.row(
@@ -126,18 +127,18 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Nil
       } else {
         Seq(CompanyNameSummary.row(ua, AmendMode))
       }
 
     val utrRows =
-      if (isVerified.contains(true)) {
+      if (isVerified) {
         Nil
       } else {
         Seq(
@@ -167,7 +168,6 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-
       ValidatedCompany.build(request.userAnswers) match {
 
         case Left(error) =>
@@ -180,17 +180,17 @@ class AmendCompanyCheckYourAnswersController @Inject() (
           )
 
         case Right(_)
-          if request.userAnswers
-            .get(AmendCheckYourAnswersSubmittedPage)
-            .contains(true) =>
+            if request.userAnswers
+              .get(AmendCheckYourAnswersSubmittedPage)
+              .contains(true) =>
           Future.successful(
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           )
 
         case Right(_)
-          if !AmendmentHelper.companyHasChanges(
-            request.userAnswers
-          ) =>
+            if !AmendmentHelper.companyHasChanges(
+              request.userAnswers
+            ) =>
           handleNoChanges()
 
         case Right(_) =>
@@ -202,7 +202,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
     }
 
   private def handleNoChanges()(implicit
-                                request: CisIdDataRequest[AnyContent]
+    request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =
@@ -227,9 +227,9 @@ class AmendCompanyCheckYourAnswersController @Inject() (
   }
 
   private def noChangesRedirect(
-                                 userAnswers: UserAnswers,
-                                 cisId: String
-                               ): Call =
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call =
     userAnswers.get(AmendJourneyTypePage) match {
 
       case Some(AmendJourneyType.Standard) =>
@@ -239,13 +239,11 @@ class AmendCompanyCheckYourAnswersController @Inject() (
         )
 
       case Some(AmendJourneyType.InsufficientInfo) =>
-        controllers.verify.routes
-          .ReviewInsufficientInfoSubcontractorsController
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
           .onPageLoad()
 
       case Some(AmendJourneyType.UnmatchedInfo) =>
-        controllers.verify.routes
-          .ReviewUnmatchedSubcontractorsRoutingController
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
           .onPageLoad()
 
       case None =>
@@ -335,7 +333,6 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-
       sessionRepository
         .set(UserAnswers(request.userAnswers.id))
         .map { _ =>

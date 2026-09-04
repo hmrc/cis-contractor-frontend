@@ -28,6 +28,7 @@ import play.api.Logging
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.*
+import scala.util.{Failure, Success, Try}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
@@ -42,7 +43,8 @@ class ReviewInsufficientInfoService @Inject() (
 
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
-  )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
+  )(implicit messages: Messages): Try[ReviewInsufficientInfoViewModel] = {
+
     val batchSubs =
       batch.verifications.flatMap { verification =>
         batch.subcontractors
@@ -55,10 +57,27 @@ class ReviewInsufficientInfoService @Inject() (
         VerificationBatchReadiness.isSubcontractorReady(sub, Some(verification))
       }
 
-    ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map { case (sub, _) => toMissingRow(sub) },
-      ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
-    )
+    missingSubs
+      .collectFirst {
+        case (sub, _) if sub.subbieResourceRef.isEmpty =>
+          Failure(
+            new IllegalStateException(
+              s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
+            )
+          )
+      }
+      .getOrElse {
+        Success(
+          ReviewInsufficientInfoViewModel(
+            missing = missingSubs.map { case (sub, _) =>
+              toMissingRow(sub)
+            },
+            ready = readySubs.map { case (sub, _) =>
+              toReadyRow(sub)
+            }
+          )
+        )
+      }
   }
 
   def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
@@ -92,13 +111,9 @@ class ReviewInsufficientInfoService @Inject() (
   private def toMissingRow(
     sub: SubcontractorCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
+
     val name = displayName(sub)
-    val subbieResourceRef =
-      sub.subbieResourceRef.getOrElse {
-        throw new IllegalStateException(
-          s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
-        )
-      }
+
     MissingSubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -106,7 +121,7 @@ class ReviewInsufficientInfoService @Inject() (
       editLink = LinkViewModel(
         controllers.amend.routes.AmendSubcontractorController
           .onPageLoad(
-            subbieResourceRef,
+            sub.subbieResourceRef.get,
             AmendJourneyType.InsufficientInfo.routeValue
           )
           .url,
