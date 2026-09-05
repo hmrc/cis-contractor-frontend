@@ -22,7 +22,7 @@ import generators.ModelGenerators
 import models.*
 import models.response.*
 import models.requests.*
-import models.verify.{ChrisVerificationRequestBuilder, SubmissionStatus, VerificationSubmissionDetails}
+import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors, SubmissionStatus, VerificationSubmissionDetails}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -159,6 +159,81 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       result.get(UnverifiedSubcontractorsPage) mustBe
         Some(Seq(unverifiedSub1, unverifiedSub2))
+
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must remove selected subcontractors that no longer exist in the newest verification batch" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val selectedSubcontractors =
+        Set(
+          SubcontractorViewModel("2", "Existing selected subcontractor"),
+          SubcontractorViewModel("999", "Removed selected subcontractor")
+        )
+
+      val selectedSubcontractorsToReverify =
+        Set(
+          SelectedSubcontractors("1", "Existing selected subcontractor to reverify"),
+          SelectedSubcontractors("998", "Removed selected subcontractor to reverify")
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(SelectSubcontractorPage, selectedSubcontractors)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, selectedSubcontractorsToReverify)
+          .success
+          .value
+
+      val newestResponse =
+        responseWithSubcontractors.copy(
+          verifications = Seq(
+            Verification(
+              verificationId = 1L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(1L),
+              verificationResourceRef = None
+            ),
+            Verification(
+              verificationId = 2L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(2L),
+              verificationResourceRef = None
+            )
+          )
+        )
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(newestResponse))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshNewestVerificationBatch(userAnswers).futureValue
+
+      result.get(SelectSubcontractorPage) mustBe Some(
+        Set(SubcontractorViewModel("2", "Existing selected subcontractor"))
+      )
+
+      result.get(SelectSubcontractorsToReverifyPage) mustBe Some(
+        Set(SelectedSubcontractors("1", "Existing selected subcontractor to reverify"))
+      )
 
       verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
       verify(mockRepo).set(any[UserAnswers])
