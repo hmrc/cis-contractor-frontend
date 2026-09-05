@@ -19,10 +19,13 @@ package views.verify
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import play.twirl.api.HtmlFormat
 import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
@@ -35,7 +38,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
 
     "render the page correctly when reverify list and email are present" in new Setup {
 
-      val doc = Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       doc.title must include(
         messages("verify.verificationRequestSubmitted.title")
@@ -50,7 +53,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages(
           "verify.verificationRequestSubmitted.submittedAt",
           submittedAt.format(
-            DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy")
+            DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy", messages.lang.locale)
           )
         )
       )
@@ -69,7 +72,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
 
       doc.select("p.govuk-body").text must include(email)
 
-      val emailVerificationLink =
+      val emailVerificationLink: Elements =
         doc.select(s"a[href='${appConfig.verificationHistoryUrl}']")
 
       emailVerificationLink.text must include(
@@ -88,7 +91,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages("verify.verificationRequestSubmitted.needHelp.subHeading")
       )
 
-      val manageLink =
+      val manageLink: Elements =
         doc.select(s"a[href='${appConfig.manageSubcontractorsUrl}/$cisId']")
 
       manageLink.size() mustBe 1
@@ -99,7 +102,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages("verify.verificationRequestSubmitted.feedback.subHeading")
       )
 
-      val surveyLink =
+      val surveyLink: Elements =
         doc.select(s"a[href='${appConfig.exitSurveyUrl}']")
 
       surveyLink.size mustBe 1
@@ -118,7 +121,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
           confirmationEmail = None
         )
 
-      val doc = Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       doc.text must not include
         messages("verify.verificationRequestSubmitted.subcontractorsToReverify.label")
@@ -144,10 +147,10 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
     val view: VerificationRequestSubmittedView =
       app.injector.instanceOf[VerificationRequestSubmittedView]
 
-    val referenceNumber = "Reference number 12345"
-    val submittedAt     = LocalDateTime.of(2026, 4, 27, 10, 30)
+    val referenceNumber            = "Reference number 12345"
+    val submittedAt: LocalDateTime = LocalDateTime.of(2026, 4, 27, 10, 30)
 
-    val subcontractorsToVerify =
+    val subcontractorsToVerify: Seq[String] =
       Seq(
         "Brody, Martin",
         "Hooper And Associates",
@@ -155,7 +158,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         "The Kintner Group"
       )
 
-    val subcontractorsToReverify =
+    val subcontractorsToReverify: Seq[String] =
       Seq(
         "Grant, Alan",
         "InGen Research"
@@ -176,7 +179,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         confirmationEmail = Some(email)
       )
 
-    lazy val html =
+    lazy val html: HtmlFormat.Appendable =
       view(viewModel)
   }
 }
