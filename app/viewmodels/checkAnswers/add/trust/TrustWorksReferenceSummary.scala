@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustWorksReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "trustWorksReference.checkYourAnswersLabel",

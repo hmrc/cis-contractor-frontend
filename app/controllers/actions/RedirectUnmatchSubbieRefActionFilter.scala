@@ -31,14 +31,12 @@ class RedirectUnmatchSubbieRefActionFilter(
   subbieResourceRef: Long,
   protected val executionContext: ExecutionContext
 ) extends ActionFilter[DataRequest] {
-  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = {
-    
+  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
     if (mode == AmendMode && !request.userAnswers.get(AmendSubbieResourceRefQuery).contains(subbieResourceRef)) {
       Future.successful(Option(Redirect(routes.JourneyRecoveryController.onPageLoad())))
     } else {
       Future.successful(None)
     }
-  }
 }
 
 class RedirectUnmatchSubbieRefActionFilterProvider @Inject() (executionContext: ExecutionContext) {
