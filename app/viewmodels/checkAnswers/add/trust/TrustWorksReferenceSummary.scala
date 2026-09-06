@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustWorksReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "trustWorksReference.checkYourAnswersLabel",
@@ -34,7 +34,7 @@ object TrustWorksReferenceSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode).url
+            controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
             .withAttribute("id" -> "trust-works-reference")

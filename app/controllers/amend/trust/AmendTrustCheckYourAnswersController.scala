@@ -71,7 +71,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
           val detailsList =
-            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+            SummaryListViewModel(rows = detailsRows(ua, isVerified, subbieResourceRef).flatten)
 
           val submitUrl =
             controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
@@ -122,7 +122,8 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Option[Boolean]
+    isVerified: Option[Boolean],
+    subbieResourceRef: Long
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
@@ -155,7 +156,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       utrRows ++
       Seq(
         TrustWorksReferenceYesNoSummary.row(ua, AmendMode),
-        TrustWorksReferenceSummary.row(ua, AmendMode)
+        TrustWorksReferenceSummary.row(ua, AmendMode, subbieResourceRef)
       )
   }
 

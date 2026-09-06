@@ -18,11 +18,12 @@ package controllers.add.trust
 
 import controllers.actions.*
 import forms.add.trust.TrustWorksReferenceFormProvider
-import models.Mode
+import models.{AmendMode, Mode}
 import navigation.Navigator
 import pages.add.trust.{TrustNamePage, TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.AmendSubbieResourceRefQuery
 import repositories.SessionRepository
 import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,6 +41,7 @@ class TrustWorksReferenceController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TrustWorksReferenceFormProvider,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustWorksReferenceView
 )(implicit ec: ExecutionContext)
@@ -48,33 +50,37 @@ class TrustWorksReferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val yesOrNoPage       = TrustWorksReferenceYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(TrustWorksReferenceYesNoPage)
+  def onPageLoad(mode: Mode, subbieResourceRef: Long = -1L): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
 
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustWorksReferencePage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      val yesOrNoPage       = TrustWorksReferenceYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(TrustWorksReferenceYesNoPage)
+
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          val preparedForm = request.userAnswers.get(TrustWorksReferencePage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          val result = Ok(view(preparedForm, mode, trustName, subbieResourceRef))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-        val result = Ok(view(preparedForm, mode, trustName))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long = -1L): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, subbieResourceRef))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustWorksReferencePage, value))
@@ -83,5 +89,5 @@ class TrustWorksReferenceController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }
