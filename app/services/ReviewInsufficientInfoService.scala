@@ -70,7 +70,7 @@ class ReviewInsufficientInfoService @Inject() (
         Success(
           ReviewInsufficientInfoViewModel(
             missing = missingSubs.map { case (sub, verification) =>
-              toMissingRow(sub)
+              toMissingRow(sub, verification)
             },
             ready = readySubs.map { case (sub, _) =>
               toReadyRow(sub)
@@ -113,8 +113,6 @@ class ReviewInsufficientInfoService @Inject() (
     verification: VerificationCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
 
-    val name = displayName(sub)
-
     val name      = displayName(sub)
     val removeUrl =
       verification.verificationResourceRef
@@ -122,7 +120,6 @@ class ReviewInsufficientInfoService @Inject() (
           controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(ref).url
         }
         .getOrElse(dummyUrl)
-
 
     MissingSubcontractorRow(
       name = name,

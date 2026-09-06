@@ -245,24 +245,38 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       vm.missing.head.name mustBe messages("verify.noName")
     }
 
-    "must build amend and proceed links while using placeholder links for remaining actions" in {
-      val sub =
-        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+    "must build amend, proceed and remove links while using placeholder links for name links" in {
 
-      val row =
+      val sub =
+        mkSub(
+          id = 1L,
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None
+        )
+
+      val viewModel =
         service
           .buildViewModel(
             GetCurrentVerificationBatchResponse(
               subcontractors = Seq(sub),
               verificationBatch = None,
-              verifications = Seq(mkVerification(sub.subcontractorId, Some(1111L)))
+              verifications = Seq(
+                mkVerification(
+                  sub.subcontractorId,
+                  Some(1111L)
+                )
+              )
             )
           )
-          .missing
-          .head
-      val row = build(sub).get.missing.head
+          .success
+          .value
+
+      val row =
+        viewModel.missing.head
 
       row.nameLink.url mustBe "#"
+
       row.editLink.url mustBe
         controllers.amend.routes.AmendSubcontractorController
           .onPageLoad(
@@ -270,11 +284,16 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
             AmendJourneyType.InsufficientInfo.routeValue
           )
           .url
-      row.proceedLink.url mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-        .onPageLoad(1L)
-        .url
+
+      row.proceedLink.url mustBe
+        controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+          .onPageLoad(1L)
+          .url
+
       row.removeLink.url mustBe
-        controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(1111L).url
+        controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+          .onPageLoad(1111L)
+          .url
     }
 
     "must return empty lists for an empty batch" in {
