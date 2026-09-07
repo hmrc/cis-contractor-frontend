@@ -23,7 +23,7 @@ import models.response.*
 import models.verify.*
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
-import play.api.i18n.Lang.logger
+import play.api.Logging
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -39,7 +39,8 @@ class VerificationService @Inject() (
   cisManageService: CisManageService,
   chrisVerificationRequestBuilder: ChrisVerificationRequestBuilder,
   sessionRepository: SessionRepository
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def refreshNewestVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
