@@ -17,7 +17,7 @@
 package connectors
 
 import models.TypeOfSubcontractor
-import models.requests.CreateAndUpdateSubcontractorPayload
+import models.requests.{CreateAndUpdateSubcontractorPayload, CreateSubmissionForVerificationRequest, ModifyVerificationsRequest, UpdateContractorSchemeParams, VerificationToUpdate}
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.{GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorListResponse, GetSubcontractorResponse, SubcontractorListItem}
 import org.mockito.ArgumentCaptor
@@ -757,6 +757,135 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       urlCaptor.getValue.toString mustBe
         "http://cis-host/cis/subcontractor/CIS-999/8888"
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.submitContractorDetails" should {
+
+    "POST /contractor-details/submit with the request body and return Unit" in {
+
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+
+      when(rb.withBody(any[JsValue]())(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "instanceId",
+          accountsOfficeReference = "123PA12345678",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678",
+          utr = Some("1234567890"),
+          name = Some("ABC Ltd"),
+          emailAddress = Some("abc@test.com"),
+          version = Some(1)
+        )
+
+      val result =
+        connector.updateContractorDetails(request).futureValue
+
+      result mustBe (())
+
+      val urlCaptor: ArgumentCaptor[URL] =
+        ArgumentCaptor.forClass(classOf[URL])
+
+      verify(http).post(urlCaptor.capture())(any[HeaderCarrier])
+
+      urlCaptor.getValue.toString must include(
+        "/contractor-details/update"
+      )
+
+      val bodyCaptor: ArgumentCaptor[JsValue] =
+        ArgumentCaptor.forClass(classOf[JsValue])
+
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "return success when the API returns OK" in {
+
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any())(any(), any(), any())).thenReturn(rb)
+
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(OK, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(config, http)
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "instanceId",
+          accountsOfficeReference = "123PA12345678",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678"
+        )
+
+      connector
+        .updateContractorDetails(request)
+        .futureValue mustBe (())
+    }
+
+    "throw an exception when the API returns a non-success status" in {
+
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any)(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "instanceId",
+          accountsOfficeReference = "123PA12345678",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678"
+        )
+
+      val ex =
+        connector
+          .updateContractorDetails(request)
+          .failed
+          .futureValue
+
+      ex mustBe a[RuntimeException]
+
+      ex.getMessage mustEqual
+        "Update contractor details failed, returned 500"
     }
   }
 }
