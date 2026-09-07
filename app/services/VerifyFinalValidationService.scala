@@ -16,7 +16,7 @@
 
 package services
 
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.{SubcontractorCurrentVerification, UserAnswers}
 import models.TypeOfSubcontractor.*
 import models.finalvalidation.*
 import models.finalvalidation.FinalValidationField.*
@@ -34,11 +34,7 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class VerifyFinalValidationService @Inject() (
   subcontractorService: SubcontractorService,
-  individualValidation: IndividualSubcontractorFinalValidation,
-  companyValidation: CompanySubcontractorFinalValidation,
-  partnershipValidation: PartnershipSubcontractorFinalValidation,
-  trustValidation: TrustSubcontractorFinalValidation,
-  addressDetailsValidation: AddressDetailsFinalValidation
+  subcontractorValidator: SubcontractorValidator
 )(implicit ec: ExecutionContext) {
 
   private final case class SelectedReference(
@@ -98,16 +94,31 @@ class VerifyFinalValidationService @Inject() (
 
       case Some(subcontractor) =>
         Try {
-          validateDraftFields(
-            subcontractor = subcontractor,
-            allSubcontractors = draft.subcontractors
-          ).distinct
-            .map { field =>
-              FinalValidationDraftIssue(
-                fieldKey = field.key,
-                value = valueFor(field, subcontractor.proposed)
+          val proposedSubcontractors =
+            draft.subcontractors.map(
+              toCurrentVerification
+            )
+
+          val fields =
+            subcontractorValidator
+              .validateFieldsFor(
+                subcontractorId = subcontractorId,
+                subcontractors = proposedSubcontractors
               )
-            }
+              .map(
+                FinalValidationFieldMapper.fromValidationField
+              )
+              .distinct
+
+          fields.map { field =>
+            FinalValidationDraftIssue(
+              fieldKey = field.key,
+              value = valueFor(
+                field,
+                subcontractor.proposed
+              )
+            )
+          }
         }
 
       case None =>
@@ -122,18 +133,34 @@ class VerifyFinalValidationService @Inject() (
     subcontractors: Seq[SubcontractorResponse]
   ): VerifyFinalValidationResult = {
 
-    // TODO: Revisit this scope when F1 rules land
-    val allSubcontractors = subcontractors
+    val validationSubcontractors =
+      subcontractors.map(toCurrentVerification)
+
+    val failedFieldsBySubcontractor =
+      subcontractorValidator.validateFields(validationSubcontractors)
 
     val failures =
       subcontractors.flatMap { subcontractor =>
-        val fields = validateFields(subcontractor, allSubcontractors)
+
+        val fields =
+          failedFieldsBySubcontractor
+            .getOrElse(
+              subcontractor.subcontractorId,
+              Seq.empty
+            )
+            .map(
+              FinalValidationFieldMapper.fromValidationField
+            )
+            .distinct
 
         Option.when(fields.nonEmpty) {
           SubcontractorFinalValidationFailure(
             subcontractorId = subcontractor.subcontractorId,
             issues = fields.map { field =>
-              FinalValidationIssue(field, valueFor(field, subcontractor))
+              FinalValidationIssue(
+                field = field,
+                value = valueFor(field, subcontractor)
+              )
             },
             subbieResourceRef = subcontractor.subbieResourceRef
           )
@@ -146,52 +173,85 @@ class VerifyFinalValidationService @Inject() (
     )
   }
 
-  private def validateFields(
-    subcontractor: SubcontractorResponse,
-    allSubcontractors: Seq[SubcontractorResponse]
-  ): Seq[FinalValidationField] = {
-    val subcontractorType =
-      subcontractor.subcontractorType
-        .flatMap(TypeOfSubcontractor.fromString)
-        .getOrElse(
-          throw new IllegalStateException(s"Invalid subcontractorType: ${subcontractor.subcontractorType}")
-        )
+  private def toCurrentVerification(
+    subcontractor: SubcontractorResponse
+  ): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = subcontractor.subcontractorId,
+      subbieResourceRef = subcontractor.subbieResourceRef,
+      firstName = subcontractor.firstName,
+      secondName = subcontractor.secondName,
+      surname = subcontractor.surname,
+      tradingName = subcontractor.tradingName,
+      utr = subcontractor.utr,
+      nino = subcontractor.nino,
+      crn = subcontractor.crn,
+      partnerUtr = subcontractor.partnerUtr,
+      partnershipTradingName = subcontractor.partnershipTradingName,
+      subcontractorType = subcontractor.subcontractorType,
+      addressLine1 = subcontractor.addressLine1,
+      addressLine2 = subcontractor.addressLine2,
+      addressLine3 = subcontractor.addressLine3,
+      addressLine4 = subcontractor.addressLine4,
+      country = subcontractor.country,
+      postcode = subcontractor.postcode,
+      emailAddress = subcontractor.emailAddress,
+      phoneNumber = subcontractor.phoneNumber,
+      mobilePhoneNumber = subcontractor.mobilePhoneNumber,
+      worksReferenceNumber = subcontractor.worksReferenceNumber,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
 
-    val typeSpecificFields =
-      subcontractorType match {
-        case Individualorsoletrader => individualValidation.validate(subcontractor, allSubcontractors)
-        case Limitedcompany         => companyValidation.validate(subcontractor, allSubcontractors)
-        case Partnership            => partnershipValidation.validate(subcontractor, allSubcontractors)
-        case Trust                  => trustValidation.validate(subcontractor, allSubcontractors)
-      }
+  private def toCurrentVerification(
+    subcontractor: FinalValidationDraftSubcontractor
+  ): SubcontractorCurrentVerification = {
 
-    val addressFields = addressDetailsValidation.validate(subcontractor)
+    val proposed =
+      subcontractor.proposed
 
-    (typeSpecificFields ++ addressFields).distinct
-  }
-
-  private def validateDraftFields(
-    subcontractor: FinalValidationDraftSubcontractor,
-    allSubcontractors: Seq[FinalValidationDraftSubcontractor]
-  ): Seq[FinalValidationField] = {
-    val subcontractorType =
-      subcontractor.subcontractorType
-        .flatMap(TypeOfSubcontractor.fromString)
-        .getOrElse(
-          throw new IllegalStateException(s"Invalid subcontractorType: ${subcontractor.subcontractorType}")
-        )
-
-    val typeSpecificFields =
-      subcontractorType match {
-        case Individualorsoletrader => individualValidation.validateDraft(subcontractor, allSubcontractors)
-        case Limitedcompany         => companyValidation.validateDraft(subcontractor, allSubcontractors)
-        case Partnership            => partnershipValidation.validateDraft(subcontractor, allSubcontractors)
-        case Trust                  => trustValidation.validateDraft(subcontractor, allSubcontractors)
-      }
-
-    val addressFields = addressDetailsValidation.validateDraft(subcontractor)
-
-    (typeSpecificFields ++ addressFields).distinct
+    SubcontractorCurrentVerification(
+      subcontractorId = subcontractor.subcontractorId,
+      subbieResourceRef = None,
+      firstName = proposed.firstName,
+      secondName = proposed.secondName,
+      surname = proposed.surname,
+      tradingName = proposed.tradingName,
+      utr = proposed.utr,
+      nino = proposed.nino,
+      crn = proposed.crn,
+      partnerUtr = proposed.partnerUtr,
+      partnershipTradingName = proposed.partnershipTradingName,
+      subcontractorType = subcontractor.subcontractorType,
+      addressLine1 = proposed.addressLine1,
+      addressLine2 = proposed.addressLine2,
+      addressLine3 = proposed.addressLine3,
+      addressLine4 = proposed.addressLine4,
+      country = proposed.country,
+      postcode = proposed.postcode,
+      emailAddress = proposed.emailAddress,
+      phoneNumber = proposed.phoneNumber,
+      mobilePhoneNumber = proposed.mobilePhoneNumber,
+      worksReferenceNumber = proposed.worksReferenceNumber,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
   }
 
   private def selectedReferences(

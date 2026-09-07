@@ -16,8 +16,8 @@
 
 package services
 
-import models.SubcontractorCurrentVerification
-
+import models.TypeOfSubcontractor.Trust
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.validation.SubcontractorValidationFailure
 import utils.TrustValidator
 
@@ -29,18 +29,25 @@ class SubcontractorTrustValidator {
   def validate(
     subcontractors: Seq[SubcontractorCurrentVerification]
   ): List[SubcontractorValidationFailure] =
-    subcontractors.toList.flatMap { subcontractor =>
-      val failedFields =
-        TrustValidator.validate(
-          subcontractorToValidate = subcontractor,
-          allSubcontractors = subcontractors
-        )
+    subcontractors.toList
+      .filter(isTrust)
+      .flatMap { subcontractor =>
+        val failedFields =
+          TrustValidator.validate(
+            subcontractorToValidate = subcontractor,
+            allSubcontractors = subcontractors
+          )
 
-      Option.when(failedFields.nonEmpty) {
-        SubcontractorValidationFailure(
-          subcontractorId = subcontractor.subcontractorId,
-          failedFields = failedFields
-        )
+        Option.when(failedFields.nonEmpty) {
+          SubcontractorValidationFailure(
+            subcontractorId = subcontractor.subcontractorId,
+            failedFields = failedFields
+          )
+        }
       }
-    }
+
+  private def isTrust(subcontractor: SubcontractorCurrentVerification): Boolean=
+    subcontractor.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .contains(Trust)
 }
