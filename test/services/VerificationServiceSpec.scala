@@ -1196,18 +1196,14 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       resetAnswers.get(VerificationSubmissionDetailsPage) mustBe None
     }
 
-    "must fail when CisIdQuery is missing and not persist UserAnswers" in {
+    "must log and gracefully recover when CisIdQuery is missing and not persist UserAnswers" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
 
-      val ex =
-        service
-          .resetUserAnswers(emptyUserAnswers)
-          .failed
-          .futureValue
-
-      ex.getMessage mustBe "CisId not found in session data"
+      service
+        .resetUserAnswers(emptyUserAnswers)
+        .futureValue
 
       verify(mockRepo, never()).set(any[UserAnswers])
     }

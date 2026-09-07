@@ -113,7 +113,7 @@ class SubmissionSendingController @Inject() (
           }
 
       case SUBMITTED_NO_RECEIPT =>
-        Future.successful(recovery)
+        Future.successful(recovery) // TODO: matching screen not found
 
       case DEPARTMENTAL_ERROR =>
         Future.successful(Redirect(controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad()))

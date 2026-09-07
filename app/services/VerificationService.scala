@@ -23,6 +23,7 @@ import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmis
 import models.verify.*
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
+import play.api.i18n.Lang.logger
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -287,7 +288,8 @@ class VerificationService @Inject() (
   def resetUserAnswers(userAnswers: UserAnswers): Future[Unit] =
     userAnswers.get(CisIdQuery) match {
       case None =>
-        Future.failed(new RuntimeException("CisId not found in session data"))
+        logger.warn("CisId not found in session data, skipping UserAnswers reset")
+        Future.successful(())
 
       case Some(cisId) =>
         UserAnswers(userAnswers.id)
