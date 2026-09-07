@@ -69,6 +69,11 @@ class FormpRdsReconcileActionImpl @Inject() (
                   Some(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
               }
         }
+        .recover {
+          case NonFatal(e) =>
+            logger.error(s"[FormpRdsReconcileAction] Failed to resolve tax office for cisId=$cisId", e)
+            Some(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+        }
     }
   }
 

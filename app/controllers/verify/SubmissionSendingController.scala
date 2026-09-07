@@ -72,7 +72,7 @@ class SubmissionSendingController @Inject() (
     }
 
   def onPollAndRedirect: Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       request.userAnswers.get(VerificationSubmissionDetailsPage) match {

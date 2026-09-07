@@ -147,6 +147,21 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
       redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
     }
 
+    "must redirect to the system error page when resolving agent tax office details fails" in {
+      val connector     = mock[ConstructionIndustrySchemeConnector]
+      val manageService = mock[CisManageService]
+      when(manageService.getAgentClient(eqTo(userAnswersId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(UpstreamErrorResponse("unavailable", SERVICE_UNAVAILABLE, SERVICE_UNAVAILABLE)))
+
+      val result = newAction(connector, manageService).invokeBlock(agentRequest, block)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+      verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(
+        any[HeaderCarrier]
+      )
+    }
+
     "must redirect to the unauthorised organisation page and not call prepopulate when the cisId is missing" in {
       val connector = mock[ConstructionIndustrySchemeConnector]
 
