@@ -23,6 +23,7 @@ import navigation.NavigatorForJourney
 import pages.{Page, QuestionPage}
 import pages.add.trust.*
 import play.api.mvc.Call
+import queries.AmendSubbieResourceRefQuery
 
 import javax.inject.{Inject, Singleton}
 
@@ -97,6 +98,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), AmendMode)(_)
     case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
     case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
+    case TrustWorksReferencePage         => navigateFromAmendTrustWorksReferencePage
     case _                               => _ => cyaRoute(AmendMode)
   }
 
@@ -251,5 +253,11 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def isMissingAnswer(contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
     userAnswers.get(contactMethodPage(contactMethod)).isEmpty
+
+  private def navigateFromAmendTrustWorksReferencePage(ua: UserAnswers): Call =
+    ua.get(AmendSubbieResourceRefQuery).fold(controllers.routes.JourneyRecoveryController.onPageLoad()) {
+      amendSubbieResourceRef =>
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad(amendSubbieResourceRef)
+    }
 
 }
