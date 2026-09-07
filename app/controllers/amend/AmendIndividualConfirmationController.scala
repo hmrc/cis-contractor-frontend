@@ -16,18 +16,21 @@
 
 package controllers.amend
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+import models.UserAnswers
+import models.amend.AmendJourneyType
+import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Reads
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
-import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
@@ -42,6 +45,7 @@ class AmendIndividualConfirmationController @Inject() (
   view: AmendConfirmationView,
   cleanupService: DefaultSubcontractorCleanupService,
   sessionRepository: SessionRepository,
+  appConfig: FrontendAppConfig,
   subcontractorNameExtractor: SubcontractorNameExtractor
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -51,51 +55,128 @@ class AmendIndividualConfirmationController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
+      val userAnswers =
+        request.userAnswers
 
-      val ua = request.userAnswers
+      if (
+        !userAnswers
+          .get(AmendCheckYourAnswersSubmittedPage)
+          .contains(true)
+      ) {
+        logger.warn(
+          "[AmendIndividualConfirmationController.onPageLoad] " +
+            "Accessed without prior CYA submission"
+        )
 
-      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn("[AmendIndividualConfirmationController] Accessed without prior CYA submission")
-        Future.successful(recoveryRedirect)
+        Future.successful(journeyRecoveryRedirect)
       } else {
-        ua.get(OriginalIndividualAnswersQuery) match {
-          case None =>
-            logger.error("[AmendIndividualConfirmationController] Missing OriginalIndividualAnswersQuery")
-            Future.successful(recoveryRedirect)
-
-          case Some(originalIndividualAnswers) =>
-            ua.get(CisIdQuery) match {
-
-              case None =>
-                logger.error("[AmendIndividualConfirmationController] Missing CisIdQuery")
-                Future.successful(recoveryRedirect)
-
-              case Some(cisId) =>
-                val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
-                val individualName = subcontractorNameExtractor.displaySubcontractorName(ua)
-
-                cleanupService.cleanAmend(ua) match {
-
-                  case Success(cleanedUa) =>
-                    sessionRepository.set(cleanedUa).map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          individualName
-                        )
-                      )
-                    }
-
-                  case Failure(exception) =>
-                    logger.warn(
-                      "[AmendIndividualConfirmationController] Failed to clean user answers",
-                      exception
-                    )
-                    Future.successful(recoveryRedirect)
-                }
-            }
-        }
+        renderConfirmation(userAnswers)
       }
     }
+
+  private def renderConfirmation(
+    userAnswers: UserAnswers
+  )(implicit request: play.api.mvc.Request[?]): Future[Result] =
+    (
+      userAnswers.get(OriginalIndividualAnswersQuery),
+      userAnswers.get(CisIdQuery),
+      userAnswers.get(AmendJourneyTypePage)
+    ) match {
+
+      case (
+            Some(originalIndividualAnswers),
+            Some(cisId),
+            Some(journeyType)
+          ) =>
+        val tableRows =
+          IndividualAmendedViewModel.rows(
+            originalIndividualAnswers,
+            userAnswers
+          )
+
+        val individualName =
+          individualDisplayName(userAnswers)
+
+        val link =
+          AmendConfirmationLinks.build(
+            journeyType,
+            cisId,
+            appConfig
+          )
+        cleanupService.cleanAmend(userAnswers) match {
+
+          case Success(cleanedUserAnswers) =>
+            sessionRepository
+              .set(cleanedUserAnswers)
+              .map { _ =>
+                Ok(
+                  view(
+                    rows = tableRows,
+                    subcontractorName = individualName,
+                    confirmationLink = link
+                  )
+                )
+              }
+              .recover { case exception =>
+                logger.error(
+                  "[AmendIndividualConfirmationController.onPageLoad] " +
+                    "Failed to save cleaned user answers",
+                  exception
+                )
+
+                journeyRecoveryRedirect
+              }
+
+          case Failure(exception) =>
+            logger.warn(
+              "[AmendIndividualConfirmationController.onPageLoad] " +
+                "Failed to clean user answers",
+              exception
+            )
+
+            Future.successful(journeyRecoveryRedirect)
+        }
+
+      case (None, _, _) =>
+        logger.error(
+          "[AmendIndividualConfirmationController.onPageLoad] " +
+            "Missing OriginalIndividualAnswersQuery"
+        )
+
+        Future.successful(journeyRecoveryRedirect)
+
+      case (_, None, _) =>
+        logger.error(
+          "[AmendIndividualConfirmationController.onPageLoad] " +
+            "Missing CisIdQuery"
+        )
+
+        Future.successful(journeyRecoveryRedirect)
+
+      case (_, _, None) =>
+        logger.error(
+          "[AmendIndividualConfirmationController.onPageLoad] " +
+            "Missing AmendJourneyTypePage"
+        )
+
+        Future.successful(journeyRecoveryRedirect)
+    }
+
+  private def individualDisplayName(
+    userAnswers: UserAnswers
+  ): String =
+    userAnswers
+      .get(SubcontractorNamePage)
+      .map { name =>
+        s"${name.firstName} ${name.lastName}"
+      }
+      .orElse(
+        userAnswers.get(TradingNameOfSubcontractorPage)
+      )
+      .getOrElse("")
+
+  private def journeyRecoveryRedirect: Result =
+    Redirect(
+      routes.JourneyRecoveryController.onPageLoad()
+    )
 }

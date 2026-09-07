@@ -185,30 +185,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       .orElse(ua.get(TradingNameOfSubcontractorPage))
       .getOrElse("")
 
-  private def confirmationRedirect(
-    amendJourneyType: AmendJourneyType
-  ): Result =
-    amendJourneyType match {
-
-      case AmendJourneyType.Standard =>
-        Redirect(
-          controllers.amend.routes.AmendIndividualConfirmationController
-            .onPageLoad()
-        )
-
-      case AmendJourneyType.InsufficientInfo =>
-        Redirect(
-          controllers.insufficient.routes.InsufficientSubcontractorDetailsUpdatedController
-            .onPageLoad()
-        )
-
-      case AmendJourneyType.UnmatchedInfo =>
-        Redirect(
-          controllers.unmatched.routes.UnmatchedSubcontractorDetailsUpdatedController
-            .onPageLoad()
-        )
-    }
-
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
       ValidatedSubcontractor.build(request.userAnswers) match {
@@ -279,7 +255,10 @@ class AmendIndividualCheckYourAnswersController @Inject() (
               .map { _ =>
                 auditService.amendSubcontractorEvent(updated)
 
-                confirmationRedirect(journeyType)
+                Redirect(
+                  controllers.amend.routes.AmendIndividualConfirmationController
+                    .onPageLoad()
+                )
               }
           }
           .recover { case t =>

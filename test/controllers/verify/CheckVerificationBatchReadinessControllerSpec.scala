@@ -214,7 +214,9 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           val result = route(application, FakeRequest(GET, normalModeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
         }
       }
 
