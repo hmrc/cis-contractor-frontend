@@ -17,6 +17,8 @@
 package utils
 
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor.Partnership
+import models.validation.SubcontractorValidationField.TradingName
 import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
 object PartnershipValidator {
@@ -28,14 +30,15 @@ object PartnershipValidator {
     TradingNameValidator
       .validate(
         subcontractorToValidate.partnershipTradingName,
-        SubcontractorValidationField.PartnershipTradingName
+        SubcontractorValidationField.PartnershipTradingName,
+        subcontractorType = Partnership
       )
       .toList ++
       UtrValidator
         .validate(subcontractorToValidate.utr, allSubcontractors)
         .toList ++
       TradingNameValidator
-        .validate(subcontractorToValidate.tradingName)
+        .validate(subcontractorToValidate.tradingName, TradingName, Partnership)
         .toList ++
       UtrValidator
         .validate(

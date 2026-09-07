@@ -27,7 +27,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
 
     "return no failures when all common details are missing" in {
       TrustValidator.validate(
-        subcontactorToValidate = subcontractorEmpty,
+        subcontractorToValidate = subcontractorEmpty,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
       ) mustBe Nil
     }
@@ -35,7 +35,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
     "return no failures for when all valid" in {
 
       TrustValidator.validate(
-        subcontactorToValidate = subcontractorValid,
+        subcontractorToValidate = subcontractorValid,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty, subcontractorValid)
       ) mustBe Nil
     }
@@ -43,7 +43,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
     "return every failure" in {
 
       TrustValidator.validate(
-        subcontactorToValidate = subcontractorInvalid,
+        subcontractorToValidate = subcontractorInvalid,
         allSubcontractors = Seq(subcontractorInvalid, subcontractorEmpty)
       ) mustBe
         List(
@@ -65,7 +65,7 @@ class TrustValidatorSpec extends AnyWordSpec with Matchers {
     "retain valid fields while returning only invalid fields - wrn is invalid" in {
 
       TrustValidator.validate(
-        subcontactorToValidate = subcontractorSomeValid,
+        subcontractorToValidate = subcontractorSomeValid,
         allSubcontractors = Seq(subcontractorSomeValid, subcontractorInvalid, subcontractorEmpty)
       ) mustBe
         List(
