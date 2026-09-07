@@ -37,7 +37,7 @@ import play.api.test.FakeRequest
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-
+import pages.verify.VerificationSubmissionDetailsPage
 import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 

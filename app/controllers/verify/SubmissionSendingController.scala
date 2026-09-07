@@ -157,8 +157,10 @@ class SubmissionSendingController @Inject() (
   )(implicit request: DataRequest[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Future.successful(Ok(view())
-          .withHeaders("Refresh" -> pollInterval.toString))
+        Future.successful(
+          Ok(view())
+            .withHeaders("Refresh" -> pollInterval.toString)
+        )
 
       case SUBMITTED =>
         verificationService
@@ -170,19 +172,23 @@ class SubmissionSendingController @Inject() (
       case SUBMITTED_NO_RECEIPT => // TODO: matching screen not found
         Future.successful(recovery)
 
-      case status@(DEPARTMENTAL_ERROR | FATAL_ERROR) =>
+      case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
 
       case SEND_ERROR =>
-        Future.successful(Redirect(
-          controllers.verify.routes.VerifySendErrorController.onPageLoad()
-        ))
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.VerifySendErrorController.onPageLoad()
+          )
+        )
 
       case TIMED_OUT =>
-        Future.successful(Redirect(
-          controllers.verify.routes.VerificationRequestInProgressController
-            .onPageLoad()
-        ))
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.VerificationRequestInProgressController
+              .onPageLoad()
+          )
+        )
 
       case _ =>
         Future.successful(recovery)
