@@ -4,6 +4,7 @@
 ->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
 
 GET   /subcontractor  controllers.IndexController.onPageLoad()
+GET   /subcontractor/service-home  controllers.ServiceHomeController.onPageLoad()
 
 GET   /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
 
