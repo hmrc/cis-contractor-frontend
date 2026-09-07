@@ -48,32 +48,32 @@ class FormpRdsReconcileActionImpl @Inject() (
         Future.successful(Some(unauthorisedRedirect(request.isAgent)))
 
       case Some(cisId) =>
-        resolveTaxOffice(request).flatMap {
-          case None =>
-            logger.warn(s"[FormpRdsReconcileAction] Missing tax office details for cisId=$cisId")
-            Future.successful(Some(unauthorisedRedirect(request.isAgent)))
+        resolveTaxOffice(request)
+          .flatMap {
+            case None =>
+              logger.warn(s"[FormpRdsReconcileAction] Missing tax office details for cisId=$cisId")
+              Future.successful(Some(unauthorisedRedirect(request.isAgent)))
 
-          case Some((taxOfficeNumber, taxOfficeReference)) =>
-            cisConnector
-              .prepopulateContractorKnownFacts(cisId, taxOfficeNumber, taxOfficeReference)
-              .map(_ => None)
-              .recover {
-                case u: UpstreamErrorResponse if u.statusCode == PRECONDITION_FAILED || u.statusCode == NOT_FOUND =>
-                  logger.warn(
-                    s"[FormpRdsReconcileAction] Contractor data missing for cisId=$cisId (status=${u.statusCode})"
-                  )
-                  Some(unauthorisedRedirect(request.isAgent))
+            case Some((taxOfficeNumber, taxOfficeReference)) =>
+              cisConnector
+                .prepopulateContractorKnownFacts(cisId, taxOfficeNumber, taxOfficeReference)
+                .map(_ => None)
+                .recover {
+                  case u: UpstreamErrorResponse if u.statusCode == PRECONDITION_FAILED || u.statusCode == NOT_FOUND =>
+                    logger.warn(
+                      s"[FormpRdsReconcileAction] Contractor data missing for cisId=$cisId (status=${u.statusCode})"
+                    )
+                    Some(unauthorisedRedirect(request.isAgent))
 
-                case NonFatal(e) =>
-                  logger.error(s"[FormpRdsReconcileAction] FORMP-RDS comparison failed for cisId=$cisId", e)
-                  Some(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
-              }
-        }
-        .recover {
-          case NonFatal(e) =>
+                  case NonFatal(e) =>
+                    logger.error(s"[FormpRdsReconcileAction] FORMP-RDS comparison failed for cisId=$cisId", e)
+                    Some(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+                }
+          }
+          .recover { case NonFatal(e) =>
             logger.error(s"[FormpRdsReconcileAction] Failed to resolve tax office for cisId=$cisId", e)
             Some(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
-        }
+          }
     }
   }
 
