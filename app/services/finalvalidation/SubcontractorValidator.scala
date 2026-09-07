@@ -33,7 +33,7 @@ class SubcontractorValidator @Inject() (
 
   def validate(subcontractors: Seq[SubcontractorCurrentVerification]): List[SubcontractorValidationFailure] = {
     validateSubcontractorTypes(subcontractors)
-    
+
     SubcontractorValidationFailure.merge(
       subcontractorDetailsValidator.validate(subcontractors),
       subcontractorCompanyValidator.validate(subcontractors),
@@ -46,15 +46,13 @@ class SubcontractorValidator @Inject() (
   def validateFields(
     subcontractors: Seq[SubcontractorCurrentVerification]
   ): Map[Long, Seq[SubcontractorValidationField]] =
-    validate(subcontractors)
-      .map { failure =>
-        failure.subcontractorId ->
-          failure.failedFields
-            .map(_.field)
-            .distinct
-      }
-      .toMap
-    
+    validate(subcontractors).map { failure =>
+      failure.subcontractorId ->
+        failure.failedFields
+          .map(_.field)
+          .distinct
+    }.toMap
+
   def validateFieldsFor(
     subcontractorId: Long,
     subcontractors: Seq[SubcontractorCurrentVerification]
@@ -76,5 +74,5 @@ class SubcontractorValidator @Inject() (
         )
       }
     }
-    
+
 }

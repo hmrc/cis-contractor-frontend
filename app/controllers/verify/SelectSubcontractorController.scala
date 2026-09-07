@@ -30,7 +30,7 @@ import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
 import services.finalvalidation.FinalValidationDraftService
-import services.{CheckboxPaginationResult, PaginationService, VerifyFinalValidationService, VerificationPreSelectionService}
+import services.{CheckboxPaginationResult, PaginationService, VerificationPreSelectionService, VerifyFinalValidationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter

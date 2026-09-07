@@ -38,7 +38,7 @@ class SubcontractorCompanyValidator {
             subcontractorToValidate = subcontractor,
             allSubcontractors = subcontractors
           )
-  
+
         Option.when(failedFields.nonEmpty) {
           SubcontractorValidationFailure(
             subcontractorId = subcontractor.subcontractorId,

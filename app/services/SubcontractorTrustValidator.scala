@@ -46,7 +46,7 @@ class SubcontractorTrustValidator {
         }
       }
 
-  private def isTrust(subcontractor: SubcontractorCurrentVerification): Boolean=
+  private def isTrust(subcontractor: SubcontractorCurrentVerification): Boolean =
     subcontractor.subcontractorType
       .flatMap(TypeOfSubcontractor.fromString)
       .contains(Trust)

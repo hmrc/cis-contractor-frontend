@@ -32,7 +32,7 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.{PaginationToReverifyService, VerifyFinalValidationService, VerificationPreSelectionService}
+import services.{PaginationToReverifyService, VerificationPreSelectionService, VerifyFinalValidationService}
 import models.requests.DataRequest
 import models.verify.*
 import pages.finalvalidation.*
