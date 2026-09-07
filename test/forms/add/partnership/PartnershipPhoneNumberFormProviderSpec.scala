@@ -16,24 +16,22 @@
 
 package forms.add.partnership
 
+import forms.Validation.phoneRegex
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
 class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey     = "partnershipPhoneNumber.error.required"
-  val lengthKey       = "partnershipPhoneNumber.error.length"
-  val invalidKey      = "partnershipPhoneNumber.error.invalid"
-  val minSixDigitsKey = "partnershipPhoneNumber.error.minSixDigits"
-  val maxLength       = 35
-
-  val phoneRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
+  val requiredKey = "partnershipPhoneNumber.error.required"
+  val lengthKey   = "partnershipPhoneNumber.error.length"
+  val invalidKey  = "partnershipPhoneNumber.error.invalid"
+  val maxLength   = 35
 
   val form = new PartnershipPhoneNumberFormProvider()()
 
   val validPhoneNumber = Seq(
     "07777777777",
-    "+447777777777",
+    "(0191) 123-4567",
     "  07777 77777 ",
     "(44)77777777777",
     "44-777-777"
@@ -68,9 +66,17 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
     "must reject invalid phone number formats" in {
       invalidPhoneNumber.foreach { invalidTelephone =>
-        val result = form.bind(Map(fieldName -> invalidTelephone))
+        val result =
+          form.bind(
+            Map(fieldName -> invalidTelephone)
+          )
+
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(phoneRegex))
+          FormError(
+            fieldName,
+            invalidKey,
+            Seq(phoneRegex)
+          )
         )
       }
     }
@@ -96,20 +102,16 @@ class PartnershipPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       }
     }
 
-    "must display error when there is less than 6 digits" in {
-      val lessThanSixDigits = Seq(
-        "01234",
-        "+012+34",
-        "+()()123",
-        "1------2"
-      )
+    "must bind a phone number containing fewer than 6 digits" in {
+      val phoneNumber = "12345"
 
-      lessThanSixDigits.foreach { number =>
-        val result = form.bind(Map(fieldName -> number))
-        result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(phoneRegex))
+      val result =
+        form.bind(
+          Map("value" -> phoneNumber)
         )
-      }
+
+      result.errors mustBe empty
+      result.value mustBe Some(phoneNumber)
     }
 
     "trim leading and trailing spaces" in {

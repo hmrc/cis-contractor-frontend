@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoSugar {
+class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with MockitoSugar {
 
   private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
 
@@ -40,17 +40,17 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
     verificationNumber: Option[String] = Some("V0000000001"),
     matched: Option[String] = Some("Y"),
     actionIndicator: Option[String] = Some("verify"),
-    subcontractorId: Option[Long] = Some(22L)
+    verificationResourceRef: Option[Long] = Some(10L)
   ): VerificationLastVerification =
     VerificationLastVerification(
       verificationId = 1001L,
       verificationBatchId = Some(99L),
-      verificationResourceRef = Some(12345L),
+      verificationResourceRef = verificationResourceRef,
       matched = matched,
       verificationNumber = verificationNumber,
       taxTreatment = Some("net"),
       subcontractorName = Some("John Smith"),
-      subcontractorId = subcontractorId,
+      subcontractorId = Some(22L),
       actionIndicator = actionIndicator
     )
 
@@ -65,11 +65,11 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
       submission = None
     )
 
-  "ReviewUnmatchedSubcontractorsController" - {
+  "ReviewUnmatchedSubcontractorsRoutingController" - {
 
-    "AC2: must redirect to UnmatchedSubcontractors when unmatched subcontractors still exist" in {
+    "AC2: must redirect to UnmatchedSubcontractors when unmatched resource refs are still on the live list" in {
       val mockService = mock[VerificationService]
-      val response    = batchResponse(verification(verificationNumber = None, subcontractorId = Some(22L)))
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
       val userAnswers = emptyUserAnswers
         .set(LastSubmittedVerificationBatchResponsePage, response)
         .success
@@ -79,8 +79,19 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
         .value
 
       when(
-        mockService.anyUnmatchedSubcontractorsStillPresent(eqTo("900063"), eqTo(Set(22L)))(any[HeaderCarrier])
-      ).thenReturn(Future.successful(true))
+        mockService.anyUnmatchedResourceRefsStillPresent(
+          eqTo("900063"),
+          eqTo(response)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
+          eqTo(userAnswers)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(userAnswers))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
@@ -91,13 +102,30 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url
-        verify(mockService).anyUnmatchedSubcontractorsStillPresent(eqTo("900063"), eqTo(Set(22L)))(any[HeaderCarrier])
+        verify(mockService)
+          .anyUnmatchedResourceRefsStillPresent(
+            eqTo("900063"),
+            eqTo(response)
+          )(any[HeaderCarrier])
+
+        verify(mockService)
+          .recreateCurrentBatchFromUnmatchedVerifications(
+            eqTo("900063"),
+            eqTo(userAnswers)
+          )(any[HeaderCarrier])
       }
     }
 
-    "AC3: must redirect to NoUnmatchedSubcontractors when unmatched subcontractors have been deleted" in {
+    "must redirect to SystemError when recreating the current batch fails" in {
       val mockService = mock[VerificationService]
-      val response    = batchResponse(verification(verificationNumber = None, subcontractorId = Some(22L)))
+
+      val response = batchResponse(
+        verification(
+          verificationNumber = None,
+          verificationResourceRef = Some(10L)
+        )
+      )
+
       val userAnswers = emptyUserAnswers
         .set(LastSubmittedVerificationBatchResponsePage, response)
         .success
@@ -107,8 +135,48 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
         .value
 
       when(
-        mockService.anyUnmatchedSubcontractorsStillPresent(eqTo("900063"), eqTo(Set(22L)))(any[HeaderCarrier])
-      ).thenReturn(Future.successful(false))
+        mockService.anyUnmatchedResourceRefsStillPresent(
+          eqTo("900063"),
+          eqTo(response)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(true))
+
+      when(
+        mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("900063"),
+          eqTo(userAnswers)
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "AC3: must redirect to NoUnmatchedSubcontractors when unmatched resource refs are not on the live list" in {
+      val mockService = mock[VerificationService]
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
+      val userAnswers = emptyUserAnswers
+        .set(LastSubmittedVerificationBatchResponsePage, response)
+        .success
+        .value
+        .set(CisIdQuery, "900063")
+        .success
+        .value
+
+      when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
@@ -123,9 +191,9 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to NoUnmatchedSubcontractors when all unmatched verifications have no subcontractorId" in {
+    "must redirect to NoUnmatchedSubcontractors when unmatched has no resource ref" in {
       val mockService = mock[VerificationService]
-      val response    = batchResponse(verification(verificationNumber = None, subcontractorId = None))
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = None))
       val userAnswers = emptyUserAnswers
         .set(LastSubmittedVerificationBatchResponsePage, response)
         .success
@@ -133,6 +201,9 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
         .set(CisIdQuery, "900063")
         .success
         .value
+
+      when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
@@ -173,7 +244,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
 
     "must redirect to SystemError when the live subcontractor check fails" in {
       val mockService = mock[VerificationService]
-      val response    = batchResponse(verification(verificationNumber = None, subcontractorId = Some(22L)))
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
       val userAnswers = emptyUserAnswers
         .set(LastSubmittedVerificationBatchResponsePage, response)
         .success
@@ -182,9 +253,8 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
         .success
         .value
 
-      when(
-        mockService.anyUnmatchedSubcontractorsStillPresent(eqTo("900063"), eqTo(Set(22L)))(any[HeaderCarrier])
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
@@ -199,7 +269,14 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
     }
 
     "must redirect to JourneyRecovery when session data is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "900063")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value

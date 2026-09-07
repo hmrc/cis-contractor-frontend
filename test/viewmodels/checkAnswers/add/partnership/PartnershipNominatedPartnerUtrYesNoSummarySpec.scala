@@ -19,6 +19,8 @@ package viewmodels.checkAnswers.add.partnership
 import controllers.add.partnership.routes
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -41,13 +43,16 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+      val maybeRow: Option[SummaryListRow] =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -59,28 +64,35 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(CheckMode).url
-      val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
+      val expectedHref       =
+        routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(CheckMode)
+          .url
+      val expectedHiddenText =
+        messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                   must contain("id" -> "add-nominated-partner-utr")
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-utr")
     }
 
-    "must return a SummaryListRow with 'Yes' when the answer is true in Amend journey" in {
+    "must return a SummaryListRow with 'Yes' when the answer is true for Amend journey" in {
       val answers = UserAnswers("test-id")
         .set(PartnershipNominatedPartnerUtrYesNoPage, true)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerUtrYesNoSummary.row(answers, AmendMode)
+      val maybeRow =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers, AmendMode)
+
       maybeRow shouldBe defined
 
-      val row =
-        maybeRow.value
+      val row = maybeRow.value
 
-      val expectedKeyText = messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.yes")
@@ -100,21 +112,25 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes                   must contain("id" -> "add-nominated-partner-utr")
+      changeAction.attributes                 should contain("id" -> "add-nominated-partner-utr")
     }
 
-    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
-      val ua = UserAnswers("test-id")
+    "must return a SummaryListRow with 'No' and change action pointing to add flow when the answer is false in AmendMode" in {
+      val answers = UserAnswers("test-id")
         .set(PartnershipNominatedPartnerUtrYesNoPage, false)
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerUtrYesNoSummary.row(ua, AmendMode)
+      val maybeRow =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers, AmendMode)
+
       maybeRow shouldBe defined
 
       val row: SummaryListRow = maybeRow.value
 
-      val expectedKeyText = messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      val expectedKeyText =
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+
       row.key.content.asHtml.toString should include(expectedKeyText)
 
       val expectedValue = messages("site.no")
@@ -125,11 +141,13 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
       actions should have size 1
 
       val changeAction       = actions.head
-      val expectedHref       = controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
-        .onPageLoad(AmendMode)
-        .url
+      val expectedHref       =
+        routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoad(AmendMode)
+          .url
       val expectedChangeText = messages("site.change")
-      val expectedHiddenText = messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
+      val expectedHiddenText =
+        messages("partnershipNominatedPartnerUtrYesNo.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
@@ -143,16 +161,107 @@ class PartnershipNominatedPartnerUtrYesNoSummarySpec extends AnyFreeSpec with Ma
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+      val maybeRow =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+
       maybeRow shouldBe defined
 
-      val row           = maybeRow.value
+      val row = maybeRow.value
+
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
+
+      PartnershipNominatedPartnerUtrYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "PartnershipNominatedPartnerUtrYesNoSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      nominatedPartnerUtrYesNo: Option[Boolean]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = nominatedPartnerUtrYesNo,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' when the ViewOnly answer is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some(true))
+
+      val maybeRow =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.yes")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when the ViewOnly answer is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some(false))
+
+      val maybeRow =
+        PartnershipNominatedPartnerUtrYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("site.no")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the ViewOnly answer does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
       PartnershipNominatedPartnerUtrYesNoSummary.row(answers) shouldBe None
     }
   }

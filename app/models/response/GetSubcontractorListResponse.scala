@@ -28,7 +28,8 @@ object GetSubcontractorListResponse {
 }
 
 final case class SubcontractorListItem(
-  subcontractorId: Long
+  subcontractorId: Long,
+  subbieResourceRef: Option[Long]
 )
 
 object SubcontractorListItem {

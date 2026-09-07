@@ -26,6 +26,7 @@ import org.scalatest.matchers.should.Matchers
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import models.info.trust.TrustAnswers
 
 class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -112,6 +113,72 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
 
       assertEscaped(html, "My Trust &amp; Co &#x27;Limited&#x27;")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - TrustNameSummary.row" - {
+
+    "must return a SummaryListRow when trust name exists in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = Some("Acme Trust"),
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustName.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        "Acme Trust"
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when trust name does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustNameSummary.row(answers) shouldBe None
     }
   }
 }

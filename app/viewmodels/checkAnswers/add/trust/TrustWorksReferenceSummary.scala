@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustWorksReferencePage
 import play.api.i18n.Messages
@@ -38,6 +39,16 @@ object TrustWorksReferenceSummary {
             .withVisuallyHiddenText(messages("trustWorksReference.change.hidden"))
             .withAttribute("id" -> "trust-works-reference")
         )
+      )
+    }
+
+  def row(
+    answers: TrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.worksReference.map { answer =>
+      SummaryListRowViewModel(
+        key = "trustWorksReference.checkYourAnswersLabel",
+        value = ValueViewModel(answer)
       )
     }
 }

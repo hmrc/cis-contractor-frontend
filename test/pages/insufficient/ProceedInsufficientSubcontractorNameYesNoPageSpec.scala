@@ -22,21 +22,17 @@ import play.api.libs.json.JsPath
 class ProceedInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
   "ProceedInsufficientSubcontractorNameYesNoPage" - {
+    val subcontractorId = "10"
 
     "have the correct path" in {
-      ProceedInsufficientSubcontractorNameYesNoPage.path mustBe
-        (JsPath \ "proceedInsufficientSubcontractorNameYesNo")
+      ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId).path mustBe
+        (JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded")
     }
 
-    "have the correct toString" in {
-      ProceedInsufficientSubcontractorNameYesNoPage.toString mustBe
-        "proceedInsufficientSubcontractorNameYesNo"
-    }
+    beRetrievable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId))
 
-    beRetrievable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage)
+    beSettable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId))
 
-    beSettable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage)
-
-    beRemovable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage)
+    beRemovable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId))
   }
 }

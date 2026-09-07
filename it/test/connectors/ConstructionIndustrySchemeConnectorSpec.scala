@@ -179,10 +179,10 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "getAgentClient" should {
 
-    val userId = "some-user-id"
+    val userId             = "some-user-id"
     val validJson: JsValue = Json.obj(
-      "uniqueId" -> "1",
-      "taxOfficeNumber" -> "123",
+      "uniqueId"           -> "1",
+      "taxOfficeNumber"    -> "123",
       "taxOfficeReference" -> "AB001"
     )
 
@@ -223,7 +223,6 @@ class ConstructionIndustrySchemeConnectorSpec
               .withStatus(INTERNAL_SERVER_ERROR)
               .withBody("Something broke")
           )
-
       )
 
       val result = connector
@@ -236,7 +235,7 @@ class ConstructionIndustrySchemeConnectorSpec
     }
 
   }
-  
+
   "hasClient(taxOfficeNumber, taxOfficeReference)" should {
 
     "GET /cis/agent/has-client/:ton/:tor and return true when BE returns 200" in {
@@ -615,6 +614,38 @@ class ConstructionIndustrySchemeConnectorSpec
       val ex =
         connector.getSubmissionStatus("http://localhost/poll", "13602").failed.futureValue
 
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "proceedInsufficientVerification" should {
+
+    val request = ProceedInsufficientVerificationRequest(
+      instanceId = "1",
+      verificationBatchResourceRef = 10L,
+      verificationResourceRef = 9L,
+      proceed = "Y"
+    )
+
+    "successfully proceed verification when BE returns 204" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data")).willReturn(
+          aResponse().withStatus(NO_CONTENT)
+        )
+      )
+
+      connector.proceedInsufficientVerification(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate upstream error on non-2xx (e.g. 500)" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-insufficient-data"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.proceedInsufficientVerification(request).failed.futureValue
       ex.getMessage must include("returned 500")
     }
   }

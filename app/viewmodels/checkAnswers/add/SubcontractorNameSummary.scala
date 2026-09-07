@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.IndividualAnswers
 
 object SubcontractorNameSummary {
 
@@ -46,6 +47,24 @@ object SubcontractorNameSummary {
           ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
             .withAttribute("id" -> "subcontractor-name")
         )
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.subcontractorName.map { answer =>
+
+      val fullName = Seq(
+        Some(answer.firstName),
+        answer.middleName,
+        Some(answer.lastName)
+      ).flatten.mkString(" ")
+
+      SummaryListRowViewModel(
+        key = "subcontractorName.checkYourAnswersLabel",
+        value = ValueViewModel(Text(fullName)),
+        actions = Seq.empty
       )
     }
 }

@@ -19,6 +19,7 @@ package controllers.verify
 import config.FrontendAppConfig
 import controllers.actions.*
 import pages.verify.LastSubmittedVerificationBatchResponsePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
@@ -37,7 +38,8 @@ class VerificationResultsController @Inject() (
   view: VerificationResultsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {

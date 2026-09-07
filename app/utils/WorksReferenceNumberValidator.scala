@@ -16,14 +16,24 @@
 
 package utils
 
-import forms.Validation.worksRefRegex
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-object WorkReferenceNumber {
+object WorksReferenceNumberValidator {
 
-  private val length = 20
-
-  def isValid(wrn: String): Boolean = wrn != null && wrn.matches(worksRefRegex)
-
-  def isLengthInRange(wrn: String): Boolean = wrn != null && (wrn.length <= length)
-
+  def validate(
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
+    value
+      .filter(_.trim.nonEmpty)
+      .flatMap { wrn =>
+        Option.when(
+          !WorksReferenceNumber.isLengthInRange(wrn) ||
+            !WorksReferenceNumber.isValid(wrn)
+        ) {
+          FieldValidationFailure(
+            field = SubcontractorValidationField.WorksReferenceNumber,
+            value = Some(wrn)
+          )
+        }
+      }
 }

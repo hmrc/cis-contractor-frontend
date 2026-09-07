@@ -28,6 +28,8 @@ import pages.add.company.CompanyWorksReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.info.company.CompanyAnswers
 
 class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -129,6 +131,77 @@ class CompanyWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with Cy
 
       assertEscaped(html, "WR-123 &amp; Co &#x27;Ref&#x27;")
 
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "CompanyWorksReferenceSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      worksReference: Option[String] = None
+    ): CompanyAnswers =
+      CompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = worksReference,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the works reference exists" in {
+
+      val answers = viewOnlyAnswers(Some("WR-001"))
+
+      val maybeRow = CompanyWorksReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyWorksReference.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("WR-001")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the works reference does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyWorksReferenceSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val worksRef = "WR-123 & Co 'Ref'"
+
+      val answers = viewOnlyAnswers(Some(worksRef))
+
+      val maybeRow = CompanyWorksReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "WR-123 &amp; Co &#x27;Ref&#x27;")
       assertNoDoubleEncoding(html)
     }
   }

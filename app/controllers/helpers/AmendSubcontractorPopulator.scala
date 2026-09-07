@@ -32,6 +32,7 @@ import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
 import pages.amend.ShowVerificationDetailsPage
+import play.api.libs.json.Writes
 import queries.*
 
 import scala.util.Try
@@ -44,8 +45,9 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address    = toAddress(subcontractor)
+      val methods    = contactMethods(subcontractor)
+      val hasAddress = addressFieldsExist(subcontractor)
 
       val name = for {
         firstName <- subcontractor.firstName
@@ -71,7 +73,7 @@ object AmendSubcontractorPopulator {
         updated <- updated.set(SubTradingNameYesNoPage, usesTradingName)
         updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
         updated <- setOptional(updated, SubcontractorNamePage, name)
-        updated <- updated.set(SubAddressYesNoPage, address.isDefined)
+        updated <- updated.set(SubAddressYesNoPage, hasAddress)
         updated <- setOptional(updated, AddressOfSubcontractorPage, address)
         updated <- updated.set(AddIndividualContactMethodsYesNoPage, methods.nonEmpty)
         updated <- if (methods.nonEmpty) { updated.set(IndividualContactMethodOptionsPage, methods) }
@@ -79,6 +81,8 @@ object AmendSubcontractorPopulator {
         updated <- setOptional(updated, IndividualEmailAddressPage, subcontractor.emailAddress)
         updated <- setOptional(updated, IndividualPhoneNumberPage, subcontractor.phoneNumber)
         updated <- setOptional(updated, IndividualMobileNumberPage, subcontractor.mobilePhoneNumber)
+        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
         updated <- updated.set(UniqueTaxpayerReferenceYesNoPage, subcontractor.utr.isDefined)
         updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage, subcontractor.utr)
         updated <- updated.set(NationalInsuranceNumberYesNoPage, subcontractor.nino.isDefined)
@@ -102,7 +106,7 @@ object AmendSubcontractorPopulator {
         usesTradingName = Some(usesTradingName),
         tradingName = subcontractor.tradingName,
         subcontractorName = name,
-        addressYesNo = Some(address.isDefined),
+        addressYesNo = Some(addressFieldsExist(subcontractor)),
         address = address,
         individualContactMethodsYesNo = Some(methods.nonEmpty),
         individualContactMethod = methods,
@@ -126,8 +130,9 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address    = toAddress(subcontractor)
+      val methods    = contactMethods(subcontractor)
+      val hasAddress = addressFieldsExist(subcontractor)
 
       val original =
         originalAnswers(
@@ -139,7 +144,7 @@ object AmendSubcontractorPopulator {
       for {
         updated <- userAnswers.set(TypeOfSubcontractorPage, Limitedcompany)
         updated <- setOptional(updated, CompanyNamePage, subcontractor.tradingName)
-        updated <- updated.set(CompanyAddressYesNoPage, address.isDefined)
+        updated <- updated.set(CompanyAddressYesNoPage, hasAddress)
         updated <- setOptional(updated, CompanyAddressPage, address)
         updated <- updated.set(AddCompanyContactMethodsYesNoPage, methods.nonEmpty)
         updated <- if (methods.nonEmpty) updated.set(CompanyContactMethodOptionsPage, methods) else Try(updated)
@@ -147,6 +152,8 @@ object AmendSubcontractorPopulator {
         updated <- setOptional(updated, CompanyPhoneNumberPage, subcontractor.phoneNumber)
         updated <- setOptional(updated, CompanyMobileNumberPage, subcontractor.mobilePhoneNumber)
         updated <- updated.set(CompanyUtrYesNoPage, subcontractor.utr.isDefined)
+        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
         updated <- setOptional(updated, CompanyUtrPage, subcontractor.utr)
         updated <- updated.set(CompanyCrnYesNoPage, subcontractor.crn.isDefined)
         updated <- setOptional(updated, CompanyCrnPage, subcontractor.crn)
@@ -175,7 +182,7 @@ object AmendSubcontractorPopulator {
     ): OriginalCompanyAnswers =
       OriginalCompanyAnswers(
         companyName = subcontractor.tradingName,
-        addressYesNo = Some(address.isDefined),
+        addressYesNo = Some(addressFieldsExist(subcontractor)),
         address = address,
         companyContactMethodsYesNo = Some(methods.nonEmpty),
         companyContactMethod = methods,
@@ -200,8 +207,9 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address = toAddress(subcontractor)
-      val methods = contactMethods(subcontractor)
+      val address    = toAddress(subcontractor)
+      val methods    = contactMethods(subcontractor)
+      val hasAddress = addressFieldsExist(subcontractor)
 
       val trustName =
         subcontractor.tradingName.orElse(
@@ -218,13 +226,15 @@ object AmendSubcontractorPopulator {
       for {
         updated <- userAnswers.set(TypeOfSubcontractorPage, Trust)
         updated <- setOptional(updated, TrustNamePage, trustName)
-        updated <- updated.set(TrustAddressYesNoPage, address.isDefined)
+        updated <- updated.set(TrustAddressYesNoPage, hasAddress)
         updated <- setOptional(updated, TrustAddressPage, address)
         updated <- updated.set(AddTrustContactMethodsYesNoPage, methods.nonEmpty)
         updated <- if (methods.nonEmpty) updated.set(TrustContactMethodOptionsPage, methods) else Try(updated)
         updated <- setOptional(updated, TrustEmailAddressPage, subcontractor.emailAddress)
         updated <- setOptional(updated, TrustPhoneNumberPage, subcontractor.phoneNumber)
         updated <- setOptional(updated, TrustMobileNumberPage, subcontractor.mobilePhoneNumber)
+        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
         updated <- updated.set(TrustUtrYesNoPage, subcontractor.utr.isDefined)
         updated <- setOptional(updated, TrustUtrPage, subcontractor.utr)
         updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
@@ -246,7 +256,7 @@ object AmendSubcontractorPopulator {
     ): OriginalTrustAnswers =
       OriginalTrustAnswers(
         trustName = trustName,
-        addressYesNo = Some(address.isDefined),
+        addressYesNo = Some(addressFieldsExist(subcontractor)),
         address = address,
         trustContactMethodsYesNo = Some(methods.nonEmpty),
         trustContactMethod = methods,
@@ -268,6 +278,7 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
       val address              = toAddress(subcontractor)
+      val hasAddress           = addressFieldsExist(subcontractor)
       val methods              = contactMethods(subcontractor)
       val nominatedPartnerName = subcontractor.tradingName
       val partnershipName      = subcontractor.partnershipTradingName
@@ -283,7 +294,7 @@ object AmendSubcontractorPopulator {
       for {
         updated <- userAnswers.set(TypeOfSubcontractorPage, Partnership)
         updated <- setOptional(updated, PartnershipNamePage, partnershipName)
-        updated <- updated.set(PartnershipAddressYesNoPage, address.isDefined)
+        updated <- updated.set(PartnershipAddressYesNoPage, hasAddress)
         updated <- setOptional(updated, PartnershipAddressPage, address)
         updated <- updated.set(AddPartnershipContactMethodsYesNoPage, methods.nonEmpty)
         updated <- if (methods.nonEmpty) updated.set(PartnershipContactMethodOptionsPage, methods) else Try(updated)
@@ -304,6 +315,8 @@ object AmendSubcontractorPopulator {
         updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
         updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
         updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
+        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
         updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
         updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
         updated <- updated.set(CisIdQuery, cisId)
@@ -320,7 +333,7 @@ object AmendSubcontractorPopulator {
     ): OriginalPartnershipAnswers =
       OriginalPartnershipAnswers(
         partnershipName = partnershipName,
-        addressYesNo = Some(address.isDefined),
+        addressYesNo = Some(addressFieldsExist(subcontractor)),
         address = address,
         partnershipContactMethodsYesNo = Some(methods.nonEmpty),
         partnershipContactMethodOptions = methods,
@@ -345,7 +358,7 @@ object AmendSubcontractorPopulator {
   private def toAddress(
     subcontractor: SubcontractorResponse
   ): Option[Address] =
-    subcontractor.addressLine1.map { line1 =>
+    subcontractor.addressLine1.filter(_.trim.nonEmpty).map { line1 =>
       Address(
         addressLine1 = line1,
         addressLine2 = subcontractor.addressLine2,
@@ -354,6 +367,20 @@ object AmendSubcontractorPopulator {
         postcode = subcontractor.postcode,
         country = subcontractor.country.map(name => Country(None, Some(name)))
       )
+    }
+
+  private def addressFieldsExist(
+    subcontractor: SubcontractorResponse
+  ): Boolean =
+    toAddress(subcontractor).isDefined
+
+  private def setOptionalQuery[A: Writes](
+    userAnswers: UserAnswers,
+    query: Settable[A],
+    value: Option[A]
+  ): Try[UserAnswers] =
+    value.fold(Try(userAnswers)) { answer =>
+      userAnswers.set(query, answer)
     }
 
   private def contactMethods(

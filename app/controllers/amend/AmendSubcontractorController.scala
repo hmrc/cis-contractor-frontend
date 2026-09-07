@@ -153,7 +153,7 @@ class AmendSubcontractorController @Inject() (
       updatedAnswers =>
         sessionRepository
           .set(updatedAnswers)
-          .map(_ => Redirect(onwardRoute(subcontractorType)))
+          .map(_ => Redirect(onwardRoute(subcontractorType, subbieResourceRef)))
     )
   private def populateUserAnswers(
     subcontractorType: TypeOfSubcontractor,
@@ -179,24 +179,24 @@ class AmendSubcontractorController @Inject() (
           .populate(userAnswers, cisId, subcontractor)
     }
 
-  private def onwardRoute(subcontractorType: TypeOfSubcontractor): Call =
+  private def onwardRoute(subcontractorType: TypeOfSubcontractor, subbieResourceRef: Long): Call =
     subcontractorType match {
       case Individualorsoletrader =>
         controllers.amend.routes.AmendIndividualCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(subbieResourceRef)
 
       case Limitedcompany =>
         controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(subbieResourceRef)
 
       case Partnership =>
         controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(subbieResourceRef)
 
       case Trust =>
         controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
-          .onPageLoad()
+          .onPageLoad(subbieResourceRef)
     }
-  private def recovery: Result                                          =
+  private def recovery: Result                                                                   =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 }

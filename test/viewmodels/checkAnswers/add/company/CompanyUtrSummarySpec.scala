@@ -28,6 +28,8 @@ import pages.add.company.CompanyUtrPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.info.company.CompanyAnswers
 
 class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -132,6 +134,109 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       CompanyUtrSummary.row(answers) shouldBe None
+    }
+  }
+
+  "CompanyUtrSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      utr: Option[String] = None
+    ): CompanyAnswers =
+      CompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = None,
+        utr = utr,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the UTR exists and is verified" in {
+
+      val answers = viewOnlyAnswers(Some("7777777777"))
+
+      val maybeRow = CompanyUtrSummary.row(
+        answers,
+        isVerified = true
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyUtr.verified.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("7777777777")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow when the UTR exists and is not verified" in {
+
+      val answers = viewOnlyAnswers(Some("7777777777"))
+
+      val maybeRow = CompanyUtrSummary.row(
+        answers,
+        isVerified = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyUtr.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString   should include(expectedKeyText)
+      row.value.content.asHtml.toString should include("7777777777")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the UTR does not exist" in {
+
+      val answers = viewOnlyAnswers()
+
+      CompanyUtrSummary.row(
+        answers,
+        isVerified = true
+      ) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val utr = "1234&5678'90"
+
+      val answers = viewOnlyAnswers(Some(utr))
+
+      val maybeRow = CompanyUtrSummary.row(
+        answers,
+        isVerified = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234&amp;5678&#x27;90")
+      assertNoDoubleEncoding(html)
     }
   }
 }

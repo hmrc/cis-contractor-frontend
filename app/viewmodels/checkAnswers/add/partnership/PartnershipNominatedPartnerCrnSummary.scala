@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerCrnPage
@@ -39,6 +40,17 @@ object PartnershipNominatedPartnerCrnSummary {
           ).withVisuallyHiddenText(messages("partnershipNominatedPartnerCrn.change.hidden"))
             .withAttribute("id" -> "nominated-partner-crn")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerCrn.map { crn =>
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerCrn.checkYourAnswersLabel",
+        value = ValueViewModel(Text(crn)),
+        actions = Seq.empty
       )
     }
 }

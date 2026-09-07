@@ -21,6 +21,7 @@ import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.add.AddressSummaryRow
+import models.info.company.CompanyAnswers
 
 object CompanyAddressSummary {
 
@@ -36,6 +37,16 @@ object CompanyAddressSummary {
         },
         hiddenTextKey = "companyAddress.change.hidden",
         id = "address-of-company"
+      )
+    }
+
+  def row(
+    answers: CompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.address.map { address =>
+      AddressSummaryRow.viewOnlyRow(
+        address = address,
+        key = "companyAddress.checkYourAnswersLabel"
       )
     }
 }

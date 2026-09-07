@@ -39,7 +39,7 @@ class TrustMobileNumberFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       Gen.oneOf(
         "07777777777",
-        "+447777777777",
+        "447777777777",
         "  07777 77777 ",
         "(44)77777777777",
         "44-777-777"

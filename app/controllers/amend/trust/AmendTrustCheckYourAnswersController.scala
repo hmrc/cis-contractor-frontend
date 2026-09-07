@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -49,6 +49,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
   appConfig: FrontendAppConfig
@@ -57,29 +58,31 @@ class AmendTrustCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val ua = request.userAnswers
 
-    ValidatedTrust.build(ua) match {
-      case Right(_) =>
-        val isVerified = ua.get(ShowVerificationDetailsPage)
-        val trustName  = ua.get(TrustNamePage).getOrElse("")
+      ValidatedTrust.build(ua) match {
+        case Right(_) =>
+          val isVerified = ua.get(ShowVerificationDetailsPage)
+          val trustName  = ua.get(TrustNamePage).getOrElse("")
 
-        val subcontractorInformationList =
-          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+          val subcontractorInformationList =
+            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-        val detailsList =
-          SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+          val detailsList =
+            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
-        val submitUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit()
-        val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
+          val submitUrl =
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
+          val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
-        Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
+          Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
 
-      case Left(error) =>
-        logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
+        case Left(error) =>
+          logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
   private def subcontractorInformationRows(
@@ -156,7 +159,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       )
   }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedTrust.build(request.userAnswers) match {
 
@@ -193,27 +196,43 @@ class AmendTrustCheckYourAnswersController @Inject() (
           }
 
         case Right(_) =>
-          subcontractorService
-            .createAndUpdateSubcontractor(request.userAnswers)
-            .flatMap { _ =>
-              Future
-                .fromTry(request.userAnswers.set(AmendCheckYourAnswersSubmittedPage, true))
-                .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+          Future
+            .fromTry(
+              request.userAnswers.set(
+                AmendCheckYourAnswersSubmittedPage,
+                true
+              )
+            )
+            .flatMap { updated =>
+              sessionRepository
+                .set(updated)
+                .flatMap { _ =>
+                  subcontractorService
+                    .updateSubcontractor(updated, submittedSubbieResourceRef(subbieResourceRef))
+                }
                 .map { _ =>
+                  auditService.amendSubcontractorEvent(request.userAnswers)
                   Redirect(
-                    controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad()
+                    controllers.amend.trust.routes.AmendTrustConfirmationController
+                      .onPageLoad()
                   )
                 }
             }
             .recover { case t =>
               logger.error(
-                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to update subcontractor",
+                "[AmendTrustCheckYourAnswersController.onSubmit] Failed to submit amend subcontractor",
                 t
               )
-              Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+              Redirect(
+                routes.JourneyRecoveryController.onPageLoad()
+              )
             }
       }
     }
+
+  private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
+    Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

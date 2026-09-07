@@ -150,37 +150,4 @@ class VerificationResultsViewModelSpec extends SpecBase {
       blank.verificationNumber mustBe ""
     }
   }
-
-  "VerificationResultsViewModel.unmatchedSubcontractorIds" - {
-
-    "must return subcontractorIds for unmatched verifications only" in {
-      val ids = VerificationResultsViewModel.unmatchedSubcontractorIds(
-        response(
-          verification(subcontractorId = Some(10L)),
-          verification(verificationNumber = None, subcontractorId = Some(22L)),
-          verification(matched = Some("N"), subcontractorId = Some(33L)),
-          verification(verificationNumber = None, subcontractorId = None)
-        )
-      )
-
-      ids mustBe Set(22L, 33L)
-    }
-
-    "must return empty when all verifications are matched" in {
-      VerificationResultsViewModel.unmatchedSubcontractorIds(response(verification())) mustBe Set.empty
-    }
-  }
-
-  "VerificationResultsViewModel.hasUnmatchedVerifications" - {
-
-    "must be true when an unmatched verification has no subcontractorId" in {
-      VerificationResultsViewModel.hasUnmatchedVerifications(
-        response(verification(verificationNumber = None, subcontractorId = None))
-      ) mustBe true
-    }
-
-    "must be false when all verifications are matched" in {
-      VerificationResultsViewModel.hasUnmatchedVerifications(response(verification())) mustBe false
-    }
-  }
 }

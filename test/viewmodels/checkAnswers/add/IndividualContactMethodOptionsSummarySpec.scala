@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add
 
 import base.SpecBase
 import models.contact.ContactMethodOptions
+import models.info.IndividualAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.IndividualContactMethodOptionsPage
@@ -169,6 +170,131 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       valueHtml must include("Email address")
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
+    }
+  }
+
+  "ViewOnly - IndividualContactMethodOptionsSummary.row" - {
+
+    "must return a row with multiple selected options" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(true),
+          individualContactMethod = Set(
+            ContactMethodOptions.Email,
+            ContactMethodOptions.Phone,
+            ContactMethodOptions.Mobile
+          ),
+          email = Some("test@test.com"),
+          phone = Some("02070000000"),
+          mobile = Some("07123456789"),
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualContactMethodOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with a single selected option" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(true),
+          individualContactMethod = Set(ContactMethodOptions.Email),
+          email = Some("test@test.com"),
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualContactMethodOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return None when no contact methods are selected" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      IndividualContactMethodOptionsSummary.row(answers) mustBe None
     }
   }
 
