@@ -130,8 +130,8 @@ POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  
 GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
-GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
+POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 
 GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
@@ -628,7 +628,7 @@ POST  /subcontractor/verify/no-new-subcontractors-to-verify  controllers.verify.
 
 GET   /subcontractor/verify/problem-with-verification-warning  controllers.verify.VerifyDepartmentalErrorController.onPageLoad()
 
-GET   /subcontractor/verify/problem-with-verification-warning-submit-again   controllers.verify.VerifyDepartmentalErrorSubmitAgainController.onPageLoad()
+GET   /subcontractor/verify/problem-with-verification-warning-submit-again  controllers.verify.VerifyDepartmentalErrorSubmitAgainController.onPageLoad()
 
 GET   /subcontractor/verify/inactive-scheme-warning  controllers.verify.InactiveSchemeWarningController.onPageLoad()
 
