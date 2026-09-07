@@ -104,10 +104,10 @@ class SelectSubcontractorController @Inject() (
     }
 
   private def renderSelectSubcontractorPage(
-                                             userAnswers: UserAnswers,
-                                             mode: Mode,
-                                             page: Int
-                                           )(implicit request: Request[_]): Future[Result] =
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: Int
+  )(implicit request: Request[_]): Future[Result] =
     getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
 
       case Right(unverifiedSubcontractors) =>
