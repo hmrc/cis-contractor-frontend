@@ -21,6 +21,8 @@ import controllers.actions.*
 import models.requests.DataRequest
 import models.verify.SubmissionStatus
 import models.verify.SubmissionStatus.*
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse}
+import models.verify.GovTalkErrorStatus.{DepartmentalError, FatalError}
 import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
