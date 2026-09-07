@@ -29,7 +29,7 @@ import models.CheckMode
 import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.{CheckboxPaginationResult, CisManageService, PaginationService, VerificationService}
+import services.{CheckboxPaginationResult, CisManageService, PaginationService, VerificationPreSelectionService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
@@ -45,6 +45,7 @@ class SelectSubcontractorController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
+  verificationPreSelectionService: VerificationPreSelectionService,
   verificationService: VerificationService,
   override protected val cisManageService: CisManageService,
   val controllerComponents: MessagesControllerComponents,
@@ -61,8 +62,10 @@ class SelectSubcontractorController @Inject() (
       request.userAnswers match {
 
         case Some(userAnswers) =>
-          Future.successful(
-            renderSelectSubcontractorPage(userAnswers, mode, page)
+          renderSelectSubcontractorPage(
+            userAnswers,
+            mode,
+            page
           )
 
         case None =>
@@ -80,7 +83,7 @@ class SelectSubcontractorController @Inject() (
             case Right(checkedAnswers) =>
               verificationService
                 .refreshNewestVerificationBatch(checkedAnswers)
-                .map { updatedAnswers =>
+                .flatMap { updatedAnswers =>
                   renderSelectSubcontractorPage(
                     updatedAnswers,
                     mode,
@@ -101,21 +104,47 @@ class SelectSubcontractorController @Inject() (
     }
 
   private def renderSelectSubcontractorPage(
-    userAnswers: UserAnswers,
-    mode: Mode,
-    page: Int
-  )(implicit request: Request[_]): Result =
+                                             userAnswers: UserAnswers,
+                                             mode: Mode,
+                                             page: Int
+                                           )(implicit request: Request[_]): Future[Result] =
     getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
 
       case Right(unverifiedSubcontractors) =>
         val subcontractorsVm =
           SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-        val preparedForm =
-          userAnswers
-            .get(SelectSubcontractorPage)
-            .map(subs => form.fill(subs.map(_.id)))
-            .getOrElse(form)
+        val selectedSubcontractors =
+          userAnswers.get(SelectSubcontractorPage) match {
+
+            case Some(subs) =>
+              Future.successful(subs)
+
+            case None =>
+              val selectedIds =
+                verificationPreSelectionService.preSelectedSubcontractorIds(
+                  unverifiedSubcontractors,
+                  userAnswers
+                )
+
+              val defaultSelections =
+                subcontractorsVm
+                  .filter(sub => selectedIds.contains(sub.id))
+                  .toSet
+
+              Future
+                .fromTry(
+                  userAnswers.set(
+                    SelectSubcontractorPage,
+                    defaultSelections
+                  )
+                )
+                .flatMap { updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map(_ => defaultSelections)
+                }
+          }
 
         val result =
           paginationService.paginateCheckboxItems(
@@ -123,30 +152,32 @@ class SelectSubcontractorController @Inject() (
             page
           )
 
-        Ok(
-          view(
-            preparedForm,
-            mode,
-            result.paginatedData,
-            result.paginationViewModel,
-            page,
-            result.startIndex,
-            result.totalCount
+        selectedSubcontractors.map { selected =>
+          Ok(
+            view(
+              form.fill(selected.map(_.id)),
+              mode,
+              result.paginatedData,
+              result.paginationViewModel,
+              page,
+              result.startIndex,
+              result.totalCount
+            )
           )
-        )
+        }
 
       case Left(redirectResult) =>
-        redirectResult
+        Future.successful(redirectResult)
     }
 
   private def hasAnyVerifiedSubcontractor(
     request: DataRequest[_]
-  ) =
+  ): Boolean =
     request.userAnswers
       .get(NewestVerificationBatchResponsePage)
       .exists(_.subcontractors.exists(_.isVerified))
 
-  def onSubmit(mode: Mode, page: Int = 1) =
+  def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
       val ua = request.userAnswers
@@ -168,25 +199,25 @@ class SelectSubcontractorController @Inject() (
           val result =
             paginationService.paginateCheckboxItems(allItems, page)
 
-          val currentPageIds =
+          val currentPageIds: Set[String] =
             result.paginatedData.map(_.value).toSet
 
-          val otherPageValues =
+          val otherPageValues: Set[SubcontractorViewModel] =
             ua.get(SelectSubcontractorPage)
               .getOrElse(Set.empty)
               .filterNot(sub => currentPageIds.contains(sub.id))
 
           val boundForm = form.bindFromRequest()
 
-          val currentSelectedValues =
+          val currentSelectedValues: Set[SubcontractorViewModel] =
             boundForm.value
               .getOrElse(Set.empty)
               .flatMap(id => subcontractorsVm.find(_.id == id))
 
-          val mergedValues =
+          val mergedValues: Set[SubcontractorViewModel] =
             otherPageValues ++ currentSelectedValues
 
-          val gotoPage =
+          val gotoPage: Option[Int] =
             request.body.asFormUrlEncoded
               .flatMap(_.get("gotoPage"))
               .flatMap(_.headOption)
@@ -200,33 +231,36 @@ class SelectSubcontractorController @Inject() (
               } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
             case None =>
-              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) for {
-                answersWithSelections <- Future.fromTry(
-                                           ua.set(SelectSubcontractorPage, mergedValues)
-                                         )
+              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
+                for {
+                  answersWithSelections <- Future.fromTry(
+                                             ua.set(SelectSubcontractorPage, mergedValues)
+                                           )
 
-                nextPage =
-                  navigator.nextPage(
-                    SelectSubcontractorPage,
-                    mode,
-                    answersWithSelections
-                  )
-
-                updatedAnswers <-
-                  if (
-                    mode == CheckMode &&
-                    answersWithSelections
-                      .get(RebuildVerificationFromWarningPage)
-                      .contains(true)
-                  )
-                    Future.fromTry(
-                      answersWithSelections.remove(RebuildVerificationFromWarningPage)
+                  nextPage =
+                    navigator.nextPage(
+                      SelectSubcontractorPage,
+                      mode,
+                      answersWithSelections
                     )
-                  else Future.successful(answersWithSelections)
 
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(nextPage)
-              else {
+                  updatedAnswers <-
+                    if (
+                      mode == CheckMode &&
+                      answersWithSelections
+                        .get(RebuildVerificationFromWarningPage)
+                        .contains(true)
+                    ) {
+                      Future.fromTry(
+                        answersWithSelections.remove(RebuildVerificationFromWarningPage)
+                      )
+                    } else {
+                      Future.successful(answersWithSelections)
+                    }
+
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(nextPage)
+              } else {
                 val formWithErrors =
                   form
                     .fill(currentSelectedValues.map(_.id))
@@ -253,7 +287,7 @@ class SelectSubcontractorController @Inject() (
     mode: Mode,
     page: Int,
     result: CheckboxPaginationResult
-  )(implicit request: DataRequest[_]) =
+  )(implicit request: DataRequest[_]): Result =
     BadRequest(
       view(
         formWithErrors,
@@ -266,7 +300,7 @@ class SelectSubcontractorController @Inject() (
       )
     )
 
-  private def getUnverifiedSubcontractorsOrRedirect(userAnswers: UserAnswers) =
+  private def getUnverifiedSubcontractorsOrRedirect(userAnswers: UserAnswers): Either[Result, Seq[Subcontractor]] =
     userAnswers.get(NewestVerificationBatchResponsePage) match {
       case None =>
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
