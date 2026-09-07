@@ -230,7 +230,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
               .map { _ =>
                 auditService.amendSubcontractorEvent(updated)
 
-                confirmationRedirect(journeyType)
+                Redirect(
+                  controllers.amend.trust.routes.AmendTrustConfirmationController
+                    .onPageLoad()
+                )
               }
           }
           .recover { case t =>
@@ -300,30 +303,6 @@ class AmendTrustCheckYourAnswersController @Inject() (
         )
 
         routes.JourneyRecoveryController.onPageLoad()
-    }
-
-  private def confirmationRedirect(
-    journeyType: AmendJourneyType
-  ): Result =
-    journeyType match {
-
-      case AmendJourneyType.Standard =>
-        Redirect(
-          controllers.amend.trust.routes.AmendTrustConfirmationController
-            .onPageLoad()
-        )
-
-      case AmendJourneyType.InsufficientInfo =>
-        Redirect(
-          controllers.insufficient.routes.InsufficientSubcontractorDetailsUpdatedController
-            .onPageLoad()
-        )
-
-      case AmendJourneyType.UnmatchedInfo =>
-        Redirect(
-          controllers.unmatched.routes.UnmatchedSubcontractorDetailsUpdatedController
-            .onPageLoad()
-        )
     }
 
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =

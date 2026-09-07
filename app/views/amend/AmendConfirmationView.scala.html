@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import views.html.components._
+@import viewmodels.amend.AmendConfirmationLink
 
 @this(
     layout: templates.Layout,
@@ -28,8 +29,11 @@
     appConfig: config.FrontendAppConfig
 )
 
-@(rows: Seq[Seq[TableRow]], subcontractorName: String)(implicit request: Request[_], messages: Messages)
-
+@(
+    rows: Seq[Seq[TableRow]],
+    subcontractorName: String,
+    confirmationLink: AmendConfirmationLink
+)(implicit request: Request[_], messages: Messages)
 @layout(
     pageTitle = titleNoForm(messages("amendConfirmation.panel.heading")),
     showBackLink = false
@@ -55,21 +59,24 @@
     )
 
     @link(
-        linkTextKey = "amendConfirmation.yourSubcontractors",
-        linkUrl = appConfig.retrieveSubcontractorListUrl,
+        linkTextKey = confirmationLink.textKey,
+        linkUrl = confirmationLink.url,
         hasFullStop = true,
         prefixTextKey = "amendConfirmation.backTo",
         isNewTab = false
     )
 
-    @h2("amendConfirmation.beforeYouGo.h2")
+    @if(confirmationLink.showBeforeYouGo) {
 
-    @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
+        @h2("amendConfirmation.beforeYouGo.h2")
 
-    <p class="govuk-body">
-        <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
-            @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
-        </a>
-        @messages("amendConfirmation.beforeYouGo.shareFeedback")
-    </p>
+        @paragraph(messages("amendConfirmation.beforeYouGo.p1"))
+
+        <p class="govuk-body">
+            <a href="#" target="_blank" rel="noopener noreferrer" class="govuk-link">
+                @messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
+            </a>
+            @messages("amendConfirmation.beforeYouGo.shareFeedback")
+        </p>
+    }
 }

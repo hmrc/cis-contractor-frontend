@@ -33,6 +33,10 @@ import repositories.SessionRepository
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+import config.FrontendAppConfig
+import models.amend.AmendJourneyType
+import pages.amend.AmendJourneyTypePage
+import viewmodels.amend.AmendConfirmationLinks
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -69,6 +73,9 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       .success
       .value
       .set(TrustNamePage, trustName)
+      .success
+      .value
+      .set(AmendJourneyTypePage, AmendJourneyType.Standard)
       .success
       .value
       .set(AmendCheckYourAnswersSubmittedPage, true)
@@ -121,13 +128,21 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
 
         status(result) mustEqual OK
 
+        val confirmationLink =
+          AmendConfirmationLinks.build(
+            AmendJourneyType.Standard,
+            cisId,
+            app.injector.instanceOf[FrontendAppConfig]
+          )
+
         contentAsString(result) mustEqual
           view(
             TrustAmendConfirmationViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            trustName
+            trustName,
+            confirmationLink
           )(request, messages(app)).toString
 
         verify(mockCleanupService).cleanAmend(any[UserAnswers])
@@ -286,6 +301,122 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
 
         verify(mockCleanupService).cleanAmend(any[UserAnswers])
         verify(mockSessionRepository, never()).set(any[UserAnswers])
+      }
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalTrustAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TrustNamePage, trustName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must render the insufficient info confirmation link" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes
+            .ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
+      }
+    }
+
+    "must render the unmatched info confirmation link" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes
+            .ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
       }
     }
   }
