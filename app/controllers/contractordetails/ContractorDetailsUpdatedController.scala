@@ -19,35 +19,67 @@ package controllers.contractordetails
 import config.FrontendAppConfig
 import controllers.actions.*
 import pages.CisIdPage
-
-import javax.inject.Inject
+import pages.contractordetails.ContractorSchemePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.ContractorDetailsUpdatedView
 
-class ContractorDetailsUpdatedController @Inject() (
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
-  view: ContractorDetailsUpdatedView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val cisAccountUrl =
-      if (!request.isAgent) {
-        appConfig.constructionIndustryOrgAccountUrl
-      } else {
-        request.userAnswers
-          .get(CisIdPage)
-          .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
-            s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+class ContractorDetailsUpdatedController @Inject() (
+                                                     override val messagesApi: MessagesApi,
+                                                     identify: IdentifierAction,
+                                                     getData: DataRetrievalAction,
+                                                     requireData: DataRequiredAction,
+                                                     contractorDetailsService: ContractorDetailsService,
+                                                     sessionRepository: SessionRepository,
+                                                     val controllerComponents: MessagesControllerComponents,
+                                                     view: ContractorDetailsUpdatedView
+                                                   )(implicit
+                                                     appConfig: FrontendAppConfig,
+                                                     ec: ExecutionContext
+                                                   ) extends FrontendBaseController
+  with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
+
+        case Some(cisId) =>
+          val cisAccountUrl =
+            if (request.isAgent) {
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            } else {
+              appConfig.constructionIndustryOrgAccountUrl
+            }
+
+          contractorDetailsService
+            .getScheme(cisId)
+            .flatMap { latestScheme =>
+              request.userAnswers
+                .set(ContractorSchemePage, latestScheme) match {
+
+                case Failure(error) =>
+                  Future.failed(error)
+
+                case Success(updatedAnswers) =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Ok(view(cisAccountUrl))
+                    }
+              }
+            }
       }
-    Ok(view(cisAccountUrl))
-  }
+    }
 }
