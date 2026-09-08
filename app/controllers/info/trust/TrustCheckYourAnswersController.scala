@@ -80,7 +80,7 @@ class TrustCheckYourAnswersController @Inject() (
                   subcontractorInformationList,
                   detailsList,
                   answers.trustName.getOrElse(""),
-                  controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url,
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
               )

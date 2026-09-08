@@ -406,7 +406,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           .url
 
         link.text() mustBe msg("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
-        link.attr("href") mustBe controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+        link.attr("href") mustBe controllers.verify.routes.ReviewUnmatchedSubcontractorsController
           .onPageLoad()
           .url
       }

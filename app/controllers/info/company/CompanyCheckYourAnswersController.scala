@@ -80,7 +80,7 @@ class CompanyCheckYourAnswersController @Inject() (
                   subcontractorInformationList,
                   detailsList,
                   answers.companyName.getOrElse(""),
-                  controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url,
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
               )
