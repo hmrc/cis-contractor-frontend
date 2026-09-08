@@ -16,7 +16,9 @@
 
 package controllers.contractordetails
 
+import config.FrontendAppConfig
 import controllers.actions.*
+import pages.CisIdPage
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -31,10 +33,20 @@ class ContractorDetailsUpdatedController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsUpdatedView
-) extends FrontendBaseController
+)(implicit appConfig: FrontendAppConfig) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
+    val cisAccountUrl =
+      if (!request.isAgent) {
+        appConfig.constructionIndustryOrgAccountUrl
+      } else {
+        request.userAnswers
+          .get(CisIdPage)
+          .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+            s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+          )
+      }
+    Ok(view(cisAccountUrl))
   }
 }
