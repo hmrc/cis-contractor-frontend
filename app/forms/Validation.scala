@@ -45,6 +45,9 @@ object Validation {
   final val ukPostcodeRegex =
     """^[A-Za-z0-9 ~!\"@#$%\&\'\(\)\*\+,\-\./:;\<=\>\?\[\\\]^_\{\}\£\€]*$"""
 
+  final val ninoRegex =
+    """^[ABCEGHJKLMNOPRSTWXYZabceghjklmnoprstwxyz][ABCEGHJKLMNPRSTWXYZabceghjklmnprstwxyz][0-9]{6}[ABCDabcd ]*$"""
+
   def isNinoValid(value: String, errorKey: String): Constraint[String] =
     Constraint {
       case str if Nino.isValid(str.replaceAll("\\s", "").toUpperCase) =>

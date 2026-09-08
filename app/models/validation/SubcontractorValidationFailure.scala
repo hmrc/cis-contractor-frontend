@@ -27,4 +27,22 @@ object SubcontractorValidationFailure {
 
   implicit val format: OFormat[SubcontractorValidationFailure] =
     Json.format[SubcontractorValidationFailure]
+
+  def merge(
+    failures: List[SubcontractorValidationFailure]*
+  ): List[SubcontractorValidationFailure] = {
+    val grouped =
+      failures.flatten.groupBy(_.subcontractorId)
+
+    failures.flatten
+      .map(_.subcontractorId)
+      .distinct
+      .map { id =>
+        SubcontractorValidationFailure(
+          subcontractorId = id,
+          failedFields = grouped(id).flatMap(_.failedFields).toList
+        )
+      }
+      .toList
+  }
 }
