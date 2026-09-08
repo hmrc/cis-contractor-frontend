@@ -24,7 +24,7 @@ import models.contact.ContactMethodOptions
 import pages.QuestionPage
 import pages.add.*
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 
 object IndividualAmendedViewModel {
@@ -158,7 +158,7 @@ object IndividualAmendedViewModel {
     Option.when(
       original.address != currentAddress
     ) {
-      row(
+      htmlRow(
         messages("addressOfSubcontractor.checkYourAnswersLabel"),
         original.address.map(formatAddress).getOrElse(missingValue),
         currentAddress.map(formatAddress).getOrElse(missingValue)
@@ -181,7 +181,7 @@ object IndividualAmendedViewModel {
       Option.when(
         original.individualContactMethod != currentMethods
       ) {
-        row(
+        htmlRow(
           messages("individualContactMethodOptions.checkYourAnswersLabel"),
           formatContactMethods(original.individualContactMethod),
           formatContactMethods(currentMethods)
@@ -214,7 +214,7 @@ object IndividualAmendedViewModel {
     if (methods.isEmpty) {
       missingSelect
     } else {
-      ContactMethodOptions
+      val contactOptions = ContactMethodOptions
         .ordered(methods)
         .map {
           case ContactMethodOptions.Email  =>
@@ -224,7 +224,15 @@ object IndividualAmendedViewModel {
           case ContactMethodOptions.Mobile =>
             messages("individualContactMethodOptions.mobile")
         }
-        .mkString(", ")
+
+      if (contactOptions.size > 1) {
+        contactOptions
+          .map(item => s"<li>$item</li>")
+          .mkString("<ul class=\"govuk-list govuk-list--bullet\">", "", "</ul>")
+      } else {
+        contactOptions.mkString
+      }
+
     }
 
   private def worksReferenceRows(original: OriginalIndividualAnswers, current: UserAnswers)(implicit
@@ -311,7 +319,7 @@ object IndividualAmendedViewModel {
       a.addressLine5,
       a.postcode,
       a.country.flatMap(_.name)
-    ).flatten.mkString(", ")
+    ).flatten.mkString("</br>")
 
   private def yesNoRow(
     page: QuestionPage[Boolean],
@@ -357,6 +365,13 @@ object IndividualAmendedViewModel {
       TableRow(content = Text(label), classes = "govuk-!-font-weight-bold"),
       TableRow(Text(previous)),
       TableRow(Text(updated))
+    )
+
+  private def htmlRow(label: String, previous: String, updated: String): Seq[TableRow] =
+    Seq(
+      TableRow(content = HtmlContent(label), classes = "govuk-!-font-weight-bold"),
+      TableRow(HtmlContent(previous)),
+      TableRow(HtmlContent(updated))
     )
 
   private def missingValue(implicit messages: Messages): String =

@@ -108,6 +108,8 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         answers.get(TypeOfSubcontractorPage).value mustBe Individualorsoletrader
         answers.get(SubTradingNameYesNoPage).value mustBe true
         answers.get(TradingNameOfSubcontractorPage).value mustBe "Test Trading Name"
+        answers.get(OriginalSubcontractorQuery).value mustBe baseSubcontractor
+        answers.get(AmendSubbieResourceRefQuery).value mustBe subbieResourceRef
 
         answers.get(SubcontractorNamePage).value mustBe SubcontractorName(
           firstName = "John",
@@ -231,6 +233,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(CompanyCrnYesNoPage).value mustBe true
         answers.get(CompanyCrnPage).value mustBe "12345678"
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(CompanyWorksReferenceYesNoPage).value mustBe true
         answers.get(CompanyWorksReferencePage).value mustBe "XLS345-MM"
@@ -341,6 +344,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(ShowVerificationDetailsPage).value mustBe true
         answers.get(CisIdQuery).value mustBe cisId
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(OriginalPartnershipAnswersQuery).value mustBe OriginalPartnershipAnswers(
           partnershipName = Some("Test Partnership"),
@@ -406,6 +410,7 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(ShowVerificationDetailsPage).value mustBe true
         answers.get(CisIdQuery).value mustBe cisId
+        answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(OriginalTrustAnswersQuery).value mustBe OriginalTrustAnswers(
           trustName = Some("Test Trust"),
@@ -468,6 +473,31 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
             addressLine4 = None,
             postcode = None,
             country = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.TrustPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor)
+            .get
+
+        answers.get(TrustAddressYesNoPage).value mustBe false
+        answers.get(TrustAddressPage) mustBe None
+
+        val original = answers.get(OriginalTrustAnswersQuery).value
+
+        original.addressYesNo mustBe Some(false)
+        original.address mustBe None
+      }
+
+      "must set address answer to false when partial backend address data is returned without address line 1" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            addressLine1 = None,
+            addressLine2 = Some("Amity Island"),
+            addressLine3 = Some("Bodmin"),
+            addressLine4 = None,
+            postcode = Some("PL31 2HL"),
+            country = Some("England")
           )
 
         val answers =

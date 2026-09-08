@@ -21,6 +21,7 @@ import models.add.SubcontractorName.format
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.matchers.must.Matchers
 import pages.behaviours.PageBehaviours
+import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 class SubcontractorNamePageSpec extends PageBehaviours with Matchers {
 
@@ -39,5 +40,25 @@ class SubcontractorNamePageSpec extends PageBehaviours with Matchers {
     beSettable[SubcontractorName](SubcontractorNamePage)
 
     beRemovable[SubcontractorName](SubcontractorNamePage)
+
+    "cleanup: must clear amend name removal when a subcontractor name is set" in {
+      val subcontractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(AmendIndividualSubcontractorNameRemovedQuery, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+
+      updatedUserAnswers.get(SubcontractorNamePage) mustBe Some(subcontractorName)
+      updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe None
+    }
   }
 }

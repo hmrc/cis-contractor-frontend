@@ -22,6 +22,7 @@ import models.response.GetNewestVerificationBatchResponse
 import models.verify.{ContractorEmailConfirmationStored, SelectedSubcontractors}
 import models.{AmendMode, CheckMode, Mode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import pages.Page
+import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
 import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
@@ -367,6 +368,33 @@ class VerifyNavigatorSpec extends SpecBase {
           NormalMode,
           ua
         ) mustBe cya
+      }
+
+      "ProceedInsufficientSubcontractorNameYesNoPage" - {
+
+        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is true" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), true)
+            .success
+            .value
+
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+              .onPageLoad()
+        }
+
+        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is false" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), false)
+            .success
+            .value
+
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+              .onPageLoad()
+        }
       }
     }
 

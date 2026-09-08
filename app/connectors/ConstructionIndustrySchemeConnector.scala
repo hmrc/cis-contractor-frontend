@@ -199,6 +199,21 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         }
       }
 
+  def deleteVerification(
+    request: DeleteVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    http
+      .post(url"$cisBaseUrl/verification/delete")
+      .withBody(Json.toJson(request))
+      .execute[DeleteVerificationResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][deleteVerification] " +
+            s"instanceId=${request.instanceId}, verificationResourceRef=${request.verificationResourceRef} - deleted verification"
+        )
+        response
+      }
+
   def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest
   )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
@@ -254,6 +269,106 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         )
 
         response
+      }
+  }
+
+  def updateContractorDetails(
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateContractorDetails] Submitting contractor details for schemeId=${request.schemeId}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/contractor-details/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - contractor details updated"
+            )
+
+            Future.successful(())
+
+          case other =>
+            logger.error(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - failed with status $other"
+            )
+
+            Future.failed(
+              new RuntimeException(
+                s"Update contractor details failed, returned $other"
+              )
+            )
+        }
+      }
+  }
+
+  def getSubcontractorList(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] = {
+    logger.debug(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
+
+    http
+      .get(url"$cisBaseUrl/subcontractors/$cisId")
+      .execute[GetSubcontractorListResponse]
+      .map { response =>
+        logger.debug(
+          s"[ConstructionIndustrySchemeConnector][getSubcontractorList] " +
+            s"Retrieved ${response.subcontractors.size} subcontractors for cisId=$cisId"
+        )
+        response
+      }
+  }
+
+  def proceedInsufficientVerification(
+    request: ProceedInsufficientVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedInsufficientVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+            )
+        }
+      }
+  def updateSubcontractor(
+    request: UpdateSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+        s"cisId=${request.cisId}, " +
+        s"subcontractorId=${request.subcontractor.subcontractorId}, " +
+        s"subbieResourceRef=${request.subcontractor.subbieResourceRef}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/subcontractor/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateSubcontractor] " +
+                s"Updated subcontractor"
+            )
+            Future.successful(())
+
+          case other =>
+            Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other: ${response.body}"))
+        }
       }
   }
 

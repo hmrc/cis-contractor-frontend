@@ -19,6 +19,7 @@ package controllers.verify
 import base.SpecBase
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.{SubcontractorLastVerification, VerificationLastVerification}
+import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -26,7 +27,7 @@ import queries.CisIdQuery
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
-class VerificationResultsControllerSpec extends SpecBase {
+class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
 
   private val subcontractor = SubcontractorLastVerification(
     subcontractorId = 1L,
@@ -41,9 +42,10 @@ class VerificationResultsControllerSpec extends SpecBase {
     verificationResourceRef = None,
     matched = Some("Y"),
     verificationNumber = Some("V0004528765"),
-    taxTreatment = Some("0"),
+    taxTreatment = Some("net"),
     subcontractorName = Some("Hooper and Associates"),
-    subcontractorId = Some(22L)
+    subcontractorId = Some(22L),
+    actionIndicator = Some("verify")
   )
 
   private val batchResponse = GetLastSubmittedVerificationBatchResponse(

@@ -22,7 +22,7 @@ import models.amend.partnership.OriginalPartnershipAnswers
 import models.contact.ContactMethodOptions
 import pages.add.partnership.*
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 
 class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
@@ -174,9 +174,9 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      addressRow.head.content mustBe Text(msgs("partnershipAddress.checkYourAnswersLabel"))
-      addressRow(1).content mustBe Text("1 Test Street, Newcastle, SA1 1AA, England")
-      addressRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      addressRow.head.content mustBe HtmlContent(msgs("partnershipAddress.checkYourAnswersLabel"))
+      addressRow(1).content mustBe HtmlContent("1 Test Street</br>Newcastle</br>SA1 1AA</br>England")
+      addressRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return an address row when the address changes" in {
@@ -199,9 +199,9 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("partnershipAddress.checkYourAnswersLabel"))
-      row(1).content mustBe Text("1 Test Street, Newcastle, SA1 1AA, England")
-      row(2).content mustBe Text("10 Test Street, Newcastle, SA1 1AA, England")
+      row.head.content mustBe HtmlContent(msgs("partnershipAddress.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent("1 Test Street</br>Newcastle</br>SA1 1AA</br>England")
+      row(2).content mustBe HtmlContent("10 Test Street</br>Newcastle</br>SA1 1AA</br>England")
     }
 
     "must display all populated address lines when an address changes" in {
@@ -227,8 +227,8 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row(2).content mustBe Text(
-        "10 Test Street, Building A, Business Park, Leeds, West Yorkshire, LS1 1AA, England"
+      row(2).content mustBe HtmlContent(
+        "10 Test Street</br>Building A</br>Business Park</br>Leeds</br>West Yorkshire</br>LS1 1AA</br>England"
       )
     }
 
@@ -259,9 +259,9 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       yesNoRow(1).content mustBe Text(msgs("site.yes"))
       yesNoRow(2).content mustBe Text(msgs("site.no"))
 
-      methodRow.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("amendConfirmation.table.selectContent.none"))
+      methodRow.head.content mustBe HtmlContent(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("amendConfirmation.table.selectContent.none"))
 
       emailRow.head.content mustBe Text(msgs("partnershipEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("partnership@test.com")
@@ -290,12 +290,12 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
-      row(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
-      row(2).content mustBe Text(
-        s"${msgs("partnershipContactMethodOptions.email")}, " +
-          s"${msgs("partnershipContactMethodOptions.phone")}, " +
-          msgs("partnershipContactMethodOptions.mobile")
+      row.head.content mustBe HtmlContent(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.email"))
+      row(2).content mustBe HtmlContent(
+        s"<ul class=\"govuk-list govuk-list--bullet\"><li>${msgs("partnershipContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("partnershipContactMethodOptions.phone")}</li>" +
+          s"<li>${msgs("partnershipContactMethodOptions.mobile")}</li></ul>"
       )
     }
 
@@ -319,10 +319,11 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
 
       val row = result.head
 
-      row.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
-      row(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
-      row(2).content mustBe Text(
-        s"${msgs("partnershipContactMethodOptions.email")}, ${msgs("partnershipContactMethodOptions.phone")}"
+      row.head.content mustBe HtmlContent(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      row(1).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.email"))
+      row(2).content mustBe HtmlContent(
+        s"<ul class=\"govuk-list govuk-list--bullet\"><li>${msgs("partnershipContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("partnershipContactMethodOptions.phone")}</li></ul>"
       )
     }
 
@@ -352,9 +353,9 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       val emailRow  = result(1)
       val phoneRow  = result(2)
 
-      methodRow.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(msgs("partnershipContactMethodOptions.phone"))
+      methodRow.head.content mustBe HtmlContent(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.phone"))
 
       emailRow.head.content mustBe Text(msgs("partnershipEmailAddress.checkYourAnswersLabel"))
       emailRow(1).content mustBe Text("partnership@test.com")
@@ -505,10 +506,11 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       val methodRow = result.head
       val phoneRow  = result(1)
 
-      methodRow.head.content mustBe Text(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
-      methodRow(1).content mustBe Text(msgs("partnershipContactMethodOptions.email"))
-      methodRow(2).content mustBe Text(
-        s"${msgs("partnershipContactMethodOptions.email")}, ${msgs("partnershipContactMethodOptions.phone")}"
+      methodRow.head.content mustBe HtmlContent(msgs("partnershipContactMethodOptions.checkYourAnswersLabel"))
+      methodRow(1).content mustBe HtmlContent(msgs("partnershipContactMethodOptions.email"))
+      methodRow(2).content mustBe HtmlContent(
+        s"<ul class=\"govuk-list govuk-list--bullet\"><li>${msgs("partnershipContactMethodOptions.email")}</li>" +
+          s"<li>${msgs("partnershipContactMethodOptions.phone")}</li></ul>"
       )
 
       phoneRow.head.content mustBe Text(msgs("partnershipPhoneNumber.checkYourAnswersLabel"))
@@ -695,7 +697,7 @@ class AmendPartnershipConfirmationViewModelSpec extends SpecBase {
       result must have size 3
 
       result(0).head.content mustBe Text(msgs("partnershipName.checkYourAnswersLabel"))
-      result(1).head.content mustBe Text(msgs("partnershipAddress.checkYourAnswersLabel"))
+      result(1).head.content mustBe HtmlContent(msgs("partnershipAddress.checkYourAnswersLabel"))
       result(2).head.content mustBe Text(msgs("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"))
     }
   }

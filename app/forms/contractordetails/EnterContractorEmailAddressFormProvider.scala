@@ -17,6 +17,7 @@
 package forms.contractordetails
 
 import forms.Validation
+import forms.mappings.Constants.MaxLength254
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -30,7 +31,7 @@ class EnterContractorEmailAddressFormProvider @Inject() extends Mappings {
         .transform(_.trim, identity)
         .verifying(
           firstError(
-            maxLength(256, "contractordetails.enterContractorEmailAddress.error.length"),
+            maxLength(MaxLength254, "contractordetails.enterContractorEmailAddress.error.length"),
             regexp(Validation.emailRegex, "contractordetails.enterContractorEmailAddress.error.invalid")
           )
         )

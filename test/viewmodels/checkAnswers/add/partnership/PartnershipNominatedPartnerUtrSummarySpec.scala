@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -149,6 +151,119 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
 
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipNominatedPartnerUtrSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      nominatedPartnerUtr: Option[String]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = nominatedPartnerUtr,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with the normal label when isVerified is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipNominatedPartnerUtrSummary.row(
+          answers,
+          isVerified = false
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerUtr.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with the verified label when isVerified is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipNominatedPartnerUtrSummary.row(
+          answers,
+          isVerified = true
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the nominated partner UTR does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      PartnershipNominatedPartnerUtrSummary.row(
+        answers,
+        isVerified = false
+      ) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890 & Ref'01"))
+
+      val row =
+        PartnershipNominatedPartnerUtrSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

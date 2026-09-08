@@ -42,14 +42,17 @@
 
     @h2("amendConfirmation.updatesMade.h2")
 
-    @govukTable(Table(
-        head = Some(Seq(
-            HeadCell(Text(messages("amendConfirmation.table.hdr.details"))),
-            HeadCell(Text(messages("amendConfirmation.table.hdr.previous"))),
-            HeadCell(Text(messages("amendConfirmation.table.hdr.updated")))
-        )),
-        rows = rows
-    ))
+    @govukTable(
+        Table(
+            head = Some(Seq(
+                HeadCell(Text(messages("amendConfirmation.table.hdr.details"))),
+                HeadCell(Text(messages("amendConfirmation.table.hdr.previous"))),
+                HeadCell(Text(messages("amendConfirmation.table.hdr.updated")))
+            )),
+            rows = rows,
+            attributes = Map("id" -> "amend-confirmation-summary-table")
+        )
+    )
 
     @link(
         linkTextKey = "amendConfirmation.yourSubcontractors",

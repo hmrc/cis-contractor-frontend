@@ -19,77 +19,123 @@ package controllers.insufficient
 import base.SpecBase
 import controllers.routes
 import forms.insufficient.ProceedInsufficientSubcontractorNameYesNoFormProvider
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.response.GetCurrentVerificationBatchResponse
+import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
-import utils.SubcontractorNameExtractor
+import services.{ReviewInsufficientInfoService, VerificationService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
 import scala.concurrent.Future
 
 class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  private val formProvider =
-    new ProceedInsufficientSubcontractorNameYesNoFormProvider()
+  private val formProvider = new ProceedInsufficientSubcontractorNameYesNoFormProvider()
 
-  private val form =
-    formProvider()
+  private val form = formProvider()
 
-  private val subcontractorName =
-    "Test Subcontractor"
+  private val subcontractorName = "Test Subcontractor"
 
-  private val mode =
-    NormalMode
+  private val subcontractorId = 10
 
-  private def onwardRoute: Call =
-    Call("GET", "/foo")
+  private val unmappedSubcontractorId = 999999L
+
+  private val mode = NormalMode
 
   private lazy val proceedInsufficientSubcontractorNameYesNoRoute =
     controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-      .onPageLoad()
+      .onPageLoad(subcontractorId)
       .url
+
+  private lazy val proceedInsufficientSubcontractorNameYesNoUnmappedSubcontractorIdUrl =
+    controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+      .onPageLoad(unmappedSubcontractorId)
+      .url
+
+  private val currentBatchResponse: GetCurrentVerificationBatchResponse =
+    GetCurrentVerificationBatchResponse(
+      subcontractors = Seq(
+        SubcontractorCurrentVerification(
+          subcontractorId = subcontractorId,
+          subbieResourceRef = Some(1111L),
+          firstName = None,
+          secondName = None,
+          surname = None,
+          tradingName = Some(subcontractorName),
+          utr = None,
+          nino = None,
+          crn = None,
+          partnerUtr = None,
+          partnershipTradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      ),
+      verificationBatch = Some(
+        VerificationBatchCurrentVerification(
+          verificationBatchId = 999L,
+          verifBatchResourceRef = Some(7777L)
+        )
+      ),
+      verifications = Seq(
+        VerificationCurrentVerification(
+          verificationId = 1L,
+          verificationBatchId = Some(999L),
+          subcontractorId = Some(subcontractorId),
+          verificationResourceRef = Some(1111L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
+        )
+      )
+    )
 
   "ProceedInsufficientSubcontractorNameYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual OK
 
@@ -97,152 +143,187 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           view(
             form,
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must populate the view correctly on a GET when the question has previously been answered NO" in {
 
-      val userAnswers =
-        UserAnswers(userAnswersId)
-          .set(
-            ProceedInsufficientSubcontractorNameYesNoPage,
-            true
-          )
-          .success
-          .value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+        .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), false)
+        .success
+        .value
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
-
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
           view(
-            form.fill(true),
+            form.fill(false),
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page on a GET when the question has previously been answered YES" in {
 
-      val mockSessionRepository =
-        mock[SessionRepository]
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+        .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), true)
+        .success
+        .value
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
-
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
-
-      when(
-        mockSessionRepository.set(any())
-      ).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator]
-              .toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository]
-              .toInstance(mockSessionRepository),
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
 
       running(application) {
 
-        val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
-            .withFormUrlEncodedBody(
-              "value" -> "true"
-            )
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted" in {
+    "must redirect to the next page on a POST and update CurrentVerificationBatch when valid data is submitted and answer = YES" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, "1")
+        .success
+        .value
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService      = mock[ReviewInsufficientInfoService]
+      val mockBatchService = mock[VerificationService]
 
       when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(Some(subcontractorName))
+        mockService.proceedInsufficientVerification(any(), any(), any())(any())
+      ).thenReturn(Future.successful(()))
+      when(mockBatchService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswers))
+      when(mockBatchService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(userAnswers))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ReviewInsufficientInfoService].toInstance(mockService),
+            bind[VerificationService].toInstance(mockBatchService)
           )
           .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to the next page on a POST and valid data is submitted and answer = YES" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, "1")
+        .success
+        .value
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
-            .withFormUrlEncodedBody(
-              "value" -> ""
-            )
+          .build()
 
-        val boundForm =
-          form.bind(
-            Map(
-              "value" -> ""
-            )
-          )
+      running(application) {
 
-        val result =
-          route(application, request).value
+        val request =
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "false")
 
-        val view =
-          application.injector
-            .instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must return Bad Request and errors on a POST when invalid data is submitted" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, "1")
+        .success
+        .value
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockService = mock[ReviewInsufficientInfoService]
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "")
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[ProceedInsufficientSubcontractorNameYesNoView]
 
         status(result) mustEqual BAD_REQUEST
 
@@ -250,38 +331,64 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           view(
             boundForm,
             mode,
-            subcontractorName
+            subcontractorName,
+            subcontractorId
           )(request, messages(application)).toString
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+    "must redirect to Journey Recovery for a GET if user answer data is found" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val mockService = mock[ReviewInsufficientInfoService]
 
-      when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(None)
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
-          )
-          .build()
+      running(application) {
+
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if subcontractorId is not found" in {
+
+      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, proceedInsufficientSubcontractorNameYesNoUnmappedSubcontractorIdUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if user answer data is found" in {
+
+      val mockService = mock[ReviewInsufficientInfoService]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            GET,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -292,36 +399,73 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
 
-      val mockSubcontractorNameExtractor =
-        mock[SubcontractorNameExtractor]
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, "1")
+        .success
+        .value
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
 
+      val mockService = mock[ReviewInsufficientInfoService]
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
+        .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoUnmappedSubcontractorIdUrl).withFormUrlEncodedBody(
+            "value" -> "true"
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when api failed" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(CisIdQuery, "1")
+        .success
+        .value
+        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .success
+        .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockService = mock[ReviewInsufficientInfoService]
       when(
-        mockSubcontractorNameExtractor.getSubcontractorName(any())
-      ).thenReturn(None)
+        mockService.proceedInsufficientVerification(any(), any(), any())(any())
+      ).thenReturn(Future.successful(()))
+
+      when(mockSessionRepository.set(any())).thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[SubcontractorNameExtractor]
-              .toInstance(mockSubcontractorNameExtractor)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ReviewInsufficientInfoService].toInstance(mockService)
           )
           .build()
 
       running(application) {
 
         val request =
-          FakeRequest(
-            POST,
-            proceedInsufficientSubcontractorNameYesNoRoute
-          )
-            .withFormUrlEncodedBody(
-              "value" -> "true"
-            )
+          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
 
-        val result =
-          route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 

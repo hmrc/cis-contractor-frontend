@@ -19,6 +19,7 @@ package viewmodels.verify
 import models.VerificationLastVerification
 import models.response.GetLastSubmittedVerificationBatchResponse
 import play.api.i18n.Messages
+import services.CheckUnmatchedSubcontractorsService
 
 case class VerificationResultsViewModel(
   name: String,
@@ -34,30 +35,43 @@ object VerificationResultsViewModel {
     response: GetLastSubmittedVerificationBatchResponse
   )(implicit messages: Messages): Seq[VerificationResultsViewModel] =
     response.verifications.map { verification =>
+      val unmatched = CheckUnmatchedSubcontractorsService.isUnmatched(verification)
       VerificationResultsViewModel(
         name = verification.subcontractorName.getOrElse(messages("verify.noName")),
-        verificationStatus = verificationStatusFor(verification),
-        taxTreatment = taxTreatmentFor(verification),
+        verificationStatus = verificationStatusFor(!unmatched),
+        taxTreatment = taxTreatmentFor(verification, !unmatched),
         verificationNumber = verification.verificationNumber.getOrElse(""),
-        isUnmatched = isUnmatched(verification)
+        isUnmatched = unmatched
       )
     }
 
-  private def verificationStatusFor(verification: VerificationLastVerification)(implicit messages: Messages): String =
-    verification.matched match {
-      case Some("Y") => messages("verify.verificationResults.status.matched")
-      case Some("N") => messages("verify.verificationResults.status.unmatched")
-      case _         => messages("site.unknown")
+  private def verificationStatusFor(verified: Boolean)(implicit messages: Messages): String =
+    if (verified) {
+      messages("verify.verificationResults.status.matched")
+    } else {
+      messages("verify.verificationResults.status.unmatched")
     }
 
-  private def isUnmatched(verification: VerificationLastVerification): Boolean =
-    verification.matched.contains("N")
-
-  private def taxTreatmentFor(verification: VerificationLastVerification)(implicit messages: Messages): String =
-    verification.taxTreatment match {
-      case Some("net")       => messages("verify.verificationResults.taxTreatment.net")
-      case Some("gross")     => messages("verify.verificationResults.taxTreatment.gross")
-      case Some("unmatched") => messages("verify.verificationResults.taxTreatment.unmatched")
-      case _                 => messages("site.unknown")
+  private def taxTreatmentFor(
+    verification: VerificationLastVerification,
+    verified: Boolean
+  )(implicit messages: Messages): String =
+    if (verified) {
+      mapTaxTreatment(verification.taxTreatment)
+    } else {
+      messages("verify.verificationResults.taxTreatment.unmatched")
     }
+
+  private def mapTaxTreatment(taxTreatment: Option[String])(implicit messages: Messages): String =
+    taxTreatment
+      .map(_.trim.toLowerCase)
+      .collect {
+        case "net" | "standardrate" | "standard rate"   =>
+          messages("verify.verificationResults.taxTreatment.net")
+        case "gross"                                    =>
+          messages("verify.verificationResults.taxTreatment.gross")
+        case "unmatched" | "higherrate" | "higher rate" =>
+          messages("verify.verificationResults.taxTreatment.unmatched")
+      }
+      .getOrElse(messages("site.unknown"))
 }
