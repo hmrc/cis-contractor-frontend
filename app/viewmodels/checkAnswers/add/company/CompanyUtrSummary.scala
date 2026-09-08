@@ -23,6 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.company.CompanyAnswers
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 object CompanyUtrSummary {
 
@@ -61,11 +62,15 @@ object CompanyUtrSummary {
     answers.utr.map { answer =>
       SummaryListRowViewModel(
         key =
-          if (isVerified)
+          if (isVerified) {
             "companyUtr.verified.checkYourAnswersLabel"
-          else
-            "companyUtr.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
+          } else {
+            "companyUtr.checkYourAnswersLabel"
+          },
+        value = ValueViewModel(
+          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
+        )
+        ,
         actions = Seq.empty
       )
     }

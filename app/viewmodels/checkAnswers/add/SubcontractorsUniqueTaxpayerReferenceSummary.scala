@@ -23,6 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
@@ -57,7 +58,10 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
     answers.utr.map { answer =>
       SummaryListRowViewModel(
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
+        value = ValueViewModel(
+          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
+        )
+        ,
         actions = Seq.empty
       )
     }
