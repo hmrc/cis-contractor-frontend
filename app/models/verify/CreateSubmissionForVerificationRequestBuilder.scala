@@ -24,7 +24,6 @@ import queries.CisIdQuery
 import utils.VerifyEmailResolver
 import viewmodels.verify.SubcontractorDisplay
 
-
 object CreateSubmissionForVerificationRequestBuilder {
 
   def build(
