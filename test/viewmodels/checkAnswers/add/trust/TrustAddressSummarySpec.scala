@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import controllers.add.trust.routes
 import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
 import models.info.trust.TrustAnswers
 import org.scalatest.OptionValues.convertOptionToValuable
@@ -76,7 +76,7 @@ class TrustAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncoding
 
       action.href shouldBe
         routes.TrustAddressController
-          .redirectToAddressLookup(Some("change"))
+          .redirectToAddressLookup(NormalMode, Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe

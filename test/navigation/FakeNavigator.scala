@@ -19,7 +19,9 @@ package navigation
 import models.{Mode, UserAnswers}
 import navigation.add.*
 import navigation.contractordetails.ContractorDetailsNavigator
+import navigation.finalvalidation.FinalValidationNavigator
 import navigation.verify.VerifyNavigator
+import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.Page
 import play.api.mvc.Call
 
@@ -34,7 +36,8 @@ class FakeNavigator(desiredRoute: Call)
       new TrustNavigator(),
       new SharedNavigator(),
       new VerifyNavigator(),
-      new ContractorDetailsNavigator()
+      new ContractorDetailsNavigator(),
+      mock[FinalValidationNavigator]
     ) {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
