@@ -18,6 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
+import models.finalvalidation.VerifyFinalValidationResult
 import models.{NormalMode, Subcontractor, SubcontractorViewModel, TypeOfSubcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
@@ -33,6 +34,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.i18n.Messages
 import repositories.SessionRepository
+import services.VerifyFinalValidationService
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.SubcontractorReverifyRow
 
 import java.time.{Clock, Instant, LocalDateTime, ZoneOffset}
@@ -102,6 +105,23 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       .onPageLoad(NormalMode, page)
       .url
 
+  private def stubSuccessfulFinalValidation(
+    verifyFinalValidationService: VerifyFinalValidationService
+  ): Unit = {
+    val validationResult =
+      VerifyFinalValidationResult(
+        subcontractors = Seq.empty,
+        failures = Seq.empty
+      )
+
+    when(
+      verifyFinalValidationService.validate(
+        any[String],
+        any[UserAnswers]
+      )(any[HeaderCarrier])
+    ).thenReturn(Future.successful(validationResult))
+  }
+  
   private lazy val postUrl: String =
     controllers.verify.routes.SelectSubcontractorsToReverifyController
       .onPageLoad(NormalMode)
@@ -258,7 +278,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         when(mockRepo.set(any())) thenReturn Future.successful(true)
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(UnverifiedSubcontractorsPage, Seq.empty)
             .success
             .value
@@ -288,7 +308,11 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       "must redirect to the next page when valid data is submitted (uses rows stored in SubcontractorReverifyRowsPage)" in {
         val mockRepo = mock[SessionRepository]
+        val verifyFinalValidationService = mock[VerifyFinalValidationService]
+
         when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        stubSuccessfulFinalValidation(verifyFinalValidationService)
 
         val rows: Seq[SubcontractorReverifyRow] =
           Seq(
@@ -304,7 +328,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(SubcontractorReverifyRowsPage, rows)
             .success
             .value
@@ -314,6 +338,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .overrides(
               bind[SessionRepository].toInstance(mockRepo),
               bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[VerifyFinalValidationService].toInstance(verifyFinalValidationService),
               bind[Clock].toInstance(fixedClock)
             )
             .build()
@@ -354,7 +379,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(SubcontractorReverifyRowsPage, rows)
             .success
             .value
@@ -390,7 +415,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       "must redirect to JourneyRecovery when no existing data is found (requireData fails)" in {
         val mockRepo = mock[SessionRepository]
-        val app      =
+        val app =
           applicationBuilder(userAnswers = None)
             .overrides(bind[SessionRepository].toInstance(mockRepo))
             .build()
@@ -1016,7 +1041,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value
@@ -1052,7 +1077,11 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
     "must allow empty submission when UnverifiedSubcontractorsPage is non-empty" in {
       val mockRepo = mock[SessionRepository]
+      val verifyFinalValidationService = mock[VerifyFinalValidationService]
+
       when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      stubSuccessfulFinalValidation(verifyFinalValidationService)
 
       val rows: Seq[SubcontractorReverifyRow] =
         Seq(
@@ -1078,7 +1107,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value
@@ -1091,6 +1120,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .overrides(
             bind[SessionRepository].toInstance(mockRepo),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[VerifyFinalValidationService].toInstance(verifyFinalValidationService),
             bind[Clock].toInstance(fixedClock)
           )
           .build()
@@ -1113,7 +1143,11 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
     "must allow empty submission when SelectSubcontractorPage already contains selections" in {
       val mockRepo = mock[SessionRepository]
+      val verifyFinalValidationService = mock[VerifyFinalValidationService]
+
       when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+      stubSuccessfulFinalValidation(verifyFinalValidationService)
 
       val rows: Seq[SubcontractorReverifyRow] =
         Seq(
@@ -1129,7 +1163,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value
@@ -1142,6 +1176,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           .overrides(
             bind[SessionRepository].toInstance(mockRepo),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[VerifyFinalValidationService].toInstance(verifyFinalValidationService),
             bind[Clock].toInstance(fixedClock)
           )
           .build()
