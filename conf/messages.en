@@ -1052,7 +1052,6 @@ verify.reviewUnmatched.unmatched.subheading                             =  Unmat
 verify.reviewUnmatched.ready.subheading                                 =  Ready for verification
 verify.reviewUnmatched.name                                             =  Name
 verify.reviewUnmatched.utr                                              =  UTR
-verify.reviewUnmatched.utr.full                                         =  Unique Taxpayer Reference
 verify.reviewUnmatched.noneProvided                                     =  None provided
 verify.reviewUnmatched.actions                                          =  Actions
 verify.reviewUnmatched.action.edit                                      =  Edit
