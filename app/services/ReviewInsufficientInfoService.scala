@@ -16,12 +16,10 @@
 
 package services
 
-import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
-import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
-import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
 import play.api.Logging
 import play.api.i18n.Messages
 import viewmodels.verify.*
