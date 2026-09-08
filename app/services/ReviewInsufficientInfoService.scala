@@ -16,6 +16,8 @@
 
 package services
 
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
+import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
@@ -48,15 +50,23 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
       }
 
     ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map { case (sub, _) => toMissingRow(sub) },
+      missing = missingSubs.map { case (sub, verification) => toMissingRow(sub, verification) },
       ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
     )
   }
 
   private def toMissingRow(
-    sub: SubcontractorCurrentVerification
+    sub: SubcontractorCurrentVerification,
+    verification: VerificationCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
-    val name = displayName(sub)
+    val name      = displayName(sub)
+    val removeUrl =
+      verification.verificationResourceRef
+        .map { ref =>
+          controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(ref).url
+        }
+        .getOrElse(dummyUrl)
+
     MissingSubcontractorRow(
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
@@ -68,7 +78,7 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
           .url,
         name
       ),
-      removeLink = LinkViewModel(dummyUrl, name)
+      removeLink = LinkViewModel(removeUrl, name)
     )
   }
 

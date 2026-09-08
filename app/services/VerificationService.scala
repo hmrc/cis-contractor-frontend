@@ -20,7 +20,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse}
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
 import play.api.mvc.AnyContent
@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class VerificationService @Inject() (
@@ -57,6 +58,38 @@ class VerificationService @Inject() (
 
       _ <- sessionRepository.set(updated)
     } yield updated
+
+  private def cleanupSelectionsNoLongerInNewestBatch(
+    response: models.response.GetNewestVerificationBatchResponse
+  )(userAnswers: UserAnswers): Try[UserAnswers] = {
+    val newestVerificationSubcontractorIds =
+      response.verifications.flatMap(_.subcontractorId).map(_.toString).toSet
+
+    val withSelectedSubcontractors =
+      userAnswers.get(SelectSubcontractorPage) match {
+        case Some(selected) =>
+          userAnswers.set(
+            SelectSubcontractorPage,
+            selected.filter(subcontractor => newestVerificationSubcontractorIds.contains(subcontractor.id))
+          )
+
+        case None =>
+          scala.util.Success(userAnswers)
+      }
+
+    withSelectedSubcontractors.flatMap { updatedAnswers =>
+      updatedAnswers.get(SelectSubcontractorsToReverifyPage) match {
+        case Some(selected) =>
+          updatedAnswers.set(
+            SelectSubcontractorsToReverifyPage,
+            selected.filter(subcontractor => newestVerificationSubcontractorIds.contains(subcontractor.id))
+          )
+
+        case None =>
+          scala.util.Success(updatedAnswers)
+      }
+    }
+  }
 
   def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
@@ -175,6 +208,51 @@ class VerificationService @Inject() (
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
+
+  def deleteVerification(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    for {
+      instanceId <- userAnswers
+                      .get(CisIdQuery)
+                      .map(Future.successful)
+                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+      response <- cisConnector.deleteVerification(
+                    DeleteVerificationRequest(
+                      instanceId = instanceId,
+                      verificationResourceRef = verificationResourceRef
+                    )
+                  )
+
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      updated      <- Future.fromTry(withVerificationBatchReadiness(afterNewest))
+      _            <- sessionRepository.set(updated)
+    } yield response
+
+  private def withVerificationBatchReadiness(userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers
+      .get(CurrentVerificationBatchResponsePage)
+      .map { batch =>
+        val remainingVerifications =
+          batch.verifications.flatMap { verification =>
+            verification.subcontractorId.flatMap { subcontractorId =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map(subcontractor => (subcontractor, verification))
+            }
+          }
+
+        val batchReady =
+          remainingVerifications.forall { case (subcontractor, verification) =>
+            VerificationBatchReadiness.isSubcontractorReady(subcontractor, Some(verification))
+          }
+
+        userAnswers.set(VerificationBatchReadinessPage, batchReady)
+      }
+      .getOrElse(userAnswers.remove(VerificationBatchReadinessPage))
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],

@@ -41,7 +41,6 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
 
     val currentBatchId = batch.verificationBatch.map(_.verificationBatchId)
 
-    // Mirror legacy VF-07-03: drive off the current batch's UNMATCHED verifications, not the full subcontractor list.
     val unmatchedRows =
       batch.verifications
         .filter(v => currentBatchId.forall(id => v.verificationBatchId.contains(id)))

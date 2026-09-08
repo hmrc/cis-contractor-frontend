@@ -22,7 +22,7 @@ import generators.ModelGenerators
 import models.*
 import models.response.*
 import models.requests.*
-import models.verify.{ChrisVerificationRequestBuilder, SubmissionStatus, VerificationSubmissionDetails}
+import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors, SubmissionStatus, VerificationSubmissionDetails}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -30,7 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -159,6 +159,81 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       result.get(UnverifiedSubcontractorsPage) mustBe
         Some(Seq(unverifiedSub1, unverifiedSub2))
+
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo).set(any[UserAnswers])
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "must remove selected subcontractors that no longer exist in the newest verification batch" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val selectedSubcontractors =
+        Set(
+          SubcontractorViewModel("2", "Existing selected subcontractor"),
+          SubcontractorViewModel("999", "Removed selected subcontractor")
+        )
+
+      val selectedSubcontractorsToReverify =
+        Set(
+          SelectedSubcontractors("1", "Existing selected subcontractor to reverify"),
+          SelectedSubcontractors("998", "Removed selected subcontractor to reverify")
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(SelectSubcontractorPage, selectedSubcontractors)
+          .success
+          .value
+          .set(SelectSubcontractorsToReverifyPage, selectedSubcontractorsToReverify)
+          .success
+          .value
+
+      val newestResponse =
+        responseWithSubcontractors.copy(
+          verifications = Seq(
+            Verification(
+              verificationId = 1L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(1L),
+              verificationResourceRef = None
+            ),
+            Verification(
+              verificationId = 2L,
+              matched = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              verificationBatchId = None,
+              subcontractorId = Some(2L),
+              verificationResourceRef = None
+            )
+          )
+        )
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(newestResponse))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshNewestVerificationBatch(userAnswers).futureValue
+
+      result.get(SelectSubcontractorPage) mustBe Some(
+        Set(SubcontractorViewModel("2", "Existing selected subcontractor"))
+      )
+
+      result.get(SelectSubcontractorsToReverifyPage) mustBe Some(
+        Set(SelectedSubcontractors("1", "Existing selected subcontractor to reverify"))
+      )
 
       verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
       verify(mockRepo).set(any[UserAnswers])
@@ -855,6 +930,82 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockConnector).modifyVerificationBatch(eqTo(req))(any[HeaderCarrier])
       verify(mockConnector, never()).getCurrentVerificationBatch(any[String])(any[HeaderCarrier])
       verify(mockConnector, never()).getNewestVerificationBatch(any[String])(any[HeaderCarrier])
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+  }
+
+  "VerificationService.deleteVerification" - {
+
+    "must call delete endpoint, refresh current+newest and persist" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val currentResp =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Nil,
+          verificationBatch = None,
+          verifications = Nil
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      val request =
+        DeleteVerificationRequest(
+          instanceId = instanceId,
+          verificationResourceRef = 1111L
+        )
+
+      val deleteResponse =
+        DeleteVerificationResponse(
+          verificationsCounter = Some(1L)
+        )
+
+      when(mockConnector.deleteVerification(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(deleteResponse))
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentResp))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result =
+        service
+          .deleteVerification(ua, 1111L)
+          .futureValue
+
+      result mustBe deleteResponse
+
+      verify(mockConnector).deleteVerification(eqTo(request))(any[HeaderCarrier])
+      verify(mockConnector).getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockConnector).getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo, times(3)).set(any[UserAnswers])
+    }
+
+    "must fail when instance id is missing" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val ex =
+        service
+          .deleteVerification(emptyUserAnswers, 1111L)
+          .failed
+          .futureValue
+
+      ex.getMessage mustBe "InstanceIdQuery not found in session data"
+
+      verify(mockConnector, never()).deleteVerification(any[DeleteVerificationRequest])(any[HeaderCarrier])
       verify(mockRepo, never()).set(any[UserAnswers])
     }
   }

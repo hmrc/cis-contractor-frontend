@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package models.requests
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef: Long) extends QuestionPage[Boolean] {
+case class DeleteVerificationRequest(
+  instanceId: String,
+  verificationResourceRef: Long
+)
 
-  override def path: JsPath =
-    JsPath \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
+object DeleteVerificationRequest {
+  given OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]
 }
