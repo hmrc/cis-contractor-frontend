@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package viewmodels.verify
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.SubcontractorCurrentVerification
+import play.api.i18n.Messages
 
-case class RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef: Long) extends QuestionPage[Boolean] {
+object SubcontractorDisplay {
 
-  override def path: JsPath =
-    JsPath \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
+  def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    sub.displayName
+
+  def utrDisplay(sub: SubcontractorCurrentVerification, noneProvidedKey: String)(implicit messages: Messages): String =
+    sub.utr
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse(messages(noneProvidedKey))
 }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package pages.insufficient
+package viewmodels.verify
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case class RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef: Long) extends QuestionPage[Boolean] {
-
-  override def path: JsPath =
-    JsPath \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
+final case class ReviewUnmatchedViewModel(
+  unmatched: Seq[MissingSubcontractorRow],
+  ready: Seq[ReadySubcontractorRow]
+) {
+  val hasUnmatched: Boolean = unmatched.nonEmpty
+  val hasReady: Boolean     = ready.nonEmpty
+  val allReady: Boolean     = unmatched.isEmpty && ready.nonEmpty
 }
