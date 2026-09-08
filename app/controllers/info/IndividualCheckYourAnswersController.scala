@@ -19,7 +19,7 @@ package controllers.info
 import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
-import models.info.IndividualAnswers
+import models.info.{CheckYourAnswersValidation, IndividualAnswers}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,7 +47,7 @@ class IndividualCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(IndividualAnswersQuery) match {
 
-        case Some(answers) =>
+        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -66,10 +66,10 @@ class IndividualCheckYourAnswersController @Inject() (
             )
           )
 
-        case None =>
+        case Some(_) | None =>
           logger.error(
             "[IndividualCheckYourAnswersController.onPageLoad] " +
-              "IndividualAnswersQuery is missing"
+              "IndividualAnswersQuery is missing or invalid"
           )
 
           Redirect(

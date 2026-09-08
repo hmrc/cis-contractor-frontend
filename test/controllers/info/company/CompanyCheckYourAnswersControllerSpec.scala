@@ -366,5 +366,35 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             .url
       }
     }
+
+    "must redirect to Journey Recovery when required CompanyAnswers are missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyAnswersQuery, answers.copy(companyContactMethodsYesNo = Some(true), email = None))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
   }
 }

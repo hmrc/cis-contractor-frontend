@@ -315,5 +315,35 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
             .url
       }
     }
+
+    "must redirect to Journey Recovery when required IndividualAnswers are missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, answers.copy(addressYesNo = Some(true), address = None))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, viewOnlyRoute)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
   }
 }
