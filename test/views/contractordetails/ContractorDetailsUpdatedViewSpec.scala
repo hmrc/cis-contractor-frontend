@@ -38,7 +38,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
         "must render the page with correct heading, paragraphs, and other contents" in new Setup {
           val html: HtmlFormat.Appendable = view(cisAccountUrl)
-          val doc: Document = Jsoup.parse(html.body)
+          val doc: Document               = Jsoup.parse(html.body)
 
           doc.title must include(messages("contractordetails.contractorDetailsUpdated.title"))
 
@@ -56,9 +56,13 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
           doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p1.details.link"))
 
-          doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link"))
+          doc.select("a").text must include(
+            messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link")
+          )
 
-          doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
+          doc.select("a").text must include(
+            messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link")
+          )
 
           doc.select("p").text must include(
             messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix")
@@ -67,7 +71,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
 
         "must not show back link or sign out link" in new Setup {
           val html: HtmlFormat.Appendable = view(cisAccountUrl)
-          val doc: Document = Jsoup.parse(html.body)
+          val doc: Document               = Jsoup.parse(html.body)
 
           doc.getElementsByClass("govuk-back-link").size mustBe 0
           doc.getElementsByClass("hmrc-sign-out-nav__link").size mustBe 0
@@ -76,10 +80,10 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
     }
 
     trait Setup {
-      val app: Application = applicationBuilder().build()
-      val view: ContractorDetailsUpdatedView = app.injector.instanceOf[ContractorDetailsUpdatedView]
+      val app: Application                          = applicationBuilder().build()
+      val view: ContractorDetailsUpdatedView        = app.injector.instanceOf[ContractorDetailsUpdatedView]
       implicit val request: play.api.mvc.Request[_] = FakeRequest()
-      implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      implicit val messages: Messages               = play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )

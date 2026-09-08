@@ -26,8 +26,12 @@ class ContractorDetailsUpdatedControllerSpec extends SpecBase {
 
   "ContractorDetailsUpdated Controller" - {
     Seq(
-      ("AGENT", applicationConfig.constructionIndustryAgentAccountUrl + "1", true, Some(emptyUserAnswers.
-        set(CisIdPage, "1").success.value)),
+      (
+        "AGENT",
+        applicationConfig.constructionIndustryAgentAccountUrl + "1",
+        true,
+        Some(emptyUserAnswers.set(CisIdPage, "1").success.value)
+      ),
       ("ORGANISATION", applicationConfig.constructionIndustryOrgAccountUrl, false, Some(emptyUserAnswers))
     ).foreach { case (accountTypeSTR, cisAccountUrl, isAgent, userAnswers) =>
       s"when accountType is '$accountTypeSTR'" - {

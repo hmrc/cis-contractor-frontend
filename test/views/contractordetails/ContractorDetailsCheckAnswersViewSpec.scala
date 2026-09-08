@@ -62,7 +62,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
           )
 
           val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
-          val doc = Jsoup.parse(html.body)
+          val doc  = Jsoup.parse(html.body)
 
           doc.select("h1").text must include(messages("contractordetails.contractorDetailsCheckAnswers.heading"))
 
@@ -73,19 +73,19 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
             )
           )
 
-          doc.select(".govuk-summary-list__key").eachText() must contain allOf(
+          doc.select(".govuk-summary-list__key").eachText() must contain allOf (
             "Unique Taxpayer Reference",
             "Scheme name"
           )
 
-          doc.select(".govuk-summary-list__value").eachText() must contain allOf(
+          doc.select(".govuk-summary-list__value").eachText() must contain allOf (
             "1234567890",
             "Scheme ABC"
           )
 
           doc.select(".govuk-summary-list__actions .govuk-link").text must include(messages("site.change"))
           doc.select("button.govuk-button").text mustBe messages("site.saveAndContinue")
-          doc.select(".govuk-link").text must include(
+          doc.select(".govuk-link").text                              must include(
             messages("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link")
           )
 
@@ -108,7 +108,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
           )
 
           val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
-          val doc = Jsoup.parse(html.body)
+          val doc  = Jsoup.parse(html.body)
 
           doc.select(".govuk-summary-list__value").text mustBe ""
           doc.select(".govuk-link").text must include(
@@ -133,7 +133,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
           )
 
           val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
-          val doc = Jsoup.parse(html.body)
+          val doc  = Jsoup.parse(html.body)
 
           val hidden = doc.select(".govuk-visually-hidden").eachText()
 
@@ -144,13 +144,13 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
 
     trait Setup {
       implicit val request: Request[_] = FakeRequest()
-      implicit val messages: Messages =
+      implicit val messages: Messages  =
         play.api.i18n.MessagesImpl(
           play.api.i18n.Lang.defaultLang,
           app.injector.instanceOf[play.api.i18n.MessagesApi]
         )
 
-      val accountsOfficeReference = "123 PA 87654321"
+      val accountsOfficeReference                 = "123 PA 87654321"
       val view: ContractorDetailsCheckAnswersView =
         app.injector.instanceOf[ContractorDetailsCheckAnswersView]
     }

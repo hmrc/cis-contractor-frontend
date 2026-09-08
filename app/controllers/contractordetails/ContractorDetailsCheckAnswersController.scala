@@ -60,7 +60,7 @@ class ContractorDetailsCheckAnswersController @Inject() (
               s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
             )
         }
-      
+
       request.userAnswers.get(ContractorSchemePage) match {
 
         case Some(scheme) =>
