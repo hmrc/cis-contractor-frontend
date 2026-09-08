@@ -24,15 +24,12 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
 class AmendCompanyConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,11 +37,8 @@ class AmendCompanyConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository,
   view: AmendConfirmationView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -75,20 +69,14 @@ class AmendCompanyConfirmationController @Inject() (
                 val companyName =
                   ua.get(CompanyNamePage).getOrElse("")
 
-                cleanupService.cleanAmend(ua) match {
-                  case Success(cleanedUa) =>
-                    sessionRepository.set(cleanedUa).map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          companyName
-                        )
-                      )
-                    }
-                  case Failure(exception) =>
-                    logger.warn("[AmendCompanyConfirmationController] Failed to clean user answers", exception)
-                    Future.successful(recoveryRedirect)
-                }
+                Future.successful(
+                  Ok(
+                    view(
+                      tableRows,
+                      companyName
+                    )
+                  )
+                )
             }
         }
       }

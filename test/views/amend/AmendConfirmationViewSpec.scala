@@ -16,7 +16,6 @@
 
 package views.amend
 
-import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -83,8 +82,8 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       beforeYouGoParagraph.text() mustBe
         messages("amendConfirmation.beforeYouGo.p1")
 
-      val manageYourSubcontractorsLink: Elements =
-        doc.select(s"a[href='${appConfig.retrieveSubcontractorListUrl}']")
+      val manageYourSubcontractorsLink: Element =
+        doc.select("a[href='" + exitRoute + "']").first()
 
       manageYourSubcontractorsLink.text() mustBe
         messages("amendConfirmation.yourSubcontractors")
@@ -94,7 +93,8 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       val html: HtmlFormat.Appendable = view(rows, subcontractorName)
       val doc: Document               = Jsoup.parse(html.toString())
 
-      val confirmationParagraph: Element = doc.select("p.govuk-body").first()
+      val confirmationParagraph: Element =
+        doc.select("p.govuk-body").first()
 
       confirmationParagraph.text() mustBe
         messages("amendConfirmation.p1", subcontractorName)
@@ -135,10 +135,12 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val appConfig: FrontendAppConfig =
-      app.injector.instanceOf[config.FrontendAppConfig]
-
     val view: AmendConfirmationView =
       app.injector.instanceOf[AmendConfirmationView]
+
+    val exitRoute: String =
+      controllers.amend.routes.AmendConfirmationController
+        .onExit()
+        .url
   }
 }

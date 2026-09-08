@@ -24,15 +24,12 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
 class AmendPartnershipConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,11 +37,8 @@ class AmendPartnershipConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository,
   view: AmendConfirmationView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -80,24 +74,14 @@ class AmendPartnershipConfirmationController @Inject() (
               case Some(_) =>
                 val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
                 val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
-                cleanupService.cleanAmend(ua) match {
-
-                  case Success(cleanedUa) =>
-                    sessionRepository.set(cleanedUa).map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          partnershipName
-                        )
-                      )
-                    }
-                  case Failure(exception) =>
-                    logger.warn(
-                      "[AmendPartnershipConfirmationController] Failed to clean user answers",
-                      exception
+                Future.successful(
+                  Ok(
+                    view(
+                      tableRows,
+                      partnershipName
                     )
-                    Future.successful(recoveryRedirect)
-                }
+                  )
+                )
             }
         }
       }
