@@ -412,7 +412,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .onPageLoad()
         }
 
-        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is false" in {
+        "must go to ProceedSubcontractorVerifyRequestPage when answer is false" in {
 
           val ua = emptyUserAnswers
             .set(ProceedSubcontractorVerifyRequestPage("10"), false)

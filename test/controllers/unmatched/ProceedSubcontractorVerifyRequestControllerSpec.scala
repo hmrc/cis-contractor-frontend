@@ -27,6 +27,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.unmatched.ProceedSubcontractorVerifyRequestPage
 import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -43,9 +44,9 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider      = new ProceedSubcontractorVerifyRequestFormProvider()
-  val form              = formProvider()
-  val subcontractorName = "Test Subcontractor"
+  val formProvider        = new ProceedSubcontractorVerifyRequestFormProvider()
+  val form: Form[Boolean] = formProvider()
+  val subcontractorName   = "Test Subcontractor"
 
   private val subcontractorId = 10
 
@@ -55,7 +56,7 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
     unmatchedRoutes.ProceedSubcontractorVerifyRequestController.onPageLoad(subcontractorId).url
 
   private lazy val proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorIdUrl =
-    controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+    controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
       .onPageLoad(unmappedSubcontractorId)
       .url
 

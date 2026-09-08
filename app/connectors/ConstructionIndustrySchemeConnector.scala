@@ -331,7 +331,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             Future.successful(())
           case other      =>
             Future.failed(
-              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+              UpstreamErrorResponse(s"proceedInsufficientVerification failed, returned $other", other, other)
             )
         }
       }
@@ -352,7 +352,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             Future.successful(())
           case other      =>
             Future.failed(
-              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+              UpstreamErrorResponse(s"proceedUnmatchedVerification failed, returned $other", other, other)
             )
         }
       }

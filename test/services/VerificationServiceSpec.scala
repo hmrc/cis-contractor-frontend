@@ -2167,7 +2167,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       result.failed.futureValue mustBe a[RuntimeException]
 
-      verify(mockConnector, never).proceedInsufficientVerification(any[ProceedVerificationRequest])(
+      verify(mockConnector, never).proceedUnmatchedVerification(any[ProceedVerificationRequest])(
         any[HeaderCarrier]
       )
     }
