@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel}
+import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel, VerificationCurrentVerification}
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -95,7 +95,20 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
     GetCurrentVerificationBatchResponse(
       subcontractors = subs,
       verificationBatch = None,
-      verifications = Seq.empty
+      verifications = subs.map { sub =>
+        VerificationCurrentVerification(
+          verificationId = sub.subcontractorId,
+          verificationBatchId = None,
+          subcontractorId = Some(sub.subcontractorId),
+          verificationResourceRef = Some(sub.subcontractorId + 1000L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
+        )
+      }
     )
 
   private def newestBatchResponse(

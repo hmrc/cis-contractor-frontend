@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.contractordetails
 
 import models.{CheckMode, UserAnswers}
-import pages.contractordetails.AddEmailAddressYesNoPage
+import pages.contractordetails.{AddEmailAddressYesNoPage, ContractorSchemePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -30,13 +30,20 @@ object AddEmailAddressYesNoSummary {
 
       val value = if (answer) "site.yes" else "site.no"
 
+      val changeUrl =
+        if (answer && ContractorSchemePage.hasExistingUtr(answers)) {
+          controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("email-address").url
+        } else {
+          controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(CheckMode).url
+        }
+
       SummaryListRowViewModel(
         key = "contractordetails.addEmailAddressYesNo.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(CheckMode).url
+            changeUrl
           )
             .withVisuallyHiddenText(messages("contractordetails.addEmailAddressYesNo.change.hidden"))
             .withAttribute("id" -> "add-email-address-yes-no")

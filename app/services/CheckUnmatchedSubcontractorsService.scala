@@ -18,7 +18,7 @@ package services
 
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.verify.ReverificationDecision
-import models.{Subcontractor, SubcontractorLastVerification, Verification, VerificationLastVerification}
+import models.{Subcontractor, SubcontractorLastVerification, Verification, VerificationCurrentVerification, VerificationLastVerification}
 
 object CheckUnmatchedSubcontractorsService {
 
@@ -59,6 +59,9 @@ object CheckUnmatchedSubcontractorsService {
   def isUnmatched(verification: VerificationLastVerification): Boolean =
     isUnmatched(toVerification(verification))
 
+  def isUnmatched(verification: VerificationCurrentVerification): Boolean =
+    isUnmatched(toVerification(verification))
+
   def isUnmatched(verification: Verification): Boolean = {
     val verificationNumberExists =
       normalise(verification.verificationNumber).isDefined
@@ -78,6 +81,18 @@ object CheckUnmatchedSubcontractorsService {
   }
 
   private def toVerification(verification: VerificationLastVerification): Verification =
+    Verification(
+      verificationId = verification.verificationId,
+      matched = verification.matched,
+      verificationNumber = verification.verificationNumber,
+      taxTreatment = verification.taxTreatment,
+      verificationBatchId = verification.verificationBatchId,
+      subcontractorId = verification.subcontractorId,
+      actionIndicator = verification.actionIndicator,
+      verificationResourceRef = verification.verificationResourceRef
+    )
+
+  private def toVerification(verification: VerificationCurrentVerification): Verification =
     Verification(
       verificationId = verification.verificationId,
       matched = verification.matched,
