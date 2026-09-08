@@ -44,7 +44,7 @@ class AuditEventModelSpec extends SpecBase {
       val extended = event.extendedDataEvent
 
       extended.auditType mustBe testAuditType
-      extended.detail    mustBe testDetailJson
+      extended.detail mustBe testDetailJson
     }
   }
 

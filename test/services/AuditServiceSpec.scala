@@ -41,7 +41,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AuditServiceSpec
-  extends SpecBase
+    extends SpecBase
     with MockitoSugar
     with BeforeAndAfterEach
     with FutureAwaits
