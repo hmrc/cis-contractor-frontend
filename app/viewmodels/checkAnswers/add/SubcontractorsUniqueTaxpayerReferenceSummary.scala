@@ -23,6 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
@@ -59,9 +60,8 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
       SummaryListRowViewModel(
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
         value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
-        )
-        ,
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+        ),
         actions = Seq.empty
       )
     }

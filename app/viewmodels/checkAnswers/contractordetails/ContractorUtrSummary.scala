@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.contractordetails
 import models.{CheckMode, UserAnswers}
 import pages.contractordetails.ContractorUtrPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -31,12 +32,15 @@ object ContractorUtrSummary {
       val isEmpty = answer.trim.isEmpty
       SummaryListRowViewModel(
         key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
-        value = ValueViewModel(
-          HtmlContent(
-            s"""<span x-apple-data-detectors="false">${if (isEmpty) "" else answer}</span>"""
+        value = if (isEmpty) {
+          ValueViewModel("")
+        } else {
+          ValueViewModel(
+            HtmlContent(
+              s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>"""
+            )
           )
-        )
-        ,
+        },
         actions = Seq(
           ActionItemViewModel(
             messages(

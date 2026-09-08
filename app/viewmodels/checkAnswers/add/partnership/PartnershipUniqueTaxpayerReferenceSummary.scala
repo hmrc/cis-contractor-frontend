@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.partnership.PartnershipAnswers
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 object PartnershipUniqueTaxpayerReferenceSummary {
@@ -63,16 +64,14 @@ object PartnershipUniqueTaxpayerReferenceSummary {
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.utr.map { answer =>
       SummaryListRowViewModel(
-        key =
-          if (isVerified) {
-            "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel"
-          } else {
-            "partnershipUniqueTaxpayerReference.checkYourAnswersLabel"
-          },
+        key = if (isVerified) {
+          "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel"
+        } else {
+          "partnershipUniqueTaxpayerReference.checkYourAnswersLabel"
+        },
         value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
-        )
-        ,
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+        ),
         actions = Seq.empty
       )
     }

@@ -20,6 +20,7 @@ import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -67,9 +68,8 @@ object TrustUtrSummary {
           "trustUtr.checkYourAnswersLabel"
         },
         value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
         )
-
       )
     }
 }

@@ -23,6 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.company.CompanyAnswers
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 object CompanyUtrSummary {
@@ -61,16 +62,14 @@ object CompanyUtrSummary {
   )(implicit messages: Messages): Option[SummaryListRow] =
     answers.utr.map { answer =>
       SummaryListRowViewModel(
-        key =
-          if (isVerified) {
-            "companyUtr.verified.checkYourAnswersLabel"
-          } else {
-            "companyUtr.checkYourAnswersLabel"
-          },
+        key = if (isVerified) {
+          "companyUtr.verified.checkYourAnswersLabel"
+        } else {
+          "companyUtr.checkYourAnswersLabel"
+        },
         value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">$answer</span>""")
-        )
-        ,
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+        ),
         actions = Seq.empty
       )
     }
