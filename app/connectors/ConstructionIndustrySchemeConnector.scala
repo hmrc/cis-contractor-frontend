@@ -335,6 +335,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             )
         }
       }
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
