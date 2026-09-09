@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.UtrViewModel
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -32,9 +33,7 @@ object TrustUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
-      val value = ValueViewModel(
-        HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
-      )
+      val value = UtrViewModel(answer)
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(
@@ -69,9 +68,7 @@ object TrustUtrSummary {
         } else {
           "trustUtr.checkYourAnswersLabel"
         },
-        value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
-        )
+        value = UtrViewModel(answer)
       )
     }
 }

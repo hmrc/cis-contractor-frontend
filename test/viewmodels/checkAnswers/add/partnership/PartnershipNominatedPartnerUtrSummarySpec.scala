@@ -265,5 +265,34 @@ class PartnershipNominatedPartnerUtrSummarySpec extends AnyFreeSpec with Matcher
 
       row.actions.value.items shouldBe empty
     }
+
+    "must prevent Safari from detecting the UTR as a telephone number for UserAnswers" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipNominatedPartnerUtrPage, "123456789")
+          .success
+          .value
+
+      val row = PartnershipNominatedPartnerUtrSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
+    "must prevent Safari from detecting the UTR for PartnershipNominatedAnswers" in {
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val row =
+        PartnershipNominatedPartnerUtrSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
+    }
   }
 }

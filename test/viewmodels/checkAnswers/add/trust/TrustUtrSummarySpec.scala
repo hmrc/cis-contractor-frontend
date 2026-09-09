@@ -286,7 +286,7 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
       row.actions shouldBe None
     }
 
-    "must prevent Safari from detecting the UTR as a telephone number" in {
+    "must prevent Safari from detecting the UTR for UserAnswers" in {
       val answers =
         UserAnswers("test-id")
           .set(TrustUtrPage, "123456789")
@@ -295,7 +295,36 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
 
       val row = TrustUtrSummary.row(answers).value
 
-      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
+    }
+
+    "must prevent Safari from detecting the UTR for TrustAnswers" in {
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = Some("1234567890"),
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val row = TrustUtrSummary.row(answers, isVerified = false).value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
     }
 
   }

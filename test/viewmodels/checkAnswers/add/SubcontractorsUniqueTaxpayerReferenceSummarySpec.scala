@@ -269,7 +269,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       row.actions.value.items shouldBe empty
     }
 
-    "must prevent Safari from detecting the UTR as a telephone number" in {
+    "must prevent Safari from detecting the UTR for UserAnswers" in {
       val answers =
         UserAnswers("test-id")
           .set(SubcontractorsUniqueTaxpayerReferencePage, "123456789")
@@ -278,8 +278,40 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
 
       val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers).value
 
-      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
     }
 
+    "must prevent Safari from detecting the UTR for IndividualAnswers" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          usesTradingName = None,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("123456789"),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
+    }
   }
 }

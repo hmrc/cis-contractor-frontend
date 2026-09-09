@@ -25,6 +25,7 @@ import viewmodels.implicits.*
 import models.info.IndividualAnswers
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import viewmodels.checkAnswers.UtrViewModel
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
@@ -32,9 +33,7 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
-      val value   = ValueViewModel(
-        HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
-      )
+      val value   = UtrViewModel(answer)
       val actions =
         if (showActions) {
           Seq(

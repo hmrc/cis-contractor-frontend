@@ -26,6 +26,7 @@ import viewmodels.implicits.*
 import models.info.partnership.PartnershipAnswers
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import viewmodels.checkAnswers.UtrViewModel
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
@@ -33,9 +34,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
-      val value = ValueViewModel(
-        HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
-      )
+      val value = UtrViewModel(answer)
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(
@@ -71,9 +70,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
         } else {
           "partnershipUniqueTaxpayerReference.checkYourAnswersLabel"
         },
-        value = ValueViewModel(
-          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
-        ),
+        value = UtrViewModel(answer),
         actions = Seq.empty
       )
     }

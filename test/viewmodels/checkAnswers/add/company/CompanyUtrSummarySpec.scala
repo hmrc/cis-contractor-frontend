@@ -239,7 +239,7 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       assertNoDoubleEncoding(html)
     }
 
-    "must prevent Safari from detecting the UTR as a telephone number" in {
+    "must prevent Safari from detecting the UTR as a telephone number for UserAnswers" in {
       val answers =
         UserAnswers("test-id")
           .set(CompanyUtrPage, "123456789")
@@ -249,6 +249,23 @@ class CompanyUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSp
       val row = CompanyUtrSummary.row(answers).value
 
       row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
+    "must prevent Safari from detecting the UTR for CompanyAnswers" in {
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val row =
+        CompanyUtrSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
     }
   }
 }
