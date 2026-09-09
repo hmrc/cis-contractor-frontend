@@ -25,6 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.amend.IndividualAmendedViewModel
+import utils.SubcontractorNameExtractor
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
@@ -35,7 +36,8 @@ class AmendIndividualConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: AmendConfirmationView
+  view: AmendConfirmationView,
+  subcontractorNameExtractor: SubcontractorNameExtractor
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
