@@ -103,11 +103,10 @@ class AmendSubcontractorControllerSpec
     )
 
   private def applicationWith(
-                               mockService: SubcontractorService,
-                               mockSessionRepository: SessionRepository,
-                               mockCleanupService: DefaultSubcontractorCleanupService =
-                               mock[DefaultSubcontractorCleanupService]
-                             ): GuiceApplicationBuilder = {
+    mockService: SubcontractorService,
+    mockSessionRepository: SessionRepository,
+    mockCleanupService: DefaultSubcontractorCleanupService = mock[DefaultSubcontractorCleanupService]
+  ): GuiceApplicationBuilder = {
 
     val mockCisManagerService = mock[CisManageService]
 

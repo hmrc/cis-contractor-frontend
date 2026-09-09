@@ -130,12 +130,12 @@ class AmendSubcontractorController @Inject() (
     }
 
   private def handleSubcontractor(
-                                   subcontractorType: TypeOfSubcontractor,
-                                   userAnswers: UserAnswers,
-                                   cisId: String,
-                                   subbieResourceRef: Long,
-                                   subcontractor: SubcontractorResponse
-                                 ): Future[Result] =
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    cisId: String,
+    subbieResourceRef: Long,
+    subcontractor: SubcontractorResponse
+  ): Future[Result] =
     cleanupService.cleanAmend(userAnswers) match {
       case Success(cleanedUserAnswers) =>
         populateUserAnswers(
