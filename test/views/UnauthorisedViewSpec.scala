@@ -36,12 +36,28 @@ class UnauthorisedViewSpec extends SpecBase with Matchers {
 
       doc.title                                 must include(messages("unauthorised.title"))
       doc.select("h1").text                     must include(messages("unauthorised.heading"))
-      doc.select("p").text                      must include(messages("unauthorised.guidance.org.p1.prefix"))
-      doc.select("p").text                      must include(messages("unauthorised.guidance.org.p1.suffix"))
-      doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.guidance.org.p1.link"))
-      doc.select("p").text                      must include(messages("unauthorised.guidance.agent.p2.prefix"))
-      doc.select("p").text                      must include(messages("unauthorised.guidance.agent.p2.suffix"))
-      doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.guidance.agent.p2.link"))
+      doc.select("p").text must include(messages("unauthorised.guidance.p1"))
+      val guidanceItems = doc.select("ul.govuk-list--bullet li")
+
+      guidanceItems.get(0).text must include(
+        messages("unauthorised.guidance.org.p1.prefix")
+      )
+      guidanceItems.get(0).text must include(
+        messages("unauthorised.guidance.org.p1.link")
+      )
+      guidanceItems.get(0).text must include(
+        messages("unauthorised.guidance.org.p1.suffix")
+      )
+
+      guidanceItems.get(1).text must include(
+        messages("unauthorised.guidance.agent.p2.prefix")
+      )
+      guidanceItems.get(1).text must include(
+        messages("unauthorised.guidance.agent.p2.link")
+      )
+      guidanceItems.get(1).text must include(
+        messages("unauthorised.guidance.agent.p2.suffix")
+      )
     }
   }
 
