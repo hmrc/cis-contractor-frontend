@@ -32,7 +32,9 @@ object CompanyUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(CompanyUtrPage).map { answer =>
-      val value = ValueViewModel(answer)
+      val value = ValueViewModel(
+        HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+      )
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(

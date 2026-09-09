@@ -264,5 +264,18 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
 
       row.actions.value.items shouldBe empty
     }
+
+    "must prevent Safari from detecting the UTR as a telephone number" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipUniqueTaxpayerReferencePage, "123456789")
+          .success
+          .value
+
+      val row = PartnershipUniqueTaxpayerReferenceSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
   }
 }

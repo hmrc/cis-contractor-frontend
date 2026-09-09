@@ -285,5 +285,18 @@ class TrustUtrSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpec
 
       row.actions shouldBe None
     }
+
+    "must prevent Safari from detecting the UTR as a telephone number" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TrustUtrPage, "123456789")
+          .success
+          .value
+
+      val row = TrustUtrSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
   }
 }

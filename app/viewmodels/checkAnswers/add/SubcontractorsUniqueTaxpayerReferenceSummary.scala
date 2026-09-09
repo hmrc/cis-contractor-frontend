@@ -32,7 +32,9 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
-      val value   = ValueViewModel(answer)
+      val value   = ValueViewModel(
+        HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+      )
       val actions =
         if (showActions) {
           Seq(
