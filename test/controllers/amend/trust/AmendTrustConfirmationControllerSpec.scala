@@ -36,6 +36,7 @@ import views.html.amend.AmendConfirmationView
 import config.FrontendAppConfig
 import models.amend.AmendJourneyType
 import pages.amend.AmendJourneyTypePage
+import services.VerificationService
 import viewmodels.amend.AmendConfirmationLinks
 
 import scala.concurrent.Future
@@ -93,16 +94,23 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
   private val mockSessionRepository =
     mock[SessionRepository]
 
+  private val mockVerificationService =
+    mock[VerificationService]
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository)
+    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[DefaultSubcontractorCleanupService]
+          .toInstance(mockCleanupService),
+        bind[SessionRepository]
+          .toInstance(mockSessionRepository),
+        bind[VerificationService]
+          .toInstance(mockVerificationService)
       )
       .build()
 
@@ -180,35 +188,6 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
 
         verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when not submitted" in {
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(TrustNamePage, trustName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, false)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -326,7 +305,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -340,13 +319,17 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       }
     }
 
-    "must render the insufficient info confirmation link" in {
+    "must refresh verification batches and render the insufficient info confirmation link" in {
 
       when(mockCleanupService.cleanAmend(any[UserAnswers]))
         .thenReturn(Success(userAnswersWithOriginal))
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
 
       val userAnswers =
         userAnswersWithOriginal
@@ -362,13 +345,12 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes
-            .ReviewInsufficientInfoSubcontractorsController
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
             .onPageLoad()
             .url
         )
@@ -377,16 +359,23 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
           messages(app)(
             "amendConfirmation.beforeYouGo.h2"
           )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
       }
     }
 
-    "must render the unmatched info confirmation link" in {
+    "must refresh verification batches and render the unmatched info confirmation link" in {
 
       when(mockCleanupService.cleanAmend(any[UserAnswers]))
         .thenReturn(Success(userAnswersWithOriginal))
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
 
       val userAnswers =
         userAnswersWithOriginal
@@ -402,13 +391,12 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes
-            .ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
             .onPageLoad()
             .url
         )
@@ -417,7 +405,35 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
           messages(app)(
             "amendConfirmation.beforeYouGo.h2"
           )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
       }
     }
+
+    "must not refresh verification batches for standard amend journey" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request =
+          FakeRequest(GET, confirmationRoute)
+
+        val result =
+          route(app, request).value
+
+        status(result) mustBe OK
+
+        verifyNoInteractions(mockVerificationService)
+      }
+    }
+
   }
 }

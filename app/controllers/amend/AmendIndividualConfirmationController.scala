@@ -28,6 +28,8 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
+import services.VerificationService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
@@ -44,6 +46,7 @@ class AmendIndividualConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
   cleanupService: DefaultSubcontractorCleanupService,
+  verificationService: VerificationService,
   sessionRepository: SessionRepository,
   appConfig: FrontendAppConfig,
   subcontractorNameExtractor: SubcontractorNameExtractor
@@ -106,8 +109,21 @@ class AmendIndividualConfirmationController @Inject() (
         cleanupService.cleanAmend(userAnswers) match {
 
           case Success(cleanedUserAnswers) =>
-            sessionRepository
-              .set(cleanedUserAnswers)
+            val persistFinalUserAnswers =
+              journeyType match {
+
+                case AmendJourneyType.Standard =>
+                  sessionRepository
+                    .set(cleanedUserAnswers)
+                    .map(_ => cleanedUserAnswers)
+
+                case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                  verificationService.refreshVerificationBatches(
+                    cleanedUserAnswers
+                  )
+              }
+
+            persistFinalUserAnswers
               .map { _ =>
                 Ok(
                   view(
@@ -120,7 +136,7 @@ class AmendIndividualConfirmationController @Inject() (
               .recover { case exception =>
                 logger.error(
                   "[AmendIndividualConfirmationController.onPageLoad] " +
-                    "Failed to save cleaned user answers",
+                    "Failed to persist confirmation session data",
                   exception
                 )
 

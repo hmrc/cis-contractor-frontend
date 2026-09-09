@@ -27,6 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.AmendConfirmationLinks
@@ -44,6 +45,7 @@ class AmendCompanyConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
+  verificationService: VerificationService,
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
@@ -94,20 +96,45 @@ class AmendCompanyConfirmationController @Inject() (
 
                     cleanupService.cleanAmend(ua) match {
 
-                      case Success(cleanedUa) =>
-                        sessionRepository.set(cleanedUa).map { _ =>
-                          Ok(
-                            view(
-                              tableRows,
-                              companyName,
-                              confirmationLink
+                      case Success(cleanedUserAnswers) =>
+                        val persistFinalUserAnswers =
+                          journeyType match {
+
+                            case AmendJourneyType.Standard =>
+                              sessionRepository
+                                .set(cleanedUserAnswers)
+                                .map(_ => cleanedUserAnswers)
+
+                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                              verificationService.refreshVerificationBatches(
+                                cleanedUserAnswers
+                              )
+                          }
+
+                        persistFinalUserAnswers
+                          .map { _ =>
+                            Ok(
+                              view(
+                                tableRows,
+                                companyName,
+                                confirmationLink
+                              )
                             )
-                          )
-                        }
+                          }
+                          .recover { case exception =>
+                            logger.error(
+                              "[AmendCompanyConfirmationController.onPageLoad] " +
+                                "Failed to persist confirmation session data",
+                              exception
+                            )
+
+                            recoveryRedirect
+                          }
 
                       case Failure(exception) =>
                         logger.warn(
-                          "[AmendCompanyConfirmationController] Failed to clean user answers",
+                          "[AmendCompanyConfirmationController.onPageLoad] " +
+                            "Failed to clean user answers",
                           exception
                         )
 

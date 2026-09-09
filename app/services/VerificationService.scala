@@ -519,4 +519,13 @@ class VerificationService @Inject() (
           )
         )
     }
+
+  def refreshVerificationBatches(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield afterNewest
 }
