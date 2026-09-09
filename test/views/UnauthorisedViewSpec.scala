@@ -34,9 +34,9 @@ class UnauthorisedViewSpec extends SpecBase with Matchers {
       val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title                                 must include(messages("unauthorised.title"))
-      doc.select("h1").text                     must include(messages("unauthorised.heading"))
-      doc.select("p").text must include(messages("unauthorised.guidance.p1"))
+      doc.title             must include(messages("unauthorised.title"))
+      doc.select("h1").text must include(messages("unauthorised.heading"))
+      doc.select("p").text  must include(messages("unauthorised.guidance.p1"))
       val guidanceItems = doc.select("ul.govuk-list--bullet li")
 
       guidanceItems.get(0).text must include(
