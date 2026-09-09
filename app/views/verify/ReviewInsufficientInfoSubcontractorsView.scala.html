@@ -120,9 +120,9 @@
     }
 
     @if(viewModel.allReady) {
-    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()) {
+    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onSubmit()) {
             @govukButton(Button(
-                content = Text(messages("site.continue")),
+                content = Text(messages("site.continue"))
             ))
         }
     }

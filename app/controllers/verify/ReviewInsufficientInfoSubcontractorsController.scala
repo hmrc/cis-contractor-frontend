@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import models.NormalMode
-import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -93,8 +93,26 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
       }
     }
 
-  // TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { _ =>
-    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
-  }
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+
+      val nextPage =
+        if (
+          request.userAnswers
+            .get(NewestVerificationBatchResponsePage)
+            .flatMap(_.scheme)
+            .flatMap(_.emailAddress)
+            .isDefined
+        ) {
+          controllers.verify.routes
+            .ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+        } else {
+          controllers.verify.routes
+            .ContractorEmailConfirmationNotStoredController
+            .onPageLoad(NormalMode)
+        }
+
+      Redirect(nextPage)
+    }
 }
