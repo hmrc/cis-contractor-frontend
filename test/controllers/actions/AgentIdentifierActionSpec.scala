@@ -343,7 +343,7 @@ class AgentIdentifierActionSpec extends SpecBase {
     "Unable to retrieve internal id or affinity group" - {
       "fail and redirect to Unauthorised screen" in {
         when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-          .thenReturn(Future.successful(None ~ emptyEnrolments ~ None ~ None) ~ None)
+          .thenReturn(Future.successful(None ~ emptyEnrolments ~ None ~ None ~ None))
         running(application) {
           val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers, clientListCheckEnforcer)
           val controller = new Harness(authAction)
