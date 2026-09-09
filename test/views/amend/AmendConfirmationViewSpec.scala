@@ -138,9 +138,10 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
     val view: AmendConfirmationView =
       app.injector.instanceOf[AmendConfirmationView]
 
+    val appConfig: config.FrontendAppConfig =
+      app.injector.instanceOf[config.FrontendAppConfig]
+
     val exitRoute: String =
-      controllers.amend.routes.AmendConfirmationController
-        .onExit()
-        .url
+      appConfig.retrieveSubcontractorListUrl
   }
 }

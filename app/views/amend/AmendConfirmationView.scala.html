@@ -56,7 +56,7 @@
 
     @link(
         linkTextKey = "amendConfirmation.yourSubcontractors",
-        linkUrl = controllers.amend.routes.AmendConfirmationController.onExit().url,
+        linkUrl = appConfig.retrieveSubcontractorListUrl,
         hasFullStop = true,
         prefixTextKey = "amendConfirmation.backTo",
         isNewTab = false
