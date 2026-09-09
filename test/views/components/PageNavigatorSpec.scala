@@ -124,6 +124,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       val ellipsisItems = doc.select(".govuk-pagination__item--ellipsis")
       ellipsisItems.size() mustBe 1
       ellipsisItems.select("button").size() mustBe 0
+      ellipsisItems.attr("aria-hidden") mustBe "true"
     }
 
     "must use the landmark label from the view model" in new Setup {
