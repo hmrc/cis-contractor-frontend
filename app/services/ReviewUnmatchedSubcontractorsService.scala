@@ -18,6 +18,7 @@ package services
 
 import models.SubcontractorCurrentVerification
 import models.VerificationCurrentVerification
+import models.amend.AmendJourneyType
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.UnmatchedBatchReadiness
 import play.api.i18n.Messages
@@ -71,13 +72,19 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
-      editLink = LinkViewModel(dummyUrl, name),
       proceedLink = LinkViewModel(
         controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
           .onPageLoad(sub.subcontractorId)
           .url,
         name
       ),
+      editLink = LinkViewModel(
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.UnmatchedInfo.routeValue
+          )
+          .url, name),
       removeLink = LinkViewModel(dummyUrl, name)
     )
   }

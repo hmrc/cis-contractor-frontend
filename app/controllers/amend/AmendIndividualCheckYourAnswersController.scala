@@ -23,8 +23,7 @@ import models.add.ValidatedSubcontractor
 import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
 import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
-import pages.add.*
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.*
@@ -178,12 +177,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     nameRows ++ addressRows ++ contactRows ++ utrRows ++ additionalRows
   }
-
-  private def displayName(ua: UserAnswers): String =
-    ua.get(SubcontractorNamePage)
-      .map(n => s"${n.firstName} ${n.lastName}")
-      .orElse(ua.get(TradingNameOfSubcontractorPage))
-      .getOrElse("")
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>

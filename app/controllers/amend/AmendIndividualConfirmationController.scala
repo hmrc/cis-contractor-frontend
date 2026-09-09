@@ -21,7 +21,6 @@ import controllers.actions.*
 import controllers.routes
 import models.UserAnswers
 import models.amend.AmendJourneyType
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -29,10 +28,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
+import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
@@ -98,7 +96,7 @@ class AmendIndividualConfirmationController @Inject() (
           )
 
         val individualName =
-          individualDisplayName(userAnswers)
+          subcontractorNameExtractor.displaySubcontractorName(userAnswers)
 
         val link =
           AmendConfirmationLinks.build(
@@ -177,19 +175,6 @@ class AmendIndividualConfirmationController @Inject() (
 
         Future.successful(journeyRecoveryRedirect)
     }
-
-  private def individualDisplayName(
-    userAnswers: UserAnswers
-  ): String =
-    userAnswers
-      .get(SubcontractorNamePage)
-      .map { name =>
-        s"${name.firstName} ${name.lastName}"
-      }
-      .orElse(
-        userAnswers.get(TradingNameOfSubcontractorPage)
-      )
-      .getOrElse("")
 
   private def journeyRecoveryRedirect: Result =
     Redirect(
