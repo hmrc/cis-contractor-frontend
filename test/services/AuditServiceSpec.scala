@@ -20,11 +20,12 @@ import base.SpecBase
 import models.TypeOfSubcontractor
 import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
+import models.audit.AuthFailureAuditEventModel
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, verify}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.*
@@ -32,18 +33,27 @@ import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
 import play.api.libs.json.JsValue
+import play.api.mvc.{Headers, Request}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalIndividualAnswersQuery}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class AuditServiceSpec
+    extends SpecBase
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with FutureAwaits
+    with DefaultAwaitTimeout {
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   private val mockAuditConnector = mock[AuditConnector]
   private val service            = new AuditService(mockAuditConnector)
+  private val testUri            = "testUri"
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -54,6 +64,23 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
     val captor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
     verify(mockAuditConnector).sendExplicitAudit(any[String], captor.capture())(any(), any(), any())
     captor.getValue
+  }
+
+  ".sendEvent" - {
+
+    "create extended event and send to auditConnector" in {
+      implicit val request: Request[?] = FakeRequest("GET", testUri, Headers(), "")
+
+      val auditEvent = AuthFailureAuditEventModel()
+
+      when(mockAuditConnector.sendExtendedEvent(any())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val result = service.sendEvent(auditEvent).futureValue
+
+      result mustBe AuditResult.Success
+      auditEvent.auditType mustBe "authoriseServiceGuardFailure"
+    }
   }
 
   ".addSubcontractorEvent" - {
