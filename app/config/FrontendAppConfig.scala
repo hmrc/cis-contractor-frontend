@@ -86,6 +86,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val constructionIndustryOrgAccountUrl: String   = configuration.get[String]("urls.constructionIndustryOrgAccount")
   lazy val cisContractorGuideUrl: String               = configuration.get[String]("urls.cisContractorGuide")
   lazy val signIntoCISURL: String                      = configuration.get[String]("urls.signIntoCIS")
+  lazy val portalAccountBaseUrl: String                = configuration.get[String]("portal-account.host")
+  lazy val authoriseClientRequestPath: String          = configuration.get[String]("urls.authoriseClientRequest")
+  lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String =
+    configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
+  lazy val clientListSearchUrl: String                 = configuration.get[String]("urls.clientListSearch")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
@@ -124,4 +129,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
       case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }
+
+  def authoriseClientRequestUrl(agentCode: String): String =
+    s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
+
 }
