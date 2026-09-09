@@ -163,7 +163,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = Some(subcontractorName),
           addressYesNo = None,
@@ -214,7 +214,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = Some(subcontractorName),
           addressYesNo = None,
@@ -253,7 +253,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
@@ -287,7 +287,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = Some(subcontractorName),
           addressYesNo = None,

@@ -16,13 +16,9 @@
 
 package pages.add
 
-import models.UserAnswers
 import models.add.SubcontractorName
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.AmendIndividualSubcontractorNameRemovedQuery
-
-import scala.util.Try
 
 case object SubcontractorNamePage extends QuestionPage[SubcontractorName] with IndividualJourney {
 
@@ -30,9 +26,4 @@ case object SubcontractorNamePage extends QuestionPage[SubcontractorName] with I
 
   override def toString: String = "subcontractorName"
 
-  override def cleanup(value: Option[SubcontractorName], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(_) => userAnswers.remove(AmendIndividualSubcontractorNameRemovedQuery)
-      case None    => super.cleanup(value, userAnswers)
-    }
 }

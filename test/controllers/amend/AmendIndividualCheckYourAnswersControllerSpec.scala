@@ -18,7 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import controllers.routes
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.{TypeOfSubcontractor, UserAnswers}
@@ -35,6 +35,7 @@ import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -63,7 +64,10 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
       .success
       .value
-      .set(SubTradingNameYesNoPage, false)
+      .set(
+        IndividualNamesOptionsPage,
+        Set(IndividualNamesOptions.SubcontractorName)
+      )
       .success
       .value
       .set(
@@ -112,7 +116,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(
         OriginalIndividualAnswersQuery,
         OriginalIndividualAnswers(
-          usesTradingName = Some(false),
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
           subcontractorName = Some(
             SubcontractorName(
               firstName = "John",
@@ -140,6 +144,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .success
       .value
 
+  private val originalIndividualAnswers = minUa.get(OriginalIndividualAnswersQuery).value
+
   "AmendIndividualCheckYourAnswersController" - {
 
     "must return OK and render the page with the correct summary list for GET when validation succeeds for unverified individual" in {
@@ -157,7 +163,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         val page = contentAsString(result)
 
         page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
-        page must include(msg("subTradingNameYesNo.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
         page must include(msg("subcontractorName.checkYourAnswersLabel"))
         page must include(msg("subAddressYesNo.checkYourAnswersLabel"))
         page must include(msg("addressOfSubcontractor.checkYourAnswersLabel"))
@@ -198,7 +204,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .set(
             OriginalIndividualAnswersQuery,
             OriginalIndividualAnswers(
-              usesTradingName = Some(false),
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
               subcontractorName = Some(
                 SubcontractorName(
                   firstName = "John",
@@ -243,7 +249,6 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
         page must include("VRN123456")
 
-        page must not include msg("subTradingNameYesNo.checkYourAnswersLabel")
         page must not include msg("subcontractorName.checkYourAnswersLabel")
         page must not include msg("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
 
@@ -285,7 +290,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .set(
             OriginalIndividualAnswersQuery,
             OriginalIndividualAnswers(
-              usesTradingName = Some(false),
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
               subcontractorName = Some(
                 SubcontractorName(
                   firstName = "John",
@@ -337,6 +342,390 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
 
         page must include(msg("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel"))
         page must include("11111111")
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with no name" in {
+
+      val originalIndividualAnswers = minUa.get(OriginalIndividualAnswersQuery).value
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set.empty
+          )
+          .success
+          .value
+          .remove(SubcontractorNamePage)
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set.empty,
+              subcontractorName = None,
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        page must not include msg("subcontractorName.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("No name provided")
+        page must include("None selected")
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only last name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "",
+              middleName = None,
+              lastName = "Smith"
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Smith")
+        page must not include "None selected"
+        page must not include "No name provided"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only first name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "John",
+              middleName = None,
+              lastName = ""
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = ""
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("John")
+        page must include("No name provided")
+        page must not include "None selected"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only middle name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "",
+              middleName = Some("Paul"),
+              lastName = ""
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "",
+                  middleName = Some("Paul"),
+                  lastName = ""
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Paul")
+        page must include("No name provided")
+        page must not include "None selected"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only trading name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(
+            TradingNameOfSubcontractorPage,
+            "Test Ltd"
+          )
+          .success
+          .value
+          .remove(SubcontractorNamePage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.TradingName),
+              subcontractorName = None,
+              tradingName = Some("Test Ltd")
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+
+        page must not include msg("subcontractorName.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Test Ltd")
+        page must not include "None selected"
+        page must not include "No name provided"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with subcontractor name and trading name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "John",
+              middleName = None,
+              lastName = "Smith"
+            )
+          )
+          .success
+          .value
+          .set(
+            TradingNameOfSubcontractorPage,
+            "Test Ltd"
+          )
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions =
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = Some("Test Ltd")
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must include("Individual")
+        page must include("John Smith")
+        page must include("Test Ltd")
+        page must not include "None selected"
+        page must not include "No name provided"
       }
     }
 

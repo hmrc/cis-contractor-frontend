@@ -20,10 +20,14 @@ import base.SpecBase
 import models.add.SubcontractorName
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 
 class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
 
-  "SubcontractorNameExtractor" - {
+  "SubcontractorNameExtractor.getSubcontractorName" - {
 
     "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
 
@@ -70,6 +74,169 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
         subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers)
 
       result mustBe None
+    }
+  }
+
+  "SubcontractorNameExtractor.displaySubcontractorName" - {
+
+    implicit val messagesApi: MessagesApi =
+      stubMessagesApi()
+
+    implicit val messages: Messages =
+      messagesApi.preferred(FakeRequest())
+
+    val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+    val tradingNameOfSubcontractor = "ABC Contractors"
+
+    val subContractorName =
+      SubcontractorName("John", Some("Paul"), "Smith")
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe "John Smith"
+    }
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage and TradingNameOfSubcontractorPage in userAnswers" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe "John Smith"
+    }
+
+    "should return lastName when only last name in SubcontractorNamePage and TradingNameOfSubcontractorPage is in userAnswers" in {
+
+      val subContractorName =
+        SubcontractorName("", None, "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe "Smith"
+    }
+
+    "should return TradingName when first and last name in SubcontractorNamePage is empty and TradingNameOfSubcontractorPage is in userAnswers" in {
+
+      val subContractorName =
+        SubcontractorName("  ", None, "  ")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe tradingNameOfSubcontractor
+    }
+
+    "should return trading name when only TradingNameOfSubcontractorPage in userAnswers" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe tradingNameOfSubcontractor
+    }
+
+    "should return trading name when only first name in SubcontractorNamePage and TradingNameOfSubcontractorPage is in userAnswers" in {
+
+      val subContractorName =
+        SubcontractorName("John", None, "")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe tradingNameOfSubcontractor
+    }
+
+    "should return No name provided when no subcontractor name exists" in {
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(emptyUserAnswers)
+
+      result mustBe messages("verify.noName")
+    }
+
+    "should return No name provided when only first name in SubcontractorNamePage" in {
+
+      val subContractorName =
+        SubcontractorName("John", None, "")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe messages("verify.noName")
+    }
+
+    "should return No name provided when only middle name in SubcontractorNamePage" in {
+
+      val subContractorName =
+        SubcontractorName("", Some("Paul"), "")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.displaySubcontractorName(userAnswers)
+
+      result mustBe messages("verify.noName")
     }
   }
 }
