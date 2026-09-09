@@ -18,10 +18,36 @@ package models.audit
 
 import models.address.Address
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsObject, Json, OWrites, __}
+import play.api.libs.json.{Format, JsObject, JsValue, Json, OWrites, __}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 trait AuditEvent {
   val auditType: String
+}
+
+trait AuditEventModel extends AuditEvent {
+  private val auditSource: String = "cis-contractor-frontend"
+
+  val detailJson: JsValue
+
+  def extendedDataEvent: ExtendedDataEvent =
+    ExtendedDataEvent(
+      auditSource = auditSource,
+      auditType = auditType,
+      detail = detailJson
+    )
+}
+
+case class AuthFailureAuditEventModel() extends AuditEventModel {
+  override val auditType: String = "authoriseServiceGuardFailure"
+
+  override val detailJson: JsValue =
+    Json.toJson(this)(AuthFailureAuditEventModel.formats)
+}
+
+object AuthFailureAuditEventModel {
+  implicit val formats: Format[AuthFailureAuditEventModel] =
+    Json.format[AuthFailureAuditEventModel]
 }
 
 private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObject) = {

@@ -17,9 +17,9 @@
 package connectors
 
 import models.TypeOfSubcontractor
-import models.requests.{CreateAndUpdateSubcontractorPayload, CreateSubmissionForVerificationRequest, DeleteVerificationRequest, ModifyVerificationsRequest, SubcontractorRequest, UpdateContractorSchemeParams, UpdateSubcontractorRequest, VerificationToUpdate}
+import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.{CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorListResponse, GetSubcontractorResponse, SubcontractorListItem}
+import models.response.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}

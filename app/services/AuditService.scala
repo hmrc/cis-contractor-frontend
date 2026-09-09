@@ -29,17 +29,35 @@ import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OWrites, Writes}
+import play.api.mvc.Request
 import queries.{SubbieResourceRefQuery, *}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.AuditExtensions
+import uk.gov.hmrc.play.audit.http.connector.*
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditService @Inject() (
   auditConnector: AuditConnector
 )(implicit ec: ExecutionContext) {
+
+  private val auditSource: String = "cis-contractor-frontend"
+
+  def sendEvent[A <: AuditEventModel](
+    auditEvent: A
+  )(implicit hc: HeaderCarrier, writes: Writes[A], request: Request[?]): Future[AuditResult] = {
+    val extendedDataEvent = ExtendedDataEvent(
+      auditSource = auditSource,
+      auditType = auditEvent.auditType,
+      detail = Json.toJson(auditEvent),
+      tags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags()
+    )
+
+    auditConnector.sendExtendedEvent(extendedDataEvent)
+  }
 
   def amendSubcontractorEvent(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Unit =
     userAnswers.get(TypeOfSubcontractorPage) match {
