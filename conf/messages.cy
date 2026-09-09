@@ -84,10 +84,10 @@ systemError.p2                           =  Cysylltwch â
 systemError.link                         =  Desg Gymorth gwasanaethau ar-lein CThEF
 systemError.p3                           =  os oes angen i chi siarad â rhywun ynghylch Cynllun y Diwydiant Adeiladu, a dyfynnu’r cyfeirnod:
 
-
-accessDenied.title                       =  xxxxxxxxxxxxxxxxxxxx
-accessDenied.heading                     =  xxxxxxxxxxxxxxxxxxxx
-accessDenied.link                        =  xxxxxxxxxxxxxxxxxxxx
+accessDenied.title                       =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+accessDenied.heading                     =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+accessDenied.paragraph                   =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.
+accessDenied.link                        =  Rhagor o wybodaeth am Gynllun y Diwydiant Adeiladu (CIS)
 
 unauthorised.title                       =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
 unauthorised.heading                     =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
