@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package queries
+package controllers.actions
 
-import play.api.libs.json.JsPath
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+private[actions] object ClientListCheckRedirects {
+  def systemError: Result =
+    Redirect(controllers.routes.SystemErrorController.onPageLoad())
 
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+  // Add when AgentLostAccessController is implemented
 }

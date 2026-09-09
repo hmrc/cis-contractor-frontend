@@ -18,7 +18,7 @@ package controllers.info
 
 import base.SpecBase
 import models.TypeOfSubcontractor.Individualorsoletrader
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import models.info.IndividualAnswers
@@ -48,7 +48,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
   private val answers =
     IndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(
         SubcontractorName(
@@ -120,7 +120,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         )
 
         page must include(
-          msg("subTradingNameYesNo.checkYourAnswersLabel")
+          msg("individualNamesOptions.checkYourAnswersLabel")
         )
 
         page must include(
@@ -238,7 +238,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include("VRN123456")
 
         page must not include (
-          msg("subTradingNameYesNo.checkYourAnswersLabel")
+          msg("individualNamesOptions.checkYourAnswersLabel")
         )
 
         page must not include (
@@ -292,6 +292,248 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include(
           msg("worksReferenceNumber.checkYourAnswersLabel")
         )
+      }
+    }
+
+    "must render the correct summary for a individual with only last name" in {
+
+      val verifiedAnswers =
+        answers.copy(
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+          tradingName = None,
+          subcontractorName = Some(
+            SubcontractorName(
+              firstName = "",
+              middleName = None,
+              lastName = "Smith"
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, verifiedAnswers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, viewOnlyRoute)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val page =
+          contentAsString(result)
+
+        page must include(
+          msg("individualNamesOptions.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("subcontractorName.checkYourAnswersLabel")
+        )
+
+        page must not include (
+          msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        )
+
+        page must include("Smith")
+      }
+    }
+
+    "must render the correct summary for a individual with only first name" in {
+
+      val verifiedAnswers =
+        answers.copy(
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+          tradingName = None,
+          subcontractorName = Some(
+            SubcontractorName(
+              firstName = "John",
+              middleName = None,
+              lastName = ""
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, verifiedAnswers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, viewOnlyRoute)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val page =
+          contentAsString(result)
+
+        page must include(
+          msg("individualNamesOptions.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("subcontractorName.checkYourAnswersLabel")
+        )
+
+        page must not include (
+          msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("verify.noName")
+        )
+
+        page must include("John")
+      }
+    }
+
+    "must render the correct summary for a individual with only middle name" in {
+
+      val verifiedAnswers =
+        answers.copy(
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+          tradingName = None,
+          subcontractorName = Some(
+            SubcontractorName(
+              firstName = "",
+              middleName = Some("Middle"),
+              lastName = ""
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, verifiedAnswers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, viewOnlyRoute)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val page =
+          contentAsString(result)
+
+        page must include(
+          msg("individualNamesOptions.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("subcontractorName.checkYourAnswersLabel")
+        )
+
+        page must not include (
+          msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("verify.noName")
+        )
+
+        page must include("Middle")
+      }
+    }
+
+    "must render the correct summary for a individual with only trading name" in {
+
+      val verifiedAnswers =
+        answers.copy(
+          individualNamesOptions = Set(IndividualNamesOptions.TradingName),
+          tradingName = Some("Test ltd"),
+          subcontractorName = None
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, verifiedAnswers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, viewOnlyRoute)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val page =
+          contentAsString(result)
+
+        page must include(
+          msg("individualNamesOptions.checkYourAnswersLabel")
+        )
+
+        page must not include (
+          msg("subcontractorName.checkYourAnswersLabel")
+        )
+
+        page must include(
+          msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        )
+
+        page must include("Test ltd")
       }
     }
 

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.agent
 
-import pages.behaviours.PageBehaviours
+import base.SpecBase
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+class ClientListCheckPolicySpec extends SpecBase {
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+  "ClientListCheckPolicy" - {
 
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
+    "must expose GroupA and Exempt policies" in {
+      ClientListCheckPolicy.GroupA mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.Exempt mustBe a[ClientListCheckPolicy]
+    }
   }
 }

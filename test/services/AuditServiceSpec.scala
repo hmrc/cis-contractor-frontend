@@ -18,12 +18,14 @@ package services
 
 import base.SpecBase
 import models.TypeOfSubcontractor
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
+import models.audit.AuthFailureAuditEventModel
+import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, verify}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.*
@@ -31,17 +33,27 @@ import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
 import play.api.libs.json.JsValue
+import play.api.mvc.{Headers, Request}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
+import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalIndividualAnswersQuery}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class AuditServiceSpec
+    extends SpecBase
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with FutureAwaits
+    with DefaultAwaitTimeout {
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   private val mockAuditConnector = mock[AuditConnector]
   private val service            = new AuditService(mockAuditConnector)
+  private val testUri            = "testUri"
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -52,6 +64,23 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
     val captor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
     verify(mockAuditConnector).sendExplicitAudit(any[String], captor.capture())(any(), any(), any())
     captor.getValue
+  }
+
+  ".sendEvent" - {
+
+    "create extended event and send to auditConnector" in {
+      implicit val request: Request[?] = FakeRequest("GET", testUri, Headers(), "")
+
+      val auditEvent = AuthFailureAuditEventModel()
+
+      when(mockAuditConnector.sendExtendedEvent(any())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val result = service.sendEvent(auditEvent).futureValue
+
+      result mustBe AuditResult.Success
+      auditEvent.auditType mustBe "authoriseServiceGuardFailure"
+    }
   }
 
   ".addSubcontractorEvent" - {
@@ -67,7 +96,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
       (detail \ "cisId").toOption mustBe None
-      (detail \ "subTradingNameYesNo").toOption mustBe None
+      (detail \ "individualNamesOptions").toOption mustBe None
     }
 
     "must include all fields in the audit event when full individual answers are provided" in {
@@ -84,7 +113,10 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
         .value
-        .set(SubTradingNameYesNoPage, true)
+        .set(
+          IndividualNamesOptionsPage,
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
         .success
         .value
         .set(TradingNameOfSubcontractorPage, "TradingName")
@@ -140,10 +172,10 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
+      (detail \ "individualNamesOptions").as[Seq[String]] mustBe Seq("subcontractorName", "tradingName")
       (detail \ "firstName").as[String] mustBe "John"
       (detail \ "middleName").as[String] mustBe "Paul"
       (detail \ "surname").as[String] mustBe "Smith"
-      (detail \ "subTradingNameYesNo").as[Boolean] mustBe true
       (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
       (detail \ "subAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"
@@ -206,6 +238,125 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEac
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "trust"
       (detail \ "trustName").as[String] mustBe "Test Trust"
+    }
+  }
+
+  ".amendSubcontractorEvent" - {
+
+    "must send an individual amend event with only the changed fields diffed" in {
+      val original = OriginalIndividualAnswers(
+        individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+        tradingName = None,
+        subcontractorName = Some(SubcontractorName("John", None, "Smith")),
+        addressYesNo = Some(false),
+        address = None,
+        individualContactMethodsYesNo = Some(false),
+        individualContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        utrYesNo = Some(false),
+        utr = None,
+        ninoYesNo = Some(false),
+        nino = None,
+        worksReferenceYesNo = Some(false),
+        worksReference = None,
+        verificationNumber = None
+      )
+
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
+        .set(CisIdQuery, "cis-001")
+        .success
+        .value
+        .set(AmendSubbieResourceRefQuery, 99999L)
+        .success
+        .value
+        .set(OriginalIndividualAnswersQuery, original)
+        .success
+        .value
+        .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+        .success
+        .value
+        .set(SubcontractorNamePage, SubcontractorName("Jane", None, "Smith"))
+        .success
+        .value
+        .set(SubAddressYesNoPage, false)
+        .success
+        .value
+        .set(AddIndividualContactMethodsYesNoPage, false)
+        .success
+        .value
+        .set(UniqueTaxpayerReferenceYesNoPage, false)
+        .success
+        .value
+        .set(NationalInsuranceNumberYesNoPage, false)
+        .success
+        .value
+        .set(WorksReferenceNumberYesNoPage, false)
+        .success
+        .value
+
+      service.amendSubcontractorEvent(ua)
+
+      val detail = captureDetail()
+      (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
+      (detail \ "cisId").as[String] mustBe "cis-001"
+      (detail \ "subbieResourceRef").as[Long] mustBe 99999L
+      (detail \ "originalDetails" \ "firstName").as[String] mustBe "John"
+      (detail \ "updatedDetails" \ "firstName").as[String] mustBe "Jane"
+      (detail \ "originalDetails" \ "surname").toOption mustBe None
+      (detail \ "updatedDetails" \ "surname").toOption mustBe None
+    }
+
+    "must omit subbieResourceRef from the event when AmendSubbieResourceRefQuery is not set" in {
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+        .success
+        .value
+
+      service.amendSubcontractorEvent(ua)
+
+      val detail = captureDetail()
+      (detail \ "subbieResourceRef").toOption mustBe None
+    }
+
+    "must send a company amend event for a limited company" in {
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+        .success
+        .value
+
+      service.amendSubcontractorEvent(ua)
+
+      val detail = captureDetail()
+      (detail \ "typeOfSubcontractor").as[String] mustBe "company"
+    }
+
+    "must send a partnership amend event for a partnership" in {
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        .success
+        .value
+
+      service.amendSubcontractorEvent(ua)
+
+      val detail = captureDetail()
+      (detail \ "typeOfSubcontractor").as[String] mustBe "partnership"
+    }
+
+    "must send a trust amend event for a trust" in {
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+        .success
+        .value
+
+      service.amendSubcontractorEvent(ua)
+
+      val detail = captureDetail()
+      (detail \ "typeOfSubcontractor").as[String] mustBe "trust"
     }
   }
 }

@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.agent
 
-import pages.QuestionPage
-import pages.add.IndividualJourney
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsSuccess, Json}
+import base.SpecBase
 
-case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
+class GetClientListStatusResponseSpec extends SpecBase {
 
-  override def path: JsPath = JsPath \ toString
+  "GetClientListStatusResponse" - {
 
-  override def toString: String = "subTradingNameYesNo"
+    "must read from JSON" in {
+      val json = Json.obj(
+        "result" -> "succeeded"
+      )
 
+      json.validate[GetClientListStatusResponse] mustBe
+        JsSuccess(
+          GetClientListStatusResponse(
+            ClientListStatus.Succeeded
+          )
+        )
+    }
+  }
 }

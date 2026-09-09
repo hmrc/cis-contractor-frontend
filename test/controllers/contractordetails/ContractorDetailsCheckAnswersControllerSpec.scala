@@ -17,7 +17,6 @@
 package controllers.contractordetails
 
 import base.SpecBase
-import connectors.ConstructionIndustrySchemeConnector
 import models.Scheme
 import models.requests.UpdateContractorSchemeParams
 import org.mockito.ArgumentCaptor
