@@ -23,8 +23,9 @@ import javax.inject.{Inject, Singleton}
 
 case class PaginationConfig(
   recordsPerPage: Int = 6,
-  maxVisiblePages: Int = 2,
-  ellipsisPadding: Int = 2
+  maxVisiblePages: Int = 2, // max number of pages visible either side of current page
+  ellipsisPadding: Int = 1, // number of pages shown before/after ellipsis
+  minEllipsisSpread: Int = 2 // minimum number of pages that ellipsis should replace
 )
 
 final case class CheckboxPaginationResult(
@@ -64,21 +65,29 @@ class PaginationService(val config: PaginationConfig) {
     val paginationStart = (page - windowSize).max(config.ellipsisPadding + 1)
     val paginationEnd   = (page + windowSize).min(totalPages - (config.ellipsisPadding))
 
+    val leftEllipsisSpread  = paginationStart - (config.ellipsisPadding + 1)
+    val rightEllipsisSpread = totalPages - config.ellipsisPadding - paginationEnd
+
+    val hasLeftGap  = paginationStart > config.ellipsisPadding + 1
+    val hasRightGap = paginationEnd < (totalPages - config.ellipsisPadding)
+
+    val showLeftEllipsis  = hasLeftGap && (leftEllipsisSpread >= config.minEllipsisSpread)
+    val showRightEllipsis = hasRightGap && (rightEllipsisSpread >= config.minEllipsisSpread)
+
     val pages: Seq[PaginationItemViewModel] = {
-      val firstPages    = buildPartialPageSeq(1, config.ellipsisPadding, page)
-      val lastPages     = buildPartialPageSeq(totalPages - (config.ellipsisPadding - 1), totalPages, page)
-      val middlePages   = buildPartialPageSeq(paginationStart, paginationEnd, page)
-      val leftEllipsis  =
-        if (paginationStart > config.ellipsisPadding + 1) Seq(PaginationItemViewModel.ellipsis()) else Seq()
-      val rightEllipsis =
-        if (paginationEnd < (totalPages - config.ellipsisPadding)) Seq(PaginationItemViewModel.ellipsis())
+      val firstPages  = buildPartialPageSeq(1, config.ellipsisPadding, page)
+      val lastPages   = buildPartialPageSeq(totalPages - (config.ellipsisPadding - 1), totalPages, page)
+      val middlePages = buildPartialPageSeq(paginationStart, paginationEnd, page)
+      val leftFill    =
+        if (showLeftEllipsis) Seq(PaginationItemViewModel.ellipsis())
+        else if (hasLeftGap) buildPartialPageSeq(paginationStart - 1, paginationStart - 1, page)
+        else Seq()
+      val fillRight   =
+        if (showRightEllipsis) Seq(PaginationItemViewModel.ellipsis())
+        else if (hasRightGap) buildPartialPageSeq(paginationEnd + 1, paginationEnd + 1, page)
         else Seq()
 
-      firstPages ++
-        leftEllipsis ++
-        middlePages ++
-        rightEllipsis ++
-        (if (totalPages > 1) lastPages else Seq())
+      firstPages ++ leftFill ++ middlePages ++ fillRight ++ (if (totalPages > 1) lastPages else Seq())
     }
 
     val pagination =
