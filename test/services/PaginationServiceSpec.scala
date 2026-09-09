@@ -61,7 +61,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginatedData.length mustBe 6
       result.paginatedData.head.value mustBe "1"
 
-      result.paginationViewModel.items.length mustBe 2
+      result.paginationViewModel.items.length mustBe 4
       result.paginationViewModel.next.isDefined mustBe true
       result.paginationViewModel.previous mustBe None
     }

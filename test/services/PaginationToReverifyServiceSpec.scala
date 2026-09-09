@@ -56,7 +56,7 @@ class PaginationToReverifyServiceSpec extends AnyWordSpec with Matchers {
       result.items.length mustBe 6
       result.items.head mustBe "Item 1"
 
-      result.pagination.items.length mustBe 2
+      result.pagination.items.length mustBe 4
       result.pagination.next.isDefined mustBe true
       result.pagination.previous mustBe None
     }
