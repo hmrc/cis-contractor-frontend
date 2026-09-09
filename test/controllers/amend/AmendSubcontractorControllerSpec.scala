@@ -123,12 +123,6 @@ class AmendSubcontractorControllerSpec
       Future.successful(answersWithCisId)
     )
 
-    when(
-      mockCleanupService.cleanAmend(any[UserAnswers])
-    ).thenReturn(
-      Success(answersWithCisId)
-    )
-
     applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(
         bind[SubcontractorService].toInstance(mockService),
