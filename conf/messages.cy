@@ -126,7 +126,6 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Dewiswch sut mae’r is-gontractwr yn gweithredu
 typeOfSubcontractor.change.hidden                                                   =  Math
 
-
 tradingNameOfSubcontractor.title                                                    =  Beth yw enw masnachu’r is-gontractwr?
 tradingNameOfSubcontractor.heading                                                  =  Beth yw enw masnachu’r is-gontractwr?
 tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Enw masnachu’r is-gontractwr
