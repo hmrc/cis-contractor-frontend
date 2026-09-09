@@ -1094,7 +1094,7 @@ verify.reverifyExistingSubcontractorsYesNo.change.hidden                        
 verify.verifyDepartmentalError.title                                               =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                             =  There was a problem with your verification request
 verify.verifyDepartmentalError.p1                                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
-verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help.
+verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help quoting error 7912.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Manage your subcontractors
