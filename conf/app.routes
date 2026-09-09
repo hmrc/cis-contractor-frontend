@@ -659,7 +659,10 @@ GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerifi
 
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
 
-GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
+GET   /subcontractor/verify/unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
+
+GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
+POST  /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onSubmit()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()

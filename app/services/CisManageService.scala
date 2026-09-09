@@ -18,7 +18,7 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, ClientListStatus}
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess}
 import queries.CisIdQuery
@@ -48,6 +48,10 @@ class CisManageService @Inject() (
           }
         }
     }
+
+  def startClientListRetrieval(using HeaderCarrier): Future[ClientListStatus] =
+    cisConnector.startClientList
+      .map(_.result)
 
   def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     cisConnector.hasClient(taxOfficeNumber, taxOfficeReference)
