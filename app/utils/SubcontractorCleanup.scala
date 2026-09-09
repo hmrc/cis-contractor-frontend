@@ -22,7 +22,6 @@ import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import pages.verify.*
-import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 import scala.util.Try
 
@@ -32,17 +31,16 @@ object SubcontractorCleanup {
     userAnswers
       .remove(AddressOfSubcontractorPage)
       .flatMap(_.remove(AddIndividualContactMethodsYesNoPage))
+      .flatMap(_.remove(IndividualNamesOptionsPage))
       .flatMap(_.remove(IndividualContactMethodOptionsPage))
       .flatMap(_.remove(IndividualEmailAddressPage))
       .flatMap(_.remove(IndividualMobileNumberPage))
       .flatMap(_.remove(IndividualPhoneNumberPage))
       .flatMap(_.remove(NationalInsuranceNumberYesNoPage))
       .flatMap(_.remove(SubAddressYesNoPage))
-      .flatMap(_.remove(AmendIndividualSubcontractorNameRemovedQuery))
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
       .flatMap(_.remove(SubNationalInsuranceNumberPage))
-      .flatMap(_.remove(SubTradingNameYesNoPage))
       .flatMap(_.remove(TradingNameOfSubcontractorPage))
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))

@@ -18,7 +18,6 @@ package controllers.amend
 
 import controllers.actions.*
 import controllers.routes
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -66,7 +65,7 @@ class AmendIndividualConfirmationController @Inject() (
 
               case Some(_) =>
                 val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
-                val individualName = individualDisplayName(ua)
+                val individualName = subcontractorNameExtractor.displaySubcontractorName(ua)
 
                 Future.successful(
                   Ok(
@@ -80,10 +79,4 @@ class AmendIndividualConfirmationController @Inject() (
         }
       }
     }
-
-  private def individualDisplayName(ua: models.UserAnswers): String =
-    ua.get(SubcontractorNamePage)
-      .map(n => s"${n.firstName} ${n.lastName}")
-      .orElse(ua.get(TradingNameOfSubcontractorPage))
-      .getOrElse("")
 }

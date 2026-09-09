@@ -16,6 +16,7 @@
 
 package pages.add
 
+import models.address.{Address, Country}
 import pages.behaviours.PageBehaviours
 
 class SubAddressYesNoPageSpec extends PageBehaviours {
@@ -28,13 +29,22 @@ class SubAddressYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](SubAddressYesNoPage)
 
-    "cleanup: must remove TradingNameOfSubcontractor userAnswers when No is selected" in {
-      val userAnswers = emptyUserAnswers.set(TradingNameOfSubcontractorPage, "ABC").success.value
+    "cleanup: must remove AddressOfSubcontractor userAnswers when No is selected" in {
 
-      val updatedUserAnswers = userAnswers.set(SubTradingNameYesNoPage, false).success.value
+      val testAddress = Address(
+        addressLine1 = "line 1",
+        addressLine2 = Some("line 2"),
+        addressLine3 = Some("line 3"),
+        addressLine4 = Some("line 4"),
+        postcode = Some("NX1 1AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
 
-      updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+      val userAnswers = emptyUserAnswers.set(AddressOfSubcontractorPage, testAddress).success.value
+
+      val updatedUserAnswers = userAnswers.set(SubAddressYesNoPage, false).success.value
+
+      updatedUserAnswers.get(AddressOfSubcontractorPage) mustBe None
     }
-
   }
 }

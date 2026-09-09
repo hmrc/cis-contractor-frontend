@@ -18,7 +18,7 @@ package controllers.amend
 
 import base.SpecBase
 import models.UserAnswers
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.amend.OriginalIndividualAnswers
 import pages.add.SubcontractorNamePage
 import pages.amend.AmendCheckYourAnswersSubmittedPage
@@ -43,7 +43,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
 
   private val original =
     OriginalIndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(subcontractorName),
       addressYesNo = None,

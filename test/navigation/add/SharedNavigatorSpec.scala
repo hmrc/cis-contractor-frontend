@@ -38,12 +38,12 @@ class SharedNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
-      "must go from a TypeOfSubcontractorPage to SubTradingNameYesNo when Individualorsoletrader is selected" in {
+      "must go from a TypeOfSubcontractorPage to IndividualNamesOptionsPage when Individualorsoletrader is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-        ) mustBe controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to CompanyNameController when Limitedcompany is selected" in {

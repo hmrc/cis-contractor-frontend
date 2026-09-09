@@ -16,13 +16,12 @@
 
 package models.amend
 
-import models.add.SubcontractorName
+import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
 import models.address.Address
-import models.add.IndividualContactMethodOptions
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalIndividualAnswers(
-  usesTradingName: Option[Boolean],
+  individualNamesOptions: Set[IndividualNamesOptions],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
   addressYesNo: Option[Boolean],
