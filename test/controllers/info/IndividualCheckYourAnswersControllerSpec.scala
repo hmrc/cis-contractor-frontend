@@ -324,7 +324,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -384,7 +384,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -448,7 +448,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -506,7 +506,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
