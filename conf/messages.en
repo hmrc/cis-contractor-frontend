@@ -193,8 +193,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  National Insurance number
 subNationalInsuranceNumber.error.required                                           =  Enter a National Insurance number
-subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  National Insurance number
 
 worksReferenceNumber.title                                                          =  What is the works reference number associated with this subcontractor?
@@ -592,8 +592,8 @@ partnershipNominatedPartnerNino.title                              =  What is th
 partnershipNominatedPartnerNino.heading                            =  What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint                               =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  National Insurance number for nominated partner
 partnershipNominatedPartnerNino.change.hidden                      =  National Insurance number for nominated partner
 
@@ -1040,34 +1040,25 @@ verify.reviewInsufficientInfo.action.edit                                       
 verify.reviewInsufficientInfo.action.proceed                                       =  Proceed
 verify.reviewInsufficientInfo.action.remove                                        =  Remove
 
-verify.reviewUnmatched.title                                            =  Review unmatched subcontractors
-verify.reviewUnmatched.heading                                          =  Review unmatched subcontractors
-verify.reviewUnmatched.p1                                               =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
-verify.reviewUnmatched.p2                                               =  To fix this, you can:
-verify.reviewUnmatched.bullet1                                          =  edit their information and correct any of their details before trying to verify them again
-verify.reviewUnmatched.bullet2                                          =  proceed with verifying them again without making any changes
-verify.reviewUnmatched.bullet3                                          =  remove the subcontractor from this verification request
-verify.reviewUnmatched.whatYouNeed.link                                 =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
-verify.reviewUnmatched.unmatched.subheading                             =  Unmatched subcontractors
-verify.reviewUnmatched.ready.subheading                                 =  Ready for verification
-verify.reviewUnmatched.name                                             =  Name
-verify.reviewUnmatched.utr                                              =  UTR
-verify.reviewUnmatched.noneProvided                                     =  None provided
-verify.reviewUnmatched.actions                                          =  Actions
-verify.reviewUnmatched.action.edit                                      =  Edit
-verify.reviewUnmatched.action.proceed                                   =  Proceed
-verify.reviewUnmatched.action.remove                                    =  Remove
-verify.reviewUnmatched.backToResults.prefix                             =  Back to
-verify.reviewUnmatched.backToResults.link                               =  Verification results
-
-verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
-verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
-verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
-verify.selectSubcontractor.checkYourAnswersLabel                        =  Subcontractors to verify
-verify.selectSubcontractor.showingResults                               =  Showing {0} to {1} of {2} results
-verify.selectSubcontractor.error.required                               =  Select at least one subcontractor to verify
-verify.selectSubcontractor.change.hidden                                =  subcontractors to verify
-verify.selectSubcontractor.display.noneSelected                         =  None selected
+verify.reviewUnmatched.title                                                       =  Review unmatched subcontractors
+verify.reviewUnmatched.heading                                                     =  Review unmatched subcontractors
+verify.reviewUnmatched.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
+verify.reviewUnmatched.p2                                                          =  To fix this, you can:
+verify.reviewUnmatched.bullet1                                                     =  edit their information and correct any of their details before trying to verify them again
+verify.reviewUnmatched.bullet2                                                     =  proceed with verifying them again without making any changes
+verify.reviewUnmatched.bullet3                                                     =  remove the subcontractor from this verification request
+verify.reviewUnmatched.whatYouNeed.link                                            =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
+verify.reviewUnmatched.unmatched.subheading                                        =  Unmatched subcontractors
+verify.reviewUnmatched.ready.subheading                                            =  Ready for verification
+verify.reviewUnmatched.name                                                        =  Name
+verify.reviewUnmatched.utr                                                         =  UTR
+verify.reviewUnmatched.noneProvided                                                =  None provided
+verify.reviewUnmatched.actions                                                     =  Actions
+verify.reviewUnmatched.action.edit                                                 =  Edit
+verify.reviewUnmatched.action.proceed                                              =  Proceed
+verify.reviewUnmatched.action.remove                                               =  Remove
+verify.reviewUnmatched.backToResults.prefix                                        =  Back to
+verify.reviewUnmatched.backToResults.link                                          =  Verification results
 
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                                 =  Which subcontractors do you want to verify?
