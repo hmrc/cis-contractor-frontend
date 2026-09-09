@@ -480,4 +480,13 @@ class VerificationService @Inject() (
             verification.subcontractorId.isDefined =>
         verification.subcontractorId.get
     }.distinct
+
+  def refreshVerificationBatches(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield afterNewest
 }

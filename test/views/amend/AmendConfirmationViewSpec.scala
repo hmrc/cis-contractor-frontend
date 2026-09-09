@@ -29,10 +29,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import viewmodels.amend.AmendConfirmationLink
 import views.html.amend.AmendConfirmationView
 
-class AmendConfirmationViewSpec
-  extends AnyWordSpec
-    with Matchers
-    with GuiceOneAppPerSuite {
+class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AmendConfirmationView" should {
 

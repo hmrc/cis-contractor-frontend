@@ -36,6 +36,7 @@ import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 import config.FrontendAppConfig
+import services.VerificationService
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -101,16 +102,23 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
   private val mockSessionRepository =
     mock[SessionRepository]
 
+  private val mockVerificationService =
+    mock[VerificationService]
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository)
+    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[DefaultSubcontractorCleanupService]
+          .toInstance(mockCleanupService),
+        bind[SessionRepository]
+          .toInstance(mockSessionRepository),
+        bind[VerificationService]
+          .toInstance(mockVerificationService)
       )
       .build()
 
@@ -263,20 +271,24 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       val userAnswers =
         emptyUserAnswers
           .set(OriginalIndividualAnswersQuery, original)
-          .success.value
+          .success
+          .value
           .set(CisIdQuery, cisId)
-          .success.value
+          .success
+          .value
           .set(SubcontractorNamePage, subcontractorName)
-          .success.value
+          .success
+          .value
           .set(AmendCheckYourAnswersSubmittedPage, true)
-          .success.value
+          .success
+          .value
 
       val app = application(userAnswers)
 
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
@@ -288,13 +300,42 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       }
     }
 
-    "must render the insufficient info confirmation link" in {
+    "must not refresh verification batches for standard amend journey" in {
 
       when(mockCleanupService.cleanAmend(any[UserAnswers]))
         .thenReturn(Success(userAnswersWithOriginal))
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request =
+          FakeRequest(GET, confirmationRoute)
+
+        val result =
+          route(app, request).value
+
+        status(result) mustBe OK
+
+        verifyNoInteractions(mockVerificationService)
+      }
+    }
+
+    "must refresh verification batches and render the insufficient info confirmation link" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(
+        mockVerificationService.refreshVerificationBatches(
+          any[UserAnswers]
+        )(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
 
       val userAnswers =
         userAnswersWithOriginal
@@ -310,14 +351,16 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
       running(app) {
 
-        val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val request =
+          FakeRequest(GET, confirmationRoute)
+
+        val result =
+          route(app, request).value
 
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes
-            .ReviewInsufficientInfoSubcontractorsController
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
             .onPageLoad()
             .url
         )
@@ -326,6 +369,54 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           messages(app)(
             "amendConfirmation.beforeYouGo.h2"
           )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(
+            any[UserAnswers]
+          )(any())
+
+        verify(mockCleanupService)
+          .cleanAmend(any[UserAnswers])
+      }
+    }
+
+    "must refresh verification batches for unmatched journey" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(
+        mockVerificationService.refreshVerificationBatches(
+          any[UserAnswers]
+        )(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val app =
+        application(userAnswers)
+
+      running(app) {
+
+        val request =
+          FakeRequest(GET, confirmationRoute)
+
+        val result =
+          route(app, request).value
+
+        status(result) mustBe OK
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
       }
     }
   }

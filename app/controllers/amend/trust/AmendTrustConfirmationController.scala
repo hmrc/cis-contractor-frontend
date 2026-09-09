@@ -29,6 +29,7 @@ import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.AmendConfirmationLinks
@@ -46,6 +47,7 @@ class AmendTrustConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
+  verificationService: VerificationService,
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
   appConfig: FrontendAppConfig
@@ -95,20 +97,45 @@ class AmendTrustConfirmationController @Inject() (
 
                     cleanupService.cleanAmend(ua) match {
 
-                      case Success(cleanedUa) =>
-                        sessionRepository.set(cleanedUa).map { _ =>
-                          Ok(
-                            view(
-                              tableRows,
-                              trustName,
-                              confirmationLink
+                      case Success(cleanedUserAnswers) =>
+                        val persistFinalUserAnswers =
+                          journeyType match {
+
+                            case AmendJourneyType.Standard =>
+                              sessionRepository
+                                .set(cleanedUserAnswers)
+                                .map(_ => cleanedUserAnswers)
+
+                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                              verificationService.refreshVerificationBatches(
+                                cleanedUserAnswers
+                              )
+                          }
+
+                        persistFinalUserAnswers
+                          .map { _ =>
+                            Ok(
+                              view(
+                                tableRows,
+                                trustName,
+                                confirmationLink
+                              )
                             )
-                          )
-                        }
+                          }
+                          .recover { case exception =>
+                            logger.error(
+                              "[AmendTrustConfirmationController.onPageLoad] " +
+                                "Failed to persist confirmation session data",
+                              exception
+                            )
+
+                            recoveryRedirect
+                          }
 
                       case Failure(exception) =>
                         logger.warn(
-                          "[AmendTrustConfirmationController] Failed to clean user answers",
+                          "[AmendTrustConfirmationController.onPageLoad] " +
+                            "Failed to clean user answers",
                           exception
                         )
 

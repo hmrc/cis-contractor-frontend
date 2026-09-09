@@ -28,10 +28,10 @@ case class AmendConfirmationLink(
 object AmendConfirmationLinks {
 
   def build(
-             journeyType: AmendJourneyType,
-             cisId: String,
-             appConfig: FrontendAppConfig
-           ): AmendConfirmationLink =
+    journeyType: AmendJourneyType,
+    cisId: String,
+    appConfig: FrontendAppConfig
+  ): AmendConfirmationLink =
     journeyType match {
 
       case AmendJourneyType.Standard =>
@@ -43,25 +43,19 @@ object AmendConfirmationLinks {
 
       case AmendJourneyType.InsufficientInfo =>
         AmendConfirmationLink(
-          url =
-            controllers.verify.routes
-              .ReviewInsufficientInfoSubcontractorsController
-              .onPageLoad()
-              .url,
-          textKey =
-            "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+          url = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url,
+          textKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
           showBeforeYouGo = false
         )
 
       case AmendJourneyType.UnmatchedInfo =>
         AmendConfirmationLink(
-          url =
-            controllers.verify.routes
-              .ReviewUnmatchedSubcontractorsRoutingController
-              .onPageLoad()
-              .url,
-          textKey =
-            "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
+          url = controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url,
+          textKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
           showBeforeYouGo = false
         )
     }
