@@ -711,5 +711,176 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
             .url
       }
     }
+
+    "validate actions on multiple tabs" - {
+
+      "must redirect to recovery page without invoking delete when user selects YES from the second tab" in {
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val mockSubcontractorNameExtractor =
+          mock[SubcontractorNameExtractor]
+
+        val mockVerificationService =
+          mock[VerificationService]
+
+        when(
+          mockSubcontractorNameExtractor.getSubcontractorName(any())
+        ).thenReturn(Some(subcontractorName))
+
+        when(
+          mockSessionRepository.set(any())
+        ).thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(
+              emptyUserAnswers
+                .set(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef), true)
+                .success
+                .value
+            )
+          )
+            .overrides(
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository),
+              bind[VerificationService]
+                .toInstance(mockVerificationService),
+              bind[SubcontractorNameExtractor]
+                .toInstance(mockSubcontractorNameExtractor)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              POST,
+              controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+                .onSubmit(verificationResourceRef)
+                .url
+            )
+              .withFormUrlEncodedBody(
+                "value" -> "true"
+              )
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        }
+      }
+
+      "must redirect to review page post deleting when user selects No from the first tab and Yes in second tab" in {
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val mockSubcontractorNameExtractor =
+          mock[SubcontractorNameExtractor]
+
+        val mockVerificationService =
+          mock[VerificationService]
+
+        val mockCheckVerificationBatchReadinessController =
+          mock[CheckVerificationBatchReadinessController]
+
+        when(
+          mockSubcontractorNameExtractor.getSubcontractorName(any())
+        ).thenReturn(Some(subcontractorName))
+
+        when(
+          mockSessionRepository.set(any())
+        ).thenReturn(Future.successful(true))
+
+        when(
+          mockSessionRepository.get(eqTo(userAnswersId))
+        ).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+        when(
+          mockVerificationService.deleteVerification(
+            any[UserAnswers],
+            eqTo(verificationResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(DeleteVerificationResponse(Some(1L)))
+        )
+
+        when(
+          mockCheckVerificationBatchReadinessController.updateVerificationBatchReadiness(any[UserAnswers])
+        ).thenReturn(Future.successful(Some(emptyUserAnswers)))
+
+        when(
+          mockVerificationService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+        ).thenReturn(Future.successful(emptyUserAnswers))
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(
+              emptyUserAnswers
+                .set(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef), false)
+                .success
+                .value
+            )
+          )
+            .overrides(
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository),
+              bind[VerificationService]
+                .toInstance(mockVerificationService),
+              bind[CheckVerificationBatchReadinessController]
+                .toInstance(mockCheckVerificationBatchReadinessController),
+              bind[SubcontractorNameExtractor]
+                .toInstance(mockSubcontractorNameExtractor)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              POST,
+              controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+                .onSubmit(verificationResourceRef)
+                .url
+            )
+              .withFormUrlEncodedBody(
+                "value" -> "true"
+              )
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+
+          verify(mockVerificationService)
+            .deleteVerification(any[UserAnswers], eqTo(verificationResourceRef))(any[HeaderCarrier])
+
+          verify(mockCheckVerificationBatchReadinessController)
+            .updateVerificationBatchReadiness(any[UserAnswers])
+
+          verify(mockVerificationService)
+            .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+
+          val savedAnswersCaptor =
+            ArgumentCaptor.forClass(classOf[UserAnswers])
+
+          verify(mockSessionRepository)
+            .set(savedAnswersCaptor.capture())
+
+          savedAnswersCaptor.getValue
+            .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)) mustBe None
+        }
+      }
+
+    }
   }
 }
