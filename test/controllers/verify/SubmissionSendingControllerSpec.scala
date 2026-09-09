@@ -30,6 +30,7 @@ import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -353,13 +354,16 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to submitted page when poll returns SUBMITTED" in {
+    "must reset user answers and redirect to submitted page when poll returns SUBMITTED" in {
       val mockService = mock[VerificationService]
 
       mockPollResponse(
         mockService,
         pollResponse(SubmissionStatus.SUBMITTED)
       )
+
+      when(mockService.resetUserAnswers(any[UserAnswers]))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationWith(
@@ -377,6 +381,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           controllers.verify.routes.VerificationRequestSubmittedController
             .onPageLoad()
             .url
+        verify(mockService).resetUserAnswers(any[UserAnswers])
       }
     }
 
