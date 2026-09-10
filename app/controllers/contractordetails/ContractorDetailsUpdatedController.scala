@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import pages.CisIdPage
 import pages.contractordetails.ContractorSchemePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -29,7 +30,6 @@ import views.html.contractordetails.ContractorDetailsUpdatedView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class ContractorDetailsUpdatedController @Inject() (
                                                      override val messagesApi: MessagesApi,
@@ -44,7 +44,8 @@ class ContractorDetailsUpdatedController @Inject() (
                                                      appConfig: FrontendAppConfig,
                                                      ec: ExecutionContext
                                                    ) extends FrontendBaseController
-  with I18nSupport {
+  with I18nSupport
+  with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
@@ -66,19 +67,27 @@ class ContractorDetailsUpdatedController @Inject() (
           contractorDetailsService
             .getScheme(cisId)
             .flatMap { latestScheme =>
-              request.userAnswers
-                .set(ContractorSchemePage, latestScheme) match {
+              Future.fromTry(
+                request.userAnswers.set(
+                  ContractorSchemePage,
+                  latestScheme
+                )
+              )
+            }
+            .flatMap { updatedAnswers =>
+              sessionRepository
+                .set(updatedAnswers)
+                .map { _ =>
+                  Ok(view(cisAccountUrl))
+                }
+            }
+            .recover { case error =>
+              logger.error(
+                "[ContractorDetailsUpdatedController] Failed to refresh contractor details",
+                error
+              )
 
-                case Failure(error) =>
-                  Future.failed(error)
-
-                case Success(updatedAnswers) =>
-                  sessionRepository
-                    .set(updatedAnswers)
-                    .map { _ =>
-                      Ok(view(cisAccountUrl))
-                    }
-              }
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
       }
     }
