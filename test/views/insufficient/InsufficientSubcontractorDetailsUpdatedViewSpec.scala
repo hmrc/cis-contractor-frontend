@@ -289,7 +289,7 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
           msgs(
             "insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey"
           )
-      )
+        )
 
       surveyLink.attr("href") mustEqual appConfig.cisFeedbackSurveyUrl
 

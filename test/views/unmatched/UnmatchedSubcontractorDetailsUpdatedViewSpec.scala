@@ -280,7 +280,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
         linkWithText(
           document,
           msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
-      )
+        )
 
       surveyLink.attr("href") mustEqual appConfig.cisFeedbackSurveyUrl
 
