@@ -36,7 +36,7 @@ import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.AmendmentHelper
+import utils.{AmendmentHelper, DefaultSubcontractorCleanupService}
 import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
@@ -52,6 +52,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   cisIdRequiredAction: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  cleanupService: DefaultSubcontractorCleanupService,
   subcontractorService: SubcontractorService,
   auditService: AuditService,
   sessionRepository: SessionRepository,
@@ -275,30 +276,30 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
             )
           }
       }
-
+      
   private def handleNoChanges()(implicit
-    request: CisIdDataRequest[AnyContent]
+                                request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =
       noChangesRedirect(
-        userAnswers = request.userAnswers,
-        cisId = request.cisId
+        request.userAnswers,
+        request.cisId
       )
 
-    sessionRepository
-      .set(
-        UserAnswers(request.userAnswers.id)
+    Future
+      .fromTry(
+        cleanupService.cleanAmend(request.userAnswers)
       )
+      .flatMap(sessionRepository.set)
       .map { _ =>
         Redirect(redirectCall)
       }
-      .recover { case throwable =>
+      .recover { case t =>
         logger.error(
           s"[AmendPartnershipCheckYourAnswersController.onSubmit] " +
-            s"Failed to clear user answers for session " +
-            s"${request.userAnswers.id}",
-          throwable
+            s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+          t
         )
 
         Redirect(

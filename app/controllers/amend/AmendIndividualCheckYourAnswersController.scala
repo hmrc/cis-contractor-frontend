@@ -33,7 +33,7 @@ import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Key, Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{AmendmentHelper, SubcontractorNameExtractor}
+import utils.{AmendmentHelper, DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import viewmodels.checkAnswers.add.*
 import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
@@ -47,6 +47,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
+  cleanupService: DefaultSubcontractorCleanupService,
   auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
@@ -267,19 +268,17 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
 
   private def handleNoChanges()(implicit
-    request: CisIdDataRequest[AnyContent]
+                                request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =
       request.userAnswers.get(AmendJourneyTypePage) match {
 
         case Some(AmendJourneyType.InsufficientInfo) =>
-          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-            .onPageLoad()
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
 
         case Some(AmendJourneyType.UnmatchedInfo) =>
-          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
-            .onPageLoad()
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
         case Some(AmendJourneyType.Standard) =>
           Call(
@@ -295,12 +294,15 @@ class AmendIndividualCheckYourAnswersController @Inject() (
           controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
+    Future
+      .fromTry(
+        cleanupService.cleanAmend(request.userAnswers)
+      )
+      .flatMap(sessionRepository.set)
       .map(_ => Redirect(redirectCall))
       .recover { case t =>
         logger.error(
-          s"[AmendIndividualCheckYourAnswersController.onSubmit] Failed to clear user answers for session ${request.userAnswers.id}",
+          s"[AmendIndividualCheckYourAnswersController.handleNoChanges] Failed to clean amend data for session ${request.userAnswers.id}",
           t
         )
 
