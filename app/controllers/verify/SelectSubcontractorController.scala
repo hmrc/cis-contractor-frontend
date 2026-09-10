@@ -162,7 +162,8 @@ class SelectSubcontractorController @Inject() (
               result.paginationViewModel,
               page,
               result.startIndex,
-              result.totalCount
+              result.totalCount,
+              result.totalPages
             )
           )
         }
@@ -297,7 +298,8 @@ class SelectSubcontractorController @Inject() (
         result.paginationViewModel,
         page,
         result.startIndex,
-        result.totalCount
+        result.totalCount,
+        result.totalPages
       )
     )
 
