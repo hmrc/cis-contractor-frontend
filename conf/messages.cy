@@ -66,6 +66,7 @@ checkYourAnswers.addSubcontractor                       =  Derbyn a chyflwyno
 site.pagination.previous                                =  Blaenorol
 site.pagination.next                                    =  Nesaf
 site.pagination.landmark                                =  Rhifo tudalennau
+site.pagination.pageTitle                               =  xxxxxxxxxxxxxxxxxxxx
 
 # Errors & Auth
 pageNotFound.title                       =  xxxxxxxxxxxxxxxxxxxx

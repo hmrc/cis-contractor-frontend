@@ -30,7 +30,8 @@ final case class CheckboxPaginationResult(
   paginatedData: Seq[CheckboxItem],
   paginationViewModel: PaginationViewModel,
   startIndex: Int,
-  totalCount: Int
+  totalCount: Int,
+  totalPages: Int
 )
 
 @Singleton
@@ -71,6 +72,6 @@ class PaginationService(val config: PaginationConfig) {
               else None
           )
 
-    CheckboxPaginationResult(pageItems, pagination, start + 1, allItems.size)
+    CheckboxPaginationResult(pageItems, pagination, start + 1, allItems.size, totalPages)
   }
 }
