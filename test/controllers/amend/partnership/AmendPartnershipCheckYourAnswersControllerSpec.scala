@@ -533,8 +533,14 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
       verify(mockSessionRepository).set(captor.capture())
 
-      captor.getValue.id mustBe ua.id
-      captor.getValue.get(CisIdQuery) mustBe None
+      val updatedUa = captor.getValue
+
+      updatedUa.id mustBe ua.id
+
+      updatedUa.get(CisIdQuery) mustBe Some(cisId)
+
+      updatedUa.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+      updatedUa.get(OriginalPartnershipAnswersQuery) mustBe None
     }
 
     "must clear answers and redirect to ReviewInsufficientInfoSubcontractorsController when no changes have been made in an insufficient information journey" in {

@@ -36,7 +36,7 @@ import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Text, Value}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.AmendmentHelper
+import utils.{AmendmentHelper, DefaultSubcontractorCleanupService}
 import viewmodels.checkAnswers.add.*
 import viewmodels.checkAnswers.add.trust.*
 import viewmodels.govuk.summarylist.*
@@ -51,6 +51,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   cisIdRequiredAction: CisIdRequiredAction,
+  cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   auditService: AuditService,
@@ -249,7 +250,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       }
 
   private def handleNoChanges()(implicit
-    request: CisIdDataRequest[AnyContent]
+                                request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =
@@ -258,15 +259,18 @@ class AmendTrustCheckYourAnswersController @Inject() (
         request.cisId
       )
 
-    sessionRepository
-      .set(UserAnswers(request.userAnswers.id))
+    Future
+      .fromTry(
+        cleanupService.cleanAmend(request.userAnswers)
+      )
+      .flatMap(sessionRepository.set)
       .map { _ =>
         Redirect(redirectCall)
       }
       .recover { case t =>
         logger.error(
           s"[AmendTrustCheckYourAnswersController.onSubmit] " +
-            s"Failed to clear user answers for session ${request.userAnswers.id}",
+            s"Failed to clean amend user answers for session ${request.userAnswers.id}",
           t
         )
 
