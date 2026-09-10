@@ -105,7 +105,14 @@ class AmendSubcontractorControllerSpec
   private def applicationWith(
     mockService: SubcontractorService,
     mockSessionRepository: SessionRepository,
-    mockCleanupService: DefaultSubcontractorCleanupService = mock[DefaultSubcontractorCleanupService]
+    mockCleanupService: DefaultSubcontractorCleanupService = {
+      val cleanupService = mock[DefaultSubcontractorCleanupService]
+
+      when(cleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(emptyUserAnswers))
+
+      cleanupService
+    }
   ): GuiceApplicationBuilder = {
 
     val mockCisManagerService = mock[CisManageService]
@@ -324,10 +331,16 @@ class AmendSubcontractorControllerSpec
         }
       }
 
-      "must clean existing amend answers before populating the selected subcontractor" in {
+      "must clean existing amend answers before populating and saving the selected subcontractor" in {
         val mockService           = mock[SubcontractorService]
         val mockSessionRepository = mock[SessionRepository]
         val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
+
+        val cleanedAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .success
+            .value
 
         when(
           mockService.getSubcontractor(
@@ -339,7 +352,7 @@ class AmendSubcontractorControllerSpec
         )
 
         when(mockCleanupService.cleanAmend(any[UserAnswers]))
-          .thenReturn(Success(emptyUserAnswers))
+          .thenReturn(Success(cleanedAnswers))
 
         when(mockSessionRepository.set(any[UserAnswers]))
           .thenReturn(Future.successful(true))
@@ -368,7 +381,18 @@ class AmendSubcontractorControllerSpec
           verify(mockCleanupService, times(1))
             .cleanAmend(any[UserAnswers])
 
-          verify(mockSessionRepository, atLeastOnce())
+          val orderedInteractions =
+            org.mockito.Mockito.inOrder(
+              mockCleanupService,
+              mockSessionRepository
+            )
+
+          orderedInteractions
+            .verify(mockCleanupService)
+            .cleanAmend(any[UserAnswers])
+
+          orderedInteractions
+            .verify(mockSessionRepository)
             .set(any[UserAnswers])
         }
       }
@@ -418,64 +442,6 @@ class AmendSubcontractorControllerSpec
 
           verify(mockCleanupService, times(1))
             .cleanAmend(any[UserAnswers])
-        }
-      }
-
-      "must clean amend answers before saving the new subcontractor answers" in {
-        val mockService           = mock[SubcontractorService]
-        val mockSessionRepository = mock[SessionRepository]
-        val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
-
-        val cleanedAnswers =
-          emptyUserAnswers
-            .set(CisIdQuery, cisId)
-            .success
-            .value
-
-        when(
-          mockService.getSubcontractor(
-            eqTo(cisId),
-            eqTo(subbieResourceRef)
-          )(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(responseWith(Some(baseSubcontractor)))
-        )
-
-        when(mockCleanupService.cleanAmend(any[UserAnswers]))
-          .thenReturn(Success(cleanedAnswers))
-
-        when(mockSessionRepository.set(any[UserAnswers]))
-          .thenReturn(Future.successful(true))
-
-        val application =
-          applicationWith(
-            mockService,
-            mockSessionRepository,
-            mockCleanupService
-          ).build()
-
-        running(application) {
-          val result =
-            route(
-              application,
-              FakeRequest(GET, amendSubcontractorRoute)
-            ).value
-
-          status(result) mustBe SEE_OTHER
-
-          val orderedInteractions =
-            org.mockito.Mockito.inOrder(
-              mockCleanupService,
-              mockSessionRepository
-            )
-
-          orderedInteractions
-            .verify(mockCleanupService)
-            .cleanAmend(any[UserAnswers])
-
-          orderedInteractions
-            .verify(mockSessionRepository)
-            .set(any[UserAnswers])
         }
       }
 
