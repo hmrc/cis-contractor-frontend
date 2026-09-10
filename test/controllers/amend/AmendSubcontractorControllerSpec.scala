@@ -22,6 +22,7 @@ import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partn
 import models.UserAnswers
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import org.mockito.ArgumentCaptor
+import utils.DefaultSubcontractorCleanupService
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atLeastOnce, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,6 +39,7 @@ import queries.CisIdQuery
 
 import scala.jdk.CollectionConverters.*
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class AmendSubcontractorControllerSpec
     extends SpecBase
@@ -102,7 +104,15 @@ class AmendSubcontractorControllerSpec
 
   private def applicationWith(
     mockService: SubcontractorService,
-    mockSessionRepository: SessionRepository
+    mockSessionRepository: SessionRepository,
+    mockCleanupService: DefaultSubcontractorCleanupService = {
+      val cleanupService = mock[DefaultSubcontractorCleanupService]
+
+      when(cleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(emptyUserAnswers))
+
+      cleanupService
+    }
   ): GuiceApplicationBuilder = {
 
     val mockCisManagerService = mock[CisManageService]
@@ -113,14 +123,19 @@ class AmendSubcontractorControllerSpec
         .success
         .value
 
-    when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(answersWithCisId))
+    when(
+      mockCisManagerService
+        .ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+    ).thenReturn(
+      Future.successful(answersWithCisId)
+    )
 
     applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(
         bind[SubcontractorService].toInstance(mockService),
         bind[CisManageService].toInstance(mockCisManagerService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService)
       )
   }
 
@@ -313,6 +328,120 @@ class AmendSubcontractorControllerSpec
           captor.getValue
             .get(TypeOfSubcontractorPage)
             .value mustBe Trust
+        }
+      }
+
+      "must clean existing amend answers before populating and saving the selected subcontractor" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
+
+        val cleanedAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(responseWith(Some(baseSubcontractor)))
+        )
+
+        when(mockCleanupService.cleanAmend(any[UserAnswers]))
+          .thenReturn(Success(cleanedAnswers))
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationWith(
+            mockService,
+            mockSessionRepository,
+            mockCleanupService
+          ).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onPageLoad(subbieResourceRef)
+              .url
+
+          verify(mockCleanupService, times(1))
+            .cleanAmend(any[UserAnswers])
+
+          val orderedInteractions =
+            org.mockito.Mockito.inOrder(
+              mockCleanupService,
+              mockSessionRepository
+            )
+
+          orderedInteractions
+            .verify(mockCleanupService)
+            .cleanAmend(any[UserAnswers])
+
+          orderedInteractions
+            .verify(mockSessionRepository)
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery when amend cleanup fails" in {
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+        val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
+
+        when(
+          mockService.getSubcontractor(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(responseWith(Some(baseSubcontractor)))
+        )
+
+        when(mockCleanupService.cleanAmend(any[UserAnswers]))
+          .thenReturn(
+            Failure(new RuntimeException("cleanup failed"))
+          )
+
+        when(mockSessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationWith(
+            mockService,
+            mockSessionRepository,
+            mockCleanupService
+          ).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, amendSubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockCleanupService, times(1))
+            .cleanAmend(any[UserAnswers])
         }
       }
 

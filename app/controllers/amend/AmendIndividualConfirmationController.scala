@@ -21,18 +21,15 @@ import controllers.routes
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import viewmodels.amend.IndividualAmendedViewModel
+import utils.SubcontractorNameExtractor
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
 class AmendIndividualConfirmationController @Inject() (
   identify: IdentifierAction,
@@ -40,11 +37,8 @@ class AmendIndividualConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
-  cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository,
   subcontractorNameExtractor: SubcontractorNameExtractor
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -71,29 +65,18 @@ class AmendIndividualConfirmationController @Inject() (
                 logger.error("[AmendIndividualConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
 
-              case Some(cisId) =>
+              case Some(_) =>
                 val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
                 val individualName = subcontractorNameExtractor.displaySubcontractorName(ua)
 
-                cleanupService.cleanAmend(ua) match {
-
-                  case Success(cleanedUa) =>
-                    sessionRepository.set(cleanedUa).map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          individualName
-                        )
-                      )
-                    }
-
-                  case Failure(exception) =>
-                    logger.warn(
-                      "[AmendIndividualConfirmationController] Failed to clean user answers",
-                      exception
+                Future.successful(
+                  Ok(
+                    view(
+                      tableRows,
+                      individualName
                     )
-                    Future.successful(recoveryRedirect)
-                }
+                  )
+                )
             }
         }
       }

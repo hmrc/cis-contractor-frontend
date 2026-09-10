@@ -20,25 +20,15 @@ import base.SpecBase
 import models.UserAnswers
 import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.amend.OriginalIndividualAnswers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
 import pages.add.SubcontractorNamePage
 import pages.amend.AmendCheckYourAnswersSubmittedPage
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
-import repositories.SessionRepository
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
-
-class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class AmendIndividualConfirmationControllerSpec extends SpecBase {
 
   private val cisId = "123456789"
 
@@ -72,7 +62,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       verificationNumber = None
     )
 
-  private def userAnswersWithOriginal =
+  private def userAnswersWithOriginal: UserAnswers =
     emptyUserAnswers
       .set(OriginalIndividualAnswersQuery, original)
       .success
@@ -88,38 +78,17 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad().url
-
-  private val mockCleanupService =
-    mock[DefaultSubcontractorCleanupService]
-
-  private val mockSessionRepository =
-    mock[SessionRepository]
-
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository)
-  }
-
-  private def application(userAnswers: UserAnswers) =
-    applicationBuilder(userAnswers = Some(userAnswers))
-      .overrides(
-        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
-      )
-      .build()
+    controllers.amend.routes.AmendIndividualConfirmationController
+      .onPageLoad()
+      .url
 
   "AmendIndividualConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
-
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
-      val app = application(userAnswersWithOriginal)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswersWithOriginal)
+      ).build()
 
       running(app) {
 
@@ -138,9 +107,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
             )(messages(app)),
             displayName
           )(request, messages(app)).toString
-
-        verify(mockCleanupService).cleanAmend(any())
-        verify(mockSessionRepository).set(any())
       }
     }
 
@@ -154,8 +120,13 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -179,8 +150,13 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -208,7 +184,9 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .success
           .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -219,29 +197,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when cleanup fails" in {
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Failure(new RuntimeException("cleanup failed")))
-
-      val app = application(userAnswersWithOriginal)
-
-      running(app) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockSessionRepository, never()).set(any())
       }
     }
   }
