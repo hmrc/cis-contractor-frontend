@@ -37,6 +37,10 @@ class UnauthorisedIndividualViewSpec extends SpecBase with Matchers {
       doc.title             must include(messages("unauthorised.individual.title"))
       doc.select("h1").text must include(messages("unauthorised.individual.heading"))
       doc.select("p").text  must include(messages("unauthorised.individual.p1"))
+      doc.select("p").text  must include(messages("unauthorised.individual.p2"))
+      doc.getElementsByClass("govuk-link").text must include(
+        messages("unauthorised.individual.link")
+      )
     }
   }
 

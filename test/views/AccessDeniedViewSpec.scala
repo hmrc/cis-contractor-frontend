@@ -19,33 +19,30 @@ package views
 import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.UnauthorisedAgentView
+import views.html.AccessDeniedView
 
-class UnauthorisedAgentViewSpec extends SpecBase with Matchers {
+class AccessDeniedViewSpec extends SpecBase {
 
-  "UnauthorisedAgentViewSpec" - {
+  "AccessDeniedView" - {
 
-    "must render the page with the correct heading and paragraph" in new Setup {
-      val html: HtmlFormat.Appendable = view()
-      val doc: Document               = Jsoup.parse(html.body)
+    "must render the page with the correct title, heading and link" in new Setup {
+      private val html: HtmlFormat.Appendable = view()
+      private val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title             must include(messages("unauthorised.agent.title"))
-      doc.select("h1").text must include(messages("unauthorised.agent.heading"))
-      doc.select("p").text must include(messages("unauthorised.agent.p1"))
-      doc.select("p").text must include(messages("unauthorised.agent.p2.prefix"))
-      doc.select("p").text must include(messages("unauthorised.agent.p2.link"))
-      doc.select("p").text must include(messages("unauthorised.agent.p2.suffix"))
+      doc.title                                 must include(messages("accessDenied.title"))
+      doc.select("h1").text                     must include(messages("accessDenied.heading"))
+      doc.select("p").text                      must include(messages("accessDenied.paragraph"))
+      doc.getElementsByClass("govuk-link").text must include(messages("accessDenied.link"))
     }
   }
 
   trait Setup {
-    val app: Application                          = applicationBuilder().build()
-    val view: UnauthorisedAgentView               = app.injector.instanceOf[UnauthorisedAgentView]
+    private val app: Application                  = applicationBuilder().build()
+    val view: AccessDeniedView                    = app.injector.instanceOf[AccessDeniedView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
