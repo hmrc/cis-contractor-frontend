@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.requests
 
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.{Json, OFormat}
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+case class DeleteVerificationRequest(
+  instanceId: String,
+  verificationResourceRef: Long
+)
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
-  }
+object DeleteVerificationRequest {
+  given OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]
 }

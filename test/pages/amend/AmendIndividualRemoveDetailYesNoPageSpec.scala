@@ -16,13 +16,12 @@
 
 package pages.amend
 
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.AmendIndividualRemoveDetail
 import models.contact.ContactMethodOptions
 import pages.add.*
 import pages.behaviours.PageBehaviours
-import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
 
@@ -147,14 +146,11 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(AddIndividualContactMethodsYesNoPage) mustBe Some(true)
     }
 
-    "cleanup: must remove SubcontractorNamePage userAnswers, set SubTradingNameYesNoPage to Yes and record name removal when Yes is selected" in {
+    "cleanup: must remove SubcontractorNamePage userAnswers and record name removal when Yes is selected" in {
       val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
       val userAnswers = emptyUserAnswers
         .set(SubcontractorNamePage, subContractorName)
-        .success
-        .value
-        .set(SubTradingNameYesNoPage, false)
         .success
         .value
 
@@ -165,43 +161,36 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           .value
 
       updatedUserAnswers.get(SubcontractorNamePage) mustBe None
-      updatedUserAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
-      updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe Some(true)
     }
 
-    "cleanup: must retain SubcontractorNamePage userAnswers, keep SubAddressYesNoPage as No and clear name removal when No is selected" in {
-      val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
+    "cleanup: must retain SubcontractorNamePage userAnswers and update " +
+      "IndividualNamesOptionsPage SubcontractorName and TradingName selected and clear name removal when No is selected" in {
+        val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
-      val userAnswers = emptyUserAnswers
-        .set(SubcontractorNamePage, subContractorName)
-        .success
-        .value
-        .set(SubTradingNameYesNoPage, false)
-        .success
-        .value
-        .set(AmendIndividualSubcontractorNameRemovedQuery, true)
-        .success
-        .value
-
-      val updatedUserAnswers =
-        userAnswers
-          .set(AmendIndividualRemoveDetailYesNoPage(AmendIndividualRemoveDetail.SubcontractorName), false)
+        val userAnswers = emptyUserAnswers
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(SubcontractorNamePage, subContractorName)
           .success
           .value
 
-      updatedUserAnswers.get(SubcontractorNamePage) mustBe Some(subContractorName)
-      updatedUserAnswers.get(SubTradingNameYesNoPage) mustBe Some(false)
-      updatedUserAnswers.get(AmendIndividualSubcontractorNameRemovedQuery) mustBe None
-    }
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendIndividualRemoveDetailYesNoPage(AmendIndividualRemoveDetail.SubcontractorName), false)
+            .success
+            .value
+
+        updatedUserAnswers.get(SubcontractorNamePage) mustBe Some(subContractorName)
+        updatedUserAnswers.get(IndividualNamesOptionsPage) mustBe Some(
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
+      }
 
     Seq(
-      (
-        "trading-name",
-        TradingNameOfSubcontractorPage,
-        SubTradingNameYesNoPage,
-        AmendIndividualRemoveDetail.TradingName,
-        "Test name"
-      ),
       (
         "utr",
         SubcontractorsUniqueTaxpayerReferencePage,
@@ -258,6 +247,49 @@ class AmendIndividualRemoveDetailYesNoPageSpec extends PageBehaviours {
           updatedUserAnswers.get(screenerPage) mustBe Some(true)
         }
       }
+    }
+
+    "when contractorDetail is trading-name" - {
+
+      s"cleanup: must remove TradingNameOfSubcontractorPage userAnswers when Yes is selected" in {
+        val userAnswers = emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, "Test name")
+          .success
+          .value
+
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendIndividualRemoveDetailYesNoPage(AmendIndividualRemoveDetail.TradingName), true)
+            .success
+            .value
+
+        updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+      }
+
+      s"cleanup: must retain TradingNameOfSubcontractorPage and update " +
+        s"IndividualNamesOptionsPage SubcontractorName and TradingName selected when No is selected" in {
+          val userAnswers = emptyUserAnswers
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName)
+            )
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "Test name")
+            .success
+            .value
+
+          val updatedUserAnswers =
+            userAnswers
+              .set(AmendIndividualRemoveDetailYesNoPage(AmendIndividualRemoveDetail.TradingName), false)
+              .success
+              .value
+
+          updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe Some("Test name")
+          updatedUserAnswers.get(IndividualNamesOptionsPage) mustBe Some(
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+        }
     }
   }
 }

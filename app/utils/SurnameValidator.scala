@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package queries
+package utils
 
-import play.api.libs.json.JsPath
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
-
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+object SurnameValidator {
+  def validate(
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
+    value.flatMap { surname =>
+      Option.when(
+        !Surname.isLengthInRange(surname) || !Surname.isValid(surname)
+      ) {
+        FieldValidationFailure(
+          field = SubcontractorValidationField.Surname,
+          value = Some(surname)
+        )
+      }
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package forms.add
+package utils
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.validation.{FieldValidationFailure, SubcontractorValidationField}
 
-import javax.inject.Inject
-
-class SubTradingNameYesNoFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("subTradingNameYesNo.error.required")
-    )
+object FirstNameValidator {
+  def validate(
+    value: Option[String]
+  ): Option[FieldValidationFailure] =
+    value.flatMap { firstName =>
+      Option.when(
+        !FirstMiddleName.isLengthInRange(firstName) || !FirstMiddleName.isValid(firstName)
+      ) {
+        FieldValidationFailure(
+          field = SubcontractorValidationField.FirstName,
+          value = Some(firstName)
+        )
+      }
+    }
 }

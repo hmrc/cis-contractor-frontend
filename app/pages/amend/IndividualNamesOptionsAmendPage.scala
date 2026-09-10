@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package pages.add
+package pages.amend
 
-import models.UserAnswers
+import models.add.IndividualNamesOptions
 import pages.QuestionPage
+import pages.add.IndividualJourney
 import play.api.libs.json.JsPath
 
-import scala.util.Try
-
-case object SubTradingNameYesNoPage extends QuestionPage[Boolean] with IndividualJourney {
-
+case object IndividualNamesOptionsAmendPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "subTradingNameYesNo"
+  override def toString: String = "individualNamesOptions"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers.remove(TradingNameOfSubcontractorPage)
-    } else if value.contains(true) then {
-      userAnswers.remove(SubcontractorNamePage)
-    } else {
-      super.cleanup(value, userAnswers)
-    }
 }

@@ -119,6 +119,37 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
     }
   }
 
+  "SubcontractorPopulatorUtils.addressFieldsExist" - {
+
+    "must return true when subcontractor has address" in {
+      SubcontractorPopulatorUtils.addressFieldsExist(subcontractor) mustBe true
+    }
+
+    "must return false when subcontractor do not has address" in {
+
+      val response =
+        subcontractor.copy(
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          postcode = None,
+          country = None
+        )
+
+      SubcontractorPopulatorUtils.addressFieldsExist(response) mustBe false
+    }
+
+    "must return false when address line 1 is missing" in {
+      val response =
+        subcontractor.copy(
+          addressLine1 = None
+        )
+
+      SubcontractorPopulatorUtils.addressFieldsExist(response) mustBe false
+    }
+  }
+
   "SubcontractorPopulatorUtils.contactMethods" - {
 
     "must return all available contact methods" in {
@@ -196,7 +227,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
       )
     }
 
-    "must return None when first name is missing" in {
+    "must return the subcontractor name without a first name when first name is missing" in {
 
       val response =
         subcontractor.copy(
@@ -205,10 +236,10 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
 
       SubcontractorPopulatorUtils.individualName(
         response
-      ) mustBe None
+      ) mustBe Some(SubcontractorName("", Some("Middle"), "Smith"))
     }
 
-    "must return None when surname is missing" in {
+    "must return the subcontractor name without a surname when surname is missing" in {
 
       val response =
         subcontractor.copy(
@@ -217,10 +248,10 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
 
       SubcontractorPopulatorUtils.individualName(
         response
-      ) mustBe None
+      ) mustBe Some(SubcontractorName("John", Some("Middle"), ""))
     }
 
-    "must return None when both first name and surname are missing" in {
+    "must return the subcontractor name with middle name only when both first name and surname are missing" in {
 
       val response =
         subcontractor.copy(
@@ -230,15 +261,15 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
 
       SubcontractorPopulatorUtils.individualName(
         response
-      ) mustBe None
+      ) mustBe Some(SubcontractorName("", Some("Middle"), ""))
     }
   }
 
-  "SubcontractorPopulatorUtils.usesTradingName" - {
+  "SubcontractorPopulatorUtils.hasTradingName" - {
 
     "must return true when trading name is present" in {
 
-      SubcontractorPopulatorUtils.usesTradingName(
+      SubcontractorPopulatorUtils.hasTradingName(
         subcontractor
       ) mustBe true
     }
@@ -250,7 +281,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
           tradingName = None
         )
 
-      SubcontractorPopulatorUtils.usesTradingName(
+      SubcontractorPopulatorUtils.hasTradingName(
         response
       ) mustBe false
     }
@@ -262,7 +293,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
           tradingName = Some("")
         )
 
-      SubcontractorPopulatorUtils.usesTradingName(
+      SubcontractorPopulatorUtils.hasTradingName(
         response
       ) mustBe false
     }
@@ -274,7 +305,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
           tradingName = Some("   ")
         )
 
-      SubcontractorPopulatorUtils.usesTradingName(
+      SubcontractorPopulatorUtils.hasTradingName(
         response
       ) mustBe false
     }
@@ -286,7 +317,7 @@ class SubcontractorPopulatorUtilsSpec extends SpecBase with Matchers {
           tradingName = Some("  Test Trading Name  ")
         )
 
-      SubcontractorPopulatorUtils.usesTradingName(
+      SubcontractorPopulatorUtils.hasTradingName(
         response
       ) mustBe true
     }
