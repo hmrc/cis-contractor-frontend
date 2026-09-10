@@ -64,6 +64,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginationViewModel.items.length mustBe 2
       result.paginationViewModel.next.isDefined mustBe true
       result.paginationViewModel.previous mustBe None
+      result.totalPages mustBe 2
     }
 
     "return correct second page data" in {
