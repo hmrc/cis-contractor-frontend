@@ -29,7 +29,6 @@ import views.html.contractordetails.ContractorDetailsUpdatedView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class ContractorDetailsUpdatedController @Inject() (
   override val messagesApi: MessagesApi,
@@ -59,17 +58,25 @@ class ContractorDetailsUpdatedController @Inject() (
           contractorDetailsService
             .getScheme(cisId)
             .flatMap { latestScheme =>
-              request.userAnswers
-                .set(ContractorSchemePage, latestScheme) match {
+              Future.fromTry(
+                request.userAnswers.set(
+                  ContractorSchemePage,
+                  latestScheme
+                )
+              )
+            }
+            .flatMap { updatedAnswers =>
+              sessionRepository
+                .set(updatedAnswers)
+                .map(_ => Ok(view()))
+            }
+            .recover { case error =>
+              logger.error(
+                "[ContractorDetailsUpdatedController] Failed to refresh contractor details",
+                error
+              )
 
-                case Failure(error) =>
-                  Future.failed(error)
-
-                case Success(updatedAnswers) =>
-                  sessionRepository
-                    .set(updatedAnswers)
-                    .map(_ => Ok(view()))
-              }
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
       }
     }

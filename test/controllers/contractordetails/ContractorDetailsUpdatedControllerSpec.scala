@@ -130,5 +130,60 @@ class ContractorDetailsUpdatedControllerSpec extends SpecBase with MockitoSugar 
             .url
       }
     }
+
+    "must redirect to journey recovery when getScheme fails" in {
+
+      val cisId = "cisId"
+
+      val mockContractorDetailsService =
+        mock[ContractorDetailsService]
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockContractorDetailsService.getScheme(anyString())(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(new RuntimeException("boom"))
+      )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockContractorDetailsService),
+            inject
+              .bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.ContractorDetailsUpdatedController.onPageLoad().url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
   }
 }
