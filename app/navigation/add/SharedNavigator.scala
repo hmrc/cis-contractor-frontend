@@ -64,8 +64,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
             // up, leaving the journey incomplete, so the user is taken through the relevant pages.
             if (journeyComplete(subcontractorType, userAnswers)) {
               checkYourAnswersFor(subcontractorType)
-            }
-            else {
+            } else {
               firstJourneyPageFor(subcontractorType)
             }
         }
