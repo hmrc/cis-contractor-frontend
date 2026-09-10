@@ -31,7 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
 import repositories.SessionRepository
-import services.{ReviewInsufficientInfoService, VerificationService}
+import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.insufficient.ProceedInsufficientSubcontractorNameYesNoView
 
@@ -221,11 +221,10 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
       val mockSessionRepository = mock[SessionRepository]
 
-      val mockService      = mock[ReviewInsufficientInfoService]
       val mockBatchService = mock[VerificationService]
 
       when(
-        mockService.proceedInsufficientVerification(any(), any(), any())(any())
+        mockBatchService.proceedInsufficientVerification(any(), any(), any())(any())
       ).thenReturn(Future.successful(()))
       when(mockBatchService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(userAnswers))
@@ -238,7 +237,6 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ReviewInsufficientInfoService].toInstance(mockService),
             bind[VerificationService].toInstance(mockBatchService)
           )
           .build()
@@ -260,7 +258,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       }
     }
 
-    "must redirect to the next page on a POST and valid data is submitted and answer = YES" in {
+    "must redirect to the next page on a POST and valid data is submitted and answer = NO" in {
 
       val userAnswers = emptyUserAnswers
         .set(CisIdQuery, "1")
@@ -308,10 +306,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         .success
         .value
 
-      val mockService = mock[ReviewInsufficientInfoService]
-
       val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
         .build()
 
       running(application) {
@@ -339,11 +334,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
     "must redirect to Journey Recovery for a GET if user answer data is found" in {
 
-      val mockService = mock[ReviewInsufficientInfoService]
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
-        .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
 
@@ -377,11 +368,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
     "must redirect to Journey Recovery for a POST if user answer data is found" in {
 
-      val mockService = mock[ReviewInsufficientInfoService]
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
-        .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
 
@@ -409,11 +396,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         .success
         .value
 
-      val mockService = mock[ReviewInsufficientInfoService]
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[ReviewInsufficientInfoService].toInstance(mockService))
-        .build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
 
@@ -445,9 +428,9 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
 
       val mockSessionRepository = mock[SessionRepository]
 
-      val mockService = mock[ReviewInsufficientInfoService]
+      val mockBatchService = mock[VerificationService]
       when(
-        mockService.proceedInsufficientVerification(any(), any(), any())(any())
+        mockBatchService.proceedInsufficientVerification(any(), any(), any())(any())
       ).thenReturn(Future.successful(()))
 
       when(mockSessionRepository.set(any())).thenReturn(Future.failed(new RuntimeException("boom")))
@@ -456,7 +439,7 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ReviewInsufficientInfoService].toInstance(mockService)
+            bind[VerificationService].toInstance(mockBatchService)
           )
           .build()
 
