@@ -44,22 +44,6 @@ class ContractorDetailsCheckAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def hasRequiredDetails(request: DataRequest[AnyContent]): Boolean = {
-    val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage) match {
-      case Some(true)  => request.userAnswers.get(SchemeNamePage).isDefined
-      case Some(false) => true
-      case None        => false
-    }
-
-    val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
-      case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
-      case Some(false) => true
-      case None        => false
-    }
-
-    schemeNameValid && emailAddressValid
-  }
-
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(ContractorSchemePage) match {
@@ -144,4 +128,20 @@ class ContractorDetailsCheckAnswersController @Inject() (
           )
       }
     }
+
+  private def hasRequiredDetails(request: DataRequest[AnyContent]): Boolean = {
+    val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(SchemeNamePage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    schemeNameValid && emailAddressValid
+  }
 }
