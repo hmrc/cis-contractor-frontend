@@ -18,6 +18,7 @@ package navigation.add
 
 import base.SpecBase
 import controllers.routes
+import models.add.IndividualNamesOptions
 import models.{AmendMode, CheckMode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
@@ -31,7 +32,7 @@ class SharedNavigatorSpec extends SpecBase {
   private val completeIndividual =
     emptyUserAnswers
       .setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
-      .setOrException(pages.add.SubTradingNameYesNoPage, true)
+      .setOrException(pages.add.IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
       .setOrException(pages.add.TradingNameOfSubcontractorPage, "ABC Ltd")
       .setOrException(pages.add.SubAddressYesNoPage, false)
       .setOrException(pages.add.AddIndividualContactMethodsYesNoPage, false)
