@@ -31,6 +31,8 @@ import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
 import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
+import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import play.api.i18n.Messages
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -45,6 +47,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val msgs: Messages       = messages(app)
 
   private val instanceId = "INST-123"
 
@@ -1100,7 +1103,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       when(
         mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
-          any[HeaderCarrier]
+          any[HeaderCarrier],
+          any[Messages]
         )
       ).thenReturn(Future.successful(chrisRequest))
 

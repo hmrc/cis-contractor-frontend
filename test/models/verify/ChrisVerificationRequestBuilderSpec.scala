@@ -26,6 +26,7 @@ import models.requests.*
 import models.*
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage}
+import play.api.i18n.Messages
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
   implicit private val ec: ExecutionContext = ExecutionContext.global
   implicit private val hc: HeaderCarrier    = HeaderCarrier()
+  implicit private val msgs: Messages       = messages(app)
 
   private val mockConnector = mock[ConstructionIndustrySchemeConnector]
   private val builder       = new ChrisVerificationRequestBuilder(mockConnector)
@@ -96,7 +98,7 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
               verificationNumber = None,
               taxTreatment = None,
               actionIndicator = None,
-              proceed = None,
+              proceed = Some("Y"),
               matched = None
             )
           )
@@ -156,7 +158,7 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
 
       result.verifications mustBe Seq(
         VerificationDetails(
-          subcontractorName = "TBC",
+          subcontractorName = "Subcontractor, Test",
           verificationResourceRef = "4001",
           proceedVerification = true
         )
