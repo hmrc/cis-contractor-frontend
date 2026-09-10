@@ -99,7 +99,7 @@ object AmendmentHelper {
   def individualHasChanges(userAnswers: UserAnswers): Boolean =
     userAnswers.get(OriginalIndividualAnswersQuery).exists { original =>
       Seq(
-        original.usesTradingName               -> userAnswers.get(SubTradingNameYesNoPage),
+        original.individualNamesOptions        -> userAnswers.get(IndividualNamesOptionsPage).getOrElse(Set.empty),
         original.tradingName                   -> userAnswers.get(TradingNameOfSubcontractorPage),
         original.subcontractorName             -> userAnswers.get(SubcontractorNamePage),
         original.addressYesNo                  -> userAnswers.get(SubAddressYesNoPage),

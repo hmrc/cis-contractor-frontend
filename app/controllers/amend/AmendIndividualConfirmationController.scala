@@ -18,7 +18,6 @@ package controllers.amend
 
 import controllers.actions.*
 import controllers.routes
-import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -27,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
+import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import viewmodels.amend.IndividualAmendedViewModel
 import views.html.amend.AmendConfirmationView
 
@@ -42,7 +41,8 @@ class AmendIndividualConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
   cleanupService: DefaultSubcontractorCleanupService,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  subcontractorNameExtractor: SubcontractorNameExtractor
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -73,7 +73,7 @@ class AmendIndividualConfirmationController @Inject() (
 
               case Some(cisId) =>
                 val tableRows      = IndividualAmendedViewModel.rows(originalIndividualAnswers, ua)
-                val individualName = individualDisplayName(ua)
+                val individualName = subcontractorNameExtractor.displaySubcontractorName(ua)
 
                 cleanupService.cleanAmend(ua) match {
 
@@ -98,10 +98,4 @@ class AmendIndividualConfirmationController @Inject() (
         }
       }
     }
-
-  private def individualDisplayName(ua: models.UserAnswers): String =
-    ua.get(SubcontractorNamePage)
-      .map(n => s"${n.firstName} ${n.lastName}")
-      .orElse(ua.get(TradingNameOfSubcontractorPage))
-      .getOrElse("")
 }

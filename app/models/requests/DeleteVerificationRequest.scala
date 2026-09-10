@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package forms.add
+package models.requests
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.Inject
+case class DeleteVerificationRequest(
+  instanceId: String,
+  verificationResourceRef: Long
+)
 
-class SubTradingNameYesNoFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("subTradingNameYesNo.error.required")
-    )
+object DeleteVerificationRequest {
+  given OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]
 }

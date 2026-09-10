@@ -16,6 +16,7 @@
 
 package forms.add
 
+import forms.Validation
 import forms.mappings.Mappings
 import models.add.SubcontractorName
 import play.api.data.Form
@@ -25,10 +26,6 @@ import javax.inject.Inject
 
 class SubcontractorNameFormProvider @Inject() extends Mappings {
 
-  private val nameRegexLettersOnly = """^[A-Za-z'\-]+$"""
-  private val lastNameRegex        = """^[A-Za-z0-9\s,\.\(\)/&'\-]+$"""
-  private val firstCharLetterRegex = """^[a-zA-Z]{1}.*"""
-
   def apply(): Form[SubcontractorName] = Form(
     mapping(
       "firstName"  -> text("subcontractorName.firstName.error.required")
@@ -36,8 +33,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             maxLength(35, "subcontractorName.firstName.error.length"),
-            regexp(firstCharLetterRegex, "subcontractorName.firstName.error.firstChar"),
-            regexp(nameRegexLettersOnly, "subcontractorName.firstName.error.invalidCharacters")
+            regexp(Validation.firstCharLetterRegex, "subcontractorName.firstName.error.firstChar"),
+            regexp(Validation.firstMiddleNameRegex, "subcontractorName.firstName.error.invalidCharacters")
           )
         ),
       "middleName" -> optional(
@@ -46,8 +43,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
           .verifying(
             firstError(
               maxLength(35, "subcontractorName.middleName.error.length"),
-              regexp(firstCharLetterRegex, "subcontractorName.middleName.error.firstChar"),
-              regexp(nameRegexLettersOnly, "subcontractorName.middleName.error.invalidCharacters")
+              regexp(Validation.firstCharLetterRegex, "subcontractorName.middleName.error.firstChar"),
+              regexp(Validation.firstMiddleNameRegex, "subcontractorName.middleName.error.invalidCharacters")
             )
           )
       ),
@@ -56,8 +53,8 @@ class SubcontractorNameFormProvider @Inject() extends Mappings {
         .verifying(
           firstError(
             maxLength(35, "subcontractorName.lastName.error.length"),
-            regexp(firstCharLetterRegex, "subcontractorName.lastName.error.firstChar"),
-            regexp(lastNameRegex, "subcontractorName.lastName.error.invalidCharacters")
+            regexp(Validation.firstCharLetterRegex, "subcontractorName.lastName.error.firstChar"),
+            regexp(Validation.surnameFormat, "subcontractorName.lastName.error.invalidCharacters")
           )
         )
     )((firstName, middleName, lastName) => SubcontractorName(firstName, middleName, lastName))(name =>

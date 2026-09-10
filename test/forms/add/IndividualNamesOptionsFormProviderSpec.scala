@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,30 @@
 
 package forms.add
 
-import forms.behaviours.BooleanFieldBehaviours
+import forms.behaviours.CheckboxFieldBehaviours
+import models.add.IndividualNamesOptions
 import play.api.data.FormError
 
-class SubTradingNameYesNoFormProviderSpec extends BooleanFieldBehaviours {
+class IndividualNamesOptionsFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val requiredKey = "subTradingNameYesNo.error.required"
-  val invalidKey  = "error.boolean"
-
-  val form = new SubTradingNameYesNoFormProvider()()
+  val form = new IndividualNamesOptionsFormProvider()()
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
+    val requiredKey = "individualNamesOptions.error.required"
 
-    behave like booleanField(
+    behave like checkboxField[IndividualNamesOptions](
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      validValues = IndividualNamesOptions.values,
+      invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 
-    behave like mandatoryField(
+    behave like mandatoryCheckboxField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredKey
     )
   }
 }

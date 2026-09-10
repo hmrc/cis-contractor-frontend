@@ -19,9 +19,9 @@ package controllers.amend
 import base.SpecBase
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
 import models.address.Address
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.amend.AmendIndividualRemoveDetail
-import models.{AmendMode, UserAnswers}
+import models.UserAnswers
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -43,6 +43,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
   val form         = formProvider()
 
   private val subcontractorTradingName = "Test individual"
+  private val subcontractorName        = "John Smith"
   private val address                  = Address("line 1", postcode = Some("AA1 1AA"))
 
   private def uaWithTradingName: UserAnswers =
@@ -57,7 +58,10 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
         case "trading-name" =>
           emptyUserAnswers
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
             .success
             .value
             .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
@@ -138,11 +142,9 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
     detail match {
       case AmendIndividualRemoveDetail.TradingName =>
         userAnswers.get(TradingNameOfSubcontractorPage) mustBe None
-        userAnswers.get(SubTradingNameYesNoPage) mustBe Some(false)
 
       case AmendIndividualRemoveDetail.SubcontractorName =>
         userAnswers.get(SubcontractorNamePage) mustBe None
-        userAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers.get(AddressOfSubcontractorPage) mustBe None
@@ -176,11 +178,15 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       case AmendIndividualRemoveDetail.TradingName =>
         userAnswers.get(TradingNameOfSubcontractorPage) mustBe Some(subcontractorTradingName)
-        userAnswers.get(SubTradingNameYesNoPage) mustBe Some(true)
+        userAnswers.get(IndividualNamesOptionsPage) mustBe Some(
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
 
       case AmendIndividualRemoveDetail.SubcontractorName =>
         userAnswers.get(SubcontractorNamePage) mustBe Some(SubcontractorName("John", Some("Paul"), "Smith"))
-        userAnswers.get(SubTradingNameYesNoPage) mustBe Some(false)
+        userAnswers.get(IndividualNamesOptionsPage) mustBe Some(
+          Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+        )
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers.get(AddressOfSubcontractorPage) mustBe Some(address)
@@ -210,10 +216,13 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
   private def uaWithSubcontractorNameAndDetail: UserAnswers =
     emptyUserAnswers
-      .set(SubTradingNameYesNoPage, true)
+      .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
       .success
       .value
       .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+      .success
+      .value
+      .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
       .success
       .value
       .set(ShowVerificationDetailsPage, false)
@@ -483,8 +492,6 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
     "when subcontractorDetail is subcontractor-name" - {
       val form = formProvider()
 
-      val subcontractorName = "John Smith"
-
       val selectedDetail = "subcontractor-name"
 
       val detailType =
@@ -539,8 +546,8 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.add.routes.TradingNameOfSubcontractorController
-            .onPageLoad(AmendMode)
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+            .onPageLoad()
             .url
 
           verify(mockSessionRepository).set(captor.capture())
@@ -643,7 +650,18 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       "must redirect to JourneyRecovery if subcontractorName is missing for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val userAnswers = emptyUserAnswers
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -657,7 +675,18 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       "must redirect to JourneyRecovery if subcontractorName is missing for a POST" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val userAnswers = emptyUserAnswers
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request =
@@ -730,7 +759,10 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       val verifiedSubcontractorUa =
         emptyUserAnswers
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
           .success
           .value
           .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
@@ -800,7 +832,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val view = application.injector.instanceOf[AmendIndividualRemoveDetailYesNoView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, form)(
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, detailTitle, form)(
             request,
             messages(application)
           ).toString
@@ -829,8 +861,8 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.add.routes.SubcontractorNameController
-            .onPageLoad(AmendMode)
+          redirectLocation(result).value mustEqual controllers.amend.routes.AmendIndividualCheckYourAnswersController
+            .onPageLoad()
             .url
 
           verify(mockSessionRepository).set(captor.capture())
@@ -894,7 +926,7 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(subcontractorTradingName, selectedDetail, detailTitle, boundForm)(
+          contentAsString(result) mustEqual view(subcontractorName, selectedDetail, detailTitle, boundForm)(
             request,
             messages(application)
           ).toString
@@ -931,9 +963,20 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if subcontractorTradingName is missing for a GET" in {
+      "must redirect to JourneyRecovery if subcontractorName is missing for a GET" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val userAnswers = emptyUserAnswers
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, removeDetailYesNoRoute)
@@ -945,9 +988,20 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
-      "must redirect to JourneyRecovery if subcontractorTradingName is missing for a POST" in {
+      "must redirect to JourneyRecovery if subcontractorName is missing for a POST" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val userAnswers = emptyUserAnswers
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+          .success
+          .value
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request =
@@ -1020,7 +1074,13 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
       val verifiedSubcontractorUa =
         emptyUserAnswers
-          .set(SubTradingNameYesNoPage, false)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "subcontractorTradingName")

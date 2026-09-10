@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.response
 
-import pages.behaviours.PageBehaviours
+import play.api.libs.json.{Json, OFormat}
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+final case class DeleteVerificationResponse(
+  verificationsCounter: Option[Long]
+)
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
-  }
+object DeleteVerificationResponse {
+  given OFormat[DeleteVerificationResponse] = Json.format[DeleteVerificationResponse]
 }
