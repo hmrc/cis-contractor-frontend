@@ -17,24 +17,67 @@
 package controllers.contractordetails
 
 import controllers.actions.*
-
-import javax.inject.Inject
+import pages.contractordetails.ContractorSchemePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
+import repositories.SessionRepository
+import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.ContractorDetailsUpdatedView
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class ContractorDetailsUpdatedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  contractorDetailsService: ContractorDetailsService,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsUpdatedView
+)(implicit
+  ec: ExecutionContext
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdQuery) match {
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Some(cisId) =>
+          contractorDetailsService
+            .getScheme(cisId)
+            .flatMap { latestScheme =>
+              Future.fromTry(
+                request.userAnswers.set(
+                  ContractorSchemePage,
+                  latestScheme
+                )
+              )
+            }
+            .flatMap { updatedAnswers =>
+              sessionRepository
+                .set(updatedAnswers)
+                .map(_ => Ok(view()))
+            }
+            .recover { case error =>
+              logger.error(
+                "[ContractorDetailsUpdatedController] Failed to refresh contractor details",
+                error
+              )
+
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+      }
+    }
 }
