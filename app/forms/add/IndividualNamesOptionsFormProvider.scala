@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package pages.amend
+package forms.add
 
-import pages.behaviours.PageBehaviours
+import forms.mappings.Mappings
+import models.add.IndividualNamesOptions
+import play.api.data.Form
+import play.api.data.Forms.set
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+import javax.inject.Inject
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+class IndividualNamesOptionsFormProvider @Inject() extends Mappings {
 
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
-  }
+  def apply(): Form[Set[IndividualNamesOptions]] =
+    Form(
+      "value" -> set(enumerable[IndividualNamesOptions]("individualNamesOptions.error.required"))
+        .verifying(nonEmptySet("individualNamesOptions.error.required"))
+    )
 }

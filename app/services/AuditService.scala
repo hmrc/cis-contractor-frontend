@@ -19,6 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import models.TypeOfSubcontractor
 import models.UserAnswers
+import models.add.IndividualNamesOptions
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
@@ -31,7 +32,7 @@ import pages.add.partnership.*
 import pages.add.trust.*
 import play.api.libs.json.{Json, OWrites, Writes}
 import play.api.mvc.Request
-import queries.{SubbieResourceRefQuery, *}
+import queries.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.*
@@ -82,10 +83,12 @@ class AuditService @Inject() (
     AddSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
+      individualNamesOptions = ua
+        .get(IndividualNamesOptionsPage)
+        .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
       firstName = ua.get(SubcontractorNamePage).map(_.firstName),
       middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
       surname = ua.get(SubcontractorNamePage).map(_.lastName),
-      subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
       tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
       subAddressYesNo = ua.get(SubAddressYesNoPage),
       addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -176,14 +179,16 @@ class AuditService @Inject() (
   private def buildAmendIndividualModel(ua: UserAnswers): AmendSubcontractorAuditEventModel =
     AmendSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalIndividualAnswersQuery).map(toIndividualDetails),
       updatedDetails = IndividualSubcontractorDetails(
+        individualNamesOptions = ua
+          .get(IndividualNamesOptionsPage)
+          .map(opts => IndividualNamesOptions.ordered(opts).map(_.toString)),
         firstName = ua.get(SubcontractorNamePage).map(_.firstName),
         middleName = ua.get(SubcontractorNamePage).flatMap(_.middleName),
         surname = ua.get(SubcontractorNamePage).map(_.lastName),
-        subTradingNameYesNo = ua.get(SubTradingNameYesNoPage),
         tradingNameOfSubcontractor = ua.get(TradingNameOfSubcontractorPage),
         subAddressYesNo = ua.get(SubAddressYesNoPage),
         addressOfSubcontractor = ua.get(AddressOfSubcontractorPage),
@@ -205,10 +210,13 @@ class AuditService @Inject() (
 
   private def toIndividualDetails(original: OriginalIndividualAnswers): IndividualSubcontractorDetails =
     IndividualSubcontractorDetails(
+      individualNamesOptions =
+        if (original.individualNamesOptions.nonEmpty)
+          Some(IndividualNamesOptions.ordered(original.individualNamesOptions).map(_.toString))
+        else None,
       firstName = original.subcontractorName.map(_.firstName),
       middleName = original.subcontractorName.flatMap(_.middleName),
       surname = original.subcontractorName.map(_.lastName),
-      subTradingNameYesNo = original.usesTradingName,
       tradingNameOfSubcontractor = original.tradingName,
       subAddressYesNo = original.addressYesNo,
       addressOfSubcontractor = original.address,
@@ -231,7 +239,7 @@ class AuditService @Inject() (
   private def buildAmendCompanyModel(ua: UserAnswers): AmendCompanySubcontractorAuditEventModel =
     AmendCompanySubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalCompanyAnswersQuery).map(toCompanyDetails),
       updatedDetails = CompanySubcontractorDetails(
@@ -278,7 +286,7 @@ class AuditService @Inject() (
   private def buildAmendPartnershipModel(ua: UserAnswers): AmendPartnershipSubcontractorAuditEventModel =
     AmendPartnershipSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalPartnershipAnswersQuery).map(toPartnershipDetails),
       updatedDetails = PartnershipSubcontractorDetails(
@@ -335,7 +343,7 @@ class AuditService @Inject() (
   private def buildAmendTrustModel(ua: UserAnswers): AmendTrustSubcontractorAuditEventModel =
     AmendTrustSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      subbieResourceRef = ua.get(SubbieResourceRefQuery),
+      subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
       originalDetails = ua.get(OriginalTrustAnswersQuery).map(toTrustDetails),
       updatedDetails = TrustSubcontractorDetails(
