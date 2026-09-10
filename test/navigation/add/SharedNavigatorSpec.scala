@@ -28,6 +28,17 @@ class SharedNavigatorSpec extends SpecBase {
   private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
   private lazy val CYA             = controllers.add.routes.CheckYourAnswersController.onPageLoad()
 
+  private val completeIndividual =
+    emptyUserAnswers
+      .setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+      .setOrException(pages.add.SubTradingNameYesNoPage, true)
+      .setOrException(pages.add.TradingNameOfSubcontractorPage, "ABC Ltd")
+      .setOrException(pages.add.SubAddressYesNoPage, false)
+      .setOrException(pages.add.AddIndividualContactMethodsYesNoPage, false)
+      .setOrException(pages.add.UniqueTaxpayerReferenceYesNoPage, false)
+      .setOrException(pages.add.NationalInsuranceNumberYesNoPage, false)
+      .setOrException(pages.add.WorksReferenceNumberYesNoPage, false)
+
   "SharedNavigator" - {
 
     "in Normal mode" - {
@@ -105,12 +116,20 @@ class SharedNavigatorSpec extends SpecBase {
           .onPageLoad()
       }
 
-      "must go from TypeOfSubcontractorPage to CYA when valid data is submitted" in {
+      "must go from TypeOfSubcontractorPage to CYA when the selected type's journey is already complete (type unchanged)" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,
           CheckMode,
-          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head)
+          completeIndividual
         ) mustBe CYA
+      }
+
+      "must go from TypeOfSubcontractorPage to the first journey page in Normal mode when the selected type's journey is incomplete (type changed)" in {
+        navigator.nextPage(
+          TypeOfSubcontractorPage,
+          CheckMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
