@@ -17,7 +17,7 @@
 package generators
 
 import models.*
-
+import models.add.IndividualNamesOptions
 import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
 import models.verify.ContractorEmailConfirmationStored
@@ -28,6 +28,11 @@ import play.api.libs.json.Json
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators {
+
+  implicit lazy val arbitraryIndividualNamesOptions: Arbitrary[IndividualNamesOptions] =
+    Arbitrary {
+      Gen.oneOf(IndividualNamesOptions.values)
+    }
 
   implicit lazy val arbitraryContactMethodOptions: Arbitrary[ContactMethodOptions] =
     Arbitrary {

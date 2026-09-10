@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package queries
+package viewmodels.verify
 
-import play.api.libs.json.JsPath
-
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
-
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+final case class ReviewUnmatchedViewModel(
+  unmatched: Seq[MissingSubcontractorRow],
+  ready: Seq[ReadySubcontractorRow]
+) {
+  val hasUnmatched: Boolean = unmatched.nonEmpty
+  val hasReady: Boolean     = ready.nonEmpty
+  val allReady: Boolean     = unmatched.isEmpty && ready.nonEmpty
 }

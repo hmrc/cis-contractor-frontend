@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package pages.amend
+package viewmodels.verify
 
-import pages.behaviours.PageBehaviours
+import models.SubcontractorCurrentVerification
+import play.api.i18n.Messages
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+object SubcontractorDisplay {
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+  def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    sub.displayName
 
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
-  }
+  def utrDisplay(sub: SubcontractorCurrentVerification, noneProvidedKey: String)(implicit messages: Messages): String =
+    sub.utr
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse(messages(noneProvidedKey))
 }

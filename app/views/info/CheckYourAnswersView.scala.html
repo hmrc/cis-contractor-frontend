@@ -26,7 +26,7 @@
     link: Link
 )
 
-@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String)(implicit request: Request[_], messages: Messages)
+@(informationList: SummaryList, detailsList: SummaryList, subcontractorName: String, backToUrl: String, backToMessage: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("amendCheckYourAnswers.title"))) {
 
@@ -39,8 +39,8 @@
         @govukSummaryList(detailsList)
 
         @link(
-            linkTextKey = "info.CheckYourAnswers.cannotVerifyAllSubcontractors",
-            linkUrl = "#",
+            linkTextKey = backToMessage,
+            linkUrl = backToUrl,
             hasFullStop = true,
             prefixTextKey = "info.CheckYourAnswers.backTo",
             isNewTab = false

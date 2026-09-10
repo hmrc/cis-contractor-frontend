@@ -18,9 +18,35 @@ package models.audit
 
 import base.SpecBase
 import models.address.{Address, Country}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 class AuditEventModelSpec extends SpecBase {
+
+  "AuthFailureAuditEventModel" - {
+
+    val underTest = AuthFailureAuditEventModel()
+
+    "must serialise correctly" in {
+      Json.toJson(underTest) mustBe Json.obj()
+    }
+  }
+
+  "extendedDataEvent" - {
+
+    val testAuditType: String   = "test-audit-type"
+    val testDetailJson: JsValue = Json.toJson(testAuditType)
+
+    "behave as expected" in {
+      val event    = new AuditEventModel {
+        override val auditType: String   = testAuditType
+        override val detailJson: JsValue = testDetailJson
+      }
+      val extended = event.extendedDataEvent
+
+      extended.auditType mustBe testAuditType
+      extended.detail mustBe testDetailJson
+    }
+  }
 
   private val address = Address(
     addressLine1 = "4 Other Place",
@@ -37,10 +63,10 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
+        individualNamesOptions = None,
         firstName = None,
         middleName = None,
         surname = None,
-        subTradingNameYesNo = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -63,10 +89,10 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = Some("1"),
         typeOfSubcontractor = "soletrader",
+        individualNamesOptions = Some(Seq("subcontractorName", "tradingName")),
         firstName = Some("John"),
         middleName = Some("Paul"),
         surname = Some("Smith"),
-        subTradingNameYesNo = Some(true),
         tradingNameOfSubcontractor = Some("TradingName"),
         subAddressYesNo = Some(true),
         addressOfSubcontractor = Some(address),
@@ -85,10 +111,10 @@ class AuditEventModelSpec extends SpecBase {
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                 -> "1",
         "typeOfSubcontractor"                   -> "soletrader",
+        "individualNamesOptions"                -> Json.arr("subcontractorName", "tradingName"),
         "firstName"                             -> "John",
         "middleName"                            -> "Paul",
         "surname"                               -> "Smith",
-        "subTradingNameYesNo"                   -> true,
         "tradingNameOfSubcontractor"            -> "TradingName",
         "subAddressYesNo"                       -> true,
         "addressOfSubcontractor"                -> Json.toJson(address),
@@ -110,10 +136,10 @@ class AuditEventModelSpec extends SpecBase {
       AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
+        individualNamesOptions = None,
         firstName = None,
         middleName = None,
         surname = None,
-        subTradingNameYesNo = None,
         tradingNameOfSubcontractor = None,
         subAddressYesNo = None,
         addressOfSubcontractor = None,
@@ -276,10 +302,10 @@ class AuditEventModelSpec extends SpecBase {
   }
 
   private val baseIndividualDetails = IndividualSubcontractorDetails(
+    individualNamesOptions = Some(Seq("subcontractorName")),
     firstName = Some("John"),
     middleName = Some("Paul"),
     surname = Some("Smith"),
-    subTradingNameYesNo = Some(false),
     tradingNameOfSubcontractor = None,
     subAddressYesNo = Some(true),
     addressOfSubcontractor = Some(address),
@@ -430,7 +456,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = Some("1"),
-        subbieResourceRef = Some(42),
+        subbieResourceRef = Some(42L),
         typeOfSubcontractor = "soletrader",
         originalDetails = None,
         updatedDetails = baseIndividualDetails
@@ -492,7 +518,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendCompanySubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(7),
+        subbieResourceRef = Some(7L),
         typeOfSubcontractor = "company",
         originalDetails = None,
         updatedDetails = baseCompanyDetails
@@ -545,7 +571,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendPartnershipSubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(3),
+        subbieResourceRef = Some(3L),
         typeOfSubcontractor = "partnership",
         originalDetails = None,
         updatedDetails = basePartnershipDetails
@@ -596,7 +622,7 @@ class AuditEventModelSpec extends SpecBase {
     "must include subbieResourceRef in JSON when present" in {
       val model = AmendTrustSubcontractorAuditEventModel(
         cisId = None,
-        subbieResourceRef = Some(99),
+        subbieResourceRef = Some(99L),
         typeOfSubcontractor = "trust",
         originalDetails = None,
         updatedDetails = baseTrustDetails
