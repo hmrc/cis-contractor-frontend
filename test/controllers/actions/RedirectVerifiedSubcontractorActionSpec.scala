@@ -30,12 +30,11 @@ import scala.concurrent.Future
 
 class RedirectVerifiedSubcontractorActionSpec extends SpecBase {
 
-  private class Harness
-    extends RedirectVerifiedSubcontractorActionImpl() {
+  private class Harness extends RedirectVerifiedSubcontractorActionImpl() {
 
     def callFilter(
-                    ua: UserAnswers
-                  ): Future[Option[Result]] = {
+      ua: UserAnswers
+    ): Future[Option[Result]] = {
       val request =
         DataRequest(
           FakeRequest(),

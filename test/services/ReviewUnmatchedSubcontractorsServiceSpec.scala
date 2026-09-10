@@ -17,12 +17,13 @@
 package services
 
 import base.SpecBase
-import models.SubcontractorCurrentVerification
-import models.VerificationCurrentVerification
-import models.VerificationBatchCurrentVerification
+import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
+import viewmodels.verify.ReviewUnmatchedViewModel
+
+import scala.util.{Failure, Try}
 
 class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
 
@@ -41,11 +42,12 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     utr: Option[String] = None,
     partnerUtr: Option[String] = None,
     crn: Option[String] = None,
-    nino: Option[String] = None
+    nino: Option[String] = None,
+    subbieResourceRef: Option[Long] = Some(999L)
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = subbieResourceRef,
       firstName = firstName,
       secondName = None,
       surname = surname,
@@ -104,7 +106,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     subs: Seq[SubcontractorCurrentVerification],
     verifications: Seq[VerificationCurrentVerification] = Nil,
     batchId: Option[Long] = None
-  ) =
+  ): Try[ReviewUnmatchedViewModel] =
     service.buildViewModel(
       GetCurrentVerificationBatchResponse(
         subcontractors = subs,
@@ -113,6 +115,14 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       )
     )
 
+  // convenience helper so the happy-path tests read the same as before
+  private def buildSuccess(
+    subs: Seq[SubcontractorCurrentVerification],
+    verifications: Seq[VerificationCurrentVerification] = Nil,
+    batchId: Option[Long] = None
+  ): ReviewUnmatchedViewModel =
+    build(subs, verifications, batchId).get
+
   "ReviewUnmatchedSubcontractorsService.buildViewModel" - {
 
     "must place an edited subcontractor (actionIndicator = 'EDIT') into the ready list" in {
@@ -120,7 +130,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
       val verification = mkVerification(subcontractorId = 1L, actionIndicator = Some("EDIT"))
 
-      val vm = build(Seq(readyCompany), Seq(verification))
+      val vm = buildSuccess(Seq(readyCompany), Seq(verification))
 
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
       vm.unmatched mustBe empty
@@ -131,7 +141,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val unmatchedCompany =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = build(Seq(unmatchedCompany), Seq(mkVerification(subcontractorId = 2L)))
+      val vm = buildSuccess(Seq(unmatchedCompany), Seq(mkVerification(subcontractorId = 2L)))
 
       vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
@@ -153,7 +163,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val unmatchedVerif = mkVerification(subcontractorId = 1L)
       val readyVerif     = mkVerification(subcontractorId = 2L, proceed = Some("Y"))
 
-      val vm = build(Seq(unmatched, ready), Seq(unmatchedVerif, readyVerif))
+      val vm = buildSuccess(Seq(unmatched, ready), Seq(unmatchedVerif, readyVerif))
 
       vm.unmatched.map(_.name) mustBe Seq("Brody, Martin")
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
@@ -164,7 +174,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
       val verification = mkVerification(subcontractorId = 1L, subcontractorName = Some("Verified Trading Name"))
 
-      val vm = build(Seq(sub), Seq(verification))
+      val vm = buildSuccess(Seq(sub), Seq(verification))
 
       vm.unmatched.head.name mustBe "Verified Trading Name"
     }
@@ -174,7 +184,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
       val verification = mkVerification(subcontractorId = 1L, subcontractorName = Some("   "))
 
-      val vm = build(Seq(sub), Seq(verification))
+      val vm = buildSuccess(Seq(sub), Seq(verification))
 
       vm.unmatched.head.name mustBe "Acme Ltd"
     }
@@ -184,7 +194,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
       val verification = mkVerification(subcontractorId = 1L, proceed = Some("Y"))
 
-      val vm = build(Seq(sub), Seq(verification))
+      val vm = buildSuccess(Seq(sub), Seq(verification))
 
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
       vm.unmatched mustBe empty
@@ -194,7 +204,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val unmatched =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = build(Seq(unmatched), Seq(mkVerification(subcontractorId = 1L)))
+      val vm = buildSuccess(Seq(unmatched), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.utr mustBe messages("verify.reviewUnmatched.noneProvided")
     }
@@ -209,7 +219,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
           utr = None
         )
 
-      val vm = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
+      val vm = buildSuccess(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.name mustBe "Brody, Martin"
     }
@@ -217,7 +227,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 
-      val vm = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
+      val vm = buildSuccess(Seq(sub), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.head.name mustBe messages("verify.noName")
     }
@@ -226,16 +236,16 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val row = build(Seq(sub), Seq(mkVerification(subcontractorId = 1L))).unmatched.head
+      val row = buildSuccess(Seq(sub), Seq(mkVerification(subcontractorId = 1L))).unmatched.head
 
       row.nameLink.url mustBe "#"
-      row.editLink.url mustBe "#"
+      row.editLink.url mustBe "/construction-industry-scheme/subcontractor/amend/start/999/unmatched"
       row.proceedLink.url mustBe "#"
       row.removeLink.url mustBe "#"
     }
 
     "must return empty lists for an empty batch" in {
-      val vm = build(Nil)
+      val vm = buildSuccess(Nil)
 
       vm.unmatched mustBe empty
       vm.ready mustBe empty
@@ -253,7 +263,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
           matched = Some("Y")
         )
 
-      val vm = build(Seq(verified), Seq(verification))
+      val vm = buildSuccess(Seq(verified), Seq(verification))
 
       vm.unmatched mustBe empty
       vm.ready mustBe empty
@@ -265,7 +275,7 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val withoutVerification =
         mkSub(id = 2L, tradingName = Some("Beta Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = build(Seq(withVerification, withoutVerification), Seq(mkVerification(subcontractorId = 1L)))
+      val vm = buildSuccess(Seq(withVerification, withoutVerification), Seq(mkVerification(subcontractorId = 1L)))
 
       vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
@@ -280,10 +290,44 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       val currentVerif    = mkVerification(subcontractorId = 1L, verificationBatchId = Some(10910L))
       val otherBatchVerif = mkVerification(subcontractorId = 2L, verificationBatchId = Some(13297L))
 
-      val vm = build(Seq(currentSub, otherBatchSub), Seq(currentVerif, otherBatchVerif), batchId = Some(10910L))
+      val vm = buildSuccess(Seq(currentSub, otherBatchSub), Seq(currentVerif, otherBatchVerif), batchId = Some(10910L))
 
       vm.unmatched.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
+    }
+
+    "must return a Failure when an unmatched subcontractor has no subbieResourceRef" in {
+      val unmatchedNoRef =
+        mkSub(
+          id = 1L,
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None,
+          subbieResourceRef = None
+        )
+
+      val result = build(Seq(unmatchedNoRef), Seq(mkVerification(subcontractorId = 1L)))
+
+      result mustBe a[Failure[_]]
+      result.failed.get mustBe an[IllegalStateException]
+      result.failed.get.getMessage must include("subcontractorId=1")
+    }
+
+    "must not fail when a ready subcontractor has no subbieResourceRef" in {
+      val readyNoRef   =
+        mkSub(
+          id = 1L,
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = Some("1234567890"),
+          subbieResourceRef = None
+        )
+      val verification = mkVerification(subcontractorId = 1L, proceed = Some("Y"))
+
+      val vm = buildSuccess(Seq(readyNoRef), Seq(verification))
+
+      vm.ready.map(_.name) mustBe Seq("Acme Ltd")
+      vm.unmatched mustBe empty
     }
   }
 }
