@@ -104,12 +104,10 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
             .flatMap(_.emailAddress)
             .isDefined
         ) {
-          controllers.verify.routes
-            .ContractorEmailConfirmationStoredController
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
             .onPageLoad(NormalMode)
         } else {
-          controllers.verify.routes
-            .ContractorEmailConfirmationNotStoredController
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
             .onPageLoad(NormalMode)
         }
 

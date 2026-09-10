@@ -115,13 +115,13 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
     mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
   private def newestBatchResponse(
-                                   subcontractors: Seq[Subcontractor],
-                                   verifications: Seq[Verification] = Seq.empty,
-                                   submission: Option[Submission] = None,
-                                   monthlyReturn: Option[MonthlyReturn] = None,
-                                   monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
-                                   status: Option[String] = None
-                                 ) =
+    subcontractors: Seq[Subcontractor],
+    verifications: Seq[Verification] = Seq.empty,
+    submission: Option[Submission] = None,
+    monthlyReturn: Option[MonthlyReturn] = None,
+    monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
+    status: Option[String] = None
+  ) =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = subcontractors,
@@ -297,8 +297,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             POST,
-            controllers.verify.routes
-              .ReviewInsufficientInfoSubcontractorsController
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
               .onSubmit()
               .url
           )
@@ -309,8 +308,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes
-            .ContractorEmailConfirmationStoredController
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
             .onPageLoad(NormalMode)
             .url
       }
@@ -349,8 +347,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             POST,
-            controllers.verify.routes
-              .ReviewInsufficientInfoSubcontractorsController
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
               .onSubmit()
               .url
           )
@@ -361,8 +358,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes
-            .ContractorEmailConfirmationNotStoredController
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
             .onPageLoad(NormalMode)
             .url
       }
