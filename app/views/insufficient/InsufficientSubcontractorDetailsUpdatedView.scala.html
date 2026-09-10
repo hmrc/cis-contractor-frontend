@@ -26,7 +26,8 @@
     govukTable: GovukTable,
     h2: H2,
     paragraph: Paragraph,
-    link: Link
+    link: Link,
+    appConfig: config.FrontendAppConfig
 )
 
 @(rows: Seq[Seq[TableRow]], subcontractorName: Option[String], returnUrl: String, returnTextKey: String, showBeforeYouGo: Boolean = false)(implicit request: Request[_], messages: Messages)
@@ -85,12 +86,11 @@
         
         @paragraph(messages("insufficientSubcontractorDetailsUpdated.beforeYouGo.p1"))
 
-        <p class="govuk-body">
-            <a href="#" class="govuk-link">
-                @messages("insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
-            </a>
-            @messages("insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
-        </p>
+        @link(
+            linkTextKey = "insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey",
+            linkUrl = appConfig.cisFeedbackSurveyUrl,
+            suffixTextKey = "insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback"
+        )
 
      }
 }

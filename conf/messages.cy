@@ -253,6 +253,10 @@ subcontractorAdded.nextSteps.link                                               
 subcontractorAdded.helpAndSupport.h2                                                =  Help a chymorth
 subcontractorAdded.helpAndSupport.p1                                                =  Os oes angen help arnoch chi gyda Chynllun y Diwydiant Adeiladu (CIS), a’r hyn y mae’n ei olygu i chi,
 subcontractorAdded.helpAndSupport.p1.link                                           =  mae arweiniad ar gael ar GOV.UK
+subcontractorAdded.beforeYouGo.h2                                                    =  Cyn i chi fynd
+subcontractorAdded.beforeYouGo.p1                                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
+subcontractorAdded.beforeYouGo.takeAShortSurvey                                      =  Llenwch arolwg byr
+subcontractorAdded.beforeYouGo.shareFeedback                                         =  i rannu’ch adborth ar y gwasanaeth hwn.
 subcontractorAdded.individual                                                       =  xxxxxxxxxxxxxxxxxxxx
 subcontractorAdded.company                                                          =  xxxxxxxxxxxxxxxxxxxx
 subcontractorAdded.partnership                                                      =  Partneriaeth

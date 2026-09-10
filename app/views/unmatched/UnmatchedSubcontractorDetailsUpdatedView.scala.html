@@ -25,7 +25,8 @@
     govukTable: GovukTable,
     h2: H2,
     paragraph: Paragraph,
-    link: Link
+    link: Link,
+    appConfig: config.FrontendAppConfig
 )
 
 @(rows: Seq[Seq[TableRow]], subcontractorName: String, returnUrl: String, returnTextKey: String, showBeforeYouGo: Boolean = false)(implicit request: Request[_], messages: Messages)
@@ -66,12 +67,11 @@
 
     @paragraph(messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1"))
 
-    <p class="govuk-body">
-        <a href="#" class="govuk-link">
-            @messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
-        </a>
-        @messages("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback")
-    </p>
+    @link(
+        linkTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey",
+        linkUrl = appConfig.cisFeedbackSurveyUrl,
+        suffixTextKey = "unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback"
+    )
 
     }
 }
