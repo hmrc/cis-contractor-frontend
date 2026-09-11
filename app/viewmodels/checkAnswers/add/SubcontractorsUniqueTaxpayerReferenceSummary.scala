@@ -23,6 +23,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import viewmodels.checkAnswers.UtrViewModel
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
@@ -30,7 +33,7 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
-      val value   = ValueViewModel(answer)
+      val value   = UtrViewModel(answer)
       val actions =
         if (showActions) {
           Seq(
@@ -57,7 +60,9 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
     answers.utr.map { answer =>
       SummaryListRowViewModel(
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
+        value = ValueViewModel(
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+        ),
         actions = Seq.empty
       )
     }
