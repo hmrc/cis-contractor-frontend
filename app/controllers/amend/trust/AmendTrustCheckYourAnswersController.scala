@@ -52,37 +52,38 @@ class AmendTrustCheckYourAnswersController @Inject() (
   auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
+    redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)) { implicit request =>
+    val ua = request.userAnswers
 
-      ValidatedTrust.build(ua) match {
-        case Right(_) =>
-          val isVerified = ua.get(ShowVerificationDetailsPage)
-          val trustName  = ua.get(TrustNamePage).getOrElse("")
+    ValidatedTrust.build(ua) match {
+      case Right(_) =>
+        val isVerified = ua.get(ShowVerificationDetailsPage)
+        val trustName  = ua.get(TrustNamePage).getOrElse("")
 
-          val subcontractorInformationList =
-            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+        val subcontractorInformationList =
+          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-          val detailsList =
-            SummaryListViewModel(rows = detailsRows(ua, isVerified, subbieResourceRef).flatten)
+        val detailsList =
+          SummaryListViewModel(rows = detailsRows(ua, isVerified, subbieResourceRef).flatten)
 
-          val submitUrl =
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
-          val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
+        val submitUrl =
+          controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
+        val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
-          Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
+        Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
 
-        case Left(error) =>
-          logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
-      }
+      case Left(error) =>
+        logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   private def subcontractorInformationRows(
