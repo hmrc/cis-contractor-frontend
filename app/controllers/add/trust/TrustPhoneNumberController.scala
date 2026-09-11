@@ -70,9 +70,9 @@ class TrustPhoneNumberController @Inject() (
       }
     }
 
-  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
-    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async {
-    implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       (for {
         trustName      <- request.userAnswers.get(TrustNamePage)
         contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
@@ -88,5 +88,5 @@ class TrustPhoneNumberController @Inject() (
             } yield Redirect(navigator.nextPage(TrustPhoneNumberPage, mode, updatedAnswers))
         ))
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

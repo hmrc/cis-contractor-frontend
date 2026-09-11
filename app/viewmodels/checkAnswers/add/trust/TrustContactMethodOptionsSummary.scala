@@ -30,7 +30,9 @@ import viewmodels.implicits.*
 
 object TrustContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustContactMethodOptionsPage).map { selectedMethods =>
       val options =
         ContactMethodOptions

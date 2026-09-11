@@ -25,7 +25,9 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object TrustAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustAddressPage).map { answer =>
       AddressSummaryRow.row(
         address = answer,

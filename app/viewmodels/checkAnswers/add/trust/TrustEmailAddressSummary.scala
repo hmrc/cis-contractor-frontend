@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object TrustEmailAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustEmailAddressPage).map { answer =>
       SummaryListRowViewModel(
         key = "trustEmailAddress.checkYourAnswersLabel",

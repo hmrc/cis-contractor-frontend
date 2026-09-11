@@ -68,7 +68,7 @@ class TrustAddressController @Inject() (
       case _                              => controllers.routes.JourneyRecoveryController.onPageLoad()
 
     }
-  
+
   def redirectToAmendAddressLookup(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen
       redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async { implicit request =>

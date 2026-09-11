@@ -121,16 +121,18 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
               val subcontractorDetailTitle =
                 messages(detailType.messageKey)
 
-              Future.successful(Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form, subbieResourceRef)))
+              Future.successful(
+                Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form, subbieResourceRef))
+              )
             }
           }
         }
         .getOrElse(Future.successful(journeyRecovery))
     }
 
-  def onSubmit(subcontractorDetail: String, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
-    redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async {
-    implicit request =>
+  def onSubmit(subcontractorDetail: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -151,7 +153,15 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                       messages(detailType.messageKey)
 
                     Future.successful(
-                      BadRequest(view(trustName, subcontractorDetail, subcontractorDetailTitle, formWithErrors, subbieResourceRef))
+                      BadRequest(
+                        view(
+                          trustName,
+                          subcontractorDetail,
+                          subcontractorDetailTitle,
+                          formWithErrors,
+                          subbieResourceRef
+                        )
+                      )
                     )
                   ,
                   value =>
@@ -164,7 +174,9 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad(subbieResourceRef).url
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+                        .onPageLoad(subbieResourceRef)
+                        .url
                     )).recover { case ex =>
                       logger.error(
                         s"Failed to save remove detail answer for '$subcontractorDetail'",
@@ -177,5 +189,5 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
           }
         }
         .getOrElse(Future.successful(journeyRecovery))
-  }
+    }
 }

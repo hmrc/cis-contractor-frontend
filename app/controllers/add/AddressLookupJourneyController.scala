@@ -105,10 +105,10 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val isAmend = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
-      //TODO is it good to put -1L here?
+      val isAmend                      = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
+      // TODO is it good to put -1L here?
       val amendSubbieResourceRef: Long = request.userAnswers.get(AmendSubbieResourceRefQuery).getOrElse(-1L)
-      
+
       saveAddressAndRedirect(id, onChangeCompletion(isAmend, amendSubbieResourceRef))
     }
 

@@ -49,28 +49,29 @@ class TrustContactMethodOptionsController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
-    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
-    val yesOrNoPage       = AddTrustContactMethodsYesNoPage
-    val yesOrNoPageOption = request.userAnswers.get(AddTrustContactMethodsYesNoPage)
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
+      val yesOrNoPage       = AddTrustContactMethodsYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(AddTrustContactMethodsYesNoPage)
 
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustContactMethodOptionsPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          val preparedForm = request.userAnswers.get(TrustContactMethodOptionsPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          val result = Ok(view(preparedForm, mode, trustName, subbieResourceRef))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-        val result = Ok(view(preparedForm, mode, trustName, subbieResourceRef))
-        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
-
-  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
-    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async {
-    implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -86,5 +87,5 @@ class TrustContactMethodOptionsController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

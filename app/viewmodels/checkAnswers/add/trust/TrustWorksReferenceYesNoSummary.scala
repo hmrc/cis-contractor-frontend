@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustWorksReferenceYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
