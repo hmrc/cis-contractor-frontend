@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package pages.amend
+package viewmodels.verify
 
-import pages.QuestionPage
-import pages.add.IndividualJourney
-import play.api.libs.json.JsPath
+import models.SubcontractorCurrentVerification
+import play.api.i18n.Messages
 
-case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
+object SubcontractorDisplay {
 
-  override def path: JsPath = JsPath \ toString
+  def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    sub.displayName
 
-  override def toString: String = "subTradingNameYesNo"
-
+  def utrDisplay(sub: SubcontractorCurrentVerification, noneProvidedKey: String)(implicit messages: Messages): String =
+    sub.utr
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse(messages(noneProvidedKey))
 }

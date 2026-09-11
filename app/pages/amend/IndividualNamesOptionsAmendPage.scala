@@ -16,16 +16,14 @@
 
 package pages.amend
 
-import pages.behaviours.PageBehaviours
+import models.add.IndividualNamesOptions
+import pages.QuestionPage
+import pages.add.IndividualJourney
+import play.api.libs.json.JsPath
 
-class SubTradingNameYesNoAmendPageSpec extends PageBehaviours {
-  "SubTradingNameYesNoAmendPage" - {
+case object IndividualNamesOptionsAmendPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[Boolean](SubTradingNameYesNoAmendPage)
+  override def toString: String = "individualNamesOptions"
 
-    beSettable[Boolean](SubTradingNameYesNoAmendPage)
-
-    beRemovable[Boolean](SubTradingNameYesNoAmendPage)
-
-  }
 }

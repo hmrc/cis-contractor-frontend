@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package models.agent
 
-import play.api.libs.json.JsPath
+import base.SpecBase
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+class ClientListCheckPolicySpec extends SpecBase {
 
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+  "ClientListCheckPolicy" - {
+
+    "must expose GroupA and Exempt policies" in {
+      ClientListCheckPolicy.GroupA mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.Exempt mustBe a[ClientListCheckPolicy]
+    }
+  }
 }

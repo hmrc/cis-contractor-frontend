@@ -20,6 +20,7 @@
 @import viewmodels.verify.SubcontractorReverifyRow
 @import viewmodels.govuk.PaginationFluency._
 @import views.html.components._
+@import viewmodels.checkAnswers.UtrContent
 
 @this(
     layout: templates.Layout,
@@ -114,7 +115,7 @@
                                     ),
 
                                     TableRow(Text(row.name)),
-                                    TableRow(Text(row.utr)),
+                                    TableRow(UtrContent(row.utr)),
                                     TableRow(Text(row.verified)),
                                     TableRow(Text(row.verificationNumber)),
                                     TableRow(Text(row.taxTreatment)),

@@ -21,6 +21,7 @@ import models.address.Address
 import models.add.SubcontractorName as AddSubcontractorName
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.add.IndividualNamesOptions
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
@@ -31,7 +32,7 @@ import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
-import queries.{AmendIndividualSubcontractorNameRemovedQuery, AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
+import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -559,8 +560,8 @@ class SubcontractorService @Inject() (
     val address =
       userAnswers.get(AddressOfSubcontractorPage)
 
-    val removeName =
-      userAnswers.get(AmendIndividualSubcontractorNameRemovedQuery).contains(true)
+    val individualNamesOptions =
+      userAnswers.get(IndividualNamesOptionsPage)
 
     val removeAddress =
       userAnswers.get(SubAddressYesNoPage).contains(false)
@@ -572,13 +573,29 @@ class SubcontractorService @Inject() (
       userAnswers.get(IndividualContactMethodOptionsPage)
 
     existing.copy(
-      firstName = updatedGroupedField(name.map(_.firstName), existing.firstName, removeName, name.isDefined),
-      secondName = updatedGroupedField(name.flatMap(_.middleName), existing.secondName, removeName, name.isDefined),
-      surname = updatedGroupedField(name.map(_.lastName), existing.surname, removeName, name.isDefined),
-      tradingName = updatedOptionalField(
+      firstName = updateNameField(
+        name.map(_.firstName),
+        existing.firstName,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      secondName = updateNameField(
+        name.flatMap(_.middleName),
+        existing.secondName,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      surname = updateNameField(
+        name.map(_.lastName),
+        existing.surname,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      tradingName = updateNameField(
         userAnswers.get(TradingNameOfSubcontractorPage),
         existing.tradingName,
-        userAnswers.get(SubTradingNameYesNoPage).contains(false)
+        individualNamesOptions,
+        IndividualNamesOptions.TradingName
       ),
       nino = updatedOptionalField(
         userAnswers.get(SubNationalInsuranceNumberPage),
@@ -634,22 +651,27 @@ class SubcontractorService @Inject() (
     )
   }
 
-  private def updatedGroupedField(
-    amended: Option[String],
-    existing: Option[String],
-    removeGroup: Boolean,
-    groupAmended: Boolean
-  ): Option[String] =
-    if (removeGroup) Some("")
-    else if (groupAmended) amended.orElse(existing.map(_ => ""))
-    else existing
-
   private def updatedOptionalField(
     amended: Option[String],
     existing: Option[String],
     removeField: Boolean
   ): Option[String] =
     if (removeField) Some("") else amended.orElse(existing)
+
+  private def updateNameField(
+    amended: Option[String],
+    existing: Option[String],
+    namesOptions: Option[Set[IndividualNamesOptions]],
+    namesOption: IndividualNamesOptions
+  ): Option[String] =
+    namesOptions match {
+      case Some(selectedMethods) if selectedMethods.contains(namesOption) =>
+        amended.orElse(existing.map(_ => ""))
+      case Some(_)                                                        =>
+        existing.map(_ => "")
+      case None                                                           =>
+        amended.orElse(existing)
+    }
 
   private def updatedContactField(
     amended: Option[String],
