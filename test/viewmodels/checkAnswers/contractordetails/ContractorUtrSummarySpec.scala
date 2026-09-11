@@ -100,5 +100,18 @@ class ContractorUtrSummarySpec extends AnyFreeSpec with Matchers {
       val expectedHiddenText = messages("contractordetails.contractorUtr.change.hidden")
       action.visuallyHiddenText.value shouldBe expectedHiddenText
     }
+
+    "must prevent Safari from detecting the UTR as a telephone number" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(ContractorUtrPage, "123456789")
+          .success
+          .value
+
+      val row = ContractorUtrSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
   }
 }
