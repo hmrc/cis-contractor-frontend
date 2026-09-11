@@ -26,13 +26,18 @@ import viewmodels.implicits.*
 
 object TrustNameSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "trustName.checkYourAnswersLabel",
         value = ValueViewModel(answer),
         actions = Seq(
-          ActionItemViewModel("site.change", controllers.add.trust.routes.TrustNameController.onPageLoad(mode).url)
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.trust.routes.TrustNameController.onPageLoad(mode, subbieResourceRef).url
+          )
             .withVisuallyHiddenText(messages("trustName.change.hidden"))
             .withAttribute("id" -> "trust-name")
         )

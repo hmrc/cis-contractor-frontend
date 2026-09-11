@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustWorksReferenceYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -39,9 +41,9 @@ object TrustWorksReferenceYesNoSummary {
             "site.change",
             if answer && mode == AmendMode then
               controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
-                .onPageLoad("works-reference-number")
+                .onPageLoad("works-reference-number", subbieResourceRef)
                 .url
-            else controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode).url
+            else controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustWorksReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-works-reference")

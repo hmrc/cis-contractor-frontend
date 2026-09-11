@@ -23,12 +23,11 @@ import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsC
 import models.requests.DataRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, Result}
-import queries.Settable
+import queries.{AddressLookupAmendReturnQuery, AmendSubbieResourceRefQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import queries.AddressLookupAmendReturnQuery
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type (individual, company,
@@ -42,6 +41,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   protected val identify: IdentifierAction
   protected val getData: DataRetrievalAction
   protected val requireData: DataRequiredAction
+  protected val redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider
   protected implicit val executionContext: ExecutionContext
 
   /** The ALF journey identifier for this subcontractor type. */
@@ -66,7 +66,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     * @param isAmend
     *   true when the change originates from the amend journey, false for the add/check journey.
     */
-  protected def onChangeCompletion(isAmend: Boolean): Call
+  protected def onChangeCompletion(isAmend: Boolean, amendSubbieResourceRef: Long): Call
 
   private val mandatoryFields = MandatoryFieldsConfigModel(
     addressLine1 = Some(true),
@@ -105,8 +105,11 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def addressLookupCallbackChange(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val isAmend = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
-      saveAddressAndRedirect(id, onChangeCompletion(isAmend))
+      val isAmend                      = request.userAnswers.get(AddressLookupAmendReturnQuery).getOrElse(false)
+      // TODO is it good to put -1L here?
+      val amendSubbieResourceRef: Long = request.userAnswers.get(AmendSubbieResourceRefQuery).getOrElse(-1L)
+
+      saveAddressAndRedirect(id, onChangeCompletion(isAmend, amendSubbieResourceRef))
     }
 
   private def saveAddressAndRedirect(id: String, onSuccess: Call)(implicit

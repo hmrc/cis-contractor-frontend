@@ -38,6 +38,7 @@ class AddressOfSubcontractorController @Inject() (
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
   override protected val addressLookupService: AddressLookupService,
+  override protected val redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
@@ -59,9 +60,9 @@ class AddressOfSubcontractorController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
 
-  override protected def onChangeCompletion(isAmend: Boolean): Call =
-    if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-    else routes.CheckYourAnswersController.onPageLoad()
+  override protected def onChangeCompletion(isAmend: Boolean, amendSubbieResourceRef: Long): Call =
+    if (isAmend) { controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad() }
+    else { routes.CheckYourAnswersController.onPageLoad() }
 
   def redirectToAmendAddressLookup(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
