@@ -45,7 +45,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
       .success
       .value
-      .set(SubTradingNameYesNoPage, true)
+      .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
       .success
       .value
       .set(TradingNameOfSubcontractorPage, "ABC Ltd")
@@ -87,7 +87,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
             .success
             .value
-            .set(SubTradingNameYesNoPage, true)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
             .success
             .value
             .set(TradingNameOfSubcontractorPage, "ABC Ltd")
@@ -147,7 +147,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
             .success
             .value
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -199,6 +199,72 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
       }
 
+      "and all optional data is present with trading name and subcontractor name" in {
+
+        val answers =
+          emptyUserAnswers
+            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+            .success
+            .value
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+            )
+            .success
+            .value
+            .set(SubcontractorNamePage, subcontractorName)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+            .success
+            .value
+            .set(SubAddressYesNoPage, true)
+            .success
+            .value
+            .set(AddressOfSubcontractorPage, address)
+            .success
+            .value
+            .set(NationalInsuranceNumberYesNoPage, true)
+            .success
+            .value
+            .set(SubNationalInsuranceNumberPage, "AB123456C")
+            .success
+            .value
+            .set(UniqueTaxpayerReferenceYesNoPage, true)
+            .success
+            .value
+            .set(SubcontractorsUniqueTaxpayerReferencePage, "1234567890")
+            .success
+            .value
+            .set(WorksReferenceNumberYesNoPage, true)
+            .success
+            .value
+            .set(WorksReferenceNumberPage, "WRN-001")
+            .success
+            .value
+            .set(AddIndividualContactMethodsYesNoPage, true)
+            .success
+            .value
+            .set(
+              IndividualContactMethodOptionsPage,
+              Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            )
+            .success
+            .value
+            .set(IndividualEmailAddressPage, "a@b.com")
+            .success
+            .value
+            .set(IndividualPhoneNumberPage, "123456789")
+            .success
+            .value
+            .set(IndividualMobileNumberPage, "987654321")
+            .success
+            .value
+
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
+
+      }
+
       "and all optional data is missing but with trading name" in {
 
         val answers =
@@ -206,7 +272,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
             .success
             .value
-            .set(SubTradingNameYesNoPage, true)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
             .success
             .value
             .set(TradingNameOfSubcontractorPage, "ABC Ltd")
@@ -238,7 +304,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
             .success
             .value
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -257,6 +323,44 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
             .success
             .value
             .set(WorksReferenceNumberYesNoPage, false)
+            .success
+            .value
+
+        ValidatedSubcontractor.build(answers) mustBe a[Right[?, ?]]
+      }
+
+      "and all optional data is missing but with trading name and subcontractor name" in {
+
+        val answers =
+          emptyUserAnswers
+            .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+            .success
+            .value
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+            )
+            .success
+            .value
+            .set(SubcontractorNamePage, subcontractorName)
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+            .success
+            .value
+            .set(SubAddressYesNoPage, false)
+            .success
+            .value
+            .set(NationalInsuranceNumberYesNoPage, false)
+            .success
+            .value
+            .set(UniqueTaxpayerReferenceYesNoPage, false)
+            .success
+            .value
+            .set(WorksReferenceNumberYesNoPage, false)
+            .success
+            .value
+            .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
 
@@ -369,7 +473,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when SubTradingNameYesNoPage is missing" in {
+      "when IndividualNamesOptionsPage is missing" in {
         val answers =
           emptyUserAnswers
             .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
@@ -379,7 +483,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
-          error mustBe MissingAnswer(SubTradingNameYesNoPage)
+          error mustBe MissingAnswer(IndividualNamesOptionsPage)
         }
       }
 
@@ -439,10 +543,13 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user said yes to SubTradingNameYesNoPage but TradingNameOfSubcontractorPage is missing" in {
+      "when user select TradingName to IndividualNamesOptionsPage but TradingNameOfSubcontractorPage is missing" in {
         val answers =
           minRequired
-            .set(SubTradingNameYesNoPage, true)
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.TradingName)
+            )
             .success
             .value
             .remove(TradingNameOfSubcontractorPage)
@@ -456,10 +563,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user said no to SubTradingNameYesNoPage but SubcontractorNamePage is missing" in {
+      "when user selected SubcontractorName to IndividualNamesOptionsPage but SubcontractorNamePage is missing" in {
         val answers =
           minRequired
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
             .success
             .value
             .remove(SubcontractorNamePage)
@@ -529,24 +636,24 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user skipped SubTradingNameYesNoPage but answered TradingNameOfSubcontractorPage" in {
+      "when user skipped IndividualNamesOptionsPage but answered TradingNameOfSubcontractorPage" in {
         val answers =
           minRequired
-            .remove(SubTradingNameYesNoPage)
+            .remove(IndividualNamesOptionsPage)
             .success
             .value
 
         val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
-          error mustBe MissingAnswer(SubTradingNameYesNoPage)
+          error mustBe MissingAnswer(IndividualNamesOptionsPage)
         }
       }
 
-      "when user skipped SubTradingNameYesNoPage but answered SubcontractorNamePage" in {
+      "when user skipped IndividualNamesOptionsPage but answered SubcontractorNamePage" in {
         val answers =
           minRequired
-            .remove(SubTradingNameYesNoPage)
+            .remove(IndividualNamesOptionsPage)
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -556,7 +663,7 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         val result = ValidatedSubcontractor.build(answers)
 
         inside(result) { case Left(error) =>
-          error mustBe MissingAnswer(SubTradingNameYesNoPage)
+          error mustBe MissingAnswer(IndividualNamesOptionsPage)
         }
       }
 
@@ -628,10 +735,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user said yes to SubTradingNameYesNoPage and answered SubcontractorNamePage" in {
+      "when user select only TradingName to IndividualNamesOptionsPage and answered SubcontractorNamePage" in {
         val answers =
           minRequired
-            .set(SubTradingNameYesNoPage, true)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -645,10 +752,10 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "when user said no to SubTradingNameYesNoPage and answered TradingNameOfSubcontractorPage" in {
+      "when user select only SubcontractorName to IndividualNamesOptionsPage and answered TradingNameOfSubcontractorPage" in {
         val answers =
           minRequired
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
             .success
             .value
             .set(TradingNameOfSubcontractorPage, "ABC Ltd")
@@ -662,11 +769,11 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         }
       }
 
-      "fail when SubTradingNameYesNo is false but TradingNameOfSubcontractor value is still present (stale session)" in {
+      "fail when only SubcontractorName is selected in IndividualNamesOptionsPage but TradingNameOfSubcontractor value is still present (stale session)" in {
 
         val userAnswers =
           minRequired
-            .set(SubTradingNameYesNoPage, false)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
             .success
             .value
             .set(SubcontractorNamePage, subcontractorName)
@@ -678,11 +785,11 @@ class ValidatedSubcontractorSpec extends SpecBase with Matchers {
         ValidatedSubcontractor.build(uaWithStale) mustBe Left(InvalidAnswer(TradingNameOfSubcontractorPage))
       }
 
-      "fail when SubTradingNameYesNo is true but SubcontractorName value is still present (stale session)" in {
+      "fail when only TradingName is selected but SubcontractorName value is still present (stale session)" in {
 
         val userAnswers =
           minRequired
-            .set(SubTradingNameYesNoPage, true)
+            .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
             .success
             .value
             .set(TradingNameOfSubcontractorPage, "ABC Ltd")

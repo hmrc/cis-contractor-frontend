@@ -17,12 +17,14 @@
 package models.verify
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{EmployerReference, UserAnswers, VerificationCurrentVerification}
+import models.{EmployerReference, SubcontractorCurrentVerification, UserAnswers, VerificationCurrentVerification}
 import models.requests.{ChrisVerificationRequest, VerificationDetails}
 import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.i18n.Messages
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.VerifyEmailResolver
+import viewmodels.verify.SubcontractorDisplay
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +37,7 @@ class ChrisVerificationRequestBuilder @Inject() (
     ua: UserAnswers,
     isAgent: Boolean,
     employerReference: EmployerReference
-  )(implicit hc: HeaderCarrier): Future[ChrisVerificationRequest] = {
+  )(implicit hc: HeaderCarrier, messages: Messages): Future[ChrisVerificationRequest] = {
 
     val cisIdFut = requireFromSession(
       ua.get(CisIdQuery),
@@ -57,6 +59,7 @@ class ChrisVerificationRequestBuilder @Inject() (
       verificationRefs             = currentVerificationBatch.verifications.flatMap(_.verificationResourceRef).toSet
       currentBatchSubcontractors   =
         currentVerificationBatch.subcontractors.filter(_.subbieResourceRef.exists(verificationRefs))
+      subsById                     = currentVerificationBatch.subcontractors.map(s => s.subcontractorId -> s).toMap
     } yield ChrisVerificationRequest(
       instanceId = cisId,
       isAgent = isAgent,
@@ -68,7 +71,9 @@ class ChrisVerificationRequestBuilder @Inject() (
       verificationBatchResourceRef = verificationBatchResourceRef.toString,
       emailRecipient = VerifyEmailResolver.resolvedEmail(ua),
       subcontractors = currentBatchSubcontractors,
-      verifications = currentVerificationBatch.verifications.map(toVerificationDetails)
+      verifications = currentVerificationBatch.verifications.map(v =>
+        toVerificationDetails(v, v.subcontractorId.flatMap(subsById.get))
+      )
     )
   }
 
@@ -81,15 +86,28 @@ class ChrisVerificationRequestBuilder @Inject() (
   private def requireValue[A](valueOpt: Option[A], errorMsg: String): A =
     valueOpt.getOrElse(throw new RuntimeException(errorMsg))
 
-  private def toVerificationDetails(verification: VerificationCurrentVerification): VerificationDetails =
+  private def toVerificationDetails(
+    verification: VerificationCurrentVerification,
+    sub: Option[SubcontractorCurrentVerification]
+  )(implicit messages: Messages): VerificationDetails =
     VerificationDetails(
-      subcontractorName =
-        "TBC", // TODO: added as per BE 4931 PR impl, but not really used in BE to build chris submission xml payload
+      subcontractorName = resolveName(verification, sub),
       verificationResourceRef = requireValue(
         verification.verificationResourceRef.map(_.toString),
         "Verification resource ref not found"
       ),
-      proceedVerification = true // TODO: how to decide this boolean?
+      proceedVerification = verification.proceed.exists(_.trim.equalsIgnoreCase("Y"))
     )
+
+  // Name maps to VERIFICATION.SUBCONTRACTOR_NAME, falling back to the subcontractor's derived name.
+  private def resolveName(
+    verification: VerificationCurrentVerification,
+    sub: Option[SubcontractorCurrentVerification]
+  )(implicit messages: Messages): String =
+    verification.subcontractorName
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .orElse(sub.map(SubcontractorDisplay.displayName))
+      .getOrElse(messages("verify.noName"))
 
 }

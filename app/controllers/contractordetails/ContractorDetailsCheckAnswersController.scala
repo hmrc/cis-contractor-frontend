@@ -17,8 +17,6 @@
 package controllers.contractordetails
 
 import config.FrontendAppConfig
-import connectors.ConstructionIndustrySchemeConnector
-import controllers.Execution.trampoline
 import controllers.actions.*
 import models.requests.UpdateContractorSchemeParams
 import pages.CisIdPage
