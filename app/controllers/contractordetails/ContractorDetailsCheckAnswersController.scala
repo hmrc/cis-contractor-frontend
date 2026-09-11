@@ -18,8 +18,8 @@ package controllers.contractordetails
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.requests.UpdateContractorSchemeParams
-import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import models.requests.{DataRequest, UpdateContractorSchemeParams}
+import pages.contractordetails.{AddEmailAddressYesNoPage, AddSchemeNameYesNoPage, ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,22 +47,27 @@ class ContractorDetailsCheckAnswersController @Inject() (
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(ContractorSchemePage) match {
-
         case Some(scheme) =>
-          val summaryRows = Seq(
-            ContractorUtrSummary.row(request.userAnswers),
-            AddSchemeNameYesNoSummary.row(request.userAnswers),
-            SchemeNameSummary.row(request.userAnswers),
-            AddEmailAddressYesNoSummary.row(request.userAnswers),
-            EnterContractorEmailAddressSummary.row(request.userAnswers)
-          ).flatten
+          if (hasRequiredDetails(request)) {
+            val summaryRows = Seq(
+              ContractorUtrSummary.row(request.userAnswers),
+              AddSchemeNameYesNoSummary.row(request.userAnswers),
+              SchemeNameSummary.row(request.userAnswers),
+              AddEmailAddressYesNoSummary.row(request.userAnswers),
+              EnterContractorEmailAddressSummary.row(request.userAnswers)
+            ).flatten
 
-          Ok(
-            view(
-              scheme.accountsOfficeReference,
-              summaryRows
+            Ok(
+              view(
+                scheme.accountsOfficeReference,
+                summaryRows
+              )
             )
-          )
+          } else {
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
 
         case None =>
           Redirect(
@@ -74,41 +79,46 @@ class ContractorDetailsCheckAnswersController @Inject() (
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(ContractorSchemePage) match {
-
         case Some(scheme) =>
-          val updateRequest =
-            UpdateContractorSchemeParams(
-              schemeId = scheme.schemeId,
-              instanceId = scheme.instanceId,
-              accountsOfficeReference = scheme.accountsOfficeReference,
-              taxOfficeNumber = scheme.taxOfficeNumber,
-              taxOfficeReference = scheme.taxOfficeReference,
-              utr = request.userAnswers.get(ContractorUtrPage),
-              name = request.userAnswers.get(SchemeNamePage),
-              emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
-              version = scheme.version,
-              displayWelcomePage = scheme.displayWelcomePage,
-              prePopCount = scheme.prePopCount,
-              prePopSuccessful = scheme.prePopSuccessful
-            )
-
-          service
-            .updateContractorDetails(updateRequest)
-            .map { _ =>
-              Redirect(
-                routes.ContractorDetailsUpdatedController.onPageLoad()
-              )
-            }
-            .recover { case t =>
-              logger.error(
-                "[ContractorDetailsCheckAnswersController.onSubmit] Failed to update contractor details",
-                t
+          if (hasRequiredDetails(request)) {
+            val updateRequest =
+              UpdateContractorSchemeParams(
+                schemeId = scheme.schemeId,
+                instanceId = scheme.instanceId,
+                accountsOfficeReference = scheme.accountsOfficeReference,
+                taxOfficeNumber = scheme.taxOfficeNumber,
+                taxOfficeReference = scheme.taxOfficeReference,
+                utr = request.userAnswers.get(ContractorUtrPage),
+                name = request.userAnswers.get(SchemeNamePage),
+                emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
+                version = scheme.version,
+                displayWelcomePage = scheme.displayWelcomePage,
+                prePopCount = scheme.prePopCount,
+                prePopSuccessful = scheme.prePopSuccessful
               )
 
+            service
+              .updateContractorDetails(updateRequest)
+              .map { _ =>
+                Redirect(routes.ContractorDetailsUpdatedController.onPageLoad())
+              }
+              .recover { case t =>
+                logger.error(
+                  "[ContractorDetailsCheckAnswersController.onSubmit] Failed to update contractor details",
+                  t
+                )
+
+                Redirect(
+                  controllers.routes.JourneyRecoveryController.onPageLoad()
+                )
+              }
+          } else {
+            Future.successful(
               Redirect(
                 controllers.routes.JourneyRecoveryController.onPageLoad()
               )
-            }
+            )
+          }
 
         case None =>
           Future.successful(
@@ -118,4 +128,20 @@ class ContractorDetailsCheckAnswersController @Inject() (
           )
       }
     }
+
+  private def hasRequiredDetails(request: DataRequest[AnyContent]): Boolean = {
+    val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(SchemeNamePage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    schemeNameValid && emailAddressValid
+  }
 }
