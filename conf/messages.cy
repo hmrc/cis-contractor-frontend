@@ -186,8 +186,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  Gellir dod o hyd i rifau Yswiriant Gwladol ar slipiau cyflog, P60s a dogfennau treth eraill. Er enghraifft, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  Rhif Yswiriant Gwladol
 subNationalInsuranceNumber.error.required                                           =  Nodwch rif Yswiriant Gwladol
-subNationalInsuranceNumber.error.length                                             =  Nodwch rif Yswiriant Gwladol dilys
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Nodwch rif Yswiriant Gwladol dilys
+subNationalInsuranceNumber.error.length                                             =  Nodwch rif Yswiriant Gwladol dilys, fel QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Nodwch rif Yswiriant Gwladol dilys, fel QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  Rhif Yswiriant Gwladol
 
 worksReferenceNumber.title                                                          =  xxxxxxxxxxxxxxxxxxxx
@@ -585,8 +585,8 @@ partnershipNominatedPartnerNino.title                              =  xxxxxxxxxx
 partnershipNominatedPartnerNino.heading                            =  Beth yw rhif Yswiriant Gwladol {0}?
 partnershipNominatedPartnerNino.hint                               =  Gellir dod o hyd i rifau Yswiriant Gwladol ar slipiau cyflog, P60s a dogfennau treth eraill. Er enghraifft, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Nodwch rif Yswiriant Gwladol
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Nodwch rif Yswiriant Gwladol dilys
-partnershipNominatedPartnerNino.error.length                       =  Nodwch rif Yswiriant Gwladol dilys
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Nodwch rif Yswiriant Gwladol dilys, fel QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Nodwch rif Yswiriant Gwladol dilys, fel QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
 partnershipNominatedPartnerNino.change.hidden                      =  Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
 

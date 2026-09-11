@@ -186,8 +186,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  National Insurance number
 subNationalInsuranceNumber.error.required                                           =  Enter a National Insurance number
-subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  National Insurance number
 
 worksReferenceNumber.title                                                          =  What is the works reference number associated with this subcontractor?
@@ -596,8 +596,8 @@ partnershipNominatedPartnerNino.title                              =  What is th
 partnershipNominatedPartnerNino.heading                            =  What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint                               =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  National Insurance number for nominated partner
 partnershipNominatedPartnerNino.change.hidden                      =  National Insurance number for nominated partner
 
