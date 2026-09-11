@@ -206,7 +206,16 @@ class SelectSubcontractorsToReverifyController @Inject() (
                               )
             _              <- sessionRepository.set(updatedAnswers)
           } yield Ok(
-            view(preparedForm, mode, result.items, result.pagination, page, result.startIndex, result.totalCount)
+            view(
+              preparedForm,
+              mode,
+              result.items,
+              result.pagination,
+              page,
+              result.startIndex,
+              result.totalCount,
+              result.totalPages
+            )
           )
       }
     }
@@ -276,7 +285,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
             result.pagination,
             page,
             result.startIndex,
-            result.totalCount
+            result.totalCount,
+            result.totalPages
           )
         )
 

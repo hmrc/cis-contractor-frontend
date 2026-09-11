@@ -66,6 +66,7 @@ checkYourAnswers.addSubcontractor                       =  Accept and submit
 site.pagination.previous                                =  Previous
 site.pagination.next                                    =  Next
 site.pagination.landmark                                =  Pagination
+site.pagination.pageTitle                               =  (page {0} of {1})
 
 # Errors & Auth
 pageNotFound.title                       =  Page not found
