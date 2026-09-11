@@ -162,6 +162,8 @@ class ReviewSubcontractorDetailsController @Inject() (
               }
 
             case ReviewUnmatchedSubcontractors | ReviewInsufficientInfoSubcontractors =>
+              // TODO: Redirect to the appropriate next page once the onSubmit journeys for
+              // ReviewUnmatchedSubcontractors(DTR-5226) and ReviewInsufficientInfoSubcontractors(DTR-6949) implemented
               Future.successful(
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               )
@@ -186,7 +188,7 @@ class ReviewSubcontractorDetailsController @Inject() (
         controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(mode).url
 
       case ReviewUnmatchedSubcontractors =>
-        controllers.routes.JourneyRecoveryController.onPageLoad().url
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
 
       case ReviewInsufficientInfoSubcontractors =>
         controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url

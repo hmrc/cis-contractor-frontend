@@ -1269,9 +1269,10 @@ finalValidations.verify.reviewSubcontractorDetails.taskList.status.incomplete   
 finalValidations.verify.reviewSubcontractorDetails.title                             = Review subcontractor details
 finalValidations.verify.reviewSubcontractorDetails.heading                           = Review subcontractor details
 finalValidations.verify.reviewSubcontractorDetails.intro                             = You need to review the subcontractor details
-finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      = Verify subcontractor
+finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      = Verify your subcontractors
 finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet = Cannot continue yet
 finalValidations.verify.reviewSubcontractorDetails.backLink                          = Back to select your subcontractors
+finalValidations.verify.reviewSubcontractorDetails.taskList.review                   = Review
 
 finalvalidations.updateSubcontractorDetails.title                              = {0}
 finalvalidations.updateSubcontractorDetails.heading                            = {0}

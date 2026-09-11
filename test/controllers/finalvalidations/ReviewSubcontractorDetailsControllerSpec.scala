@@ -256,10 +256,9 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
               )
             ),
             canContinue = false,
-            backUrl =
-              controllers.verify.routes.SelectSubcontractorController
-                .onPageLoad(NormalMode)
-                .url
+            backUrl = controllers.verify.routes.SelectSubcontractorController
+              .onPageLoad(NormalMode)
+              .url
           )
 
         status(result) mustBe OK
@@ -345,10 +344,9 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
               )
             ),
             canContinue = false,
-            backUrl =
-              controllers.verify.routes.SelectSubcontractorsToReverifyController
-                .onPageLoad(CheckMode)
-                .url
+            backUrl = controllers.verify.routes.SelectSubcontractorsToReverifyController
+              .onPageLoad(CheckMode)
+              .url
           )
 
         status(result) mustBe OK

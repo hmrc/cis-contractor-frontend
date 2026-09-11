@@ -37,11 +37,11 @@ import scala.util.Success
 
 class FinalValidationCompleteControllerSpec extends SpecBase {
 
-  private val instanceId       = "1"
-  private val draftId          = "draft-id"
-  private val otherDraftId     = "other-draft-id"
-  private val handoffId        = "handoff-id"
-  private val subcontractorId  = 101L
+  private val instanceId        = "1"
+  private val draftId           = "draft-id"
+  private val otherDraftId      = "other-draft-id"
+  private val handoffId         = "handoff-id"
+  private val subcontractorId   = 101L
   private val subbieResourceRef = 100L
 
   private val payload =
@@ -76,11 +76,11 @@ class FinalValidationCompleteControllerSpec extends SpecBase {
       .url
 
   private def applicationWith(
-                               userAnswers: Option[UserAnswers],
-                               finalValidationHandoffService: FinalValidationHandoffService,
-                               finalValidationDraftService: FinalValidationDraftService,
-                               correctionBuilder: FinalValidationCorrectionBuilder
-                             ) =
+    userAnswers: Option[UserAnswers],
+    finalValidationHandoffService: FinalValidationHandoffService,
+    finalValidationDraftService: FinalValidationDraftService,
+    correctionBuilder: FinalValidationCorrectionBuilder
+  ) =
     applicationBuilder(userAnswers = userAnswers)
       .configure(
         "play.http.context" -> "/"

@@ -39,9 +39,9 @@ import scala.util.{Failure, Success}
 
 class FinalValidationChangeControllerSpec extends SpecBase {
 
-  private val cisId = "1"
-  private val draftId = "draft-id"
-  private val subcontractorId = 1L
+  private val cisId             = "1"
+  private val draftId           = "draft-id"
+  private val subcontractorId   = 1L
   private val subbieResourceRef = 100L
 
   private val field =
@@ -61,9 +61,9 @@ class FinalValidationChangeControllerSpec extends SpecBase {
       )
 
   private def finalValidationChangeRoute(
-                                          fieldKey: String = field.key,
-                                          targetKey: String = changeTarget.key
-                                        ) =
+    fieldKey: String = field.key,
+    targetKey: String = changeTarget.key
+  ) =
     routes.FinalValidationChangeController
       .onPageLoad(
         subcontractorId,
@@ -73,41 +73,41 @@ class FinalValidationChangeControllerSpec extends SpecBase {
       .url
 
   private def draft(
-                     id: Long = subcontractorId,
-                     readiness: String = "Incomplete",
-                     issues: Seq[FinalValidationDraftIssue] = Seq(
-                       FinalValidationDraftIssue(
-                         fieldKey = field.key,
-                         value = Some("1234567890")
-                       )
-                     )
-                   ): FinalValidationDraft =
+    id: Long = subcontractorId,
+    readiness: String = "Incomplete",
+    issues: Seq[FinalValidationDraftIssue] = Seq(
+      FinalValidationDraftIssue(
+        fieldKey = field.key,
+        value = Some("1234567890")
+      )
+    )
+  ): FinalValidationDraft =
     Json
       .obj(
         "subcontractors" -> Json.arr(
           Json.obj(
-            "subcontractorId" -> id,
+            "subcontractorId"   -> id,
             "subbieResourceRef" -> subbieResourceRef,
-            "baseVersion" -> 1,
+            "baseVersion"       -> 1,
             "subcontractorType" -> "soletrader",
-            "displayName" -> "Test Subcontractor",
-            "base" -> Json.obj(),
-            "proposed" -> Json.obj(),
-            "changedTargets" -> Json.arr(),
-            "issues" -> Json.toJson(issues),
-            "readiness" -> readiness
+            "displayName"       -> "Test Subcontractor",
+            "base"              -> Json.obj(),
+            "proposed"          -> Json.obj(),
+            "changedTargets"    -> Json.arr(),
+            "issues"            -> Json.toJson(issues),
+            "readiness"         -> readiness
           )
         )
       )
       .as[FinalValidationDraft]
 
   private def applicationWith(
-                               userAnswers: Option[UserAnswers],
-                               finalValidationDraftService: FinalValidationDraftService,
-                               finalValidationSubcontractorService: FinalValidationSubcontractorService,
-                               finalValidationNavigator: FinalValidationNavigator,
-                               sessionRepository: SessionRepository
-                             ) =
+    userAnswers: Option[UserAnswers],
+    finalValidationDraftService: FinalValidationDraftService,
+    finalValidationSubcontractorService: FinalValidationSubcontractorService,
+    finalValidationNavigator: FinalValidationNavigator,
+    sessionRepository: SessionRepository
+  ) =
     applicationBuilder(userAnswers = userAnswers)
       .configure(
         "play.http.context" -> "/"

@@ -121,7 +121,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       )(any[HeaderCarrier])
     ).thenReturn(Future.successful(validationResult))
   }
-  
+
   private lazy val postUrl: String =
     controllers.verify.routes.SelectSubcontractorsToReverifyController
       .onPageLoad(NormalMode)
@@ -307,7 +307,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       }
 
       "must redirect to the next page when valid data is submitted (uses rows stored in SubcontractorReverifyRowsPage)" in {
-        val mockRepo = mock[SessionRepository]
+        val mockRepo                     = mock[SessionRepository]
         val verifyFinalValidationService = mock[VerifyFinalValidationService]
 
         when(mockRepo.set(any())) thenReturn Future.successful(true)
@@ -415,7 +415,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       "must redirect to JourneyRecovery when no existing data is found (requireData fails)" in {
         val mockRepo = mock[SessionRepository]
-        val app =
+        val app      =
           applicationBuilder(userAnswers = None)
             .overrides(bind[SessionRepository].toInstance(mockRepo))
             .build()
@@ -1076,7 +1076,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
     }
 
     "must allow empty submission when UnverifiedSubcontractorsPage is non-empty" in {
-      val mockRepo = mock[SessionRepository]
+      val mockRepo                     = mock[SessionRepository]
       val verifyFinalValidationService = mock[VerifyFinalValidationService]
 
       when(mockRepo.set(any())) thenReturn Future.successful(true)
@@ -1142,7 +1142,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
     }
 
     "must allow empty submission when SelectSubcontractorPage already contains selections" in {
-      val mockRepo = mock[SessionRepository]
+      val mockRepo                     = mock[SessionRepository]
       val verifyFinalValidationService = mock[VerifyFinalValidationService]
 
       when(mockRepo.set(any())) thenReturn Future.successful(true)

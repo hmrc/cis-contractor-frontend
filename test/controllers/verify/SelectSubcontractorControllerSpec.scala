@@ -51,9 +51,9 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new SelectSubcontractorFormProvider()
+  val formProvider            = new SelectSubcontractorFormProvider()
   val form: Form[Set[String]] = formProvider()
-  val paginationService = new PaginationService()
+  val paginationService       = new PaginationService()
 
   private val verifyFinalValidationService = mock[VerifyFinalValidationService]
 
@@ -142,8 +142,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private val allSubs = SubcontractorViewModel.fromSubcontractors(subcontractors)
-  private val brodyMartin = allSubs.head
+  private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
+  private val brodyMartin      = allSubs.head
   private val epsilonCarpentry = allSubs(6)
 
   "SelectSubcontractor Controller" - {
@@ -160,11 +160,11 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SubcontractorViewModel.checkboxItems(allSubs)
+        val allItems         = SubcontractorViewModel.checkboxItems(allSubs)
         val paginationResult = paginationService.paginateCheckboxItems(allItems, 1)
 
         status(result) mustEqual OK
@@ -193,11 +193,11 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SubcontractorViewModel.checkboxItems(allSubs)
+        val allItems         = SubcontractorViewModel.checkboxItems(allSubs)
         val paginationResult = paginationService.paginateCheckboxItems(allItems, 1)
 
         status(result) mustEqual OK
@@ -250,7 +250,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems = SubcontractorViewModel.checkboxItems(allSubs)
+        val allItems         = SubcontractorViewModel.checkboxItems(allSubs)
         val paginationResult = paginationService.paginateCheckboxItems(allItems, 1)
 
         val result = route(application, request).value
@@ -286,7 +286,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url(2))
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
       }
@@ -303,7 +303,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       val request = FakeRequest(GET, url())
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustBe OK
     }
@@ -327,7 +327,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -369,7 +369,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -393,7 +393,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -409,7 +409,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -431,7 +431,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, url())
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -573,7 +573,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val priorSelection: Set[SubcontractorViewModel] = Set(brodyMartin)
-      val userAnswers =
+      val userAnswers                                 =
         uaWithSubcontractors
           .set(SelectSubcontractorPage, priorSelection)
           .success
@@ -602,7 +602,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SubcontractorViewModel] = Set(brodyMartin)
-      val userAnswers =
+      val userAnswers                                 =
         uaWithSubcontractors
           .set(SelectSubcontractorPage, page1Selection)
           .success
@@ -675,7 +675,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val page1Selection: Set[SubcontractorViewModel] = Set(brodyMartin)
-      val userAnswers =
+      val userAnswers                                 =
         uaWithSubcontractors
           .set(SelectSubcontractorPage, page1Selection)
           .success
@@ -712,8 +712,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val allItems = SubcontractorViewModel.checkboxItems(allSubs)
-      val page1 = paginationService.paginateCheckboxItems(allItems, 1)
-      val page2 = paginationService.paginateCheckboxItems(allItems, 2)
+      val page1    = paginationService.paginateCheckboxItems(allItems, 1)
+      val page2    = paginationService.paginateCheckboxItems(allItems, 2)
 
       val page1Subs: Set[SubcontractorViewModel] =
         page1.paginatedData.flatMap(item => allSubs.find(_.id == item.value)).toSet
@@ -763,7 +763,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect when form binds but submitted ids match no known subcontractor and selection is not mandatory" in {
 
-      class TestSelectSubcontractorFormProvider @Inject()() extends SelectSubcontractorFormProvider {
+      class TestSelectSubcontractorFormProvider @Inject() () extends SelectSubcontractorFormProvider {
         override def apply(): Form[Set[String]] =
           Form(single("value" -> ignored(Set("non-existent-id"))))
       }
