@@ -39,6 +39,7 @@ class TrustContactMethodOptionsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustContactMethodOptionsFormProvider,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: TrustContactMethodOptionsView
@@ -48,7 +49,8 @@ class TrustContactMethodOptionsController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
+    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
     val yesOrNoPage       = AddTrustContactMethodsYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(AddTrustContactMethodsYesNoPage)
 
@@ -60,13 +62,14 @@ class TrustContactMethodOptionsController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        val result = Ok(view(preparedForm, mode, trustName))
+        val result = Ok(view(preparedForm, mode, trustName, subbieResourceRef))
         yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
+    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async {
     implicit request =>
       request.userAnswers
         .get(TrustNamePage)
@@ -74,7 +77,7 @@ class TrustContactMethodOptionsController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, subbieResourceRef))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustContactMethodOptionsPage, value))

@@ -39,6 +39,7 @@ class TrustPhoneNumberController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustPhoneNumberFormProvider,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustPhoneNumberView
 )(implicit ec: ExecutionContext)
@@ -47,8 +48,9 @@ class TrustPhoneNumberController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
 
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
       val trustName     = request.userAnswers.get(TrustNamePage)
@@ -59,7 +61,7 @@ class TrustPhoneNumberController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, trustName))
+          Ok(view(preparedForm, mode, trustName, subbieResourceRef))
 
         case (Some(_), _) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
@@ -68,7 +70,8 @@ class TrustPhoneNumberController @Inject() (
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
+    redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async {
     implicit request =>
       (for {
         trustName      <- request.userAnswers.get(TrustNamePage)
@@ -77,7 +80,7 @@ class TrustPhoneNumberController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, subbieResourceRef))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustPhoneNumberPage, value))

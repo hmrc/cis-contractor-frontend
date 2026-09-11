@@ -38,6 +38,7 @@ class PartnershipAddressController @Inject() (
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
   override protected val addressLookupService: AddressLookupService,
+  override protected val redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
     extends AddressLookupJourneyController {
@@ -58,7 +59,7 @@ class PartnershipAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
 
-  override protected def onChangeCompletion(isAmend: Boolean): Call =
+  override protected def onChangeCompletion(isAmend: Boolean, amendSubbieResourceRef: Long): Call =
     if (isAmend) {
       controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
     } else {

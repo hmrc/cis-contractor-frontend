@@ -30,7 +30,7 @@ import viewmodels.implicits.*
 
 object TrustContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustContactMethodOptionsPage).map { selectedMethods =>
       val options =
         ContactMethodOptions
@@ -44,7 +44,7 @@ object TrustContactMethodOptionsSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode).url
+            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
             .withAttribute("id" -> "trust-methods-of-contact")

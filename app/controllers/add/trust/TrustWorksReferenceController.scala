@@ -18,12 +18,11 @@ package controllers.add.trust
 
 import controllers.actions.*
 import forms.add.trust.TrustWorksReferenceFormProvider
-import models.{AmendMode, Mode}
+import models.Mode
 import navigation.Navigator
 import pages.add.trust.{TrustNamePage, TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.AmendSubbieResourceRefQuery
 import repositories.SessionRepository
 import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -50,7 +49,7 @@ class TrustWorksReferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, subbieResourceRef: Long = -1L): Action[AnyContent] =
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen
       redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
 
@@ -71,7 +70,7 @@ class TrustWorksReferenceController @Inject() (
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(mode: Mode, subbieResourceRef: Long = -1L): Action[AnyContent] =
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen
       redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       request.userAnswers

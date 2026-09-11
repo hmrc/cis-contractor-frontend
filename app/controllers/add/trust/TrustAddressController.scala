@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
-import models.{Mode, UserAnswers}
+import models.{AmendMode, Mode, UserAnswers}
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -38,6 +38,7 @@ class TrustAddressController @Inject() (
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
   override protected val addressLookupService: AddressLookupService,
+  override protected val redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
     extends AddressLookupJourneyController {
@@ -58,15 +59,19 @@ class TrustAddressController @Inject() (
   override protected def onCompletion(mode: Mode): Call =
     routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
 
-  override protected def onChangeCompletion(isAmend: Boolean): Call =
-    if (isAmend) {
-      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
-    } else {
-      routes.TrustCheckYourAnswersController.onPageLoad()
-    }
+  override protected def onChangeCompletion(isAmend: Boolean, amendSubbieResourceRef: Long): Call =
+    (isAmend, amendSubbieResourceRef) match {
+      case (true, -1L)                    => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case (true, amendSubbieResourceRef) =>
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad(amendSubbieResourceRef)
+      case (false, _)                     => routes.TrustCheckYourAnswersController.onPageLoad()
+      case _                              => controllers.routes.JourneyRecoveryController.onPageLoad()
 
-  def redirectToAmendAddressLookup(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    }
+  
+  def redirectToAmendAddressLookup(subbieResourceRef: Long = -1L): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async { implicit request =>
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)

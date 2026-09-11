@@ -130,7 +130,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       if (isVerified.contains(true)) {
         Nil
       } else {
-        Seq(TrustNameSummary.row(ua, AmendMode))
+        Seq(TrustNameSummary.row(ua, AmendMode, subbieResourceRef))
       }
 
     val utrRows =
@@ -138,24 +138,24 @@ class AmendTrustCheckYourAnswersController @Inject() (
         Nil
       } else {
         Seq(
-          TrustUtrYesNoSummary.row(ua, AmendMode),
-          TrustUtrSummary.row(ua, AmendMode)
+          TrustUtrYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+          TrustUtrSummary.row(ua, AmendMode, subbieResourceRef)
         )
       }
 
     nameRows ++
       Seq(
-        TrustAddressYesNoSummary.row(ua, AmendMode),
-        TrustAddressSummary.row(ua, AmendMode),
-        AddTrustContactMethodsYesNoSummary.row(ua, AmendMode),
-        TrustContactMethodOptionsSummary.row(ua, AmendMode),
-        TrustEmailAddressSummary.row(ua, AmendMode),
-        TrustPhoneNumberSummary.row(ua, AmendMode),
-        TrustMobileNumberSummary.row(ua, AmendMode)
+        TrustAddressYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustAddressSummary.row(ua, AmendMode, subbieResourceRef),
+        AddTrustContactMethodsYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustContactMethodOptionsSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustEmailAddressSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustPhoneNumberSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustMobileNumberSummary.row(ua, AmendMode, subbieResourceRef)
       ) ++
       utrRows ++
       Seq(
-        TrustWorksReferenceYesNoSummary.row(ua, AmendMode),
+        TrustWorksReferenceYesNoSummary.row(ua, AmendMode, subbieResourceRef),
         TrustWorksReferenceSummary.row(ua, AmendMode, subbieResourceRef)
       )
   }

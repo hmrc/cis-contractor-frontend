@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object TrustMobileNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(TrustMobileNumberPage).map { answer =>
       SummaryListRowViewModel(
         key = "trustMobileNumber.checkYourAnswersLabel",
@@ -34,7 +34,7 @@ object TrustMobileNumberSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode).url
+            controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustMobileNumber.change.hidden"))
             .withAttribute("id" -> "trust-mobile-number")

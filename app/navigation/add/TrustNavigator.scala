@@ -39,9 +39,9 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       amendRouteMap(page)(userAnswers)
   }
 
-  private def cyaRoute(mode: Mode): Call = mode match {
+  private def cyaRoute(mode: Mode, subbieResourceRef: Long = -1L): Call = mode match {
     case AmendMode =>
-      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad()
+      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad(subbieResourceRef)
     case _         => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
   }
 
@@ -87,6 +87,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val amendRouteMap: Page => UserAnswers => Call = {
+    case TrustNamePage                   => navigateFromAmendTrustAnswerPage
     case TrustAddressYesNoPage           => navigatorFromTrustAddressYesNoPage(AmendMode)(_)
     case AddTrustContactMethodsYesNoPage => navigatorFromAddTrustContactMethodsYesNoPage(AmendMode)(_)
     case TrustContactMethodOptionsPage   => nextMissingSelectedContactMethodPageAfter(current = None, AmendMode)(_)
@@ -98,35 +99,43 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       nextMissingSelectedContactMethodPageAfter(current = Some(ContactMethodOptions.Mobile), AmendMode)(_)
     case TrustWorksReferenceYesNoPage    => navigatorFromTrustWorksReferenceYesNoPage(AmendMode)(_)
     case TrustUtrYesNoPage               => navigatorFromTrustUtrYesNoPage(AmendMode)(_)
-    case TrustWorksReferencePage         => navigateFromAmendTrustWorksReferencePage
+    case TrustUtrPage                    => navigateFromAmendTrustAnswerPage
+    case TrustWorksReferencePage         => navigateFromAmendTrustAnswerPage
     case _                               => _ => cyaRoute(AmendMode)
   }
-
+  
   private def navigatorFromTrustUtrYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(TrustUtrYesNoPage), mode) match {
-      case (Some(true), NormalMode)             => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
-      case (Some(false), NormalMode)            =>
+    (ua.get(TrustUtrYesNoPage), mode, ua.get(AmendSubbieResourceRefQuery)) match {
+      case (Some(true), NormalMode, _)                           => controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)
+      case (Some(false), NormalMode, _)                          =>
         controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(NormalMode)
-      case (Some(true), CheckMode | AmendMode)  =>
+      case (Some(true), CheckMode, _)                            =>
         ua.get(TrustUtrPage)
           .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
-      case (Some(false), CheckMode | AmendMode) =>
+      case (Some(false), CheckMode, _)                           =>
         cyaRoute(mode)
-      case _                                    =>
+      case (Some(true), AmendMode, Some(amendSubbieResourceRef)) =>
+        ua.get(TrustUtrPage)
+          .fold(controllers.add.trust.routes.TrustUtrController.onPageLoad(mode, amendSubbieResourceRef)) { _ =>
+            cyaRoute(mode, amendSubbieResourceRef)
+          }
+      case (Some(false), AmendMode, Some(amendSubbieResourceRef))               =>
+        cyaRoute(mode, amendSubbieResourceRef)
+      case _                                                     =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromTrustAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     mode match {
       case AmendMode =>
-        ua.get(TrustAddressYesNoPage) match {
-          case Some(true)  =>
-            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
-          case Some(false) =>
-            cyaRoute(mode)
-          case None        =>
+        (ua.get(TrustAddressYesNoPage), ua.get(AmendSubbieResourceRefQuery)) match {
+          case (Some(true), Some(amendSubbieResourceRef))  =>
+            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup(amendSubbieResourceRef)
+          case (Some(false), Some(amendSubbieResourceRef)) =>
+            cyaRoute(mode, amendSubbieResourceRef)
+          case _                                           =>
             controllers.routes.JourneyRecoveryController.onPageLoad()
         }
       case _         =>
@@ -143,39 +152,58 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def navigatorFromTrustWorksReferenceYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(TrustWorksReferenceYesNoPage), mode) match {
-      case (Some(true), NormalMode)             =>
+    (ua.get(TrustWorksReferenceYesNoPage), mode, ua.get(AmendSubbieResourceRefQuery)) match {
+      case (Some(true), NormalMode, _)                            =>
         controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(NormalMode)
-      case (Some(false), NormalMode)            =>
+      case (Some(false), NormalMode, _)                           =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
-      case (Some(true), CheckMode | AmendMode)  =>
+      case (Some(true), CheckMode, _)                             =>
         ua.get(TrustWorksReferencePage)
           .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode)) { _ =>
             cyaRoute(mode)
           }
-      case (Some(false), CheckMode | AmendMode) =>
+      case (Some(false), CheckMode, _)                            =>
         cyaRoute(mode)
-      case _                                    =>
+      case (Some(true), AmendMode, Some(amendSubbieResourceRef))  =>
+        ua.get(TrustWorksReferencePage)
+          .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoad(mode, amendSubbieResourceRef)) {
+            _ =>
+              cyaRoute(mode, amendSubbieResourceRef)
+          }
+      case (Some(false), AmendMode, Some(amendSubbieResourceRef)) =>
+        cyaRoute(mode, amendSubbieResourceRef)
+      case _                                                      =>
         routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigatorFromAddTrustContactMethodsYesNoPage(mode: Mode)(ua: UserAnswers): Call =
-    (ua.get(AddTrustContactMethodsYesNoPage), mode) match {
+    (ua.get(AddTrustContactMethodsYesNoPage), mode, ua.get(AmendSubbieResourceRefQuery)) match {
 
-      case (Some(true), NormalMode) =>
+      case (Some(true), NormalMode, _) =>
         controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(NormalMode)
 
-      case (Some(false), NormalMode) =>
+      case (Some(false), NormalMode, _) =>
         controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(NormalMode)
 
-      case (Some(true), CheckMode | AmendMode) =>
+      case (Some(true), CheckMode, _) =>
         ua.get(TrustContactMethodOptionsPage)
-          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode)) { _ =>
+          .fold(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(CheckMode)) { _ =>
             cyaRoute(mode)
           }
 
-      case (Some(false), CheckMode | AmendMode) =>
-        cyaRoute(mode)
+      case (Some(false), CheckMode, _) =>
+        cyaRoute(CheckMode)
+
+      case (Some(true), AmendMode, Some(amendSubbieResourceRef)) =>
+        ua.get(TrustContactMethodOptionsPage)
+          .fold(
+            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode, amendSubbieResourceRef)
+          ) { _ =>
+            cyaRoute(mode, amendSubbieResourceRef)
+          }
+
+      case (Some(false), AmendMode, Some(amendSubbieResourceRef)) =>
+        cyaRoute(mode, amendSubbieResourceRef)
 
       case _ =>
         routes.JourneyRecoveryController.onPageLoad()
@@ -194,13 +222,30 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     current: Option[ContactMethodOptions],
     mode: Mode = CheckMode
   )(userAnswers: UserAnswers): Call =
-    navigateFromContactMethodPage(current, userAnswers) { remaining =>
-      remaining
-        .find(isMissingAnswer(_)(userAnswers))
-        .map(contactMethodPageCall(_, mode))
-        .getOrElse(
-          cyaRoute(mode)
-        )
+    (mode, userAnswers.get(AmendSubbieResourceRefQuery)) match {
+
+      case (CheckMode, _) =>
+        navigateFromContactMethodPage(current, userAnswers) { remaining =>
+          remaining
+            .find(isMissingAnswer(_)(userAnswers))
+            .map(contactMethodPageCall(_, mode))
+            .getOrElse(
+              cyaRoute(mode)
+            )
+        }
+
+      case (AmendMode, Some(amendSubbieResourceRef)) =>
+        navigateFromContactMethodPage(current, userAnswers) { remaining =>
+          remaining
+            .find(isMissingAnswer(_)(userAnswers))
+            .map(contactMethodPageCall(_, mode, amendSubbieResourceRef))
+            .getOrElse(
+              cyaRoute(mode, amendSubbieResourceRef)
+            )
+        }
+
+      case _ =>
+        routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def navigateFromContactMethodPage(
@@ -234,14 +279,18 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       ContactMethodOptions.ordered
     }
 
-  private def contactMethodPageCall(contactMethod: ContactMethodOptions, mode: Mode): Call =
+  private def contactMethodPageCall(
+    contactMethod: ContactMethodOptions,
+    mode: Mode,
+    subbieResourceRef: Long = -1L
+  ): Call =
     contactMethod match {
       case ContactMethodOptions.Email  =>
-        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(mode)
+        controllers.add.trust.routes.TrustEmailAddressController.onPageLoad(mode, subbieResourceRef)
       case ContactMethodOptions.Phone  =>
-        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode)
+        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode, subbieResourceRef)
       case ContactMethodOptions.Mobile =>
-        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode)
+        controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(mode, subbieResourceRef)
     }
 
   private def contactMethodPage(contactMethod: ContactMethodOptions): QuestionPage[String] =
@@ -254,7 +303,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
   private def isMissingAnswer(contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
     userAnswers.get(contactMethodPage(contactMethod)).isEmpty
 
-  private def navigateFromAmendTrustWorksReferencePage(ua: UserAnswers): Call =
+  private def navigateFromAmendTrustAnswerPage(ua: UserAnswers): Call =
     ua.get(AmendSubbieResourceRefQuery).fold(controllers.routes.JourneyRecoveryController.onPageLoad()) {
       amendSubbieResourceRef =>
         controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad(amendSubbieResourceRef)

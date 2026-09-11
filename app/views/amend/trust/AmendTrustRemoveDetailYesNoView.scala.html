@@ -24,11 +24,11 @@
     govukButton: GovukButton
 )
 
-@(name: String, subcontractorDetail:String, subcontractorDetailTitle: String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(name: String, subcontractorDetail:String, subcontractorDetailTitle: String, form: Form[_], subbieResourceRef: Long)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("amendTrustRemoveDetailYesNo.title"))) {
 
-    @formHelper(action = controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail, subbieResourceRef), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

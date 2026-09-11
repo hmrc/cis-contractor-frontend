@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object TrustUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L, showActions: Boolean = true)(implicit
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
@@ -35,7 +35,7 @@ object TrustUtrSummary {
         val actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.TrustUtrController.onPageLoad(mode).url
+            controllers.add.trust.routes.TrustUtrController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustUtr.change.hidden"))
             .withAttribute("id" -> "trust-utr")
