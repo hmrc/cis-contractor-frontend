@@ -99,7 +99,10 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(SubNationalInsuranceNumberPage, nationalInsuranceNumber)
           .success
           .value
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
           .success
           .value
           .set(TradingNameOfSubcontractorPage, name)
@@ -128,7 +131,7 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(SubcontractorNamePage) mustBe None
       result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
       result.get(SubNationalInsuranceNumberPage) mustBe None
-      result.get(SubTradingNameYesNoPage) mustBe None
+      result.get(IndividualNamesOptionsPage) mustBe None
       result.get(TradingNameOfSubcontractorPage) mustBe None
       result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
       result.get(WorksReferenceNumberPage) mustBe None
@@ -403,7 +406,10 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(SubNationalInsuranceNumberPage, nationalInsuranceNumber)
           .success
           .value
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
           .success
           .value
           .set(TradingNameOfSubcontractorPage, name)
@@ -578,7 +584,7 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(SubcontractorNamePage) mustBe None
       result.get(SubcontractorsUniqueTaxpayerReferencePage) mustBe None
       result.get(SubNationalInsuranceNumberPage) mustBe None
-      result.get(SubTradingNameYesNoPage) mustBe None
+      result.get(IndividualNamesOptionsPage) mustBe None
       result.get(TradingNameOfSubcontractorPage) mustBe None
       result.get(UniqueTaxpayerReferenceYesNoPage) mustBe None
       result.get(WorksReferenceNumberPage) mustBe None

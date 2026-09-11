@@ -126,13 +126,6 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Select how the subcontractor is operating
 typeOfSubcontractor.change.hidden                                                   =  type
 
-subTradingNameYesNo.title                                                           =  Does the subcontractor use a trading name?
-subTradingNameYesNo.heading                                                         =  Does the subcontractor use a trading name?
-subTradingNameYesNo.hint                                                            =  This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel                                           =  Does subcontractor use a trading name?
-subTradingNameYesNo.error.required                                                  =  Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden                                                   =  does subcontractor use a trading name?
-
 tradingNameOfSubcontractor.title                                                    =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading                                                  =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Subcontractor trading name
@@ -513,6 +506,17 @@ unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors               
 
 info.CheckYourAnswers.backTo                                                        =  Back to
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Review unmatched subcontractors
+
+individualNamesOptions.title                                                        =  Which names do you want to add for this subcontractor?
+individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
+individualNamesOptions.subcontractorName                                            =  Subcontractor name
+individualNamesOptions.tradingName                                                  =  Trading name
+individualNamesOptions.noSelection                                                  =  None selected
+individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
+individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
+individualNamesOptions.checkYourAnswersLabel                                        =  Names
+individualNamesOptions.change.hidden                                                =  names
 
 insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
 insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
@@ -1040,25 +1044,25 @@ verify.reviewInsufficientInfo.action.edit                                       
 verify.reviewInsufficientInfo.action.proceed                                       =  Proceed
 verify.reviewInsufficientInfo.action.remove                                        =  Remove
 
-verify.reviewUnmatched.title                                            =  Review unmatched subcontractors
-verify.reviewUnmatched.heading                                          =  Review unmatched subcontractors
-verify.reviewUnmatched.p1                                               =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
-verify.reviewUnmatched.p2                                               =  To fix this, you can:
-verify.reviewUnmatched.bullet1                                          =  edit their information and correct any of their details before trying to verify them again
-verify.reviewUnmatched.bullet2                                          =  proceed with verifying them again without making any changes
-verify.reviewUnmatched.bullet3                                          =  remove the subcontractor from this verification request
-verify.reviewUnmatched.whatYouNeed.link                                 =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
-verify.reviewUnmatched.unmatched.subheading                             =  Unmatched subcontractors
-verify.reviewUnmatched.ready.subheading                                 =  Ready for verification
-verify.reviewUnmatched.name                                             =  Name
-verify.reviewUnmatched.utr                                              =  UTR
-verify.reviewUnmatched.noneProvided                                     =  None provided
-verify.reviewUnmatched.actions                                          =  Actions
-verify.reviewUnmatched.action.edit                                      =  Edit
-verify.reviewUnmatched.action.proceed                                   =  Proceed
-verify.reviewUnmatched.action.remove                                    =  Remove
-verify.reviewUnmatched.backToResults.prefix                             =  Back to
-verify.reviewUnmatched.backToResults.link                               =  Verification results
+verify.reviewUnmatched.title                                                       =  Review unmatched subcontractors
+verify.reviewUnmatched.heading                                                     =  Review unmatched subcontractors
+verify.reviewUnmatched.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
+verify.reviewUnmatched.p2                                                          =  To fix this, you can:
+verify.reviewUnmatched.bullet1                                                     =  edit their information and correct any of their details before trying to verify them again
+verify.reviewUnmatched.bullet2                                                     =  proceed with verifying them again without making any changes
+verify.reviewUnmatched.bullet3                                                     =  remove the subcontractor from this verification request
+verify.reviewUnmatched.whatYouNeed.link                                            =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
+verify.reviewUnmatched.unmatched.subheading                                        =  Unmatched subcontractors
+verify.reviewUnmatched.ready.subheading                                            =  Ready for verification
+verify.reviewUnmatched.name                                                        =  Name
+verify.reviewUnmatched.utr                                                         =  UTR
+verify.reviewUnmatched.noneProvided                                                =  None provided
+verify.reviewUnmatched.actions                                                     =  Actions
+verify.reviewUnmatched.action.edit                                                 =  Edit
+verify.reviewUnmatched.action.proceed                                              =  Proceed
+verify.reviewUnmatched.action.remove                                               =  Remove
+verify.reviewUnmatched.backToResults.prefix                                        =  Back to
+verify.reviewUnmatched.backToResults.link                                          =  Verification results
 
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                                 =  Which subcontractors do you want to verify?

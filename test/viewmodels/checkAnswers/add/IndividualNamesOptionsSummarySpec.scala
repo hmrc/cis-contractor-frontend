@@ -17,53 +17,43 @@
 package viewmodels.checkAnswers.add
 
 import base.SpecBase
-import models.contact.ContactMethodOptions
-import models.info.IndividualAnswers
+import models.add.IndividualNamesOptions
 import models.{AmendMode, CheckMode, UserAnswers}
+import models.info.IndividualAnswers
 import org.scalatest.matchers.must.Matchers
-import pages.add.IndividualContactMethodOptionsPage
-import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
+import pages.add.IndividualNamesOptionsPage
+import play.api.test.Helpers.stubMessages
+import play.api.i18n.Messages
 
-class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
-  implicit val messages: Messages = new DefaultMessagesApi(
-    Map(
-      "en" -> Map(
-        "individualContactMethodOptions.checkYourAnswersLabel" -> "Methods of contact",
-        "individualContactMethodOptions.email"                 -> "Email address",
-        "individualContactMethodOptions.phone"                 -> "Phone number",
-        "individualContactMethodOptions.mobile"                -> "Mobile number",
-        "individualContactMethodOptions.change.hidden"         -> "methods of contact",
-        "site.change"                                          -> "Change"
-      )
-    )
-  ).preferred(Seq(Lang("en")))
+class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
 
-  "IndividualContactMethodOptionsSummary.row" - {
+  implicit val messages: Messages = stubMessages()
+
+  "IndividualNamesOptionsSummary.row" - {
 
     "must return a row with multiple selected options" in {
 
       val answers: UserAnswers =
         UserAnswers("test-id")
           .set(
-            IndividualContactMethodOptionsPage,
-            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
           )
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(answers)
+      val result = IndividualNamesOptionsSummary.row(answers)
 
       result mustBe defined
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(messages("individualContactMethodOptions.checkYourAnswersLabel"))
+      row.key.content.asHtml.toString must include(messages("individualNamesOptions.checkYourAnswersLabel"))
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include("Email address")
-      valueHtml must include("Phone number")
-      valueHtml must include("Mobile number")
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
       valueHtml must not include "<br>"
       valueHtml must include("govuk-list--bullet")
 
@@ -74,17 +64,17 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
       val action = actions.head
 
-      action.href mustBe controllers.add.routes.IndividualContactMethodOptionsController
+      action.href mustBe controllers.add.routes.IndividualNamesOptionsController
         .onPageLoad(CheckMode)
         .url
 
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("individualContactMethodOptions.change.hidden")
+        messages("individualNamesOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "individual-methods-of-contact")
+      action.attributes must contain("id" -> "individual-names-options")
     }
 
     "must return a row with multiple selected options in amend journey" in {
@@ -92,25 +82,24 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       val answers: UserAnswers =
         UserAnswers("test-id")
           .set(
-            IndividualContactMethodOptionsPage,
-            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
           )
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(answers, AmendMode)
+      val result = IndividualNamesOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 
       val row = result.value
 
-      row.key.content.asHtml.toString must include(messages("individualContactMethodOptions.checkYourAnswersLabel"))
+      row.key.content.asHtml.toString must include(messages("individualNamesOptions.checkYourAnswersLabel"))
 
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include("Email address")
-      valueHtml must include("Phone number")
-      valueHtml must include("Mobile number")
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
       valueHtml must not include "<br>"
       valueHtml must include("govuk-list--bullet")
 
@@ -121,34 +110,34 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
       val action = actions.head
 
-      action.href mustBe controllers.add.routes.IndividualContactMethodOptionsController
+      action.href mustBe controllers.add.routes.IndividualNamesOptionsController
         .onPageLoad(AmendMode)
         .url
 
       action.content.asHtml.toString must include(messages("site.change"))
 
       action.visuallyHiddenText mustBe Some(
-        messages("individualContactMethodOptions.change.hidden")
+        messages("individualNamesOptions.change.hidden")
       )
 
-      action.attributes must contain("id" -> "individual-methods-of-contact")
+      action.attributes must contain("id" -> "individual-names-options")
     }
 
     "must return a row with a single selected option" in {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(answers)
+      val result = IndividualNamesOptionsSummary.row(answers)
 
       result mustBe defined
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include("Email address")
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
@@ -157,90 +146,36 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
       val answers: UserAnswers =
         emptyUserAnswers
-          .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(answers, AmendMode)
+      val result = IndividualNamesOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 
       val valueHtml = result.value.value.content.asHtml.toString
 
-      valueHtml must include("Email address")
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
     }
   }
 
-  "ViewOnly - IndividualContactMethodOptionsSummary.row" - {
-
-    "must return a row with multiple selected options" in {
-
+  "ViewOnly - IndividualNamesOptionsSummary.row" - {
+    "must return a row with both names options selected" in {
       val answers =
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          individualNamesOptions = Set.empty,
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,
           address = None,
-          individualContactMethodsYesNo = Some(true),
-          individualContactMethod = Set(
-            ContactMethodOptions.Email,
-            ContactMethodOptions.Phone,
-            ContactMethodOptions.Mobile
-          ),
-          email = Some("test@test.com"),
-          phone = Some("02070000000"),
-          mobile = Some("07123456789"),
-          utrYesNo = None,
-          utr = None,
-          ninoYesNo = None,
-          nino = None,
-          worksReferenceYesNo = None,
-          worksReference = None,
-          verificationNumber = None
-        )
-
-      val result =
-        IndividualContactMethodOptionsSummary.row(answers)
-
-      result mustBe defined
-
-      val row = result.value
-
-      row.key.content.asHtml.toString must include(
-        messages("individualContactMethodOptions.checkYourAnswersLabel")
-      )
-
-      val valueHtml = row.value.content.asHtml.toString
-
-      valueHtml must include("Email address")
-      valueHtml must include("Phone number")
-      valueHtml must include("Mobile number")
-      valueHtml must not include "<br>"
-      valueHtml must include("govuk-list--bullet")
-
-      row.actions mustBe defined
-      row.actions.value.items mustBe empty
-    }
-
-    "must return a row with a single selected option" in {
-
-      val answers =
-        IndividualAnswers(
-          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
-          showVerificationDetails = false,
-          individualNamesOptions = Set.empty,
-          tradingName = None,
-          subcontractorName = None,
-          addressYesNo = None,
-          address = None,
-          individualContactMethodsYesNo = Some(true),
-          individualContactMethod = Set(ContactMethodOptions.Email),
-          email = Some("test@test.com"),
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
           phone = None,
           mobile = None,
           utrYesNo = None,
@@ -253,15 +188,65 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
         )
 
       val result =
-        IndividualContactMethodOptionsSummary.row(answers)
+        IndividualNamesOptionsSummary.row(answers)
 
       result mustBe defined
 
       val row = result.value
 
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
       val valueHtml = row.value.content.asHtml.toString
 
-      valueHtml must include("Email address")
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return a row with a single selected option" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = Some(false),
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val result =
+        IndividualNamesOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
       valueHtml must not include "<br>"
       valueHtml must not include "govuk-list--bullet"
 
@@ -269,8 +254,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
       row.actions.value.items mustBe empty
     }
 
-    "must return None when no contact methods are selected" in {
-
+    "must return None selected when no contact methods are selected" in {
       val answers =
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
@@ -294,11 +278,29 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           verificationNumber = None
         )
 
-      IndividualContactMethodOptionsSummary.row(answers) mustBe None
+      val result =
+        IndividualNamesOptionsSummary.row(answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(
+        messages("individualNamesOptions.checkYourAnswersLabel")
+      )
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("individualNamesOptions.noSelection")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
     }
   }
 
   "return None when the answer is not set" in {
-    IndividualContactMethodOptionsSummary.row(emptyUserAnswers) mustBe None
+    IndividualNamesOptionsSummary.row(emptyUserAnswers) mustBe None
   }
 }

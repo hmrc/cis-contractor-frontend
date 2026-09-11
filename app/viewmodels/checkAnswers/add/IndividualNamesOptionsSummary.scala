@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.add.partnership
+package viewmodels.checkAnswers.add
 
-import models.contact.ContactMethodOptions
-import models.info.partnership.PartnershipAnswers
+import models.add.IndividualNamesOptions
+import models.info.IndividualAnswers
 import models.{CheckMode, Mode, UserAnswers}
-import pages.add.partnership.PartnershipContactMethodOptionsPage
+import pages.add.IndividualNamesOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,50 +28,56 @@ import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PartnershipContactMethodOptionsSummary {
+object IndividualNamesOptionsSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipContactMethodOptionsPage).map { selectedMethods =>
+    answers.get(IndividualNamesOptionsPage).map { selectedMethods =>
+
       val options =
-        ContactMethodOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$m")).toString)
+        if (selectedMethods.isEmpty) {
+          Seq(HtmlFormat.escape(messages("individualNamesOptions.noSelection")).toString)
+        } else {
+          IndividualNamesOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+        }
+
       SummaryListRowViewModel(
-        key = "partnershipContactMethodOptions.checkYourAnswersLabel",
+        key = "individualNamesOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
           .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode).url
+            controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode).url
           )
-            .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "partnership-methods-of-contact")
+            .withVisuallyHiddenText(messages("individualNamesOptions.change.hidden"))
+            .withAttribute("id" -> "individual-names-options")
         )
       )
     }
 
-  def row(
-    answers: PartnershipAnswers
-  )(implicit messages: Messages): Option[SummaryListRow] =
-    Option.when(answers.partnershipContactMethodOptions.nonEmpty) {
+  def row(answers: IndividualAnswers)(implicit messages: Messages): Option[SummaryListRow] =
 
-      val options =
-        ContactMethodOptions
-          .ordered(answers.partnershipContactMethodOptions)
-          .map(m =>
-            HtmlFormat
-              .escape(messages(s"partnershipContactMethodOptions.$m"))
-              .toString
-          )
+    val selectedMethods = answers.individualNamesOptions
 
+    val options =
+      if (selectedMethods.isEmpty) {
+        Seq(HtmlFormat.escape(messages("individualNamesOptions.noSelection")).toString)
+      } else {
+        IndividualNamesOptions
+          .ordered(selectedMethods)
+          .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+      }
+
+    Some(
       SummaryListRowViewModel(
-        key = "partnershipContactMethodOptions.checkYourAnswersLabel",
+        key = "individualNamesOptions.checkYourAnswersLabel",
         value = ValueViewModelHelper
           .makeGovukBulletList(options, false)
           .getOrElse(ValueViewModel(HtmlContent(""))),
         actions = Seq.empty
       )
-    }
+    )
 }
