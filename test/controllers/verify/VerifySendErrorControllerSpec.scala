@@ -17,82 +17,66 @@
 package controllers.verify
 
 import base.SpecBase
-import controllers.routes
+import controllers.actions.{FakeIdentifierAction, IdentifierAction}
 import models.UserAnswers
-import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
-import play.api.inject.bind
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
 import views.html.verify.VerifySendErrorView
 
 import scala.concurrent.Future
-import queries.CisIdQuery
 
 class VerifySendErrorControllerSpec extends SpecBase with MockitoSugar {
+  import play.api.Application
+  import play.api.inject.guice.GuiceApplicationBuilder
 
   private val cisId = "12345"
+
+  private val mockRepo = mock[SessionRepository]
+  when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+  private lazy val view = app.injector.instanceOf[VerifySendErrorView]
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .overrides(
+      bind[IdentifierAction] toInstance new FakeIdentifierAction(
+        isAgent = false,
+        hasAgentRef = false,
+        hasEmployeeRef = true
+      )(parsers),
+      bind[SessionRepository] toInstance mockRepo
+    )
+    .build()
 
   "VerifySendError Controller" - {
 
     "must return OK and the correct view for a GET when cisId is in ua" in {
+      val userAnswersWithCisId = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+      mockSession(userAnswersWithCisId)
 
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
+      val request = FakeRequest(GET, routes.VerifySendErrorController.onPageLoad().url)
+      val result  = route(app, request).value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, controllers.verify.routes.VerifySendErrorController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[VerifySendErrorView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(s"${applicationConfig.manageSubcontractorsUrl}/$cisId")(
-          request,
-          messages(application)
-        ).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view(cisId)(request, messages(app)).toString
     }
 
     "must redirect to JourneyRecovery for a GET when CisId is missing" in {
-      def ua: UserAnswers = emptyUserAnswers
+      mockSession(emptyUserAnswers)
 
-      val mockRepo = mock[SessionRepository]
+      val request = FakeRequest(GET, routes.VerifySendErrorController.onPageLoad().url)
+      val result  = route(app, request).value
 
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, controllers.verify.routes.VerifySendErrorController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
     }
   }
+
+  private def mockSession(userAnswers: UserAnswers) =
+    when(mockRepo.get(any)) thenReturn Future.successful(Some(userAnswers))
 }
