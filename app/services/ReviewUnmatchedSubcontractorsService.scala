@@ -18,12 +18,14 @@ package services
 
 import models.SubcontractorCurrentVerification
 import models.VerificationCurrentVerification
+import models.amend.AmendJourneyType
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.UnmatchedBatchReadiness
 import play.api.i18n.Messages
 import viewmodels.verify.*
 
 import javax.inject.{Inject, Singleton}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class ReviewUnmatchedSubcontractorsService @Inject() {
@@ -35,7 +37,7 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
 
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
-  )(implicit messages: Messages): ReviewUnmatchedViewModel = {
+  )(implicit messages: Messages): Try[ReviewUnmatchedViewModel] = {
     val subcontractorsById =
       batch.subcontractors.map(sub => sub.subcontractorId -> sub).toMap
 
@@ -56,10 +58,27 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
         UnmatchedBatchReadiness.isVerificationReady(Some(verification))
       }
 
-    ReviewUnmatchedViewModel(
-      unmatched = unmatchedSubs.map { case (sub, verification) => toUnmatchedRow(sub, Some(verification)) },
-      ready = readySubs.map { case (sub, verification) => toReadyRow(sub, Some(verification)) }
-    )
+    unmatchedSubs
+      .collectFirst {
+        case (sub, _) if sub.subbieResourceRef.isEmpty =>
+          Failure(
+            new IllegalStateException(
+              s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
+            )
+          )
+      }
+      .getOrElse {
+        Success(
+          ReviewUnmatchedViewModel(
+            unmatched = unmatchedSubs.map { case (sub, verification) =>
+              toUnmatchedRow(sub, Some(verification))
+            },
+            ready = readySubs.map { case (sub, verification) =>
+              toReadyRow(sub, Some(verification))
+            }
+          )
+        )
+      }
   }
 
   private def toUnmatchedRow(
@@ -71,7 +90,15 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
-      editLink = LinkViewModel(dummyUrl, name),
+      editLink = LinkViewModel(
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.UnmatchedInfo.routeValue
+          )
+          .url,
+        name
+      ),
       proceedLink = LinkViewModel(dummyUrl, name),
       removeLink = LinkViewModel(dummyUrl, name)
     )

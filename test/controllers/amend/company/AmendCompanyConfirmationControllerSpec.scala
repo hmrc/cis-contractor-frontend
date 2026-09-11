@@ -33,8 +33,14 @@ import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 import pages.amend.AmendCheckYourAnswersSubmittedPage
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import config.FrontendAppConfig
+import models.amend.AmendJourneyType
+import pages.amend.AmendJourneyTypePage
+import services.VerificationService
+import viewmodels.amend.AmendConfirmationLinks
 
 class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
@@ -47,9 +53,12 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
   private val mockSessionRepository =
     mock[SessionRepository]
 
+  private val mockVerificationService =
+    mock[VerificationService]
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository)
+    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
   }
 
   private val original =
@@ -82,6 +91,9 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
       .set(CompanyNamePage, companyName)
       .success
       .value
+      .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+      .success
+      .value
       .set(AmendCheckYourAnswersSubmittedPage, true)
       .success
       .value
@@ -94,8 +106,12 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[DefaultSubcontractorCleanupService]
+          .toInstance(mockCleanupService),
+        bind[SessionRepository]
+          .toInstance(mockSessionRepository),
+        bind[VerificationService]
+          .toInstance(mockVerificationService)
       )
       .build()
 
@@ -121,13 +137,21 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
         status(result) mustEqual OK
 
+        val confirmationLink =
+          AmendConfirmationLinks.build(
+            AmendJourneyType.Standard,
+            cisId,
+            app.injector.instanceOf[FrontendAppConfig]
+          )
+
         contentAsString(result) mustEqual
           view(
             CompanyAmendConfirmationViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            companyName
+            companyName,
+            confirmationLink
           )(request, messages(app)).toString
 
         verify(mockCleanupService).cleanAmend(any[UserAnswers])
@@ -165,35 +189,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
         verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when not submitted" in {
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdQuery, cisId)
-          .success
-          .value
-          .set(CompanyNamePage, companyName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, false)
-          .success
-          .value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -286,6 +281,155 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
         verify(mockCleanupService).cleanAmend(any[UserAnswers])
         verify(mockSessionRepository, never()).set(any[UserAnswers])
+      }
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalCompanyAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must refresh verification batches and render the insufficient info confirmation link" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      }
+    }
+
+    "must refresh verification batches and render the unmatched info confirmation link" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      }
+    }
+
+    "must not refresh verification batches for standard amend journey" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustBe OK
+
+        verifyNoInteractions(mockVerificationService)
       }
     }
   }
