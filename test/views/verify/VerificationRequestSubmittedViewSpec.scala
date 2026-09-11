@@ -103,7 +103,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       )
 
       val surveyLink: Elements =
-        doc.select(s"a[href='${appConfig.exitSurveyUrl}']")
+        doc.select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
 
       surveyLink.size mustBe 1
       surveyLink.attr("target") mustBe ""

@@ -17,6 +17,7 @@
 package views.unmatched
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -45,6 +46,9 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
 
   private lazy val view =
     application.injector.instanceOf[UnmatchedSubcontractorDetailsUpdatedView]
+
+  private lazy val appConfig =
+    application.injector.instanceOf[FrontendAppConfig]
 
   private lazy val rows =
     Seq(
@@ -278,7 +282,7 @@ class UnmatchedSubcontractorDetailsUpdatedViewSpec extends SpecBase {
           msgs("unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey")
         )
 
-      surveyLink.attr("href") mustEqual "#"
+      surveyLink.attr("href") mustEqual appConfig.cisFeedbackSurveyUrl
 
       assertLinkIsNotShown(
         document,

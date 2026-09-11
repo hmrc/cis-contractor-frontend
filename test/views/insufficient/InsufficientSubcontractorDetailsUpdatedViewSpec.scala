@@ -17,6 +17,7 @@
 package views.insufficient
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import play.api.i18n.Messages
@@ -42,6 +43,9 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
 
   private lazy val view =
     application.injector.instanceOf[InsufficientSubcontractorDetailsUpdatedView]
+
+  private lazy val appConfig =
+    application.injector.instanceOf[FrontendAppConfig]
 
   private lazy val rows =
     Seq(
@@ -287,7 +291,7 @@ class InsufficientSubcontractorDetailsUpdatedViewSpec extends SpecBase {
           )
         )
 
-      surveyLink.attr("href") mustEqual "#"
+      surveyLink.attr("href") mustEqual appConfig.cisFeedbackSurveyUrl
 
       assertLinkIsNotShown(
         document,
