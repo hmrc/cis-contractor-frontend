@@ -70,7 +70,7 @@ class SubcontractorValidator @Inject() (
           .isEmpty
       ) {
         throw new IllegalArgumentException(
-          s"Iinvalid subcontractor type: ${subcontractor.subcontractorType}"
+          s"Invalid subcontractor type: ${subcontractor.subcontractorType}"
         )
       }
     }

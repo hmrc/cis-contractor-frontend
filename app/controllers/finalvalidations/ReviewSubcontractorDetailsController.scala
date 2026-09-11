@@ -126,7 +126,8 @@ class ReviewSubcontractorDetailsController @Inject() (
                         withoutContext      <- withoutMode.remove(FinalValidationContextPage)
                         withoutPayload      <- withoutContext.remove(VerifyFinalValidationPayloadPage)
                         withoutChangeTarget <- withoutPayload.remove(FinalValidationChangeTargetPage)
-                      } yield withoutChangeTarget
+                        withBaseUtr         <- withoutChangeTarget.remove(FinalValidationBaseUtrPage)
+                      } yield withBaseUtr
 
                     Future.fromTry(cleanedAnswers).flatMap { answers =>
                       sessionRepository.set(answers).map { _ =>

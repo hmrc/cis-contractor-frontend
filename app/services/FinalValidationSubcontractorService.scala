@@ -169,7 +169,7 @@ class FinalValidationSubcontractorService @Inject() {
           yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
           valuePage = PartnershipNominatedPartnerUtrPage,
           value = details.partnerUtr,
-          forceYes = true
+          forceYes = false
         )
       case PartnerUtr if subcontractorType == Partnership      =>
         populateStringYesNoPair(
@@ -177,7 +177,7 @@ class FinalValidationSubcontractorService @Inject() {
           yesNoPage = PartnershipNominatedPartnerUtrYesNoPage,
           valuePage = PartnershipNominatedPartnerUtrPage,
           value = details.partnerUtr,
-          forceYes = false
+          forceYes = true
         )
       case NinoYesNo                                           =>
         ninoPages(subcontractorType).flatMap { case (yesNoPage, valuePage) =>

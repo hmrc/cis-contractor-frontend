@@ -373,7 +373,6 @@ class VerifyFinalValidationService @Inject() (
       case PhoneNumber            => subcontractor.phoneNumber
       case MobilePhoneNumber      => subcontractor.mobilePhoneNumber
       case WorkReferenceNumber    => subcontractor.worksReferenceNumber
-      case _                      => None
     }
 
   private def valueFor(
@@ -400,6 +399,5 @@ class VerifyFinalValidationService @Inject() (
       case PhoneNumber            => details.phoneNumber
       case MobilePhoneNumber      => details.mobilePhoneNumber
       case WorkReferenceNumber    => details.worksReferenceNumber
-      case _                      => None
     }
 }
