@@ -18,7 +18,11 @@ package navigation.add
 
 import controllers.routes
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
-import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
+import models.add.ValidatedSubcontractor
+import models.add.company.ValidatedCompany
+import models.add.partnership.ValidatedPartnership
+import models.add.trust.ValidatedTrust
+import models.{AmendMode, CheckMode, Mode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
@@ -49,17 +53,45 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    (userAnswers.get(TypeOfSubcontractorPage), mode) match {
-      case (Some(Individualorsoletrader), NormalMode) =>
-        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Some(Limitedcompany), NormalMode)         =>
-        controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Some(Partnership), NormalMode)            =>
-        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Some(Trust), NormalMode)                  =>
-        controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
-      case (None, _)                                  => routes.JourneyRecoveryController.onPageLoad()
-      case (_, CheckMode | AmendMode)                 => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    userAnswers.get(TypeOfSubcontractorPage) match {
+      case None                    => routes.JourneyRecoveryController.onPageLoad()
+      case Some(subcontractorType) =>
+        mode match {
+          case NormalMode            => firstJourneyPageFor(subcontractorType)
+          case CheckMode | AmendMode =>
+            // In check mode, only skip straight to CYA when the selected type's journey is already
+            // complete (i.e. the type was not changed). If the type changed its answers are cleaned
+            // up, leaving the journey incomplete, so the user is taken through the relevant pages.
+            if (journeyComplete(subcontractorType, userAnswers)) {
+              checkYourAnswersFor(subcontractorType)
+            } else {
+              firstJourneyPageFor(subcontractorType)
+            }
+        }
+    }
+
+  private def firstJourneyPageFor(subcontractorType: TypeOfSubcontractor): Call =
+    subcontractorType match {
+      case Individualorsoletrader => controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
+      case Limitedcompany         => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      case Partnership            => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case Trust                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
+    }
+
+  private def checkYourAnswersFor(subcontractorType: TypeOfSubcontractor): Call =
+    subcontractorType match {
+      case Individualorsoletrader => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case Limitedcompany         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case Partnership            => controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case Trust                  => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+    }
+
+  private def journeyComplete(subcontractorType: TypeOfSubcontractor, userAnswers: UserAnswers): Boolean =
+    subcontractorType match {
+      case Individualorsoletrader => ValidatedSubcontractor.build(userAnswers).isRight
+      case Limitedcompany         => ValidatedCompany.build(userAnswers).isRight
+      case Partnership            => ValidatedPartnership.build(userAnswers).isRight
+      case Trust                  => ValidatedTrust.build(userAnswers).isRight
     }
 
 }
