@@ -454,37 +454,11 @@ amendIndividualRemoveDetailYesNo.detail.utr                                     
 amendIndividualRemoveDetailYesNo.detail.nationalInsuranceNumber                     =  xxxxxxxxxxxxxxxxxxxx
 amendIndividualRemoveDetailYesNo.detail.worksReferenceNumber                        =  xxxxxxxxxxxxxxxxxxxx
 
-proceedInsufficientSubcontractorNameYesNo.title                                     =  xxxxxxxxxxxxxxxxxxxx
-proceedInsufficientSubcontractorNameYesNo.heading                                   =  xxxxxxxxxxxxxxxxxxxx
-proceedInsufficientSubcontractorNameYesNo.hint                                      =  xxxxxxxxxxxxxxxxxxxx
-proceedInsufficientSubcontractorNameYesNo.error.required                            =  xxxxxxxxxxxxxxxxxxxx
-
-removeInsufficientSubcontractorNameYesNo.title                                      =  xxxxxxxxxxxxxxxxxxxx
-removeInsufficientSubcontractorNameYesNo.heading                                    =  xxxxxxxxxxxxxxxxxxxx
-removeInsufficientSubcontractorNameYesNo.hint                                       =  xxxxxxxxxxxxxxxxxxxx
-removeInsufficientSubcontractorNameYesNo.error.required                             =  xxxxxxxxxxxxxxxxxxxx
-
-unmatched.removeSubcontractorVerifyRequest.title                                    =  xxxxxxxxxxxxxxxxxxxx
-unmatched.removeSubcontractorVerifyRequest.heading                                  =  xxxxxxxxxxxxxxxxxxxx
-unmatched.removeSubcontractorVerifyRequest.p1                                       =  xxxxxxxxxxxxxxxxxxxx
-unmatched.removeSubcontractorVerifyRequest.error.required                           =  xxxxxxxxxxxxxxxxxxxx
-unmatched.proceedSubcontractorVerifyRequest.title                                   =  xxxxxxxxxxxxxxxxxxxx
-unmatched.proceedSubcontractorVerifyRequest.heading                                 =  xxxxxxxxxxxxxxxxxxxx
-unmatched.proceedSubcontractorVerifyRequest.p1                                      =  xxxxxxxxxxxxxxxxxxxx
-unmatched.proceedSubcontractorVerifyRequest.error.required                          =  xxxxxxxxxxxxxxxxxxxx
-
 unmatchedSubcontractors.title                                                       =  xxxxxxxxxxxxxxxxxxxx
 unmatchedSubcontractors.heading                                                     =  xxxxxxxxxxxxxxxxxxxx
 unmatchedSubcontractors.p1                                                          =  xxxxxxxxxxxxxxxxxxxx
 unmatchedSubcontractors.p2                                                          =  xxxxxxxxxxxxxxxxxxxx
 unmatchedSubcontractors.verificationResults.link                                    =  xxxxxxxxxxxxxxxxxxxx
-
-noUnmatchedSubcontractors.title                                                     =  xxxxxxxxxxxxxxxxxxxx
-noUnmatchedSubcontractors.heading                                                   =  xxxxxxxxxxxxxxxxxxxx
-noUnmatchedSubcontractors.p1                                                        =  xxxxxxxxxxxxxxxxxxxx
-noUnmatchedSubcontractors.p2                                                        =  xxxxxxxxxxxxxxxxxxxx
-noUnmatchedSubcontractors.backTo                                                    =  xxxxxxxxxxxxxxxxxxxx
-noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  xxxxxxxxxxxxxxxxxxxx
 
 unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.heading                              =  xxxxxxxxxxxxxxxxxxxx
@@ -503,9 +477,6 @@ unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey     
 unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback            =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  xxxxxxxxxxxxxxxxxxxx
-
-info.CheckYourAnswers.backTo                                                        =  xxxxxxxxxxxxxxxxxxxx
-info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  xxxxxxxxxxxxxxxxxxxx
 
 insufficientSubcontractorDetailsUpdated.title                                       =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.p1                                          =  xxxxxxxxxxxxxxxxxxxx
@@ -1015,24 +986,6 @@ verify.selectSubcontractorsToReverify.taxTreatment.unmatched                    
 verify.selectSubcontractorsToReverify.taxTreatment.gross                           =  xxxxxxxxxxxxxxxxxxxx
 verify.selectSubcontractorsToReverify.display.noneSelected                         =  xxxxxxxxxxxxxxxxxxxx
 
-verify.reviewInsufficientInfo.title                                                =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.heading                                              =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.p1                                                   =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.p2                                                   =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.bullet1                                              =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.bullet2                                              =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.bullet3                                              =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.whatYouNeed.link                                     =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.missing.subheading                                   =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.ready.subheading                                     =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.name                                                 =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.utr                                                  =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.noneProvided                                         =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.actions                                              =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.edit                                          =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.proceed                                       =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.remove                                        =  xxxxxxxxxxxxxxxxxxxx
-
 verify.selectSubcontractor.title                                                   =  xxxxxxxxxxxxxxxxxxxx
 verify.selectSubcontractor.heading                                                 =  xxxxxxxxxxxxxxxxxxxx
 verify.selectSubcontractor.hint                                                    =  xxxxxxxxxxxxxxxxxxxx
@@ -1137,22 +1090,6 @@ verify.noVerificationResults.p                                                  
 verify.noVerificationResults.backTo                                                =  xxxxxxxxxxxxxxxxxxxx
 verify.noVerificationResults.manageYourSubcontractors.link                         =  xxxxxxxxxxxxxxxxxxxx
 
-verify.verificationResults.title                                                   =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.heading                                                 =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.paragraph                                               =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.name                                                    =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.status                                                  =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment                                            =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.verificationNumber                                      =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.reviewUnmatchedSubcontractors.button                    =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.backTo                                                  =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.manageYourSubcontractors.link                           =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.status.matched                                          =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.status.unmatched                                        =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.net                                        =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.gross                                      =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.unmatched                                  =  xxxxxxxxxxxxxxxxxxxx
-
 verify.verifyDepartmentalErrorSubmitAgainController.title                          =  xxxxxxxxxxxxxxxxxxxx
 verify.verifyDepartmentalErrorSubmitAgainController.heading                        =  xxxxxxxxxxxxxxxxxxxx
 verify.verifyDepartmentalErrorSubmitAgainController.p1                             =  xxxxxxxxxxxxxxxxxxxx
@@ -1246,13 +1183,13 @@ verify.reviewInsufficientInfo.utr                                              =
 verify.reviewInsufficientInfo.noneProvided                                     =  xxxxxxxxxxxxxxxxxxxx
 verify.reviewInsufficientInfo.actions                                          =  Camau
 verify.reviewInsufficientInfo.action.edit                                      =  Golygu
-verify.reviewInsufficientInfo.action.proceed                                   =  Proceed
-verify.reviewInsufficientInfo.action.remove                                    =  Remove
+verify.reviewInsufficientInfo.action.proceed                                   =  Parhau
+verify.reviewInsufficientInfo.action.remove                                    =  Dileu
 
 proceedInsufficientSubcontractorNameYesNo.title                                =  A ydych yn siŵr eich bod am barhau gyda chynnwys yr is-gontractwr hwn yn y cais hwn am ddilysiad
 proceedInsufficientSubcontractorNameYesNo.heading                              =  A ydych yn siŵr eich bod am barhau gyda chynnwys {0} yn y cais hwn am ddilysiad?
-proceedInsufficientSubcontractorNameYesNo.hint                                 =  This will assign the higher rate tax treatment to this subcontractor.
-proceedInsufficientSubcontractorNameYesNo.error.required                       =  Select yes if you want to proceed with including this subcontractor in this verification request
+proceedInsufficientSubcontractorNameYesNo.hint                                 =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
+proceedInsufficientSubcontractorNameYesNo.error.required                       =  xxxxxxxxxxxxxxxxxxxx
 
 removeInsufficientSubcontractorNameYesNo.title                                 =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
 removeInsufficientSubcontractorNameYesNo.heading                               =  A ydych yn siŵr eich bod am ddileu {0} o’r cais hwn am ddilysiad?
