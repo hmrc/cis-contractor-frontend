@@ -26,7 +26,7 @@ class FinalValidationBaseUtrPageSpec extends SpecBase {
     "must have the correct path" in {
 
       FinalValidationBaseUtrPage.path mustBe
-        JsPath \ "finalValidation" \ "finalValidationBaseUtr"
+        JsPath \ "finalvalidation" \ "finalValidationBaseUtr"
     }
 
     "must have the correct string representation" in {

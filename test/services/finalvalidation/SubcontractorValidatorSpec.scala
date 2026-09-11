@@ -121,7 +121,7 @@ class SubcontractorValidatorSpec extends SpecBase {
           }
 
         exception.getMessage mustBe
-          "Iinvalid subcontractor type: Some(invalid)"
+          "Invalid subcontractor type: Some(invalid)"
       }
 
       "must throw when a subcontractor type is missing" in {
@@ -183,7 +183,7 @@ class SubcontractorValidatorSpec extends SpecBase {
           }
 
         exception.getMessage mustBe
-          "Iinvalid subcontractor type: None"
+          "Invalid subcontractor type: None"
       }
     }
 
