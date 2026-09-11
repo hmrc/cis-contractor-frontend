@@ -63,7 +63,7 @@ class AgentIdentifierActionSpec extends SpecBase {
     }
 
   private val agentCode: String = "123456789"
-  
+
   type RetrievalsType = Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[CredentialRole] ~ Option[String]
 
   class Harness(authAction: IdentifierAction) {

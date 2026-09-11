@@ -53,7 +53,7 @@ class AgentIdentifierAction @Inject() (
     authorised(defaultPredicate)
       .retrieve(
         Retrievals.internalId and Retrievals.allEnrolments
-          and Retrievals.affinityGroup and Retrievals.credentialRole  and Retrievals.agentCode
+          and Retrievals.affinityGroup and Retrievals.credentialRole and Retrievals.agentCode
       ) {
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) ~ _ =>
           logger.info("AgentIdentifierAction - Organisation login attempt")

@@ -23,7 +23,12 @@ import play.api.mvc.*
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (isAgent: Boolean, hasAgentRef: Boolean, hasEmployeeRef: Boolean, agentCode: Option[String] = Some("agentCode"))(
+class FakeIdentifierAction @Inject() (
+  isAgent: Boolean,
+  hasAgentRef: Boolean,
+  hasEmployeeRef: Boolean,
+  agentCode: Option[String] = Some("agentCode")
+)(
   bodyParsers: PlayBodyParsers
 ) extends IdentifierAction {
 
@@ -36,7 +41,16 @@ class FakeIdentifierAction @Inject() (isAgent: Boolean, hasAgentRef: Boolean, ha
       }
     } else {
       if (hasEmployeeRef) {
-        block(IdentifierRequest(request, "id", Some(EmployerReference("taxOfficeNumber", "taxOfficeReference")), None, false, None))
+        block(
+          IdentifierRequest(
+            request,
+            "id",
+            Some(EmployerReference("taxOfficeNumber", "taxOfficeReference")),
+            None,
+            false,
+            None
+          )
+        )
       } else {
         block(IdentifierRequest(request, "id", None, None, false, None))
       }
