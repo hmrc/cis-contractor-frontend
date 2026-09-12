@@ -23,6 +23,7 @@ import models.requests.*
 import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetLastSubmittedVerificationBatchResponse}
 import models.verify.*
 import pages.verify.*
+import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -257,7 +258,8 @@ class VerificationService @Inject() (
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],
-    hc: HeaderCarrier
+    hc: HeaderCarrier,
+    messages: Messages
   ): Future[ChrisSubmissionResponse] =
     for {
       latestUa      <- getCurrentVerificationBatch(request.userAnswers)
@@ -286,7 +288,7 @@ class VerificationService @Inject() (
   private def submitVerificationToChris(
     submissionId: Long,
     ua: UserAnswers
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisSubmissionResponse] =
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier, messages: Messages): Future[ChrisSubmissionResponse] =
     for {
       employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
       chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
@@ -295,7 +297,7 @@ class VerificationService @Inject() (
 
   private def buildCreateSubmissionRequest(
     ua: UserAnswers
-  ): Future[CreateSubmissionForVerificationRequest] =
+  )(implicit messages: Messages): Future[CreateSubmissionForVerificationRequest] =
     CreateSubmissionForVerificationRequestBuilder
       .build(ua)
       .fold(

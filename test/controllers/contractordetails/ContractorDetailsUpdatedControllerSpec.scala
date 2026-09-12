@@ -17,30 +17,43 @@
 package controllers.contractordetails
 
 import base.SpecBase
+import pages.CisIdPage
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.contractordetails.ContractorDetailsUpdatedView
 
 class ContractorDetailsUpdatedControllerSpec extends SpecBase {
 
   "ContractorDetailsUpdated Controller" - {
+    Seq(
+      (
+        "AGENT",
+        applicationConfig.constructionIndustryAgentAccountUrl + "1",
+        true,
+        Some(emptyUserAnswers.set(CisIdPage, "1").success.value)
+      ),
+      ("ORGANISATION", applicationConfig.constructionIndustryOrgAccountUrl, false, Some(emptyUserAnswers))
+    ).foreach { case (accountTypeSTR, cisAccountUrl, isAgent, userAnswers) =>
+      s"when accountType is '$accountTypeSTR'" - {
 
-    "must return OK and the correct view for a GET" in {
+        "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+          val application = applicationBuilder(userAnswers = userAnswers, isAgent = isAgent).build()
 
-      running(application) {
-        val request = FakeRequest(GET, routes.ContractorDetailsUpdatedController.onPageLoad().url)
+          running(application) {
+            val request = FakeRequest(GET, routes.ContractorDetailsUpdatedController.onPageLoad().url)
 
-        val result = route(application, request).value
+            val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ContractorDetailsUpdatedView]
+            val view = application.injector.instanceOf[ContractorDetailsUpdatedView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(
-          request,
-          messages(application)
-        ).toString
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(cisAccountUrl)(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
       }
     }
   }

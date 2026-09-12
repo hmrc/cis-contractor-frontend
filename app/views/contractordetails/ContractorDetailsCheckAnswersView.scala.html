@@ -26,7 +26,7 @@
     formHelper: FormWithCSRF
 )
 
-@(accountsOfficeReference: String, summaryRows: Seq[SummaryListRow])(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(accountsOfficeReference: String, summaryRows: Seq[SummaryListRow], cisAccountUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
@@ -42,5 +42,5 @@
         )
     }
 
-        @link("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link", appConfig.cisReturnDashboardUrl)
+        @link("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link", cisAccountUrl)
 }

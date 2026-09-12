@@ -23,6 +23,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.CisIdPage
 import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.inject
 import play.api.test.FakeRequest
@@ -46,6 +47,36 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
   )
 
   "ContractorDetailsCheckAnswersController" - {
+
+    Seq(
+      (
+        "AGENT",
+        applicationConfig.constructionIndustryAgentAccountUrl + "1",
+        true,
+        Some(emptyUserAnswers.set(ContractorSchemePage, scheme).success.value.set(CisIdPage, "1").success.value)
+      ),
+      (
+        "ORGANISATION",
+        applicationConfig.constructionIndustryOrgAccountUrl,
+        false,
+        Some(emptyUserAnswers.set(ContractorSchemePage, scheme).success.value)
+      )
+    ).foreach { case (accountTypeSTR, cisAccountUrl, isAgent, userAnswers) =>
+      s"when accountType is '$accountTypeSTR'" - {
+        "must return OK with the correct Return to CIS account link" in {
+
+          val application = applicationBuilder(userAnswers = userAnswers, isAgent = isAgent).build()
+
+          running(application) {
+            val request = FakeRequest(GET, routes.ContractorDetailsCheckAnswersController.onPageLoad().url)
+            val result  = route(application, request).value
+
+            status(result) mustEqual OK
+            contentAsString(result) must include(cisAccountUrl)
+          }
+        }
+      }
+    }
 
     "must return OK and the correct view for a GET when answers exist" in {
 
