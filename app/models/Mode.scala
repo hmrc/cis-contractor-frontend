@@ -23,14 +23,16 @@ sealed trait Mode
 case object CheckMode extends Mode
 case object NormalMode extends Mode
 case object AmendMode extends Mode
+case object FinalValidationMode extends Mode
 
 object Mode {
 
   implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
     override def to(value: Mode): String = value match {
-      case NormalMode => "NormalMode"
-      case CheckMode  => "CheckMode"
-      case AmendMode  => "AmendMode"
+      case NormalMode          => "NormalMode"
+      case CheckMode           => "CheckMode"
+      case AmendMode           => "AmendMode"
+      case FinalValidationMode => "FinalValidationMode"
     }
   }
 
@@ -42,10 +44,11 @@ object Mode {
         value: String
       ): Either[String, Mode] =
         value match {
-          case "NormalMode" => Right(NormalMode)
-          case "CheckMode"  => Right(CheckMode)
-          case "AmendMode"  => Right(AmendMode)
-          case _            => Left(s"Invalid mode: $value")
+          case "NormalMode"          => Right(NormalMode)
+          case "CheckMode"           => Right(CheckMode)
+          case "AmendMode"           => Right(AmendMode)
+          case "FinalValidationMode" => Right(FinalValidationMode)
+          case _                     => Left(s"Invalid mode: $value")
         }
 
       override def unbind(
@@ -53,9 +56,10 @@ object Mode {
         value: Mode
       ): String =
         value match {
-          case NormalMode => "NormalMode"
-          case CheckMode  => "CheckMode"
-          case AmendMode  => "AmendMode"
+          case NormalMode          => "NormalMode"
+          case CheckMode           => "CheckMode"
+          case AmendMode           => "AmendMode"
+          case FinalValidationMode => "FinalValidationMode"
         }
     }
 }

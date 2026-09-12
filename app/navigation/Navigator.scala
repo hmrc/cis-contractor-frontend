@@ -35,11 +35,15 @@ class Navigator @Inject() (
   trustNavigator: navigation.add.TrustNavigator,
   sharedNavigator: navigation.add.SharedNavigator,
   verifyNavigator: navigation.verify.VerifyNavigator,
-  contractorDetailsNavigator: navigation.contractordetails.ContractorDetailsNavigator
+  contractorDetailsNavigator: navigation.contractordetails.ContractorDetailsNavigator,
+  finalValidationNavigator: navigation.finalvalidation.FinalValidationNavigator
 ) {
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
-    navigatorFor(page).nextPage(page, mode, userAnswers)
+    mode match {
+      case FinalValidationMode => finalValidationNavigator.nextPage(page, mode, userAnswers)
+      case _                   => navigatorFor(page).nextPage(page, mode, userAnswers)
+    }
 
   private def navigatorFor(page: Page): NavigatorForJourney =
     page match {

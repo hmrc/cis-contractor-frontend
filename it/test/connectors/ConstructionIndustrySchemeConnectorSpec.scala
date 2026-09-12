@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.agent.ClientListStatus
 import models.TypeOfSubcontractor.Individualorsoletrader
+import models.finalvalidation.*
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
 import models.response.*
@@ -666,6 +667,478 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val ex = connector.proceedInsufficientVerification(request).failed.futureValue
       ex.getMessage must include("returned 500")
+    }
+  }
+
+  "getFinalValidationJourneyHandoff" should {
+
+    val handoffId = "handoff-id"
+    val journeyType = JourneyHandoffTypes.FinalValidation
+
+    val payload =
+      FinalValidationHandoffPayload(
+        draftId = "draft-id",
+        instanceId = "1",
+        subcontractorId = 1L,
+        subbieResourceRef = 100L,
+        field = FinalValidationField.Utr,
+        changeTarget = FinalValidationChangeTarget.Utr
+      )
+
+    "return the handoff payload when BE returns 200" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/journey-handoffs/$journeyType/$handoffId"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(OK)
+            .withHeader("Content-Type", "application/json")
+            .withBody(Json.toJson(payload).toString)
+        )
+      )
+
+      connector
+        .getFinalValidationJourneyHandoff(
+          journeyType,
+          handoffId
+        )
+        .futureValue mustBe Some(payload)
+    }
+
+    "return None when BE returns 404" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/journey-handoffs/$journeyType/$handoffId"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(NOT_FOUND)
+        )
+      )
+
+      connector
+        .getFinalValidationJourneyHandoff(
+          journeyType,
+          handoffId
+        )
+        .futureValue mustBe None
+    }
+
+    "propagate upstream error when BE returns 500" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/journey-handoffs/$journeyType/$handoffId"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(INTERNAL_SERVER_ERROR)
+            .withBody("boom")
+        )
+      )
+
+      val ex =
+        connector
+          .getFinalValidationJourneyHandoff(
+            journeyType,
+            handoffId
+          )
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "createFinalValidationDraft" should {
+
+    val createDraftRequest =
+      CreateFinalValidationDraftRequest(
+        instanceId = "1",
+        context = "VerifySubcontractor",
+        subcontractors = Seq.empty
+      )
+
+    "create the draft when BE returns 201" in {
+
+      val response =
+        CreateFinalValidationDraftResponse(
+          draftId = "draft-id"
+        )
+
+      stubFor(
+        post(
+          urlPathEqualTo(
+            "/cis/final-validation/drafts"
+          )
+        )
+          .withHeader(
+            "Content-Type",
+            containing("application/json")
+          )
+          .withRequestBody(
+            equalToJson(
+              Json.toJson(createDraftRequest).toString
+            )
+          )
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withHeader("Content-Type", "application/json")
+              .withBody(Json.toJson(response).toString)
+          )
+      )
+
+      connector
+        .createFinalValidationDraft(createDraftRequest)
+        .futureValue mustBe response
+    }
+
+    "propagate upstream error when BE returns 500" in {
+
+      stubFor(
+        post(
+          urlPathEqualTo(
+            "/cis/final-validation/drafts"
+          )
+        )
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector
+          .createFinalValidationDraft(createDraftRequest)
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "getFinalValidationDraft" should {
+
+    val instanceId = "1"
+    val draftId = "draft-id"
+
+    val draftJson =
+      Json.obj(
+        "subcontractors" -> Json.arr()
+      )
+
+    val draft =
+      draftJson.as[FinalValidationDraft]
+
+    "return the draft when BE returns 200" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(OK)
+            .withHeader("Content-Type", "application/json")
+            .withBody(draftJson.toString)
+        )
+      )
+
+      connector
+        .getFinalValidationDraft(
+          instanceId,
+          draftId
+        )
+        .futureValue mustBe draft
+    }
+
+    "propagate upstream error when BE returns 500" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(INTERNAL_SERVER_ERROR)
+            .withBody("boom")
+        )
+      )
+
+      val ex =
+        connector
+          .getFinalValidationDraft(
+            instanceId,
+            draftId
+          )
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "updateFinalValidationReadiness" should {
+
+    val instanceId = "1"
+    val draftId = "draft-id"
+
+    val request =
+      UpdateFinalValidationReadinessRequest(
+        subcontractorId = 1L,
+        issues = Seq(
+          FinalValidationDraftIssue(
+            fieldKey = FinalValidationField.Utr.key,
+            value = Some("1234567890")
+          )
+        )
+      )
+
+    val draftJson =
+      Json.obj(
+        "subcontractors" -> Json.arr()
+      )
+
+    val draft =
+      draftJson.as[FinalValidationDraft]
+
+    "update the readiness when BE returns 200" in {
+
+      stubFor(
+        put(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/readiness"
+          )
+        )
+          .withHeader(
+            "Content-Type",
+            containing("application/json")
+          )
+          .withRequestBody(
+            equalToJson(
+              Json.toJson(request).toString
+            )
+          )
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(draftJson.toString)
+          )
+      )
+
+      connector
+        .updateFinalValidationReadiness(
+          instanceId,
+          draftId,
+          request
+        )
+        .futureValue mustBe draft
+    }
+
+    "propagate upstream error when BE returns 500" in {
+
+      stubFor(
+        put(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/readiness"
+          )
+        )
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector
+          .updateFinalValidationReadiness(
+            instanceId,
+            draftId,
+            request
+          )
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "updateFinalValidationCorrection" should {
+
+    val instanceId = "1"
+    val draftId = "draft-id"
+
+    val request =
+      Json
+        .obj(
+          "subcontractorId" -> 1L,
+          "changeTarget" -> FinalValidationChangeTarget.Utr.key,
+          "patch" -> Json.obj(
+            "utr" -> "1234567890"
+          )
+        )
+        .as[UpdateFinalValidationCorrectionRequest]
+
+    val draftJson =
+      Json.obj(
+        "subcontractors" -> Json.arr()
+      )
+
+    val draft =
+      draftJson.as[FinalValidationDraft]
+
+    "update the correction when BE returns 200" in {
+
+      stubFor(
+        put(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/correction"
+          )
+        )
+          .withHeader(
+            "Content-Type",
+            containing("application/json")
+          )
+          .withRequestBody(
+            equalToJson(
+              Json.toJson(request).toString
+            )
+          )
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody(draftJson.toString)
+          )
+      )
+
+      connector
+        .updateFinalValidationCorrection(
+          instanceId,
+          draftId,
+          request
+        )
+        .futureValue mustBe draft
+    }
+
+    "propagate upstream error when BE returns 500" in {
+
+      stubFor(
+        put(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/correction"
+          )
+        )
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector
+          .updateFinalValidationCorrection(
+            instanceId,
+            draftId,
+            request
+          )
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "commitFinalValidationDraft" should {
+
+    val instanceId = "1"
+    val draftId = "draft-id"
+
+    "successfully commit when BE returns 204" in {
+
+      stubFor(
+        post(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/commit"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(NO_CONTENT)
+        )
+      )
+
+      connector
+        .commitFinalValidationDraft(
+          instanceId,
+          draftId
+        )
+        .futureValue mustBe ((): Unit)
+    }
+
+    "successfully commit when BE returns 200" in {
+
+      stubFor(
+        post(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/commit"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(OK)
+        )
+      )
+
+      connector
+        .commitFinalValidationDraft(
+          instanceId,
+          draftId
+        )
+        .futureValue mustBe ((): Unit)
+    }
+
+    "return an UpstreamErrorResponse when BE returns an unexpected status" in {
+
+      stubFor(
+        post(
+          urlPathEqualTo(
+            s"/cis/final-validation/drafts/$instanceId/$draftId/commit"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(INTERNAL_SERVER_ERROR)
+            .withBody("boom")
+        )
+      )
+
+      val ex =
+        connector
+          .commitFinalValidationDraft(
+            instanceId,
+            draftId
+          )
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
     }
   }
 

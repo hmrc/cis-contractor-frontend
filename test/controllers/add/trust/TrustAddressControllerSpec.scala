@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +31,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AddressLookupService
-import models.UserAnswers
 import queries.AddressLookupAmendReturnQuery
 
 import scala.concurrent.Future
@@ -54,16 +53,24 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private lazy val redirectRoute =
-    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup().url
+    controllers.add.trust.routes.TrustAddressController
+      .redirectToAddressLookup(NormalMode, None)
+      .url
 
   private lazy val redirectChangeRoute =
-    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")).url
+    controllers.add.trust.routes.TrustAddressController
+      .redirectToAddressLookup(NormalMode, Some("change"))
+      .url
 
   private lazy val callbackRoute =
-    controllers.add.trust.routes.TrustAddressController.addressLookupCallback("addr-id").url
+    controllers.add.trust.routes.TrustAddressController
+      .addressLookupCallback("addr-id", NormalMode)
+      .url
 
   private lazy val callbackChangeRoute =
-    controllers.add.trust.routes.TrustAddressController.addressLookupCallbackChange("addr-id").url
+    controllers.add.trust.routes.TrustAddressController
+      .addressLookupCallbackChange("addr-id", NormalMode)
+      .url
 
   "TrustAddress Controller" - {
 
@@ -111,7 +118,9 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
             )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
-            controllers.add.trust.routes.TrustAddressController.addressLookupCallback().url
+            controllers.add.trust.routes.TrustAddressController
+              .addressLookupCallback("", NormalMode)
+              .url
           optNameCaptor.getValue mustBe Some(trustName)
         }
       }
@@ -158,7 +167,9 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
             )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
-            controllers.add.trust.routes.TrustAddressController.addressLookupCallbackChange().url
+            controllers.add.trust.routes.TrustAddressController
+              .addressLookupCallbackChange("", NormalMode)
+              .url
           optNameCaptor.getValue mustBe Some(trustName)
         }
       }
@@ -252,6 +263,37 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
           verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())
           idCaptor.getValue mustBe "addr-id"
+        }
+      }
+
+      "must retrieve and persist the address then redirect to Final Validation Complete in Final Validation mode" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersWithName))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              GET,
+              controllers.add.trust.routes.TrustAddressController
+                .addressLookupCallback("addr-id", FinalValidationMode)
+                .url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.finalvalidations.routes.FinalValidationCompleteController
+              .onPageLoad()
+              .url
         }
       }
 
@@ -428,7 +470,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.trust.routes.TrustAddressController
-              .redirectToAddressLookup(Some("change"))
+              .redirectToAddressLookup(NormalMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

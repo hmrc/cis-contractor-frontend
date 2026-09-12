@@ -18,6 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
+import models.finalvalidation.{FinalValidationContext, FinalValidationDraftRequestBuilder, VerifyFinalValidationSource}
 import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
@@ -31,12 +32,16 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.{PaginationToReverifyService, VerificationPreSelectionService}
+import services.{PaginationToReverifyService, VerificationPreSelectionService, VerifyFinalValidationService}
 import models.requests.DataRequest
 import models.verify.*
+import pages.finalvalidation.*
 import pages.verify.*
 import play.api.data.Form
 import rules.verify.ReverificationRules
+import services.finalvalidation.FinalValidationDraftService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import java.time.{Clock, LocalDate}
 import java.util.Locale
@@ -50,6 +55,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  verifyFinalValidationService: VerifyFinalValidationService,
+  finalValidationDraftService: FinalValidationDraftService,
+  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: SelectSubcontractorsToReverifyFormProvider,
   paginationToReverifyService: PaginationToReverifyService,
   verificationPreSelectionService: VerificationPreSelectionService,
@@ -212,7 +221,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
     }
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
+      implicit val hc: HeaderCarrier =
+        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       val allRows: Seq[SubcontractorReverifyRow] =
         request.userAnswers
@@ -301,9 +313,77 @@ class SelectSubcontractorsToReverifyController @Inject() (
           boundForm.fold(
             formWithErrors => Future.successful(renderForm(formWithErrors)),
             _ =>
-              saveSelectionsAndRedirect { updatedAnswers =>
-                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
-              }
+              for {
+                withSelections <- Future.fromTry(
+                                    request.userAnswers.set(
+                                      SelectSubcontractorsToReverifyPage,
+                                      mergedSelections
+                                    )
+                                  )
+
+                withContext <- Future.fromTry(
+                                 withSelections.set(
+                                   FinalValidationContextPage,
+                                   FinalValidationContext.VerifySubcontractor
+                                 )
+                               )
+
+                withSource <- Future.fromTry(
+                                withContext.set(
+                                  VerifyFinalValidationSourcePage,
+                                  VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                )
+                              )
+
+                validation <- verifyFinalValidationService.validate(
+                                request.cisId,
+                                withSource
+                              )
+
+                result <-
+                  if (validation.hasErrors) {
+                    for {
+                      createRequest <- Future.fromTry(
+                                         finalValidationDraftRequestBuilder.build(
+                                           request.cisId,
+                                           validation
+                                         )
+                                       )
+
+                      draftId <- finalValidationDraftService.create(createRequest)
+
+                      withDraftId <- Future.fromTry(
+                                       withSource.set(
+                                         FinalValidationDraftIdPage,
+                                         draftId
+                                       )
+                                     )
+
+                      withMode <- Future.fromTry(
+                                    withDraftId.set(
+                                      VerifyFinalValidationModePage,
+                                      mode.toString
+                                    )
+                                  )
+
+                      _ <- sessionRepository.set(withMode)
+
+                    } yield Redirect(
+                      controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                    )
+
+                  } else {
+                    sessionRepository.set(withSource).map { _ =>
+                      Redirect(
+                        navigator.nextPage(
+                          SelectSubcontractorsToReverifyPage,
+                          mode,
+                          withSource
+                        )
+                      )
+                    }
+                  }
+              } yield result
           )
       }
     }

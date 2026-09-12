@@ -17,6 +17,8 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.address.Address
+import models.add.SubcontractorName as AddSubcontractorName
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.add.IndividualNamesOptions

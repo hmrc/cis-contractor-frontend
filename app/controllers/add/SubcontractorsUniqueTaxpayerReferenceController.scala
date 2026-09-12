@@ -18,10 +18,11 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.UtrFormProvider
-import models.{AmendMode, Mode}
+import models.{AmendMode, FinalValidationMode, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.{SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
+import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -93,9 +94,13 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
               value =>
                 val prevValue = request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage)
+                val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
                   case AmendMode if prevValue.contains(value) =>
+                    saveAndContinue(mode, value)
+
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
                     saveAndContinue(mode, value)
 
                   case _ =>

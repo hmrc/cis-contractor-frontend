@@ -124,4 +124,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
       case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }
+
+  def cisFrontendFinalValidationReturnUrl(handoffId: String): String =
+    s"$cisFrontendFinalValidationReturn/$handoffId"
+
+  lazy val cisFrontendFinalValidationReturn: String =
+    configuration.get[String]("urls.cisFrontendFinalValidationReturn")
 }
