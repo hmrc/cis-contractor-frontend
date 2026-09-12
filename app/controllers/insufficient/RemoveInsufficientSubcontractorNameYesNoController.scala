@@ -81,55 +81,56 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onSubmit(verificationResourceRef: Long = -1L, mode: Mode = NormalMode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)) match {
-        case Some(true)         => Future.successful(recoveryRedirect)
-        case Some(false) | None =>
-          subcontractorName(request, verificationResourceRef)
-            .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-              form
-                .bindFromRequest()
-                .fold(
-                  formWithErrors =>
-                    Future.successful(
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          mode,
-                          subcontractorName,
-                          verificationResourceRef
+      val isAlreadyRemoving = request.userAnswers
+        .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)) contains true
+      if isAlreadyRemoving then Future.successful(recoveryRedirect)
+      else {
+        subcontractorName(request, verificationResourceRef)
+          .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        mode,
+                        subcontractorName,
+                        verificationResourceRef
+                      )
+                    )
+                  ),
+                value =>
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(
+                        request.userAnswers.set(
+                          RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
+                          value
                         )
                       )
-                    ),
-                  value =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(
-                          request.userAnswers.set(
-                            RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
-                            value
+                    cleanedAnswers <- Future.fromTry(
+                                        updatedAnswers.remove(
+                                          RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
+                                        )
+                                      )
+
+                    _ <- sessionRepository.set(cleanedAnswers)
+
+                    redirect <-
+                      if (value) {
+                        deleteAndRedirect(cleanedAnswers, verificationResourceRef)
+                      } else {
+                        Future.successful(
+                          Redirect(
+                            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
                           )
                         )
-                      cleanedAnswers <- Future.fromTry(
-                                          updatedAnswers.remove(
-                                            RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
-                                          )
-                                        )
-
-                      _ <- sessionRepository.set(cleanedAnswers)
-
-                      redirect <-
-                        if (value) {
-                          deleteAndRedirect(cleanedAnswers, verificationResourceRef)
-                        } else {
-                          Future.successful(
-                            Redirect(
-                              controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-                            )
-                          )
-                        }
-                    } yield redirect
-                )
-            }
+                      }
+                  } yield redirect
+              )
+          }
       }
     }
 
