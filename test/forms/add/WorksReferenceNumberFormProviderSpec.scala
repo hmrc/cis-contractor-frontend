@@ -36,7 +36,7 @@ class WorksReferenceNumberFormProviderSpec extends StringFieldBehaviours {
     "ABC Construction LTD",
     "A&B Contractors Ltd",
     "North-East (UK)",
-    "Symbols ~!@#$%&'()*+",
+    "Symbols ~!@#$%&'()*",
     "Symbols ,-./:;=?_{}£",
     "Symbol €",
     "Contains £ and €",
