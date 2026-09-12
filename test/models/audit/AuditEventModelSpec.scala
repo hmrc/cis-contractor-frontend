@@ -63,7 +63,8 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
-        individualNamesOptions = None,
+        subcontractorNameSelected = None,
+        tradingNameSelected = None,
         firstName = None,
         middleName = None,
         surname = None,
@@ -71,7 +72,9 @@ class AuditEventModelSpec extends SpecBase {
         subAddressYesNo = None,
         addressOfSubcontractor = None,
         addIndividualContactMethodsYesNo = None,
-        individualContactMethodOptions = None,
+        individualEmailContactMethod = None,
+        individualPhoneContactMethod = None,
+        individualMobileContactMethod = None,
         individualEmailAddress = None,
         individualPhoneNumber = None,
         individualMobileNumber = None,
@@ -89,7 +92,8 @@ class AuditEventModelSpec extends SpecBase {
       val model = AddSubcontractorAuditEventModel(
         cisId = Some("1"),
         typeOfSubcontractor = "soletrader",
-        individualNamesOptions = Some(Seq("subcontractorName", "tradingName")),
+        subcontractorNameSelected = Some(true),
+        tradingNameSelected = Some(true),
         firstName = Some("John"),
         middleName = Some("Paul"),
         surname = Some("Smith"),
@@ -97,7 +101,9 @@ class AuditEventModelSpec extends SpecBase {
         subAddressYesNo = Some(true),
         addressOfSubcontractor = Some(address),
         addIndividualContactMethodsYesNo = Some(true),
-        individualContactMethodOptions = Some(Seq("email", "phone", "mobile")),
+        individualEmailContactMethod = Some(true),
+        individualPhoneContactMethod = Some(true),
+        individualMobileContactMethod = Some(true),
         individualEmailAddress = Some("test@test.com"),
         individualPhoneNumber = Some("+447960141611"),
         individualMobileNumber = Some("01912170507"),
@@ -111,15 +117,18 @@ class AuditEventModelSpec extends SpecBase {
       Json.toJson(model) mustEqual Json.obj(
         "cisId"                                 -> "1",
         "typeOfSubcontractor"                   -> "soletrader",
-        "individualNamesOptions"                -> Json.arr("subcontractorName", "tradingName"),
+        "subcontractorNameSelected"             -> true,
+        "tradingNameSelected"                   -> true,
         "firstName"                             -> "John",
         "middleName"                            -> "Paul",
         "surname"                               -> "Smith",
         "tradingNameOfSubcontractor"            -> "TradingName",
         "subAddressYesNo"                       -> true,
-        "addressOfSubcontractor"                -> Json.toJson(address),
+        "addressOfSubcontractor"                -> Json.toJson(address)(Address.auditWrites),
         "addIndividualContactMethodsYesNo"      -> true,
-        "individualContactMethodOptions"        -> Json.arr("email", "phone", "mobile"),
+        "individualEmailContactMethod"          -> true,
+        "individualPhoneContactMethod"          -> true,
+        "individualMobileContactMethod"         -> true,
         "individualEmailAddress"                -> "test@test.com",
         "individualPhoneNumber"                 -> "+447960141611",
         "individualMobileNumber"                -> "01912170507",
@@ -132,11 +141,12 @@ class AuditEventModelSpec extends SpecBase {
       )
     }
 
-    "must have auditType addSubcontractor" in {
+    "must have auditType AddSubcontractor" in {
       AddSubcontractorAuditEventModel(
         cisId = None,
         typeOfSubcontractor = "soletrader",
-        individualNamesOptions = None,
+        subcontractorNameSelected = None,
+        tradingNameSelected = None,
         firstName = None,
         middleName = None,
         surname = None,
@@ -144,7 +154,9 @@ class AuditEventModelSpec extends SpecBase {
         subAddressYesNo = None,
         addressOfSubcontractor = None,
         addIndividualContactMethodsYesNo = None,
-        individualContactMethodOptions = None,
+        individualEmailContactMethod = None,
+        individualPhoneContactMethod = None,
+        individualMobileContactMethod = None,
         individualEmailAddress = None,
         individualPhoneNumber = None,
         individualMobileNumber = None,
@@ -154,7 +166,7 @@ class AuditEventModelSpec extends SpecBase {
         subNationalInsuranceNumber = None,
         worksReferenceNumberYesNo = None,
         worksReferenceNumber = None
-      ).auditType mustBe "addSubcontractor"
+      ).auditType mustBe "AddSubcontractor"
     }
   }
 
@@ -168,7 +180,9 @@ class AuditEventModelSpec extends SpecBase {
         companyAddressYesNo = None,
         companyAddress = None,
         addCompanyContactMethodsYesNo = None,
-        companyContactMethodOptions = None,
+        companyEmailContactMethod = None,
+        companyPhoneContactMethod = None,
+        companyMobileContactMethod = None,
         companyEmailAddress = None,
         companyPhoneNumber = None,
         companyMobileNumber = None,
@@ -190,7 +204,9 @@ class AuditEventModelSpec extends SpecBase {
         companyAddressYesNo = Some(true),
         companyAddress = Some(address),
         addCompanyContactMethodsYesNo = Some(true),
-        companyContactMethodOptions = Some(Seq("email")),
+        companyEmailContactMethod = Some(true),
+        companyPhoneContactMethod = Some(false),
+        companyMobileContactMethod = Some(false),
         companyEmailAddress = Some("company@test.com"),
         companyPhoneNumber = Some("01912170507"),
         companyMobileNumber = Some("+447960141611"),
@@ -206,9 +222,11 @@ class AuditEventModelSpec extends SpecBase {
         "typeOfSubcontractor"           -> "company",
         "companyName"                   -> "Test Co Ltd",
         "companyAddressYesNo"           -> true,
-        "companyAddress"                -> Json.toJson(address),
+        "companyAddress"                -> Json.toJson(address)(Address.auditWrites),
         "addCompanyContactMethodsYesNo" -> true,
-        "companyContactMethodOptions"   -> Json.arr("email"),
+        "companyEmailContactMethod"     -> true,
+        "companyPhoneContactMethod"     -> false,
+        "companyMobileContactMethod"    -> false,
         "companyEmailAddress"           -> "company@test.com",
         "companyPhoneNumber"            -> "01912170507",
         "companyMobileNumber"           -> "+447960141611",
@@ -232,7 +250,9 @@ class AuditEventModelSpec extends SpecBase {
         partnershipAddressYesNo = None,
         partnershipAddress = None,
         addPartnershipContactMethodsYesNo = None,
-        partnershipContactMethodOptions = None,
+        partnershipEmailContactMethod = None,
+        partnershipPhoneContactMethod = None,
+        partnershipMobileContactMethod = None,
         partnershipEmailAddress = None,
         partnershipPhoneNumber = None,
         partnershipMobileNumber = None,
@@ -259,7 +279,9 @@ class AuditEventModelSpec extends SpecBase {
         partnershipAddressYesNo = Some(true),
         partnershipAddress = Some(address),
         addPartnershipContactMethodsYesNo = Some(true),
-        partnershipContactMethodOptions = Some(Seq("email")),
+        partnershipEmailContactMethod = Some(true),
+        partnershipPhoneContactMethod = Some(false),
+        partnershipMobileContactMethod = Some(false),
         partnershipEmailAddress = Some("partnership@test.com"),
         partnershipPhoneNumber = Some("01912170507"),
         partnershipMobileNumber = Some("+447960141611"),
@@ -280,9 +302,11 @@ class AuditEventModelSpec extends SpecBase {
         "typeOfSubcontractor"                       -> "partnership",
         "partnershipName"                           -> "Test Partnership",
         "partnershipAddressYesNo"                   -> true,
-        "partnershipAddress"                        -> Json.toJson(address),
+        "partnershipAddress"                        -> Json.toJson(address)(Address.auditWrites),
         "addPartnershipContactMethodsYesNo"         -> true,
-        "partnershipContactMethodOptions"           -> Json.arr("email"),
+        "partnershipEmailContactMethod"             -> true,
+        "partnershipPhoneContactMethod"             -> false,
+        "partnershipMobileContactMethod"            -> false,
         "partnershipEmailAddress"                   -> "partnership@test.com",
         "partnershipPhoneNumber"                    -> "01912170507",
         "partnershipMobileNumber"                   -> "+447960141611",
@@ -302,7 +326,8 @@ class AuditEventModelSpec extends SpecBase {
   }
 
   private val baseIndividualDetails = IndividualSubcontractorDetails(
-    individualNamesOptions = Some(Seq("subcontractorName")),
+    subcontractorNameSelected = Some(true),
+    tradingNameSelected = Some(false),
     firstName = Some("John"),
     middleName = Some("Paul"),
     surname = Some("Smith"),
@@ -310,7 +335,9 @@ class AuditEventModelSpec extends SpecBase {
     subAddressYesNo = Some(true),
     addressOfSubcontractor = Some(address),
     addIndividualContactMethodsYesNo = Some(true),
-    individualContactMethodOptions = Some(Seq("email", "phone", "mobile")),
+    individualEmailContactMethod = Some(true),
+    individualPhoneContactMethod = Some(true),
+    individualMobileContactMethod = Some(true),
     individualEmailAddress = Some("sub@example.com"),
     individualPhoneNumber = Some("01234567890"),
     individualMobileNumber = Some("07123456789"),
@@ -327,7 +354,9 @@ class AuditEventModelSpec extends SpecBase {
     companyAddressYesNo = Some(true),
     companyAddress = Some(address),
     addCompanyContactMethodsYesNo = Some(true),
-    companyContactMethodOptions = Some(Seq("email")),
+    companyEmailContactMethod = Some(true),
+    companyPhoneContactMethod = Some(false),
+    companyMobileContactMethod = Some(false),
     companyEmailAddress = Some("company@example.com"),
     companyPhoneNumber = Some("01234567890"),
     companyMobileNumber = Some("07123456789"),
@@ -344,7 +373,9 @@ class AuditEventModelSpec extends SpecBase {
     partnershipAddressYesNo = Some(true),
     partnershipAddress = Some(address),
     addPartnershipContactMethodsYesNo = Some(true),
-    partnershipContactMethodOptions = Some(Seq("email")),
+    partnershipEmailContactMethod = Some(true),
+    partnershipPhoneContactMethod = Some(false),
+    partnershipMobileContactMethod = Some(false),
     partnershipEmailAddress = Some("partnership@example.com"),
     partnershipPhoneNumber = Some("01234567890"),
     partnershipMobileNumber = Some("07123456789"),
@@ -366,7 +397,9 @@ class AuditEventModelSpec extends SpecBase {
     trustAddressYesNo = Some(true),
     trustAddress = Some(address),
     addTrustContactMethodsYesNo = Some(true),
-    trustContactMethodOptions = Some(Seq("email")),
+    trustEmailContactMethod = Some(true),
+    trustPhoneContactMethod = Some(false),
+    trustMobileContactMethod = Some(false),
     trustEmailAddress = Some("trust@example.com"),
     trustPhoneNumber = Some("01234567890"),
     trustMobileNumber = Some("07123456789"),
@@ -475,14 +508,14 @@ class AuditEventModelSpec extends SpecBase {
       (Json.toJson(model) \ "subbieResourceRef").toOption mustBe None
     }
 
-    "must have auditType amendSubcontractor" in {
+    "must have auditType AmendSubcontractor" in {
       AmendSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "soletrader",
         originalDetails = None,
         updatedDetails = baseIndividualDetails
-      ).auditType mustBe "amendSubcontractor"
+      ).auditType mustBe "AmendSubcontractor"
     }
   }
 
@@ -526,14 +559,14 @@ class AuditEventModelSpec extends SpecBase {
       (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 7
     }
 
-    "must have auditType amendSubcontractor" in {
+    "must have auditType AmendSubcontractor" in {
       AmendCompanySubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "company",
         originalDetails = None,
         updatedDetails = baseCompanyDetails
-      ).auditType mustBe "amendSubcontractor"
+      ).auditType mustBe "AmendSubcontractor"
     }
   }
 
@@ -579,14 +612,14 @@ class AuditEventModelSpec extends SpecBase {
       (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 3
     }
 
-    "must have auditType amendSubcontractor" in {
+    "must have auditType AmendSubcontractor" in {
       AmendPartnershipSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "partnership",
         originalDetails = None,
         updatedDetails = basePartnershipDetails
-      ).auditType mustBe "amendSubcontractor"
+      ).auditType mustBe "AmendSubcontractor"
     }
   }
 
@@ -630,14 +663,14 @@ class AuditEventModelSpec extends SpecBase {
       (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 99
     }
 
-    "must have auditType amendSubcontractor" in {
+    "must have auditType AmendSubcontractor" in {
       AmendTrustSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "trust",
         originalDetails = None,
         updatedDetails = baseTrustDetails
-      ).auditType mustBe "amendSubcontractor"
+      ).auditType mustBe "AmendSubcontractor"
     }
   }
 
@@ -651,7 +684,9 @@ class AuditEventModelSpec extends SpecBase {
         trustAddressYesNo = None,
         trustAddress = None,
         addTrustContactMethodsYesNo = None,
-        trustContactMethodOptions = None,
+        trustEmailContactMethod = None,
+        trustPhoneContactMethod = None,
+        trustMobileContactMethod = None,
         trustEmailAddress = None,
         trustPhoneNumber = None,
         trustMobileNumber = None,
@@ -671,7 +706,9 @@ class AuditEventModelSpec extends SpecBase {
         trustAddressYesNo = Some(true),
         trustAddress = Some(address),
         addTrustContactMethodsYesNo = Some(true),
-        trustContactMethodOptions = Some(Seq("email")),
+        trustEmailContactMethod = Some(true),
+        trustPhoneContactMethod = Some(false),
+        trustMobileContactMethod = Some(false),
         trustEmailAddress = Some("trust@test.com"),
         trustPhoneNumber = Some("01912170507"),
         trustMobileNumber = Some("+447960141611"),
@@ -685,9 +722,11 @@ class AuditEventModelSpec extends SpecBase {
         "typeOfSubcontractor"         -> "trust",
         "trustName"                   -> "Test Trust",
         "trustAddressYesNo"           -> true,
-        "trustAddress"                -> Json.toJson(address),
+        "trustAddress"                -> Json.toJson(address)(Address.auditWrites),
         "addTrustContactMethodsYesNo" -> true,
-        "trustContactMethodOptions"   -> Json.arr("email"),
+        "trustEmailContactMethod"     -> true,
+        "trustPhoneContactMethod"     -> false,
+        "trustMobileContactMethod"    -> false,
         "trustEmailAddress"           -> "trust@test.com",
         "trustPhoneNumber"            -> "01912170507",
         "trustMobileNumber"           -> "+447960141611",

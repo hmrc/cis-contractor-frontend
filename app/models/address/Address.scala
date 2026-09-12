@@ -66,6 +66,18 @@ case class Address(
 
 object Address {
 
+  val auditWrites: OWrites[Address] = OWrites { address =>
+    Json.obj("addressLine1" -> address.addressLine1) ++
+      address.addressLine2.fold(Json.obj())(v => Json.obj("addressLine2" -> v)) ++
+      address.addressLine3.fold(Json.obj())(v => Json.obj("addressLine3" -> v)) ++
+      address.addressLine4.fold(Json.obj())(v => Json.obj("addressLine4" -> v)) ++
+      address.addressLine5.fold(Json.obj())(v => Json.obj("addressLine5" -> v)) ++
+      address.postcode.fold(Json.obj())(v => Json.obj("postcode" -> v)) ++
+      address.country.flatMap(_.code).fold(Json.obj())(v => Json.obj("countryCode" -> v)) ++
+      address.country.flatMap(_.name).fold(Json.obj())(v => Json.obj("countryName" -> v)) ++
+      Json.obj("addressValidated" -> address.addressValidated)
+  }
+
   private sealed trait AddressLineOrPostcode
 
   private final case class AddressLine(line: String) extends AddressLineOrPostcode
