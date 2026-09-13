@@ -29,29 +29,39 @@
     extraClasses: String = emptyString,
     bold: Boolean = false,
     linkId: String = emptyString,
-    newLineBeforeSuffixText:Boolean = false
+    newLineBeforeSuffixText:Boolean = false,
+    ariaLabel: String = emptyString,
+    visuallyHiddenText: String = emptyString,
+    linkText: String = emptyString
 )(implicit messages: Messages)
 
-@defining {
-    @if(prefixTextKey.nonEmpty) {
-        @{Html(messages(prefixTextKey))}
-    }
-    @if(hasFullStop) {
-        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(linkId.nonEmpty){id="@linkId"} @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>.
-    } else {
-        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(linkId.nonEmpty){id="@linkId"} @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>
-    }
+@defining(if(linkText.nonEmpty) linkText else messages(linkTextKey)) { visibleLinkText =>
+    @defining {
+        @if(prefixTextKey.nonEmpty) {
+            @{Html(messages(prefixTextKey))}
+        }
 
-    @if(suffixTextKey.nonEmpty) {
-        @if(newLineBeforeSuffixText) {</br>}
-        @{Html(messages(suffixTextKey))}
-    }
-} { content =>
-    @if(paragraphWrapped){
-    <p class="govuk-body @if(extraClasses.nonEmpty){@extraClasses}">
-        @content
-    </p>
-    } else {
-        @content
-    }
+        <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}"
+           @if(linkId.nonEmpty){id="@linkId"}
+           @if(ariaLabel.nonEmpty){aria-label="@ariaLabel"}
+           @if(isNewTab){rel="noreferrer noopener" target="_blank"}>
+            @visibleLinkText
+            @if(visuallyHiddenText.nonEmpty) {
+                <span class="govuk-visually-hidden">@visuallyHiddenText</span>
+            }
+        </a>@if(hasFullStop){.}
+
+        @if(suffixTextKey.nonEmpty) {
+            @if(newLineBeforeSuffixText) {<br>}
+            @{Html(messages(suffixTextKey))}
+        }
+    } { content =>
+        @if(paragraphWrapped) {
+            <p class="govuk-body @if(extraClasses.nonEmpty){@extraClasses}">
+                @content
+            </p>
+        } else {
+            @content
+        }
+     }
 }

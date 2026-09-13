@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
-@import viewmodels.verify.{ReviewInsufficientInfoViewModel, MissingSubcontractorRow, ReadySubcontractorRow, LinkViewModel}
+@import viewmodels.verify.{ReviewInsufficientInfoViewModel, MissingSubcontractorRow, LinkViewModel}
 @import views.html.components._
 @import play.twirl.api.HtmlFormat
 @import viewmodels.checkAnswers.UtrContent
@@ -38,25 +38,29 @@
 @(viewModel: ReviewInsufficientInfoViewModel)(implicit request: Request[_], messages: Messages)
 
 @nameLink(vm: LinkViewModel, name: String) = {
-        @link(
-            linkTextKey = HtmlFormat.escape(name).body,
-            linkUrl = vm.url, paragraphWrapped = false)
+    @link(
+        linkText = name,
+        linkUrl = vm.url,
+        paragraphWrapped = false,
+        visuallyHiddenText = messages("verify.reviewInsufficientInfo.hidden.subcontractor", name)
+    )
 }
 
-@actionLink(textKey: String, vm: LinkViewModel) = {
+@actionLink(textKey: String, hiddenTextKey: String, vm: LinkViewModel, name: String) = {
     @link(
-        linkTextKey = messages(textKey),
+        linkTextKey = textKey,
         linkUrl = vm.url,
-        paragraphWrapped = false
+        paragraphWrapped = false,
+        visuallyHiddenText = messages(hiddenTextKey, name)
     )
 }
 
 @missingActions(row: MissingSubcontractorRow) = {
-    @actionLink("verify.reviewInsufficientInfo.action.edit", row.editLink)
+    @actionLink("verify.reviewInsufficientInfo.action.edit", "verify.reviewInsufficientInfo.action.edit.hidden", row.editLink, row.name)
     <span aria-hidden="true"> | </span>
-    @actionLink("verify.reviewInsufficientInfo.action.proceed", row.proceedLink)
+    @actionLink("verify.reviewInsufficientInfo.action.proceed", "verify.reviewInsufficientInfo.action.proceed.hidden", row.proceedLink, row.name)
     <span aria-hidden="true"> | </span>
-    @actionLink("verify.reviewInsufficientInfo.action.remove", row.removeLink)
+    @actionLink("verify.reviewInsufficientInfo.action.remove", "verify.reviewInsufficientInfo.action.remove.hidden", row.removeLink, row.name)
 }
 
 @layout(pageTitle = titleNoForm(messages("verify.reviewInsufficientInfo.title"))) {
@@ -121,10 +125,10 @@
     }
 
     @if(viewModel.allReady) {
-    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()) {
-            @govukButton(Button(
-                content = Text(messages("site.continue")),
-            ))
+        @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()) {
+                @govukButton(Button(
+                    content = Text(messages("site.continue"))
+                ))
+            }
         }
-    }
 }

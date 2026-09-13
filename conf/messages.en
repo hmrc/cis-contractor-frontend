@@ -14,6 +14,9 @@ site.signIn                                             =  Sign in
 site.govuk                                              =  GOV.UK
 site.saveAndContinue                                    =  Save and continue
 site.unknown                                            =  Unknown
+site.pagination.goToPage                                =  Go to page {0}
+site.pagination.goToPrevious                            =  Go to previous page
+site.pagination.goToNext                                =  Go to next page
 
 date.day                                                =  Day
 date.month                                              =  Month
@@ -1043,6 +1046,10 @@ verify.reviewInsufficientInfo.actions                                           
 verify.reviewInsufficientInfo.action.edit                                          =  Edit
 verify.reviewInsufficientInfo.action.proceed                                       =  Proceed
 verify.reviewInsufficientInfo.action.remove                                        =  Remove
+verify.reviewInsufficientInfo.hidden.subcontractor= View the details of {0}
+verify.reviewInsufficientInfo.action.edit.hidden=Edit the details for {0}
+verify.reviewInsufficientInfo.action.proceed.hidden=Proceed to verify {0}
+verify.reviewInsufficientInfo.action.remove.hidden=Remove {0} from verification request
 
 verify.reviewUnmatched.title                                                       =  Review unmatched subcontractors
 verify.reviewUnmatched.heading                                                     =  Review unmatched subcontractors
@@ -1063,6 +1070,10 @@ verify.reviewUnmatched.action.proceed                                           
 verify.reviewUnmatched.action.remove                                               =  Remove
 verify.reviewUnmatched.backToResults.prefix                                        =  Back to
 verify.reviewUnmatched.backToResults.link                                          =  Verification results
+verify.reviewUnmatched.action.edit.hidden                               =  Edit the details for {0}
+verify.reviewUnmatched.action.proceed.hidden                            =  Proceed to verify {0}
+verify.reviewUnmatched.action.remove.hidden                             =  Remove {0} from verification request
+verify.reviewUnmatched.name.hidden                                      =  View the details of {0}
 
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                                 =  Which subcontractors do you want to verify?
