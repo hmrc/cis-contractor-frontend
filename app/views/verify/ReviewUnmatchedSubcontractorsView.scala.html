@@ -56,11 +56,11 @@
 }
 
 @unmatchedActions(row: MissingSubcontractorRow) = {
-    @actionLink("verify.reviewUnmatched.action.edit", "verify.reviewUnmatched.action.edit.hidden", row.editLink)
+    @actionLink("verify.reviewUnmatched.action.edit", "verify.reviewUnmatched.action.edit.hidden", row.editLink, row.name)
     <span aria-hidden="true"> | </span>
-    @actionLink("verify.reviewUnmatched.action.proceed", "verify.reviewUnmatched.action.proceed.hidden", row.proceedLink)
+    @actionLink("verify.reviewUnmatched.action.proceed", "verify.reviewUnmatched.action.proceed.hidden", row.proceedLink, row.name)
     <span aria-hidden="true"> | </span>
-    @actionLink("verify.reviewUnmatched.action.remove", "verify.reviewUnmatched.action.remove.hidden", row.removeLink)
+    @actionLink("verify.reviewUnmatched.action.remove", "verify.reviewUnmatched.action.remove.hidden", row.removeLink, row.name)
 }
 
 @layout(pageTitle = titleNoForm(messages("verify.reviewUnmatched.title"))) {

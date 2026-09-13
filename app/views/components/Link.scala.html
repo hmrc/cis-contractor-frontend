@@ -19,7 +19,7 @@
 @this()
 
 @(
-    linkTextKey: String,
+    linkTextKey: String = emptyString,
     linkUrl: String,
     isNewTab: Boolean = false,
     hasFullStop: Boolean = false,
@@ -30,7 +30,6 @@
     bold: Boolean = false,
     linkId: String = emptyString,
     newLineBeforeSuffixText:Boolean = false,
-    ariaLabel: String = emptyString,
     visuallyHiddenText: String = emptyString,
     linkText: String = emptyString
 )(implicit messages: Messages)
@@ -43,7 +42,6 @@
 
         <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}"
            @if(linkId.nonEmpty){id="@linkId"}
-           @if(ariaLabel.nonEmpty){aria-label="@ariaLabel"}
            @if(isNewTab){rel="noreferrer noopener" target="_blank"}>
             @visibleLinkText
             @if(visuallyHiddenText.nonEmpty) {
