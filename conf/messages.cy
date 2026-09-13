@@ -8,30 +8,30 @@ site.no                                                 =  Na
 site.yes                                                =  Iawn
 site.continue                                           =  Parhau
 site.update                                             =  Diweddaru
-site.start                                              =  xxxxxxxxxxxxxxxxxxxx
-site.startAgain                                         =  xxxxxxxxxxxxxxxxxxxx
-site.signIn                                             =  xxxxxxxxxxxxxxxxxxxx
+site.start                                              =  Dechrau nawr
+site.startAgain                                         =  Dechrau eto
+site.signIn                                             =  Mewngofnodi
 site.govuk                                              =  GOV.UK
 site.saveAndContinue                                    =  Cadw a pharhau
-site.unknown                                            =  xxxxxxxxxxxxxxxxxxxx
+site.unknown                                            =  Anhysbys
 
-date.day                                                =  xxxxxxxxxxxxxxxxxxxx
-date.month                                              =  xxxxxxxxxxxxxxxxxxxx
-date.year                                               =  xxxxxxxxxxxxxxxxxxxx
-date.error.day                                          =  xxxxxxxxxxxxxxxxxxxx
-date.error.month                                        =  xxxxxxxxxxxxxxxxxxxx
-date.error.year                                         =  xxxxxxxxxxxxxxxxxxxx
+date.day                                                =  Diwrnod
+date.month                                              =  Mis
+date.year                                               =  Blwyddyn
+date.error.day                                          =  diwrnod
+date.error.month                                        =  mis
+date.error.year                                         =  blwyddyn
 
-error.boolean                                           =  xxxxxxxxxxxxxxxxxxxx
+error.boolean                                           =  Rhowch ateb
 
-timeout.title                                           =  xxxxxxxxxxxxxxxxxxxx
-timeout.message                                         =  xxxxxxxxxxxxxxxxxxxx
-timeout.keepAlive                                       =  xxxxxxxxxxxxxxxxxxxx
-timeout.signOut                                         =  xxxxxxxxxxxxxxxxxxxx
+timeout.title                                           =  Rydych ar fin cael eich allgofnodi
+timeout.message                                         =  Am resymau diogelwch, cewch eich allgofnodi o’r gwasanaeth hwn ymhen
+timeout.keepAlive                                       =  Peidio ag allgofnodi
+timeout.signOut                                         =  Allgofnodi
 
-error.title.prefix                                      =  Error:
-error.prefix                                            =  xxxxxxxxxxxxxxxxxxxx
-error.summary.title                                     =  xxxxxxxxxxxxxxxxxxxx
+error.title.prefix                                      =  Gwall:
+error.prefix                                            =  Gwall
+error.summary.title                                     =  Mae problem
 
 index.title                                             =  xxxxxxxxxxxxxxxxxxxx
 index.heading                                           =  xxxxxxxxxxxxxxxxxxxx
@@ -283,7 +283,7 @@ individualEmailAddress.checkYourAnswersLabel                                    
 individualEmailAddress.error.required                                               =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
 individualEmailAddress.error.length                                                 =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
 individualEmailAddress.error.invalid                                                =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
-individualEmailAddress.change.hidden                                                =  xxxxxxxxxxxxxxxxxxxx
+individualEmailAddress.change.hidden                                                =  cyfeiriad e-bost
 
 individualChooseContactDetails.title                                                =  xxxxxxxxxxxxxxxxxxxx
 individualChooseContactDetails.heading                                              =  xxxxxxxxxxxxxxxxxxxx
@@ -628,7 +628,7 @@ partnershipEmailAddress.checkYourAnswersLabel                      =  Cyfeiriad 
 partnershipEmailAddress.error.required                             =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
 partnershipEmailAddress.error.invalid                              =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
 partnershipEmailAddress.error.length                               =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
-partnershipEmailAddress.change.hidden                              =  xxxxxxxxxxxxxxxxxxxx
+partnershipEmailAddress.change.hidden                              =  cyfeiriad e-bost
 
 partnershipPhoneNumber.title                                       =  xxxxxxxxxxxxxxxxxxxx
 partnershipPhoneNumber.heading                                     =  Beth yw’r rhif ffôn ar gyfer {0}?
@@ -834,7 +834,7 @@ trustEmailAddress.checkYourAnswersLabel            =  Cyfeiriad e-bost
 trustEmailAddress.error.required                   =  Nodwch gyfeiriad e-bost yn y fformat cywir, fel enw@enghraifft.com
 trustEmailAddress.error.length                     =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com, hyd at 254 o gymeriadau
 trustEmailAddress.error.invalid                    =  Nodwch gyfeiriad e-bost dilys yn y fformat cywir, fel enw@enghraifft.com
-trustEmailAddress.change.hidden                    =  xxxxxxxxxxxxxxxxxxxx
+trustEmailAddress.change.hidden                    =  cyfeiriad e-bost
 
 trustPhoneNumber.title                             =  xxxxxxxxxxxxxxxxxxxx
 trustPhoneNumber.heading                           =  Beth yw’r rhif ffôn ar gyfer {0}?
@@ -1003,7 +1003,7 @@ verify.emailAddress.checkYourAnswersLabel                                       
 verify.emailAddress.error.required                                                 =  xxxxxxxxxxxxxxxxxxxx
 verify.emailAddress.error.length                                                   =  xxxxxxxxxxxxxxxxxxxx
 verify.emailAddress.error.invalid                                                  =  xxxxxxxxxxxxxxxxxxxx
-verify.emailAddress.change.hidden                                                  =  xxxxxxxxxxxxxxxxxxxx
+verify.emailAddress.change.hidden                                                  =  cyfeiriad e-bost
 
 verify.reverifyExistingSubcontractorsYesNo.title                                   =  xxxxxxxxxxxxxxxxxxxx
 verify.reverifyExistingSubcontractorsYesNo.heading                                 =  xxxxxxxxxxxxxxxxxxxx
@@ -1146,12 +1146,12 @@ contractordetails.contractorDetailsCheckAnswers.table.schemeName               =
 contractordetails.contractorDetailsCheckAnswers.table.schemeName.hidden        =  enw’r cynllun
 contractordetails.contractorDetailsCheckAnswers.table.email                    =  E-bost?
 contractordetails.contractorDetailsCheckAnswers.table.email.hidden             =  e-bost
-contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  xxxxxxxxxxxxxxxxxxxx
+contractordetails.contractorDetailsCheckAnswers.table.link.addDetails          =  Ychwanegu manylion
 contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link      =  Dychwelyd i ‘Cyfrif CIS’
 
 contractordetails.addEmailAddressYesNo.title                                   =  A ydych am nodi cyfeiriad e-bost y contractwr?
 contractordetails.addEmailAddressYesNo.heading                                 =  A ydych am nodi cyfeiriad e-bost y contractwr?
-contractordetails.addEmailAddressYesNo.error.required                          =  xxxxxxxxxxxxxxxxxxxx
+contractordetails.addEmailAddressYesNo.error.required                          =  Dewiswch ‘Iawn’ i ychwanegu cyfeiriad e-bost y contractwr
 contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Ychwanegu cyfeiriad e-bost?
 contractordetails.addEmailAddressYesNo.change.hidden                           =  ychwanegu cyfeiriad e-bost?
 
