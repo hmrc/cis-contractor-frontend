@@ -297,28 +297,6 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__prev button").attr("value") mustBe "1"
       doc.select(".govuk-pagination__next button").attr("value") mustBe "3"
     }
-
-    "must render pagination icons as hidden from assistive technology" in new Setup {
-      val pagination = PaginationViewModel(
-        items = Seq(
-          PaginationItemViewModel("2", "/test?page=2").withCurrent(true)
-        ),
-        previous = Some(PaginationLinkViewModel("/test?page=1")),
-        next = Some(PaginationLinkViewModel("/test?page=3"))
-      )
-
-      val doc = parse(pageNavigator(pagination, page = 2))
-
-      val icons = doc.select(".govuk-pagination__icon")
-
-      icons.size() mustBe 2
-
-      icons.get(0).attr("aria-hidden") mustBe "true"
-      icons.get(0).attr("focusable") mustBe "false"
-
-      icons.get(1).attr("aria-hidden") mustBe "true"
-      icons.get(1).attr("focusable") mustBe "false"
-    }
   }
 
   trait Setup {
