@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package forms.add
+package viewmodels.checkAnswers
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
+import viewmodels.govuk.summarylist.*
 
-import javax.inject.Inject
+object UtrViewModel {
+  def apply(utr: String): Value =
+    ValueViewModel(UtrContent(utr))
+}
 
-class SubTradingNameYesNoFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("subTradingNameYesNo.error.required")
-    )
+object UtrContent {
+  def apply(utr: String): HtmlContent =
+    HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(utr)}</span>""")
 }

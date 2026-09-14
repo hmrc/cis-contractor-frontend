@@ -17,10 +17,9 @@
 package controllers.contractordetails
 
 import config.FrontendAppConfig
-import connectors.ConstructionIndustrySchemeConnector
-import controllers.Execution.trampoline
 import controllers.actions.*
 import models.requests.UpdateContractorSchemeParams
+import pages.CisIdPage
 import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -48,6 +47,18 @@ class ContractorDetailsCheckAnswersController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+
+      val cisAccountUrl =
+        if (!request.isAgent) {
+          appConfig.constructionIndustryOrgAccountUrl
+        } else {
+          request.userAnswers
+            .get(CisIdPage)
+            .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            )
+        }
+
       request.userAnswers.get(ContractorSchemePage) match {
 
         case Some(scheme) =>
@@ -62,7 +73,8 @@ class ContractorDetailsCheckAnswersController @Inject() (
           Ok(
             view(
               scheme.accountsOfficeReference,
-              summaryRows
+              summaryRows,
+              cisAccountUrl
             )
           )
 

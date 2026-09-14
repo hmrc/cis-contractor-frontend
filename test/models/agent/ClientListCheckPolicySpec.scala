@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.agent
 
-import pages.QuestionPage
-import pages.add.IndividualJourney
-import play.api.libs.json.JsPath
+import base.SpecBase
 
-case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
+class ClientListCheckPolicySpec extends SpecBase {
 
-  override def path: JsPath = JsPath \ toString
+  "ClientListCheckPolicy" - {
 
-  override def toString: String = "subTradingNameYesNo"
-
+    "must expose GroupA and Exempt policies" in {
+      ClientListCheckPolicy.GroupA mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.Exempt mustBe a[ClientListCheckPolicy]
+    }
+  }
 }

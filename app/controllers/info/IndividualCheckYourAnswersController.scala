@@ -19,6 +19,7 @@ package controllers.info
 import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
+import models.amend.AmendJourneyType
 import models.info.IndividualAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -43,7 +44,7 @@ class IndividualCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(journeyType: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(IndividualAnswersQuery) match {
 
@@ -58,13 +59,38 @@ class IndividualCheckYourAnswersController @Inject() (
               rows = detailsRows(answers).flatten
             )
 
-          Ok(
-            view(
-              subcontractorInformationList,
-              detailsList,
-              displayName(answers)
-            )
-          )
+          val messages = request.messages
+
+          AmendJourneyType.fromString(journeyType) match {
+            case Some(AmendJourneyType.InsufficientInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  displayName(answers),
+                  controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+                )
+              )
+
+            case Some(AmendJourneyType.UnmatchedInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  displayName(answers),
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+                )
+              )
+
+            case _ =>
+              logger.error(
+                "[IndividualCheckYourAnswersController.onPageLoad] " +
+                  "journeyType is invalid"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
 
         case None =>
           logger.error(
@@ -117,7 +143,7 @@ class IndividualCheckYourAnswersController @Inject() (
     val nameRows =
       if (!answers.showVerificationDetails) {
         Seq(
-          SubTradingNameYesNoSummary.row(answers),
+          IndividualNamesOptionsSummary.row(answers),
           SubcontractorNameSummary.row(answers),
           TradingNameOfSubcontractorSummary.row(answers)
         )
@@ -167,15 +193,18 @@ class IndividualCheckYourAnswersController @Inject() (
 
   private def displayName(
     answers: IndividualAnswers
-  ): String =
+  )(implicit messages: Messages): String =
     answers.subcontractorName
-      .map { name =>
-        Seq(
-          Some(name.firstName),
-          name.middleName,
-          Some(name.lastName)
-        ).flatten.mkString(" ")
+      .flatMap { name =>
+        val firstName = name.firstName.trim
+        val lastName  = name.lastName.trim
+
+        (firstName.nonEmpty, lastName.nonEmpty) match {
+          case (true, true)  => Some(s"$firstName $lastName")
+          case (false, true) => Some(lastName)
+          case _             => None
+        }
       }
-      .orElse(answers.tradingName)
-      .getOrElse("")
+      .orElse(answers.tradingName.map(_.trim).filter(_.nonEmpty))
+      .getOrElse(messages("verify.noName"))
 }
