@@ -30,8 +30,7 @@ import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.*
 import play.api.i18n.Messages
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent

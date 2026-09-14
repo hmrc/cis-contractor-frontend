@@ -18,6 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
+import models.finalvalidation.VerifyFinalValidationResult
 import models.response.GetNewestVerificationBatchResponse
 import models.{CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
 import navigation.{FakeNavigator, Navigator}
@@ -28,14 +29,15 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{NewestVerificationBatchResponsePage, RebuildVerificationFromWarningPage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Forms.*
 import play.api.data.Form
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.PaginationService
+import services.{PaginationService, VerifyFinalValidationService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.SelectSubcontractorView
-import play.api.i18n.Messages
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -52,6 +54,30 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   val formProvider            = new SelectSubcontractorFormProvider()
   val form: Form[Set[String]] = formProvider()
   val paginationService       = new PaginationService()
+
+  private val verifyFinalValidationService = mock[VerifyFinalValidationService]
+
+  when(
+    verifyFinalValidationService.validate(
+      any[String],
+      any[UserAnswers]
+    )(any[HeaderCarrier])
+  ).thenReturn(
+    Future.successful(
+      VerifyFinalValidationResult(
+        subcontractors = Seq.empty,
+        failures = Seq.empty
+      )
+    )
+  )
+
+  private def applicationBuilderWithSuccessfulFinalValidation(
+    userAnswers: UserAnswers
+  ) =
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(
+        bind[VerifyFinalValidationService].toInstance(verifyFinalValidationService)
+      )
 
   def url(page: Int = 1): String =
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode, page).url
@@ -108,7 +134,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     )
 
   private def uaWithSubcontractors: UserAnswers =
-    emptyUserAnswers
+    userAnswersWithCisId
       .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
       .success
       .value
@@ -117,8 +143,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
-  private val brodyMartin      = allSubs.head // first subcontractor, on page 1
-  private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
+  private val brodyMartin      = allSubs.head
+  private val epsilonCarpentry = allSubs(6)
 
   "SelectSubcontractor Controller" - {
 
@@ -194,7 +220,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+        applicationBuilderWithSuccessfulFinalValidation(uaWithSubcontractors)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -442,7 +468,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -464,7 +490,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val subcontractorCount = 0
 
       def uaWithNoUnverifiedSubcontractor: UserAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(UnverifiedSubcontractorsPage, generateSubcontractors(subcontractorCount))
           .success
           .value
@@ -583,7 +609,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -614,7 +640,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -656,7 +682,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -706,7 +732,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val appWithAnswers =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -754,7 +780,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val userAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value
@@ -766,7 +792,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
@@ -800,7 +826,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value
@@ -812,7 +838,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
+        applicationBuilderWithSuccessfulFinalValidation(ua)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)

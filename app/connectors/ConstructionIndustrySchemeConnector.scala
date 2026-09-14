@@ -21,6 +21,7 @@ import models.agent.GetClientListStatusResponse
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
+import models.finalvalidation.*
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{JsValue, Json, OFormat}
@@ -322,6 +323,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def getFinalValidationJourneyHandoff(
+    journeyType: String,
+    handoffId: String
+  )(using hc: HeaderCarrier): Future[Option[FinalValidationHandoffPayload]] =
+    http
+      .get(url"$cisBaseUrl/journey-handoffs/$journeyType/$handoffId")
+      .execute[Option[FinalValidationHandoffPayload]]
+
   def proceedInsufficientVerification(
     request: ProceedInsufficientVerificationRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
@@ -342,6 +351,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             )
         }
       }
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
@@ -372,4 +382,55 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def createFinalValidationDraft(
+    request: CreateFinalValidationDraftRequest
+  )(implicit hc: HeaderCarrier): Future[CreateFinalValidationDraftResponse] =
+    http
+      .post(url"$cisBaseUrl/final-validation/drafts")
+      .withBody(Json.toJson(request))
+      .execute[CreateFinalValidationDraftResponse]
+
+  def getFinalValidationDraft(
+    instanceId: String,
+    draftId: String
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .get(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId")
+      .execute[FinalValidationDraft]
+
+  def updateFinalValidationReadiness(
+    instanceId: String,
+    draftId: String,
+    request: UpdateFinalValidationReadinessRequest
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .put(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/readiness")
+      .withBody(Json.toJson(request))
+      .execute[FinalValidationDraft]
+
+  def updateFinalValidationCorrection(
+    instanceId: String,
+    draftId: String,
+    request: UpdateFinalValidationCorrectionRequest
+  )(implicit hc: HeaderCarrier): Future[FinalValidationDraft] =
+    http
+      .put(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/correction")
+      .withBody(Json.toJson(request))
+      .execute[FinalValidationDraft]
+
+  def commitFinalValidationDraft(
+    instanceId: String,
+    draftId: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/final-validation/drafts/$instanceId/$draftId/commit")
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            Future.successful(())
+          case _               =>
+            Future.failed(UpstreamErrorResponse(response.body, response.status, response.status))
+        }
+      }
 }

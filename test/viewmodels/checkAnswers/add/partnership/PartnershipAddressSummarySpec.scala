@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import helpers.CyaEncodingSpecHelper
 import controllers.add.partnership.routes
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -77,7 +77,7 @@ class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEn
 
       action.href shouldBe
         routes.PartnershipAddressController
-          .redirectToAddressLookup(Some("change"))
+          .redirectToAddressLookup(NormalMode, Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe

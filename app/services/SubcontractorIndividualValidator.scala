@@ -16,7 +16,8 @@
 
 package services
 
-import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor.Individualorsoletrader
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.validation.SubcontractorValidationFailure
 import utils.IndividualValidator
 
@@ -28,18 +29,25 @@ class SubcontractorIndividualValidator {
   def validate(
     subcontractors: Seq[SubcontractorCurrentVerification]
   ): List[SubcontractorValidationFailure] =
-    subcontractors.toList.flatMap { subcontractor =>
-      val failedFields =
-        IndividualValidator.validate(
-          subcontractorToValidate = subcontractor,
-          allSubcontractors = subcontractors
-        )
+    subcontractors.toList
+      .filter(isIndividual)
+      .flatMap { subcontractor =>
+        val failedFields =
+          IndividualValidator.validate(
+            subcontractorToValidate = subcontractor,
+            allSubcontractors = subcontractors
+          )
 
-      Option.when(failedFields.nonEmpty) {
-        SubcontractorValidationFailure(
-          subcontractorId = subcontractor.subcontractorId,
-          failedFields = failedFields
-        )
+        Option.when(failedFields.nonEmpty) {
+          SubcontractorValidationFailure(
+            subcontractorId = subcontractor.subcontractorId,
+            failedFields = failedFields
+          )
+        }
       }
-    }
+
+  private def isIndividual(subcontractor: SubcontractorCurrentVerification): Boolean =
+    subcontractor.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .contains(Individualorsoletrader)
 }
