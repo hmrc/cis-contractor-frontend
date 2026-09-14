@@ -18,6 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
+import models.agent.ClientListStatus
 import models.TypeOfSubcontractor.Individualorsoletrader
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.IndividualOrSoleTraderPayload
@@ -234,6 +235,24 @@ class ConstructionIndustrySchemeConnectorSpec
       result.getMessage must include("Something broke")
     }
 
+  }
+
+  "startClientList" should {
+
+    "POST /cis/agent/client-list/retrieval/start and return succeeded" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{ "result": "succeeded" }""")
+          )
+      )
+
+      connector.startClientList.futureValue.result mustBe
+        ClientListStatus.Succeeded
+    }
   }
 
   "hasClient(taxOfficeNumber, taxOfficeReference)" should {
@@ -620,11 +639,10 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "proceedInsufficientVerification" should {
 
-    val request = ProceedInsufficientVerificationRequest(
+    val request = ProceedVerificationRequest(
       instanceId = "1",
       verificationBatchResourceRef = 10L,
-      verificationResourceRef = 9L,
-      proceed = "Y"
+      verificationResourceRef = 9L
     )
 
     "successfully proceed verification when BE returns 204" in {
@@ -650,4 +668,34 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "proceedUnmatchedVerification" should {
+
+    val request = ProceedVerificationRequest(
+      instanceId = "1",
+      verificationBatchResourceRef = 10L,
+      verificationResourceRef = 9L
+    )
+
+    "successfully proceed verification when BE returns 204" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-unmatched-data")).willReturn(
+          aResponse().withStatus(NO_CONTENT)
+        )
+      )
+
+      connector.proceedUnmatchedVerification(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate upstream error on non-2xx (e.g. 500)" in {
+
+      stubFor(
+        post(urlPathEqualTo("/cis/verification/proceed-with-unmatched-data"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.proceedUnmatchedVerification(request).failed.futureValue
+      ex.getMessage must include("returned 500")
+    }
+  }
 }

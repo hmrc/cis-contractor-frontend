@@ -134,13 +134,6 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Select how the subcontractor is operating
 typeOfSubcontractor.change.hidden                                                   =  type
 
-subTradingNameYesNo.title                                                           =  Does the subcontractor use a trading name?
-subTradingNameYesNo.heading                                                         =  Does the subcontractor use a trading name?
-subTradingNameYesNo.hint                                                            =  This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel                                           =  Does subcontractor use a trading name?
-subTradingNameYesNo.error.required                                                  =  Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden                                                   =  does subcontractor use a trading name?
-
 tradingNameOfSubcontractor.title                                                    =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading                                                  =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Subcontractor trading name
@@ -201,8 +194,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  National Insurance number
 subNationalInsuranceNumber.error.required                                           =  Enter a National Insurance number
-subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  National Insurance number
 
 worksReferenceNumber.title                                                          =  What is the works reference number associated with this subcontractor?
@@ -521,6 +514,17 @@ unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors               
 
 info.CheckYourAnswers.backTo                                                        =  Back to
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Review unmatched subcontractors
+
+individualNamesOptions.title                                                        =  Which names do you want to add for this subcontractor?
+individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
+individualNamesOptions.subcontractorName                                            =  Subcontractor name
+individualNamesOptions.tradingName                                                  =  Trading name
+individualNamesOptions.noSelection                                                  =  None selected
+individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
+individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
+individualNamesOptions.checkYourAnswersLabel                                        =  Names
+individualNamesOptions.change.hidden                                                =  names
 
 insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
 insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
@@ -600,8 +604,8 @@ partnershipNominatedPartnerNino.title                              =  What is th
 partnershipNominatedPartnerNino.heading                            =  What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint                               =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  National Insurance number for nominated partner
 partnershipNominatedPartnerNino.change.hidden                      =  National Insurance number for nominated partner
 
@@ -1048,35 +1052,25 @@ verify.reviewInsufficientInfo.action.edit                                       
 verify.reviewInsufficientInfo.action.proceed                                       =  Proceed
 verify.reviewInsufficientInfo.action.remove                                        =  Remove
 
-verify.reviewUnmatched.title                                            =  Review unmatched subcontractors
-verify.reviewUnmatched.heading                                          =  Review unmatched subcontractors
-verify.reviewUnmatched.p1                                               =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
-verify.reviewUnmatched.p2                                               =  To fix this, you can:
-verify.reviewUnmatched.bullet1                                          =  edit their information and correct any of their details before trying to verify them again
-verify.reviewUnmatched.bullet2                                          =  proceed with verifying them again without making any changes
-verify.reviewUnmatched.bullet3                                          =  remove the subcontractor from this verification request
-verify.reviewUnmatched.whatYouNeed.link                                 =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
-verify.reviewUnmatched.unmatched.subheading                             =  Unmatched subcontractors
-verify.reviewUnmatched.ready.subheading                                 =  Ready for verification
-verify.reviewUnmatched.name                                             =  Name
-verify.reviewUnmatched.utr                                              =  UTR
-verify.reviewUnmatched.utr.full                                         =  Unique Taxpayer Reference
-verify.reviewUnmatched.noneProvided                                     =  None provided
-verify.reviewUnmatched.actions                                          =  Actions
-verify.reviewUnmatched.action.edit                                      =  Edit
-verify.reviewUnmatched.action.proceed                                   =  Proceed
-verify.reviewUnmatched.action.remove                                    =  Remove
-verify.reviewUnmatched.backToResults.prefix                             =  Back to
-verify.reviewUnmatched.backToResults.link                               =  Verification results
-
-verify.selectSubcontractor.title                                        =  Which subcontractors do you want to verify?
-verify.selectSubcontractor.heading                                      =  Which subcontractors do you want to verify?
-verify.selectSubcontractor.hint                                         =  Select the unverified subcontractors you want to add to this verification request
-verify.selectSubcontractor.checkYourAnswersLabel                        =  Subcontractors to verify
-verify.selectSubcontractor.showingResults                               =  Showing {0} to {1} of {2} results
-verify.selectSubcontractor.error.required                               =  Select at least one subcontractor to verify
-verify.selectSubcontractor.change.hidden                                =  subcontractors to verify
-verify.selectSubcontractor.display.noneSelected                         =  None selected
+verify.reviewUnmatched.title                                                       =  Review unmatched subcontractors
+verify.reviewUnmatched.heading                                                     =  Review unmatched subcontractors
+verify.reviewUnmatched.p1                                                          =  Some of the subcontractor details in your most recent verification request do not match the information about that subcontractor held by HMRC. This means we cannot verify them or give them an accurate tax treatment.
+verify.reviewUnmatched.p2                                                          =  To fix this, you can:
+verify.reviewUnmatched.bullet1                                                     =  edit their information and correct any of their details before trying to verify them again
+verify.reviewUnmatched.bullet2                                                     =  proceed with verifying them again without making any changes
+verify.reviewUnmatched.bullet3                                                     =  remove the subcontractor from this verification request
+verify.reviewUnmatched.whatYouNeed.link                                            =  What you must do as a Construction Industry Scheme (CIS) contractor (opens in new tab)
+verify.reviewUnmatched.unmatched.subheading                                        =  Unmatched subcontractors
+verify.reviewUnmatched.ready.subheading                                            =  Ready for verification
+verify.reviewUnmatched.name                                                        =  Name
+verify.reviewUnmatched.utr                                                         =  UTR
+verify.reviewUnmatched.noneProvided                                                =  None provided
+verify.reviewUnmatched.actions                                                     =  Actions
+verify.reviewUnmatched.action.edit                                                 =  Edit
+verify.reviewUnmatched.action.proceed                                              =  Proceed
+verify.reviewUnmatched.action.remove                                               =  Remove
+verify.reviewUnmatched.backToResults.prefix                                        =  Back to
+verify.reviewUnmatched.backToResults.link                                          =  Verification results
 
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                                 =  Which subcontractors do you want to verify?
@@ -1112,7 +1106,7 @@ verify.reverifyExistingSubcontractorsYesNo.change.hidden                        
 verify.verifyDepartmentalError.title                                               =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                             =  There was a problem with your verification request
 verify.verifyDepartmentalError.p1                                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
-verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help.
+verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help quoting error 7912.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Manage your subcontractors
@@ -1275,3 +1269,16 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+agent.agentLostAccess.title                                                    =  Sorry, you are unable to use this service
+agent.agentLostAccess.heading                                                  =  Sorry, you are unable to use this service
+agent.agentLostAccess.p1                                                       =  You are no longer authorised.
+agent.agentLostAccess.h2                                                       =  What you need to do
+agent.agentLostAccess.bullet.title                                             =  Ask your client to authorise you. They can do this by either:
+agent.agentLostAccess.bullet.item.1.prefix                                     =  authorising you through their
+agent.agentLostAccess.bullet.item.1.link                                       =  HMRC online account
+agent.agentLostAccess.bullet.item.2.prefix                                     =  downloading and completing
+agent.agentLostAccess.bullet.item.2.link                                       =  form 64—8
+agent.agentLostAccess.bullet.item.2.suffix                                     =  to authorise you by post
+agent.agentLostAccess.p2                                                       =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.agentLostAccess.return.link                                              =  Return to client list

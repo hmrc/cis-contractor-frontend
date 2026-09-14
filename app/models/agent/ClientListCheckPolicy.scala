@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package queries
+package models.agent
 
-import play.api.libs.json.JsPath
+sealed trait ClientListCheckPolicy
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
-
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+object ClientListCheckPolicy {
+  case object GroupA extends ClientListCheckPolicy
+  case object Exempt extends ClientListCheckPolicy
 }

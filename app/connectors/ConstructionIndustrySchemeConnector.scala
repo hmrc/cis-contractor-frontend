@@ -17,6 +17,7 @@
 package connectors
 
 import models.Scheme
+import models.agent.GetClientListStatusResponse
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
@@ -27,6 +28,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -93,6 +95,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
   }
+
+  def startClientList(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
 
   def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     http
@@ -316,7 +323,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def proceedInsufficientVerification(
-    request: ProceedInsufficientVerificationRequest
+    request: ProceedVerificationRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
     http
       .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
@@ -331,10 +338,32 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             Future.successful(())
           case other      =>
             Future.failed(
-              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+              UpstreamErrorResponse(s"proceedInsufficientVerification failed, returned $other", other, other)
             )
         }
       }
+
+  def proceedUnmatchedVerification(
+    request: ProceedVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-unmatched-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedUnmatchedVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"proceedUnmatchedVerification failed, returned $other", other, other)
+            )
+        }
+      }
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
