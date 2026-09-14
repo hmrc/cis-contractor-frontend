@@ -160,7 +160,7 @@ class SelectSubcontractorController @Inject() (
               mode,
               result.paginatedData,
               result.paginationViewModel,
-              page,
+              result.currentPage,
               result.startIndex,
               result.totalCount,
               result.totalPages
@@ -278,7 +278,13 @@ class SelectSubcontractorController @Inject() (
                       "verify.selectSubcontractor.error.required"
                     )
 
-                Future.successful(renderPageWithError(formWithErrors, mode, page, result))
+                Future.successful(
+                  renderPageWithError(
+                    formWithErrors,
+                    mode,
+                    result
+                  )
+                )
               }
           }
       }
@@ -287,7 +293,6 @@ class SelectSubcontractorController @Inject() (
   private def renderPageWithError(
     formWithErrors: Form[Set[String]],
     mode: Mode,
-    page: Int,
     result: CheckboxPaginationResult
   )(implicit request: Request[_]): Result =
     BadRequest(
@@ -296,7 +301,7 @@ class SelectSubcontractorController @Inject() (
         mode,
         result.paginatedData,
         result.paginationViewModel,
-        page,
+        result.currentPage,
         result.startIndex,
         result.totalCount,
         result.totalPages
