@@ -82,6 +82,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
 
       result.paginatedData.head.value mustBe "1"
       result.paginationViewModel.items.exists(_.current) mustBe true
+      result.currentPage mustBe 1
     }
 
     "clamp page to maximum when page too high" in {
@@ -91,6 +92,7 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginatedData.head.value mustBe "7"
       result.paginationViewModel.previous.isDefined mustBe true
       result.paginationViewModel.next mustBe None
+      result.currentPage mustBe 2
     }
 
     "mark current page correctly" in {

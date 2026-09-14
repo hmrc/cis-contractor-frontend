@@ -39,6 +39,13 @@ class ViewUtilsSpec extends SpecBase {
       withPagination("Which subcontractors do you want to verify?", currentPage = 1, totalPages = 1) mustBe
         "Which subcontractors do you want to verify?"
     }
+
+    "must not format page numbers with thousand separators" in {
+      implicit val msgs: Messages = messages(app)
+
+      withPagination("Which subcontractors do you want to verify?", currentPage = 1000, totalPages = 2000) mustBe
+        "Which subcontractors do you want to verify? (page 1000 of 2000)"
+    }
   }
 
   "title with pagination" - {

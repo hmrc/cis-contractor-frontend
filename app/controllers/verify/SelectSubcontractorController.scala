@@ -94,7 +94,7 @@ class SelectSubcontractorController @Inject() (
                 mode,
                 result.paginatedData,
                 result.paginationViewModel,
-                page,
+                result.currentPage,
                 result.startIndex,
                 result.totalCount,
                 result.totalPages
@@ -209,7 +209,6 @@ class SelectSubcontractorController @Inject() (
                   renderPageWithError(
                     formWithErrors,
                     mode,
-                    page,
                     result
                   )
                 )
@@ -221,7 +220,6 @@ class SelectSubcontractorController @Inject() (
   private def renderPageWithError(
     formWithErrors: Form[Set[String]],
     mode: Mode,
-    page: Int,
     result: CheckboxPaginationResult
   )(implicit request: DataRequest[_]): Result =
     BadRequest(
@@ -230,7 +228,7 @@ class SelectSubcontractorController @Inject() (
         mode,
         result.paginatedData,
         result.paginationViewModel,
-        page,
+        result.currentPage,
         result.startIndex,
         result.totalCount,
         result.totalPages

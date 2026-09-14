@@ -211,7 +211,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
               mode,
               result.items,
               result.pagination,
-              page,
+              result.currentPage,
               result.startIndex,
               result.totalCount,
               result.totalPages
@@ -283,7 +283,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
             mode,
             result.items,
             result.pagination,
-            page,
+            result.currentPage,
             result.startIndex,
             result.totalCount,
             result.totalPages
