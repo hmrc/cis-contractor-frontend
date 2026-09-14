@@ -19,7 +19,7 @@ package controllers.contractordetails
 import base.SpecBase
 import models.{Scheme, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, anyString, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
@@ -27,6 +27,7 @@ import pages.contractordetails.ContractorSchemePage
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
 import services.ContractorDetailsService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,9 +35,7 @@ import views.html.contractordetails.ContractorDetailsUpdatedView
 
 import scala.concurrent.Future
 
-class ContractorDetailsUpdatedControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class ContractorDetailsUpdatedControllerSpec extends SpecBase with MockitoSugar {
 
   "ContractorDetailsUpdated Controller" - {
 
@@ -64,7 +63,6 @@ class ContractorDetailsUpdatedControllerSpec
         false
       )
     ).foreach { case (accountType, expectedCisAccountUrl, isAgent) =>
-
       s"when account type is '$accountType'" - {
 
         "must refresh the scheme in session and return OK with the correct view for a GET" in {
@@ -139,8 +137,7 @@ class ContractorDetailsUpdatedControllerSpec
             verify(mockSessionRepository)
               .set(userAnswersCaptor.capture())
 
-            userAnswersCaptor
-              .getValue
+            userAnswersCaptor.getValue
               .get(ContractorSchemePage) mustBe Some(latestScheme)
           }
         }
