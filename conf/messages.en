@@ -15,8 +15,6 @@ site.govuk                                              =  GOV.UK
 site.saveAndContinue                                    =  Save and continue
 site.unknown                                            =  Unknown
 site.pagination.goToPage                                =  Go to page {0}
-site.pagination.goToPrevious                            =  Go to previous page
-site.pagination.goToNext                                =  Go to next page
 
 date.day                                                =  Day
 date.month                                              =  Month

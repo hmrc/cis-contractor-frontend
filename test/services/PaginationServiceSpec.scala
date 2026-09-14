@@ -26,8 +26,8 @@ import play.api.test.Helpers.stubMessagesApi
 class PaginationServiceSpec extends AnyWordSpec with Matchers {
 
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
-  private val defaultConfig = PaginationConfig()
-  private val service       = new PaginationService(defaultConfig)
+  private val defaultConfig       = PaginationConfig()
+  private val service             = new PaginationService(defaultConfig)
 
   private def checkbox(id: String, content: String): CheckboxItem =
     CheckboxItem(

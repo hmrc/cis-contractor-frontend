@@ -14,6 +14,7 @@ site.signIn                                             =  xxxxxxxxxxxxxxxxxxxx
 site.govuk                                              =  GOV.UK
 site.saveAndContinue                                    =  Cadw a pharhau
 site.unknown                                            =  xxxxxxxxxxxxxxxxxxxx
+site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
 
 date.day                                                =  xxxxxxxxxxxxxxxxxxxx
 date.month                                              =  xxxxxxxxxxxxxxxxxxxx
@@ -1185,6 +1186,12 @@ verify.reviewInsufficientInfo.actions                                          =
 verify.reviewInsufficientInfo.action.edit                                      =  Golygu
 verify.reviewInsufficientInfo.action.proceed                                   =  Parhau
 verify.reviewInsufficientInfo.action.remove                                    =  Dileu
+verify.reviewInsufficientInfo.hidden.subcontractor                             =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.edit.hidden                               =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.proceed.hidden                            =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.remove.hidden                             =  xxxxxxxxxxxxxxxxxxxx
+
+
 
 proceedInsufficientSubcontractorNameYesNo.title                                =  A ydych yn siŵr eich bod am barhau gyda chynnwys yr is-gontractwr hwn yn y cais hwn am ddilysiad
 proceedInsufficientSubcontractorNameYesNo.heading                              =  A ydych yn siŵr eich bod am barhau gyda chynnwys {0} yn y cais hwn am ddilysiad?
@@ -1248,6 +1255,11 @@ verify.reviewUnmatched.action.proceed                                          =
 verify.reviewUnmatched.action.remove                                           =  Dileu
 verify.reviewUnmatched.backToResults.prefix                                    =  Yn ôl i
 verify.reviewUnmatched.backToResults.link                                      =  Ganlyniadau dilysu
+verify.reviewUnmatched.action.edit.hidden                                      =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.proceed.hidden                                   =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.remove.hidden                                    =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.name.hidden                                             =  xxxxxxxxxxxxxxxxxxxx
+
 
 info.CheckYourAnswers.backTo                                                   =  Yn ôl i
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                            =  Ni ellir dilysu pob is-gontractwr.

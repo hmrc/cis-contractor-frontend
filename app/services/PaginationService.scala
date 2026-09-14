@@ -65,14 +65,20 @@ class PaginationService(val config: PaginationConfig) {
           )
           .copy(
             previous =
-              if (page > 1) Some(PaginationLinkViewModel("")
-                .withText("site.pagination.previous")
-                .withLabelText(messages("site.pagination.goToPage", page - 1)))
+              if (page > 1)
+                Some(
+                  PaginationLinkViewModel("")
+                    .withText("site.pagination.previous")
+                    .withLabelText(messages("site.pagination.goToPage", page - 1))
+                )
               else None,
             next =
-              if (page < totalPages) Some(PaginationLinkViewModel("")
-                .withText("site.pagination.next")
-                .withLabelText(messages("site.pagination.goToPage", page + 1)))
+              if (page < totalPages)
+                Some(
+                  PaginationLinkViewModel("")
+                    .withText("site.pagination.next")
+                    .withLabelText(messages("site.pagination.goToPage", page + 1))
+                )
               else None
           )
 
