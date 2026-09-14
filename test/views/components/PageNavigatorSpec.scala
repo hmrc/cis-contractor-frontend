@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import viewmodels.govuk.PaginationFluency._
+import viewmodels.govuk.PaginationFluency.*
 import views.html.components.PageNavigator
 
 class PageNavigatorSpec extends SpecBase with Matchers {
@@ -69,12 +69,15 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       )
     }
 
-    "must render visually hidden text for the previous button" in new Setup {
+    "must render the previous button with visually hidden destination page" in new Setup {
       val pagination = PaginationViewModel(
         items = Seq(
           PaginationItemViewModel("2", "/test?page=2").withCurrent(true)
         ),
-        previous = Some(PaginationLinkViewModel("/test?page=1"))
+        previous = Some(
+          PaginationLinkViewModel("/test?page=1")
+            .withLabelText(messages("site.pagination.goToPage", 1))
+        )
       )
 
       val doc = parse(pageNavigator(pagination, page = 2))
@@ -84,7 +87,7 @@ class PageNavigatorSpec extends SpecBase with Matchers {
 
       hiddenText.size() mustBe 1
       hiddenText.text() mustBe
-        messages("site.pagination.goToPrevious")
+        messages("site.pagination.goToPage", 1)
     }
 
     "must render previous button with the correct attributes" in new Setup {
@@ -127,22 +130,25 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       )
     }
 
-    "must render visually hidden text for the next button" in new Setup {
+    "must render the next button with visually hidden destination page" in new Setup {
       val pagination = PaginationViewModel(
         items = Seq(
-          PaginationItemViewModel("1", "/test?page=1").withCurrent(true)
+          PaginationItemViewModel("2", "/test?page=2").withCurrent(true)
         ),
-        next = Some(PaginationLinkViewModel("/test?page=2"))
+        next = Some(
+          PaginationLinkViewModel("/test?page=3")
+            .withLabelText(messages("site.pagination.goToPage", 3))
+        )
       )
 
-      val doc = parse(pageNavigator(pagination, page = 1))
+      val doc = parse(pageNavigator(pagination, page = 2))
 
       val hiddenText =
         doc.select(".govuk-pagination__next .govuk-visually-hidden")
 
       hiddenText.size() mustBe 1
       hiddenText.text() mustBe
-        messages("site.pagination.goToNext")
+        messages("site.pagination.goToPage", 3)
     }
 
     "must render next button with the correct attributes" in new Setup {
