@@ -39,6 +39,7 @@ class TrustNameController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TrustNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustNameView
 )(implicit ec: ExecutionContext)
@@ -47,23 +48,25 @@ class TrustNameController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
 
       val preparedForm = request.userAnswers.get(TrustNamePage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, subbieResourceRef))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subbieResourceRef))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustNamePage, value))

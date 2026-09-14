@@ -25,11 +25,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, subbieResourceRef: Long)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustWorksReference.title"))) {
 
-    @formHelper(action = controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(mode)) {
+    @formHelper(action = controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(mode, subbieResourceRef)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

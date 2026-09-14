@@ -38,6 +38,7 @@ class TrustAddressYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustAddressYesNoFormProvider,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustAddressYesNoView
 )(implicit ec: ExecutionContext)
@@ -46,29 +47,32 @@ class TrustAddressYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustAddressYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          val preparedForm = request.userAnswers.get(TrustAddressYesNoPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, trustName, subbieResourceRef))
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-        Ok(view(preparedForm, mode, trustName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, subbieResourceRef))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage, value))
@@ -77,5 +81,5 @@ class TrustAddressYesNoController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

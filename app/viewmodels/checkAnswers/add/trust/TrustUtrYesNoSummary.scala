@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object TrustUtrYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, subbieResourceRef: Long = -1L)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(TrustUtrYesNoPage).map { answer =>
 
       val value = if (answer) "site.yes" else "site.no"
@@ -38,8 +40,10 @@ object TrustUtrYesNoSummary {
           ActionItemViewModel(
             "site.change",
             if answer && mode == AmendMode then
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
-            else controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode).url
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+                .onPageLoad("utr", subbieResourceRef)
+                .url
+            else controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode, subbieResourceRef).url
           )
             .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-utr")
