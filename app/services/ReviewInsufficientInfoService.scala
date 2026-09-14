@@ -17,18 +17,16 @@
 package services
 
 import models.TypeOfSubcontractor.*
-import models.response.GetCurrentVerificationBatchResponse
-import connectors.ConstructionIndustrySchemeConnector
 import models.amend.AmendJourneyType
-import models.requests.ProceedInsufficientVerificationRequest
+import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
 import play.api.Logging
 import play.api.i18n.Messages
 import viewmodels.verify.*
-import scala.util.{Failure, Success, Try}
 
 import javax.inject.{Inject, Singleton}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class ReviewInsufficientInfoService @Inject() extends Logging {

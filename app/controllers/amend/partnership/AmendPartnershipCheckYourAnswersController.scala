@@ -276,9 +276,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
             )
           }
       }
-      
+
   private def handleNoChanges()(implicit
-                                request: CisIdDataRequest[AnyContent]
+    request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
 
     val redirectCall =

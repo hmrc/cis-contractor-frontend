@@ -147,6 +147,8 @@ POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsControll
 
 GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
 
+GET   /agent/no-longer-authorised  controllers.AgentLostAccessController.onPageLoad()
+
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
 
@@ -709,5 +711,3 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
-
-GET   /agent/no-longer-authorised                                     controllers.AgentLostAccessController.onPageLoad()

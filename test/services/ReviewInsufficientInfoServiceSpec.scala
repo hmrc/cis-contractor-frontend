@@ -17,10 +17,7 @@
 package services
 
 import base.SpecBase
-import connectors.ConstructionIndustrySchemeConnector
 import models.amend.AmendJourneyType
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import models.requests.ProceedInsufficientVerificationRequest
 import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import org.scalatest.BeforeAndAfterEach
