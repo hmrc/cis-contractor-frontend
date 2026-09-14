@@ -129,7 +129,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(true),
@@ -175,7 +175,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(false),
@@ -216,7 +216,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = None,

@@ -19,8 +19,8 @@ package controllers.helpers
 import controllers.amend.AmendControllerUtils.{setOptional, shouldShowVerificationDetails}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.UserAnswers
-import models.add.{IndividualContactMethodOptions, SubcontractorName}
-import models.address.{Address, Country}
+import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
+import models.address.Address
 import models.amend.OriginalIndividualAnswers
 import models.amend.company.OriginalCompanyAnswers
 import models.amend.partnership.OriginalPartnershipAnswers
@@ -45,32 +45,28 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address    = toAddress(subcontractor)
-      val methods    = contactMethods(subcontractor)
-      val hasAddress = addressFieldsExist(subcontractor)
+      val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val methods    = SubcontractorPopulatorUtils.contactMethods(subcontractor)
+      val hasAddress = SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)
 
-      val name = for {
-        firstName <- subcontractor.firstName
-        surname   <- subcontractor.surname
-      } yield SubcontractorName(
-        firstName = firstName,
-        middleName = subcontractor.secondName,
-        lastName = surname
-      )
+      val name = SubcontractorPopulatorUtils.individualName(subcontractor)
 
-      val usesTradingName = subcontractor.tradingName.exists(_.trim.nonEmpty)
+      val hasName: Boolean                                    = name.isDefined
+      val hasTradingName: Boolean                             = SubcontractorPopulatorUtils.hasTradingName(subcontractor)
+      val individualNamesOptions: Set[IndividualNamesOptions] =
+        SubcontractorPopulatorUtils.individualNamesOptions(hasName, hasTradingName)
 
       val original = originalAnswers(
         subcontractor = subcontractor,
         address = address,
         methods = methods,
-        name = name,
-        usesTradingName = usesTradingName
+        individualNamesOptions = individualNamesOptions,
+        name = name
       )
 
       for {
         updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
-        updated <- updated.set(SubTradingNameYesNoPage, usesTradingName)
+        updated <- updated.set(IndividualNamesOptionsPage, individualNamesOptions)
         updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
         updated <- setOptional(updated, SubcontractorNamePage, name)
         updated <- updated.set(SubAddressYesNoPage, hasAddress)
@@ -99,14 +95,14 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse,
       address: Option[Address],
       methods: Set[IndividualContactMethodOptions],
-      name: Option[SubcontractorName],
-      usesTradingName: Boolean
+      individualNamesOptions: Set[IndividualNamesOptions],
+      name: Option[SubcontractorName]
     ): OriginalIndividualAnswers =
       OriginalIndividualAnswers(
-        usesTradingName = Some(usesTradingName),
+        individualNamesOptions = individualNamesOptions,
         tradingName = subcontractor.tradingName,
         subcontractorName = name,
-        addressYesNo = Some(addressFieldsExist(subcontractor)),
+        addressYesNo = Some(SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)),
         address = address,
         individualContactMethodsYesNo = Some(methods.nonEmpty),
         individualContactMethod = methods,
@@ -130,9 +126,9 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address    = toAddress(subcontractor)
-      val methods    = contactMethods(subcontractor)
-      val hasAddress = addressFieldsExist(subcontractor)
+      val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val methods    = SubcontractorPopulatorUtils.contactMethods(subcontractor)
+      val hasAddress = SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)
 
       val original =
         originalAnswers(
@@ -182,7 +178,7 @@ object AmendSubcontractorPopulator {
     ): OriginalCompanyAnswers =
       OriginalCompanyAnswers(
         companyName = subcontractor.tradingName,
-        addressYesNo = Some(addressFieldsExist(subcontractor)),
+        addressYesNo = Some(SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)),
         address = address,
         companyContactMethodsYesNo = Some(methods.nonEmpty),
         companyContactMethod = methods,
@@ -207,9 +203,9 @@ object AmendSubcontractorPopulator {
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
 
-      val address    = toAddress(subcontractor)
-      val methods    = contactMethods(subcontractor)
-      val hasAddress = addressFieldsExist(subcontractor)
+      val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val methods    = SubcontractorPopulatorUtils.contactMethods(subcontractor)
+      val hasAddress = SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)
 
       val trustName =
         subcontractor.tradingName.orElse(
@@ -256,7 +252,7 @@ object AmendSubcontractorPopulator {
     ): OriginalTrustAnswers =
       OriginalTrustAnswers(
         trustName = trustName,
-        addressYesNo = Some(addressFieldsExist(subcontractor)),
+        addressYesNo = Some(SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)),
         address = address,
         trustContactMethodsYesNo = Some(methods.nonEmpty),
         trustContactMethod = methods,
@@ -277,9 +273,9 @@ object AmendSubcontractorPopulator {
       cisId: String,
       subcontractor: SubcontractorResponse
     ): Try[UserAnswers] = {
-      val address              = toAddress(subcontractor)
-      val hasAddress           = addressFieldsExist(subcontractor)
-      val methods              = contactMethods(subcontractor)
+      val address              = SubcontractorPopulatorUtils.toAddress(subcontractor)
+      val hasAddress           = SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)
+      val methods              = SubcontractorPopulatorUtils.contactMethods(subcontractor)
       val nominatedPartnerName = subcontractor.tradingName
       val partnershipName      = subcontractor.partnershipTradingName
 
@@ -333,7 +329,7 @@ object AmendSubcontractorPopulator {
     ): OriginalPartnershipAnswers =
       OriginalPartnershipAnswers(
         partnershipName = partnershipName,
-        addressYesNo = Some(addressFieldsExist(subcontractor)),
+        addressYesNo = Some(SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)),
         address = address,
         partnershipContactMethodsYesNo = Some(methods.nonEmpty),
         partnershipContactMethodOptions = methods,
@@ -355,25 +351,6 @@ object AmendSubcontractorPopulator {
       )
   }
 
-  private def toAddress(
-    subcontractor: SubcontractorResponse
-  ): Option[Address] =
-    subcontractor.addressLine1.filter(_.trim.nonEmpty).map { line1 =>
-      Address(
-        addressLine1 = line1,
-        addressLine2 = subcontractor.addressLine2,
-        addressLine3 = subcontractor.addressLine3,
-        addressLine4 = subcontractor.addressLine4,
-        postcode = subcontractor.postcode,
-        country = subcontractor.country.map(name => Country(None, Some(name)))
-      )
-    }
-
-  private def addressFieldsExist(
-    subcontractor: SubcontractorResponse
-  ): Boolean =
-    toAddress(subcontractor).isDefined
-
   private def setOptionalQuery[A: Writes](
     userAnswers: UserAnswers,
     query: Settable[A],
@@ -382,14 +359,4 @@ object AmendSubcontractorPopulator {
     value.fold(Try(userAnswers)) { answer =>
       userAnswers.set(query, answer)
     }
-
-  private def contactMethods(
-    subcontractor: SubcontractorResponse
-  ): Set[ContactMethodOptions] =
-    Set(
-      subcontractor.emailAddress.map(_ => ContactMethodOptions.Email),
-      subcontractor.phoneNumber.map(_ => ContactMethodOptions.Phone),
-      subcontractor.mobilePhoneNumber.map(_ => ContactMethodOptions.Mobile)
-    ).flatten
-
 }
