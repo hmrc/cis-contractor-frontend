@@ -72,7 +72,12 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
       nameLink = LinkViewModel(dummyUrl, name),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
       editLink = LinkViewModel(dummyUrl, name),
-      proceedLink = LinkViewModel(dummyUrl, name),
+      proceedLink = LinkViewModel(
+        controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
+          .onPageLoad(sub.subcontractorId)
+          .url,
+        name
+      ),
       removeLink = LinkViewModel(dummyUrl, name)
     )
   }

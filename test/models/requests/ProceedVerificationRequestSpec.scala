@@ -20,69 +20,11 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matchers {
+class ProceedVerificationRequestSpec extends AnyWordSpec with Matchers {
 
-  "ProceedInsufficientVerificationRequest (JSON)" should {
+  "ProceedVerificationRequest (JSON)" should {
 
     "read and write with mandatory fields" in {
-      val json = Json.parse("""
-                              |{
-                              |  "instanceId": "1",
-                              |  "verificationBatchResourceRef": 9,
-                              |  "verificationResourceRef": 10,
-                              |  "proceed": "Y"
-                              |}
-        """.stripMargin)
-
-      val model = json.as[ProceedInsufficientVerificationRequest]
-      model.instanceId mustBe "1"
-      model.verificationBatchResourceRef mustBe 9
-      model.verificationResourceRef mustBe 10
-      model.proceed mustBe "Y"
-
-      Json.toJson(model) mustBe json
-    }
-
-    "fail to read missing instanceId" in {
-      val json = Json.parse("""
-                              |{
-                              |  "verificationBatchResourceRef": 9,
-                              |  "verificationResourceRef": 10,
-                              |  "proceed": "Y"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[ProceedInsufficientVerificationRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing verificationBatchResourceRef" in {
-      val json = Json.parse("""
-                              |{
-                              |  "instanceId": "1",
-                              |  "verificationResourceRef": 10,
-                              |  "proceed": "Y"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[ProceedInsufficientVerificationRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing verificationResourceRef" in {
-      val json = Json.parse("""
-                              |{
-                              |  "instanceId": "1",
-                              |  "verificationBatchResourceRef": 9,
-                              |  "proceed": "Y"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[ProceedInsufficientVerificationRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing proceed" in {
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
@@ -91,7 +33,47 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
                               |}
         """.stripMargin)
 
-      val result = json.validate[ProceedInsufficientVerificationRequest]
+      val model = json.as[ProceedVerificationRequest]
+      model.instanceId mustBe "1"
+      model.verificationBatchResourceRef mustBe 9
+      model.verificationResourceRef mustBe 10
+
+      Json.toJson(model) mustBe json
+    }
+
+    "fail to read missing instanceId" in {
+      val json = Json.parse("""
+                              |{
+                              |  "verificationBatchResourceRef": 9,
+                              |  "verificationResourceRef": 10
+                              |}
+        """.stripMargin)
+
+      val result = json.validate[ProceedVerificationRequest]
+      result.isError mustBe true
+    }
+
+    "fail to read missing verificationBatchResourceRef" in {
+      val json = Json.parse("""
+                              |{
+                              |  "instanceId": "1",
+                              |  "verificationResourceRef": 10
+                              |}
+        """.stripMargin)
+
+      val result = json.validate[ProceedVerificationRequest]
+      result.isError mustBe true
+    }
+
+    "fail to read missing verificationResourceRef" in {
+      val json = Json.parse("""
+                              |{
+                              |  "instanceId": "1",
+                              |  "verificationBatchResourceRef": 9
+                              |}
+        """.stripMargin)
+
+      val result = json.validate[ProceedVerificationRequest]
       result.isError mustBe true
     }
   }

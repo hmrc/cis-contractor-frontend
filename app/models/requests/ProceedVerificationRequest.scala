@@ -18,13 +18,12 @@ package models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ProceedInsufficientVerificationRequest(
+case class ProceedVerificationRequest(
   instanceId: String,
   verificationBatchResourceRef: Long,
-  verificationResourceRef: Long,
-  proceed: String
+  verificationResourceRef: Long
 )
 
-object ProceedInsufficientVerificationRequest {
-  given OFormat[ProceedInsufficientVerificationRequest] = Json.format
+object ProceedVerificationRequest {
+  given OFormat[ProceedVerificationRequest] = Json.format
 }
