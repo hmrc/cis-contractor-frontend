@@ -186,8 +186,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  National Insurance number
 subNationalInsuranceNumber.error.required                                           =  Enter a National Insurance number
-subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  National Insurance number
 
 worksReferenceNumber.title                                                          =  What is the works reference number associated with this subcontractor?
@@ -596,8 +596,8 @@ partnershipNominatedPartnerNino.title                              =  What is th
 partnershipNominatedPartnerNino.heading                            =  What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint                               =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  National Insurance number for nominated partner
 partnershipNominatedPartnerNino.change.hidden                      =  National Insurance number for nominated partner
 
@@ -1098,7 +1098,7 @@ verify.reverifyExistingSubcontractorsYesNo.change.hidden                        
 verify.verifyDepartmentalError.title                                               =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                             =  There was a problem with your verification request
 verify.verifyDepartmentalError.p1                                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
-verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help.
+verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help quoting error 7912.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Manage your subcontractors
@@ -1261,3 +1261,16 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+agent.agentLostAccess.title                                                    =  Sorry, you are unable to use this service
+agent.agentLostAccess.heading                                                  =  Sorry, you are unable to use this service
+agent.agentLostAccess.p1                                                       =  You are no longer authorised.
+agent.agentLostAccess.h2                                                       =  What you need to do
+agent.agentLostAccess.bullet.title                                             =  Ask your client to authorise you. They can do this by either:
+agent.agentLostAccess.bullet.item.1.prefix                                     =  authorising you through their
+agent.agentLostAccess.bullet.item.1.link                                       =  HMRC online account
+agent.agentLostAccess.bullet.item.2.prefix                                     =  downloading and completing
+agent.agentLostAccess.bullet.item.2.link                                       =  form 64—8
+agent.agentLostAccess.bullet.item.2.suffix                                     =  to authorise you by post
+agent.agentLostAccess.p2                                                       =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.agentLostAccess.return.link                                              =  Return to client list
