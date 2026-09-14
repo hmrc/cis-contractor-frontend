@@ -57,11 +57,11 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case None                    => routes.JourneyRecoveryController.onPageLoad()
       case Some(subcontractorType) =>
         mode match {
-          case NormalMode            => firstJourneyPageFor(subcontractorType)
-          case CheckMode | AmendMode =>
-            // In check mode, only skip straight to CYA when the selected type's journey is already
-            // complete (i.e. the type was not changed). If the type changed its answers are cleaned
-            // up, leaving the journey incomplete, so the user is taken through the relevant pages.
+          case NormalMode => firstJourneyPageFor(subcontractorType)
+          case _          =>
+            // Only skip straight to CYA when the selected type's journey is already complete
+            // (i.e. the type was not changed). If the type changed its answers are cleaned up,
+            // leaving the journey incomplete, so the user is taken through the relevant pages.
             if (journeyComplete(subcontractorType, userAnswers)) {
               checkYourAnswersFor(subcontractorType)
             } else {
