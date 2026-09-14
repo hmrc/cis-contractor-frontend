@@ -32,7 +32,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.response.{CreateSubmissionForVerificationResponse, DeleteVerificationResponse}
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
