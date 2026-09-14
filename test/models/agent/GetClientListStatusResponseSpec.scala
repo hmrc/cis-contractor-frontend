@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
-package queries
+package models.agent
 
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsSuccess, Json}
+import base.SpecBase
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+class GetClientListStatusResponseSpec extends SpecBase {
 
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+  "GetClientListStatusResponse" - {
+
+    "must read from JSON" in {
+      val json = Json.obj(
+        "result" -> "succeeded"
+      )
+
+      json.validate[GetClientListStatusResponse] mustBe
+        JsSuccess(
+          GetClientListStatusResponse(
+            ClientListStatus.Succeeded
+          )
+        )
+    }
+  }
 }
