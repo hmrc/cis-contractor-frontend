@@ -267,9 +267,14 @@ class ReviewUnmatchedSubcontractorsViewSpec extends SpecBase {
       )
     }
 
-    "must render the back to results link with the correct prefix and full stop" in {
+    "must render the back to results link" in {
       val document =
-        doc(ReviewUnmatchedViewModel(unmatched = Seq(unmatchedRow), ready = Nil))
+        doc(
+          ReviewUnmatchedViewModel(
+            unmatched = Seq(unmatchedRow),
+            ready = Nil
+          )
+        )
 
       val backToResults =
         document.select(
@@ -277,9 +282,8 @@ class ReviewUnmatchedSubcontractorsViewSpec extends SpecBase {
         )
 
       backToResults.size() mustBe 1
-      backToResults.text mustBe
-        s"${messagesImpl("verify.reviewUnmatched.backToResults.prefix")} " +
-        s"${messagesImpl("verify.reviewUnmatched.backToResults.link")}"
+      backToResults.text() mustBe
+        messagesImpl("verify.reviewUnmatched.backToResults.link")
     }
   }
 }

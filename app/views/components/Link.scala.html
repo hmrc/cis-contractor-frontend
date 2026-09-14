@@ -39,15 +39,11 @@
         @if(prefixTextKey.nonEmpty) {
             @{Html(messages(prefixTextKey))}
         }
-
         <a href="@linkUrl" class="govuk-link @if(bold){govuk-!-font-weight-bold}"
            @if(linkId.nonEmpty){id="@linkId"}
-           @if(isNewTab){rel="noreferrer noopener" target="_blank"}>
-            @visibleLinkText
-            @if(visuallyHiddenText.nonEmpty) {
-                <span class="govuk-visually-hidden">@visuallyHiddenText</span>
-            }
-        </a>@if(hasFullStop){.}
+           @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@visibleLinkText@if(visuallyHiddenText.nonEmpty) {
+            <span class="govuk-visually-hidden">@visuallyHiddenText</span>
+        }</a>@if(hasFullStop){.}
 
         @if(suffixTextKey.nonEmpty) {
             @if(newLineBeforeSuffixText) {<br>}
