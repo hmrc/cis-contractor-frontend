@@ -19,6 +19,7 @@ package controllers.helpers.info
 import controllers.amend.AmendControllerUtils.shouldShowVerificationDetails
 import controllers.helpers.SubcontractorPopulatorUtils
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.add.IndividualNamesOptions
 import models.info.IndividualAnswers
 import models.info.company.CompanyAnswers
 import models.info.partnership.PartnershipAnswers
@@ -44,8 +45,10 @@ object SubcontractorPopulator {
       val name =
         SubcontractorPopulatorUtils.individualName(subcontractor)
 
-      val usesTradingName =
-        SubcontractorPopulatorUtils.usesTradingName(subcontractor)
+      val hasName: Boolean                                    = name.isDefined
+      val hasTradingName: Boolean                             = SubcontractorPopulatorUtils.hasTradingName(subcontractor)
+      val individualNamesOptions: Set[IndividualNamesOptions] =
+        SubcontractorPopulatorUtils.individualNamesOptions(hasName, hasTradingName)
 
       val methods =
         SubcontractorPopulatorUtils.contactMethods(subcontractor)
@@ -54,7 +57,7 @@ object SubcontractorPopulator {
         IndividualAnswers(
           subcontractorType = subcontractorType,
           showVerificationDetails = shouldShowVerificationDetails(subcontractor),
-          usesTradingName = Some(usesTradingName),
+          individualNamesOptions = individualNamesOptions,
           tradingName = subcontractor.tradingName,
           subcontractorName = name,
           addressYesNo = Some(address.isDefined),

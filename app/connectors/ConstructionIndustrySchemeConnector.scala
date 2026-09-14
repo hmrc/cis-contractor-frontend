@@ -17,6 +17,7 @@
 package connectors
 
 import models.Scheme
+import models.agent.GetClientListStatusResponse
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
@@ -27,6 +28,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -93,6 +95,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
   }
+
+  def startClientList(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
 
   def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     http
@@ -192,6 +199,21 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         }
       }
 
+  def deleteVerification(
+    request: DeleteVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    http
+      .post(url"$cisBaseUrl/verification/delete")
+      .withBody(Json.toJson(request))
+      .execute[DeleteVerificationResponse]
+      .map { response =>
+        logger.info(
+          s"[ConstructionIndustrySchemeConnector][deleteVerification] " +
+            s"instanceId=${request.instanceId}, verificationResourceRef=${request.verificationResourceRef} - deleted verification"
+        )
+        response
+      }
+
   def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest
   )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
@@ -247,6 +269,41 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         )
 
         response
+      }
+  }
+
+  def updateContractorDetails(
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateContractorDetails] Submitting contractor details for schemeId=${request.schemeId}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/contractor-details/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - contractor details updated"
+            )
+
+            Future.successful(())
+
+          case other =>
+            logger.error(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - failed with status $other"
+            )
+
+            Future.failed(
+              new RuntimeException(
+                s"Update contractor details failed, returned $other"
+              )
+            )
+        }
       }
   }
 

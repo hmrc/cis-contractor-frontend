@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package queries
+package viewmodels.verify
 
-import play.api.libs.json.JsPath
+import models.SubcontractorCurrentVerification
+import play.api.i18n.Messages
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+object SubcontractorDisplay {
 
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+  def displayName(sub: SubcontractorCurrentVerification)(implicit messages: Messages): String =
+    sub.displayName
+
+  def utrDisplay(sub: SubcontractorCurrentVerification, noneProvidedKey: String)(implicit messages: Messages): String =
+    sub.utr
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse(messages(noneProvidedKey))
 }

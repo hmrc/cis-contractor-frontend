@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,67 +17,69 @@
 package controllers.add
 
 import controllers.actions.*
-import forms.add.SubTradingNameYesNoFormProvider
+import forms.add.IndividualNamesOptionsFormProvider
+import models.add.IndividualNamesOptions
 import models.{AmendMode, Mode}
 import navigation.Navigator
 import pages.QuestionPage
-import pages.add.SubTradingNameYesNoPage
-import pages.amend.SubTradingNameYesNoAmendPage
+import pages.add.{IndividualNamesOptionsPage, SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import pages.amend.IndividualNamesOptionsAmendPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.add.SubTradingNameYesNoView
+import views.html.add.IndividualNamesOptionsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubTradingNameYesNoController @Inject() (
+class IndividualNamesOptionsController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: SubTradingNameYesNoFormProvider,
-  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  formProvider: IndividualNamesOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: SubTradingNameYesNoView
+  view: IndividualNamesOptionsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-      val preparedForm = request.userAnswers.get(SubTradingNameYesNoPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+    val preparedForm = request.userAnswers.get(IndividualNamesOptionsPage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+    Ok(view(preparedForm, mode))
+  }
 
-      val pageToUpdate: QuestionPage[Boolean] =
-        mode match {
-          case AmendMode => SubTradingNameYesNoAmendPage
-          case _         => SubTradingNameYesNoPage
-        }
-
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
+
+            val ua = request.userAnswers
+
+            val pageToUpdate: QuestionPage[Set[IndividualNamesOptions]] =
+              (mode, ua.get(SubcontractorNamePage), ua.get(TradingNameOfSubcontractorPage)) match {
+                case (AmendMode, Some(_), Some(_)) if value.size == 1 => IndividualNamesOptionsAmendPage
+                case _                                                =>
+                  IndividualNamesOptionsPage
+              }
+
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(pageToUpdate, value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SubTradingNameYesNoPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage, mode, updatedAnswers))
         )
-    }
+  }
 }

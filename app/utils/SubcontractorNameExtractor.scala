@@ -18,15 +18,26 @@ package utils
 
 import models.UserAnswers
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
+import play.api.i18n.Messages
 
 class SubcontractorNameExtractor {
 
   def getSubcontractorName(userAnswers: UserAnswers): Option[String] =
     userAnswers
       .get(SubcontractorNamePage)
-      .map(n => s"${n.firstName.trim} ${n.lastName.trim}".trim)
-      .filter(_.nonEmpty)
-      .orElse(
-        userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty)
-      )
+      .flatMap { name =>
+        val firstName = name.firstName.trim
+        val lastName  = name.lastName.trim
+
+        (firstName.nonEmpty, lastName.nonEmpty) match {
+          case (true, true)  => Some(s"$firstName $lastName")
+          case (false, true) => Some(lastName)
+          case _             => None
+        }
+      }
+      .orElse(userAnswers.get(TradingNameOfSubcontractorPage).map(_.trim).filter(_.nonEmpty))
+
+  def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
+    getSubcontractorName(userAnswers)
+      .getOrElse(messages("verify.noName"))
 }
