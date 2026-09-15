@@ -30,6 +30,7 @@ import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
 import java.time.LocalDateTime
+import utils.DateTimeFormats
 import java.time.format.DateTimeFormatter
 
 class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerSuite {

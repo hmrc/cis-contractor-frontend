@@ -536,6 +536,19 @@ insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors           
 insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
 insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
 
+agent.agentLostAccess.title                                                         =  Sorry, you are unable to use this service
+agent.agentLostAccess.heading                                                       =  Sorry, you are unable to use this service
+agent.agentLostAccess.p1                                                            =  You are no longer authorised.
+agent.agentLostAccess.h2                                                            =  What you need to do
+agent.agentLostAccess.bullet.title                                                  =  Ask your client to authorise you. They can do this by either:
+agent.agentLostAccess.bullet.item.1.prefix                                          =  authorising you through their
+agent.agentLostAccess.bullet.item.1.link                                            =  HMRC online account
+agent.agentLostAccess.bullet.item.2.prefix                                          =  downloading and completing
+agent.agentLostAccess.bullet.item.2.link                                            =  form 64—8
+agent.agentLostAccess.bullet.item.2.suffix                                          =  to authorise you by post
+agent.agentLostAccess.p2                                                            =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.agentLostAccess.return.link                                                   =  Return to client list
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1127,7 +1140,7 @@ verify.noSubcontractorsSelectedWarning.cancel                                   
 verify.verificationRequestSubmitted.title                                          =  Verification request submitted
 verify.verificationRequestSubmitted.heading                                        =  Verification request submitted
 verify.verificationRequestSubmitted.reference                                      =  Your verification reference number
-verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0}
+verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0} on {1}
 verify.verificationRequestSubmitted.details.subHeading                             =  Verification request details
 verify.verificationRequestSubmitted.subcontractorsToVerify.label                   =  Subcontractors to verify
 verify.verificationRequestSubmitted.subcontractorsToReverify.label                 =  Subcontractors to reverify
@@ -1261,16 +1274,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
-
-agent.agentLostAccess.title                                                    =  Sorry, you are unable to use this service
-agent.agentLostAccess.heading                                                  =  Sorry, you are unable to use this service
-agent.agentLostAccess.p1                                                       =  You are no longer authorised.
-agent.agentLostAccess.h2                                                       =  What you need to do
-agent.agentLostAccess.bullet.title                                             =  Ask your client to authorise you. They can do this by either:
-agent.agentLostAccess.bullet.item.1.prefix                                     =  authorising you through their
-agent.agentLostAccess.bullet.item.1.link                                       =  HMRC online account
-agent.agentLostAccess.bullet.item.2.prefix                                     =  downloading and completing
-agent.agentLostAccess.bullet.item.2.link                                       =  form 64—8
-agent.agentLostAccess.bullet.item.2.suffix                                     =  to authorise you by post
-agent.agentLostAccess.p2                                                       =  It can take up to 5 working days for new authorisations to appear in your account.
-agent.agentLostAccess.return.link                                              =  Return to client list
