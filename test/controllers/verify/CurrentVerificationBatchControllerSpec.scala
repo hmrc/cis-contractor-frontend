@@ -21,7 +21,7 @@ import controllers.routes
 import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import models.validation.{FieldValidationFailure, SubcontractorValidationFailure}
-import models.validation.SubcontractorValidationField.EmailAddress
+import models.validation.SubcontractorValidationField.{EmailAddress, PartnershipTradingName}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
@@ -299,6 +299,112 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       captor.getValue
         .get(SubcontractorValidationFailuresPage)
         .value mustBe failures
+    }
+
+    "must merge partnership field failures with details failures for the same subcontractor" in {
+      val mockService =
+        mock[VerificationService]
+
+      val mockValidator =
+        mock[SubcontractorDetailsValidator]
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val subcontractors =
+        Seq(
+          currentSubcontractor(1L).copy(
+            subcontractorType = Some("partnership"),
+            partnershipTradingName = None,
+            tradingName = Some("Jane Smith")
+          )
+        )
+
+      val response =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = subcontractors,
+          verificationBatch = None,
+          verifications = Seq.empty
+        )
+
+      val updatedAnswers =
+        emptyUserAnswers.setOrException(
+          CurrentVerificationBatchResponsePage,
+          response
+        )
+
+      val detailsFailures =
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 1L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid-email")
+              )
+            )
+          )
+        )
+
+      when(
+        mockService.getCurrentVerificationBatch(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(updatedAnswers)
+      )
+
+      when(
+        mockValidator.validate(subcontractors)
+      ).thenReturn(detailsFailures)
+
+      when(
+        mockSessionRepository.set(
+          any[UserAnswers]
+        )
+      ).thenReturn(Future.successful(true))
+
+      val application =
+        buildApplication(
+          userAnswers = Some(emptyUserAnswers),
+          verificationService = mockService,
+          validator = mockValidator,
+          sessionRepository = mockSessionRepository
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustEqual SEE_OTHER
+      }
+
+      val captor =
+        ArgumentCaptor.forClass(
+          classOf[UserAnswers]
+        )
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      captor.getValue
+        .get(SubcontractorValidationFailuresPage)
+        .value mustBe
+        List(
+          SubcontractorValidationFailure(
+            subcontractorId = 1L,
+            failedFields = List(
+              FieldValidationFailure(
+                field = EmailAddress,
+                value = Some("invalid-email")
+              ),
+              FieldValidationFailure(
+                field = PartnershipTradingName,
+                value = None
+              )
+            )
+          )
+        )
     }
 
     "must replace previous failures with an empty list when every subcontractor passes" in {

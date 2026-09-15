@@ -18,7 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
@@ -30,7 +30,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.libs.json.*
 
@@ -55,7 +55,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
       .success
       .value
-      .set(SubTradingNameYesNoPage, true)
+      .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
       .success
       .value
       .set(TradingNameOfSubcontractorPage, "ABC Ltd")
@@ -107,8 +107,22 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         country = Some(Country(Some("GB"), Some("United Kingdom")))
       )
 
+      val name = SubcontractorName("John", Some("Paul"), "Smith")
+
       val ua =
         minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(SubcontractorNamePage, name)
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
           .set(AddIndividualContactMethodsYesNoPage, true)
           .success
           .value
@@ -165,8 +179,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         val content = contentAsString(result)
 
         content must include("Type")
-        content must include("Does subcontractor use a trading name?")
-        content must include("Subcontractor trading name")
+        content must include("Names")
+        content must include("Trading name")
+        content must include("Subcontractor name")
         content must include("Add subcontractor address?")
         content must include("Address")
         content must include("Methods of contact")
@@ -178,6 +193,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content must include("Add works reference number?")
         content must include("Works reference number")
 
+        content                 must include("John Paul Smith")
         content                 must include("ABC Ltd")
         contentAsString(result) must include("Phone number")
         contentAsString(result) must include("Mobile number")
@@ -189,7 +205,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         content                 must include("WRN-001")
         content                 must include("1 Test Street")
 
-        content must include(controllers.add.routes.SubTradingNameYesNoController.onPageLoad(CheckMode).url)
+        content must include(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.SubAddressYesNoController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(CheckMode).url)
         content must include(controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url)
@@ -235,6 +251,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to SubcontractorAdded page and set submitted flag when valid data is submitted" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
@@ -246,7 +263,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -264,6 +282,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verifyNoMoreInteractions(mockSubcontractorService)
     }
 
@@ -276,12 +295,14 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(submittedUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -303,6 +324,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery when service call fails (recover block) and not set submitted flag" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -311,7 +333,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -333,6 +356,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Journey Recovery on submit when validation fails (Left(error)) and not call service" in {
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val invalidUa =
         emptyUserAnswers
@@ -344,7 +368,8 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         applicationBuilder(userAnswers = Some(invalidUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -377,7 +402,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "company contact option validation" - {
+    "contact option validation" - {
 
       "must return OK when Email is selected and a email is present" in {
         val ua = minUa
@@ -655,65 +680,73 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
+    "Names options change cleanup" - {
+      "must return OK when IndividualNamesOptionsPage changes from TradingName to SubcontractorName and stale TradingNameOfSubcontractor values are cleaned up" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val ua = minUa
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(SubcontractorNamePage, name)
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          val content = contentAsString(result)
+          content mustNot include("ABC Ltd")
+          content must include("John Paul Smith")
+        }
+      }
+
+      "must return OK when IndividualNamesOptionsPage changes from SubcontractorName to TradingName and stale SubcontractorNamePage values are cleaned up" in {
+
+        val name = SubcontractorName("John", Some("Paul"), "Smith")
+
+        val ua = minUa
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+          .set(SubcontractorNamePage, name)
+          .success
+          .value
+          .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
+          .success
+          .value
+          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, CYARoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual OK
+          val content = contentAsString(result)
+          content must include("ABC Ltd")
+          content mustNot include("John Paul Smith")
+        }
+      }
+    }
+
     "YesNo stale session" - {
-
-      "must return OK when SubTradingNameYesNoPage changes from Yes to No and stale TradingNameOfSubcontractor values are cleaned up" in {
-
-        val name = SubcontractorName("John", Some("Paul"), "Smith")
-
-        val ua = minUa
-          .set(SubTradingNameYesNoPage, true)
-          .success
-          .value
-          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-          .success
-          .value
-          .set(SubTradingNameYesNoPage, false)
-          .success
-          .value
-          .set(SubcontractorNamePage, name)
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(GET, CYARoute)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-        }
-      }
-
-      "must return OK when SubTradingNameYesNoPage changes from No to Yes and stale SubcontractorNamePage values are cleaned up" in {
-
-        val name = SubcontractorName("John", Some("Paul"), "Smith")
-
-        val ua = minUa
-          .set(SubTradingNameYesNoPage, false)
-          .success
-          .value
-          .set(SubcontractorNamePage, name)
-          .success
-          .value
-          .set(SubTradingNameYesNoPage, true)
-          .success
-          .value
-          .set(TradingNameOfSubcontractorPage, "ABC Ltd")
-          .success
-          .value
-
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(GET, CYARoute)
-          val result  = route(application, request).value
-
-          status(result) mustEqual OK
-        }
-      }
 
       "must return OK when SubAddressYesNo changes from Yes to No and stale UTR values are cleaned up" in {
 
@@ -819,7 +852,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when SubTradingNameYesNoPage is false but TradingNameOfSubcontractor value is present (stale session)" in {
+      "must redirect to Journey Recovery when only SubcontractorName is selected in IndividualNamesOptionsPage but TradingNameOfSubcontractor value is present (stale session)" in {
 
         val name = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -828,7 +861,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
             .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
-            .set(SubTradingNameYesNoPage, false)
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName)
+            )
             .success
             .value
             .set(SubcontractorNamePage, name)
@@ -847,7 +883,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery when SubTradingNameYesNoPage is true but TradingNameOfSubcontractor value is present (stale session)" in {
+      "must redirect to Journey Recovery when only TradingName is selected in IndividualNamesOptionsPage but TradingNameOfSubcontractor value is present (stale session)" in {
 
         val name = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -856,7 +892,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
             .set(AddIndividualContactMethodsYesNoPage, false)
             .success
             .value
-            .set(SubTradingNameYesNoPage, true)
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.TradingName)
+            )
             .success
             .value
             .set(TradingNameOfSubcontractorPage, "ABC Ltd")

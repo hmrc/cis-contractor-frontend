@@ -17,9 +17,9 @@
 package controllers.helpers.info
 
 import base.SpecBase
-import controllers.helpers.info.SubcontractorPopulator
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.add.IndividualNamesOptions
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import models.response.SubcontractorResponse
@@ -103,7 +103,10 @@ class SubcontractorPopulatorSpec extends SpecBase with Matchers {
       answers.subcontractorType mustBe Individualorsoletrader
       answers.showVerificationDetails mustBe true
 
-      answers.usesTradingName mustBe Some(true)
+      answers.individualNamesOptions mustBe Set(
+        IndividualNamesOptions.SubcontractorName,
+        IndividualNamesOptions.TradingName
+      )
       answers.tradingName mustBe Some("Test Trading Name")
 
       answers.subcontractorName.value.firstName mustBe "John"

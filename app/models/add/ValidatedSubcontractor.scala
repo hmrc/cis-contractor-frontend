@@ -18,7 +18,8 @@ package models.add
 
 import models.address.Address
 import models.contact.ContactMethodOptions
-import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
+import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
+import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.*
 
@@ -39,8 +40,12 @@ object ValidatedSubcontractor extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedSubcontractor] =
     for {
       typeOfSubcontractor            <- validateType(answers)
-      tradingName                    <- getOptionalPageValue(answers, TradingNameOfSubcontractorPage, SubTradingNameYesNoPage)
-      subcontractorName              <- getOptionalNamePage(answers)
+      tradingName                    <- getNamesPageValue(
+                                          answers,
+                                          TradingNameOfSubcontractorPage,
+                                          IndividualNamesOptions.TradingName
+                                        )
+      subcontractorName              <- getNamesPageValue(answers, SubcontractorNamePage, IndividualNamesOptions.SubcontractorName)
       address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage, SubAddressYesNoPage)
       individualContactMethodOptions <-
         getOptionalPageValue(answers, IndividualContactMethodOptionsPage, AddIndividualContactMethodsYesNoPage)
@@ -95,15 +100,24 @@ object ValidatedSubcontractor extends Validation {
       case _                                          => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
-  // SubTradingNameYesNoPage is inverted for SubcontractorNamePage
-  // Yes  -> SubcontractorNamePage not required
-  // No   -> SubcontractorNamePage required
-  // To be Kept separate from generic helper for clarity.
-  private def getOptionalNamePage(answers: UserAnswers): Either[ValidationError, Option[SubcontractorName]] =
-    (answers.get(SubcontractorNamePage), answers.get(SubTradingNameYesNoPage)) match {
-      case (Some(value), Some(false)) => Right(Some(value))
-      case (None, Some(true))         => Right(None)
-      case _                          => Left(InvalidAnswer(SubcontractorNamePage))
+  private def getNamesPageValue[A](
+    userAnswers: UserAnswers,
+    questionPage: QuestionPage[A],
+    expectedNamesOption: IndividualNamesOptions
+  )(implicit
+    reads: Reads[A]
+  ): Either[ValidationError, Option[A]] =
+    (
+      userAnswers.get(questionPage),
+      userAnswers.get(IndividualNamesOptionsPage)
+    ) match {
+      case (_, None)                                                                                           =>
+        Left(MissingAnswer(IndividualNamesOptionsPage))
+      case (Some(value), Some(individualNamesOptions)) if individualNamesOptions.contains(expectedNamesOption) =>
+        Right(Some(value))
+      case (None, Some(individualNamesOptions)) if !individualNamesOptions.contains(expectedNamesOption)       =>
+        Right(None)
+      case _                                                                                                   =>
+        Left(InvalidAnswer(questionPage))
     }
-
 }

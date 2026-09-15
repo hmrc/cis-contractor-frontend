@@ -132,7 +132,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       IndividualAnswers(
         subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
         showVerificationDetails = false,
-        usesTradingName = None,
+        individualNamesOptions = Set.empty,
         tradingName = None,
         subcontractorName = None,
         addressYesNo = None,

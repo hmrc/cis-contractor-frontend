@@ -112,6 +112,32 @@ class UtrValidatorSpec extends AnyWordSpec with Matchers {
           )
         )
     }
+
+    "return a partner UTR format failure without treating it as a duplicate of another UTR" in {
+      UtrValidator
+        .validate(
+          value = Some("12345A7890"),
+          subcontractors = Seq(subcontractorValid, subcontractorDupUtr),
+          field = SubcontractorValidationField.PartnerUtr,
+          checkDuplicate = false
+        ) mustBe
+        Some(
+          FieldValidationFailure(
+            field = SubcontractorValidationField.PartnerUtr,
+            value = Some("12345A7890")
+          )
+        )
+    }
+
+    "return no failure for a valid partner UTR that matches another subcontractor UTR when duplicate checks are off" in {
+      UtrValidator
+        .validate(
+          value = Some("5860920998"),
+          subcontractors = Seq(subcontractorValid, subcontractorDupUtr),
+          field = SubcontractorValidationField.PartnerUtr,
+          checkDuplicate = false
+        ) mustBe None
+    }
   }
 
   private def subcontractorEmpty: SubcontractorCurrentVerification =

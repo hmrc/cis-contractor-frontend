@@ -19,13 +19,14 @@ package controllers.verify
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.Mode
 import models.response.GetCurrentVerificationBatchResponse
+import models.validation.SubcontractorValidationFailure
 import pages.validation.SubcontractorValidationFailuresPage
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.{SubcontractorDetailsValidator, VerificationService}
+import services.{SubcontractorDetailsValidator, SubcontractorPartnershipValidator, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class CurrentVerificationBatchController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
   subcontractorDetailsValidator: SubcontractorDetailsValidator,
+  subcontractorPartnershipValidator: SubcontractorPartnershipValidator,
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -56,8 +58,13 @@ class CurrentVerificationBatchController @Inject() (
             .get(CurrentVerificationBatchResponsePage)
             .map { response =>
               val validationFailures =
-                subcontractorDetailsValidator.validate(
-                  response.subcontractors
+                SubcontractorValidationFailure.merge(
+                  subcontractorDetailsValidator.validate(
+                    response.subcontractors
+                  ),
+                  subcontractorPartnershipValidator.validate(
+                    response.subcontractors
+                  )
                 )
 
               for {
