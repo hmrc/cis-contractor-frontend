@@ -19,38 +19,33 @@ package views.insufficient
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.Form
-import play.api.i18n.Lang
-import play.api.i18n.Messages
-import play.api.i18n.MessagesApi
-import play.api.i18n.MessagesImpl
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
 import java.util
 
 class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+  private val formProvider = new RemoveInsufficientSubcontractorNameYesNoFormProvider()
+  private val form         = formProvider()
+
+  private val subcontractorName = "Test Subcontractor"
+
+  private given Request[_]         = FakeRequest()
+  private given messages: Messages = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
+
+  private val view = app.injector.instanceOf[RemoveInsufficientSubcontractorNameYesNoView]
 
   "RemoveInsufficientSubcontractorNameYesNoView" should {
 
-    "render the page with title, heading, hint, yes/no radios and submit button" in new Setup {
-
-      val html: HtmlFormat.Appendable =
-        view(
-          form,
-          NormalMode,
-          subcontractorName
-        )
-
-      val doc: Document =
-        Jsoup.parse(html.toString())
+    "render the page with title, heading, hint, yes/no radios and submit button" in {
+      val html = view(form, subcontractorName)
+      val doc  = Jsoup.parse(html.toString())
 
       doc
         .select("title")
@@ -108,26 +103,12 @@ class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with 
         messages("site.continue")
     }
 
-    "display error summary and inline error when no option is selected" in new Setup {
+    "display error summary and inline error when no option is selected" in {
+      val errorForm = form.withError("value", "removeInsufficientSubcontractorNameYesNo.error.required")
+      val html      = view(errorForm, subcontractorName)
+      val doc       = Jsoup.parse(html.toString())
 
-      val errorForm: Form[Boolean] =
-        form.withError(
-          "value",
-          "removeInsufficientSubcontractorNameYesNo.error.required"
-        )
-
-      val html: HtmlFormat.Appendable =
-        view(
-          errorForm,
-          NormalMode,
-          subcontractorName
-        )
-
-      val doc: Document =
-        Jsoup.parse(html.toString())
-
-      val summary: Elements =
-        doc.select(".govuk-error-summary")
+      val summary: Elements = doc.select(".govuk-error-summary")
 
       summary
         .text() must include(
@@ -144,29 +125,5 @@ class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with 
         messages("removeInsufficientSubcontractorNameYesNo.error.required")
       )
     }
-  }
-
-  trait Setup {
-
-    val formProvider =
-      new RemoveInsufficientSubcontractorNameYesNoFormProvider()
-
-    val form: Form[Boolean] =
-      formProvider()
-
-    val subcontractorName =
-      "Test Subcontractor"
-
-    implicit val request: Request[_] =
-      FakeRequest()
-
-    implicit val messages: Messages =
-      MessagesImpl(
-        Lang.defaultLang,
-        app.injector.instanceOf[MessagesApi]
-      )
-
-    val view: RemoveInsufficientSubcontractorNameYesNoView =
-      app.injector.instanceOf[RemoveInsufficientSubcontractorNameYesNoView]
   }
 }
