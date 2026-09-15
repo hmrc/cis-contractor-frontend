@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new RemoveInsufficientSubcontractorNameYesNoFormProvider()
-  private val form = formProvider()
+  private val form         = formProvider()
 
   private val subcontractorName = "Test Subcontractor"
 

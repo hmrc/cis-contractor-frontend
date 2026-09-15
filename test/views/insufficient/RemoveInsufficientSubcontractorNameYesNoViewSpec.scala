@@ -17,7 +17,6 @@
 package views.insufficient
 
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
-import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
