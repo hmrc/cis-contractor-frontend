@@ -16,14 +16,15 @@
 
 package pages.amend
 
+import models.amend.AmendJourneyType
 import pages.QuestionPage
-import pages.add.IndividualJourney
 import play.api.libs.json.JsPath
 
-case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
+case object AmendJourneyTypePage extends QuestionPage[AmendJourneyType] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath =
+    JsPath \ toString
 
-  override def toString: String = "subTradingNameYesNo"
-
+  override def toString: String =
+    "amendJourneyType"
 }

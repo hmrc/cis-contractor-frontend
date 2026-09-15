@@ -27,6 +27,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.VerificationSubmissionDetailsPage
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
@@ -74,7 +75,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
     when(
       mockService.createSubmitAndPersistVerificationSubmission(
         any[DataRequest[AnyContent]],
-        any[HeaderCarrier]
+        any[HeaderCarrier],
+        any[Messages]
       )
     ).thenReturn(Future.successful(response))
 
@@ -140,7 +142,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockService).createSubmitAndPersistVerificationSubmission(
           any[DataRequest[AnyContent]],
-          any[HeaderCarrier]
+          any[HeaderCarrier],
+          any[Messages]
         )
       }
     }
@@ -311,7 +314,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockService.createSubmitAndPersistVerificationSubmission(
           any[DataRequest[AnyContent]],
-          any[HeaderCarrier]
+          any[HeaderCarrier],
+          any[Messages]
         )
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
@@ -358,7 +362,8 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockService, never).createSubmitAndPersistVerificationSubmission(
           any[DataRequest[AnyContent]],
-          any[HeaderCarrier]
+          any[HeaderCarrier],
+          any[Messages]
         )
       }
     }

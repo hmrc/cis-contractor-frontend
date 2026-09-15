@@ -18,13 +18,21 @@ package models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ProceedInsufficientVerificationRequest(
+final case class UpdateContractorSchemeParams(
+  schemeId: Int,
   instanceId: String,
-  verificationBatchResourceRef: Long,
-  verificationResourceRef: Long,
-  proceed: String
+  accountsOfficeReference: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  utr: Option[String] = None,
+  name: Option[String] = None,
+  emailAddress: Option[String] = None,
+  displayWelcomePage: Option[String] = None,
+  prePopCount: Option[Int] = None,
+  prePopSuccessful: Option[String] = None,
+  version: Option[Int] = None
 )
 
-object ProceedInsufficientVerificationRequest {
-  given OFormat[ProceedInsufficientVerificationRequest] = Json.format
+object UpdateContractorSchemeParams {
+  given OFormat[UpdateContractorSchemeParams] = Json.format[UpdateContractorSchemeParams]
 }

@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with MockitoSugar {
 
-  private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
+  private val endpointUrl = "/subcontractor/verify/unmatched-subcontractors"
 
   private def verification(
     verificationNumber: Option[String] = Some("V0000000001"),

@@ -17,6 +17,7 @@
 package connectors
 
 import models.Scheme
+import models.agent.GetClientListStatusResponse
 import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
 import models.response.*
@@ -27,6 +28,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -109,6 +111,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response
       }
   }
+
+  def startClientList(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
 
   def hasClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     http
@@ -281,6 +288,41 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       }
   }
 
+  def updateContractorDetails(
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateContractorDetails] Submitting contractor details for schemeId=${request.schemeId}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/contractor-details/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - contractor details updated"
+            )
+
+            Future.successful(())
+
+          case other =>
+            logger.error(
+              s"[ConstructionIndustrySchemeConnector][updateContractorDetails] schemeId=${request.schemeId} - failed with status $other"
+            )
+
+            Future.failed(
+              new RuntimeException(
+                s"Update contractor details failed, returned $other"
+              )
+            )
+        }
+      }
+  }
+
   def getSubcontractorList(cisId: String)(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] = {
     logger.debug(s"[ConstructionIndustrySchemeConnector][getSubcontractorList] cisId=$cisId")
 
@@ -297,7 +339,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def proceedInsufficientVerification(
-    request: ProceedInsufficientVerificationRequest
+    request: ProceedVerificationRequest
   )(implicit hc: HeaderCarrier): Future[Unit] =
     http
       .post(url"$cisBaseUrl/verification/proceed-with-insufficient-data")
@@ -312,10 +354,32 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             Future.successful(())
           case other      =>
             Future.failed(
-              UpstreamErrorResponse(s"ProceedInsufficientVerification failed, returned $other", other, other)
+              UpstreamErrorResponse(s"proceedInsufficientVerification failed, returned $other", other, other)
             )
         }
       }
+
+  def proceedUnmatchedVerification(
+    request: ProceedVerificationRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/verification/proceed-with-unmatched-data")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case NO_CONTENT =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][proceedUnmatchedVerification] instanceId=${request.instanceId}"
+            )
+            Future.successful(())
+          case other      =>
+            Future.failed(
+              UpstreamErrorResponse(s"proceedUnmatchedVerification failed, returned $other", other, other)
+            )
+        }
+      }
+
   def updateSubcontractor(
     request: UpdateSubcontractorRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
@@ -342,6 +406,41 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
           case other =>
             Future.failed(new RuntimeException(s"Update subcontractor failed, returned $other: ${response.body}"))
+        }
+      }
+  }
+
+  def updateSubcontractorForEdit(
+    request: UpdateSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+
+    logger.info(
+      s"[ConstructionIndustrySchemeConnector][updateSubcontractorForEdit] " +
+        s"cisId=${request.cisId}, " +
+        s"subcontractorId=${request.subcontractor.subcontractorId}, " +
+        s"subbieResourceRef=${request.subcontractor.subbieResourceRef}"
+    )
+
+    http
+      .post(url"$cisBaseUrl/subcontractor/edit")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            logger.info(
+              s"[ConstructionIndustrySchemeConnector][updateSubcontractorForEdit] " +
+                s"Updated subcontractor"
+            )
+
+            Future.successful(())
+
+          case other =>
+            Future.failed(
+              new RuntimeException(
+                s"Update subcontractor for edit failed, returned $other: ${response.body}"
+              )
+            )
         }
       }
   }

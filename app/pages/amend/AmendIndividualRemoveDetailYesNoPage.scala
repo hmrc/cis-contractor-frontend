@@ -17,12 +17,12 @@
 package pages.amend
 
 import models.UserAnswers
+import models.add.IndividualNamesOptions
 import models.amend.AmendIndividualRemoveDetail
 import models.amend.AmendIndividualRemoveDetail.*
 import pages.QuestionPage
 import pages.add.*
 import play.api.libs.json.JsPath
-import queries.AmendIndividualSubcontractorNameRemovedQuery
 
 // All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
 
@@ -38,22 +38,24 @@ case class AmendIndividualRemoveDetailYesNoPage(subcontractorDetail: AmendIndivi
       case TradingName if value.contains(true) =>
         userAnswers
           .remove(TradingNameOfSubcontractorPage)
-          .flatMap(_.set(SubTradingNameYesNoPage, false))
 
       case TradingName if value.contains(false) =>
         userAnswers
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
 
       case SubcontractorName if value.contains(true) =>
         userAnswers
           .remove(SubcontractorNamePage)
-          .flatMap(_.set(SubTradingNameYesNoPage, true))
-          .flatMap(_.set(AmendIndividualSubcontractorNameRemovedQuery, true))
 
       case SubcontractorName if value.contains(false) =>
         userAnswers
-          .set(SubTradingNameYesNoPage, false)
-          .flatMap(_.remove(AmendIndividualSubcontractorNameRemovedQuery))
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
 
       case Address if value.contains(true) =>
         userAnswers

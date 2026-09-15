@@ -35,10 +35,11 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   private val cisId             = "INST-123"
   private val subbieResourceRef = 1001L
+  private val journeyType       = "insufficient"
 
   private lazy val viewOnlySubcontractorRoute =
     controllers.info.routes.SubcontractorController
-      .onPageLoad(cisId, subbieResourceRef)
+      .onPageLoad(cisId, subbieResourceRef, journeyType)
       .url
 
   private val baseSubcontractor =
@@ -147,7 +148,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.routes.IndividualCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -204,7 +205,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.company.routes.CompanyCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -261,7 +262,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.partnership.routes.PartnershipCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -318,7 +319,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.trust.routes.TrustCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
