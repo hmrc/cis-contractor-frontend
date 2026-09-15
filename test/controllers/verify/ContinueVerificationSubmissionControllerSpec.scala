@@ -31,10 +31,10 @@ import repositories.SessionRepository
 
 import scala.concurrent.Future
 
-class SubmitUnmatchedControllerSpec extends SpecBase {
+class ContinueVerificationSubmissionControllerSpec extends SpecBase {
 
   private lazy val endpointUrl =
-    controllers.verify.routes.SubmitUnmatchedController.onSubmit().url
+    controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
 
   private def subcontractor(id: Long): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
@@ -131,7 +131,7 @@ class SubmitUnmatchedControllerSpec extends SpecBase {
       )
     )
 
-  "SubmitUnmatchedController" - {
+  "ContinueVerificationSubmissionController" - {
 
     "when there are no existing verification selections" - {
 

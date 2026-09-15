@@ -673,7 +673,7 @@ GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.Unmatche
 
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
-GET   /subcontractor/verify/submit-unmatched  controllers.verify.SubmitUnmatchedController.onSubmit()
+GET   /subcontractor/verify/continue-verification-submission  controllers.verify.ContinueVerificationSubmissionController.onSubmit()
 
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()

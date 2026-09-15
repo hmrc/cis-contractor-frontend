@@ -63,6 +63,6 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
 
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
-      Redirect(controllers.verify.routes.SubmitUnmatchedController.onSubmit())
+      Redirect(controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit())
     }
 }

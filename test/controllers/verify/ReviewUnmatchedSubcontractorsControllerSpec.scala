@@ -69,7 +69,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.SubmitUnmatchedController.onSubmit().url
+          controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
       }
     }
   }

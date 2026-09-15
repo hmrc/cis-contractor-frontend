@@ -17,9 +17,9 @@
 package connectors
 
 import models.TypeOfSubcontractor
-import models.requests.{CreateAndUpdateSubcontractorPayload, CreateSubmissionForVerificationRequest, DeleteVerificationRequest, ModifyVerificationsRequest, SubcontractorRequest, UpdateContractorSchemeParams, UpdateSubcontractorRequest, VerificationToUpdate}
+import models.requests.*
 import models.requests.CreateAndUpdateSubcontractorPayload.*
-import models.response.{CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetCurrentVerificationBatchResponse, GetLastSubmittedVerificationBatchResponse, GetNewestVerificationBatchResponse, GetSubcontractorListResponse, GetSubcontractorResponse, SubcontractorListItem}
+import models.response.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -32,6 +32,7 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
