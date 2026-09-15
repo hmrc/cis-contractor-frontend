@@ -24,18 +24,17 @@ import models.amend.AmendJourneyType
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
+import utils.SubcontractorNameExtractor
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.Future
 
 class AmendIndividualConfirmationController @Inject() (
   identify: IdentifierAction,
@@ -43,37 +42,35 @@ class AmendIndividualConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
-  cleanupService: DefaultSubcontractorCleanupService,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
   appConfig: FrontendAppConfig,
   subcontractorNameExtractor: SubcontractorNameExtractor
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  (identify andThen getData andThen requireData).async { implicit request =>
 
-      val userAnswers =
-        request.userAnswers
+    val userAnswers =
+      request.userAnswers
 
-      if (
-        !userAnswers
-          .get(AmendCheckYourAnswersSubmittedPage)
-          .contains(true)
-      ) {
-        logger.warn(
-          "[AmendIndividualConfirmationController.onPageLoad] " +
-            "Accessed without prior CYA submission"
-        )
+    if (
+      !userAnswers
+        .get(AmendCheckYourAnswersSubmittedPage)
+        .contains(true)
+    ) {
+      logger.warn(
+        "[AmendIndividualConfirmationController.onPageLoad] " +
+          "Accessed without prior CYA submission"
+      )
 
-        Future.successful(journeyRecoveryRedirect)
-      } else {
-        renderConfirmation(userAnswers)
-      }
+      Future.successful(journeyRecoveryRedirect)
+    } else {
+      renderConfirmation(userAnswers)
     }
+  }
 
   private def renderConfirmation(
     userAnswers: UserAnswers
