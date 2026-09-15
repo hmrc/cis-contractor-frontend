@@ -20,18 +20,17 @@ import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import generators.ModelGenerators
 import models.*
-import models.response.*
 import models.requests.*
-import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors, SubmissionStatus, VerificationSubmissionDetails}
+import models.response.*
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
+import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors, SubmissionStatus, VerificationSubmissionDetails}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, *}
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatestplus.mockito.MockitoSugar
 import pages.QuestionPage
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
-import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage, LastSubmittedVerificationBatchResponsePage, NewestVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.*
 import play.api.i18n.Messages
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
