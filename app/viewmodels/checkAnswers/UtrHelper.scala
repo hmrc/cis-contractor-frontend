@@ -27,9 +27,6 @@ object UtrViewModel {
 }
 
 object UtrContent {
-  def apply(utr: String): HtmlContent = {
-    val zwsp = "\u200B"
-    val broken = utr.grouped(1).mkString(zwsp)
-    HtmlContent(s"""<span>${HtmlFormat.escape(broken)}</span>""")
-  }
+  def apply(utr: String): HtmlContent =
+    HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(utr)}</span>""")
 }
