@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages.amend
 
-import play.api.libs.json.{Json, OFormat}
+import models.amend.AmendJourneyType
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class ProceedInsufficientVerificationRequest(
-  instanceId: String,
-  verificationBatchResourceRef: Long,
-  verificationResourceRef: Long,
-  proceed: String
-)
+case object AmendJourneyTypePage extends QuestionPage[AmendJourneyType] {
 
-object ProceedInsufficientVerificationRequest {
-  given OFormat[ProceedInsufficientVerificationRequest] = Json.format
+  override def path: JsPath =
+    JsPath \ toString
+
+  override def toString: String =
+    "amendJourneyType"
 }

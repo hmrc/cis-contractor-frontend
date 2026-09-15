@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package models.requests
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class ProceedSubcontractorVerifyRequestPage(subcontractorId: String) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ "proceedSubcontractorVerifyRequest" \ subcontractorId \ "proceeded"
+case class ProceedVerificationRequest(
+  instanceId: String,
+  verificationBatchResourceRef: Long,
+  verificationResourceRef: Long
+)
+
+object ProceedVerificationRequest {
+  given OFormat[ProceedVerificationRequest] = Json.format
 }

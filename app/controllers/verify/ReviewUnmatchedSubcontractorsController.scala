@@ -19,6 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.NormalMode
 import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ReviewUnmatchedSubcontractorsService
@@ -26,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewUnmatchedSubcontractorsView
 
 import javax.inject.Inject
+import scala.util.{Failure, Success}
 
 class ReviewUnmatchedSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -36,14 +38,26 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   reviewUnmatchedSubcontractorsService: ReviewUnmatchedSubcontractorsService,
   view: ReviewUnmatchedSubcontractorsView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
         case Some(currentBatch) =>
-          Ok(view(reviewUnmatchedSubcontractorsService.buildViewModel(currentBatch)))
-        case None               =>
+          reviewUnmatchedSubcontractorsService.buildViewModel(currentBatch) match {
+            case Success(viewModel) =>
+              Ok(view(viewModel))
+
+            case Failure(e) =>
+              logger.error(
+                "[ReviewUnmatchedSubcontractorsController] Failed to build review unmatched subcontractors view model",
+                e
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+
+        case None =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
@@ -51,6 +65,8 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   // TODO: This is a temporary redirect until DTR-5226 is implemented to handle the next step in the journey
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
-      Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
+      Redirect(
+        controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+      )
     }
 }
