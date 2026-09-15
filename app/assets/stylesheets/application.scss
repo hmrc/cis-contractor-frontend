@@ -2,47 +2,41 @@
     Styling in this and other .scss files will be compiled by the sbt-sass-compiler plugin: https://github.com/hmrc/sbt-sass-compiler
     If you encounter any issue with Sass compilation using the plugin, please reach out to the PlatUI team.
  */
+.govuk-table__container {
+    overflow-x: scroll;
+}
+
+#subcontractor-table {
+    min-width: 900px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+#subcontractor-table th {
+    line-height: 1.2;
+    white-space: nowrap !important;
+    overflow-wrap: anywhere;
+  }
+
+#subcontractor-table th,
+#subcontractor-table td {
+  padding-right: 25px;
+  vertical-align: middle;
+}
+
+#subcontractor-table td:nth-child(2) {
+    overflow-wrap: anywhere;
+}
 
 @media (max-width: 768px) {
-
   .govuk-table__container {
-    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 20px;
   }
-
-  #subcontractor-table {
-    min-width: 900px;
-  }
 }
 
-@media (min-width: 769px) {
-
-  .govuk-table__container {
-    overflow-x: visible;
-  }
-
-  #subcontractor-table {
-    min-width: auto;
-  }
-}
-
-@media (min-width: 970px) {
-
-  #subcontractor-table th {
-    white-space: nowrap !important;
-  }
-  #subcontractor-table td {
-    white-space: normal;
+.govuk-checkboxes__item {
     overflow-wrap: break-word;
-  }
-}
-
-@media (max-width: 1024px) {
-
-  #subcontractor-table th {
-    white-space: normal;
-  }
 }
 
 .govuk-pagination__link--button {
@@ -80,23 +74,6 @@
   &:focus {
     color: #0b0c0c;
   }
-}
-
-#subcontractor-table th,
-#subcontractor-table td {
-  padding-right: 25px;
-  vertical-align: middle;
-}
-
-#subcontractor-table th {
-  overflow-wrap: break-word;
-  line-height: 1.2;
-}
-
-#subcontractor-table th:first-child,
-#subcontractor-table td:first-child {
-  width: 40px;
-  padding-right: 10px;
 }
 
 #amend-confirmation-summary-table ul {
