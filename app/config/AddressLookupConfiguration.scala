@@ -48,7 +48,7 @@ class AddressLookupConfiguration @Inject() (implicit appConfig: FrontendAppConfi
         deskProServiceName = Some(appConfig.contactFormServiceIdentifier),
         showPhaseBanner = Some(true),
         showBackButtons = Some(true),
-        disableTranslations = Some(true),
+        disableTranslations = Some(false),
         includeHMRCBranding = Some(false),
         ukMode = Some(useUkMode),
         selectPageConfig = AddressLookupSelectConfigModel(
