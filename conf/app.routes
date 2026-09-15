@@ -85,7 +85,7 @@ POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
+GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
 GET   /subcontractor/info/start/:cisId/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long, journeyType: String)
 
@@ -146,6 +146,8 @@ GET   /subcontractor/amend/names  controllers.add.IndividualNamesOptionsControll
 POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
+
+GET   /agent/no-longer-authorised  controllers.AgentLostAccessController.onPageLoad()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -709,5 +711,3 @@ POST  /contractor-details/change-add-contractor-scheme-name  controllers.contrac
 
 GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
 POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)
-
-GET   /agent/no-longer-authorised                                     controllers.AgentLostAccessController.onPageLoad()

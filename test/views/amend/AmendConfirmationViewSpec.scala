@@ -18,99 +18,217 @@ package views.amend
 
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
+import viewmodels.amend.AmendConfirmationLink
 import views.html.amend.AmendConfirmationView
-
-import java.util
 
 class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   "AmendConfirmationView" should {
 
-    "render the confirmation panel, table and links" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
-      val doc: Document               = Jsoup.parse(html.toString())
+    "render the confirmation panel, table and links for standard amend journey" in new Setup {
 
-      doc.title() must include(messages("amendConfirmation.panel.heading"))
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          standardConfirmationLink
+        )
 
-      val confirmationPanelTitle: Elements = doc.select(".govuk-panel__title")
-      confirmationPanelTitle.text() mustBe
+      val doc =
+        Jsoup.parse(html.toString())
+
+      doc.title() must include(
+        messages("amendConfirmation.panel.heading")
+      )
+
+      doc.select(".govuk-panel__title").text() mustBe
         messages("amendConfirmation.panel.heading")
 
-      val headings: util.List[String] = doc.select("h2").eachText()
+      val headings =
+        doc.select("h2").eachText()
 
-      headings must contain(messages("amendConfirmation.updatesMade.h2"))
-      headings must contain(messages("amendConfirmation.beforeYouGo.h2"))
+      headings must contain(
+        messages("amendConfirmation.updatesMade.h2")
+      )
 
-      val table: Elements = doc.select("table")
+      headings must contain(
+        messages("amendConfirmation.beforeYouGo.h2")
+      )
+
+      val table =
+        doc.select("table")
+
       table.size() mustBe 1
 
-      val tableHeaders: Elements = doc.select("thead th")
+      val tableHeaders =
+        doc.select("thead th")
 
       tableHeaders.get(0).text() mustBe
         messages("amendConfirmation.table.hdr.details")
+
       tableHeaders.get(1).text() mustBe
         messages("amendConfirmation.table.hdr.previous")
+
       tableHeaders.get(2).text() mustBe
         messages("amendConfirmation.table.hdr.updated")
 
-      val tableRows: Elements = doc.select("tbody tr")
+      val tableRows =
+        doc.select("tbody tr")
+
       tableRows.size() mustBe 1
 
-      val firstRow: Element = tableRows.first()
+      val firstRow =
+        tableRows.first()
 
       firstRow.select("td").get(0).text() mustBe "Trust name"
       firstRow.select("td").get(1).text() mustBe "Old Trust"
       firstRow.select("td").get(2).text() mustBe "New Trust"
 
-      val bodyParagraphs: Elements = doc.select("p.govuk-body")
-
-      val backToParagraph: Element = bodyParagraphs.get(1)
-      backToParagraph.text() mustBe
-        s"${messages("amendConfirmation.backTo")} ${messages("amendConfirmation.yourSubcontractors")}."
-
-      val beforeYouGoParagraph: Element = bodyParagraphs.get(2)
-      beforeYouGoParagraph.text() mustBe
-        messages("amendConfirmation.beforeYouGo.p1")
-
-      val manageYourSubcontractorsLink: Elements =
-        doc.select(s"a[href='${appConfig.retrieveSubcontractorListUrl}']")
+      val manageYourSubcontractorsLink =
+        doc.select(
+          s"a[href='${appConfig.retrieveSubcontractorListUrl}']"
+        )
 
       manageYourSubcontractorsLink.text() mustBe
         messages("amendConfirmation.yourSubcontractors")
     }
 
     "render the subcontractor name in the confirmation text" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
-      val doc: Document               = Jsoup.parse(html.toString())
 
-      val confirmationParagraph: Element = doc.select("p.govuk-body").first()
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          standardConfirmationLink
+        )
 
-      confirmationParagraph.text() mustBe
-        messages("amendConfirmation.p1", subcontractorName)
+      val doc =
+        Jsoup.parse(html.toString())
+
+      doc.select("p.govuk-body").first().text() mustBe
+        messages(
+          "amendConfirmation.p1",
+          subcontractorName
+        )
     }
 
-    "render the survey link" in new Setup {
-      val html: HtmlFormat.Appendable = view(rows, subcontractorName)
-      val doc: Document               = Jsoup.parse(html.toString())
+    "render the survey link for standard journey" in new Setup {
 
-      val surveyLink: Element = doc.select("a[href='#']").last()
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          standardConfirmationLink
+        )
+
+      val doc =
+        Jsoup.parse(html.toString())
+
+      val surveyLink =
+        doc.select("a[href='#']").last()
 
       surveyLink.text() mustBe
-        messages("amendConfirmation.beforeYouGo.takeAShortSurvey")
+        messages(
+          "amendConfirmation.beforeYouGo.takeAShortSurvey"
+        )
+
       surveyLink.attr("href") mustBe "#"
       surveyLink.attr("target") mustBe "_blank"
       surveyLink.attr("rel") mustBe "noopener noreferrer"
+    }
+
+    "hide the before you go section for insufficient info journey" in new Setup {
+
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          insufficientConfirmationLink
+        )
+
+      val doc =
+        Jsoup.parse(html.toString())
+
+      val headings =
+        doc.select("h2").eachText()
+
+      headings must contain(
+        messages("amendConfirmation.updatesMade.h2")
+      )
+
+      headings must not contain
+        messages("amendConfirmation.beforeYouGo.h2")
+
+      doc.text() must not include
+        messages("amendConfirmation.beforeYouGo.p1")
+
+      val link =
+        doc.select("a[href='/review-insufficient']")
+
+      link.text() mustBe
+        messages(
+          "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors"
+        )
+    }
+
+    "hide the before you go section for unmatched journey" in new Setup {
+
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          unmatchedConfirmationLink
+        )
+
+      val doc =
+        Jsoup.parse(html.toString())
+
+      val headings =
+        doc.select("h2").eachText()
+
+      headings must contain(
+        messages("amendConfirmation.updatesMade.h2")
+      )
+
+      headings must not contain
+        messages("amendConfirmation.beforeYouGo.h2")
+
+      doc.text() must not include
+        messages("amendConfirmation.beforeYouGo.p1")
+
+      val link =
+        doc.select("a[href='/review-unmatched']")
+
+      link.text() mustBe
+        messages(
+          "unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors"
+        )
+    }
+
+    "must not render survey link when before you go section is hidden" in new Setup {
+
+      val html =
+        view(
+          rows,
+          subcontractorName,
+          insufficientConfirmationLink
+        )
+
+      val doc =
+        Jsoup.parse(html.toString())
+
+      doc.text() must not include
+        messages(
+          "amendConfirmation.beforeYouGo.takeAShortSurvey"
+        )
     }
   }
 
@@ -127,7 +245,8 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         )
       )
 
-    implicit val request: Request[_] = FakeRequest()
+    implicit val request: Request[_] =
+      FakeRequest()
 
     implicit val messages: Messages =
       play.api.i18n.MessagesImpl(
@@ -136,9 +255,30 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       )
 
     val appConfig: FrontendAppConfig =
-      app.injector.instanceOf[config.FrontendAppConfig]
+      app.injector.instanceOf[FrontendAppConfig]
 
     val view: AmendConfirmationView =
       app.injector.instanceOf[AmendConfirmationView]
+
+    val standardConfirmationLink =
+      AmendConfirmationLink(
+        url = appConfig.retrieveSubcontractorListUrl,
+        textKey = "amendConfirmation.yourSubcontractors",
+        showBeforeYouGo = true
+      )
+
+    val insufficientConfirmationLink =
+      AmendConfirmationLink(
+        url = "/review-insufficient",
+        textKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+        showBeforeYouGo = false
+      )
+
+    val unmatchedConfirmationLink =
+      AmendConfirmationLink(
+        url = "/review-unmatched",
+        textKey = "unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
+        showBeforeYouGo = false
+      )
   }
 }
