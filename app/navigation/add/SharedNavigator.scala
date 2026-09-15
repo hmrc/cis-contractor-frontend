@@ -51,7 +51,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
   private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
     (userAnswers.get(TypeOfSubcontractorPage), mode) match {
       case (Some(Individualorsoletrader), NormalMode) =>
-        controllers.add.routes.SubTradingNameYesNoController.onPageLoad(NormalMode)
+        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
       case (Some(Limitedcompany), NormalMode)         =>
         controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
       case (Some(Partnership), NormalMode)            =>

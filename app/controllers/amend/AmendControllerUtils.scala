@@ -17,8 +17,10 @@
 package controllers.amend
 
 import models.UserAnswers
+import models.amend.AmendJourneyType
 import models.response.SubcontractorResponse
 import pages.QuestionPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.libs.json.Writes
 
 import scala.util.Try
@@ -44,4 +46,22 @@ object AmendControllerUtils {
     subcontractor.verified.exists(
       _.trim.equalsIgnoreCase("Y")
     ) || subcontractor.pendingVerifications.exists(_ > 0)
+
+  def isVerifiedForAmendJourney(
+    userAnswers: UserAnswers
+  ): Boolean =
+    userAnswers.get(AmendJourneyTypePage) match {
+
+      case Some(AmendJourneyType.Standard) =>
+        userAnswers.get(ShowVerificationDetailsPage).contains(true)
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        false
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        false
+
+      case None =>
+        userAnswers.get(ShowVerificationDetailsPage).contains(true)
+    }
 }

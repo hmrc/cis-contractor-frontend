@@ -18,9 +18,9 @@ package controllers.amend
 
 import base.SpecBase
 import controllers.routes
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
-import models.amend.OriginalIndividualAnswers
+import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
@@ -35,13 +35,14 @@ import queries.OriginalIndividualAnswersQuery
 import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import config.FrontendAppConfig
 import queries.CisIdQuery
 import utils.AmendmentHelper
-import pages.amend.{AmendCheckYourAnswersSubmittedPage, ShowVerificationDetailsPage}
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 
 class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -63,7 +64,10 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
       .success
       .value
-      .set(SubTradingNameYesNoPage, false)
+      .set(
+        IndividualNamesOptionsPage,
+        Set(IndividualNamesOptions.SubcontractorName)
+      )
       .success
       .value
       .set(
@@ -112,7 +116,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       .set(
         OriginalIndividualAnswersQuery,
         OriginalIndividualAnswers(
-          usesTradingName = Some(false),
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
           subcontractorName = Some(
             SubcontractorName(
               firstName = "John",
@@ -139,6 +143,20 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       )
       .success
       .value
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.Standard
+      )
+      .success
+      .value
+      .set(
+        CisIdQuery,
+        "cis-123"
+      )
+      .success
+      .value
+
+  private val originalIndividualAnswers = minUa.get(OriginalIndividualAnswersQuery).value
 
   "AmendIndividualCheckYourAnswersController" - {
 
@@ -157,7 +175,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         val page = contentAsString(result)
 
         page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
-        page must include(msg("subTradingNameYesNo.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
         page must include(msg("subcontractorName.checkYourAnswersLabel"))
         page must include(msg("subAddressYesNo.checkYourAnswersLabel"))
         page must include(msg("addressOfSubcontractor.checkYourAnswersLabel"))
@@ -198,7 +216,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .set(
             OriginalIndividualAnswersQuery,
             OriginalIndividualAnswers(
-              usesTradingName = Some(false),
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
               subcontractorName = Some(
                 SubcontractorName(
                   firstName = "John",
@@ -243,7 +261,6 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         page must include(msg("amendCheckYourAnswers.verificationNumber.label"))
         page must include("VRN123456")
 
-        page must not include msg("subTradingNameYesNo.checkYourAnswersLabel")
         page must not include msg("subcontractorName.checkYourAnswersLabel")
         page must not include msg("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
 
@@ -285,7 +302,7 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
           .set(
             OriginalIndividualAnswersQuery,
             OriginalIndividualAnswers(
-              usesTradingName = Some(false),
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
               subcontractorName = Some(
                 SubcontractorName(
                   firstName = "John",
@@ -340,6 +357,390 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       }
     }
 
+    "must return OK and render the correct summary for a individual with no name" in {
+
+      val originalIndividualAnswers = minUa.get(OriginalIndividualAnswersQuery).value
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set.empty
+          )
+          .success
+          .value
+          .remove(SubcontractorNamePage)
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set.empty,
+              subcontractorName = None,
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+        page must not include msg("subcontractorName.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("No name provided")
+        page must include("None selected")
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only last name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "",
+              middleName = None,
+              lastName = "Smith"
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Smith")
+        page must not include "None selected"
+        page must not include "No name provided"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only first name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "John",
+              middleName = None,
+              lastName = ""
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = ""
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("John")
+        page must include("No name provided")
+        page must not include "None selected"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only middle name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "",
+              middleName = Some("Paul"),
+              lastName = ""
+            )
+          )
+          .success
+          .value
+          .remove(TradingNameOfSubcontractorPage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "",
+                  middleName = Some("Paul"),
+                  lastName = ""
+                )
+              ),
+              tradingName = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must not include msg("tradingNameOfSubcontractor.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Paul")
+        page must include("No name provided")
+        page must not include "None selected"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with only trading name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(
+            TradingNameOfSubcontractorPage,
+            "Test Ltd"
+          )
+          .success
+          .value
+          .remove(SubcontractorNamePage)
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions = Set(IndividualNamesOptions.TradingName),
+              subcontractorName = None,
+              tradingName = Some("Test Ltd")
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+
+        page must not include msg("subcontractorName.checkYourAnswersLabel")
+
+        page must include("Individual")
+        page must include("Test Ltd")
+        page must not include "None selected"
+        page must not include "No name provided"
+      }
+    }
+
+    "must return OK and render the correct summary for a individual with subcontractor name and trading name" in {
+
+      val verifiedUa =
+        minUa
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+          .set(
+            SubcontractorNamePage,
+            SubcontractorName(
+              firstName = "John",
+              middleName = None,
+              lastName = "Smith"
+            )
+          )
+          .success
+          .value
+          .set(
+            TradingNameOfSubcontractorPage,
+            "Test Ltd"
+          )
+          .success
+          .value
+          .set(
+            OriginalIndividualAnswersQuery,
+            originalIndividualAnswers.copy(
+              individualNamesOptions =
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
+              subcontractorName = Some(
+                SubcontractorName(
+                  firstName = "John",
+                  middleName = None,
+                  lastName = "Smith"
+                )
+              ),
+              tradingName = Some("Test Ltd")
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("individualNamesOptions.checkYourAnswersLabel"))
+        page must include(msg("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("subcontractorName.checkYourAnswersLabel"))
+
+        page must include("Individual")
+        page must include("John Smith")
+        page must include("Test Ltd")
+        page must not include "None selected"
+        page must not include "No name provided"
+      }
+    }
+
     "must redirect to Journey Recovery when validation fails" in {
 
       val invalidUa =
@@ -371,7 +772,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       val mockAuditService         = mock[AuditService]
       val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -402,11 +804,20 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
             .url
       }
 
+      val journeyCaptor =
+        ArgumentCaptor.forClass(
+          classOf[AmendJourneyType]
+        )
+
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          journeyCaptor.capture(),
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
+
+      journeyCaptor.getValue mustBe
+        AmendJourneyType.Standard
       verify(mockAuditService).amendSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
       verify(mockSessionRepository).set(captor.capture())
 
@@ -500,8 +911,132 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
       verify(mockSessionRepository).set(captor.capture())
 
+      val updatedUa = captor.getValue
+
+      updatedUa.id mustBe ua.id
+      updatedUa.get(CisIdQuery) mustBe Some(cisId)
+      updatedUa.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+
+    "must clear answers and redirect to ReviewInsufficientInfoSubcontractorsController when no changes have been made in an insufficient information journey" in {
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      AmendmentHelper.individualHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository).set(captor.capture())
+
       captor.getValue.id mustBe ua.id
-      captor.getValue.get(CisIdQuery) mustBe None
+    }
+
+    "must clear answers and redirect to ReviewUnmatchedSubcontractorsRoutingController when no changes have been made in an unmatched journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+          .set(WorksReferenceNumberPage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      AmendmentHelper.individualHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository).set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
     }
 
     "must redirect to Journey Recovery when the service fails" in {
@@ -514,7 +1049,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
         .thenReturn(Future.successful(true))
 
       when(
-        mockSubcontractorService.updateSubcontractor(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -546,7 +1082,8 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       }
 
       verify(mockSubcontractorService)
-        .updateSubcontractor(
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
           any[UserAnswers],
           any[Option[Long]]
         )(any[HeaderCarrier])
@@ -584,11 +1121,60 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       verifyNoInteractions(mockSubcontractorService)
     }
 
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing on submit" in {
+
+      val ua =
+        minUa
+          .remove(AmendJourneyTypePage)
+          .success
+          .value
+
+      val mockSubcontractorService =
+        mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService]
+              .toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
     "must redirect to Journey Recovery when POST validation fails" in {
 
       val invalidUa =
         emptyUserAnswers
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+          .set(
+            CisIdQuery,
+            "cis-123"
+          )
           .success
           .value
 

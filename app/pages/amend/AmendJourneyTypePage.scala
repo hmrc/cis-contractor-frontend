@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package queries
+package pages.amend
 
+import models.amend.AmendJourneyType
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+case object AmendJourneyTypePage extends QuestionPage[AmendJourneyType] {
 
   override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+    JsPath \ toString
+
+  override def toString: String =
+    "amendJourneyType"
 }

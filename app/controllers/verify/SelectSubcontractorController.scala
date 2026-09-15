@@ -28,7 +28,7 @@ import models.CheckMode
 import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.{CheckboxPaginationResult, PaginationService}
+import services.{CheckboxPaginationResult, PaginationService, VerificationPreSelectionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
@@ -44,6 +44,7 @@ class SelectSubcontractorController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
+  verificationPreSelectionService: VerificationPreSelectionService,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
@@ -53,7 +54,7 @@ class SelectSubcontractorController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val userAnswers = request.userAnswers
 
@@ -62,11 +63,23 @@ class SelectSubcontractorController @Inject() (
           val subcontractorsVm =
             SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-          val preparedForm =
-            userAnswers
-              .get(SelectSubcontractorPage)
-              .map(subs => form.fill(subs.map(_.id)))
-              .getOrElse(form)
+          val selectedSubcontractors =
+            userAnswers.get(SelectSubcontractorPage) match {
+              case Some(subs) => Future.successful(subs)
+              case None       =>
+                val selectedIds =
+                  verificationPreSelectionService.preSelectedSubcontractorIds(
+                    unverifiedSubcontractors,
+                    userAnswers
+                  )
+
+                val defaultSelections =
+                  subcontractorsVm.filter(sub => selectedIds.contains(sub.id)).toSet
+
+                Future.fromTry(userAnswers.set(SelectSubcontractorPage, defaultSelections)).flatMap { updatedAnswers =>
+                  sessionRepository.set(updatedAnswers).map(_ => defaultSelections)
+                }
+            }
 
           val result =
             paginationService.paginateCheckboxItems(
@@ -74,20 +87,22 @@ class SelectSubcontractorController @Inject() (
               page
             )
 
-          Ok(
-            view(
-              preparedForm,
-              mode,
-              result.paginatedData,
-              result.paginationViewModel,
-              page,
-              result.startIndex,
-              result.totalCount
+          selectedSubcontractors.map { selected =>
+            Ok(
+              view(
+                form.fill(selected.map(_.id)),
+                mode,
+                result.paginatedData,
+                result.paginationViewModel,
+                page,
+                result.startIndex,
+                result.totalCount
+              )
             )
-          )
+          }
 
         case Left(redirectResult) =>
-          redirectResult
+          Future.successful(redirectResult)
       }
     }
   private def hasAnyVerifiedSubcontractor(

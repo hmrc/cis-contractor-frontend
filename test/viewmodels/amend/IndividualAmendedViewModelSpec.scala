@@ -17,7 +17,7 @@
 package viewmodels.amend
 
 import base.SpecBase
-import models.add.SubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
@@ -31,7 +31,7 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
   private val original =
     OriginalIndividualAnswers(
-      usesTradingName = Some(false),
+      individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
       tradingName = None,
       subcontractorName = Some(
         SubcontractorName(
@@ -65,7 +65,10 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
   private val answersMatchingOriginal =
     emptyUserAnswers
-      .set(SubTradingNameYesNoPage, false)
+      .set(
+        IndividualNamesOptionsPage,
+        Set(IndividualNamesOptions.SubcontractorName)
+      )
       .success
       .value
       .set(
@@ -151,14 +154,17 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val originalTrading =
         original.copy(
-          usesTradingName = Some(true),
+          individualNamesOptions = Set(IndividualNamesOptions.TradingName),
           tradingName = Some("ABC Contractors"),
           subcontractorName = None
         )
 
       val answers =
         answersMatchingOriginal
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "XYZ Contractors")
@@ -179,7 +185,10 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val answers =
         answersMatchingOriginal
-          .set(SubTradingNameYesNoPage, true)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
           .success
           .value
           .set(TradingNameOfSubcontractorPage, "ABC Contractors")
@@ -206,14 +215,17 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       val originalTrading =
         original.copy(
-          usesTradingName = Some(true),
+          individualNamesOptions = Set(IndividualNamesOptions.TradingName),
           tradingName = Some("ABC Contractors"),
           subcontractorName = None
         )
 
       val answers =
         answersMatchingOriginal
-          .set(SubTradingNameYesNoPage, false)
+          .set(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.SubcontractorName)
+          )
           .success
           .value
           .set(
@@ -228,21 +240,21 @@ class IndividualAmendedViewModelSpec extends SpecBase {
 
       result must have size 3
 
-      val yesNoRow   = result(0)
-      val tradingRow = result(1)
-      val nameRow    = result(2)
+      val namesOptionsRow = result(0)
+      val nameRow         = result(1)
+      val tradingRow      = result(2)
 
-      yesNoRow.head.content mustBe Text(msgs("subTradingNameYesNo.checkYourAnswersLabel"))
-      yesNoRow(1).content mustBe Text(msgs("site.yes"))
-      yesNoRow(2).content mustBe Text(msgs("site.no"))
-
-      tradingRow.head.content mustBe Text(msgs("tradingNameOfSubcontractor.checkYourAnswersLabel"))
-      tradingRow(1).content mustBe Text("ABC Contractors")
-      tradingRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
+      namesOptionsRow.head.content mustBe HtmlContent(msgs("individualNamesOptions.checkYourAnswersLabel"))
+      namesOptionsRow(1).content mustBe HtmlContent(msgs("individualNamesOptions.tradingName"))
+      namesOptionsRow(2).content mustBe HtmlContent(msgs("individualNamesOptions.subcontractorName"))
 
       nameRow.head.content mustBe Text(msgs("subcontractorName.checkYourAnswersLabel"))
       nameRow(1).content mustBe Text(msgs("amendConfirmation.table.content.none"))
       nameRow(2).content mustBe Text("John A Smith")
+
+      tradingRow.head.content mustBe Text(msgs("tradingNameOfSubcontractor.checkYourAnswersLabel"))
+      tradingRow(1).content mustBe Text("ABC Contractors")
+      tradingRow(2).content mustBe Text(msgs("amendConfirmation.table.content.none"))
     }
 
     "must return address yes/no and address rows when address is removed" in {

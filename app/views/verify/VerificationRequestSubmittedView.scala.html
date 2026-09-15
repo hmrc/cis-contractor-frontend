@@ -64,6 +64,12 @@
                 vm.submittedAt.format(DateTimeFormats.dateTimeFormat()(messages.lang))
             )
         )
+    @paragraph(
+        messages(
+            "verify.verificationRequestSubmitted.submittedAt",
+            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy", messages.lang.locale))
+        )
+    )
 
     @subHeading(
         messages(
