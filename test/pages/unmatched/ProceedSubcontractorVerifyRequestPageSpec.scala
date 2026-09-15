@@ -16,22 +16,25 @@
 
 package pages.unmatched
 
-import base.SpecBase
+import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
-class ProceedSubcontractorVerifyRequestPageSpec extends SpecBase {
+class ProceedSubcontractorVerifyRequestPageSpec extends PageBehaviours {
 
   "ProceedSubcontractorVerifyRequestPage" - {
 
+    val subcontractorId = "10"
+
     "must have the correct path" in {
-      ProceedSubcontractorVerifyRequestPage.path mustBe (
-        JsPath \ "proceedSubcontractorVerifyRequest"
-      )
+      ProceedSubcontractorVerifyRequestPage(
+        subcontractorId
+      ).path mustBe (JsPath \ "proceedSubcontractorVerifyRequest" \ subcontractorId \ "proceeded")
     }
 
-    "must have the correct toString value" in {
-      ProceedSubcontractorVerifyRequestPage.toString mustBe
-        "proceedSubcontractorVerifyRequest"
-    }
+    beRetrievable[Boolean](ProceedSubcontractorVerifyRequestPage(subcontractorId))
+
+    beSettable[Boolean](ProceedSubcontractorVerifyRequestPage(subcontractorId))
+
+    beRemovable[Boolean](ProceedSubcontractorVerifyRequestPage(subcontractorId))
   }
 }

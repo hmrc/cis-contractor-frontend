@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package models.requests
+package viewmodels.checkAnswers
 
-import play.api.libs.json.{Json, OFormat}
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
+import viewmodels.govuk.summarylist.*
 
-case class ProceedInsufficientVerificationRequest(
-  instanceId: String,
-  verificationBatchResourceRef: Long,
-  verificationResourceRef: Long,
-  proceed: String
-)
+object UtrViewModel {
+  def apply(utr: String): Value =
+    ValueViewModel(UtrContent(utr))
+}
 
-object ProceedInsufficientVerificationRequest {
-  given OFormat[ProceedInsufficientVerificationRequest] = Json.format
+object UtrContent {
+  def apply(utr: String): HtmlContent =
+    HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(utr)}</span>""")
 }

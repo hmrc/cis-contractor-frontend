@@ -17,15 +17,21 @@
 package controllers.amend
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.UserAnswers
 import models.add.{IndividualNamesOptions, SubcontractorName}
-import models.amend.OriginalIndividualAnswers
+import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import pages.add.SubcontractorNamePage
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
-import viewmodels.amend.IndividualAmendedViewModel
+import repositories.SessionRepository
+import services.VerificationService
+import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 
 class AmendIndividualConfirmationControllerSpec extends SpecBase {
@@ -73,14 +79,33 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
       .set(SubcontractorNamePage, subcontractorName)
       .success
       .value
+      .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+      .success
+      .value
       .set(AmendCheckYourAnswersSubmittedPage, true)
       .success
       .value
+  
+private lazy val confirmationRoute =
+  controllers.amend.routes.AmendIndividualConfirmationController
+    .onPageLoad()
+    .url
 
-  private lazy val confirmationRoute =
-    controllers.amend.routes.AmendIndividualConfirmationController
-      .onPageLoad()
-      .url
+private val mockSessionRepository =
+  mock[SessionRepository]
+
+private val mockVerificationService =
+  mock[VerificationService]
+
+private def application(userAnswers: UserAnswers) =
+  applicationBuilder(userAnswers = Some(userAnswers))
+    .overrides(
+      bind[SessionRepository]
+        .toInstance(mockSessionRepository),
+      bind[VerificationService]
+        .toInstance(mockVerificationService)
+    )
+    .build()
 
   "AmendIndividualConfirmationController" - {
 
@@ -99,13 +124,21 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
 
+        val confirmationLink =
+          AmendConfirmationLinks.build(
+            AmendJourneyType.Standard,
+            cisId,
+            app.injector.instanceOf[FrontendAppConfig]
+          )
+
         contentAsString(result) mustEqual
           view(
             IndividualAmendedViewModel.rows(
               original,
               userAnswersWithOriginal
             )(messages(app)),
-            displayName
+            displayName,
+            confirmationLink
           )(request, messages(app)).toString
       }
     }
@@ -197,6 +230,151 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase {
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalIndividualAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(SubcontractorNamePage, subcontractorName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must not refresh verification batches for standard amend journey" in {
+
+  when(mockSessionRepository.set(any[UserAnswers]))
+    .thenReturn(Future.successful(true))
+
+  val app = application(userAnswersWithOriginal)
+
+  running(app) {
+
+    val request =
+      FakeRequest(GET, confirmationRoute)
+
+    val result =
+      route(app, request).value
+
+    status(result) mustBe OK
+
+    verifyNoInteractions(mockVerificationService)
+  }
+}
+
+    "must refresh verification batches and render the insufficient info confirmation link" in {
+
+  when(
+    mockVerificationService.refreshVerificationBatches(
+      any[UserAnswers]
+    )(any())
+  ).thenReturn(
+    Future.successful(userAnswersWithOriginal)
+  )
+
+  val userAnswers =
+    userAnswersWithOriginal
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.InsufficientInfo
+      )
+      .success
+      .value
+
+  val app =
+    application(userAnswers)
+
+  running(app) {
+
+    val request =
+      FakeRequest(GET, confirmationRoute)
+
+    val result =
+      route(app, request).value
+
+    status(result) mustEqual OK
+
+    contentAsString(result) must include(
+      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+        .onPageLoad()
+        .url
+    )
+
+    contentAsString(result) must not include
+      messages(app)(
+        "amendConfirmation.beforeYouGo.h2"
+      )
+
+    verify(mockVerificationService)
+      .refreshVerificationBatches(
+        any[UserAnswers]
+      )(any())
+  }
+}
+
+    "must refresh verification batches for unmatched journey" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(Success(userAnswersWithOriginal))
+
+      when(
+        mockVerificationService.refreshVerificationBatches(
+          any[UserAnswers]
+        )(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val app =
+        application(userAnswers)
+
+      running(app) {
+
+        val request =
+          FakeRequest(GET, confirmationRoute)
+
+        val result =
+          route(app, request).value
+
+        status(result) mustBe OK
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
       }
     }
   }

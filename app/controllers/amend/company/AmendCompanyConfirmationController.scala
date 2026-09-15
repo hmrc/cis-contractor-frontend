@@ -16,20 +16,25 @@
 
 package controllers.amend.company
 
+import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
+import models.amend.AmendJourneyType
 import pages.add.company.CompanyNamePage
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import repositories.SessionRepository
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AmendCompanyConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -37,49 +42,109 @@ class AmendCompanyConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: AmendConfirmationView
-) extends FrontendBaseController
+  verificationService: VerificationService,
+  sessionRepository: SessionRepository,
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
-      val ua               = request.userAnswers
+  (identify andThen getData andThen requireData).async { implicit request =>
+    val recoveryRedirect =
+      Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn("[AmendCompanyConfirmationController] Accessed without prior CYA submission")
-        Future.successful(recoveryRedirect)
-      } else {
-        ua.get(OriginalCompanyAnswersQuery) match {
-          case None                         =>
-            logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
-            Future.successful(recoveryRedirect)
-          case Some(originalCompanyAnswers) =>
-            ua.get(CisIdQuery) match {
+    val ua = request.userAnswers
 
-              case None =>
-                logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
-                Future.successful(recoveryRedirect)
+    if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+      logger.warn(
+        "[AmendCompanyConfirmationController] Accessed without prior CYA submission"
+      )
+      Future.successful(recoveryRedirect)
+    } else {
+      ua.get(OriginalCompanyAnswersQuery) match {
 
-              case Some(_) =>
-                val tableRows =
-                  CompanyAmendConfirmationViewModel.rows(originalCompanyAnswers, ua)
+        case None =>
+          logger.error(
+            "[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery"
+          )
+          Future.successful(recoveryRedirect)
 
-                val companyName =
-                  ua.get(CompanyNamePage).getOrElse("")
+        case Some(originalCompanyAnswers) =>
+          ua.get(CisIdQuery) match {
 
-                Future.successful(
-                  Ok(
-                    view(
-                      tableRows,
-                      companyName
+            case None =>
+              logger.error(
+                "[AmendCompanyConfirmationController] Missing CisIdQuery"
+              )
+              Future.successful(recoveryRedirect)
+
+            case Some(cisId) =>
+              ua.get(AmendJourneyTypePage) match {
+
+                case Some(journeyType) =>
+                  val tableRows =
+                    CompanyAmendConfirmationViewModel.rows(
+                      originalCompanyAnswers,
+                      ua
                     )
+
+                  val companyName =
+                    ua.get(CompanyNamePage).getOrElse("")
+
+                  val confirmationLink =
+                    AmendConfirmationLinks.build(
+                      journeyType,
+                      cisId,
+                      appConfig
+                    )
+
+                  val persistFinalUserAnswers =
+                    journeyType match {
+
+                      case AmendJourneyType.Standard =>
+                        sessionRepository
+                          .set(ua)
+                          .map(_ => ua)
+
+                      case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                        verificationService.refreshVerificationBatches(
+                          ua
+                        )
+                    }
+
+                  persistFinalUserAnswers
+                    .map { _ =>
+                      Ok(
+                        view(
+                          tableRows,
+                          companyName,
+                          confirmationLink
+                        )
+                      )
+                    }
+                    .recover { case exception =>
+                      logger.error(
+                        "[AmendCompanyConfirmationController.onPageLoad] " +
+                          "Failed to persist confirmation session data",
+                        exception
+                      )
+
+                      recoveryRedirect
+                    }
+
+                case None =>
+                  logger.error(
+                    "[AmendCompanyConfirmationController] Missing AmendJourneyTypePage"
                   )
-                )
-            }
-        }
+
+                  Future.successful(recoveryRedirect)
+              }
+          }
       }
     }
-
-}
+  }
+    }
+      

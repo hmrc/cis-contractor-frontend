@@ -22,6 +22,7 @@ import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import models.info.IndividualAnswers
+import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.MessagesApi
 import play.api.test.FakeRequest
@@ -74,9 +75,11 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       subcontractorType = Individualorsoletrader
     )
 
-  private lazy val viewOnlyRoute =
+  private val journeyType = "insufficient"
+
+  private lazy val insufficientRouteUrl =
     controllers.info.routes.IndividualCheckYourAnswersController
-      .onPageLoad()
+      .onPageLoad(journeyType)
       .url
 
   "IndividualCheckYourAnswersController" - {
@@ -97,7 +100,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -213,7 +216,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -321,7 +324,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -381,7 +384,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -445,7 +448,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -503,7 +506,7 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
 
         val msg =
           application.injector
@@ -544,7 +547,137 @@ class IndividualCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       running(application) {
 
         val request =
-          FakeRequest(GET, viewOnlyRoute)
+          FakeRequest(GET, insufficientRouteUrl)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must render the correct back to message and Url when the journey is insufficient" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, answers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, insufficientRouteUrl)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val doc  = Jsoup.parse(contentAsString(result))
+        val link = doc.select("main a").first()
+
+        link.text() mustBe msg("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+        link.attr("href") mustBe controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
+
+        link.text()       must not be msg("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+        link.attr("href") must not be controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must render the correct back to message and Url when the journey is unmatched" in {
+
+      val journeyType = "unmatched"
+
+      lazy val unmatchedRouteUrl =
+        controllers.info.routes.IndividualCheckYourAnswersController
+          .onPageLoad(journeyType)
+          .url
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, answers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, unmatchedRouteUrl)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        val doc  = Jsoup.parse(contentAsString(result))
+        val link = doc.select("main a").first()
+
+        link.text()       must not be msg("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+        link.attr("href") must not be controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+          .url
+
+        link.text() mustBe msg("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+        link.attr("href") mustBe controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to Journey Recovery when when journeyType is not valid" in {
+
+      val journeyType = "invalid"
+
+      lazy val invalidRouteUrl =
+        controllers.info.routes.IndividualCheckYourAnswersController
+          .onPageLoad(journeyType)
+          .url
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(IndividualAnswersQuery, answers)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, invalidRouteUrl)
 
         val result =
           route(application, request).value

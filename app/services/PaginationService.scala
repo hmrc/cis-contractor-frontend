@@ -23,7 +23,9 @@ import javax.inject.{Inject, Singleton}
 
 case class PaginationConfig(
   recordsPerPage: Int = 6,
-  maxVisiblePages: Int = 5
+  maxVisiblePages: Int = 2, // max number of pages visible either side of current page
+  ellipsisPadding: Int = 1, // number of pages shown before/after ellipsis
+  minEllipsisSpread: Int = 2 // minimum number of pages that ellipsis should replace
 )
 
 final case class CheckboxPaginationResult(
@@ -39,6 +41,14 @@ class PaginationService(val config: PaginationConfig) {
   @Inject
   def this() = this(PaginationConfig())
 
+  private def buildPartialPageSeq(
+    startIndex: Int,
+    endIndex: Int,
+    currentPage: Int
+  ): IndexedSeq[PaginationItemViewModel] =
+    (startIndex to endIndex)
+      .map(p => PaginationItemViewModel(p.toString, "").withCurrent(p == currentPage))
+
   def paginateCheckboxItems(
     allItems: Seq[CheckboxItem],
     currentPage: Int
@@ -47,21 +57,44 @@ class PaginationService(val config: PaginationConfig) {
     val totalPages = math.ceil(allItems.size.toDouble / config.recordsPerPage).toInt.max(1)
     val page       = currentPage.max(1).min(totalPages)
 
-    val start = (page - 1) * config.recordsPerPage
-    val end   = start + config.recordsPerPage
+    val pageStart = (page - 1) * config.recordsPerPage
+    val pageEnd   = pageStart + config.recordsPerPage
+    val pageItems = allItems.slice(pageStart, pageEnd)
 
-    val pageItems = allItems.slice(start, end)
+    val windowSize      = config.maxVisiblePages / 2
+    val paginationStart = (page - windowSize).max(config.ellipsisPadding + 1)
+    val paginationEnd   = (page + windowSize).min(totalPages - (config.ellipsisPadding))
+
+    val leftEllipsisSpread  = paginationStart - (config.ellipsisPadding + 1)
+    val rightEllipsisSpread = totalPages - config.ellipsisPadding - paginationEnd
+
+    val hasLeftGap  = paginationStart > config.ellipsisPadding + 1
+    val hasRightGap = paginationEnd < (totalPages - config.ellipsisPadding)
+
+    val showLeftEllipsis  = hasLeftGap && (leftEllipsisSpread >= config.minEllipsisSpread)
+    val showRightEllipsis = hasRightGap && (rightEllipsisSpread >= config.minEllipsisSpread)
+
+    val pages: Seq[PaginationItemViewModel] = {
+      val firstPages  = buildPartialPageSeq(1, config.ellipsisPadding, page)
+      val lastPages   = buildPartialPageSeq(totalPages - (config.ellipsisPadding - 1), totalPages, page)
+      val middlePages = buildPartialPageSeq(paginationStart, paginationEnd, page)
+      val leftFill    =
+        if (showLeftEllipsis) Seq(PaginationItemViewModel.ellipsis())
+        else if (hasLeftGap) buildPartialPageSeq(paginationStart - 1, paginationStart - 1, page)
+        else Seq()
+      val fillRight   =
+        if (showRightEllipsis) Seq(PaginationItemViewModel.ellipsis())
+        else if (hasRightGap) buildPartialPageSeq(paginationEnd + 1, paginationEnd + 1, page)
+        else Seq()
+
+      firstPages ++ leftFill ++ middlePages ++ fillRight ++ (if (totalPages > 1) lastPages else Seq())
+    }
 
     val pagination =
       if (totalPages <= 1) PaginationViewModel()
       else
         PaginationViewModel()
-          .withItems(
-            (1 to totalPages).map { p =>
-              PaginationItemViewModel(number = p.toString, href = "")
-                .withCurrent(p == page)
-            }
-          )
+          .withItems(pages)
           .copy(
             previous =
               if (page > 1) Some(PaginationLinkViewModel("").withText("site.pagination.previous"))
@@ -71,6 +104,6 @@ class PaginationService(val config: PaginationConfig) {
               else None
           )
 
-    CheckboxPaginationResult(pageItems, pagination, start + 1, allItems.size)
+    CheckboxPaginationResult(pageItems, pagination, pageStart + 1, allItems.size)
   }
 }
