@@ -17,7 +17,6 @@
 @import config.FrontendAppConfig
 @import java.time.LocalDateTime
 @import java.time.format.DateTimeFormatter
-@import utils.DateTimeFormats
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
 @import uk.gov.hmrc.govukfrontend.views.Aliases.*
 
@@ -60,7 +59,7 @@
     @paragraph(
         messages(
             "verify.verificationRequestSubmitted.submittedAt",
-            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm",messages.lang.locale))
+            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy",messages.lang.locale))
         )
     )
 
