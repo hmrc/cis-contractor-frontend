@@ -17,7 +17,6 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.NormalMode
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -62,11 +61,8 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
       }
     }
 
-  // TODO: This is a temporary redirect until DTR-5226 is implemented to handle the next step in the journey
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData) { _ =>
-      Redirect(
-        controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
-      )
+      Redirect(controllers.verify.routes.SubmitUnmatchedController.onSubmit())
     }
 }

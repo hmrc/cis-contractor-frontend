@@ -61,7 +61,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "onSubmit must redirect to the contractor email confirmation stored page" in {
+    "onSubmit must redirect to the submit unmatched endpoint" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
@@ -69,7 +69,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(models.NormalMode).url
+          controllers.verify.routes.SubmitUnmatchedController.onSubmit().url
       }
     }
   }
