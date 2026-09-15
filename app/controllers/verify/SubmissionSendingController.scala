@@ -19,10 +19,10 @@ package controllers.verify
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.requests.DataRequest
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse}
-import models.verify.GovTalkErrorStatus.{DepartmentalError, FatalError}
 import models.verify.SubmissionStatus
 import models.verify.SubmissionStatus.*
+import models.response.{ChrisPollResponse, ChrisSubmissionResponse}
+import models.verify.GovTalkErrorStatus.{DepartmentalError, FatalError}
 import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -41,6 +41,7 @@ class SubmissionSendingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   val controllerComponents: MessagesControllerComponents,
   appConfig: FrontendAppConfig,
   view: SubmissionSendingView,
@@ -56,9 +57,8 @@ class SubmissionSendingController @Inject() (
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       verificationService.createSubmitAndPersistVerificationSubmission
         .map(redirectForInitialSubmissionResponse)
@@ -73,8 +73,7 @@ class SubmissionSendingController @Inject() (
 
   def onPollAndRedirect: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       request.userAnswers.get(VerificationSubmissionDetailsPage) match {
         case None =>
