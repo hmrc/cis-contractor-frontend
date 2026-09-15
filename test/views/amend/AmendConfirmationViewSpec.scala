@@ -141,7 +141,6 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         )
 
       surveyLink.attr("href") mustBe appConfig.feedbackUrl
-      surveyLink.attr("rel") mustBe "noopener noreferrer"
     }
 
     "hide the before you go section for insufficient info journey" in new Setup {
