@@ -57,17 +57,10 @@
         )
     )
 
-        @paragraph(
-            messages(
-                "verify.verificationRequestSubmitted.submittedAt",
-                vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm")),
-                vm.submittedAt.format(DateTimeFormats.dateTimeFormat()(messages.lang))
-            )
-        )
     @paragraph(
         messages(
             "verify.verificationRequestSubmitted.submittedAt",
-            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy", messages.lang.locale))
+            vm.submittedAt.format(DateTimeFormatter.ofPattern("HH:mm",messages.lang.locale))
         )
     )
 
