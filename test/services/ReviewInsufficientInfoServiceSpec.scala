@@ -17,20 +17,16 @@
 package services
 
 import base.SpecBase
-import connectors.ConstructionIndustrySchemeConnector
-import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import models.requests.ProceedInsufficientVerificationRequest
+import models.amend.AmendJourneyType
 import models.response.GetCurrentVerificationBatchResponse
-import org.mockito.Mockito.{never, reset, verify, when}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
@@ -40,13 +36,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  private val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-  private val service                                            = new ReviewInsufficientInfoService(mockConnector)
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockConnector)
-  }
+  private val service = new ReviewInsufficientInfoService()
 
   private def mkSub(
     id: Long,
@@ -62,7 +52,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
   ): SubcontractorCurrentVerification =
     SubcontractorCurrentVerification(
       subcontractorId = id,
-      subbieResourceRef = None,
+      subbieResourceRef = Some(100L),
       firstName = firstName,
       secondName = None,
       surname = surname,
@@ -127,7 +117,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val readyCompany =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = build(readyCompany)
+      val vm = build(readyCompany).get
 
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
       vm.missing mustBe empty
@@ -138,7 +128,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val missingCompany =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = build(missingCompany)
+      val vm = build(missingCompany).get
 
       vm.missing.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready mustBe empty
@@ -158,7 +148,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val ready   =
         mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = build(missing, ready)
+      val vm = build(missing, ready).get
 
       vm.missing.map(_.name) mustBe Seq("Brody, Martin")
       vm.ready.map(_.name) mustBe Seq("Acme Ltd")
@@ -168,7 +158,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val missing =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
-      val vm = build(missing)
+      val vm = build(missing).get
 
       vm.missing.head.utr mustBe messages("verify.reviewInsufficientInfo.noneProvided")
     }
@@ -183,7 +173,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           utr = None
         )
 
-      val vm = build(sub)
+      val vm = build(sub).get
 
       vm.missing.head.name mustBe "Brody, Martin"
     }
@@ -199,7 +189,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           utr = None
         )
 
-      val vm = build(sub)
+      val vm = build(sub).get
 
       vm.missing.head.name mustBe "Doe Trading"
     }
@@ -215,7 +205,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           utr = None
         )
 
-      val vm = build(sub)
+      val vm = build(sub).get
 
       vm.missing.head.name mustBe "Brody, Martin"
     }
@@ -231,7 +221,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           utr = None
         )
 
-      val vm = build(sub)
+      val vm = build(sub).get
 
       vm.missing.head.name mustBe "Acme Ltd"
     }
@@ -239,38 +229,64 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
     "must use 'No name provided' when no name can be derived" in {
       val sub = mkSub(id = 1L, subcontractorType = Some("company"), utr = None)
 
-      val vm = build(sub)
+      val vm = build(sub).get
 
       vm.missing.head.name mustBe messages("verify.noName")
     }
 
-    "must use a real remove url when verification resource ref is present" in {
-      val sub =
-        mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
+    "must build amend, proceed and remove links while using placeholder links for name links" in {
 
-      val row =
+      val sub =
+        mkSub(
+          id = 1L,
+          tradingName = Some("Acme Ltd"),
+          subcontractorType = Some("company"),
+          utr = None
+        )
+
+      val viewModel =
         service
           .buildViewModel(
             GetCurrentVerificationBatchResponse(
               subcontractors = Seq(sub),
               verificationBatch = None,
-              verifications = Seq(mkVerification(sub.subcontractorId, Some(1111L)))
+              verifications = Seq(
+                mkVerification(
+                  sub.subcontractorId,
+                  Some(1111L)
+                )
+              )
             )
           )
-          .missing
-          .head
+          .success
+          .value
+
+      val row =
+        viewModel.missing.head
 
       row.nameLink.url mustBe "#"
-      row.editLink.url mustBe "#"
-      row.proceedLink.url mustBe controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-        .onPageLoad(1L)
-        .url
+
+      row.editLink.url mustBe
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            100L,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
+
+      row.proceedLink.url mustBe
+        controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+          .onPageLoad(1L)
+          .url
+
       row.removeLink.url mustBe
-        controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(1111L).url
+        controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
+          .onPageLoad(1111L)
+          .url
     }
 
     "must return empty lists for an empty batch" in {
-      val vm = build()
+      val vm = build().get
 
       vm.missing mustBe empty
       vm.ready mustBe empty
@@ -283,7 +299,7 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val ready   =
         mkSub(id = 2L, tradingName = Some("Other Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-      val vm = build(missing, ready)
+      val vm = build(missing, ready).get
 
       vm.missing.map(_.name) mustBe Seq("Acme Ltd")
       vm.ready.map(_.name) mustBe Seq("Other Ltd")
@@ -304,104 +320,8 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
           )
         )
 
-      vm.missing.map(_.name) mustBe Seq("Acme Ltd")
-      vm.ready mustBe empty
-    }
-  }
-
-  "ReviewInsufficientInfoService.proceedInsufficientVerification" - {
-
-    val subcontractorId              = 123L
-    val cisId                        = "cis-123"
-    val verificationBatchResourceRef = 99L
-    val verificationResourceRef      = 10L
-
-    val currentBatchResponse: GetCurrentVerificationBatchResponse =
-      GetCurrentVerificationBatchResponse(
-        subcontractors = Seq(
-          SubcontractorCurrentVerification(
-            subcontractorId = subcontractorId,
-            subbieResourceRef = Some(1111L),
-            firstName = None,
-            secondName = None,
-            surname = None,
-            tradingName = None,
-            utr = None,
-            nino = None,
-            crn = None,
-            partnerUtr = None,
-            partnershipTradingName = None,
-            subcontractorType = None,
-            addressLine1 = None,
-            addressLine2 = None,
-            addressLine3 = None,
-            addressLine4 = None,
-            country = None,
-            postcode = None,
-            emailAddress = None,
-            phoneNumber = None,
-            mobilePhoneNumber = None,
-            worksReferenceNumber = None,
-            matched = None,
-            autoVerified = None,
-            verified = None,
-            verificationNumber = None,
-            taxTreatment = None,
-            verificationDate = None,
-            version = None,
-            updatedTaxTreatment = None,
-            lastMonthlyReturnDate = None,
-            pendingVerifications = None
-          )
-        ),
-        verificationBatch = Some(
-          VerificationBatchCurrentVerification(
-            verificationBatchId = 999L,
-            verifBatchResourceRef = Some(verificationBatchResourceRef)
-          )
-        ),
-        verifications = Seq(
-          VerificationCurrentVerification(
-            verificationId = 1L,
-            verificationBatchId = Some(999L),
-            subcontractorId = Some(subcontractorId),
-            verificationResourceRef = Some(verificationResourceRef),
-            subcontractorName = None,
-            verificationNumber = None,
-            taxTreatment = None,
-            actionIndicator = None,
-            proceed = None,
-            matched = None
-          )
-        )
-      )
-
-    "must call the connector with the correct request when resource refs are available" in {
-
-      val request = ProceedInsufficientVerificationRequest(
-        instanceId = cisId,
-        verificationBatchResourceRef = verificationBatchResourceRef,
-        verificationResourceRef = verificationResourceRef,
-        proceed = "Y"
-      )
-
-      when(mockConnector.proceedInsufficientVerification(eqTo(request))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
-
-      service.proceedInsufficientVerification(cisId, subcontractorId, currentBatchResponse).futureValue mustBe ()
-
-      verify(mockConnector).proceedInsufficientVerification(request)
-    }
-
-    "must fail when subcontractorId is missing" in {
-
-      val result = service.proceedInsufficientVerification(cisId, 99, currentBatchResponse)
-
-      result.failed.futureValue mustBe a[RuntimeException]
-
-      verify(mockConnector, never).proceedInsufficientVerification(any[ProceedInsufficientVerificationRequest])(
-        any[HeaderCarrier]
-      )
+      vm.get.missing.map(_.name) mustBe Seq("Acme Ltd")
+      vm.get.ready mustBe empty
     }
   }
 }

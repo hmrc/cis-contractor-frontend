@@ -19,35 +19,76 @@ package controllers.contractordetails
 import config.FrontendAppConfig
 import controllers.actions.*
 import pages.CisIdPage
-
-import javax.inject.Inject
+import pages.contractordetails.ContractorSchemePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.ContractorDetailsUpdatedView
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class ContractorDetailsUpdatedController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  contractorDetailsService: ContractorDetailsService,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsUpdatedView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+)(implicit
+  appConfig: FrontendAppConfig,
+  ec: ExecutionContext
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val cisAccountUrl =
-      if (!request.isAgent) {
-        appConfig.constructionIndustryOrgAccountUrl
-      } else {
-        request.userAnswers
-          .get(CisIdPage)
-          .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
-            s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
+
+        case Some(cisId) =>
+          val cisAccountUrl =
+            if (request.isAgent) {
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            } else {
+              appConfig.constructionIndustryOrgAccountUrl
+            }
+
+          contractorDetailsService
+            .getScheme(cisId)
+            .flatMap { latestScheme =>
+              Future.fromTry(
+                request.userAnswers.set(
+                  ContractorSchemePage,
+                  latestScheme
+                )
+              )
+            }
+            .flatMap { updatedAnswers =>
+              sessionRepository
+                .set(updatedAnswers)
+                .map { _ =>
+                  Ok(view(cisAccountUrl))
+                }
+            }
+            .recover { case error =>
+              logger.error(
+                "[ContractorDetailsUpdatedController] Failed to refresh contractor details",
+                error
+              )
+
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
       }
-    Ok(view(cisAccountUrl))
-  }
+    }
 }
