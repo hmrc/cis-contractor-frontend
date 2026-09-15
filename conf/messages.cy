@@ -128,10 +128,10 @@ typeOfSubcontractor.change.hidden                                               
 
 tradingNameOfSubcontractor.title                                                    =  Beth yw enw masnachu’r is-gontractwr?
 tradingNameOfSubcontractor.heading                                                  =  Beth yw enw masnachu’r is-gontractwr?
-tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Enw masnachu’r is-gontractwr
+tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Enw masnachu
 tradingNameOfSubcontractor.error.required                                           =  Nodwch enw masnachu, fel Adeiladu ABC Cyf
 tradingNameOfSubcontractor.error.length                                             =  Nodwch enw masnachu hyd at 56 o gymeriadau
-tradingNameOfSubcontractor.change.hidden                                            =  xxxxxxxxxxxxxxxxxxxx
+tradingNameOfSubcontractor.change.hidden                                            =  enw masnachu
 tradingNameOfSubcontractor.error.invalidCharacters                                  =  Nodwch enw masnachu, fel Adeiladu ABC Cyf
 
 subAddressYesNo.title                                                               =  xxxxxxxxxxxxxxxxxxxx
