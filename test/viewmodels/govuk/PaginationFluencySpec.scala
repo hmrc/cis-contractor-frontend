@@ -114,11 +114,11 @@ class PaginationFluencySpec extends PlaySpec {
         PaginationFluency
           .PaginationLinkViewModel("/next")
           .withText("Next")
-          .withLabelText("Go to next page")
+          .withLabelText("Go to page 2")
 
       link.href mustBe "/next"
       link.text mustBe Some("Next")
-      link.labelText mustBe Some("Go to next page")
+      link.labelText mustBe Some("Go to page 2")
     }
 
     "convert to PaginationLink" in {
@@ -126,12 +126,14 @@ class PaginationFluencySpec extends PlaySpec {
         PaginationFluency
           .PaginationLinkViewModel("/next")
           .withText("Next")
+          .withLabelText("Go to page 2")
 
       val result =
         link.asPaginationLink
 
       result.href mustBe "/next"
       result.text mustBe Some("Next")
+      result.labelText mustBe Some("Go to page 2")
     }
   }
 }

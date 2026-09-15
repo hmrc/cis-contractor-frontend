@@ -27,11 +27,13 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
 
-  private implicit val request: Request[?]    = FakeRequest()
+  private implicit val request: Request[?] = FakeRequest()
+
   private implicit val messagesImpl: Messages =
     app.injector.instanceOf[play.api.i18n.MessagesApi].preferred(FakeRequest())
 
-  private val view = app.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
+  private val view =
+    app.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
 
   private def link(name: String) = LinkViewModel("#", name)
 
@@ -58,65 +60,291 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
   "ReviewInsufficientInfoSubcontractorsView" - {
 
     "must render the heading, title and introductory content" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Nil))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
 
-      document.title     must include(messagesImpl("verify.reviewInsufficientInfo.title"))
-      document.select("h1").text mustBe messagesImpl("verify.reviewInsufficientInfo.heading")
-      document.body.text must include(messagesImpl("verify.reviewInsufficientInfo.p1"))
-      document.body.text must include(messagesImpl("verify.reviewInsufficientInfo.p2"))
+      document.title     must include(
+        messagesImpl("verify.reviewInsufficientInfo.title")
+      )
+      document.select("h1").text mustBe
+        messagesImpl("verify.reviewInsufficientInfo.heading")
+      document.body.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.p1")
+      )
+      document.body.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.p2")
+      )
       document.select("ul.govuk-list--bullet li").size() mustBe 3
     }
 
     "must render the 'What you'll need' link opening in a new tab" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Nil))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
 
-      val whatYouNeed = document.select("a[href$=verify-subcontractors]")
+      val whatYouNeed =
+        document.select("a[href$=verify-subcontractors]")
+
       whatYouNeed.size() mustBe 1
       whatYouNeed.attr("target") mustBe "_blank"
-      whatYouNeed.text must include(messagesImpl("verify.reviewInsufficientInfo.whatYouNeed.link"))
+      whatYouNeed.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.whatYouNeed.link")
+      )
     }
 
     "must render the missing information table with Edit, Proceed and Remove actions" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Nil))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
 
-      val table = document.getElementById("missing-information-table")
-      table must not be null
+      val table =
+        document.getElementById("missing-information-table")
 
+      table      must not be null
       table.text must include("Brody, Martin")
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.noneProvided"))
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.edit"))
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.proceed"))
-      table.text must include(messagesImpl("verify.reviewInsufficientInfo.action.remove"))
+      table.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.noneProvided")
+      )
+      table.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.action.edit")
+      )
+      table.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.action.proceed")
+      )
+      table.text must include(
+        messagesImpl("verify.reviewInsufficientInfo.action.remove")
+      )
+    }
+
+    "must render the subcontractor name link with visually hidden text" in {
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
+
+      val nameLink =
+        document.select("#missing-information-table a").first()
+
+      nameLink.text mustBe
+        s"Brody, Martin ${messagesImpl(
+            "verify.reviewInsufficientInfo.hidden.subcontractor",
+            "Brody, Martin"
+          )}"
+
+      val hiddenText =
+        nameLink.select(".govuk-visually-hidden")
+
+      hiddenText.size() mustBe 1
+      hiddenText.text mustBe
+        messagesImpl(
+          "verify.reviewInsufficientInfo.hidden.subcontractor",
+          "Brody, Martin"
+        )
+    }
+
+    "must render visually hidden text for each missing action link" in {
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
+
+      val actionLinks =
+        document.select("#missing-information-table a")
+
+      actionLinks.size() mustBe 4
+
+      actionLinks.get(1).text mustBe
+        s"${messagesImpl("verify.reviewInsufficientInfo.action.edit")} " +
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.edit.hidden",
+          "Brody, Martin"
+        )
+
+      actionLinks.get(2).text mustBe
+        s"${messagesImpl("verify.reviewInsufficientInfo.action.proceed")} " +
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.proceed.hidden",
+          "Brody, Martin"
+        )
+
+      actionLinks.get(3).text mustBe
+        s"${messagesImpl("verify.reviewInsufficientInfo.action.remove")} " +
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.remove.hidden",
+          "Brody, Martin"
+        )
+    }
+
+    "must render the correct visually hidden text inside each missing action link" in {
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
+
+      val actionLinks =
+        document.select("#missing-information-table a")
+
+      actionLinks.size() mustBe 4
+
+      actionLinks
+        .get(1)
+        .select(".govuk-visually-hidden")
+        .text mustBe
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.edit.hidden",
+          "Brody, Martin"
+        )
+
+      actionLinks
+        .get(2)
+        .select(".govuk-visually-hidden")
+        .text mustBe
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.proceed.hidden",
+          "Brody, Martin"
+        )
+
+      actionLinks
+        .get(3)
+        .select(".govuk-visually-hidden")
+        .text mustBe
+        messagesImpl(
+          "verify.reviewInsufficientInfo.action.remove.hidden",
+          "Brody, Martin"
+        )
+    }
+
+    "must render separators between missing action links as aria-hidden" in {
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
+
+      val separators =
+        document.select(
+          "#missing-information-table span[aria-hidden='true']"
+        )
+
+      separators.size() mustBe 2
+      separators.eachText().toArray.toSeq mustBe Seq("|", "|")
     }
 
     "must render the ready table with the full Unique Taxpayer Reference header" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Nil, ready = Seq(readyRow)))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Nil,
+            ready = Seq(readyRow)
+          )
+        )
 
       val table = document.getElementById("ready-table")
-      table must not be null
 
-      table.select("thead th").text must include(messagesImpl("verify.reviewInsufficientInfo.utr"))
+      table                         must not be null
+      table.select("thead th").text must include(
+        messagesImpl("verify.reviewInsufficientInfo.utr")
+      )
       table.text                    must include("Smith, John")
       table.text                    must include("1234567890")
     }
 
+    "must render visually hidden text for a ready subcontractor name" in {
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Nil,
+            ready = Seq(readyRow)
+          )
+        )
+
+      val nameLink =
+        document.select("#ready-table a").first()
+
+      nameLink.text mustBe
+        s"Smith, John ${messagesImpl(
+            "verify.reviewInsufficientInfo.hidden.subcontractor",
+            "Smith, John"
+          )}"
+
+      nameLink
+        .select(".govuk-visually-hidden")
+        .text mustBe
+        messagesImpl(
+          "verify.reviewInsufficientInfo.hidden.subcontractor",
+          "Smith, John"
+        )
+    }
+
     "must not render the missing table when there are no missing subcontractors" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Nil, ready = Seq(readyRow)))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Nil,
+            ready = Seq(readyRow)
+          )
+        )
 
       document.getElementById("missing-information-table") mustBe null
     }
 
     "must not render the ready table when there are no ready subcontractors" in {
-      val document = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Nil))
+      val document =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Nil
+          )
+        )
 
       document.getElementById("ready-table") mustBe null
     }
 
     "must render a Continue button only when all subcontractors are ready" in {
-      val allReady = doc(ReviewInsufficientInfoViewModel(missing = Nil, ready = Seq(readyRow)))
-      allReady.select(".govuk-button").text must include(messagesImpl("site.continue"))
+      val allReady =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Nil,
+            ready = Seq(readyRow)
+          )
+        )
 
-      val stillMissing = doc(ReviewInsufficientInfoViewModel(missing = Seq(missingRow), ready = Seq(readyRow)))
+      allReady.select(".govuk-button").text must include(
+        messagesImpl("site.continue")
+      )
+
+      val stillMissing =
+        doc(
+          ReviewInsufficientInfoViewModel(
+            missing = Seq(missingRow),
+            ready = Seq(readyRow)
+          )
+        )
+
       stillMissing.select(".govuk-button").size() mustBe 0
     }
   }

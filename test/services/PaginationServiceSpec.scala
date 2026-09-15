@@ -18,12 +18,16 @@ package services
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.must.Matchers
+import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+import play.api.test.Helpers.stubMessagesApi
 
 class PaginationServiceSpec extends AnyWordSpec with Matchers {
 
-  private val defaultConfig = PaginationConfig()
-  private val service       = new PaginationService(defaultConfig)
+  implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
+  private val defaultConfig       = PaginationConfig()
+  private val service             = new PaginationService(defaultConfig)
 
   private def checkbox(id: String, content: String): CheckboxItem =
     CheckboxItem(
@@ -73,7 +77,10 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginatedData.head.value mustBe "7"
 
       result.paginationViewModel.previous.isDefined mustBe true
-      result.paginationViewModel.next.isDefined mustBe false
+      result.paginationViewModel.next mustBe None
+
+      result.paginationViewModel.previous.flatMap(_.labelText) mustBe
+        Some(messages("site.pagination.goToPage", 1))
     }
 
     "clamp page to minimum (page 0 becomes page 1)" in {
@@ -128,6 +135,16 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginationViewModel.items.length mustBe 4 // 20 items → 4 pages (6,6,6,2)
 
       result.paginationViewModel.items.map(_.number) must contain allOf ("1", "2", "3", "4")
+    }
+
+    "set accessible label for previous and next page links" in {
+      val result = service.paginateCheckboxItems(items(20), 2)
+
+      result.paginationViewModel.previous.flatMap(_.labelText) mustBe
+        Some(messages("site.pagination.goToPage", 1))
+
+      result.paginationViewModel.next.flatMap(_.labelText) mustBe
+        Some(messages("site.pagination.goToPage", 3))
     }
   }
 }

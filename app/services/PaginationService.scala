@@ -16,6 +16,7 @@
 
 package services
 
+import play.api.i18n.Messages
 import viewmodels.govuk.PaginationFluency.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
@@ -52,7 +53,7 @@ class PaginationService(val config: PaginationConfig) {
   def paginateCheckboxItems(
     allItems: Seq[CheckboxItem],
     currentPage: Int
-  ): CheckboxPaginationResult = {
+  )(implicit messages: Messages): CheckboxPaginationResult = {
 
     val totalPages = math.ceil(allItems.size.toDouble / config.recordsPerPage).toInt.max(1)
     val page       = currentPage.max(1).min(totalPages)
@@ -97,10 +98,20 @@ class PaginationService(val config: PaginationConfig) {
           .withItems(pages)
           .copy(
             previous =
-              if (page > 1) Some(PaginationLinkViewModel("").withText("site.pagination.previous"))
+              if (page > 1)
+                Some(
+                  PaginationLinkViewModel("")
+                    .withText("site.pagination.previous")
+                    .withLabelText(messages("site.pagination.goToPage", page - 1))
+                )
               else None,
             next =
-              if (page < totalPages) Some(PaginationLinkViewModel("").withText("site.pagination.next"))
+              if (page < totalPages)
+                Some(
+                  PaginationLinkViewModel("")
+                    .withText("site.pagination.next")
+                    .withLabelText(messages("site.pagination.goToPage", page + 1))
+                )
               else None
           )
 
