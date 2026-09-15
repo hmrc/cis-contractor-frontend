@@ -49,32 +49,62 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
   "ContractorDetailsCheckAnswersController" - {
 
     "must return OK and the correct view for a GET when all required answers exist" in {
-    Seq(
-      (
-        "AGENT",
-        applicationConfig.constructionIndustryAgentAccountUrl + "1",
-        true,
-        Some(emptyUserAnswers.set(ContractorSchemePage, scheme).success.value.set(CisIdPage, "1").success.value)
-      ),
-      (
-        "ORGANISATION",
-        applicationConfig.constructionIndustryOrgAccountUrl,
-        false,
-        Some(emptyUserAnswers.set(ContractorSchemePage, scheme).success.value)
-      )
-    ).foreach { case (accountTypeSTR, cisAccountUrl, isAgent, userAnswers) =>
-      s"when accountType is '$accountTypeSTR'" - {
-        "must return OK with the correct Return to CIS account link" in {
+      Seq(
+        (
+          "AGENT",
+          applicationConfig.constructionIndustryAgentAccountUrl + "1",
+          true,
+          Some(
+            emptyUserAnswers
+              .set(ContractorSchemePage, scheme)
+              .success
+              .value
+              .set(CisIdPage, "1")
+              .success
+              .value
+              .set(AddSchemeNameYesNoPage, false)
+              .success
+              .value
+              .set(AddEmailAddressYesNoPage, false)
+              .success
+              .value
+          )
+        ),
+        (
+          "ORGANISATION",
+          applicationConfig.constructionIndustryOrgAccountUrl,
+          false,
+          Some(
+            emptyUserAnswers
+              .set(ContractorSchemePage, scheme)
+              .success
+              .value
+              .set(AddSchemeNameYesNoPage, false)
+              .success
+              .value
+              .set(AddEmailAddressYesNoPage, false)
+              .success
+              .value
+          )
+        )
+      ).foreach { case (_, cisAccountUrl, isAgent, userAnswers) =>
+        val application =
+          applicationBuilder(
+            userAnswers = userAnswers,
+            isAgent = isAgent
+          ).build()
 
-          val application = applicationBuilder(userAnswers = userAnswers, isAgent = isAgent).build()
+        running(application) {
+          val request =
+            FakeRequest(
+              GET,
+              routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+            )
 
-          running(application) {
-            val request = FakeRequest(GET, routes.ContractorDetailsCheckAnswersController.onPageLoad().url)
-            val result  = route(application, request).value
+          val result = route(application, request).value
 
-            status(result) mustEqual OK
-            contentAsString(result) must include(cisAccountUrl)
-          }
+          status(result) mustEqual OK
+          contentAsString(result) must include(cisAccountUrl)
         }
       }
     }
