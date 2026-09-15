@@ -19,7 +19,7 @@ package views.verify
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
@@ -102,15 +102,10 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages("verify.verificationRequestSubmitted.feedback.subHeading")
       )
 
-      val surveyLink: Elements =
-        doc.select(s"a[href='${appConfig.exitSurveyUrl}']")
+      val surveyLink = doc.select("a:contains(Take a short survey)").last()
 
-      surveyLink.size mustBe 1
-      surveyLink.attr("target") mustBe ""
-
-      surveyLink.first.parent.text must include(
-        messages("verify.verificationRequestSubmitted.feedback.p2")
-      )
+      surveyLink.text() mustBe messages("verify.verificationRequestSubmitted.feedback.survey.link")
+      surveyLink.attr("href") mustBe appConfig.feedbackUrl
     }
 
     "not render reverify section or email paragraph when both are absent" in new Setup {
