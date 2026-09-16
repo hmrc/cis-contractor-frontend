@@ -37,7 +37,9 @@ object CheckYourAnswersValidation {
             answers.tradingName
           )) &&
           (!answers.individualNamesOptions.contains(IndividualNamesOptions.SubcontractorName) ||
-            answers.subcontractorName.exists(name => nonBlank(name.firstName) && nonBlank(name.lastName)))
+            answers.subcontractorName.exists(name =>
+              nonBlank(name.firstName) || nonBlank(name.middleName) || nonBlank(name.lastName)
+            ))
         }
       ) &&
       optionalAnswer(answers.addressYesNo, answers.address)(isValidAddress) &&
