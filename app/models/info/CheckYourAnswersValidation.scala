@@ -33,7 +33,9 @@ object CheckYourAnswersValidation {
           nonBlank(answers.utr)
         } else {
           answers.individualNamesOptions.nonEmpty &&
-          (!answers.individualNamesOptions.contains(IndividualNamesOptions.TradingName) || nonBlank(answers.tradingName)) &&
+          (!answers.individualNamesOptions.contains(IndividualNamesOptions.TradingName) || nonBlank(
+            answers.tradingName
+          )) &&
           (!answers.individualNamesOptions.contains(IndividualNamesOptions.SubcontractorName) ||
             answers.subcontractorName.exists(name => nonBlank(name.firstName) && nonBlank(name.lastName)))
         }
