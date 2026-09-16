@@ -19,15 +19,16 @@ package controllers.verify
 import controllers.actions.*
 import models.NormalMode
 import models.contractordetails.ContractorDetailsValidationTarget
-import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
-import play.api.i18n.I18nSupport
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.Logging
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfoService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
+import scala.util.{Failure, Success}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,44 +46,90 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    contractorDetailsFinalValidationService
-      .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
-      .flatMap { case (validatedAnswers, validation) =>
-        if (!validation.allComplete) {
-          Future.successful(
-            Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad())
-          )
-        } else {
-          validatedAnswers.get(CurrentVerificationBatchResponsePage) match {
-            case Some(batch) =>
-              val viewModel = reviewInsufficientInfoService.buildViewModel(batch)
-              if (viewModel.hasMissing || viewModel.hasReady) {
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(validatedAnswers.set(VerificationBatchReadinessPage, viewModel.allReady))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Ok(view(viewModel))
-              } else {
-                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-              }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+        .flatMap { case (validatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad())
+            )
+          } else {
+            validatedAnswers.get(CurrentVerificationBatchResponsePage) match {
 
-            case None =>
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Some(batch) =>
+                reviewInsufficientInfoService.buildViewModel(batch) match {
+
+                  case Success(viewModel) =>
+                    if (viewModel.hasMissing || viewModel.hasReady) {
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            validatedAnswers.set(
+                              VerificationBatchReadinessPage,
+                              viewModel.allReady
+                            )
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Ok(view(viewModel))
+                    } else {
+                      Future.successful(
+                        Redirect(
+                          controllers.routes.JourneyRecoveryController.onPageLoad()
+                        )
+                      )
+                    }
+
+                  case Failure(error) =>
+                    logger.error(
+                      "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed to build view model",
+                      error
+                    )
+
+                    Future.successful(
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController.onPageLoad()
+                      )
+                    )
+                }
+
+              case None =>
+                Future.successful(
+                  Redirect(
+                    controllers.routes.JourneyRecoveryController.onPageLoad()
+                  )
+                )
+            }
           }
         }
-      }
-      .recover { case t =>
-        logger.error(
-          "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed final contractor validation",
-          t
-        )
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
-  }
+        .recover { case t =>
+          logger.error(
+            "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed final contractor validation",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 
-  // TODO: This is a temporary redirect until DTR-6949 is implemented to handle the next step in the journey
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { _ =>
-    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode))
-  }
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+
+      val nextPage =
+        if (
+          request.userAnswers
+            .get(NewestVerificationBatchResponsePage)
+            .flatMap(_.scheme)
+            .flatMap(_.emailAddress)
+            .isDefined
+        ) {
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoad(NormalMode)
+        } else {
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+            .onPageLoad(NormalMode)
+        }
+
+      Redirect(nextPage)
+    }
 }

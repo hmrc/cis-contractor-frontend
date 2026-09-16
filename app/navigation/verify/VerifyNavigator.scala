@@ -24,6 +24,7 @@ import pages.Page
 import pages.verify.*
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
+import pages.unmatched.ProceedSubcontractorVerifyRequestPage
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -60,6 +61,8 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
     case ProceedInsufficientSubcontractorNameYesNoPage(_) =>
       _ => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
+    case ProceedSubcontractorVerifyRequestPage(_)         =>
+      _ => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
     case _                                                => _ => controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 

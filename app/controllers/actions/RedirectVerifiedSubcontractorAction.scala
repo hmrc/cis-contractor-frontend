@@ -16,9 +16,9 @@
 
 package controllers.actions
 
+import controllers.amend.AmendControllerUtils
 import controllers.routes
 import models.requests.DataRequest
-import pages.amend.ShowVerificationDetailsPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Result}
 
@@ -29,7 +29,9 @@ class RedirectVerifiedSubcontractorActionImpl @Inject() (implicit val executionC
     extends RedirectVerifiedSubcontractorAction {
 
   override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = {
-    val showVerificationDetails = request.userAnswers.get(ShowVerificationDetailsPage).getOrElse(false)
+    val showVerificationDetails = AmendControllerUtils.isVerifiedForAmendJourney(
+      request.userAnswers
+    )
     if (showVerificationDetails) {
       Future.successful(Option(Redirect(routes.JourneyRecoveryController.onPageLoad())))
     } else {

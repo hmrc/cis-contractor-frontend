@@ -35,5 +35,27 @@ class AddSchemeNameYesNoPageSpec extends PageBehaviours {
     beSettable[Boolean](AddSchemeNameYesNoPage)
 
     beRemovable[Boolean](AddSchemeNameYesNoPage)
+
+    "must remove the scheme name when the answer is No" in {
+      val answers = emptyUserAnswers
+        .set(SchemeNamePage, "Test scheme")
+        .success
+        .value
+
+      val result = answers.set(AddSchemeNameYesNoPage, false).success.value
+
+      result.get(SchemeNamePage) mustBe empty
+    }
+
+    "must keep the scheme name when the answer is Yes" in {
+      val answers = emptyUserAnswers
+        .set(SchemeNamePage, "Test scheme")
+        .success
+        .value
+
+      val result = answers.set(AddSchemeNameYesNoPage, true).success.value
+
+      result.get(SchemeNamePage) mustBe Some("Test scheme")
+    }
   }
 }

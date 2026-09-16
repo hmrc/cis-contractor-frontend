@@ -32,7 +32,7 @@ class SubcontractorTrustValidator {
     subcontractors.toList.flatMap { subcontractor =>
       val failedFields =
         TrustValidator.validate(
-          subcontactorToValidate = subcontractor,
+          subcontractorToValidate = subcontractor,
           allSubcontractors = subcontractors
         )
 

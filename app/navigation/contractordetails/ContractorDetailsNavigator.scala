@@ -16,22 +16,76 @@
 
 package navigation.contractordetails
 
+import controllers.contractordetails.{routes => contractorDetailsRoutes}
 import controllers.routes
-import models.{Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
-import pages.contractordetails.{ContractorDetailsValidationTargetPage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.contractordetails.*
+import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ContractorDetailsNavigator @Inject() () extends NavigatorForJourney {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers) =
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
     if (userAnswers.get(ContractorDetailsValidationTargetPage).isDefined && finalValidationPage(page)) {
       controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
     } else {
-      routes.IndexController.onPageLoad()
+      mode match {
+        case NormalMode            => normalRoutes(page)(userAnswers)
+        case CheckMode | AmendMode => checkRoutes(page)(userAnswers)
+      }
+    }
+
+  private def checkAnswers: Call =
+    contractorDetailsRoutes.ContractorDetailsCheckAnswersController.onPageLoad()
+
+  private val normalRoutes: Page => UserAnswers => Call = {
+    case ContractorUtrPage               => _ => contractorDetailsRoutes.AddSchemeNameYesNoController.onPageLoad(NormalMode)
+    case AddSchemeNameYesNoPage          => nextForAddSchemeNameYesNo(NormalMode)
+    case SchemeNamePage                  => _ => contractorDetailsRoutes.AddEmailAddressYesNoController.onPageLoad(NormalMode)
+    case AddEmailAddressYesNoPage        => nextForAddEmailAddressYesNo(NormalMode)
+    case EnterContractorEmailAddressPage => _ => checkAnswers
+    case _                               => _ => routes.IndexController.onPageLoad()
+  }
+
+  private val checkRoutes: Page => UserAnswers => Call = {
+    case AddSchemeNameYesNoPage          => nextForAddSchemeNameYesNo(CheckMode)
+    case AddEmailAddressYesNoPage        => nextForAddEmailAddressYesNo(CheckMode)
+    case ContractorUtrPage               => _ => checkAnswers
+    case SchemeNamePage                  => _ => checkAnswers
+    case EnterContractorEmailAddressPage => _ => checkAnswers
+    case _                               => _ => routes.IndexController.onPageLoad()
+  }
+
+  private def nextForAddSchemeNameYesNo(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddSchemeNameYesNoPage), mode) match {
+      case (Some(true), NormalMode)             =>
+        contractorDetailsRoutes.SchemeNameController.onPageLoad(NormalMode)
+      case (Some(false), NormalMode)            =>
+        contractorDetailsRoutes.AddEmailAddressYesNoController.onPageLoad(NormalMode)
+      case (Some(true), CheckMode | AmendMode)  =>
+        contractorDetailsRoutes.SchemeNameController.onPageLoad(CheckMode)
+      case (Some(false), CheckMode | AmendMode) =>
+        checkAnswers
+      case _                                    =>
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def nextForAddEmailAddressYesNo(mode: Mode)(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddEmailAddressYesNoPage), mode) match {
+      case (Some(true), NormalMode)             =>
+        contractorDetailsRoutes.EnterContractorEmailAddressController.onPageLoad(NormalMode)
+      case (Some(false), NormalMode)            =>
+        checkAnswers
+      case (Some(true), CheckMode | AmendMode)  =>
+        contractorDetailsRoutes.EnterContractorEmailAddressController.onPageLoad(CheckMode)
+      case (Some(false), CheckMode | AmendMode) =>
+        checkAnswers
+      case _                                    =>
+        routes.JourneyRecoveryController.onPageLoad()
     }
 
   private def finalValidationPage(page: Page): Boolean =

@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.Scheme
-import models.requests.{UpdateSchemeRequest, UpdateSchemeVersionRequest}
+import models.requests.{UpdateContractorSchemeParams, UpdateSchemeRequest, UpdateSchemeVersionRequest}
 import models.response.UpdateSchemeVersionResponse
 import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.when
@@ -125,6 +125,80 @@ class ContractorDetailsServiceSpec extends SpecBase with MockitoSugar {
       )
 
       service.updateScheme(request).futureValue mustBe (())
+    }
+  }
+
+  "updateContractorDetails" - {
+
+    "call the connector with the supplied request" in {
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "cisId",
+          accountsOfficeReference = "123 PA 87654321",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678",
+          utr = Some("1234567890"),
+          name = Some("Test Scheme"),
+          emailAddress = Some("test@example.com"),
+          version = scheme.version,
+          displayWelcomePage = scheme.displayWelcomePage,
+          prePopCount = scheme.prePopCount,
+          prePopSuccessful = scheme.prePopSuccessful
+        )
+
+      when(
+        mockCisConnector.updateContractorDetails(
+          eqTo(request)
+        )(eqTo(hc))
+      ).thenReturn(
+        Future.successful(())
+      )
+
+      service
+        .updateContractorDetails(request)
+        .futureValue
+
+      succeed
+    }
+
+    "propagate connector failures" in {
+
+      val request =
+        UpdateContractorSchemeParams(
+          schemeId = 123,
+          instanceId = "cisId",
+          accountsOfficeReference = "123 PA 87654321",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "45678",
+          utr = Some("1234567890"),
+          name = Some("Test Scheme"),
+          emailAddress = Some("test@example.com"),
+          version = scheme.version,
+          displayWelcomePage = scheme.displayWelcomePage,
+          prePopCount = scheme.prePopCount,
+          prePopSuccessful = scheme.prePopSuccessful
+        )
+
+      val exception =
+        new RuntimeException("connector failure")
+
+      when(
+        mockCisConnector.updateContractorDetails(
+          eqTo(request)
+        )(eqTo(hc))
+      ).thenReturn(
+        Future.failed(exception)
+      )
+
+      val result =
+        service
+          .updateContractorDetails(request)
+          .failed
+          .futureValue
+
+      result mustBe exception
     }
   }
 }

@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel}
+import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel, VerificationCurrentVerification}
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -95,7 +95,20 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
     GetCurrentVerificationBatchResponse(
       subcontractors = subs,
       verificationBatch = None,
-      verifications = Seq.empty
+      verifications = subs.map { sub =>
+        VerificationCurrentVerification(
+          verificationId = sub.subcontractorId,
+          verificationBatchId = None,
+          subcontractorId = Some(sub.subcontractorId),
+          verificationResourceRef = Some(sub.subcontractorId + 1000L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
+        )
+      }
     )
 
   private def newestBatchResponse(
@@ -191,7 +204,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
     "batch not ready" - {
 
-      "must redirect to Journey Recovery" in {
+      "must redirect to ReviewInsufficientInfoSubcontractorsController" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(notReadyCurrentIndividual(1))))
@@ -201,7 +214,9 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           val result = route(application, FakeRequest(GET, normalModeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
         }
       }
 
