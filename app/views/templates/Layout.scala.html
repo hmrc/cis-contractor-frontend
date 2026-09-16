@@ -46,6 +46,7 @@
 
 @head = {
 
+<meta name="format-detection" content="telephone=no">
 
 @if(timeout) {
     @hmrcTimeoutDialog(
@@ -61,7 +62,7 @@
         language            = Some(messages.lang.code)
       )
     )
-} else 
+} else
     @stylesheets()
 }
 
