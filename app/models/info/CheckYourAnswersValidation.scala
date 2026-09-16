@@ -17,6 +17,7 @@
 package models.info
 
 import models.TypeOfSubcontractor
+import models.add.IndividualNamesOptions
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.info.company.CompanyAnswers
@@ -31,10 +32,10 @@ object CheckYourAnswersValidation {
         if (answers.showVerificationDetails) {
           nonBlank(answers.utr)
         } else {
-          answers.usesTradingName.exists {
-            case true  => nonBlank(answers.tradingName)
-            case false => answers.subcontractorName.exists(name => nonBlank(name.firstName) && nonBlank(name.lastName))
-          }
+          answers.individualNamesOptions.nonEmpty &&
+          (!answers.individualNamesOptions.contains(IndividualNamesOptions.TradingName) || nonBlank(answers.tradingName)) &&
+          (!answers.individualNamesOptions.contains(IndividualNamesOptions.SubcontractorName) ||
+            answers.subcontractorName.exists(name => nonBlank(name.firstName) && nonBlank(name.lastName)))
         }
       ) &&
       optionalAnswer(answers.addressYesNo, answers.address)(isValidAddress) &&
