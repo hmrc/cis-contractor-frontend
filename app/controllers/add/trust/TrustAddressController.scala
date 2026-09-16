@@ -22,7 +22,7 @@ import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
 import models.{Mode, UserAnswers}
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
@@ -46,7 +46,9 @@ class TrustAddressController @Inject() (
 
   override protected def addressPage: Settable[Address] = TrustAddressPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
     userAnswers.get(TrustNamePage)
 
   override protected def standardCallback: Call =

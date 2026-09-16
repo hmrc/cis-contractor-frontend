@@ -22,7 +22,7 @@ import models.{Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.{CompanyAddressPage, CompanyNamePage}
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
@@ -46,7 +46,9 @@ class CompanyAddressController @Inject() (
 
   override protected def addressPage: Settable[Address] = CompanyAddressPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
     userAnswers.get(CompanyNamePage)
 
   override protected def standardCallback: Call =

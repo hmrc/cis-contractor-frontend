@@ -19,9 +19,9 @@ package controllers.add
 import controllers.actions.*
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
-import models.{Mode, UserAnswers}
+import models.{AmendMode, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
@@ -47,8 +47,10 @@ class AddressOfSubcontractorController @Inject() (
 
   override protected def addressPage: Settable[Address] = AddressOfSubcontractorPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
-    subcontractorNameExtractor.getSubcontractorName(userAnswers)
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
+    subcontractorNameExtractor.getSubcontractorName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.AddressOfSubcontractorController.addressLookupCallback()
@@ -68,7 +70,7 @@ class AddressOfSubcontractorController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 }

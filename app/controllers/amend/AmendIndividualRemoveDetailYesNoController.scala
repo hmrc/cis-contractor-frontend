@@ -19,7 +19,7 @@ package controllers.amend
 import controllers.actions.*
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
 import models.add.IndividualNamesOptions.{SubcontractorName, TradingName}
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.AmendIndividualRemoveDetail
 import pages.add.*
 import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
@@ -138,7 +138,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
@@ -164,7 +164,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {

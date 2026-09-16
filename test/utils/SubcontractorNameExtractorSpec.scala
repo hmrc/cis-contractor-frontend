@@ -17,6 +17,7 @@
 package utils
 
 import base.SpecBase
+import models.{AmendMode, CheckMode, NormalMode}
 import models.add.SubcontractorName
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
@@ -26,6 +27,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
 class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
+
+  private implicit val messages: Messages = stubMessages()
 
   "SubcontractorNameExtractor.getSubcontractorName" - {
 
@@ -74,6 +77,156 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
         subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers)
 
       result mustBe None
+    }
+  }
+
+  "normal mode: SubcontractorNameExtractor.getSubcontractorName" - {
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val subContractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, NormalMode)
+
+      result mustBe Some("John Smith")
+    }
+
+    "should return trading name when TradingNameOfSubcontractorPage exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val tradingNameOfSubcontractor = "ABC Contractors"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, NormalMode)
+
+      result mustBe Some(tradingNameOfSubcontractor)
+    }
+
+    "should return None when no subcontractor name exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers, NormalMode)
+
+      result mustBe None
+    }
+  }
+
+  "check mode: SubcontractorNameExtractor.getSubcontractorName" - {
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val subContractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, CheckMode)
+
+      result mustBe Some("John Smith")
+    }
+
+    "should return trading name when TradingNameOfSubcontractorPage exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val tradingNameOfSubcontractor = "ABC Contractors"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, CheckMode)
+
+      result mustBe Some(tradingNameOfSubcontractor)
+    }
+
+    "should return None when no subcontractor name exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers, CheckMode)
+
+      result mustBe None
+    }
+  }
+
+  "Amend mode: SubcontractorNameExtractor.getSubcontractorName" - {
+
+    "should return the subcontractor firstName and lastName when SubcontractorNamePage is in userAnswers" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val subContractorName =
+        SubcontractorName("John", Some("Paul"), "Smith")
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorNamePage, subContractorName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, AmendMode)
+
+      result mustBe Some("John Smith")
+    }
+
+    "should return trading name when TradingNameOfSubcontractorPage exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val tradingNameOfSubcontractor = "ABC Contractors"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(TradingNameOfSubcontractorPage, tradingNameOfSubcontractor)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(userAnswers, AmendMode)
+
+      result mustBe Some(tradingNameOfSubcontractor)
+    }
+
+    "should return None when no subcontractor name exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers, AmendMode)
+
+      result mustBe Some("verify.noName")
     }
   }
 
