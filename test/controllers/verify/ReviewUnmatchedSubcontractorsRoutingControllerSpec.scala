@@ -101,7 +101,9 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
         verify(mockService)
           .anyUnmatchedResourceRefsStillPresent(
             eqTo("900063"),
