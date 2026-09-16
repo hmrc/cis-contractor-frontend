@@ -16,7 +16,7 @@
 
 package pages.contractordetails
 
-import models.Scheme
+import models.{Scheme, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
@@ -24,4 +24,7 @@ case object ContractorSchemePage extends QuestionPage[Scheme] {
 
   override def path: JsPath =
     JsPath \ "contractordetails" \ toString
+
+  def hasExistingUtr(answers: UserAnswers): Boolean =
+    answers.get(this).flatMap(_.utr).exists(_.trim.nonEmpty)
 }

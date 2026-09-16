@@ -124,7 +124,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and correct view for GET (page 1)" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, url())
@@ -138,7 +144,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          form,
+          form.fill(allSubs.map(_.id).toSet),
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
@@ -244,7 +250,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must support pagination (page 2)" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, url(2))
@@ -256,7 +268,13 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
     "must render the page for a GET when no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithSubcontractors)).build()
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       val request = FakeRequest(GET, url())
       val result  = route(application, request).value

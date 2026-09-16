@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, ClientListStatus, GetClientListStatusResponse}
 import models.response.CisTaxpayerResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
@@ -181,6 +181,28 @@ final class CisManageServiceSpec extends SpecBase with MockitoSugar {
 
         verify(mockConnector).getCisTaxpayer()(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
+      }
+    }
+
+    "startClientListRetrieval" - {
+
+      "delegate to connector and return the client list status" in {
+        val (service, connector, sessionRepo) = newService()
+
+        val response =
+          GetClientListStatusResponse(
+            ClientListStatus.Succeeded
+          )
+
+        when(
+          connector.startClientList(using any[HeaderCarrier])
+        ).thenReturn(Future.successful(response))
+
+        service.startClientListRetrieval.futureValue mustBe
+          ClientListStatus.Succeeded
+
+        verify(connector).startClientList(using any[HeaderCarrier])
+        verifyNoInteractions(sessionRepo)
       }
     }
 

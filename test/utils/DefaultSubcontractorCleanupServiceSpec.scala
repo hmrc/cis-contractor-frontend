@@ -32,7 +32,7 @@ class DefaultSubcontractorCleanupServiceSpec extends SpecBase {
 
   private val originalIndividual =
     OriginalIndividualAnswers(
-      usesTradingName = None,
+      individualNamesOptions = Set.empty,
       tradingName = None,
       subcontractorName = None,
       addressYesNo = None,

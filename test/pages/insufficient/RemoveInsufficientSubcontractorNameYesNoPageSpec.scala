@@ -17,15 +17,23 @@
 package pages.insufficient
 
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
+import org.scalacheck.Gen
 
 class RemoveInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
   "RemoveInsufficientSubcontractorNameYesNoPage" - {
 
-    beRetrievable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+    val page = RemoveInsufficientSubcontractorNameYesNoPage(12345L)
 
-    beSettable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+    "must use the verification resource ref in its path" in {
+      page.path mustBe (JsPath \ "removeInsufficientSubcontractorNameYesNo" \ "12345" \ "removed")
+    }
 
-    beRemovable[Boolean](RemoveInsufficientSubcontractorNameYesNoPage)
+    beRetrievable[Boolean](Gen.const(page))
+
+    beSettable[Boolean](Gen.const(page))
+
+    beRemovable[Boolean](Gen.const(page))
   }
 }
