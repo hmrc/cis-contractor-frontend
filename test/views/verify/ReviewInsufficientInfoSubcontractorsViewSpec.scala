@@ -35,7 +35,7 @@ class ReviewInsufficientInfoSubcontractorsViewSpec extends SpecBase {
   private val view =
     app.injector.instanceOf[ReviewInsufficientInfoSubcontractorsView]
 
-  private def link(name: String) = LinkViewModel("#", name)
+  private def link(name: String) = LinkViewModel("#")
 
   private val missingRow =
     MissingSubcontractorRow(

@@ -35,7 +35,7 @@ class ReviewUnmatchedSubcontractorsViewSpec extends SpecBase {
   private val view =
     app.injector.instanceOf[ReviewUnmatchedSubcontractorsView]
 
-  private def link(name: String) = LinkViewModel("#", name)
+  private def link(name: String) = LinkViewModel("#")
 
   private val unmatchedRow =
     MissingSubcontractorRow(

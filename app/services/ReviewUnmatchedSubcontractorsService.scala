@@ -88,13 +88,12 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
     val name = resolveName(sub, verification)
     MissingSubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(dummyUrl),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
       proceedLink = LinkViewModel(
         controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
           .onPageLoad(sub.subcontractorId)
-          .url,
-        name
+          .url
       ),
       editLink = LinkViewModel(
         controllers.amend.routes.AmendSubcontractorController
@@ -102,10 +101,9 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             sub.subbieResourceRef.get,
             AmendJourneyType.UnmatchedInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
-      removeLink = LinkViewModel(dummyUrl, name)
+      removeLink = LinkViewModel(dummyUrl)
     )
   }
 
@@ -116,7 +114,7 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
     val name = resolveName(sub, verification)
     ReadySubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(dummyUrl),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey)
     )
   }
