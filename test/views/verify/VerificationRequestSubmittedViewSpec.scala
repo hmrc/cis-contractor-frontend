@@ -19,7 +19,7 @@ package views.verify
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
+import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
@@ -136,7 +136,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         app.injector.instanceOf[MessagesApi]
       )
 
-    implicit val appConfig: FrontendAppConfig =
+    val appConfig: FrontendAppConfig =
       app.injector.instanceOf[FrontendAppConfig]
 
     val view: VerificationRequestSubmittedView =
