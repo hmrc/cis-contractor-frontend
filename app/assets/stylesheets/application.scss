@@ -179,3 +179,9 @@
   outline: 3px solid #ffdd00;
   outline-offset: 0;
 }
+
+.final-validation-subcontractor-details {
+  .govuk-summary-list__value {
+    white-space: pre-line;
+  }
+}

@@ -226,7 +226,13 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
         UpdateSubcontractorDetailsRow(
           field = FinalValidationField.AddressLine1,
           labelKey = "finalvalidations.updateSubcontractorDetails.address",
-          value = Some("1 Test Street Test Area Test Town AA1 1AA United Kingdom"),
+          value = Some(
+            """1 Test Street
+              |Test Area
+              |Test Town
+              |AA1 1AA
+              |United Kingdom""".stripMargin
+          ),
           changeUrl = s"/change/${FinalValidationField.AddressLine1.key}/${FinalValidationChangeTarget.Address.key}"
         )
       )

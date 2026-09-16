@@ -285,7 +285,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
       val details = subcontractor.proposed
 
       val value =
-        combined(
+        multiline(
           details.addressLine1,
           details.addressLine2,
           details.addressLine3,
@@ -523,12 +523,12 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
   private def present(value: Option[String]): Boolean =
     value.exists(_.trim.nonEmpty)
 
-  private def combined(values: Option[String]*): Option[String] = {
+  private def multiline(values: Option[String]*): Option[String] = {
     val result =
       values.flatten
         .map(_.trim)
         .filter(_.nonEmpty)
-        .mkString(" ")
+        .mkString("\n")
 
     Option.when(result.nonEmpty)(result)
   }

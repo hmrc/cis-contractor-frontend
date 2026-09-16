@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TradingNameOfSubcontractorFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.add.IndividualNamesOptions.TradingName
 import navigation.Navigator
 import pages.add.{IndividualNamesOptionsPage, TradingNameOfSubcontractorPage}
@@ -50,20 +50,35 @@ class TradingNameOfSubcontractorController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
-
-      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
-
-      namesOptions match {
-        case Some(namesOptions) if namesOptions.contains(TradingName) =>
-          val preparedForm = request.userAnswers.get(TradingNameOfSubcontractorPage) match {
-            case None        => form
-            case Some(value) => form.fill(value)
-          }
+      mode match {
+        case FinalValidationMode =>
+          val preparedForm =
+            request.userAnswers.get(TradingNameOfSubcontractorPage) match {
+              case Some(value) => form.fill(value)
+              case None        => form
+            }
 
           Ok(view(preparedForm, mode))
 
         case _ =>
-          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+          val namesOptions =
+            request.userAnswers.get(IndividualNamesOptionsPage)
+
+          namesOptions match {
+            case Some(namesOptions) if namesOptions.contains(TradingName) =>
+              val preparedForm =
+                request.userAnswers.get(TradingNameOfSubcontractorPage) match {
+                  case Some(value) => form.fill(value)
+                  case None        => form
+                }
+
+              Ok(view(preparedForm, mode))
+
+            case _ =>
+              Redirect(
+                controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode)
+              )
+          }
       }
     }
 
