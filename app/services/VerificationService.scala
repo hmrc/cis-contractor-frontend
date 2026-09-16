@@ -20,9 +20,10 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
-import models.response.{ChrisPollResponse, ChrisSubmissionResponse, CreateSubmissionForVerificationResponse, DeleteVerificationResponse, GetLastSubmittedVerificationBatchResponse}
+import models.response.*
 import models.verify.*
 import pages.verify.*
+import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
@@ -257,7 +258,8 @@ class VerificationService @Inject() (
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],
-    hc: HeaderCarrier
+    hc: HeaderCarrier,
+    messages: Messages
   ): Future[ChrisSubmissionResponse] =
     for {
       latestUa      <- getCurrentVerificationBatch(request.userAnswers)
@@ -286,7 +288,7 @@ class VerificationService @Inject() (
   private def submitVerificationToChris(
     submissionId: Long,
     ua: UserAnswers
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier): Future[ChrisSubmissionResponse] =
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier, messages: Messages): Future[ChrisSubmissionResponse] =
     for {
       employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
       chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
@@ -295,7 +297,7 @@ class VerificationService @Inject() (
 
   private def buildCreateSubmissionRequest(
     ua: UserAnswers
-  ): Future[CreateSubmissionForVerificationRequest] =
+  )(implicit messages: Messages): Future[CreateSubmissionForVerificationRequest] =
     CreateSubmissionForVerificationRequestBuilder
       .build(ua)
       .fold(
@@ -478,4 +480,52 @@ class VerificationService @Inject() (
             verification.subcontractorId.isDefined =>
         verification.subcontractorId.get
     }.distinct
+
+  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
+    implicit hc: HeaderCarrier
+  ): Future[Unit] =
+    proceedVerification(cisId, subcontractorId, batch, cisConnector.proceedInsufficientVerification)
+
+  def proceedUnmatchedVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
+    implicit hc: HeaderCarrier
+  ): Future[Unit] =
+    proceedVerification(cisId, subcontractorId, batch, cisConnector.proceedUnmatchedVerification)
+
+  private def proceedVerification(
+    cisId: String,
+    subcontractorId: Long,
+    batch: GetCurrentVerificationBatchResponse,
+    proceed: ProceedVerificationRequest => Future[Unit]
+  ): Future[Unit] =
+    (
+      for {
+        verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
+        verificationResourceRef      <- batch.verifications
+                                          .find(_.subcontractorId.contains(subcontractorId))
+                                          .flatMap(_.verificationResourceRef)
+      } yield ProceedVerificationRequest(
+        instanceId = cisId,
+        verificationBatchResourceRef = verificationBatchResourceRef,
+        verificationResourceRef = verificationResourceRef
+      )
+    ) match {
+      case Some(request) =>
+        proceed(request)
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            s"Unable to proceed verification. Missing resource refs for subcontractorId=$subcontractorId"
+          )
+        )
+    }
+
+  def refreshVerificationBatches(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    for {
+      afterCurrent <- getCurrentVerificationBatch(userAnswers)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      _            <- sessionRepository.set(afterNewest)
+    } yield afterNewest
 }

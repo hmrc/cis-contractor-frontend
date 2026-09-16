@@ -16,17 +16,21 @@
 
 package controllers.amend.partnership
 
+import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
+import models.amend.AmendJourneyType
 import pages.add.partnership.PartnershipNamePage
-import pages.amend.AmendCheckYourAnswersSubmittedPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DefaultSubcontractorCleanupService
+import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
@@ -41,8 +45,10 @@ class AmendPartnershipConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   cleanupService: DefaultSubcontractorCleanupService,
+  verificationService: VerificationService,
   sessionRepository: SessionRepository,
-  view: AmendConfirmationView
+  view: AmendConfirmationView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -77,25 +83,78 @@ class AmendPartnershipConfirmationController @Inject() (
                 logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
 
-              case Some(_) =>
-                val tableRows       = AmendPartnershipConfirmationViewModel.rows(originalPartnershipAnswers, ua)
-                val partnershipName = ua.get(PartnershipNamePage).getOrElse("")
-                cleanupService.cleanAmend(ua) match {
+              case Some(cisId) =>
+                ua.get(AmendJourneyTypePage) match {
 
-                  case Success(cleanedUa) =>
-                    sessionRepository.set(cleanedUa).map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          partnershipName
-                        )
+                  case Some(journeyType) =>
+                    val tableRows =
+                      AmendPartnershipConfirmationViewModel.rows(
+                        originalPartnershipAnswers,
+                        ua
                       )
+
+                    val partnershipName =
+                      ua.get(PartnershipNamePage).getOrElse("")
+
+                    val confirmationLink =
+                      AmendConfirmationLinks.build(
+                        journeyType,
+                        cisId,
+                        appConfig
+                      )
+
+                    cleanupService.cleanAmend(ua) match {
+
+                      case Success(cleanedUserAnswers) =>
+                        val persistFinalUserAnswers =
+                          journeyType match {
+
+                            case AmendJourneyType.Standard =>
+                              sessionRepository
+                                .set(cleanedUserAnswers)
+                                .map(_ => cleanedUserAnswers)
+
+                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                              verificationService.refreshVerificationBatches(
+                                cleanedUserAnswers
+                              )
+                          }
+
+                        persistFinalUserAnswers
+                          .map { _ =>
+                            Ok(
+                              view(
+                                tableRows,
+                                partnershipName,
+                                confirmationLink
+                              )
+                            )
+                          }
+                          .recover { case exception =>
+                            logger.error(
+                              "[AmendPartnershipConfirmationController.onPageLoad] " +
+                                "Failed to persist confirmation session data",
+                              exception
+                            )
+
+                            recoveryRedirect
+                          }
+
+                      case Failure(exception) =>
+                        logger.warn(
+                          "[AmendPartnershipConfirmationController.onPageLoad] " +
+                            "Failed to clean user answers",
+                          exception
+                        )
+
+                        Future.successful(recoveryRedirect)
                     }
-                  case Failure(exception) =>
-                    logger.warn(
-                      "[AmendPartnershipConfirmationController] Failed to clean user answers",
-                      exception
+
+                  case None =>
+                    logger.error(
+                      "[AmendPartnershipConfirmationController] Missing AmendJourneyTypePage"
                     )
+
                     Future.successful(recoveryRedirect)
                 }
             }
