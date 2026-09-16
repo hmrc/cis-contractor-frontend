@@ -1132,7 +1132,7 @@ verify.noVerificationResults.manageYourSubcontractors.link                      
 
 verify.verifyDepartmentalErrorSubmitAgainController.title                          =  Mae problem gyda’ch cais dilysu
 verify.verifyDepartmentalErrorSubmitAgainController.heading                        =  Mae problem gyda’ch cais dilysu
-verify.verifyDepartmentalErrorSubmitAgainController.p1                             =  TNid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
+verify.verifyDepartmentalErrorSubmitAgainController.p1                             =  Nid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
 verify.verifyDepartmentalErrorSubmitAgainController.p2                             =  I ddilysu’r is-gontractwyr hyn, mae angen i chi ddechrau eto gyda chais dilysu newydd.
 verify.verifyDepartmentalErrorSubmitAgainController.backTo                         =  Yn ôl i
 verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link  =  Rheoli’ch is-gontractwyr
