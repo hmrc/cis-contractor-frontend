@@ -76,7 +76,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       action.href shouldBe
         routes.AddressOfSubcontractorController
-          .redirectToAddressLookup(NormalMode,Some("change"))
+          .redirectToAddressLookup(NormalMode, Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe
