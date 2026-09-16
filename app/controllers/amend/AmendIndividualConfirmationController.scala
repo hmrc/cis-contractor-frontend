@@ -34,7 +34,7 @@ import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AmendIndividualConfirmationController @Inject() (
   identify: IdentifierAction,
@@ -46,31 +46,32 @@ class AmendIndividualConfirmationController @Inject() (
   sessionRepository: SessionRepository,
   appConfig: FrontendAppConfig,
   subcontractorNameExtractor: SubcontractorNameExtractor
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-  (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
 
-    val userAnswers =
-      request.userAnswers
+      val userAnswers =
+        request.userAnswers
 
-    if (
-      !userAnswers
-        .get(AmendCheckYourAnswersSubmittedPage)
-        .contains(true)
-    ) {
-      logger.warn(
-        "[AmendIndividualConfirmationController.onPageLoad] " +
-          "Accessed without prior CYA submission"
-      )
+      if (
+        !userAnswers
+          .get(AmendCheckYourAnswersSubmittedPage)
+          .contains(true)
+      ) {
+        logger.warn(
+          "[AmendIndividualConfirmationController.onPageLoad] " +
+            "Accessed without prior CYA submission"
+        )
 
-      Future.successful(journeyRecoveryRedirect)
-    } else {
-      renderConfirmation(userAnswers)
+        Future.successful(journeyRecoveryRedirect)
+      } else {
+        renderConfirmation(userAnswers)
+      }
     }
-  }
 
   private def renderConfirmation(
     userAnswers: UserAnswers
@@ -95,58 +96,44 @@ class AmendIndividualConfirmationController @Inject() (
         val individualName =
           subcontractorNameExtractor.displaySubcontractorName(userAnswers)
 
-        val link =
+        val confirmationLink =
           AmendConfirmationLinks.build(
             journeyType,
             cisId,
             appConfig
           )
-        cleanupService.cleanAmend(userAnswers) match {
 
-          case Success(cleanedUserAnswers) =>
-            val persistFinalUserAnswers =
-              journeyType match {
+        val persistFinalUserAnswers =
+          journeyType match {
 
-                case AmendJourneyType.Standard =>
-                  sessionRepository
-                    .set(cleanedUserAnswers)
-                    .map(_ => cleanedUserAnswers)
+            case AmendJourneyType.Standard =>
+              sessionRepository
+                .set(userAnswers)
+                .map(_ => userAnswers)
 
-                case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                  verificationService.refreshVerificationBatches(
-                    cleanedUserAnswers
-                  )
-              }
+            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+              verificationService.refreshVerificationBatches(userAnswers)
+          }
 
-            persistFinalUserAnswers
-              .map { _ =>
-                Ok(
-                  view(
-                    rows = tableRows,
-                    subcontractorName = individualName,
-                    confirmationLink = link
-                  )
-                )
-              }
-              .recover { case exception =>
-                logger.error(
-                  "[AmendIndividualConfirmationController.onPageLoad] " +
-                    "Failed to persist confirmation session data",
-                  exception
-                )
-
-                journeyRecoveryRedirect
-              }
-
-          case Failure(exception) =>
-            logger.warn(
+        persistFinalUserAnswers
+          .map { _ =>
+            Ok(
+              view(
+                rows = tableRows,
+                subcontractorName = individualName,
+                confirmationLink = confirmationLink
+              )
+            )
+          }
+          .recover { case exception =>
+            logger.error(
               "[AmendIndividualConfirmationController.onPageLoad] " +
-                "Failed to clean user answers",
+                "Failed to persist confirmation session data",
               exception
             )
 
-            Future.successful(journeyRecoveryRedirect)
-        }
+            journeyRecoveryRedirect
+          }
 
       case (None, _, _) =>
         logger.error(

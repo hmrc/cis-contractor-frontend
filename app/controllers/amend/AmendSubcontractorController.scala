@@ -170,6 +170,7 @@ class AmendSubcontractorController @Inject() (
     subcontractor: SubcontractorResponse
   ): Future[Result] =
     cleanupService.cleanAmend(userAnswers) match {
+
       case Success(cleanedUserAnswers) =>
         populateUserAnswers(
           subcontractorType,
@@ -188,9 +189,30 @@ class AmendSubcontractorController @Inject() (
             Future.successful(recovery)
           },
           updatedAnswers =>
-            sessionRepository
-              .set(updatedAnswers)
-              .map(_ => Redirect(onwardRoute(subcontractorType, subbieResourceRef)))
+            updatedAnswers
+              .set(AmendJourneyTypePage, amendJourneyType)
+              .fold(
+                error => {
+                  logger.error(
+                    s"[AmendSubcontractorController] Failed to set AmendJourneyTypePage " +
+                      s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+
+                  Future.successful(recovery)
+                },
+                updatedAnswersWithJourneyType =>
+                  sessionRepository
+                    .set(updatedAnswersWithJourneyType)
+                    .map(_ =>
+                      Redirect(
+                        onwardRoute(
+                          subcontractorType,
+                          subbieResourceRef
+                        )
+                      )
+                    )
+              )
         )
 
       case Failure(error) =>
@@ -201,26 +223,7 @@ class AmendSubcontractorController @Inject() (
         )
 
         Future.successful(recovery)
-      },
-      updatedAnswers =>
-        updatedAnswers
-          .set(AmendJourneyTypePage, amendJourneyType)
-          .fold(
-            error => {
-              logger.error(
-                s"[AmendSubcontractorController] Failed to set AmendJourneyTypePage " +
-                  s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-                error
-              )
-
-              Future.successful(recovery)
-            },
-            updatedAnswersWithJourneyType =>
-              sessionRepository
-                .set(updatedAnswersWithJourneyType)
-                .map(_ => Redirect(onwardRoute(subcontractorType, subbieResourceRef)))
-          )
-    )
+    }
 
   private def populateUserAnswers(
     subcontractorType: TypeOfSubcontractor,

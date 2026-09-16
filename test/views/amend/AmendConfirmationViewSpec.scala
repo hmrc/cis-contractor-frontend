@@ -102,7 +102,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         messages("amendConfirmation.yourSubcontractors")
     }
 
-   "render the subcontractor name in the confirmation text" in new Setup {
+    "render the subcontractor name in the confirmation text" in new Setup {
 
       val html =
         view(
@@ -121,8 +121,8 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         messages(
           "amendConfirmation.p1",
           subcontractorName
-     )
-  }
+        )
+    }
 
     "render the survey link for standard journey" in new Setup {
 

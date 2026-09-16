@@ -68,10 +68,10 @@ class AmendTrustConfirmationController @Inject() (
             Future.successful(recoveryRedirect)
           case Some(originalTrustAnswers) =>
             ua.get(CisIdQuery) match {
-              case None        =>
+              case None =>
                 logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
-              
+
               case Some(cisId) =>
                 ua.get(AmendJourneyTypePage) match {
 

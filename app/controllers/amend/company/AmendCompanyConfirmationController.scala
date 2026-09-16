@@ -52,99 +52,98 @@ class AmendCompanyConfirmationController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-  (identify andThen getData andThen requireData).async { implicit request =>
-    val recoveryRedirect =
-      Redirect(routes.JourneyRecoveryController.onPageLoad())
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-    val ua = request.userAnswers
+      val ua = request.userAnswers
 
-    if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-      logger.warn(
-        "[AmendCompanyConfirmationController] Accessed without prior CYA submission"
-      )
-      Future.successful(recoveryRedirect)
-    } else {
-      ua.get(OriginalCompanyAnswersQuery) match {
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
+        logger.warn(
+          "[AmendCompanyConfirmationController] Accessed without prior CYA submission"
+        )
+        Future.successful(recoveryRedirect)
+      } else {
+        ua.get(OriginalCompanyAnswersQuery) match {
 
-        case None =>
-          logger.error(
-            "[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery"
-          )
-          Future.successful(recoveryRedirect)
+          case None =>
+            logger.error(
+              "[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery"
+            )
+            Future.successful(recoveryRedirect)
 
-        case Some(originalCompanyAnswers) =>
-          ua.get(CisIdQuery) match {
+          case Some(originalCompanyAnswers) =>
+            ua.get(CisIdQuery) match {
 
-            case None =>
-              logger.error(
-                "[AmendCompanyConfirmationController] Missing CisIdQuery"
-              )
-              Future.successful(recoveryRedirect)
+              case None =>
+                logger.error(
+                  "[AmendCompanyConfirmationController] Missing CisIdQuery"
+                )
+                Future.successful(recoveryRedirect)
 
-            case Some(cisId) =>
-              ua.get(AmendJourneyTypePage) match {
+              case Some(cisId) =>
+                ua.get(AmendJourneyTypePage) match {
 
-                case Some(journeyType) =>
-                  val tableRows =
-                    CompanyAmendConfirmationViewModel.rows(
-                      originalCompanyAnswers,
-                      ua
-                    )
-
-                  val companyName =
-                    ua.get(CompanyNamePage).getOrElse("")
-
-                  val confirmationLink =
-                    AmendConfirmationLinks.build(
-                      journeyType,
-                      cisId,
-                      appConfig
-                    )
-
-                  val persistFinalUserAnswers =
-                    journeyType match {
-
-                      case AmendJourneyType.Standard =>
-                        sessionRepository
-                          .set(ua)
-                          .map(_ => ua)
-
-                      case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                        verificationService.refreshVerificationBatches(
-                          ua
-                        )
-                    }
-
-                  persistFinalUserAnswers
-                    .map { _ =>
-                      Ok(
-                        view(
-                          tableRows,
-                          companyName,
-                          confirmationLink
-                        )
-                      )
-                    }
-                    .recover { case exception =>
-                      logger.error(
-                        "[AmendCompanyConfirmationController.onPageLoad] " +
-                          "Failed to persist confirmation session data",
-                        exception
+                  case Some(journeyType) =>
+                    val tableRows =
+                      CompanyAmendConfirmationViewModel.rows(
+                        originalCompanyAnswers,
+                        ua
                       )
 
-                      recoveryRedirect
-                    }
+                    val companyName =
+                      ua.get(CompanyNamePage).getOrElse("")
 
-                case None =>
-                  logger.error(
-                    "[AmendCompanyConfirmationController] Missing AmendJourneyTypePage"
-                  )
+                    val confirmationLink =
+                      AmendConfirmationLinks.build(
+                        journeyType,
+                        cisId,
+                        appConfig
+                      )
 
-                  Future.successful(recoveryRedirect)
-              }
-          }
+                    val persistFinalUserAnswers =
+                      journeyType match {
+
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
+
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(
+                            ua
+                          )
+                      }
+
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            companyName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
+                          "[AmendCompanyConfirmationController.onPageLoad] " +
+                            "Failed to persist confirmation session data",
+                          exception
+                        )
+
+                        recoveryRedirect
+                      }
+
+                  case None =>
+                    logger.error(
+                      "[AmendCompanyConfirmationController] Missing AmendJourneyTypePage"
+                    )
+
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
       }
     }
-  }
-    }
-      
+}

@@ -79,7 +79,7 @@ class AmendPartnershipConfirmationController @Inject() (
               case None =>
                 logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
-              
+
               case Some(cisId) =>
                 ua.get(AmendJourneyTypePage) match {
 

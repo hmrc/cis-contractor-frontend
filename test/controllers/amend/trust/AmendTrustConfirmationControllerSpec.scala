@@ -23,6 +23,8 @@ import models.amend.AmendJourneyType
 import models.amend.trust.OriginalTrustAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.TrustNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.inject.bind
@@ -36,7 +38,7 @@ import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
-class AmendTrustConfirmationControllerSpec extends SpecBase {
+class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val cisId = "123456789"
 
@@ -350,7 +352,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase {
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes.ReviewUnmatchedInfoSubcontractorsController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
             .onPageLoad()
             .url
         )
