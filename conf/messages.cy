@@ -117,6 +117,40 @@ unauthorised.agent.p2.link               =  xxxxxxxxxxxxxxxxxxxx
 unauthorised.agent.p2.suffix             =  xxxxxxxxxxxxxxxxxxxx
 
 # Individual and Common
+amendPartnershipRemoveDetailYesNo.heading                                           =  Ydych chi’n siŵr eich bod chi am dynnu’r {0} o gofnod {1}?
+amendPartnershipRemoveDetailYesNo.error.required                                    =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
+amendPartnershipRemoveDetailYesNo.detail.address                                    =  cyfeiriad
+amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  manylion cysylltu
+amendPartnershipRemoveDetailYesNo.detail.utr                                        =  UTR
+amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  cyfeirnod y gwaith
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  UTR y partner enwebedig
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  rhif Yswiriant Gwladol y partner enwebedig
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  rhif cofrestru’r cwmni y partner enwebedig
+
+amendConfirmation.panel.heading                                                     =  Manylion yr is-gontractwr wedi’u diweddaru
+amendConfirmation.p1                                                                =  Rydych chi wedi diweddaru’r manylion is-gontractwr ar gyfer {0}.
+amendConfirmation.updatesMade.h2                                                    =  Wedi’u diweddaru
+amendConfirmation.table.hdr.previous                                                =  Blaenorol
+amendConfirmation.table.hdr.updated                                                 =  Wedi’i ddiweddaru
+amendConfirmation.table.hdr.details                                                 =  Manylion
+amendConfirmation.backTo                                                            =  Yn ôl i
+amendConfirmation.yourSubcontractors                                                =  Eich is-gontractwyr
+amendConfirmation.beforeYouGo.h2                                                    =  Cyn i chi fynd
+amendConfirmation.beforeYouGo.p1                                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
+amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Llenwch arolwg byr
+amendConfirmation.beforeYouGo.shareFeedback                                         =  i rannu’ch adborth ar y gwasanaeth hwn.
+amendConfirmation.table.content.none                                                =  Heb roi un
+amendConfirmation.table.selectContent.none                                          =  Heb ddewis un
+
+amendCheckYourAnswers.title                                                         =  Gwybodaeth am yr is-gontractwr
+amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  Gwybodaeth am yr is-gontractwr
+amendCheckYourAnswers.heading.moreDetails.h2                                        =  Rhagor o fanylion
+amendCheckYourAnswers.confirm.h2                                                    =  Cadarnhau’r newidiadau
+amendCheckYourAnswers.confirm.p1                                                    =  Drwy newid manylion yr is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
+amendCheckYourAnswers.confirm                                                       =  Cadarnhau
+amendCheckYourAnswers.cancelChanges                                                 =  Canslo’r newidiadau
+amendCheckYourAnswers.verificationNumber.label                                      =  Rhif dilysu
+
 typeOfSubcontractor.title                                                           =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
 typeOfSubcontractor.heading                                                         =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
 typeOfSubcontractor.soletrader                                                      =  Unigolyn neu unig fasnachwr
@@ -401,30 +435,6 @@ amendCompanyRemoveDetailYesNo.detail.utr                                        
 amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber                      =  xxxxxxxxxxxxxxxxxxxx
 amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber                           =  xxxxxxxxxxxxxxxxxxxx
 
-amendCheckYourAnswers.title                                                         =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.heading.moreDetails.h2                                        =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.confirm.h2                                                    =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.confirm.p1                                                    =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.confirm                                                       =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.cancelChanges                                                 =  xxxxxxxxxxxxxxxxxxxx
-amendCheckYourAnswers.verificationNumber.label                                      =  xxxxxxxxxxxxxxxxxxxx
-
-amendConfirmation.panel.heading                                                     =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.p1                                                                =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.updatesMade.h2                                                    =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.table.hdr.previous                                                =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.table.hdr.updated                                                 =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.table.hdr.details                                                 =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.backTo                                                            =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.yourSubcontractors                                                =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.beforeYouGo.h2                                                    =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.beforeYouGo.p1                                                    =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.beforeYouGo.shareFeedback                                         =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.table.content.none                                                =  xxxxxxxxxxxxxxxxxxxx
-amendConfirmation.table.selectContent.none                                          =  xxxxxxxxxxxxxxxxxxxx
-
 amendTrustRemoveDetailYesNo.title                                                   =  xxxxxxxxxxxxxxxxxxxx
 amendTrustRemoveDetailYesNo.heading                                                 =  xxxxxxxxxxxxxxxxxxxx
 amendTrustRemoveDetailYesNo.error.required                                          =  xxxxxxxxxxxxxxxxxxxx
@@ -434,15 +444,6 @@ amendTrustRemoveDetailYesNo.detail.utr                                          
 amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                             =  xxxxxxxxxxxxxxxxxxxx
 
 amendPartnershipRemoveDetailYesNo.title                                             =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.heading                                           =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.error.required                                    =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.address                                    =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.utr                                        =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  xxxxxxxxxxxxxxxxxxxx
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  xxxxxxxxxxxxxxxxxxxx
 
 amendIndividualRemoveDetailYesNo.title                                              =  xxxxxxxxxxxxxxxxxxxx
 amendIndividualRemoveDetailYesNo.heading                                            =  xxxxxxxxxxxxxxxxxxxx
@@ -496,6 +497,49 @@ insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback               
 insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  xxxxxxxxxxxxxxxxxxxx
+
+proceedInsufficientSubcontractorNameYesNo.title                                     =  A ydych yn siŵr eich bod am barhau gyda chynnwys yr is-gontractwr hwn yn y cais hwn am ddilysiad
+proceedInsufficientSubcontractorNameYesNo.heading                                   =  A ydych yn siŵr eich bod am barhau gyda chynnwys {0} yn y cais hwn am ddilysiad?
+proceedInsufficientSubcontractorNameYesNo.hint                                      =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
+proceedInsufficientSubcontractorNameYesNo.error.required                            =  xxxxxxxxxxxxxxxxxxxx
+
+removeInsufficientSubcontractorNameYesNo.title                                      =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
+removeInsufficientSubcontractorNameYesNo.heading                                    =  A ydych yn siŵr eich bod am ddileu {0} o’r cais hwn am ddilysiad?
+removeInsufficientSubcontractorNameYesNo.hint                                       =  Bydd hyn yn golygu y byddant yn parhau i fod heb eu dilysu, felly ni chewch wneud unrhyw daliad iddynt.
+removeInsufficientSubcontractorNameYesNo.error.required                             =  xxxxxxxxxxxxxxxxxxxx
+
+noUnmatchedSubcontractors.title                                                     =  Dim is-gontractwyr sydd heb eu paru
+noUnmatchedSubcontractors.heading                                                   =  Dim is-gontractwyr sydd heb eu paru
+noUnmatchedSubcontractors.p1                                                        =  Mae’r is-gontractwyr sydd wedi cael eu nodi fel rhai sydd heb eu paru yn eich canlyniadau dilysu diweddaraf wedi cael eu dileu.
+noUnmatchedSubcontractors.p2                                                        =  Gallwch nawr ddilysu unrhyw un o’ch is-gontractwyr eraill drwy greu cais newydd am ddilysiad.
+noUnmatchedSubcontractors.backTo                                                    =  Yn ôl i
+noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Rheoli’ch is-gontractwyr
+
+unmatched.removeSubcontractorVerifyRequest.title                                    =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
+unmatched.removeSubcontractorVerifyRequest.heading                                  =  A ydych yn siŵr eich bod am ddileu {0} o’r cais hwn am ddilysiad?
+unmatched.removeSubcontractorVerifyRequest.p1                                       =  Bydd hyn yn golygu y byddant yn parhau i fod heb eu dilysu, felly ni chewch wneud unrhyw daliad iddynt.
+unmatched.removeSubcontractorVerifyRequest.error.required                           =  Dewiswch ‘Iawn’ os ydych am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad
+unmatched.proceedSubcontractorVerifyRequest.title                                   =  A ydych yn siŵr eich bod am barhau gyda dilysu yr is-gontractwr
+unmatched.proceedSubcontractorVerifyRequest.heading                                 =  A ydych yn siŵr eich bod am barhau gyda dilysu {0}?
+unmatched.proceedSubcontractorVerifyRequest.p1                                      =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
+unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Dewiswch ‘Iawn’ os ydych chi am barhau i ddilysu’r is-gontractwr hwn
+
+info.CheckYourAnswers.backTo                                                        =  Yn ôl i
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Ni ellir dilysu pob is-gontractwr.
+info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Adolygiad o is-gontractwyr sydd heb eu paru
+
+agent.agentLostAccess.title                                                         =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.heading                                                       =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.p1                                                            =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.h2                                                            =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.title                                                  =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.item.1.prefix                                          =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.item.1.link                                            =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.item.2.prefix                                          =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.item.2.link                                            =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.bullet.item.2.suffix                                          =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.p2                                                            =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.return.link                                                   =  xxxxxxxxxxxxxxxxxxxx
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  xxxxxxxxxxxxxxxxxxxx
@@ -1098,17 +1142,89 @@ verify.verifyDepartmentalErrorSubmitAgainController.p2                          
 verify.verifyDepartmentalErrorSubmitAgainController.backTo                         =  xxxxxxxxxxxxxxxxxxxx
 verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link  =  xxxxxxxxxxxxxxxxxxxx
 
+verify.reviewInsufficientInfo.title                                                =  Ni ellir dilysu pob is-gontractwr
+verify.reviewInsufficientInfo.heading                                              =  Ni ellir dilysu pob is-gontractwr
+verify.reviewInsufficientInfo.p1                                                   =  Nid oes gan bob un o’r is-gontractwyr sydd yn eich cais am ddilysiad yr holl wybodaeth sydd ei hangen arnom er mwyn eu dilysu.
+verify.reviewInsufficientInfo.p2                                                   =  I gywiro hyn, gallwch wneud y canlynol:
+verify.reviewInsufficientInfo.bullet1                                              =  diwygio’u gwybodaeth, a chywiro unrhyw fanylion amdanynt
+verify.reviewInsufficientInfo.bullet2                                              =  parhau i’w cynnwys yn y cais hwn am ddilysiad heb wneud unrhyw newidiadau
+verify.reviewInsufficientInfo.bullet3                                              =  dileu’r is-gontractwr o’r cais hwn am ddilysiad
+verify.reviewInsufficientInfo.whatYouNeed.link                                     =  Yr hyn y bydd ei angen arnoch er mwyn dilysu is-gontractwyr (yn agor dab newydd)
+verify.reviewInsufficientInfo.missing.subheading                                   =  Is-gontractwyr sydd â gwybodaeth ar goll
+verify.reviewInsufficientInfo.ready.subheading                                     =  Yn barod am ddilysiad
+verify.reviewInsufficientInfo.name                                                 =  Enw
+verify.reviewInsufficientInfo.utr                                                  =  UTR
+verify.reviewInsufficientInfo.noneProvided                                         =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.actions                                              =  Camau
+verify.reviewInsufficientInfo.action.edit                                          =  Golygu
+verify.reviewInsufficientInfo.action.proceed                                       =  Parhau
+verify.reviewInsufficientInfo.action.remove                                        =  Dileu
+
+verify.verificationResults.title                                                   =  Canlyniadau dilysu
+verify.verificationResults.heading                                                 =  Canlyniadau dilysu
+verify.verificationResults.paragraph                                               =  Dyma ganlyniadau dilysu eich cais diweddaraf am ddilysiad.
+verify.verificationResults.name                                                    =  Enw
+verify.verificationResults.status                                                  =  Statws dilysu
+verify.verificationResults.taxTreatment                                            =  Triniaeth o ran treth
+verify.verificationResults.verificationNumber                                      =  Rhif dilysu
+verify.verificationResults.reviewUnmatchedSubcontractors.button                    =  Adolygiad o is-gontractwyr sydd heb eu paru
+verify.verificationResults.backTo                                                  =  Yn ôl i
+verify.verificationResults.manageYourSubcontractors.link                           =  Yn ôl i Rheoli’ch is-gontractwyr
+verify.verificationResults.status.matched                                          =  xxxxxxxxxxxxxxxxxxxx
+verify.verificationResults.status.unmatched                                        =  xxxxxxxxxxxxxxxxxxxx
+verify.verificationResults.taxTreatment.net                                        =  xxxxxxxxxxxxxxxxxxxx
+verify.verificationResults.taxTreatment.gross                                      =  xxxxxxxxxxxxxxxxxxxx
+verify.verificationResults.taxTreatment.unmatched                                  =  xxxxxxxxxxxxxxxxxxxx
+
+verify.reviewUnmatched.title                                                       =  Adolygiad o is-gontractwyr sydd heb eu paru
+verify.reviewUnmatched.heading                                                     =  Adolygiad o is-gontractwyr sydd heb eu paru
+verify.reviewUnmatched.p1                                                          =  Mae rhai o’r manylion ynghylch yr is-gontractwyr sydd yn eich cais diweddaraf am ddilysiad yn wahanol i’r wybodaeth sydd gan CThEF am yr is-gontractwyr, ac felly nid yw’r manylion yn cyd-fynd. Golyga hyn na allwn eu dilysu, na rhoi triniaeth gywir iddynt o ran treth.
+verify.reviewUnmatched.p2                                                          =  I gywiro hyn, gallwch wneud y canlynol:
+verify.reviewUnmatched.bullet1                                                     =  diwygio’u gwybodaeth, a chywiro unrhyw fanylion amdanynt, cyn mynd ati i’w dilysu unwaith eto
+verify.reviewUnmatched.bullet2                                                     =  parhau i’w dilysu eto heb wneud unrhyw newidiadau
+verify.reviewUnmatched.bullet3                                                     =  dileu’r is-gontractwr o’r cais hwn am ddilysiad
+verify.reviewUnmatched.whatYouNeed.link                                            =  Yr hyn sydd angen i chi ei wneud fel contractwr yn y Cynllun y Diwydiant Adeiladu (CIS) (yn agor tab newydd)
+verify.reviewUnmatched.unmatched.subheading                                        =  Is-gontractwyr sydd heb eu paru
+verify.reviewUnmatched.ready.subheading                                            =  Yn barod am ddilysiad
+verify.reviewUnmatched.name                                                        =  Enw
+verify.reviewUnmatched.utr                                                         =  UTR
+verify.reviewUnmatched.noneProvided                                                =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.actions                                                     =  Camau
+verify.reviewUnmatched.action.edit                                                 =  Golygu
+verify.reviewUnmatched.action.proceed                                              =  Parhau
+verify.reviewUnmatched.action.remove                                               =  Dileu
+verify.reviewUnmatched.backToResults.prefix                                        =  Yn ôl i
+verify.reviewUnmatched.backToResults.link                                          =  Ganlyniadau dilysu
+
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Manylion y contractwr
 contractordetails.contractorDetailsIndex.heading                               =  Rheoli manylion y contractwr
 contractordetails.contractorDetailsIndex.p1                                    =  I ddefnyddio’r gwasanaeth Cynllun y Diwydiant Adeiladu, bydd angen Cyfeirnod Unigryw y Trethdalwr y contractwr arnoch.
 
+contractordetails.contractorUtr.title                                          =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer eich contractwr
+contractordetails.contractorUtr.heading                                        =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer eich contractwr
+contractordetails.contractorUtr.p1                                             =  Bydd i’w weld yn eich Cyfrif Treth Personol, yn ap CThEF, neu ar Ffurflenni Treth a dogfennau eraill oddi wrth CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
+contractordetails.contractorUtr.findUtr.link                                   =  Cael rhagor o help i ddod o hyd i’ch UTR (yn agor tab newydd)
+contractordetails.contractorUtr.label                                          =  Beth yw’r UTR ar gyfer eich contractwr?
+contractordetails.contractorUtr.hint                                           =  Mae UTR yn rhif 10 digid.
+contractordetails.contractorUtr.error.required                                 =  Nodwch Gyfeirnod Unigryw y Trethdalwr 10 digid ar gyfer y contractwr
+contractordetails.contractorUtr.error.invalid                                  =  Nodwch Gyfeirnod Trethdalwr Unigryw (UTR) dilys sy’n 10 digid
+contractordetails.contractorUtr.checkYourAnswersLabel                          =  Cyfeirnod Unigryw y Trethdalwr
+contractordetails.contractorUtr.change.hidden                                  =  Cyfeirnod Unigryw y Trethdalwr
+contractordetails.contractorUtr.error.length                                   =  xxxxxxxxxxxxxxxxxxxx
+
+contractordetails.addSchemeNameYesNo.title                                     =  A ydych am nodi enw cynllun y contractwr?
+contractordetails.addSchemeNameYesNo.heading                                   =  A ydych am nodi enw cynllun y contractwr?
+contractordetails.addSchemeNameYesNo.error.required                            =  Dewiswch ‘Iawn’ i nodi enw cynllun y contractwr
+contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Ychwanegu enw’r cynllun?
+contractordetails.addSchemeNameYesNo.change.hidden                             =  ychwanegu enw’r cynllun?
+
 contractordetails.schemeName.title                                             =  Beth yw enw cynllun y contractwr?
 contractordetails.schemeName.heading                                           =  Beth yw enw cynllun y contractwr?
-contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
 contractordetails.schemeName.error.required                                    =  Nodwch enw’r cynllun
 contractordetails.schemeName.error.length                                      =  Rydych wedi nodi gormod o gymeriadau ar gyfer enw’r cynllun
 contractordetails.schemeName.error.invalidCharacters                           =  Rydych wedi nodi enw’r cynllun yn y fformat anghywir
+contractordetails.schemeName.checkYourAnswersLabel                             =  Enw’r cynllun
 contractordetails.schemeName.change.hidden                                     =  enw’r Cynllun
 
 contractordetails.enterContractorEmailAddress.title                            =  Beth yw cyfeiriad e-bost y contractwr?
@@ -1127,18 +1243,6 @@ contractordetails.contractorDetailsUpdated.returnToDashboard.link              =
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link             =  Beth oedd eich barn am y gwasanaeth hwn?
 contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix           =  (mae’n cymryd 30 eiliad)
 
-contractordetails.contractorUtr.title                                          =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer eich contractwr
-contractordetails.contractorUtr.heading                                        =  Cyfeirnod Unigryw y Trethdalwr (UTR) ar gyfer eich contractwr
-contractordetails.contractorUtr.p1                                             =  Bydd i’w weld yn eich Cyfrif Treth Personol, yn ap CThEF, neu ar Ffurflenni Treth a dogfennau eraill oddi wrth CThEF. Efallai y cyfeirir ato gan ddefnyddio’r geiriau ‘cyfeirnod’, ‘UTR’ neu ‘defnydd swyddogol’.
-contractordetails.contractorUtr.findUtr.link                                   =  Cael rhagor o help i ddod o hyd i’ch UTR (yn agor tab newydd)
-contractordetails.contractorUtr.label                                          =  Beth yw’r UTR ar gyfer eich contractwr?
-contractordetails.contractorUtr.hint                                           =  Mae UTR yn rhif 10 digid.
-contractordetails.contractorUtr.checkYourAnswersLabel                          =  Cyfeirnod Unigryw y Trethdalwr
-contractordetails.contractorUtr.change.hidden                                  =  Cyfeirnod Unigryw y Trethdalwr
-contractordetails.contractorUtr.error.required                                 =  Nodwch Gyfeirnod Unigryw y Trethdalwr 10 digid ar gyfer y contractwr
-contractordetails.contractorUtr.error.invalid                                  =  Nodwch Gyfeirnod Trethdalwr Unigryw (UTR) dilys sy’n 10 digid
-contractordetails.contractorUtr.error.length                                   =  xxxxxxxxxxxxxxxxxxxx
-
 contractordetails.contractorDetailsCheckAnswers.title                          =  Manylion y contractwr
 contractordetails.contractorDetailsCheckAnswers.heading                        =  Manylion y contractwr
 contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference        =  Cyfeirnod y swyddfa gyfrifon: {0}
@@ -1156,124 +1260,9 @@ contractordetails.addEmailAddressYesNo.error.required                          =
 contractordetails.addEmailAddressYesNo.checkYourAnswersLabel                   =  Ychwanegu cyfeiriad e-bost?
 contractordetails.addEmailAddressYesNo.change.hidden                           =  ychwanegu cyfeiriad e-bost?
 
-contractordetails.addSchemeNameYesNo.title                                     =  A ydych am nodi enw cynllun y contractwr?
-contractordetails.addSchemeNameYesNo.heading                                   =  A ydych am nodi enw cynllun y contractwr?
-contractordetails.addSchemeNameYesNo.error.required                            =  Dewiswch ‘Iawn’ i nodi enw cynllun y contractwr
-contractordetails.addSchemeNameYesNo.checkYourAnswersLabel                     =  Ychwanegu enw’r cynllun?
-contractordetails.addSchemeNameYesNo.change.hidden                             =  ychwanegu enw’r cynllun?
-
 contractordetails.removeDetailYesNo.title                                      =  A ydych yn siŵr eich bod am dynnu {0} y contractwr?
 contractordetails.removeDetailYesNo.heading                                    =  A ydych yn siŵr eich bod am dynnu {0} y contractwr?
 contractordetails.removeDetailYesNo.detail.email                               =  cyfeiriad e-bost
 contractordetails.removeDetailYesNo.detail.schemeName                          =  enw’r cynllun
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
-
-verify.reviewInsufficientInfo.title                                            =  Ni ellir dilysu pob is-gontractwr
-verify.reviewInsufficientInfo.heading                                          =  Ni ellir dilysu pob is-gontractwr
-verify.reviewInsufficientInfo.p1                                               =  Nid oes gan bob un o’r is-gontractwyr sydd yn eich cais am ddilysiad yr holl wybodaeth sydd ei hangen arnom er mwyn eu dilysu.
-verify.reviewInsufficientInfo.p2                                               =  I gywiro hyn, gallwch wneud y canlynol:
-verify.reviewInsufficientInfo.bullet1                                          =  diwygio’u gwybodaeth, a chywiro unrhyw fanylion amdanynt
-verify.reviewInsufficientInfo.bullet2                                          =  parhau i’w cynnwys yn y cais hwn am ddilysiad heb wneud unrhyw newidiadau
-verify.reviewInsufficientInfo.bullet3                                          =  dileu’r is-gontractwr o’r cais hwn am ddilysiad
-verify.reviewInsufficientInfo.whatYouNeed.link                                 =  Yr hyn y bydd ei angen arnoch er mwyn dilysu is-gontractwyr (yn agor dab newydd)
-verify.reviewInsufficientInfo.missing.subheading                               =  Is-gontractwyr sydd â gwybodaeth ar goll
-verify.reviewInsufficientInfo.ready.subheading                                 =  Yn barod am ddilysiad
-verify.reviewInsufficientInfo.name                                             =  Enw
-verify.reviewInsufficientInfo.utr                                              =  UTR
-verify.reviewInsufficientInfo.noneProvided                                     =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.actions                                          =  Camau
-verify.reviewInsufficientInfo.action.edit                                      =  Golygu
-verify.reviewInsufficientInfo.action.proceed                                   =  Parhau
-verify.reviewInsufficientInfo.action.remove                                    =  Dileu
-verify.reviewInsufficientInfo.hidden.subcontractor                             =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.edit.hidden                               =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.proceed.hidden                            =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewInsufficientInfo.action.remove.hidden                             =  xxxxxxxxxxxxxxxxxxxx
-
-
-
-proceedInsufficientSubcontractorNameYesNo.title                                =  A ydych yn siŵr eich bod am barhau gyda chynnwys yr is-gontractwr hwn yn y cais hwn am ddilysiad
-proceedInsufficientSubcontractorNameYesNo.heading                              =  A ydych yn siŵr eich bod am barhau gyda chynnwys {0} yn y cais hwn am ddilysiad?
-proceedInsufficientSubcontractorNameYesNo.hint                                 =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
-proceedInsufficientSubcontractorNameYesNo.error.required                       =  xxxxxxxxxxxxxxxxxxxx
-
-removeInsufficientSubcontractorNameYesNo.title                                 =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
-removeInsufficientSubcontractorNameYesNo.heading                               =  A ydych yn siŵr eich bod am ddileu {0} o’r cais hwn am ddilysiad?
-removeInsufficientSubcontractorNameYesNo.hint                                  =  Bydd hyn yn golygu y byddant yn parhau i fod heb eu dilysu, felly ni chewch wneud unrhyw daliad iddynt.
-removeInsufficientSubcontractorNameYesNo.error.required                        =  xxxxxxxxxxxxxxxxxxxx
-
-noUnmatchedSubcontractors.title                                                =  Dim is-gontractwyr sydd heb eu paru
-noUnmatchedSubcontractors.heading                                              =  Dim is-gontractwyr sydd heb eu paru
-noUnmatchedSubcontractors.p1                                                   =  Mae’r is-gontractwyr sydd wedi cael eu nodi fel rhai sydd heb eu paru yn eich canlyniadau dilysu diweddaraf wedi cael eu dileu.
-noUnmatchedSubcontractors.p2                                                   =  Gallwch nawr ddilysu unrhyw un o’ch is-gontractwyr eraill drwy greu cais newydd am ddilysiad.
-noUnmatchedSubcontractors.backTo                                               =  Yn ôl i
-noUnmatchedSubcontractors.manageYourSubcontractors.link                        =  Rheoli’ch is-gontractwyr
-
-verify.verificationResults.title                                               =  Canlyniadau dilysu
-verify.verificationResults.heading                                             =  Canlyniadau dilysu
-verify.verificationResults.paragraph                                           =  Dyma ganlyniadau dilysu eich cais diweddaraf am ddilysiad.
-verify.verificationResults.name                                                =  Enw
-verify.verificationResults.status                                              =  Statws dilysu
-verify.verificationResults.taxTreatment                                        =  Triniaeth o ran treth
-verify.verificationResults.verificationNumber                                  =  Rhif dilysu
-verify.verificationResults.reviewUnmatchedSubcontractors.button                =  Adolygiad o is-gontractwyr sydd heb eu paru
-verify.verificationResults.backTo                                              =  Yn ôl i
-verify.verificationResults.manageYourSubcontractors.link                       =  Yn ôl i Rheoli’ch is-gontractwyr
-verify.verificationResults.status.matched                                      =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.status.unmatched                                    =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.net                                    =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.gross                                  =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationResults.taxTreatment.unmatched                              =  xxxxxxxxxxxxxxxxxxxx
-
-unmatched.removeSubcontractorVerifyRequest.title                               =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
-unmatched.removeSubcontractorVerifyRequest.heading                             =  A ydych yn siŵr eich bod am ddileu {0} o’r cais hwn am ddilysiad?
-unmatched.removeSubcontractorVerifyRequest.p1                                  =  Bydd hyn yn golygu y byddant yn parhau i fod heb eu dilysu, felly ni chewch wneud unrhyw daliad iddynt.
-unmatched.removeSubcontractorVerifyRequest.error.required                      =  Dewiswch ‘Iawn’ os ydych am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad
-
-unmatched.proceedSubcontractorVerifyRequest.title                              =  A ydych yn siŵr eich bod am barhau gyda dilysu yr is-gontractwr
-unmatched.proceedSubcontractorVerifyRequest.heading                            =  A ydych yn siŵr eich bod am barhau gyda dilysu {0}?
-unmatched.proceedSubcontractorVerifyRequest.p1                                 =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
-unmatched.proceedSubcontractorVerifyRequest.error.required                     =  Dewiswch ‘Iawn’ os ydych chi am barhau i ddilysu’r is-gontractwr hwn
-
-verify.reviewUnmatched.title                                                   =  Adolygiad o is-gontractwyr sydd heb eu paru
-verify.reviewUnmatched.heading                                                 =  Adolygiad o is-gontractwyr sydd heb eu paru
-verify.reviewUnmatched.p1                                                      =  Mae rhai o’r manylion ynghylch yr is-gontractwyr sydd yn eich cais diweddaraf am ddilysiad yn wahanol i’r wybodaeth sydd gan CThEF am yr is-gontractwyr, ac felly nid yw’r manylion yn cyd-fynd. Golyga hyn na allwn eu dilysu, na rhoi triniaeth gywir iddynt o ran treth.
-verify.reviewUnmatched.p2                                                      =  I gywiro hyn, gallwch wneud y canlynol:
-verify.reviewUnmatched.bullet1                                                 =  diwygio’u gwybodaeth, a chywiro unrhyw fanylion amdanynt, cyn mynd ati i’w dilysu unwaith eto
-verify.reviewUnmatched.bullet2                                                 =  parhau i’w dilysu eto heb wneud unrhyw newidiadau
-verify.reviewUnmatched.bullet3                                                 =  dileu’r is-gontractwr o’r cais hwn am ddilysiad
-verify.reviewUnmatched.whatYouNeed.link                                        =  Yr hyn sydd angen i chi ei wneud fel contractwr yn y Cynllun y Diwydiant Adeiladu (CIS) (yn agor tab newydd)
-verify.reviewUnmatched.unmatched.subheading                                    =  Is-gontractwyr sydd heb eu paru
-verify.reviewUnmatched.ready.subheading                                        =  Yn barod am ddilysiad
-verify.reviewUnmatched.name                                                    =  Enw
-verify.reviewUnmatched.utr                                                     =  UTR
-verify.reviewUnmatched.noneProvided                                            =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewUnmatched.actions                                                 =  Camau
-verify.reviewUnmatched.action.edit                                             =  Golygu
-verify.reviewUnmatched.action.proceed                                          =  Parhau
-verify.reviewUnmatched.action.remove                                           =  Dileu
-verify.reviewUnmatched.backToResults.prefix                                    =  Yn ôl i
-verify.reviewUnmatched.backToResults.link                                      =  Ganlyniadau dilysu
-verify.reviewUnmatched.action.edit.hidden                                      =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewUnmatched.action.proceed.hidden                                   =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewUnmatched.action.remove.hidden                                    =  xxxxxxxxxxxxxxxxxxxx
-verify.reviewUnmatched.name.hidden                                             =  xxxxxxxxxxxxxxxxxxxx
-
-
-info.CheckYourAnswers.backTo                                                   =  Yn ôl i
-info.CheckYourAnswers.cannotVerifyAllSubcontractors                            =  Ni ellir dilysu pob is-gontractwr.
-info.CheckYourAnswers.reviewUnmatchedSubcontractors                            =  Adolygiad o is-gontractwyr sydd heb eu paru
-
-agent.agentLostAccess.title = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.heading = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.p1 = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.h2 = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.title = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.1.prefix = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.1.link = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.prefix = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.link = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.suffix = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.p2 = xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.return.link = xxxxxxxxxxxxxxxxxxxx
