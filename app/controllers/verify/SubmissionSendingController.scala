@@ -87,7 +87,9 @@ class SubmissionSendingController @Inject() (
 
           verificationService
             .pollStatusAndPersist(request.userAnswers, submissionDetails)
-            .map(response => redirectForPollSubmissionResponse(response, pollInterval))
+            .flatMap { response =>
+              redirectForPollSubmissionResponse(response, pollInterval)
+            }
             .recover { case ex =>
               logger.error(
                 "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
@@ -152,37 +154,44 @@ class SubmissionSendingController @Inject() (
   private def redirectForPollSubmissionResponse(
     response: ChrisPollResponse,
     pollInterval: Int
-  )(implicit request: DataRequest[_]): Result =
+  )(implicit request: DataRequest[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Ok(view())
-          .withHeaders("Refresh" -> pollInterval.toString)
-
-      case SUBMITTED =>
-        Redirect(
-          controllers.verify.routes.VerificationRequestSubmittedController
-            .onPageLoad()
+        Future.successful(
+          Ok(view())
+            .withHeaders("Refresh" -> pollInterval.toString)
         )
 
+      case SUBMITTED =>
+        verificationService
+          .resetUserAnswers(request.userAnswers)
+          .map { _ =>
+            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+          }
+
       case SUBMITTED_NO_RECEIPT => // TODO: matching screen not found
-        recovery
+        Future.successful(recovery)
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
-        redirectForErrorStatus(status, response.govTalkErrorStatus)
+        Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
 
       case SEND_ERROR =>
-        Redirect(
-          controllers.verify.routes.VerifySendErrorController.onPageLoad()
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.VerifySendErrorController.onPageLoad()
+          )
         )
 
       case TIMED_OUT =>
-        Redirect(
-          controllers.verify.routes.VerificationRequestInProgressController
-            .onPageLoad()
+        Future.successful(
+          Redirect(
+            controllers.verify.routes.VerificationRequestInProgressController
+              .onPageLoad()
+          )
         )
 
       case _ =>
-        recovery
+        Future.successful(recovery)
     }
 
   private def isSubmitAgainError(
