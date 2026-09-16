@@ -32,7 +32,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import models.response.{CreateSubmissionForVerificationResponse, DeleteVerificationResponse}
 
 import java.net.URL
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -533,6 +532,167 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
       bodyCaptor.getValue mustBe Json.toJson(req)
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateSubcontractorForEdit" should {
+
+    val request =
+      UpdateSubcontractorRequest(
+        cisId = "INST-123",
+        subcontractor = SubcontractorRequest(
+          subcontractorId = 123L,
+          utr = None,
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = None,
+          nino = None,
+          secondName = None,
+          surname = None,
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = None,
+          lastUpdate = None,
+          subbieResourceRef = Some(1001L),
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      )
+
+    "return Unit when CIS responds with NO_CONTENT (204)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(NO_CONTENT, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      connector
+        .updateSubcontractorForEdit(request)
+        .futureValue mustBe (())
+
+      val bodyCaptor =
+        ArgumentCaptor.forClass(classOf[JsValue])
+
+      verify(rb)
+        .withBody(bodyCaptor.capture())(
+          any(),
+          any(),
+          any()
+        )
+
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "return Unit when CIS responds with OK (200)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(OK, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      connector
+        .updateSubcontractorForEdit(request)
+        .futureValue mustBe (())
+    }
+
+    "fail when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              INTERNAL_SERVER_ERROR,
+              "boom"
+            )
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      val ex =
+        connector
+          .updateSubcontractorForEdit(request)
+          .failed
+          .futureValue
+
+      ex.getMessage mustBe
+        s"Update subcontractor for edit failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 

@@ -16,32 +16,28 @@
 
 package services
 
-import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
-import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
+import models.amend.AmendJourneyType
 import models.response.GetCurrentVerificationBatchResponse
-import connectors.ConstructionIndustrySchemeConnector
-import models.requests.ProceedInsufficientVerificationRequest
 import models.verify.VerificationBatchReadiness
+import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
 import play.api.Logging
 import play.api.i18n.Messages
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.*
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 @Singleton
-class ReviewInsufficientInfoService @Inject() (
-  cisConnector: ConstructionIndustrySchemeConnector
-) extends Logging {
+class ReviewInsufficientInfoService @Inject() extends Logging {
 
   // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
   private val dummyUrl = "#"
 
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
-  )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
+  )(implicit messages: Messages): Try[ReviewInsufficientInfoViewModel] = {
+
     val batchSubs =
       batch.verifications.flatMap { verification =>
         batch.subcontractors
@@ -54,44 +50,34 @@ class ReviewInsufficientInfoService @Inject() (
         VerificationBatchReadiness.isSubcontractorReady(sub, Some(verification))
       }
 
-    ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map { case (sub, verification) => toMissingRow(sub, verification) },
-      ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
-    )
-  }
-
-  def proceedInsufficientVerification(cisId: String, subcontractorId: Long, batch: GetCurrentVerificationBatchResponse)(
-    implicit hc: HeaderCarrier
-  ): Future[Unit] = {
-    val request =
-      for {
-        verificationBatchResourceRef <- batch.verificationBatch.flatMap(_.verifBatchResourceRef)
-        verificationResourceRef      <- batch.verifications
-                                          .find(_.subcontractorId.contains(subcontractorId))
-                                          .flatMap(_.verificationResourceRef)
-      } yield ProceedInsufficientVerificationRequest(
-        instanceId = cisId,
-        verificationBatchResourceRef = verificationBatchResourceRef,
-        verificationResourceRef = verificationResourceRef,
-        proceed = "Y"
-      )
-    request match {
-      case Some(req) =>
-        cisConnector.proceedInsufficientVerification(req)
-
-      case None =>
-        Future.failed(
-          new RuntimeException(
-            s"Unable to proceed insufficient verification. Missing resource refs for subcontractorId=$subcontractorId"
+    missingSubs
+      .collectFirst {
+        case (sub, _) if sub.subbieResourceRef.isEmpty =>
+          Failure(
+            new IllegalStateException(
+              s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
+            )
+          )
+      }
+      .getOrElse {
+        Success(
+          ReviewInsufficientInfoViewModel(
+            missing = missingSubs.map { case (sub, verification) =>
+              toMissingRow(sub, verification)
+            },
+            ready = readySubs.map { case (sub, _) =>
+              toReadyRow(sub)
+            }
           )
         )
-    }
+      }
   }
 
   private def toMissingRow(
     sub: SubcontractorCurrentVerification,
     verification: VerificationCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
+
     val name      = displayName(sub)
     val removeUrl =
       verification.verificationResourceRef
@@ -104,7 +90,15 @@ class ReviewInsufficientInfoService @Inject() (
       name = name,
       nameLink = LinkViewModel(dummyUrl, name),
       utr = utrDisplay(sub),
-      editLink = LinkViewModel(dummyUrl, name),
+      editLink = LinkViewModel(
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url,
+        name
+      ),
       proceedLink = LinkViewModel(
         controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
           .onPageLoad(sub.subcontractorId)

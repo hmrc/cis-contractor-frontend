@@ -20,6 +20,7 @@
 @import viewmodels.verify.{ReviewInsufficientInfoViewModel, MissingSubcontractorRow, ReadySubcontractorRow, LinkViewModel}
 @import views.html.components._
 @import play.twirl.api.HtmlFormat
+@import viewmodels.checkAnswers.UtrContent
 
 @this(
     layout: templates.Layout,
@@ -90,7 +91,7 @@
                 rows = viewModel.missing.map { row =>
                     Seq(
                         TableRow(HtmlContent(nameLink(row.nameLink, row.name))),
-                        TableRow(Text(row.utr)),
+                        TableRow(UtrContent(row.utr)),
                         TableRow(HtmlContent(missingActions(row)))
                     )
                 },
@@ -120,9 +121,9 @@
     }
 
     @if(viewModel.allReady) {
-    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()) {
+    @formHelper(action = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onSubmit()) {
             @govukButton(Button(
-                content = Text(messages("site.continue")),
+                content = Text(messages("site.continue"))
             ))
         }
     }

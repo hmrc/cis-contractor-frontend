@@ -38,7 +38,6 @@ class YesOrNoPageGuardServiceSpec extends SpecBase with MockitoSugar with ModelG
     val mode = NormalMode
 
     val serviceTestData = Seq(
-      (SubTradingNameYesNoPage, controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)),
       (
         AddIndividualContactMethodsYesNoPage,
         controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)

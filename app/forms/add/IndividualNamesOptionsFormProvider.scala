@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package queries
+package forms.add
 
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import models.add.IndividualNamesOptions
+import play.api.data.Form
+import play.api.data.Forms.set
 
-case object AmendIndividualSubcontractorNameRemovedQuery extends Gettable[Boolean] with Settable[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath =
-    JsPath \ "amendIndividualSubcontractorNameRemoved"
+class IndividualNamesOptionsFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Set[IndividualNamesOptions]] =
+    Form(
+      "value" -> set(enumerable[IndividualNamesOptions]("individualNamesOptions.error.required"))
+        .verifying(nonEmptySet("individualNamesOptions.error.required"))
+    )
 }

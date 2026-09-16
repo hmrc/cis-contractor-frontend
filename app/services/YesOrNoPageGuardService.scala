@@ -44,7 +44,6 @@ class YesOrNoPageGuardService @Inject() extends LoggingUtil {
     }
 
   private def fetchRoute(page: QuestionPage[Boolean], mode: Mode): Call = page match {
-    case SubTradingNameYesNoPage              => controllers.add.routes.SubTradingNameYesNoController.onPageLoad(mode)
     case AddIndividualContactMethodsYesNoPage =>
       controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
     case UniqueTaxpayerReferenceYesNoPage     =>

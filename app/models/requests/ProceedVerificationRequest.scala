@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package pages.amend
+package models.requests
 
-import pages.QuestionPage
-import pages.add.IndividualJourney
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case object SubTradingNameYesNoAmendPage extends QuestionPage[Boolean] with IndividualJourney {
+case class ProceedVerificationRequest(
+  instanceId: String,
+  verificationBatchResourceRef: Long,
+  verificationResourceRef: Long
+)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "subTradingNameYesNo"
-
+object ProceedVerificationRequest {
+  given OFormat[ProceedVerificationRequest] = Json.format
 }

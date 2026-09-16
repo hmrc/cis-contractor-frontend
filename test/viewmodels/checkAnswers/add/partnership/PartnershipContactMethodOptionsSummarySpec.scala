@@ -205,7 +205,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
       row.actions.value.items mustBe empty
     }
 
-    "must return a row with empty value and no actions when no contact methods are selected" in {
+    "must return None when no contact method is selected" in {
 
       val answers = PartnershipAnswers(
         subcontractorType = models.TypeOfSubcontractor.Partnership,
@@ -232,20 +232,7 @@ class PartnershipContactMethodOptionsSummarySpec extends SpecBase with Matchers 
         verificationNumber = None
       )
 
-      val result = PartnershipContactMethodOptionsSummary.row(answers)
-
-      result mustBe defined
-
-      val row = result.value
-
-      row.key.content.asHtml.toString must include(
-        messages("partnershipContactMethodOptions.checkYourAnswersLabel")
-      )
-
-      row.value.content.asHtml.toString mustBe ""
-
-      row.actions mustBe defined
-      row.actions.value.items mustBe empty
+      PartnershipContactMethodOptionsSummary.row(answers) mustBe None
     }
   }
 
