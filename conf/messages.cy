@@ -14,6 +14,7 @@ site.signIn                                             =  Mewngofnodi
 site.govuk                                              =  GOV.UK
 site.saveAndContinue                                    =  Cadw a pharhau
 site.unknown                                            =  Anhysbys
+site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
 
 date.day                                                =  Diwrnod
 date.month                                              =  Mis
@@ -1158,6 +1159,10 @@ verify.reviewInsufficientInfo.actions                                           
 verify.reviewInsufficientInfo.action.edit                                          =  Golygu
 verify.reviewInsufficientInfo.action.proceed                                       =  Parhau
 verify.reviewInsufficientInfo.action.remove                                        =  Dileu
+verify.reviewInsufficientInfo.hidden.subcontractor                                 =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.edit.hidden                                   =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.proceed.hidden                                =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.remove.hidden                                 =  xxxxxxxxxxxxxxxxxxxx
 
 verify.verificationResults.title                                                   =  Canlyniadau dilysu
 verify.verificationResults.heading                                                 =  Canlyniadau dilysu
@@ -1194,6 +1199,10 @@ verify.reviewUnmatched.action.proceed                                           
 verify.reviewUnmatched.action.remove                                               =  Dileu
 verify.reviewUnmatched.backToResults.prefix                                        =  Yn ôl i
 verify.reviewUnmatched.backToResults.link                                          =  Ganlyniadau dilysu
+verify.reviewUnmatched.action.edit.hidden                                          =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.proceed.hidden                                       =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.remove.hidden                                        =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.name.hidden                                                 =  xxxxxxxxxxxxxxxxxxxx
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Manylion y contractwr
