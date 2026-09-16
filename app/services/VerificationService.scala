@@ -23,8 +23,8 @@ import models.response.*
 import models.verify.*
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
-import play.api.i18n.Messages
 import play.api.Logging
+import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
