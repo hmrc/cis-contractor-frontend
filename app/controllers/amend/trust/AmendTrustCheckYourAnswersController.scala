@@ -68,10 +68,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
     redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)) { implicit request =>
     val ua = request.userAnswers
 
-      ValidatedTrust.build(ua) match {
-        case Right(_) =>
-          val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val trustName  = ua.get(TrustNamePage).getOrElse("")
+    ValidatedTrust.build(ua) match {
+      case Right(_) =>
+        val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
+        val trustName  = ua.get(TrustNamePage).getOrElse("")
 
         val subcontractorInformationList =
           SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
