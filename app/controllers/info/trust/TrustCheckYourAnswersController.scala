@@ -20,6 +20,7 @@ import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
 import models.amend.AmendJourneyType
+import models.info.CheckYourAnswersValidation
 import models.info.trust.TrustAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -49,7 +50,7 @@ class TrustCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(TrustAnswersQuery) match {
 
-        case Some(answers) =>
+        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -93,10 +94,10 @@ class TrustCheckYourAnswersController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
-        case None =>
+        case Some(_) | None =>
           logger.error(
             "[TrustCheckYourAnswersController.onPageLoad] " +
-              "TrustAnswersQuery is missing"
+              "TrustAnswersQuery is missing or invalid"
           )
 
           Redirect(

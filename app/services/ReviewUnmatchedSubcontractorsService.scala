@@ -105,7 +105,12 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
           .url,
         name
       ),
-      removeLink = LinkViewModel(dummyUrl, name)
+      removeLink = LinkViewModel(
+        controllers.unmatched.routes.RemoveSubcontractorVerifyRequestController
+          .onPageLoad(sub.subcontractorId)
+          .url,
+        name
+      )
     )
   }
 

@@ -71,8 +71,9 @@ class AddressLookupConfigurationSpec extends SpecBase {
         mandatoryFieldsConfigModel = mandatoryFields
       ).options
 
+      options.useNewGovUkServiceNavigation mustBe Some(true)
       options.includeHMRCBranding mustBe Some(false)
-      options.disableTranslations mustBe Some(true)
+      options.disableTranslations mustBe Some(false)
       options.showPhaseBanner mustBe Some(true)
       options.showBackButtons mustBe Some(true)
       options.pageHeadingStyle mustBe "govuk-heading-l"
