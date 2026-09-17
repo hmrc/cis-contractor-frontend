@@ -65,7 +65,7 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber)
       .success
       .value
-  
+
   "TrustPhoneNumberController" - {
 
     "must return OK and the correct view for a GET when Phone is selected" in {

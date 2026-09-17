@@ -65,7 +65,7 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber)
       .success
       .value
-  
+
   "CompanyPhoneNumberController" - {
 
     "must return OK and the correct view for a GET when Phone is selected" in {

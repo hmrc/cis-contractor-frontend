@@ -63,9 +63,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private def uaWithNameAndFinalValidationPhoneTarget: UserAnswers =
-    uaWithName.set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber)
-      .success
-      .value
+    uaWithName.set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber).success.value
 
   "IndividualPhoneNumberController" - {
 
