@@ -19,10 +19,7 @@ package controllers.helpers
 import base.SpecBase
 import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
-import pages.add.partnership.{
-  PartnershipNamePage,
-  PartnershipNominatedPartnerNamePage
-}
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
 

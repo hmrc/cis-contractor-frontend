@@ -118,8 +118,8 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
     }
 
   private def uaWithDetailPresentButNameMissing(
-                                                 detail: AmendPartnershipRemoveDetail
-                                               ): UserAnswers =
+    detail: AmendPartnershipRemoveDetail
+  ): UserAnswers =
     if (nominatedPartnerDetails.contains(detail)) {
       uaWithDetail(detail)
         .remove(PartnershipNominatedPartnerNamePage)
@@ -131,7 +131,6 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
         .success
         .value
     }
-
 
   "AmendPartnershipRemoveDetailYesNo Controller" - {
 

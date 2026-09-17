@@ -344,7 +344,7 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
         .success
         .value
 
-      ValidatedPartnership.buildForAmend(ua).toOption .value.partnershipName mustBe ""
+      ValidatedPartnership.buildForAmend(ua).toOption.value.partnershipName mustBe ""
     }
 
     "return empty nominated partner name when PartnershipNominatedPartnerNamePage is missing" in {
@@ -353,7 +353,7 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
         .success
         .value
 
-      ValidatedPartnership.buildForAmend(ua).toOption .value.partnershipNominatedPartnerName mustBe ""
+      ValidatedPartnership.buildForAmend(ua).toOption.value.partnershipNominatedPartnerName mustBe ""
     }
   }
 

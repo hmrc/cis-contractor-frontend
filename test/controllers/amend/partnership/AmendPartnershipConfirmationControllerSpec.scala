@@ -435,7 +435,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result = route(app, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual OK
       }
