@@ -18,10 +18,11 @@ package controllers.add.trust
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
+import controllers.helpers.TrustNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
-import models.{Mode, UserAnswers}
-import pages.add.trust.{TrustAddressPage, TrustNamePage}
+import models.{AmendMode, Mode, UserAnswers}
+import pages.add.trust.TrustAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
@@ -49,7 +50,7 @@ class TrustAddressController @Inject() (
   override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
     messages: Messages
   ): Option[String] =
-    userAnswers.get(TrustNamePage)
+    TrustNameDisplayHelper.getDisplayName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.TrustAddressController.addressLookupCallback()
@@ -72,7 +73,7 @@ class TrustAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.TrustAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.TrustAddressController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 

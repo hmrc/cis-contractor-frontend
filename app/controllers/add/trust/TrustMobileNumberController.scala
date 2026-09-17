@@ -17,11 +17,12 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.TrustNameDisplayHelper
 import forms.add.trust.TrustMobileNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage, TrustNamePage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,7 +52,7 @@ class TrustMobileNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
-      val trustName     = request.userAnswers.get(TrustNamePage)
+      val trustName     = TrustNameDisplayHelper.getDisplayName(request.userAnswers, mode)
 
       (trustName, contactOption) match {
         case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Mobile) =>
@@ -71,7 +72,7 @@ class TrustMobileNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        trustName      <- request.userAnswers.get(TrustNamePage)
+        trustName      <- TrustNameDisplayHelper.getDisplayName(request.userAnswers, mode)
         contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Mobile)
       } yield form

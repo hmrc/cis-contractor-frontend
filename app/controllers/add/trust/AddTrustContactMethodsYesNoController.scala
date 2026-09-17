@@ -17,10 +17,11 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.TrustNameDisplayHelper
 import forms.add.trust.AddTrustContactMethodsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.{AddTrustContactMethodsYesNoPage, TrustNamePage}
+import pages.add.trust.AddTrustContactMethodsYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -47,8 +48,8 @@ class AddTrustContactMethodsYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(TrustNamePage)
+    TrustNameDisplayHelper
+      .getDisplayName(request.userAnswers, mode)
       .map { trustName =>
         val preparedForm = request.userAnswers.get(AddTrustContactMethodsYesNoPage) match {
           case None        => form
@@ -62,8 +63,8 @@ class AddTrustContactMethodsYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      TrustNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()

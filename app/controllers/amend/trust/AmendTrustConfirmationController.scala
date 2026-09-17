@@ -18,13 +18,13 @@ package controllers.amend.trust
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.helpers.TrustNameDisplayHelper
 import controllers.routes
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.AmendJourneyType
-import pages.add.trust.TrustNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
@@ -154,6 +154,6 @@ class AmendTrustConfirmationController @Inject() (
       }
     }
 
-  private def trustDisplayName(ua: UserAnswers): String =
-    ua.get(TrustNamePage).getOrElse("")
+  private def trustDisplayName(ua: UserAnswers)(implicit messages: Messages): String =
+    TrustNameDisplayHelper.displayName(ua, AmendMode)
 }

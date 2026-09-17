@@ -17,8 +17,9 @@
 package controllers.amend.trust
 
 import controllers.actions.*
+import controllers.helpers.TrustNameDisplayHelper
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.trust.AmendTrustRemoveDetail
 import pages.add.trust.*
 import pages.amend.ShowVerificationDetailsPage
@@ -102,8 +103,8 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      TrustNameDisplayHelper
+        .getDisplayName(request.userAnswers, AmendMode)
         .map { trustName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
@@ -128,8 +129,8 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      TrustNameDisplayHelper
+        .getDisplayName(request.userAnswers, AmendMode)
         .map { trustName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {

@@ -502,6 +502,7 @@ POST  /subcontractor/amend/trust/check-address       controllers.add.trust.Trust
 GET   /subcontractor/add/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/trust/address              controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/trust/address-change       controllers.add.trust.TrustAddressController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)

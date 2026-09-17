@@ -24,7 +24,7 @@ import pages.add.trust.*
 import play.api.libs.json.Reads
 
 final case class ValidatedTrust(
-  trustName: Option[String],
+  trustName: String,
   trustAddress: Option[Address],
   trustContactMethodOptions: Option[Set[TrustContactMethodOptions]],
   trustEmail: Option[String],
@@ -36,13 +36,20 @@ final case class ValidatedTrust(
 
 object ValidatedTrust extends Validation {
 
-  def build(answers: UserAnswers, isAmendMode: Boolean = false): Either[ValidationError, ValidatedTrust] =
+  def build(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
+    buildTrust(answers, getPageValue(answers, TrustNamePage))
+
+  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
+    buildTrust(answers, getAmendPageValue(answers, TrustNamePage))
+
+  private def buildTrust(
+    answers: UserAnswers,
+    trustName: Either[ValidationError, String]
+  ): Either[ValidationError, ValidatedTrust] =
     for {
       _ <- validateType(answers)
 
-      trustName <-
-        if (isAmendMode) getOptionalValue(answers, TrustNamePage)
-        else getPageValue(answers, TrustNamePage).map(Some(_))
+      trustName <- trustName
 
       trustAddress <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
 
