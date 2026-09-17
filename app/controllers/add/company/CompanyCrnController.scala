@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyCrnView
 
 import javax.inject.Inject
@@ -41,6 +42,7 @@ class CompanyCrnController @Inject() (
   formProvider: CompanyCrnFormProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   view: CompanyCrnView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -53,8 +55,8 @@ class CompanyCrnController @Inject() (
     val yesOrNoPage       = CompanyCrnYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(CompanyCrnYesNoPage)
 
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyCrnPage) match {
           case None        => form
@@ -69,8 +71,8 @@ class CompanyCrnController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
