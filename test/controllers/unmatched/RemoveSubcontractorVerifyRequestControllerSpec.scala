@@ -258,7 +258,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
       val mockFrontendAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-      when(mockFrontendAppConfig.manageYourSubcontractorsUrl(eqTo(cisId))).thenReturn("some-url")
+      when(mockFrontendAppConfig.retrieveSubcontractorListUrl).thenReturn("some-url")
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
