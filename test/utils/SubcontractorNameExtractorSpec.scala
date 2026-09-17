@@ -20,6 +20,7 @@ import base.SpecBase
 import models.{AmendMode, CheckMode, NormalMode}
 import models.add.SubcontractorName
 import org.scalatestplus.mockito.MockitoSugar
+import pages.add.company.CompanyNamePage
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
@@ -390,6 +391,100 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
         subcontractorNameExtractor.displaySubcontractorName(userAnswers)
 
       result mustBe messages("verify.noName")
+    }
+  }
+
+
+
+
+
+  "normal mode: SubcontractorNameExtractor.getCompanyName" - {
+
+    "should return the companyName when CompanyNamePage is in userAnswers" in {
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val companyName = "Test Ltd"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(userAnswers, NormalMode)
+
+      result mustBe Some("Test Ltd")
+    }
+
+    "should return None when no companyName exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(emptyUserAnswers, NormalMode)
+
+      result mustBe None
+    }
+  }
+
+  "check mode: SubcontractorNameExtractor.getCompanyName" - {
+
+    "should return the companyName when CompanyNamePage is in userAnswers" in {
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val companyName = "Test Ltd"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(userAnswers, CheckMode)
+
+      result mustBe Some("Test Ltd")
+    }
+
+    "should return None when no companyName exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(emptyUserAnswers, CheckMode)
+
+      result mustBe None
+    }
+  }
+
+  "Amend mode: SubcontractorNameExtractor.getCompanyName" - {
+
+    "should return the companyName when CompanyNamePage is in userAnswers" in {
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val companyName = "Test Ltd"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(userAnswers, AmendMode)
+
+      result mustBe Some("Test Ltd")
+    }
+
+    "should return No name provided  when no companyName exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(emptyUserAnswers, AmendMode)
+
+      result mustBe Some(messages("verify.noName"))
     }
   }
 }

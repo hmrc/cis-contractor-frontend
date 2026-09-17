@@ -54,7 +54,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             NormalMode,
             emptyUserAnswers.setOrException(CompanyAddressYesNoPage, true)
-          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup()
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode)
         }
 
         "to AddCompanyContactMethodsYesNo page when answer is No" in {
@@ -1096,7 +1096,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CheckMode,
             answers
           ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(
-            Some(CheckMode.toString)
+            NormalMode, Some(CheckMode.toString)
           )
         }
 
