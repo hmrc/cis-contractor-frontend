@@ -2,12 +2,22 @@
     Styling in this and other .scss files will be compiled by the sbt-sass-compiler plugin: https://github.com/hmrc/sbt-sass-compiler
     If you encounter any issue with Sass compilation using the plugin, please reach out to the PlatUI team.
  */
+ :root {
+     --max-table-width: 960px;
+     --govuk-min-margin: 30px;
+
+     @media (max-width: 641px) {
+         --govuk-min-margin: 15px;
+     }
+ }
+
 .govuk-table__container {
+    width: min(var(--max-table-width), calc(100vw - (2*var(--govuk-min-margin)))) !important;
     overflow-x: scroll;
 }
 
 #subcontractor-table {
-    min-width: 900px;
+    max-width: min(var(--max-table-width), calc(100vw - (2*var(--govuk-min-margin))));
     white-space: normal;
     overflow-wrap: break-word;
 }
@@ -20,8 +30,12 @@
 
 #subcontractor-table th,
 #subcontractor-table td {
-  padding-right: 25px;
-  vertical-align: middle;
+    padding-right: 25px;
+    vertical-align: middle;
+}
+
+#subcontractor-table td:not(:first-child) {
+    min-width: 100px;
 }
 
 #subcontractor-table td:nth-child(2) {
