@@ -17,6 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.PartnershipNameDisplayHelper
 import forms.add.partnership.PartnershipUtrFormProvider
 import models.{AmendMode, Mode}
 import models.requests.DataRequest
@@ -65,8 +66,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       val yesOrNoPage       = PartnershipHasUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-      request.userAnswers
-        .get(PartnershipNamePage)
+      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
             case None        => form
@@ -80,8 +80,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()

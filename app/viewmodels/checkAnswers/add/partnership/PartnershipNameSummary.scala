@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
+import controllers.helpers.PartnershipNameDisplayHelper
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.Messages
@@ -28,7 +29,7 @@ import viewmodels.implicits.*
 object PartnershipNameSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNamePage).map { answer =>
+    PartnershipNameDisplayHelper.getDisplayName(answers, mode).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipName.checkYourAnswersLabel",
         value = ValueViewModel(answer),

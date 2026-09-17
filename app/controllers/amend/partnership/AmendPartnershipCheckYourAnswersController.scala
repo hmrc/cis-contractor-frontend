@@ -19,6 +19,7 @@ package controllers.amend.partnership
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
+import controllers.helpers.PartnershipNameDisplayHelper
 import controllers.routes
 import models.add.partnership.ValidatedPartnership
 import models.amend.AmendJourneyType
@@ -67,11 +68,11 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     implicit request =>
       val ua = request.userAnswers
 
-      ValidatedPartnership.build(ua) match {
+      ValidatedPartnership.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
 
-          val partnershipName              = ua.get(PartnershipNamePage).getOrElse("")
+          val partnershipName              = PartnershipNameDisplayHelper.displayName(ua, AmendMode)
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
@@ -178,7 +179,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         andThen requireData
         andThen cisIdRequiredAction
     ).async { implicit request =>
-      ValidatedPartnership.build(request.userAnswers) match {
+      ValidatedPartnership.buildForAmend(request.userAnswers) match {
 
         case Left(error) =>
           logger.error(

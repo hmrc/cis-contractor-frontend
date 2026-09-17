@@ -17,14 +17,15 @@
 package controllers.amend.partnership
 
 import controllers.actions.*
+import controllers.helpers.PartnershipNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import pages.add.partnership.*
 import models.requests.DataRequest
 import pages.amend.ShowVerificationDetailsPage
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import play.api.Logging
@@ -69,8 +70,8 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
 
   private def getPartnershipName(
     userAnswers: UserAnswers
-  ): Option[String] =
-    userAnswers.get(PartnershipNamePage)
+  )(implicit messages: Messages): Option[String] =
+    PartnershipNameDisplayHelper.getDisplayName(userAnswers, AmendMode)
 
   private def getNominatedPartnerName(
     userAnswers: UserAnswers
@@ -80,7 +81,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
-  ): Option[String] =
+  )(implicit messages: Messages): Option[String] =
     if (subcontractorDetail.isNominatedPartnerDetail) {
       getNominatedPartnerName(userAnswers)
     } else {
@@ -139,7 +140,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     subcontractorDetail: String
   )(
     block: (String, String) => Future[Result]
-  )(implicit request: DataRequest[_]): Future[Result] =
+  )(implicit request: DataRequest[_], messages: Messages): Future[Result] =
     withValidDetail(subcontractorDetail) { detailType =>
       if (!detailIsPresent(detailType, request.userAnswers)) {
         Future.successful(journeyRecovery)

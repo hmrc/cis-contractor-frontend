@@ -17,6 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.PartnershipNameDisplayHelper
 import forms.add.partnership.PartnershipNominatedPartnerNameFormProvider
 import models.Mode
 import navigation.Navigator
@@ -48,8 +49,7 @@ class PartnershipNominatedPartnerNameController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerNamePage) match {
             case None        => form
@@ -63,8 +63,7 @@ class PartnershipNominatedPartnerNameController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           form
             .bindFromRequest()

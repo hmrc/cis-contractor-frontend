@@ -18,7 +18,9 @@ package controllers.amend.partnership
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.helpers.PartnershipNameDisplayHelper
 import controllers.routes
+import models.AmendMode
 import models.amend.AmendJourneyType
 import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
@@ -94,7 +96,7 @@ class AmendPartnershipConfirmationController @Inject() (
                       )
 
                     val partnershipName =
-                      ua.get(PartnershipNamePage).getOrElse("")
+                      PartnershipNameDisplayHelper.displayName(ua, AmendMode)
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(

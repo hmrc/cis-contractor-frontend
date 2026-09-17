@@ -571,6 +571,7 @@ partnershipName.error.length                                       =  Partnershi
 partnershipName.error.invalidCharacters                            =  Enter a valid partnership name
 partnershipName.checkYourAnswersLabel                              =  Partnership name
 partnershipName.change.hidden                                      =  partnership name
+partnershipName.noNameProvided                                     =  No Name Provided
 
 partnershipWorksReferenceNumber.title                              =  What is the works reference number associated with this partnership?
 partnershipWorksReferenceNumber.heading                            =  What is the works reference number associated with {0}?
