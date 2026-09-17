@@ -394,10 +394,6 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
     }
   }
 
-
-
-
-
   "normal mode: SubcontractorNameExtractor.getCompanyName" - {
 
     "should return the companyName when CompanyNamePage is in userAnswers" in {

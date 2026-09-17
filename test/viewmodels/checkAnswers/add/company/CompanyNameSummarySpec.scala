@@ -122,15 +122,15 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.CompanyNameController.onPageLoad(AmendMode).url
+      val expectedHref       = routes.CompanyNameController.onPageLoad(AmendMode).url
       val expectedHiddenText = messages("companyName.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes must contain("id" -> "company-name")
+      changeAction.attributes                   must contain("id" -> "company-name")
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {

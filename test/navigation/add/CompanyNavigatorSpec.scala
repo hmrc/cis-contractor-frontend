@@ -1096,7 +1096,8 @@ class CompanyNavigatorSpec extends SpecBase {
             CheckMode,
             answers
           ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(
-            NormalMode, Some(CheckMode.toString)
+            NormalMode,
+            Some(CheckMode.toString)
           )
         }
 
