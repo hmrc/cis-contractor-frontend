@@ -37,7 +37,7 @@ class FinalValidationFieldSpec extends AnyFreeSpec with Matchers {
       SecondName.key mustBe "secondName"
       Surname.key mustBe "surname"
       Nino.key mustBe "nino"
-      WorkReferenceNumber.key mustBe "workReferenceNumber"
+      WorksReferenceNumber.key mustBe "worksReferenceNumber"
       AddressLine1.key mustBe "addressLine1"
       AddressLine2.key mustBe "addressLine2"
       AddressLine3.key mustBe "addressLine3"
@@ -63,7 +63,7 @@ class FinalValidationFieldSpec extends AnyFreeSpec with Matchers {
           SecondName,
           Surname,
           Nino,
-          WorkReferenceNumber,
+          WorksReferenceNumber,
           AddressLine1,
           AddressLine2,
           AddressLine3,

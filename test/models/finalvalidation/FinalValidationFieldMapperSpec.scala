@@ -44,7 +44,7 @@ class FinalValidationFieldMapperSpec extends AnyFreeSpec with Matchers {
       SubcontractorValidationField.Nino                   ->
         FinalValidationField.Nino,
       SubcontractorValidationField.WorksReferenceNumber   ->
-        FinalValidationField.WorkReferenceNumber,
+        FinalValidationField.WorksReferenceNumber,
       SubcontractorValidationField.AddressLine1           ->
         FinalValidationField.AddressLine1,
       SubcontractorValidationField.AddressLine2           ->

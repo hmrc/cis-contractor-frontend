@@ -53,7 +53,7 @@ object FinalValidationFieldMapper {
         FinalValidationField.Nino
 
       case SubcontractorValidationField.WorksReferenceNumber =>
-        FinalValidationField.WorkReferenceNumber
+        FinalValidationField.WorksReferenceNumber
 
       case SubcontractorValidationField.AddressLine1 =>
         FinalValidationField.AddressLine1

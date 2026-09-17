@@ -20,7 +20,7 @@ import base.SpecBase
 import models.UserAnswers
 import models.add.SubcontractorName
 import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
-import models.add.{IndividualNamesOptions, SubcontractorName}
+import models.add.IndividualNamesOptions
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach

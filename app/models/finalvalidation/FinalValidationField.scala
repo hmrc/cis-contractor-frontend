@@ -60,8 +60,8 @@ object FinalValidationField {
     override val key: String = "nino"
   }
 
-  case object WorkReferenceNumber extends FinalValidationField {
-    override val key: String = "workReferenceNumber"
+  case object WorksReferenceNumber extends FinalValidationField {
+    override val key: String = "worksReferenceNumber"
   }
 
   case object AddressLine1 extends FinalValidationField {
@@ -110,7 +110,7 @@ object FinalValidationField {
     SecondName,
     Surname,
     Nino,
-    WorkReferenceNumber,
+    WorksReferenceNumber,
     AddressLine1,
     AddressLine2,
     AddressLine3,

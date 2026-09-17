@@ -362,7 +362,7 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
                   value = Some("AA1 1AA")
                 ),
                 FinalValidationIssue(
-                  field = FinalValidationField.WorkReferenceNumber,
+                  field = FinalValidationField.WorksReferenceNumber,
                   value = Some("WR123")
                 )
               ),
@@ -842,7 +842,7 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
           value = Some("john@example.com")
         ),
         FinalValidationDraftIssue(
-          fieldKey = "workReferenceNumber",
+          fieldKey = "worksReferenceNumber",
           value = Some("WR123")
         )
       )

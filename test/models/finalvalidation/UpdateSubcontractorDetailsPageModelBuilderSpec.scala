@@ -305,7 +305,7 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
             proposed = details,
             issues = Seq(
               FinalValidationDraftIssue(
-                fieldKey = FinalValidationField.WorkReferenceNumber.key,
+                fieldKey = FinalValidationField.WorksReferenceNumber.key,
                 value = Some("WRN123")
               )
             )
@@ -315,18 +315,18 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
 
       result mustBe Seq(
         UpdateSubcontractorDetailsRow(
-          field = FinalValidationField.WorkReferenceNumber,
+          field = FinalValidationField.WorksReferenceNumber,
           labelKey = "finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber",
           value = Some(summon[Messages]("site.yes")),
           changeUrl =
-            s"/change/${FinalValidationField.WorkReferenceNumber.key}/${FinalValidationChangeTarget.WorksReferenceNumberYesNo.key}"
+            s"/change/${FinalValidationField.WorksReferenceNumber.key}/${FinalValidationChangeTarget.WorksReferenceNumberYesNo.key}"
         ),
         UpdateSubcontractorDetailsRow(
-          field = FinalValidationField.WorkReferenceNumber,
+          field = FinalValidationField.WorksReferenceNumber,
           labelKey = "finalvalidations.updateSubcontractorDetails.worksReferenceNumber",
           value = Some("WRN123"),
           changeUrl =
-            s"/change/${FinalValidationField.WorkReferenceNumber.key}/${FinalValidationChangeTarget.WorksReferenceNumber.key}"
+            s"/change/${FinalValidationField.WorksReferenceNumber.key}/${FinalValidationChangeTarget.WorksReferenceNumber.key}"
         )
       )
     }

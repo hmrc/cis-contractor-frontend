@@ -372,7 +372,7 @@ class VerifyFinalValidationService @Inject() (
       case EmailAddress           => subcontractor.emailAddress
       case PhoneNumber            => subcontractor.phoneNumber
       case MobilePhoneNumber      => subcontractor.mobilePhoneNumber
-      case WorkReferenceNumber    => subcontractor.worksReferenceNumber
+      case WorksReferenceNumber    => subcontractor.worksReferenceNumber
     }
 
   private def valueFor(
@@ -398,6 +398,6 @@ class VerifyFinalValidationService @Inject() (
       case EmailAddress           => details.emailAddress
       case PhoneNumber            => details.phoneNumber
       case MobilePhoneNumber      => details.mobilePhoneNumber
-      case WorkReferenceNumber    => details.worksReferenceNumber
+      case WorksReferenceNumber    => details.worksReferenceNumber
     }
 }

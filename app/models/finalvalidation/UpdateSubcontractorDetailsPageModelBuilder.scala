@@ -266,7 +266,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
       contactRows(subcontractor, changeUrl) ++
       optionalRows(
         subcontractor = subcontractor,
-        field = WorkReferenceNumber,
+        field = WorksReferenceNumber,
         value = details.worksReferenceNumber,
         yesNoLabelKey = "finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber",
         valueLabelKey = "finalvalidations.updateSubcontractorDetails.worksReferenceNumber",
