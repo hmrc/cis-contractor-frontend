@@ -19,7 +19,7 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.SubcontractorNameFormProvider
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import models.add.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -46,6 +46,9 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
   private lazy val subcontractorNameAmendRoute =
     controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode).url
 
+  private lazy val subcontractorNameFinalValidationRoute =
+    controllers.add.routes.SubcontractorNameController.onPageLoad(FinalValidationMode).url
+
   private def uaWithSubcontractorNameOption: UserAnswers =
     emptyUserAnswers
       .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.SubcontractorName))
@@ -53,6 +56,31 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   "SubcontractorName Controller" - {
+
+    "must return OK for a GET in FinalValidationMode when IndividualNamesOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, subcontractorNameFinalValidationRoute)
+
+        val result =
+          route(application, request).value
+
+        val view =
+          application.injector.instanceOf[SubcontractorNameView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(
+            form,
+            FinalValidationMode
+          )(request, messages(application)).toString
+      }
+    }
 
     "must return OK and the correct view for a GET" in {
 

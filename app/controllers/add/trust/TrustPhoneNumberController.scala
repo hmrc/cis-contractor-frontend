@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import controllers.actions.*
 import forms.add.trust.TrustPhoneNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.trust.{TrustContactMethodOptionsPage, TrustNamePage, TrustPhoneNumberPage}
@@ -53,27 +53,38 @@ class TrustPhoneNumberController @Inject() (
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
       val trustName     = request.userAnswers.get(TrustNamePage)
 
-      (trustName, contactOption) match {
-        case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (trustName, phoneIsAvailable) match {
+        case (Some(trustName), true) =>
           val preparedForm = request.userAnswers.get(TrustPhoneNumberPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, trustName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption =
+        request.userAnswers.get(TrustContactMethodOptionsPage)
+
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
       (for {
-        trustName      <- request.userAnswers.get(TrustNamePage)
-        contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Phone)
+        trustName <- request.userAnswers.get(TrustNamePage)
+        if phoneIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

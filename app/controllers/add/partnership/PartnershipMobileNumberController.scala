@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import forms.add.partnership.PartnershipMobileNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipMobileNumberPage, PartnershipNamePage}
@@ -53,27 +53,38 @@ class PartnershipMobileNumberController @Inject() (
     val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
     val partnershipName = request.userAnswers.get(PartnershipNamePage)
 
-    (partnershipName, contactOption) match {
-      case (Some(partnershipName), Some(options)) if options.contains(ContactMethodOptions.Mobile) =>
+    val mobileIsAvailable =
+      mode == FinalValidationMode ||
+        contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+    (partnershipName, mobileIsAvailable) match {
+      case (Some(partnershipName), true) =>
         val preparedForm = request.userAnswers.get(PartnershipMobileNumberPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
         Ok(view(preparedForm, mode, partnershipName))
 
-      case (Some(_), _) =>
+      case (Some(_), false) =>
         Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
-      case _            =>
+      case _                =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption =
+        request.userAnswers.get(PartnershipContactMethodOptionsPage)
+
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
       (for {
         partnershipName <- request.userAnswers.get(PartnershipNamePage)
-        contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Mobile)
+        if mobileIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

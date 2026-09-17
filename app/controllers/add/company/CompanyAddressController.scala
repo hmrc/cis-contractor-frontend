@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
+import models.{FinalValidationMode, Mode, NormalMode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.{CompanyAddressPage, CompanyNamePage}
@@ -49,14 +49,19 @@ class CompanyAddressController @Inject() (
   override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
     userAnswers.get(CompanyNamePage)
 
-  override protected def standardCallback: Call =
-    routes.CompanyAddressController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.CompanyAddressController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
@@ -70,7 +75,7 @@ class CompanyAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(NormalMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 

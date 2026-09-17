@@ -18,18 +18,22 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorFormProvider
-import models.requests.DataRequest
 import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import models.CheckMode
+import models.finalvalidation.{FinalValidationContext, FinalValidationDraftRequestBuilder, VerifyFinalValidationSource}
+import pages.finalvalidation.*
 import pages.verify.RebuildVerificationFromWarningPage
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.{CheckboxPaginationResult, PaginationService, VerificationPreSelectionService}
+import services.finalvalidation.FinalValidationDraftService
+import services.{CheckboxPaginationResult, PaginationService, VerificationPreSelectionService, VerifyFinalValidationService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.verify.SelectSubcontractorView
 
 import javax.inject.Inject
@@ -42,6 +46,10 @@ class SelectSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  verifyFinalValidationService: VerifyFinalValidationService,
+  finalValidationDraftService: FinalValidationDraftService,
+  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
   verificationPreSelectionService: VerificationPreSelectionService,
@@ -105,15 +113,18 @@ class SelectSubcontractorController @Inject() (
           Future.successful(redirectResult)
       }
     }
+
   private def hasAnyVerifiedSubcontractor(
-    request: DataRequest[_]
+    userAnswers: UserAnswers
   ): Boolean =
-    request.userAnswers
+    userAnswers
       .get(NewestVerificationBatchResponsePage)
       .exists(_.subcontractors.exists(_.isVerified))
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       val ua = request.userAnswers
 
@@ -166,20 +177,13 @@ class SelectSubcontractorController @Inject() (
               } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
             case None =>
-              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
+              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(ua)) {
                 for {
                   answersWithSelections <- Future.fromTry(
                                              ua.set(SelectSubcontractorPage, mergedValues)
                                            )
 
-                  nextPage =
-                    navigator.nextPage(
-                      SelectSubcontractorPage,
-                      mode,
-                      answersWithSelections
-                    )
-
-                  updatedAnswers <-
+                  cleanedAnswers <-
                     if (
                       mode == CheckMode &&
                       answersWithSelections
@@ -193,8 +197,69 @@ class SelectSubcontractorController @Inject() (
                       Future.successful(answersWithSelections)
                     }
 
-                  _ <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(nextPage)
+                  withContext <- Future.fromTry(
+                                   cleanedAnswers.set(
+                                     FinalValidationContextPage,
+                                     FinalValidationContext.VerifySubcontractor
+                                   )
+                                 )
+
+                  withSource <- Future.fromTry(
+                                  withContext.set(
+                                    VerifyFinalValidationSourcePage,
+                                    VerifyFinalValidationSource.SelectSubcontractor
+                                  )
+                                )
+
+                  validation <- verifyFinalValidationService.validate(
+                                  request.cisId,
+                                  withSource
+                                )
+
+                  result <-
+                    if (validation.hasErrors) {
+                      for {
+                        createRequest <- Future.fromTry(
+                                           finalValidationDraftRequestBuilder.build(
+                                             request.cisId,
+                                             validation
+                                           )
+                                         )
+
+                        draftId <- finalValidationDraftService.create(createRequest)
+
+                        withDraftId <- Future.fromTry(
+                                         withSource.set(
+                                           FinalValidationDraftIdPage,
+                                           draftId
+                                         )
+                                       )
+
+                        withMode <- Future.fromTry(
+                                      withDraftId.set(
+                                        VerifyFinalValidationModePage,
+                                        mode.toString
+                                      )
+                                    )
+
+                        _ <- sessionRepository.set(withMode)
+
+                      } yield Redirect(
+                        controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                      )
+
+                    } else {
+                      sessionRepository.set(withSource).map { _ =>
+                        Redirect(
+                          navigator.nextPage(
+                            SelectSubcontractorPage,
+                            mode,
+                            withSource
+                          )
+                        )
+                      }
+                    }
+                } yield result
               } else {
                 val formWithErrors =
                   form
@@ -222,7 +287,7 @@ class SelectSubcontractorController @Inject() (
     mode: Mode,
     page: Int,
     result: CheckboxPaginationResult
-  )(implicit request: DataRequest[_]): Result =
+  )(implicit request: Request[_]): Result =
     BadRequest(
       view(
         formWithErrors,

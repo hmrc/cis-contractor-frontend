@@ -20,11 +20,13 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -44,6 +46,9 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   lazy val companyEmailAddressRoute: String =
     controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(NormalMode).url
 
+  lazy val companyEmailAddressFinalValidationRoute: String =
+    controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(FinalValidationMode).url
+
   private def uaWithName: UserAnswers =
     emptyUserAnswers
       .set(CompanyNamePage, companyName)
@@ -53,6 +58,12 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithNameAndEmailOption: UserAnswers =
     uaWithName
       .set(CompanyContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+
+  private def uaWithNameAndFinalValidationEmailTarget: UserAnswers =
+    uaWithName
+      .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.EmailAddress)
       .success
       .value
 
@@ -302,6 +313,54 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when CompanyContactMethodOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationEmailTarget)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyEmailAddressFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[CompanyEmailAddressView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when CompanyContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationEmailTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyEmailAddressFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "abc@test.com"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }

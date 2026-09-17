@@ -20,11 +20,13 @@ import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustMobileNumberFormProvider
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage, TrustNamePage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,6 +45,9 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   lazy val trustMobileNumberRoute: String =
     controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(NormalMode).url
 
+  lazy val trustMobileNumberFinalValidationRoute: String =
+    controllers.add.trust.routes.TrustMobileNumberController.onPageLoad(FinalValidationMode).url
+
   private def uaWithName: UserAnswers =
     emptyUserAnswers
       .set(TrustNamePage, trustName)
@@ -52,6 +57,12 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithNameAndMobileOption: UserAnswers =
     uaWithName
       .set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile))
+      .success
+      .value
+
+  private def uaWithNameAndFinalValidationMobileTarget: UserAnswers =
+    uaWithName
+      .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.MobilePhoneNumber)
       .success
       .value
 
@@ -303,6 +314,54 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when TrustContactMethodOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, trustMobileNumberFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TrustMobileNumberView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, trustName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when TrustContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationMobileTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustMobileNumberFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "07700 900 982"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }
