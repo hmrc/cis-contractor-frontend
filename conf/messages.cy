@@ -866,7 +866,9 @@ trustAddressYesNo.hint                             =  Gallwch ychwanegu’r wybo
 trustAddressYesNo.error.required                   =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer yr ymddiriedolaeth hon
 trustAddressYesNo.checkYourAnswersLabel            =  Ychwanegu cyfeiriad yr ymddiriedolaeth?
 trustAddressYesNo.change.hidden                    =  xxxxxxxxxxxxxxxxxxxx
+
 trustName.noNameProvided                           =  xxxxxxxxxxxxxxxxxxxx
+
 trustAddress.checkYourAnswersLabel                 =  Cyfeiriad
 trustAddress.change.hidden                         =  cyfeiriad
 
