@@ -370,5 +370,21 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
       exception.getMessage mustBe
         "Unknown Final Validation field key: unknown"
     }
+
+    "must use the proposed partnership name as the display name" in {
+
+      val subbie =
+        subcontractor(
+          proposed = FinalValidationSubcontractorDetails(
+            partnershipTradingName = Some("Alice")
+          ),
+          issues = Seq.empty,
+          subcontractorType = "partnership"
+        ).copy(
+          displayName = "Alice|"
+        )
+
+      builder.displayName(subbie) mustBe "Alice"
+    }
   }
 }

@@ -138,7 +138,7 @@ class UpdateSubcontractorDetailsControllerSpec extends SpecBase {
         status(result) mustBe OK
 
         contentAsString(result) must include(
-          "Hooper And Associates"
+          "A Alice"
         )
 
         verify(finalValidationDraftService)

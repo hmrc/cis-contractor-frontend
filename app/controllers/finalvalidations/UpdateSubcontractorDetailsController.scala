@@ -82,7 +82,7 @@ class UpdateSubcontractorDetailsController @Inject() (
                   view(
                     UpdateSubcontractorDetailsPageModel(
                       subcontractor.subcontractorId,
-                      subcontractor.displayName,
+                      pageModelBuilder.displayName(subcontractor),
                       rows
                     )
                   )

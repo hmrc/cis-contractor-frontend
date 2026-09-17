@@ -564,4 +564,31 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     Option.when(result.nonEmpty)(result)
   }
 
+  def displayName(
+    subcontractor: FinalValidationDraftSubcontractor
+  ): String = {
+
+    val details = subcontractor.proposed
+
+    val currentDisplayName =
+      subcontractorType(subcontractor) match {
+        case Individualorsoletrader =>
+          soleTraderName(details)
+
+        case Limitedcompany =>
+          details.tradingName
+
+        case Trust =>
+          details.tradingName
+
+        case Partnership =>
+          details.partnershipTradingName
+      }
+
+    currentDisplayName
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse(subcontractor.displayName)
+  }
+
 }

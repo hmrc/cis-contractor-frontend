@@ -46,6 +46,7 @@ class ReviewSubcontractorDetailsController @Inject() (
   sessionRepository: SessionRepository,
   navigator: Navigator,
   finalValidationDraftService: FinalValidationDraftService,
+  pageModelBuilder: UpdateSubcontractorDetailsPageModelBuilder,
   val controllerComponents: MessagesControllerComponents,
   view: ReviewSubcontractorDetailsView
 )(using ec: ExecutionContext)
@@ -70,7 +71,7 @@ class ReviewSubcontractorDetailsController @Inject() (
               draft.subcontractors.map { subcontractor =>
                 ReviewSubcontractorDetailsRow(
                   subcontractorId = subcontractor.subcontractorId,
-                  name = subcontractor.displayName,
+                  name = pageModelBuilder.displayName(subcontractor),
                   hasErrors = subcontractor.readiness == FinalValidationReadiness.Incomplete
                 )
               }
