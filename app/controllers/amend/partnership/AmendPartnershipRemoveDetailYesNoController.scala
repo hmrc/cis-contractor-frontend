@@ -75,8 +75,8 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
 
   private def getNominatedPartnerName(
     userAnswers: UserAnswers
-  ): Option[String] =
-    userAnswers.get(PartnershipNominatedPartnerNamePage)
+  )(implicit messages: Messages): Option[String] =
+    PartnershipNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
 
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,

@@ -21,7 +21,7 @@ import controllers.helpers.PartnershipNameDisplayHelper
 import forms.add.partnership.PartnershipWorksReferenceNumberFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage}
+import pages.add.partnership.{PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

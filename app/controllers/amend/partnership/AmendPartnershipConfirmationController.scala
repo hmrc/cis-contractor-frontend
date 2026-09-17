@@ -22,7 +22,6 @@ import controllers.helpers.PartnershipNameDisplayHelper
 import controllers.routes
 import models.AmendMode
 import models.amend.AmendJourneyType
-import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}

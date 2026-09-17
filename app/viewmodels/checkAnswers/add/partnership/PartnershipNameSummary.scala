@@ -16,11 +16,10 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
 import controllers.helpers.PartnershipNameDisplayHelper
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
-import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*

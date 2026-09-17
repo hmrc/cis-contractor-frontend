@@ -90,4 +90,13 @@ trait Validation {
         )(_ => Left(InvalidAnswer(questionPage)))
     }
   }
+
+  def getAmendPageValue(
+    answers: UserAnswers,
+    questionPage: QuestionPage[String]
+  ): Either[ValidationError, String] =
+    answers.get(questionPage) match {
+      case Some(value) => Right(value.trim)
+      case None        => Right("")
+    }
 }

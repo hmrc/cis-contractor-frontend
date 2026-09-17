@@ -19,10 +19,10 @@ package controllers.add.partnership
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
 import controllers.helpers.PartnershipNameDisplayHelper
-import models.{Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
+import models.{Mode, UserAnswers}
+import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}

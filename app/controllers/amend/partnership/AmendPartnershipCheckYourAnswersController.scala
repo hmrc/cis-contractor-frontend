@@ -25,8 +25,6 @@ import models.add.partnership.ValidatedPartnership
 import models.amend.AmendJourneyType
 import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
-import pages.add.*
-import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}

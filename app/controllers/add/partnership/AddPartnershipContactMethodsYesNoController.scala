@@ -21,7 +21,7 @@ import controllers.helpers.PartnershipNameDisplayHelper
 import forms.add.partnership.AddPartnershipContactMethodsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{AddPartnershipContactMethodsYesNoPage, PartnershipNamePage}
+import pages.add.partnership.AddPartnershipContactMethodsYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

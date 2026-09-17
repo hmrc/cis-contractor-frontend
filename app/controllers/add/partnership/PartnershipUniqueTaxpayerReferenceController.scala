@@ -19,10 +19,10 @@ package controllers.add.partnership
 import controllers.actions.*
 import controllers.helpers.PartnershipNameDisplayHelper
 import forms.add.partnership.PartnershipUtrFormProvider
-import models.{AmendMode, Mode}
 import models.requests.DataRequest
+import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

@@ -17,7 +17,7 @@
 package controllers.helpers
 
 import models.{AmendMode, Mode, UserAnswers}
-import pages.add.partnership.PartnershipNamePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import play.api.i18n.Messages
 
 object PartnershipNameDisplayHelper {
@@ -31,6 +31,22 @@ object PartnershipNameDisplayHelper {
       }
     }
 
+  def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
+    userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+      if (mode == AmendMode) {
+        Some(messages("partnershipName.noNameProvided"))
+      } else {
+        None
+      }
+    }
+
   def displayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
-    getDisplayName(userAnswers, mode).getOrElse("")
+    userAnswers
+      .get(PartnershipNamePage)
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty))
+      .getOrElse {
+        if (mode == AmendMode) messages("partnershipName.noNameProvided") else ""
+      }
 }
