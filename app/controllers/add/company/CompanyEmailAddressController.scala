@@ -27,6 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyEmailAddressView
 
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class CompanyEmailAddressController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyEmailAddressFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyEmailAddressView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,8 @@ class CompanyEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = request.userAnswers.get(CompanyNamePage)
+      val companyName   = subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
 
       (companyName, contactOption) match {
         case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
@@ -72,7 +75,8 @@ class CompanyEmailAddressController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        companyName    <- request.userAnswers.get(CompanyNamePage)
+        companyName    <- subcontractorNameExtractor
+                            .getCompanyName(request.userAnswers, mode)
         contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Email)
       } yield form

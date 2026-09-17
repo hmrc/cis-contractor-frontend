@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
+import models.{AmendMode, Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.{CompanyAddressPage, CompanyNamePage}
@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
+import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,6 +39,7 @@ class CompanyAddressController @Inject() (
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
   override protected val addressLookupService: AddressLookupService,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
     extends AddressLookupJourneyController {
@@ -49,7 +51,8 @@ class CompanyAddressController @Inject() (
   override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
     messages: Messages
   ): Option[String] =
-    userAnswers.get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.CompanyAddressController.addressLookupCallback()
@@ -72,7 +75,7 @@ class CompanyAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 

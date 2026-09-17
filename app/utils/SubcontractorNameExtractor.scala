@@ -17,6 +17,7 @@
 package utils
 
 import models.{AmendMode, Mode, UserAnswers}
+import pages.add.company.CompanyNamePage
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.i18n.Messages
 
@@ -44,4 +45,9 @@ class SubcontractorNameExtractor {
   def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
     getSubcontractorName(userAnswers)
       .getOrElse(messages("verify.noName"))
+
+  def getCompanyName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
+    userAnswers
+      .get(CompanyNamePage)
+      .orElse(Option.when(mode == AmendMode)(messages("verify.noName")))
 }

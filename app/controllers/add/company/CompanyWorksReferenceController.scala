@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyWorksReferenceView
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class CompanyWorksReferenceController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyWorksReferenceFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: CompanyWorksReferenceView
@@ -52,8 +54,8 @@ class CompanyWorksReferenceController @Inject() (
     val yesOrNoPage       = CompanyWorksReferenceYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(CompanyWorksReferenceYesNoPage)
 
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyWorksReferencePage) match {
           case None        => form
@@ -68,8 +70,8 @@ class CompanyWorksReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()

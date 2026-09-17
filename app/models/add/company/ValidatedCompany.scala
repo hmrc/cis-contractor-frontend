@@ -38,9 +38,25 @@ final case class ValidatedCompany(
 object ValidatedCompany extends Validation {
 
   def build(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
+    buildCompany(
+      answers,
+      getPageValue(answers, CompanyNamePage),
+    )
+
+  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
+    buildCompany(
+      answers,
+      getAmendPageValue(answers, CompanyNamePage),
+    )
+
+
+  private def buildCompany(
+    answers: UserAnswers,
+    companyName: Either[ValidationError, String]
+  ): Either[ValidationError, ValidatedCompany] =
     for {
       _                           <- validateType(answers)
-      companyName                 <- getPageValue(answers, CompanyNamePage)
+      companyName                 <- companyName
       companyAddress              <- getOptionalPageValue(answers, CompanyAddressPage, CompanyAddressYesNoPage)
       companyContactMethodOptions <-
         getOptionalPageValue(answers, CompanyContactMethodOptionsPage, AddCompanyContactMethodsYesNoPage).flatMap {

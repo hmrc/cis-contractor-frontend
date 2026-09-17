@@ -26,6 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.AddCompanyContactMethodsYesNoView
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class AddCompanyContactMethodsYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: AddCompanyContactMethodsYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: AddCompanyContactMethodsYesNoView
 )(implicit ec: ExecutionContext)
@@ -48,8 +50,8 @@ class AddCompanyContactMethodsYesNoController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(AddCompanyContactMethodsYesNoPage) match {
           case None        => form
@@ -63,8 +65,8 @@ class AddCompanyContactMethodsYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
