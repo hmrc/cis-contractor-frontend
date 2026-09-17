@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{NormalMode, AmendMode}
 import models.address.{Address, Country}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -54,10 +54,10 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private lazy val redirectRoute =
-    controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup().url
+    controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(NormalMode).url
 
   private lazy val redirectChangeRoute =
-    controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change")).url
+    controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(NormalMode, Some("change")).url
 
   private lazy val callbackRoute =
     controllers.add.partnership.routes.PartnershipAddressController.addressLookupCallback("addr-id").url
@@ -428,7 +428,7 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.partnership.routes.PartnershipAddressController
-              .redirectToAddressLookup(Some("change"))
+              .redirectToAddressLookup(AmendMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

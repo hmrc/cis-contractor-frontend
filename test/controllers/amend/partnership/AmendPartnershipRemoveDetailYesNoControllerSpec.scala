@@ -118,52 +118,20 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
     }
 
   private def uaWithDetailPresentButNameMissing(
-    detail: AmendPartnershipRemoveDetail
-  ): UserAnswers =
-    detail match {
-
-      case AmendPartnershipRemoveDetail.Address =>
-        emptyUserAnswers
-          .set(PartnershipAddressYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.ContactDetails =>
-        emptyUserAnswers
-          .set(AddPartnershipContactMethodsYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.Utr =>
-        emptyUserAnswers
-          .set(PartnershipHasUtrYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
-        emptyUserAnswers
-          .set(PartnershipWorksReferenceNumberYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.NominatedPartnerUtr =>
-        emptyUserAnswers
-          .set(PartnershipNominatedPartnerUtrYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
-        emptyUserAnswers
-          .set(PartnershipNominatedPartnerNinoYesNoPage, true)
-          .success
-          .value
-
-      case AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber =>
-        emptyUserAnswers
-          .set(PartnershipNominatedPartnerCrnYesNoPage, true)
-          .success
-          .value
+                                                 detail: AmendPartnershipRemoveDetail
+                                               ): UserAnswers =
+    if (nominatedPartnerDetails.contains(detail)) {
+      uaWithDetail(detail)
+        .remove(PartnershipNominatedPartnerNamePage)
+        .success
+        .value
+    } else {
+      uaWithDetail(detail)
+        .remove(PartnershipNamePage)
+        .success
+        .value
     }
+
 
   "AmendPartnershipRemoveDetailYesNo Controller" - {
 
@@ -420,7 +388,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
           }
         }
 
-        "must redirect to Journey Recovery on GET when the partnership or nominated partner name is missing" in {
+        "must return OK on GET when the partnership or nominated partner name is missing" in {
 
           val application =
             applicationBuilder(
@@ -438,21 +406,27 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             val result =
               route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
-
-            redirectLocation(result).value mustEqual
-              controllers.routes.JourneyRecoveryController
-                .onPageLoad()
-                .url
+            status(result) mustEqual OK
           }
         }
 
-        "must redirect to Journey Recovery on POST when the partnership or nominated partner name is missing" in {
+        "must redirect to the amend partnership Check Your Answers page on POST when the partnership or nominated partner name is missing" in {
+
+          val mockSessionRepository =
+            mock[SessionRepository]
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
 
           val application =
             applicationBuilder(
               userAnswers = Some(uaWithDetailPresentButNameMissing(detail))
-            ).build()
+            )
+              .overrides(
+                bind[SessionRepository]
+                  .toInstance(mockSessionRepository)
+              )
+              .build()
 
           running(application) {
 
@@ -473,7 +447,7 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
             status(result) mustEqual SEE_OTHER
 
             redirectLocation(result).value mustEqual
-              controllers.routes.JourneyRecoveryController
+              controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
                 .onPageLoad()
                 .url
           }

@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import models.info.company.CompanyAnswers
+import models.NormalMode
 
 class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 

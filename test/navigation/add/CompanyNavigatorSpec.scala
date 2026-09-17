@@ -1095,10 +1095,7 @@ class CompanyNavigatorSpec extends SpecBase {
             CompanyAddressYesNoPage,
             CheckMode,
             answers
-          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(
-            NormalMode,
-            Some(CheckMode.toString)
-          )
+          ) mustBe controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(CheckMode)
         }
 
         "to Company CYA when answer is Yes and CompanyAddressPage is answered before" in {
