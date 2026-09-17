@@ -90,7 +90,13 @@ class FinalValidationSubcontractorService @Inject() {
         userAnswers.set(TrustNamePage, details.tradingName.getOrElse(""))
 
       case Partnership =>
-        userAnswers.set(PartnershipNamePage, details.partnershipTradingName.getOrElse(""))
+        for {
+          withPartnershipName <- userAnswers.set(PartnershipNamePage, details.partnershipTradingName.getOrElse(""))
+          result              <- withPartnershipName.set(
+                                   PartnershipNominatedPartnerNamePage,
+                                   details.tradingName.getOrElse("")
+                                 )
+        } yield result
     }
 
   private def populateFinalValidationTarget(

@@ -21,6 +21,7 @@ import models.UserAnswers
 import models.TypeOfSubcontractor.Individualorsoletrader
 import models.finalvalidation.*
 import pages.add.*
+import pages.add.partnership.*
 import pages.finalvalidation.*
 import play.api.libs.json.{JsObject, Json}
 import queries.CisIdQuery
@@ -378,6 +379,46 @@ class FinalValidationSubcontractorServiceSpec extends SpecBase {
 
       result.failure.exception.getMessage mustBe
         "Unsupported subcontractor type: None"
+    }
+
+    "must populate both partnership names for a NINO target" in {
+
+      val draftSubcontractor =
+        subcontractor(
+          proposed = Json.obj(
+            "partnershipTradingName" -> "Alice Partnership",
+            "tradingName"            -> "Alice",
+            "nino"                   -> "PX123456A"
+          ),
+          subcontractorType = Some("partnership")
+        )
+
+      val result =
+        service
+          .populateFinalValidationUserAnswers(
+            userAnswers = UserAnswers("id"),
+            instanceId = "CIS-123",
+            subcontractor = draftSubcontractor,
+            changeTarget = FinalValidationChangeTarget.NinoYesNo
+          )
+          .success
+          .value
+
+      result
+        .get(PartnershipNamePage)
+        .value mustBe "Alice Partnership"
+
+      result
+        .get(PartnershipNominatedPartnerNamePage)
+        .value mustBe "Alice"
+
+      result
+        .get(PartnershipNominatedPartnerNinoYesNoPage)
+        .value mustBe true
+
+      result
+        .get(PartnershipNominatedPartnerNinoPage)
+        .value mustBe "PX123456A"
     }
   }
 }
