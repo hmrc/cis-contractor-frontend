@@ -66,7 +66,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       val yesOrNoPage       = PartnershipHasUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      PartnershipNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
             case None        => form
@@ -80,7 +81,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      PartnershipNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()

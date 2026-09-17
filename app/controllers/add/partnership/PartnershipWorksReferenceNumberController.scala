@@ -53,7 +53,8 @@ class PartnershipWorksReferenceNumberController @Inject() (
     val yesOrNoPage       = PartnershipWorksReferenceNumberYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage)
 
-    PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+    PartnershipNameDisplayHelper
+      .getDisplayName(request.userAnswers, mode)
       .map { partnershipName =>
         val preparedForm = request.userAnswers.get(PartnershipWorksReferenceNumberPage) match {
           case None        => form
@@ -69,7 +70,8 @@ class PartnershipWorksReferenceNumberController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      PartnershipNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           form
             .bindFromRequest()

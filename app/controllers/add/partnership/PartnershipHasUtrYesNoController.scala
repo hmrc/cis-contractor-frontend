@@ -50,7 +50,8 @@ class PartnershipHasUtrYesNoController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
-      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      PartnershipNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipHasUtrYesNoPage) match {
             case None        => form
@@ -63,7 +64,8 @@ class PartnershipHasUtrYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      PartnershipNameDisplayHelper
+        .getDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()
