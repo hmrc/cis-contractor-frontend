@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.company.CompanyWorksReferenceFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage}
+import pages.add.company.{CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

@@ -21,7 +21,7 @@ import controllers.add.AddressLookupJourneyController
 import models.{AmendMode, Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
-import pages.add.company.{CompanyAddressPage, CompanyNamePage}
+import pages.add.company.CompanyAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}

@@ -21,7 +21,7 @@ import forms.add.company.CompanyUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
+import pages.add.company.{CompanyUtrPage, CompanyUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

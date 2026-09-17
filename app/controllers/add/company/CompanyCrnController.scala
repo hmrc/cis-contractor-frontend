@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.company.CompanyCrnFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyCrnPage, CompanyCrnYesNoPage, CompanyNamePage}
+import pages.add.company.{CompanyCrnPage, CompanyCrnYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

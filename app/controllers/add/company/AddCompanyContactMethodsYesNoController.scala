@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.add.company.AddCompanyContactMethodsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{AddCompanyContactMethodsYesNoPage, CompanyNamePage}
+import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

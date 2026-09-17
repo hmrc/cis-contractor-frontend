@@ -21,7 +21,7 @@ import forms.add.company.CompanyPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyNamePage, CompanyPhoneNumberPage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
