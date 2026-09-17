@@ -20,11 +20,13 @@ import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyPhoneNumberFormProvider
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyContactMethodOptionsPage, CompanyNamePage, CompanyPhoneNumberPage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,6 +45,9 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   private lazy val companyPhoneNumberRoute =
     controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(NormalMode).url
 
+  private lazy val companyPhoneNumberFinalValidationRoute =
+    controllers.add.company.routes.CompanyPhoneNumberController.onPageLoad(FinalValidationMode).url
+
   private def uaWithName: UserAnswers =
     emptyUserAnswers
       .set(CompanyNamePage, companyName)
@@ -55,6 +60,12 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def uaWithNameAndFinalValidationPhoneTarget: UserAnswers =
+    uaWithName
+      .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber)
+      .success
+      .value
+  
   "CompanyPhoneNumberController" - {
 
     "must return OK and the correct view for a GET when Phone is selected" in {
@@ -306,6 +317,54 @@ class CompanyPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when CompanyContactMethodOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyPhoneNumberFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[CompanyPhoneNumberView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, companyName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when CompanyContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationPhoneTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyPhoneNumberFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "0123456723"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }

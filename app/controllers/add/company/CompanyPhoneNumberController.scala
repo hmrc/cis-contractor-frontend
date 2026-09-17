@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import forms.add.company.CompanyPhoneNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.company.{CompanyContactMethodOptionsPage, CompanyNamePage, CompanyPhoneNumberPage}
@@ -53,27 +53,38 @@ class CompanyPhoneNumberController @Inject() (
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
       val companyName   = request.userAnswers.get(CompanyNamePage)
 
-      (companyName, contactOption) match {
-        case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (companyName, phoneIsAvailable) match {
+        case (Some(companyName), true) =>
           val preparedForm = request.userAnswers.get(CompanyPhoneNumberPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, companyName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption =
+        request.userAnswers.get(CompanyContactMethodOptionsPage)
+
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
       (for {
-        companyName    <- request.userAnswers.get(CompanyNamePage)
-        contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Phone)
+        companyName <- request.userAnswers.get(CompanyNamePage)
+        if phoneIsAvailable
       } yield form
         .bindFromRequest()
         .fold(
