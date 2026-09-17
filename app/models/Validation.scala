@@ -30,6 +30,12 @@ trait Validation {
       case None        => Left(MissingAnswer(questionPage))
     }
 
+  def getOptionalValue[A](
+    answers: UserAnswers,
+    questionPage: QuestionPage[A]
+  )(implicit reads: Reads[A]): Either[ValidationError, Option[A]] =
+    Right(answers.get(questionPage))
+
   def getOptionalPageValue[A](
     answers: UserAnswers,
     questionPage: QuestionPage[A],

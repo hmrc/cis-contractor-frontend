@@ -67,10 +67,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
     implicit request =>
       val ua = request.userAnswers
 
-      ValidatedTrust.build(ua) match {
+      ValidatedTrust.build(ua, isAmendMode = true) match {
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val trustName  = ua.get(TrustNamePage).getOrElse("")
+          val trustName  = ua.get(TrustNamePage).getOrElse(Messages("verify.noName"))
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -166,7 +166,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-      ValidatedTrust.build(request.userAnswers) match {
+      ValidatedTrust.build(request.userAnswers, isAmendMode = true) match {
 
         case Left(error) =>
           logger.error(
