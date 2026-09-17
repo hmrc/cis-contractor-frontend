@@ -70,7 +70,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
       ValidatedCompany.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified  = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val companyName = ua.get(CompanyNamePage).getOrElse("No name provided")
+          val companyName = ua.get(CompanyNamePage).getOrElse(Messages("verify.noName"))
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
