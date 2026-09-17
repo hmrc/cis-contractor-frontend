@@ -21,7 +21,7 @@ import controllers.add.AddressLookupJourneyController
 import controllers.helpers.PartnershipNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import models.{Mode, UserAnswers}
+import models.{AmendMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -73,7 +73,7 @@ class PartnershipAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.PartnershipAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.PartnershipAddressController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 
