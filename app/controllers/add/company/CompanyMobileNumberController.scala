@@ -76,7 +76,7 @@ class CompanyMobileNumberController @Inject() (
     implicit request =>
       (for {
         companyName    <- subcontractorNameExtractor
-          .getCompanyName(request.userAnswers, mode)
+                            .getCompanyName(request.userAnswers, mode)
         contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Mobile)
       } yield form

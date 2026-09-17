@@ -31,20 +31,21 @@ object CompanyNameSummary {
     val subcontractorNameExtractor = new SubcontractorNameExtractor()
 
     subcontractorNameExtractor
-      .getCompanyName(answers, mode).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyName.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+      .getCompanyName(answers, mode)
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "companyName.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("companyName.change.hidden"))
+              .withAttribute("id" -> "company-name")
           )
-            .withVisuallyHiddenText(messages("companyName.change.hidden"))
-            .withAttribute("id" -> "company-name")
         )
-      )
-    }
+      }
   }
 
   def row(

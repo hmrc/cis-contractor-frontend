@@ -138,8 +138,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
           userAnswers.get(CompanyAddressYesNoPage),
           userAnswers.get(CompanyAddressPage).isDefined,
           onYes = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode),
-          onYesChange =
-            controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
+          onYesChange = controllers.add.company.routes.CompanyAddressController
+            .redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
           onNo = controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(NormalMode),
           checkYourAnswers = controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
         )

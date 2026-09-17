@@ -40,15 +40,14 @@ object ValidatedCompany extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
     buildCompany(
       answers,
-      getPageValue(answers, CompanyNamePage),
+      getPageValue(answers, CompanyNamePage)
     )
 
   def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
     buildCompany(
       answers,
-      getAmendPageValue(answers, CompanyNamePage),
+      getAmendPageValue(answers, CompanyNamePage)
     )
-
 
   private def buildCompany(
     answers: UserAnswers,
