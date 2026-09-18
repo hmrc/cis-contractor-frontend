@@ -19,23 +19,20 @@ package controllers.amend.company
 import base.SpecBase
 import models.UserAnswers
 import models.amend.company.OriginalCompanyAnswers
+import pages.add.company.CompanyNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import viewmodels.amend.company.CompanyAmendConfirmationViewModel
+import views.html.amend.AmendConfirmationView
+import scala.concurrent.Future
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.CompanyNamePage
 import play.api.inject.bind
-import play.api.test.FakeRequest
-import play.api.test.Helpers.*
-import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
-import utils.DefaultSubcontractorCleanupService
-import viewmodels.amend.company.CompanyAmendConfirmationViewModel
-import views.html.amend.AmendConfirmationView
-import pages.amend.AmendCheckYourAnswersSubmittedPage
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 import config.FrontendAppConfig
 import models.amend.AmendJourneyType
 import pages.amend.AmendJourneyTypePage
@@ -47,9 +44,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
   private val companyName = "Company Ltd"
   private val cisId       = "contractor-123"
 
-  private val mockCleanupService =
-    mock[DefaultSubcontractorCleanupService]
-
   private val mockSessionRepository =
     mock[SessionRepository]
 
@@ -58,7 +52,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
+    reset(mockSessionRepository, mockVerificationService)
   }
 
   private val original =
@@ -80,7 +74,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
       verificationNumber = None
     )
 
-  private val userAnswersWithOriginal =
+  private def userAnswersWithOriginal: UserAnswers =
     emptyUserAnswers
       .set(OriginalCompanyAnswersQuery, original)
       .success
@@ -106,8 +100,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService]
-          .toInstance(mockCleanupService),
         bind[SessionRepository]
           .toInstance(mockSessionRepository),
         bind[VerificationService]
@@ -118,9 +110,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
   "AmendCompanyConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -153,9 +142,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
             companyName,
             confirmationLink
           )(request, messages(app)).toString
-
-        verify(mockCleanupService).cleanAmend(any[UserAnswers])
-        verify(mockSessionRepository).set(any[UserAnswers])
       }
     }
 
@@ -186,9 +172,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
           controllers.routes.JourneyRecoveryController
             .onPageLoad()
             .url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
       }
     }
 
@@ -220,7 +203,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
             .onPageLoad()
             .url
 
-        verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
       }
     }
@@ -252,35 +234,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
           controllers.routes.JourneyRecoveryController
             .onPageLoad()
             .url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when cleanup fails" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(
-          Failure(new RuntimeException("cleanup failed"))
-        )
-
-      val app = application(userAnswersWithOriginal)
-
-      running(app) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-
-        verify(mockCleanupService).cleanAmend(any[UserAnswers])
-        verify(mockSessionRepository, never()).set(any[UserAnswers])
       }
     }
 
@@ -315,15 +268,11 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
             .onPageLoad()
             .url
 
-        verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
       }
     }
 
     "must refresh verification batches and render the insufficient info confirmation link" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(
         mockVerificationService
@@ -368,9 +317,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
 
     "must refresh verification batches and render the unmatched info confirmation link" in {
 
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
-
       when(
         mockVerificationService
           .refreshVerificationBatches(any[UserAnswers])(any())
@@ -413,9 +359,6 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
     }
 
     "must not refresh verification batches for standard amend journey" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
