@@ -86,9 +86,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(TrustUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendTrustRemoveDetail.WorksReferenceNumber =>
         userAnswers

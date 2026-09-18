@@ -19,12 +19,13 @@ package controllers.amend.partnership
 import base.SpecBase
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
 import models.UserAnswers
+import models.amend.AmendJourneyType
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.*
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -617,6 +618,57 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must allow access for a GET when subcontractor is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(insufficientInfoUa)
+          ).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(unmatchedInfoUa)
+          ).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
     }
 
     "when detail is NominatedPartnerUtr" - {
@@ -664,6 +716,55 @@ class AmendPartnershipRemoveDetailYesNoControllerSpec extends SpecBase with Mock
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must allow access for a GET when nominated partner is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(insufficientInfoUa)
+          ).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+      "must allow access for a GET when nominated partner is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(unmatchedInfoUa)
+          ).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
         }
       }
     }

@@ -17,15 +17,14 @@
 package controllers.amend.partnership
 
 import controllers.actions.*
-import controllers.helpers.PartnershipNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
 import models.{AmendMode, UserAnswers}
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import pages.add.partnership.*
 import models.requests.DataRequest
-import pages.amend.ShowVerificationDetailsPage
+import pages.add.partnership.*
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import play.api.Logging
@@ -108,9 +107,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(PartnershipHasUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
         userAnswers
@@ -121,9 +118,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(PartnershipNominatedPartnerUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
         userAnswers
