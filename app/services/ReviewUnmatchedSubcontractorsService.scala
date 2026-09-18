@@ -92,7 +92,8 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             AmendJourneyType.UnmatchedInfo.routeValue
           )
           .url,
-        name),
+        name
+      ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
       proceedLink = LinkViewModel(
         controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
@@ -132,7 +133,8 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             AmendJourneyType.UnmatchedInfo.routeValue
           )
           .url,
-        name),
+        name
+      ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey)
     )
   }
