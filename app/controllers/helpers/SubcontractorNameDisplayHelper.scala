@@ -40,7 +40,7 @@ object SubcontractorNameDisplayHelper {
       .getOrElse {
         if (mode == AmendMode) messages("verify.noName") else ""
       }
-      
+
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(PartnershipNamePage).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode) {
