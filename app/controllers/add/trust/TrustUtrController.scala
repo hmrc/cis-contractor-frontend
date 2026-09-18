@@ -42,6 +42,7 @@ class TrustUtrController @Inject() (
   formProvider: TrustUtrFormProvider,
   subcontractorService: SubcontractorService,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: TrustUtrView
@@ -60,8 +61,9 @@ class TrustUtrController @Inject() (
       navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+  def onPageLoad(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)) { implicit request =>
       val yesOrNoPage       = TrustUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
 
@@ -72,21 +74,22 @@ class TrustUtrController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          val result       = Ok(view(preparedForm, mode, trustName))
+          val result       = Ok(view(preparedForm, mode, trustName, subbieResourceRef))
           yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+  def onSubmit(mode: Mode, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor andThen
+      redirectUnmatchSubbieRefActionFilter(mode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, subbieResourceRef))),
               value =>
                 val prevValue = request.userAnswers.get(TrustUtrPage)
 
@@ -102,7 +105,7 @@ class TrustUtrController @Inject() (
                             key = "value",
                             message = "trustUtr.error.duplicate"
                           )
-                        Future.successful(BadRequest(view(errorForm, mode, trustName)))
+                        Future.successful(BadRequest(view(errorForm, mode, trustName, subbieResourceRef)))
                       case false =>
                         saveAndContinue(mode, value)
                     }

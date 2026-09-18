@@ -57,37 +57,38 @@ class AmendTrustCheckYourAnswersController @Inject() (
   auditService: AuditService,
   sessionRepository: SessionRepository,
   view: AmendCheckYourAnswersView,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(subbieResourceRef: Long = -1L): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      val ua = request.userAnswers
+  def onPageLoad(subbieResourceRef: Long): Action[AnyContent] = (identify andThen getData andThen requireData andThen
+    redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)) { implicit request =>
+    val ua = request.userAnswers
 
-      ValidatedTrust.build(ua) match {
-        case Right(_) =>
-          val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val trustName  = ua.get(TrustNamePage).getOrElse("")
+    ValidatedTrust.build(ua) match {
+      case Right(_) =>
+        val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
+        val trustName  = ua.get(TrustNamePage).getOrElse("")
 
-          val subcontractorInformationList =
-            SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
+        val subcontractorInformationList =
+          SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
-          val detailsList =
-            SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
+        val detailsList =
+          SummaryListViewModel(rows = detailsRows(ua, isVerified, subbieResourceRef).flatten)
 
-          val submitUrl =
-            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
-          val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
+        val submitUrl =
+          controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit(subbieResourceRef)
+        val cancelUrl = controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel()
 
-          Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
+        Ok(view(subcontractorInformationList, detailsList, trustName, submitUrl, cancelUrl))
 
-        case Left(error) =>
-          logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
-      }
+      case Left(error) =>
+        logger.error(s"[AmendTrustCheckYourAnswersController.onPageLoad] Failed to load the page: $error")
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   private def subcontractorInformationRows(
@@ -127,14 +128,15 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   private def detailsRows(
     ua: UserAnswers,
-    isVerified: Boolean
+    isVerified: Boolean,
+    subbieResourceRef: Long
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
 
     val nameRows =
       if (isVerified) {
         Nil
       } else {
-        Seq(TrustNameSummary.row(ua, AmendMode))
+        Seq(TrustNameSummary.row(ua, AmendMode, subbieResourceRef))
       }
 
     val utrRows =
@@ -142,25 +144,25 @@ class AmendTrustCheckYourAnswersController @Inject() (
         Nil
       } else {
         Seq(
-          TrustUtrYesNoSummary.row(ua, AmendMode),
-          TrustUtrSummary.row(ua, AmendMode)
+          TrustUtrYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+          TrustUtrSummary.row(ua, AmendMode, subbieResourceRef)
         )
       }
 
     nameRows ++
       Seq(
-        TrustAddressYesNoSummary.row(ua, AmendMode),
-        TrustAddressSummary.row(ua, AmendMode),
-        AddTrustContactMethodsYesNoSummary.row(ua, AmendMode),
-        TrustContactMethodOptionsSummary.row(ua, AmendMode),
-        TrustEmailAddressSummary.row(ua, AmendMode),
-        TrustPhoneNumberSummary.row(ua, AmendMode),
-        TrustMobileNumberSummary.row(ua, AmendMode)
+        TrustAddressYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustAddressSummary.row(ua, AmendMode, subbieResourceRef),
+        AddTrustContactMethodsYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustContactMethodOptionsSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustEmailAddressSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustPhoneNumberSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustMobileNumberSummary.row(ua, AmendMode, subbieResourceRef)
       ) ++
       utrRows ++
       Seq(
-        TrustWorksReferenceYesNoSummary.row(ua, AmendMode),
-        TrustWorksReferenceSummary.row(ua, AmendMode)
+        TrustWorksReferenceYesNoSummary.row(ua, AmendMode, subbieResourceRef),
+        TrustWorksReferenceSummary.row(ua, AmendMode, subbieResourceRef)
       )
   }
 
