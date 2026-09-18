@@ -650,6 +650,67 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    def pollResponseWithStatus(pollStatus: SubmissionStatus): ChrisPollResponse =
+      ChrisPollResponse(
+        status = pollStatus,
+        correlationId = "corr-id",
+        pollUrl = None,
+        pollInterval = None,
+        error = None,
+        irMarkReceived = None,
+        lastMessageDate = None,
+        acceptedTime = None
+      )
+
+    def redirectForPollStatus(pollStatus: SubmissionStatus): String = {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(VerificationSubmissionDetailsPage, submissionDetails)
+          .success
+          .value
+
+      when(
+        mockService.pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(pollResponseWithStatus(pollStatus)))
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value
+      }
+    }
+
+    "must redirect to verify-send-error (SM-06) when poll returns SEND_ERROR" in {
+      redirectForPollStatus(SubmissionStatus.SEND_ERROR) mustBe
+        controllers.verify.routes.VerifySendErrorController.onPageLoad().url
+    }
+
+    "must redirect to request-in-progress when poll returns TIMED_OUT" in {
+      redirectForPollStatus(SubmissionStatus.TIMED_OUT) mustBe
+        controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+    }
+
+    "must redirect to departmental-error (SM-07) when poll returns DEPARTMENTAL_ERROR" in {
+      redirectForPollStatus(SubmissionStatus.DEPARTMENTAL_ERROR) mustBe
+        controllers.verify.routes.VerifyDepartmentalErrorController.onPageLoad().url
+    }
+
+    "must redirect to verification-not-submitted warning (SM-08) when poll returns FATAL_ERROR" in {
+      redirectForPollStatus(SubmissionStatus.FATAL_ERROR) mustBe
+        controllers.verify.routes.VerificationNotSubmittedWarningController.onPageLoad().url
+    }
+
     "must redirect to recovery when VerificationSubmissionDetailsPage is missing" in {
       val mockService = mock[VerificationService]
 
