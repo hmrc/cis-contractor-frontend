@@ -20,13 +20,12 @@ import controllers.actions.*
 import controllers.amend.AmendControllerUtils
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
-import models.{AmendMode, UserAnswers}
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.requests.DataRequest
+import models.{AmendMode, UserAnswers}
 import pages.add.partnership.*
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository

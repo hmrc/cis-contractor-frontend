@@ -20,8 +20,8 @@ import controllers.actions.*
 import controllers.amend.AmendControllerUtils
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import models.{AmendMode, UserAnswers}
 import models.amend.trust.AmendTrustRemoveDetail
+import models.{AmendMode, UserAnswers}
 import pages.add.trust.*
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import play.api.Logging
