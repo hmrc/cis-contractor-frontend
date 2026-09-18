@@ -325,8 +325,7 @@ class IndexControllerSpec extends SpecBase {
       val mockSessionRepository = mock[SessionRepository]
       val mockCisManagerService = mock[CisManageService]
 
-
-      val viewFlowAnswers = emptyUserAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader).success.value
+      val viewFlowAnswers                 = emptyUserAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader).success.value
       val updatedUserAnswers: UserAnswers = emptyUserAnswers
 
       when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
@@ -343,7 +342,7 @@ class IndexControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
         status(result) mustEqual SEE_OTHER
       }
 
@@ -357,15 +356,17 @@ class IndexControllerSpec extends SpecBase {
       val mockSessionRepository = mock[SessionRepository]
       val mockCisManagerService = mock[CisManageService]
 
-      val uniqueId = "unique-id-123"
-      val ton = "taxOfficeNumber"
-      val tor = "taxOfficeReference"
+      val uniqueId        = "unique-id-123"
+      val ton             = "taxOfficeNumber"
+      val tor             = "taxOfficeReference"
       val viewFlowAnswers = emptyUserAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader).success.value
 
       when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
         .thenReturn(
           Future.successful(
-            Some(AgentClientData(uniqueId = uniqueId, taxOfficeNumber = ton, taxOfficeReference = tor, schemeName = None))
+            Some(
+              AgentClientData(uniqueId = uniqueId, taxOfficeNumber = ton, taxOfficeReference = tor, schemeName = None)
+            )
           )
         )
       when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
@@ -383,7 +384,7 @@ class IndexControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
         status(result) mustEqual SEE_OTHER
       }
 
