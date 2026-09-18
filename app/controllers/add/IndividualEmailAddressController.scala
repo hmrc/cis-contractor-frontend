@@ -55,7 +55,7 @@ class IndividualEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
-      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
 
       (subcontractorName, contactOption) match {
         case (Some(subcontractorName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
@@ -75,7 +75,7 @@ class IndividualEmailAddressController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
         contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Email)
       } yield form

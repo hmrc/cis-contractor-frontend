@@ -17,11 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipUtrFormProvider
-import models.{AmendMode, Mode}
 import models.requests.DataRequest
+import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -65,8 +66,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       val yesOrNoPage       = PartnershipHasUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-      request.userAnswers
-        .get(PartnershipNamePage)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
             case None        => form
@@ -80,8 +81,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()

@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.PartnershipNamePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -409,6 +409,35 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
         status(result) mustBe OK
 
         verifyNoInteractions(mockVerificationService)
+      }
+    }
+
+    "must return OK when partnership name and partner name is missing in amend mode" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(
+          Success(
+            userAnswersWithOriginal
+              .remove(PartnershipNamePage)
+              .success
+              .value
+              .remove(PartnershipNominatedPartnerNamePage)
+              .success
+              .value
+          )
+        )
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
       }
     }
   }

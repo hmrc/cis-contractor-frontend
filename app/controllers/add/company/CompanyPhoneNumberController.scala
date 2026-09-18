@@ -21,11 +21,12 @@ import forms.add.company.CompanyPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyNamePage, CompanyPhoneNumberPage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyPhoneNumberView
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class CompanyPhoneNumberController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyPhoneNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyPhoneNumberView
 )(implicit ec: ExecutionContext)
@@ -51,7 +53,8 @@ class CompanyPhoneNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = request.userAnswers.get(CompanyNamePage)
+      val companyName   = subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
 
       (companyName, contactOption) match {
         case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
@@ -71,7 +74,8 @@ class CompanyPhoneNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        companyName    <- request.userAnswers.get(CompanyNamePage)
+        companyName    <- subcontractorNameExtractor
+                            .getCompanyName(request.userAnswers, mode)
         contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Phone)
       } yield form
