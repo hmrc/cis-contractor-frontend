@@ -17,7 +17,7 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import controllers.helpers.PartnershipNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -51,7 +51,7 @@ class PartnershipPhoneNumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-    val partnershipName = PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
     (partnershipName, contactOption) match {
       case (Some(partnershipName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
@@ -71,7 +71,7 @@ class PartnershipPhoneNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        partnershipName <- PartnershipNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+        partnershipName <- SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
         contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Phone)
       } yield form

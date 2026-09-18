@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import play.api.i18n.Messages
@@ -27,7 +27,7 @@ import viewmodels.implicits.*
 object TrustNameSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    TrustNameDisplayHelper.getDisplayName(answers, mode).map { answer =>
+    SubcontractorNameDisplayHelper.getTrustDisplayName(answers, mode).map { answer =>
       SummaryListRowViewModel(
         key = "trustName.checkYourAnswersLabel",
         value = ValueViewModel(answer),

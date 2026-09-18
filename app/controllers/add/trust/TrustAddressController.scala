@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
 import models.{AmendMode, Mode, UserAnswers}
@@ -50,7 +50,7 @@ class TrustAddressController @Inject() (
   override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
     messages: Messages
   ): Option[String] =
-    TrustNameDisplayHelper.getDisplayName(userAnswers, mode)
+    SubcontractorNameDisplayHelper.getTrustDisplayName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.TrustAddressController.addressLookupCallback()

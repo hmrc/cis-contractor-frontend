@@ -17,7 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
@@ -48,8 +48,8 @@ class TrustAddressYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    TrustNameDisplayHelper
-      .getDisplayName(request.userAnswers, mode)
+    SubcontractorNameDisplayHelper
+      .getTrustDisplayName(request.userAnswers, mode)
       .map { trustName =>
         val preparedForm = request.userAnswers.get(TrustAddressYesNoPage) match {
           case None        => form
@@ -63,8 +63,8 @@ class TrustAddressYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      TrustNameDisplayHelper
-        .getDisplayName(request.userAnswers, mode)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()

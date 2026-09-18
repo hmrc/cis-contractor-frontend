@@ -866,8 +866,6 @@ trustAddressYesNo.error.required                   =  Dewiswch p’un a ydych ch
 trustAddressYesNo.checkYourAnswersLabel            =  Ychwanegu cyfeiriad yr ymddiriedolaeth?
 trustAddressYesNo.change.hidden                    =  xxxxxxxxxxxxxxxxxxxx
 
-trustName.noNameProvided                           =  xxxxxxxxxxxxxxxxxxxx
-
 trustAddress.checkYourAnswersLabel                 =  Cyfeiriad
 trustAddress.change.hidden                         =  cyfeiriad
 

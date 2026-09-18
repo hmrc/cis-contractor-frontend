@@ -19,7 +19,7 @@ package controllers.amend.partnership
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
-import controllers.helpers.PartnershipNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.add.partnership.ValidatedPartnership
 import models.amend.AmendJourneyType
@@ -70,7 +70,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
 
-          val partnershipName              = PartnershipNameDisplayHelper.displayName(ua, AmendMode)
+          val partnershipName              = SubcontractorNameDisplayHelper.partnershipDisplayName(ua, AmendMode)
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 

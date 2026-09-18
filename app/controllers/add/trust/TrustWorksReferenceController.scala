@@ -17,7 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustWorksReferenceFormProvider
 import models.Mode
 import navigation.Navigator
@@ -53,8 +53,8 @@ class TrustWorksReferenceController @Inject() (
     val yesOrNoPage       = TrustWorksReferenceYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(TrustWorksReferenceYesNoPage)
 
-    TrustNameDisplayHelper
-      .getDisplayName(request.userAnswers, mode)
+    SubcontractorNameDisplayHelper
+      .getTrustDisplayName(request.userAnswers, mode)
       .map { trustName =>
         val preparedForm = request.userAnswers.get(TrustWorksReferencePage) match {
           case None        => form
@@ -69,8 +69,8 @@ class TrustWorksReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      TrustNameDisplayHelper
-        .getDisplayName(request.userAnswers, mode)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()

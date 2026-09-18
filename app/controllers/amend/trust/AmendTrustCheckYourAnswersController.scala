@@ -19,7 +19,7 @@ package controllers.amend.trust
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.add.trust.ValidatedTrust
 import models.amend.AmendJourneyType
@@ -69,7 +69,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
       ValidatedTrust.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val trustName  = TrustNameDisplayHelper.displayName(ua, AmendMode)
+          val trustName  = SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)

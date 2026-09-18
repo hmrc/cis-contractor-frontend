@@ -20,14 +20,15 @@ import base.SpecBase
 import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
+import pages.add.trust.TrustNamePage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.FakeRequest
 
-class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
+class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
 
   implicit lazy val testMessages: Messages = messages(app)
 
-  "PartnershipNameDisplayHelper.getDisplayName" - {
+  "SubcontractorNameDisplayHelper.getPartnershipDisplayName" - {
 
     "return the partnership name when it is provided" in {
       val userAnswers =
@@ -36,7 +37,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getDisplayName(
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe Some("Test Partnership")
@@ -49,21 +50,21 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getDisplayName(
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe Some("Test Partnership")
     }
 
     "return no name provided when the partnership name is missing in amend mode" in {
-      PartnershipNameDisplayHelper.getDisplayName(
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         emptyUserAnswers,
         AmendMode
-      ) mustBe Some(testMessages("partnershipName.noNameProvided"))
+      ) mustBe Some(testMessages("verify.noName"))
     }
 
     "return None when the partnership name is missing in normal mode" in {
-      PartnershipNameDisplayHelper.getDisplayName(
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         emptyUserAnswers,
         NormalMode
       ) mustBe None
@@ -76,14 +77,14 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getDisplayName(
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         userAnswers,
         AmendMode
-      ) mustBe Some(testMessages("partnershipName.noNameProvided"))
+      ) mustBe Some(testMessages("verify.noName"))
     }
   }
 
-  "PartnershipNameDisplayHelper.getPartnerDisplayName" - {
+  "SubcontractorNameDisplayHelper.getPartnerDisplayName" - {
 
     "return the nominated partner name when it is provided" in {
       val userAnswers =
@@ -92,7 +93,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getPartnerDisplayName(
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
         userAnswers,
         AmendMode
       ) mustBe Some("Test Partner")
@@ -105,21 +106,21 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getPartnerDisplayName(
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
         userAnswers,
         AmendMode
       ) mustBe Some("Test Partner")
     }
 
     "return no name provided when the nominated partner name is missing in amend mode" in {
-      PartnershipNameDisplayHelper.getPartnerDisplayName(
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
         emptyUserAnswers,
         AmendMode
-      ) mustBe Some(testMessages("partnershipName.noNameProvided"))
+      ) mustBe Some(testMessages("verify.noName"))
     }
 
     "return None when the nominated partner name is missing in normal mode" in {
-      PartnershipNameDisplayHelper.getPartnerDisplayName(
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
         emptyUserAnswers,
         NormalMode
       ) mustBe None
@@ -132,14 +133,14 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.getPartnerDisplayName(
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
         userAnswers,
         AmendMode
-      ) mustBe Some(testMessages("partnershipName.noNameProvided"))
+      ) mustBe Some(testMessages("verify.noName"))
     }
   }
 
-  "PartnershipNameDisplayHelper.displayName" - {
+  "SubcontractorNameDisplayHelper.partnershipDisplayName" - {
 
     "return the partnership name when it is provided" in {
       val userAnswers =
@@ -148,7 +149,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partnership"
@@ -161,7 +162,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partnership"
@@ -174,7 +175,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partner"
@@ -187,7 +188,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partner"
@@ -203,21 +204,21 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partnership"
     }
 
     "return no name provided when both names are missing in amend mode" in {
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         emptyUserAnswers,
         AmendMode
-      ) mustBe testMessages("partnershipName.noNameProvided")
+      ) mustBe testMessages("verify.noName")
     }
 
     "return an empty string when both names are missing in normal mode" in {
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         emptyUserAnswers,
         NormalMode
       ) mustBe ""
@@ -233,7 +234,7 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
       ) mustBe "Test Partner"
@@ -249,10 +250,109 @@ class PartnershipNameDisplayHelperSpec extends SpecBase with Matchers {
           .success
           .value
 
-      PartnershipNameDisplayHelper.displayName(
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
         userAnswers,
         AmendMode
-      ) mustBe testMessages("partnershipName.noNameProvided")
+      ) mustBe testMessages("verify.noName")
+    }
+  }
+
+  "SubcontractorNameDisplayHelper.getTrustDisplayName" - {
+
+    "return the partnership name when it is provided" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, "Test Trust")
+          .success
+          .value
+
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        userAnswers,
+        AmendMode
+      ) mustBe Some("Test Trust")
+    }
+
+    "return the trimmed Trust name when it contains whitespace" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, "  Test Trust  ")
+          .success
+          .value
+
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        userAnswers,
+        AmendMode
+      ) mustBe Some("Test Trust")
+    }
+
+    "return no name provided when the trust name is missing in amend mode" in {
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        emptyUserAnswers,
+        AmendMode
+      ) mustBe Some(testMessages("verify.noName"))
+    }
+
+    "return None when the trust name is missing in normal mode" in {
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        emptyUserAnswers,
+        NormalMode
+      ) mustBe None
+    }
+
+    "return no name provided when the trust name is blank in amend mode" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, "   ")
+          .success
+          .value
+
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        userAnswers,
+        AmendMode
+      ) mustBe Some(testMessages("verify.noName"))
+    }
+  }
+
+  "SubcontractorNameDisplayHelper.trustDisplayName" - {
+
+    "return the trust name when it is provided" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, "Test Trust")
+          .success
+          .value
+
+      SubcontractorNameDisplayHelper.trustDisplayName(
+        userAnswers,
+        AmendMode
+      ) mustBe "Test Trust"
+    }
+
+    "return the trimmed trust name when it contains whitespace" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, "  Test Trust  ")
+          .success
+          .value
+
+      SubcontractorNameDisplayHelper.trustDisplayName(
+        userAnswers,
+        AmendMode
+      ) mustBe "Test Trust"
+    }
+
+    "return no name provided when trust name is missing in amend mode" in {
+      SubcontractorNameDisplayHelper.trustDisplayName(
+        emptyUserAnswers,
+        AmendMode
+      ) mustBe testMessages("verify.noName")
+    }
+
+    "return an empty string when trust name are missing in normal mode" in {
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
+        emptyUserAnswers,
+        NormalMode
+      ) mustBe ""
     }
   }
 }

@@ -17,17 +17,18 @@
 package controllers.amend.partnership
 
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
-import models.{AmendMode, UserAnswers}
 import models.amend.partnership.AmendPartnershipRemoveDetail
-import pages.add.partnership.*
 import models.requests.DataRequest
+import models.{AmendMode, UserAnswers}
 import pages.add.partnership.*
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import play.api.Logging
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.partnership.AmendPartnershipRemoveDetailYesNoView
 
@@ -70,12 +71,12 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
   private def getPartnershipName(
     userAnswers: UserAnswers
   )(implicit messages: Messages): Option[String] =
-    PartnershipNameDisplayHelper.getDisplayName(userAnswers, AmendMode)
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode)
 
   private def getNominatedPartnerName(
     userAnswers: UserAnswers
   )(implicit messages: Messages): Option[String] =
-    PartnershipNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
+    SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
 
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,
