@@ -219,7 +219,7 @@ class ContractorDetailsFinalValidationServiceSpec extends SpecBase with MockitoS
           accountsOfficeReference = "123 PA 87654321",
           prePopCount = 7,
           prePopSuccessful = "Y",
-          uniqueTaxReference = "5860920998",
+          utr = "5860920998",
           name = "Updated Scheme",
           emailAddress = "updated@example.com",
           version = 4

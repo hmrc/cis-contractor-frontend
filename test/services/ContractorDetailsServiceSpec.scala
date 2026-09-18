@@ -112,7 +112,7 @@ class ContractorDetailsServiceSpec extends SpecBase with MockitoSugar {
           accountsOfficeReference = "123 PA 87654321",
           prePopCount = 1,
           prePopSuccessful = "Y",
-          uniqueTaxReference = "1234567890",
+          utr = "1234567890",
           name = "Test Scheme",
           emailAddress = "test@example.com",
           version = 2

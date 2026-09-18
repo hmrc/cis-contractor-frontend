@@ -230,7 +230,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         accountsOfficeReference = "AO123",
         prePopCount = 2,
         prePopSuccessful = "Y",
-        uniqueTaxReference = "1234567890",
+        utr = "1234567890",
         name = "Scheme name",
         emailAddress = "test@example.com",
         version = 4

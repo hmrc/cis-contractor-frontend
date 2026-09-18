@@ -33,7 +33,7 @@ class UpdateSchemeRequestSpec extends SpecBase {
           accountsOfficeReference = "AO123",
           prePopCount = 2,
           prePopSuccessful = "Y",
-          uniqueTaxReference = "1234567890",
+          utr = "1234567890",
           name = "Scheme",
           emailAddress = "test@example.com",
           version = 4
@@ -43,7 +43,7 @@ class UpdateSchemeRequestSpec extends SpecBase {
 
       (json \ "schemeId").as[Int] mustBe 1
       (json \ "instanceId").as[String] mustBe "INST-123"
-      (json \ "uniqueTaxReference").as[String] mustBe "1234567890"
+      (json \ "utr").as[String] mustBe "1234567890"
       (json \ "version").as[Int] mustBe 4
     }
   }

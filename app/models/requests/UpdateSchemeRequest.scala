@@ -26,7 +26,7 @@ final case class UpdateSchemeRequest(
   accountsOfficeReference: String,
   prePopCount: Int,
   prePopSuccessful: String,
-  uniqueTaxReference: String,
+  utr: String,
   name: String,
   emailAddress: String,
   version: Int

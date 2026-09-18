@@ -76,7 +76,7 @@ class ContractorDetailsFinalValidationService @Inject() (
                              accountsOfficeReference = scheme.accountsOfficeReference,
                              prePopCount = scheme.prePopCount.getOrElse(0),
                              prePopSuccessful = scheme.prePopSuccessful.getOrElse(""),
-                             uniqueTaxReference = userAnswers.get(ContractorUtrPage).getOrElse(""),
+                             utr = userAnswers.get(ContractorUtrPage).getOrElse(""),
                              name = userAnswers.get(SchemeNamePage).getOrElse(""),
                              emailAddress = userAnswers.get(EnterContractorEmailAddressPage).getOrElse(""),
                              version = versionResponse.newVersion
