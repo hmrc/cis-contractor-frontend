@@ -411,7 +411,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def updateSubcontractorForEdit(
-    request: UpdateSubcontractorRequest
+    request: UpdateSubcontractorForEditRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
 
     logger.info(
