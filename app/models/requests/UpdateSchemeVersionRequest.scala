@@ -19,8 +19,8 @@ package models.requests
 import play.api.libs.json.{Json, OFormat}
 
 final case class UpdateSchemeVersionRequest(
-  instanceId: String,
-  version: Int
+  currentVersion: Int,
+  instanceId: String
 )
 
 object UpdateSchemeVersionRequest {

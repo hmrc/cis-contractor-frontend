@@ -87,7 +87,7 @@ class ContractorDetailsServiceSpec extends SpecBase with MockitoSugar {
   "updateSchemeVersion" - {
 
     "return the new version returned by the connector" in {
-      val request  = UpdateSchemeVersionRequest(instanceId = "cisId", version = 1)
+      val request  = UpdateSchemeVersionRequest(currentVersion = 1, instanceId = "cisId")
       val response = UpdateSchemeVersionResponse(newVersion = 2)
 
       when(

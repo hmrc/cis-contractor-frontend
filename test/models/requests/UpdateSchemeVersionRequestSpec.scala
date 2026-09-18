@@ -24,9 +24,9 @@ class UpdateSchemeVersionRequestSpec extends SpecBase {
   "UpdateSchemeVersionRequest" - {
 
     "must write to JSON" in {
-      val json = Json.toJson(UpdateSchemeVersionRequest(instanceId = "INST-123", version = 3))
+      val json = Json.toJson(UpdateSchemeVersionRequest(currentVersion = 3, instanceId = "INST-123"))
 
-      (json \ "version").as[Int] mustBe 3
+      (json \ "currentVersion").as[Int] mustBe 3
       (json \ "instanceId").as[String] mustBe "INST-123"
     }
   }

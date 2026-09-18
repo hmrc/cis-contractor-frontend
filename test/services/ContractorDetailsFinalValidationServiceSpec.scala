@@ -200,7 +200,7 @@ class ContractorDetailsFinalValidationServiceSpec extends SpecBase with MockitoS
         .futureValue mustBe (())
 
       verify(mockContractorDetailsService)
-        .updateSchemeVersion(eqTo(UpdateSchemeVersionRequest(instanceId = "cisId", version = 3)))(
+        .updateSchemeVersion(eqTo(UpdateSchemeVersionRequest(currentVersion = 3, instanceId = "cisId")))(
           any[HeaderCarrier]
         )
 
