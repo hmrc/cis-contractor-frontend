@@ -22,8 +22,7 @@ import java.time.LocalDateTime
 
 final case class UpdateSubcontractorRequest(
   cisId: String,
-  subcontractor: SubcontractorRequest,
-  verificationForEdit: Option[UpdateVerificationForEditRequest] = None
+  subcontractor: SubcontractorRequest
 )
 
 object UpdateSubcontractorRequest {

@@ -196,23 +196,5 @@ class UpdateSubcontractorRequestSpec extends SpecBase {
       result.lastMonthlyReturnDate mustBe
         Some(LocalDateTime.of(2026, 6, 30, 23, 59))
     }
-
-    "must serialise and deserialise when verificationForEdit is present" in {
-      val requestWithVerification =
-        request.copy(
-          verificationForEdit = Some(
-            UpdateVerificationForEditRequest(
-              verificationBatchResourceRef = 123L,
-              verificationResourceRef = 456L
-            )
-          )
-        )
-
-      val json =
-        Json.toJson(requestWithVerification)
-
-      json.as[UpdateSubcontractorRequest] mustBe
-        requestWithVerification
-    }
   }
 }

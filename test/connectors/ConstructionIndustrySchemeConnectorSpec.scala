@@ -538,7 +538,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
   "ConstructionIndustrySchemeConnector.updateSubcontractorForEdit" should {
 
     val request =
-      UpdateSubcontractorRequest(
+      UpdateSubcontractorForEditRequest(
         cisId = "INST-123",
         subcontractor = SubcontractorRequest(
           subcontractorId = 123L,

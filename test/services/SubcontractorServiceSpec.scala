@@ -24,7 +24,7 @@ import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
 import models.amend.AmendJourneyType
 import pages.add.company.*
-import models.requests.{CreateAndUpdateSubcontractorPayload, SubcontractorRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
+import models.requests.{CreateAndUpdateSubcontractorPayload, SubcontractorRequest, UpdateSubcontractorForEditRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.{GetCurrentVerificationBatchResponse, GetSubcontractorResponse, GetSubcontractorUTRsResponse, SubcontractorResponse}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -2644,7 +2644,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         when(
           mockConnector.updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
         ).thenReturn(Future.successful(()))
 
@@ -2657,7 +2657,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val captor =
           ArgumentCaptor.forClass(
-            classOf[UpdateSubcontractorRequest]
+            classOf[UpdateSubcontractorForEditRequest]
           )
 
         verify(mockConnector)
@@ -2746,7 +2746,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         when(
           mockConnector.updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
           Future.failed(
@@ -2770,7 +2770,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         verify(mockConnector)
           .updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
 
         verifyNoMoreInteractions(mockConnector)
@@ -2829,7 +2829,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         when(
           mockConnector.updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
         ).thenReturn(Future.successful(()))
 
@@ -2843,7 +2843,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val captor =
           ArgumentCaptor.forClass(
-            classOf[UpdateSubcontractorRequest]
+            classOf[UpdateSubcontractorForEditRequest]
           )
 
         verify(mockConnector)
@@ -2877,7 +2877,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         when(
           mockConnector.updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
         ).thenReturn(Future.successful(()))
 
@@ -2891,7 +2891,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val captor =
           ArgumentCaptor.forClass(
-            classOf[UpdateSubcontractorRequest]
+            classOf[UpdateSubcontractorForEditRequest]
           )
 
         verify(mockConnector)
@@ -2951,6 +2951,112 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should fail an unmatched information amend when CurrentVerificationBatchResponsePage is missing" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(CompanyNamePage, "Updated Company")
+            .success
+            .value
+        // deliberately NOT setting CurrentVerificationBatchResponsePage
+
+        val exception =
+          service
+            .submitAmendSubcontractor(
+              amendJourneyType = AmendJourneyType.UnmatchedInfo,
+              userAnswers = userAnswers,
+              subbieResourceRef = Some(1001L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "CurrentVerificationBatchResponsePage not found in session data for subcontractorId=123"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail an unmatched information amend when verificationBatch is None" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val batchWithoutVerificationBatch =
+          currentVerificationBatch.copy(
+            verificationBatch = None
+          )
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(
+              CurrentVerificationBatchResponsePage,
+              batchWithoutVerificationBatch
+            )
+            .success
+            .value
+
+        val exception =
+          service
+            .submitAmendSubcontractor(
+              amendJourneyType = AmendJourneyType.UnmatchedInfo,
+              userAnswers = userAnswers,
+              subbieResourceRef = Some(1001L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "Unable to update unmatched verification. Missing verification resource references for subcontractorId=123"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail an unmatched information amend when verifBatchResourceRef is missing" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val batchWithoutBatchResourceRef =
+          currentVerificationBatch.copy(
+            verificationBatch = currentVerificationBatch.verificationBatch.map(
+              _.copy(verifBatchResourceRef = None)
+            )
+          )
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(
+              CurrentVerificationBatchResponsePage,
+              batchWithoutBatchResourceRef
+            )
+            .success
+            .value
+
+        val exception =
+          service
+            .submitAmendSubcontractor(
+              amendJourneyType = AmendJourneyType.UnmatchedInfo,
+              userAnswers = userAnswers,
+              subbieResourceRef = Some(1001L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "Unable to update unmatched verification. Missing verification resource references for subcontractorId=123"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should fail an unmatched information amend when no verification matches the subcontractor" in {
         val mockConnector =
           mock[ConstructionIndustrySchemeConnector]
@@ -2990,6 +3096,43 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should fail an unmatched information amend when there are no verifications in the batch" in {
+        val mockConnector =
+          mock[ConstructionIndustrySchemeConnector]
+
+        val service =
+          new SubcontractorService(mockConnector)
+
+        val batchWithNoVerifications =
+          currentVerificationBatch.copy(
+            verifications = Seq.empty
+          )
+
+        val userAnswers =
+          baseUpdateAnswers(TypeOfSubcontractor.Limitedcompany)
+            .set(
+              CurrentVerificationBatchResponsePage,
+              batchWithNoVerifications
+            )
+            .success
+            .value
+
+        val exception =
+          service
+            .submitAmendSubcontractor(
+              amendJourneyType = AmendJourneyType.UnmatchedInfo,
+              userAnswers = userAnswers,
+              subbieResourceRef = Some(1001L)
+            )
+            .failed
+            .futureValue
+
+        exception.getMessage mustBe
+          "Unable to update unmatched verification. Missing verification resource references for subcontractorId=123"
+
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should propagate a failure from the selected update operation" in {
         val mockConnector =
           mock[ConstructionIndustrySchemeConnector]
@@ -3005,7 +3148,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         when(
           mockConnector.updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
         ).thenReturn(
           Future.failed(
@@ -3027,7 +3170,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         verify(mockConnector)
           .updateSubcontractorForEdit(
-            any[UpdateSubcontractorRequest]
+            any[UpdateSubcontractorForEditRequest]
           )(any[HeaderCarrier])
 
         verifyNoMoreInteractions(mockConnector)

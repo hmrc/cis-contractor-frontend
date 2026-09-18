@@ -30,7 +30,7 @@ import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
+import models.requests.{SubcontractorRequest, UpdateSubcontractorForEditRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
 import pages.verify.CurrentVerificationBatchResponsePage
 import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
@@ -247,7 +247,7 @@ class SubcontractorService @Inject() (
 
       _ <-
         cisConnector.updateSubcontractorForEdit(
-          UpdateSubcontractorRequest(
+          UpdateSubcontractorForEditRequest(
             cisId = cisId,
             subcontractor = subcontractor,
             verificationForEdit = verificationForEdit
