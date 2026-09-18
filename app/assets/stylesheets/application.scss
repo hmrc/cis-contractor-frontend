@@ -12,12 +12,14 @@
  }
 
 .govuk-table__container {
-    width: min(var(--max-table-width), calc(100vw - (2*var(--govuk-min-margin)))) !important;
+    width: calc(100vw - (2*var(--govuk-min-margin))) !important;
+    max-width: var(--max-table-width);
     overflow-x: scroll;
 }
 
 #subcontractor-table {
-    max-width: min(var(--max-table-width), calc(100vw - (2*var(--govuk-min-margin))));
+    width: calc(100vw - (2*var(--govuk-min-margin)));
+    max-width: var(--max-table-width);
     white-space: normal;
     overflow-wrap: break-word;
 }
