@@ -1,0 +1,55 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.actions
+
+import javax.inject.Inject
+import models.requests.{CisIdDataRequest, DataRequest}
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionRefiner, Result}
+import queries.CisIdQuery
+
+import scala.concurrent.{ExecutionContext, Future}
+
+class CisIdRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CisIdRequiredAction {
+
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] =
+    request.userAnswers.get(CisIdQuery) match {
+      case Some(cisId) =>
+        Future.successful(
+          Right(
+            CisIdDataRequest[A](
+              request.request,
+              request.userId,
+              request.userAnswers,
+              cisId,
+              request.employerReference,
+              request.agentReference,
+              request.isAgent,
+              request.agentCode
+            )
+          )
+        )
+      case None        =>
+        if (request.isAgent) {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())))
+        } else {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())))
+        }
+    }
+}
+
+trait CisIdRequiredAction extends ActionRefiner[DataRequest, CisIdDataRequest]

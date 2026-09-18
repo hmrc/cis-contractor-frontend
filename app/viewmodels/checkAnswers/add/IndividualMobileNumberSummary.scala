@@ -22,6 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.IndividualAnswers
 
 object IndividualMobileNumberSummary {
 
@@ -36,7 +37,19 @@ object IndividualMobileNumberSummary {
             controllers.add.routes.IndividualMobileNumberController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("individualMobileNumber.change.hidden"))
+            .withAttribute("id" -> "individual-mobile-number")
         )
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.mobile.map { answer =>
+      SummaryListRowViewModel(
+        key = "individualMobileNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

@@ -19,20 +19,28 @@ package navigation.verify
 import base.SpecBase
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
-import models.{AmendMode, CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import models.verify.{ContractorEmailConfirmationStored, SelectedSubcontractors}
+import models.{AmendMode, CheckMode, Mode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import pages.Page
+import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
+import pages.unmatched.ProceedSubcontractorVerifyRequestPage
 import pages.verify.*
 
 class VerifyNavigatorSpec extends SpecBase {
 
   private val navigator = new VerifyNavigator()
 
-  private lazy val journeyRecovery = routes.JourneyRecoveryController.onPageLoad()
-  private lazy val cya             = controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+  private lazy val journeyRecovery =
+    routes.JourneyRecoveryController.onPageLoad()
 
-  private lazy val createVerificationBatch =
-    controllers.verify.routes.CreateVerificationBatchAndVerificationsController.onSubmit()
+  private lazy val cya =
+    controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
+
+  private def currentVerificationBatch(mode: Mode) =
+    controllers.verify.routes.CurrentVerificationBatchController.onPageLoad(mode)
+
+  private lazy val noSubcontractorsSelectedWarningCheckMode =
+    controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoadCheckMode()
 
   "VerifyNavigator" - {
 
@@ -52,14 +60,14 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to VerificationDeclarationController when answer is false" in {
+        "must go to VerifyCheckYourAnswerController when answer is false" in {
           val ua = emptyUserAnswers.setOrException(ContractorEmailConfirmationNotStoredPage, false)
 
           navigator.nextPage(
             ContractorEmailConfirmationNotStoredPage,
             NormalMode,
             ua
-          ) mustBe controllers.verify.routes.VerificationDeclarationController.onPageLoad()
+          ) mustBe cya
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -116,7 +124,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode)
         }
 
-        "must go to CheckVerificationBatchReadinessController in NormalMode when there are no verified subcontractors" in {
+        "must go to CurrentVerificationBatchController in NormalMode when there are no verified subcontractors" in {
 
           val ua = emptyUserAnswers
             .set(
@@ -156,7 +164,44 @@ class VerifyNavigatorSpec extends SpecBase {
             .value
 
           navigator.nextPage(SelectSubcontractorPage, NormalMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            currentVerificationBatch(NormalMode)
+        }
+
+        "must go to CheckVerificationBatchReadinessController in CheckMode when selections exist" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                SelectSubcontractorPage,
+                Set(SubcontractorViewModel("1", "Test Subcontractor"))
+              )
+              .success
+              .value
+
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua) mustBe
+            controllers.verify.routes.CurrentVerificationBatchController
+              .onPageLoad(CheckMode)
+        }
+
+        "must go to ReverifyExistingSubcontractorsYesNoController in CheckMode when rebuildVerificationFromWarning is true" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                SelectSubcontractorPage,
+                Set(SubcontractorViewModel("1", "Test Subcontractor"))
+              )
+              .success
+              .value
+              .set(RebuildVerificationFromWarningPage, true)
+              .success
+              .value
+
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua) mustBe
+            controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode)
+        }
+
+        "must go to NoSubcontractorsSelectedWarningController in CheckMode when no selections exist" in {
+          navigator.nextPage(SelectSubcontractorPage, CheckMode, emptyUserAnswers) mustBe
+            noSubcontractorsSelectedWarningCheckMode
         }
       }
 
@@ -174,7 +219,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode)
         }
 
-        "must go to CheckVerificationBatchReadinessController when answer is false and selections exist (NormalMode)" in {
+        "must go to CurrentVerificationBatchController when answer is false and selections exist (NormalMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -189,7 +234,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, NormalMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            currentVerificationBatch(NormalMode)
         }
 
         "must go to NoSubcontractorsSelectedWarningController when answer is false and no selections exist (NormalMode)" in {
@@ -234,7 +279,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "ContractorEmailConfirmationStoredPage" - {
 
-        "must go to CreateVerificationBatchAndVerificationsController when answer is CurrentEmail" in {
+        "must go to VerifyCheckYourAnswersController when answer is CurrentEmail" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.CurrentEmail
@@ -244,7 +289,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             NormalMode,
             ua
-          ) mustBe createVerificationBatch
+          ) mustBe cya
         }
 
         "must go to EmailAddressController when answer is DifferentEmail" in {
@@ -256,7 +301,7 @@ class VerifyNavigatorSpec extends SpecBase {
             controllers.verify.routes.EmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to CreateVerificationBatchAndVerificationsController when answer is DoNotSend" in {
+        "must go to VerifyCheckYourAnswersController when answer is DoNotSend" in {
           val ua = emptyUserAnswers.setOrException(
             ContractorEmailConfirmationStoredPage,
             ContractorEmailConfirmationStored.DoNotSend
@@ -266,7 +311,7 @@ class VerifyNavigatorSpec extends SpecBase {
             ContractorEmailConfirmationStoredPage,
             NormalMode,
             ua
-          ) mustBe createVerificationBatch
+          ) mustBe cya
         }
 
         "must go to JourneyRecovery when answer is not present" in {
@@ -276,7 +321,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "SelectSubcontractorsToReverifyPage" - {
 
-        "must go to CheckVerificationBatchReadinessController when selections exist in SelectSubcontractorPage (NormalMode)" in {
+        "must go to CurrentVerificationBatchController when selections exist in SelectSubcontractorPage (NormalMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -288,10 +333,10 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            currentVerificationBatch(NormalMode)
         }
 
-        "must go to CheckVerificationBatchReadinessController when selections exist in SelectSubcontractorsToReverifyPage (NormalMode)" in {
+        "must go to CurrentVerificationBatchController when selections exist in SelectSubcontractorsToReverifyPage (NormalMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -303,7 +348,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(SelectSubcontractorsToReverifyPage, NormalMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness()
+            currentVerificationBatch(NormalMode)
         }
 
         "must go to NoSubcontractorsSelectedWarningController when no selections exist (NormalMode)" in {
@@ -316,22 +361,68 @@ class VerifyNavigatorSpec extends SpecBase {
         }
       }
 
-      "must go to CreateVerificationBatchAndVerificationsController from EmailAddressPage in NormalMode" in {
+      "must go to VerifyCheckYourAnswers from EmailAddressPage in NormalMode" in {
         val ua = emptyUserAnswers.setOrException(EmailAddressPage, "test@test.com")
 
         navigator.nextPage(
           EmailAddressPage,
           NormalMode,
           ua
-        ) mustBe createVerificationBatch
+        ) mustBe cya
       }
 
-      "must go to VerifyCheckYourAnswers from VerificationDeclarationPage in NormalMode" in {
-        navigator.nextPage(
-          VerificationDeclarationPage,
-          NormalMode,
-          emptyUserAnswers
-        ) mustBe cya
+      "ProceedInsufficientSubcontractorNameYesNoPage" - {
+
+        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is true" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), true)
+            .success
+            .value
+
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+              .onPageLoad()
+        }
+
+        "must go to ProceedInsufficientSubcontractorNameYesNoPage when answer is false" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedInsufficientSubcontractorNameYesNoPage("10"), false)
+            .success
+            .value
+
+          navigator.nextPage(ProceedInsufficientSubcontractorNameYesNoPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+              .onPageLoad()
+        }
+      }
+
+      "ProceedSubcontractorVerifyRequestPage" - {
+
+        "must go to ProceedSubcontractorVerifyRequestPage when answer is true" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedSubcontractorVerifyRequestPage("10"), true)
+            .success
+            .value
+
+          navigator.nextPage(ProceedSubcontractorVerifyRequestPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+              .onPageLoad()
+        }
+
+        "must go to ProceedSubcontractorVerifyRequestPage when answer is false" in {
+
+          val ua = emptyUserAnswers
+            .set(ProceedSubcontractorVerifyRequestPage("10"), false)
+            .success
+            .value
+
+          navigator.nextPage(ProceedSubcontractorVerifyRequestPage("10"), NormalMode, ua) mustBe
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+              .onPageLoad()
+        }
       }
     }
 
@@ -384,7 +475,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "SelectSubcontractorPage" - {
 
-        "must go to CheckVerificationBatchReadinessController in CheckMode when selections exist" in {
+        "must go to CurrentVerificationBatchController in CheckMode when selections exist" in {
           val ua =
             emptyUserAnswers
               .set(
@@ -394,61 +485,62 @@ class VerifyNavigatorSpec extends SpecBase {
               .success
               .value
 
-          navigator.nextPage(SelectSubcontractorPage, CheckMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadinessInCheckMode()
+          navigator.nextPage(
+            SelectSubcontractorPage,
+            CheckMode,
+            ua
+          ) mustBe
+            currentVerificationBatch(CheckMode)
         }
 
         "must go to NoSubcontractorsSelectedWarningController in CheckMode when no selections exist" in {
-          navigator.nextPage(SelectSubcontractorPage, CheckMode, emptyUserAnswers) mustBe
-            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+          navigator.nextPage(
+            SelectSubcontractorPage,
+            CheckMode,
+            emptyUserAnswers
+          ) mustBe
+            noSubcontractorsSelectedWarningCheckMode
+        }
+
+        "must go to CurrentVerificationBatchController in CheckMode when no new subcontractors are selected but reverify selections exist" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                SelectSubcontractorsToReverifyPage,
+                Set(SelectedSubcontractors("1", "Test Subcontractor"))
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            SelectSubcontractorPage,
+            CheckMode,
+            ua
+          ) mustBe
+            currentVerificationBatch(CheckMode)
+        }
+
+        "must go to ReverifyExistingSubcontractorsYesNoController in CheckMode when subcontractor is coming through the warning" in {
+          val ua =
+            emptyUserAnswers
+              .set(
+                RebuildVerificationFromWarningPage,
+                true
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            SelectSubcontractorPage,
+            CheckMode,
+            ua
+          ) mustBe
+            controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController
+              .onPageLoad(CheckMode)
         }
       }
 
       "ReverifyExistingSubcontractorsYesNoPage" - {
-
-        "must go to SelectSubcontractorsToReverifyController when answer is true (CheckMode)" in {
-
-          val ua =
-            emptyUserAnswers
-              .set(ReverifyExistingSubcontractorsYesNoPage, true)
-              .success
-              .value
-
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode)
-        }
-
-        "must go to CheckVerificationBatchReadinessController when answer is false and selections exist (CheckMode)" in {
-
-          val ua =
-            emptyUserAnswers
-              .set(ReverifyExistingSubcontractorsYesNoPage, false)
-              .success
-              .value
-              .set(
-                SelectSubcontractorPage,
-                Set(SubcontractorViewModel("1", "Test Subcontractor"))
-              )
-              .success
-              .value
-
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadinessInCheckMode()
-        }
-
-        "must go to NoSubcontractorsSelectedWarningController when answer is false and no selections exist (CheckMode)" in {
-
-          val ua =
-            emptyUserAnswers
-              .set(ReverifyExistingSubcontractorsYesNoPage, false)
-              .success
-              .value
-
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
-        }
 
         "must go to CheckVerificationBatchReadinessController when answer is true and reverify selections exist (CheckMode)" in {
 
@@ -464,9 +556,69 @@ class VerifyNavigatorSpec extends SpecBase {
               .success
               .value
 
-          navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, CheckMode, ua) mustBe
+          navigator.nextPage(
+            ReverifyExistingSubcontractorsYesNoPage,
+            CheckMode,
+            ua
+          ) mustBe
             controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadinessInCheckMode()
+              .checkVerificationBatchReadiness(CheckMode)
+        }
+
+        "must go to SelectSubcontractorsToReverifyController when answer is true and no reverify selections exist (CheckMode)" in {
+
+          val ua =
+            emptyUserAnswers
+              .set(ReverifyExistingSubcontractorsYesNoPage, true)
+              .success
+              .value
+
+          navigator.nextPage(
+            ReverifyExistingSubcontractorsYesNoPage,
+            CheckMode,
+            ua
+          ) mustBe
+            controllers.verify.routes.SelectSubcontractorsToReverifyController
+              .onPageLoad(CheckMode)
+        }
+
+        "must go to NoSubcontractorsSelectedWarningController when answer is false and no selections exist (CheckMode)" in {
+
+          val ua =
+            emptyUserAnswers
+              .set(ReverifyExistingSubcontractorsYesNoPage, false)
+              .success
+              .value
+
+          navigator.nextPage(
+            ReverifyExistingSubcontractorsYesNoPage,
+            CheckMode,
+            ua
+          ) mustBe
+            noSubcontractorsSelectedWarningCheckMode
+        }
+
+        "must go to CurrentVerificationBatchController when answer is false and selections exist (CheckMode)" in {
+
+          val ua =
+            emptyUserAnswers
+              .set(ReverifyExistingSubcontractorsYesNoPage, false)
+              .success
+              .value
+              .set(
+                SelectSubcontractorPage,
+                Set(SubcontractorViewModel("1", "Test Subcontractor"))
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            ReverifyExistingSubcontractorsYesNoPage,
+            CheckMode,
+            ua
+          ) mustBe
+            controllers.verify.routes.CurrentVerificationBatchController
+              .onPageLoad(CheckMode)
         }
       }
 
@@ -511,7 +663,7 @@ class VerifyNavigatorSpec extends SpecBase {
               .value
 
           navigator.nextPage(VerifyYourSubcontractorsYesNoPage, CheckMode, ua) mustBe
-            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+            noSubcontractorsSelectedWarningCheckMode
         }
       }
 
@@ -559,7 +711,7 @@ class VerifyNavigatorSpec extends SpecBase {
 
       "SelectSubcontractorsToReverifyPage" - {
 
-        "must go to CheckVerificationBatchReadinessController when selections exist in SelectSubcontractorsToReverifyPage (CheckMode)" in {
+        "must go to CurrentVerificationBatchController when selections exist in SelectSubcontractorsToReverifyPage (CheckMode)" in {
 
           val ua =
             emptyUserAnswers
@@ -570,18 +722,43 @@ class VerifyNavigatorSpec extends SpecBase {
               .success
               .value
 
-          navigator.nextPage(SelectSubcontractorsToReverifyPage, CheckMode, ua) mustBe
-            controllers.verify.routes.CheckVerificationBatchReadinessController
-              .checkVerificationBatchReadinessInCheckMode()
+          navigator.nextPage(
+            SelectSubcontractorsToReverifyPage,
+            CheckMode,
+            ua
+          ) mustBe
+            controllers.verify.routes.CurrentVerificationBatchController
+              .onPageLoad(CheckMode)
         }
 
-        "must go to NoSubcontractorsSelectedWarningController when no selections exist (CheckMode)" in {
+        "must go to CurrentVerificationBatchController when selections exist in SelectSubcontractorPage (CheckMode)" in {
+
+          val ua =
+            emptyUserAnswers
+              .set(
+                SelectSubcontractorPage,
+                Set(SubcontractorViewModel("1", "Test Subcontractor"))
+              )
+              .success
+              .value
+
+          navigator.nextPage(
+            SelectSubcontractorsToReverifyPage,
+            CheckMode,
+            ua
+          ) mustBe
+            controllers.verify.routes.CurrentVerificationBatchController
+              .onPageLoad(CheckMode)
+        }
+
+        "must go to NoSubcontractorsSelectedWarningController when no selections exist in either page (CheckMode)" in {
 
           navigator.nextPage(
             SelectSubcontractorsToReverifyPage,
             CheckMode,
             emptyUserAnswers
-          ) mustBe controllers.verify.routes.NoSubcontractorsSelectedWarningController.onPageLoad()
+          ) mustBe
+            noSubcontractorsSelectedWarningCheckMode
         }
       }
     }

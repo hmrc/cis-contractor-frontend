@@ -27,6 +27,7 @@ import pages.add.trust.TrustWorksReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.info.trust.TrustAnswers
 
 class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -126,6 +127,72 @@ class TrustWorksReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaE
 
       assertEscaped(html, "WR-999 &amp; Co &#x27;Trust&#x27;")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - TrustWorksReferenceSummary.row" - {
+
+    "must return a SummaryListRow when works reference exists in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = Some("WR-001"),
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustWorksReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustWorksReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        "WR-001"
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when works reference does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustWorksReferenceSummary.row(answers) shouldBe None
     }
   }
 }

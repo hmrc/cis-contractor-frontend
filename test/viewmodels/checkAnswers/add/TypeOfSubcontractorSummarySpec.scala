@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add
 
 import controllers.add.routes
-import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
+import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -57,8 +57,8 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction = actions.head
       changeAction.content.asHtml.toString should include(messages("site.change"))
 
-      // DTR-2951: Reset journey in NormalMode (not CheckMode)
-      changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+      // Change link uses CheckMode so an unchanged type returns straight to CYA
+      changeAction.href                     shouldBe routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
       changeAction.visuallyHiddenText.value shouldBe messages("typeOfSubcontractor.change.hidden")
     }
 
@@ -87,6 +87,93 @@ class TypeOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers {
 
       row.value.content.asHtml.toString should include(
         messages("typeOfSubcontractor.company")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+  }
+
+  "TypeOfSubcontractorSummary.row(TypeOfSubcontractor)" - {
+
+    "must return a SummaryListRow for an individual or sole trader" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Individualorsoletrader)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.soletrader")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a limited company" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Limitedcompany)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.company")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a partnership" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Partnership)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.partnership")
+      )
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow for a trust" in {
+
+      val maybeRow =
+        TypeOfSubcontractorSummary.row(TypeOfSubcontractor.Trust)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("typeOfSubcontractor.trust")
       )
 
       row.actions             shouldBe defined

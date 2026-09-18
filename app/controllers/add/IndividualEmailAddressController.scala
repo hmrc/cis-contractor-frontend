@@ -17,13 +17,14 @@
 package controllers.add
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
+import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -46,23 +47,28 @@ class IndividualEmailAddressController @Inject() (
   view: IndividualEmailAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with ContactGuard {
+    with I18nSupport {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactMethodInSet(
-        subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
-        request.userAnswers.get(IndividualContactMethodOptionsPage),
-        ContactMethodOptions.Email
-      ) { subcontractorName =>
-        val preparedForm = request.userAnswers.get(IndividualEmailAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, subcontractorName))
+
+      val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+
+      (subcontractorName, contactOption) match {
+        case (Some(subcontractorName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+          val preparedForm = request.userAnswers.get(IndividualEmailAddressPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, mode, subcontractorName))
+
+        case (Some(_), _) =>
+          Redirect(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode))
+        case _            =>
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
     }
 

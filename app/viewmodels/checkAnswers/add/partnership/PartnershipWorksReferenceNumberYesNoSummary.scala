@@ -16,12 +16,14 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.partnership.PartnershipAnswers
 
 object PartnershipWorksReferenceNumberYesNoSummary {
 
@@ -36,11 +38,29 @@ object PartnershipWorksReferenceNumberYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
+                .url
+            else controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipWorksReferenceNumberYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-works-reference-number")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerWorksReferenceYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

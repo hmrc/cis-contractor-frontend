@@ -25,7 +25,7 @@ case class OriginalPartnershipAnswers(
   addressYesNo: Option[Boolean],
   address: Option[Address],
   partnershipContactMethodsYesNo: Option[Boolean],
-  partnershipContactMethodOptions: Option[Set[PartnershipContactMethodOptions]],
+  partnershipContactMethodOptions: Set[PartnershipContactMethodOptions],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],
@@ -39,7 +39,8 @@ case class OriginalPartnershipAnswers(
   nominatedPartnerCrnYesNo: Option[Boolean],
   nominatedPartnerCrn: Option[String],
   nominatedPartnerWorksReferenceYesNo: Option[Boolean],
-  nominatedPartnerWorksReference: Option[String]
+  nominatedPartnerWorksReference: Option[String],
+  verificationNumber: Option[String]
 )
 
 object OriginalPartnershipAnswers extends models.Enumerable.Implicits {

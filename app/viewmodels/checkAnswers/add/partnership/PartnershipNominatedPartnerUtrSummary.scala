@@ -16,28 +16,59 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
+import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.UtrViewModel
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(PartnershipNominatedPartnerUtrPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerUtr.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
+      val value = UtrViewModel(answer)
+      if (showActions) {
+        val actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode).url
+            routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtr.change.hidden"))
             .withAttribute("id" -> "nominated-partner-utr")
         )
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerUtr.checkYourAnswersLabel",
+          value = value,
+          actions = actions
+        )
+      } else {
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel",
+          value = value,
+          actions = Seq.empty
+        )
+      }
+    }
+
+  def row(
+    answers: PartnershipAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerUtr.map { answer =>
+      SummaryListRowViewModel(
+        key = if (isVerified) {
+          "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel"
+        } else {
+          "partnershipNominatedPartnerUtr.checkYourAnswersLabel"
+        },
+        value = UtrViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

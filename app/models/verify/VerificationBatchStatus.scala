@@ -24,13 +24,21 @@ object VerificationBatchStatus {
   case object Validated extends VerificationBatchStatus
   case object Pending extends VerificationBatchStatus
   case object Accepted extends VerificationBatchStatus
+  case object Submitted extends VerificationBatchStatus
+  case object SubmittedNoReceipt extends VerificationBatchStatus
+  case object FatalError extends VerificationBatchStatus
+  case object DepartmentalError extends VerificationBatchStatus
 
   def from(value: String): Option[VerificationBatchStatus] =
     value match {
-      case "STARTED"   => Some(Started)
-      case "VALIDATED" => Some(Validated)
-      case "PENDING"   => Some(Pending)
-      case "ACCEPTED"  => Some(Accepted)
-      case _           => None
+      case "STARTED"              => Some(Started)
+      case "VALIDATED"            => Some(Validated)
+      case "PENDING"              => Some(Pending)
+      case "ACCEPTED"             => Some(Accepted)
+      case "SUBMITTED"            => Some(Submitted)
+      case "SUBMITTED_NO_RECEIPT" => Some(SubmittedNoReceipt)
+      case "FATAL_ERROR"          => Some(FatalError)
+      case "DEPARTMENTAL_ERROR"   => Some(DepartmentalError)
+      case _                      => None
     }
 }

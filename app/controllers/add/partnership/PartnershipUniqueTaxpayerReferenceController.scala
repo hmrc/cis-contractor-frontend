@@ -21,11 +21,11 @@ import forms.add.partnership.PartnershipUtrFormProvider
 import models.{AmendMode, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
 
@@ -41,6 +41,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   requireData: DataRequiredAction,
   formProvider: PartnershipUtrFormProvider,
   subcontractorService: SubcontractorService,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipUniqueTaxpayerReferenceView
 )(implicit ec: ExecutionContext)
@@ -58,21 +60,26 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       navigator.nextPage(PartnershipUniqueTaxpayerReferencePage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
-      .map { partnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, partnershipName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val yesOrNoPage       = PartnershipHasUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+      request.userAnswers
+        .get(PartnershipNamePage)
+        .map { partnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          val result       = Ok(view(preparedForm, mode, partnershipName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
+        }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(PartnershipNamePage)
         .map { name =>
@@ -105,5 +112,5 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

@@ -22,6 +22,8 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.company.CompanyAnswers
+import viewmodels.checkAnswers.UtrViewModel
 
 object CompanyUtrSummary {
 
@@ -29,7 +31,7 @@ object CompanyUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(CompanyUtrPage).map { answer =>
-      val value = ValueViewModel(answer)
+      val value = UtrViewModel(answer)
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(
@@ -51,5 +53,21 @@ object CompanyUtrSummary {
           actions = Seq.empty
         )
       }
+    }
+
+  def row(
+    answers: CompanyAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key = if (isVerified) {
+          "companyUtr.verified.checkYourAnswersLabel"
+        } else {
+          "companyUtr.checkYourAnswersLabel"
+        },
+        value = UtrViewModel(answer),
+        actions = Seq.empty
+      )
     }
 }

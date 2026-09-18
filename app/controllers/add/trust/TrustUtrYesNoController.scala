@@ -38,6 +38,7 @@ class TrustUtrYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustUtrYesNoFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: TrustUtrYesNoView
 )(implicit ec: ExecutionContext)
@@ -47,7 +48,7 @@ class TrustUtrYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -61,7 +62,7 @@ class TrustUtrYesNoController @Inject() (
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>

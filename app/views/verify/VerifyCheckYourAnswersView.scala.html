@@ -15,13 +15,17 @@
  *@
 
 @import views.html.components._
+@import views.html.verify.VerificationDeclarationContent
 
 @this(
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     h1: H1,
+    h2: H2,
     govukButton: GovukButton,
-    formHelper: FormWithCSRF
+    formHelper: FormWithCSRF,
+    verificationDeclarationContent: VerificationDeclarationContent
+
 )
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
@@ -33,6 +37,10 @@
         @h1("verify.verifyCheckYourAnswers.heading")
 
         @govukSummaryList(list)
+
+        @h2("verify.verificationDeclaration.heading")
+
+        @verificationDeclarationContent()
 
         @govukButton(ButtonViewModel(messages("verify.verifyCheckYourAnswers.confirm")))
     }

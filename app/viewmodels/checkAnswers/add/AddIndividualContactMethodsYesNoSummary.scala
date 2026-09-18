@@ -16,7 +16,9 @@
 
 package viewmodels.checkAnswers.add
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.AmendIndividualRemoveDetail
+import models.info.IndividualAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.AddIndividualContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,11 +38,29 @@ object AddIndividualContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+                .url
+            else controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-individual-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.individualContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addIndividualContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

@@ -38,8 +38,8 @@ class CompanyMobileNumberFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       Gen.oneOf(
-        "+44 7700 900 999",
-        "+44 7700 900 111",
+        "44 7700 900 999",
+        "44 7700 900 111",
         "07700 900 982"
       )
     )

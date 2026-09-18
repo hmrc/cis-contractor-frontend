@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipEmailAddressPage
 import play.api.i18n.Messages
@@ -38,6 +39,17 @@ object PartnershipEmailAddressSummary {
             .withVisuallyHiddenText(messages("partnershipEmailAddress.change.hidden"))
             .withAttribute("id" -> "partnership-email-address")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.email.map { answer =>
+      SummaryListRowViewModel(
+        key = "partnershipEmailAddress.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

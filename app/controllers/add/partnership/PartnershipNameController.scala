@@ -38,6 +38,7 @@ class PartnershipNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipNameFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNameView
 )(implicit ec: ExecutionContext)
@@ -47,13 +48,13 @@ class PartnershipNameController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       val preparedForm = request.userAnswers.get(PartnershipNamePage).fold(form)(form.fill)
       Ok(view(preparedForm, mode))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerNamePage
 import play.api.i18n.Messages
@@ -38,6 +39,17 @@ object PartnershipNominatedPartnerNameSummary {
             .withVisuallyHiddenText(messages("partnershipNominatedPartnerName.change.hidden"))
             .withAttribute("id" -> "nominated-partner-name")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.nominatedPartnerName.map { answer =>
+      SummaryListRowViewModel(
+        key = "partnershipNominatedPartnerName.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

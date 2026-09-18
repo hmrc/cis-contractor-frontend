@@ -22,11 +22,14 @@ import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers.must
 import org.scalatest.matchers.should.Matchers
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -63,6 +66,7 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       changeAction.content.asHtml.toString    should include(expectedChangeText)
       changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "partnership-unique-taxpayer-reference")
     }
 
     "must return a SummaryListRow when the answer exists in AmendMode" in {
@@ -96,6 +100,35 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
 
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipUniqueTaxpayerReferencePage, utr)
+          .success
+          .value
+
+      val maybeRow = PartnershipUniqueTaxpayerReferenceSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       PartnershipUniqueTaxpayerReferenceSummary.row(answers) shouldBe None
@@ -118,5 +151,148 @@ class PartnershipUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Mat
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
     }
+  }
+
+  "PartnershipUniqueTaxpayerReferenceSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      utr: Option[String]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = utr,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with the normal label when isVerified is false" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipUniqueTaxpayerReferenceSummary.row(
+          answers,
+          isVerified = false
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with the verified label when isVerified is true" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val maybeRow =
+        PartnershipUniqueTaxpayerReferenceSummary.row(
+          answers,
+          isVerified = true
+        )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the UTR does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      PartnershipUniqueTaxpayerReferenceSummary.row(
+        answers,
+        isVerified = false
+      ) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("1234567890 & Ref'01"))
+
+      val row =
+        PartnershipUniqueTaxpayerReferenceSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
+    }
+
+    "must prevent Safari from detecting the UTR as a telephone number for UserAnswers" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(PartnershipUniqueTaxpayerReferencePage, "123456789")
+          .success
+          .value
+
+      val row = PartnershipUniqueTaxpayerReferenceSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include("""x-apple-data-detectors="false"""")
+    }
+
+    "must prevent Safari from detecting the UTR for PartnershipAnswers" in {
+      val answers =
+        viewOnlyAnswers(Some("1234567890"))
+
+      val row =
+        PartnershipUniqueTaxpayerReferenceSummary
+          .row(
+            answers,
+            isVerified = false
+          )
+          .value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
+    }
+
   }
 }

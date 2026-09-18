@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.amend.company.AmendCompanyRemoveDetail
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -26,6 +27,8 @@ import pages.add.company.CompanyUtrYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.TypeOfSubcontractor
+import models.info.company.CompanyAnswers
 
 class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -101,8 +104,8 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
       val expectedHref       =
-        controllers.add.company.routes.CompanyUtrYesNoController
-          .onPageLoad(AmendMode)
+        controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+          .onPageLoad(AmendCompanyRemoveDetail.Utr.key)
           .url
       val expectedHiddenText =
         messages("companyUtrYesNo.change.hidden")
@@ -134,6 +137,83 @@ class CompanyUtrYesNoSummarySpec extends AnyFreeSpec with Matchers {
     "must return None when the answer does not exist" in {
 
       val answers = UserAnswers("test-id")
+
+      CompanyUtrYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "CompanyUtrYesNoSummary.row with ViewOnlyCompanyAnswers" - {
+
+    def viewOnlyAnswers(
+      utrYesNo: Option[Boolean] = None
+    ): CompanyAnswers =
+      CompanyAnswers(
+        subcontractorType = TypeOfSubcontractor.Limitedcompany,
+        showVerificationDetails = false,
+        companyName = None,
+        addressYesNo = None,
+        address = None,
+        companyContactMethodsYesNo = None,
+        companyContactMethod = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        crnYesNo = None,
+        crn = None,
+        utrYesNo = utrYesNo,
+        utr = None,
+        worksReferenceYesNo = None,
+        worksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+
+      val answers = viewOnlyAnswers(Some(true))
+
+      val maybeRow = CompanyUtrYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyUtrYesNo.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+
+      val answers = viewOnlyAnswers(Some(false))
+
+      val maybeRow = CompanyUtrYesNoSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText =
+        messages("companyUtrYesNo.checkYourAnswersLabel")
+
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the answer does not exist" in {
+
+      val answers = viewOnlyAnswers()
 
       CompanyUtrYesNoSummary.row(answers) shouldBe None
     }

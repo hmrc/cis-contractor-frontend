@@ -16,7 +16,9 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.partnership.AmendPartnershipRemoveDetail
+import models.info.partnership.PartnershipAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.AddPartnershipContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,11 +38,29 @@ object AddPartnershipContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoad(AmendPartnershipRemoveDetail.ContactDetails.key)
+                .url
+            else controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addPartnershipContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-partnership-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.partnershipContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        "addPartnershipContactMethodsYesNo.checkYourAnswersLabel",
+        ValueViewModel(value),
+        Seq.empty
       )
     }
 }

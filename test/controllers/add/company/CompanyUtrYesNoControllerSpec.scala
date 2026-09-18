@@ -19,11 +19,12 @@ package controllers.add.company
 import base.SpecBase
 import controllers.routes
 import forms.add.company.CompanyUtrYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyNamePage, CompanyUtrYesNoPage}
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,6 +42,9 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val companyUtrYesNoRoute =
     controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(NormalMode).url
+
+  private lazy val companyUtrYesNoAmendRoute =
+    controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(AmendMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -247,6 +251,97 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
           .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a Post when subcontractor is verified" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when subcontractor is unverified in amend mode" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrYesNoAmendRoute)
+
+        val result = route(application, request).value
+        val view   = application.injector.instanceOf[CompanyUtrYesNoView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, companyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted when subcontractor is unverified in amend mode" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrYesNoAmendRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyUtrController
+          .onPageLoad(AmendMode)
           .url
       }
     }

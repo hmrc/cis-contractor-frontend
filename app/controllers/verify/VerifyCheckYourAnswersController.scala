@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.verify.ValidatedVerify
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
@@ -30,7 +30,6 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class VerifyCheckYourAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -64,15 +63,22 @@ class VerifyCheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       ValidatedVerify.build(request.userAnswers) match {
+
         case Right(_) =>
           Future.successful(
-            Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+            Redirect(
+              controllers.verify.routes.SubmissionSendingController.onPageLoad()
+            )
           )
 
         case Left(error) =>
-          logger.error(s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error")
+          logger.error(
+            s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
+          )
           Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
           )
       }
     }

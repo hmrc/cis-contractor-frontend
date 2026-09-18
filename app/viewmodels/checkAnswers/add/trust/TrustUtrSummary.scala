@@ -16,10 +16,12 @@
 
 package viewmodels.checkAnswers.add.trust
 
+import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.UtrViewModel
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -29,7 +31,7 @@ object TrustUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(TrustUtrPage).map { answer =>
-      val value = ValueViewModel(answer)
+      val value = UtrViewModel(answer)
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(
@@ -51,5 +53,20 @@ object TrustUtrSummary {
           actions = Seq.empty
         )
       }
+    }
+
+  def row(
+    answers: TrustAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key = if (isVerified) {
+          "trustUtr.verified.checkYourAnswersLabel"
+        } else {
+          "trustUtr.checkYourAnswersLabel"
+        },
+        value = UtrViewModel(answer)
+      )
     }
 }

@@ -21,11 +21,11 @@ import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.trust.{TrustNamePage, TrustUtrPage}
+import pages.add.trust.{TrustNamePage, TrustUtrPage, TrustUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustUtrView
 
@@ -41,7 +41,9 @@ class TrustUtrController @Inject() (
   requireData: DataRequiredAction,
   formProvider: TrustUtrFormProvider,
   subcontractorService: SubcontractorService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: TrustUtrView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -58,21 +60,26 @@ class TrustUtrController @Inject() (
       navigator.nextPage(TrustUtrPage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(TrustNamePage)
-      .map { trustName =>
-        val preparedForm = request.userAnswers.get(TrustUtrPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, trustName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val yesOrNoPage       = TrustUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+      request.userAnswers
+        .get(TrustNamePage)
+        .map { trustName =>
+          val preparedForm = request.userAnswers.get(TrustUtrPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          val result       = Ok(view(preparedForm, mode, trustName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
+        }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -103,5 +110,5 @@ class TrustUtrController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

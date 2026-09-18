@@ -28,6 +28,8 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipWorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -138,6 +140,83 @@ class PartnershipWorksReferenceNumberSummarySpec extends AnyFreeSpec with Matche
 
       assertEscaped(html, "WR-123 &amp; Co &#x27;Ref&#x27;")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "PartnershipWorksReferenceNumberSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      nominatedPartnerWorksReference: Option[String]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = None,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = nominatedPartnerWorksReference,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the nominated partner works reference exists" in {
+
+      val answers =
+        viewOnlyAnswers(Some("ABC123456"))
+
+      val maybeRow =
+        PartnershipWorksReferenceNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("partnershipWorksReferenceNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("ABC123456")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when the nominated partner works reference does not exist" in {
+
+      val answers =
+        viewOnlyAnswers(None)
+
+      PartnershipWorksReferenceNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly in ViewOnly row" in {
+
+      val answers =
+        viewOnlyAnswers(Some("WR-123 & Co 'Ref'"))
+
+      val row =
+        PartnershipWorksReferenceNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "WR-123 &amp; Co &#x27;Ref&#x27;")
+      assertNoDoubleEncoding(html)
+
+      row.actions.value.items shouldBe empty
     }
   }
 }

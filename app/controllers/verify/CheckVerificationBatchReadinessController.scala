@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.actions.*
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import models.verify.VerificationBatchReadiness
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -41,137 +41,81 @@ class CheckVerificationBatchReadinessController @Inject() (
     with I18nSupport
     with Logging {
 
-  def checkVerificationBatchReadinessInCheckMode(): Action[AnyContent] =
-    checkVerificationBatchReadiness(CheckMode)
-
-  def checkVerificationBatchReadinessBeforeDeclaration(): Action[AnyContent] =
-    checkVerificationBatchReadinessAfterBatchUpdate()
-
-  private def checkVerificationBatchReadinessAfterBatchUpdate(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val ua = request.userAnswers
-
-      val selectedUnverifiedIds: Set[String] =
-        ua.get(SelectSubcontractorPage)
-          .getOrElse(Set.empty)
-          .map(_.id)
-
-      val selectedReverifyIds: Set[String] =
-        ua.get(SelectSubcontractorsToReverifyPage)
-          .getOrElse(Set.empty)
-          .map(_.id)
-
-      val selectedIds: Set[String] =
-        selectedUnverifiedIds ++ selectedReverifyIds
-
-      val isReverifyOnly =
-        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
-
-      val batchReadyOpt =
-        ua.get(NewestVerificationBatchResponsePage)
-          .filter(_ => selectedIds.nonEmpty)
-          .map { batchResponse =>
-            if (isReverifyOnly) {
-              val batchSubcontractorIds =
-                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
-
-              selectedReverifyIds.subsetOf(batchSubcontractorIds)
-            } else {
-              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
-            }
-          }
-
-      batchReadyOpt match {
-        case Some(true) =>
-          for {
-            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, true))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(
-            controllers.verify.routes.VerificationDeclarationController.onPageLoad()
-          )
-
-        case Some(false) =>
-          for {
-            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, false))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
-        case None =>
-          logger.error(
-            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadinessBeforeDeclaration] Missing selected subcontractors or verification batch response"
-          )
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
-
   def checkVerificationBatchReadiness(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val ua = request.userAnswers
+      updateVerificationBatchReadiness(request.userAnswers).map {
+        case Some(updatedAnswers) if updatedAnswers.get(VerificationBatchReadinessPage).contains(true) =>
+          val redirect = mode match {
+            case NormalMode =>
+              nextEmailConfirmationPage(updatedAnswers)
 
-      val selectedUnverifiedIds: Set[String] =
-        ua.get(SelectSubcontractorPage)
-          .getOrElse(Set.empty)
-          .map(_.id)
+            case CheckMode =>
+              controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
 
-      val selectedReverifyIds: Set[String] =
-        ua.get(SelectSubcontractorsToReverifyPage)
-          .getOrElse(Set.empty)
-          .map(_.id)
-
-      val selectedIds: Set[String] =
-        selectedUnverifiedIds ++ selectedReverifyIds
-
-      val isReverifyOnly =
-        selectedUnverifiedIds.isEmpty && selectedReverifyIds.nonEmpty
-
-      val batchReadyOpt =
-        ua.get(NewestVerificationBatchResponsePage)
-          .filter(_ => selectedIds.nonEmpty)
-          .map { batchResponse =>
-            if (isReverifyOnly) {
-              val batchSubcontractorIds =
-                batchResponse.subcontractors.map(_.subcontractorId.toString).toSet
-
-              selectedReverifyIds.subsetOf(batchSubcontractorIds)
-            } else {
-              VerificationBatchReadiness.isBatchReady(selectedIds, batchResponse.subcontractors)
-            }
+            case AmendMode =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
-      batchReadyOpt match {
-        case Some(true) =>
-          for {
-            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, true))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield {
-            val redirect = mode match {
-              case NormalMode =>
-                nextEmailConfirmationPage(updatedAnswers)
+          Redirect(redirect)
 
-              case CheckMode =>
-                controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-
-              case AmendMode =>
-                controllers.routes.JourneyRecoveryController.onPageLoad()
-            }
-
-            Redirect(redirect)
-          }
-
-        case Some(false) =>
-          // TODO(DTR-4685): Route to VF-05 once that page is built; for now redirecting to Journey Recovery
-          for {
-            updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, false))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) =>
+          Redirect(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
 
         case None =>
-          logger.error(
-            "[CheckVerificationBatchReadinessController.checkVerificationBatchReadiness] Missing selected subcontractors or verification batch response"
-          )
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
+
+  def updateVerificationBatchReadiness(ua: UserAnswers): Future[Option[UserAnswers]] =
+    batchReadiness(ua) match {
+      case Some(batchReady) =>
+        for {
+          updatedAnswers <- Future.fromTry(ua.set(VerificationBatchReadinessPage, batchReady))
+          _              <- sessionRepository.set(updatedAnswers)
+        } yield Some(updatedAnswers)
+
+      case None =>
+        logger.error(
+          "[CheckVerificationBatchReadinessController.updateVerificationBatchReadiness] Missing selected subcontractors or verification batch response"
+        )
+        Future.successful(None)
+    }
+
+  private def batchReadiness(ua: UserAnswers): Option[Boolean] = {
+    val selectedUnverifiedIds: Set[String] =
+      ua.get(SelectSubcontractorPage)
+        .getOrElse(Set.empty)
+        .map(_.id)
+
+    val selectedReverifyIds: Set[String] =
+      ua.get(SelectSubcontractorsToReverifyPage)
+        .getOrElse(Set.empty)
+        .map(_.id)
+
+    val selectedIds: Set[String] =
+      selectedUnverifiedIds ++ selectedReverifyIds
+
+    ua.get(CurrentVerificationBatchResponsePage)
+      .filter(_ => selectedIds.nonEmpty)
+      .flatMap { batchResponse =>
+        val currentSubcontractorIds =
+          batchResponse.verifications
+            .flatMap(_.subcontractorId)
+            .map(_.toString)
+            .toSet
+
+        val remainingSelectedIds =
+          selectedIds.intersect(currentSubcontractorIds)
+
+        if (batchResponse.verifications.isEmpty) {
+          Some(true)
+        } else {
+          Option.when(remainingSelectedIds.nonEmpty) {
+            VerificationBatchReadiness.isBatchReady(remainingSelectedIds, batchResponse)
+          }
+        }
+      }
+  }
 
   private def nextEmailConfirmationPage(ua: UserAnswers): Call = {
     val hasStoredEmail = ua

@@ -17,6 +17,7 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.Mode
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -61,7 +62,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
         verificationService.getCurrentVerificationBatch(ua)
     }
 
-  def onSubmit(): Action[AnyContent] =
+  def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       userAnswersWithCurrentBatch(request.userAnswers)
         .flatMap { ua =>
@@ -91,18 +92,15 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
             case Right(selectedIds) =>
               ua.get(CurrentVerificationBatchResponsePage) match {
 
-                case None =>
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
                 case Some(_) if hasCurrentBatch(ua) =>
                   Future.successful(
                     Redirect(
                       controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-                        .modifyVerificationBatch()
+                        .modifyVerificationBatch(mode)
                     )
                   )
 
-                case Some(_) =>
+                case Some(ref) if ref.verificationBatch.flatMap(_.verifBatchResourceRef).isEmpty =>
                   verificationService
                     .createVerificationBatchAndVerifications(
                       userAnswers = ua,
@@ -112,7 +110,7 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                     .map(_ =>
                       Redirect(
                         controllers.verify.routes.CheckVerificationBatchReadinessController
-                          .checkVerificationBatchReadiness()
+                          .checkVerificationBatchReadiness(mode)
                       )
                     )
                     .recover { case t =>
@@ -122,6 +120,9 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                       )
                       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                     }
+
+                case _ =>
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               }
           }
         }

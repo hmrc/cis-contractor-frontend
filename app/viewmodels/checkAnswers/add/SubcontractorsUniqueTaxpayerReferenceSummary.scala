@@ -22,22 +22,48 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.IndividualAnswers
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import viewmodels.checkAnswers.UtrViewModel
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(SubcontractorsUniqueTaxpayerReferencePage).map { answer =>
+      val value   = UtrViewModel(answer)
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+              .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
+          )
+        } else {
+          Seq.empty
+        }
       SummaryListRowViewModel(
         key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode).url
-          )
-            .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
-            .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
-        )
+        value = value,
+        actions = actions
+      )
+    }
+
+  def row(
+    answers: IndividualAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
+        value = ValueViewModel(
+          HtmlContent(s"""<span x-apple-data-detectors="false">${HtmlFormat.escape(answer)}</span>""")
+        ),
+        actions = Seq.empty
       )
     }
 }

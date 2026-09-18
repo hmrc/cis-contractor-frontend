@@ -16,23 +16,28 @@
 
 package models.amend
 
-import models.add.SubcontractorName
+import models.add.{IndividualContactMethodOptions, IndividualNamesOptions, SubcontractorName}
 import models.address.Address
-import models.add.IndividualContactMethodOptions
 import play.api.libs.json.{Json, OFormat}
 
 case class OriginalIndividualAnswers(
-  usesTradingName: Option[Boolean],
+  individualNamesOptions: Set[IndividualNamesOptions],
   tradingName: Option[String],
   subcontractorName: Option[SubcontractorName],
+  addressYesNo: Option[Boolean],
   address: Option[Address],
-  individualContactMethod: Option[Set[IndividualContactMethodOptions]],
+  individualContactMethodsYesNo: Option[Boolean],
+  individualContactMethod: Set[IndividualContactMethodOptions],
   email: Option[String],
   phone: Option[String],
   mobile: Option[String],
+  utrYesNo: Option[Boolean],
   utr: Option[String],
+  ninoYesNo: Option[Boolean],
   nino: Option[String],
-  worksReference: Option[String]
+  worksReferenceYesNo: Option[Boolean],
+  worksReference: Option[String],
+  verificationNumber: Option[String]
 )
 
 object OriginalIndividualAnswers extends models.Enumerable.Implicits {

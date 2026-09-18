@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.company.CompanyCrnFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyCrnPage, CompanyNamePage}
+import pages.add.company.{CompanyCrnPage, CompanyCrnYesNoPage, CompanyNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyCrnView
 
@@ -39,6 +40,7 @@ class CompanyCrnController @Inject() (
   requireData: DataRequiredAction,
   formProvider: CompanyCrnFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: CompanyCrnView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -47,6 +49,10 @@ class CompanyCrnController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+
+    val yesOrNoPage       = CompanyCrnYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(CompanyCrnYesNoPage)
+
     request.userAnswers
       .get(CompanyNamePage)
       .map { companyName =>
@@ -55,7 +61,8 @@ class CompanyCrnController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, companyName))
+        val result = Ok(view(preparedForm, mode, companyName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }

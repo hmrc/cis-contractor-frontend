@@ -20,7 +20,6 @@ import controllers.actions.*
 import models.Mode
 import navigation.Navigator
 import pages.verify.VerificationDeclarationPage
-import forms.verify.VerificationDeclarationFormProvider
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -37,16 +36,13 @@ class VerificationDeclarationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  formProvider: VerificationDeclarationFormProvider,
   view: VerificationDeclarationView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
-
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view(form, mode))
+    Ok(view())
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =

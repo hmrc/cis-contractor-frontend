@@ -50,8 +50,13 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val name = "John Smith"
 
+  private val mode = NormalMode
+
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subContractorName).success.value
+
+  private def uaWithoutName: UserAnswers =
+    emptyUserAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email)).success.value
 
   private def uaWithNameAndEmailChoice: UserAnswers =
     uaWithName
@@ -105,7 +110,21 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Email is not selected" in {
+    "must redirect to Journey Recovery for a GET when subcontractor name is none" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithoutName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to contact method option page for a GET when Email is not selected" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
@@ -115,7 +134,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualContactMethodOptionsController
+          .onPageLoad(mode)
+          .url
       }
     }
 
@@ -174,7 +195,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery when contact choice is missing" in {
+    "must redirect to contact method option page when contact choice is missing" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
 
@@ -184,7 +205,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualContactMethodOptionsController
+          .onPageLoad(mode)
+          .url
       }
     }
 

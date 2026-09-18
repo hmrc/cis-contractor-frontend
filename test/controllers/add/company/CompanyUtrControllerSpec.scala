@@ -23,7 +23,8 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyNamePage, CompanyUtrPage}
+import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -46,7 +47,13 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
   private lazy val companyUtrRouteAmend = controllers.add.company.routes.CompanyUtrController.onPageLoad(AmendMode).url
 
   private def uaWithName: UserAnswers =
-    emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+    emptyUserAnswers
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
+      .set(CompanyUtrYesNoPage, true)
+      .success
+      .value
 
   "CompanyUtr Controller" - {
 
@@ -63,6 +70,43 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName.set(CompanyUtrYesNoPage, false).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val companyName = "Accenture"
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers.set(CompanyNamePage, companyName).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 
@@ -389,6 +433,99 @@ class CompanyUtrControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a Post when subcontractor is verified" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRoute)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when subcontractor is unverified in amend mode" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, companyUtrRouteAmend)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[CompanyUtrView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, companyName)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the AmendCompanyCheckYourAnswers page when valid data is submitted when subcontractor is unverified in amend mode" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyUtrRouteAmend)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
   }

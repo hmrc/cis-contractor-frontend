@@ -18,7 +18,8 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.NormalMode
+import models.{CheckMode, Mode, NormalMode}
+import pages.verify.RebuildVerificationFromWarningPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
@@ -43,20 +44,37 @@ class NoSubcontractorsSelectedWarningController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val SelectSubcontractorsUrl =
-      controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
-    request.userAnswers.get(CisIdQuery) match {
-      case Some(_) =>
-        val cancelUrl =
-          controllers.verify.routes.NoSubcontractorsSelectedWarningController.onCancel().url
+  def onPageLoad(): Action[AnyContent] =
+    onPageLoadForMode(NormalMode, setRebuildFlag = false)
 
-        Ok(view(cancelUrl, SelectSubcontractorsUrl))
+  def onPageLoadCheckMode(): Action[AnyContent] =
+    onPageLoadForMode(CheckMode, setRebuildFlag = true)
 
-      case None =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+  private def onPageLoadForMode(mode: Mode, setRebuildFlag: Boolean): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdQuery) match {
+        case Some(_) =>
+          val selectSubcontractorsUrl =
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(mode).url
+
+          val cancelUrl =
+            controllers.verify.routes.NoSubcontractorsSelectedWarningController.onCancel().url
+
+          if (setRebuildFlag) {
+            for {
+              updatedAnswers <- Future.fromTry(
+                                  request.userAnswers.set(RebuildVerificationFromWarningPage, true)
+                                )
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Ok(view(cancelUrl, selectSubcontractorsUrl))
+          } else {
+            Future.successful(Ok(view(cancelUrl, selectSubcontractorsUrl)))
+          }
+
+        case None =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
-  }
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

@@ -46,6 +46,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
   private val name = "John Smith"
+  private val mode = NormalMode
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(SubcontractorNamePage, subcontractorName).success.value
@@ -102,9 +103,27 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Phone is not selected" in {
+    "must redirect to contact method option page for a GET when Phone is not selected" in {
 
       val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualPhoneNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.add.routes.IndividualContactMethodOptionsController
+          .onPageLoad(mode)
+          .url
+      }
+    }
+
+    "must redirect to recovery page for a GET when subcontractor name is empty" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone)).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, individualPhoneNumberRoute)

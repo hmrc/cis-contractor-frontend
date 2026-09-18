@@ -21,11 +21,11 @@ import forms.add.company.CompanyUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyUtrPage}
+import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyUtrView
 
@@ -41,6 +41,8 @@ class CompanyUtrController @Inject() (
   requireData: DataRequiredAction,
   formProvider: CompanyUtrFormProvider,
   subcontractorService: SubcontractorService,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -58,23 +60,29 @@ class CompanyUtrController @Inject() (
       navigator.nextPage(CompanyUtrPage, mode, updatedAnswers)
     )
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+
+      val yesOrNoPage       = CompanyUtrYesNoPage
+      val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
+
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          val result = Ok(view(preparedForm, mode, companyName))
+          yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-        Ok(view(preparedForm, mode, companyName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(CompanyNamePage)
         .map { companyName =>
@@ -107,5 +115,5 @@ class CompanyUtrController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

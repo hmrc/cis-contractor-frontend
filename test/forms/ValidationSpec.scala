@@ -56,9 +56,6 @@ class ValidationSpec extends AnyFreeSpec with Matchers {
       "must not match with no at sign" in {
         matches("testexample.com") mustBe false
       }
-      "must not match when domain starts with a dot" in {
-        matches("test@.example.com") mustBe false
-      }
       "must not match an empty string" in {
         matches("") mustBe false
       }

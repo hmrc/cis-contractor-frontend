@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.add.trust
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.info.trust.TrustAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.trust.AddTrustContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,11 +37,26 @@ object AddTrustContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("contact-details").url
+            else controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-trust-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: TrustAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.trustContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addTrustContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value)
       )
     }
 }

@@ -31,7 +31,7 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = title(form, messages("contractordetails.contractorUtr.title")), showSignOut = false) {
+@layout(pageTitle = title(form, messages("contractordetails.contractorUtr.title"))) {
 
     @formHelper(action = controllers.contractordetails.routes.ContractorUtrController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 

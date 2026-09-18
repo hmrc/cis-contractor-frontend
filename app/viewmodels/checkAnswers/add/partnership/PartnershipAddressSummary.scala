@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.info.partnership.PartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
@@ -39,4 +40,13 @@ object PartnershipAddressSummary {
       )
     }
 
+  def row(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.address.map { address =>
+      AddressSummaryRow.viewOnlyRow(
+        address = address,
+        key = "partnershipAddress.checkYourAnswersLabel"
+      )
+    }
 }

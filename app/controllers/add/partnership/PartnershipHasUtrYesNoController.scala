@@ -38,6 +38,7 @@ class PartnershipHasUtrYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipHasUtrYesNoFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipHasUtrYesNoView
 )(implicit ec: ExecutionContext)
@@ -47,7 +48,7 @@ class PartnershipHasUtrYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       request.userAnswers
         .get(PartnershipNamePage)
         .map { partnershipName =>
@@ -61,7 +62,7 @@ class PartnershipHasUtrYesNoController @Inject() (
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(PartnershipNamePage)
         .map { name =>

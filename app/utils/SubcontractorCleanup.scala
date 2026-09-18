@@ -31,6 +31,7 @@ object SubcontractorCleanup {
     userAnswers
       .remove(AddressOfSubcontractorPage)
       .flatMap(_.remove(AddIndividualContactMethodsYesNoPage))
+      .flatMap(_.remove(IndividualNamesOptionsPage))
       .flatMap(_.remove(IndividualContactMethodOptionsPage))
       .flatMap(_.remove(IndividualEmailAddressPage))
       .flatMap(_.remove(IndividualMobileNumberPage))
@@ -40,7 +41,6 @@ object SubcontractorCleanup {
       .flatMap(_.remove(SubcontractorNamePage))
       .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage))
       .flatMap(_.remove(SubNationalInsuranceNumberPage))
-      .flatMap(_.remove(SubTradingNameYesNoPage))
       .flatMap(_.remove(TradingNameOfSubcontractorPage))
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage))
       .flatMap(_.remove(WorksReferenceNumberPage))
@@ -120,5 +120,6 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CurrentVerificationBatchResponsePage))
       .flatMap(_.remove(NewestVerificationBatchResponsePage))
       .flatMap(_.remove(VerificationBatchReadinessPage))
+      .flatMap(_.remove(RebuildVerificationFromWarningPage))
 
 }

@@ -17,15 +17,17 @@
 package controllers.verify
 
 import base.SpecBase
-import models.response.GetNewestVerificationBatchResponse
-import models.{AmendMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorViewModel}
-import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage}
+import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
+import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel, VerificationCurrentVerification}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
 class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
-  private val normalModeUrl = "/subcontractor/verify/check-verification-batch-readiness"
+  private val normalModeUrl = controllers.verify.routes.CheckVerificationBatchReadinessController
+    .checkVerificationBatchReadiness(NormalMode)
+    .url
 
   private def readyIndividual(id: Long): Subcontractor = Subcontractor(
     subcontractorId = id,
@@ -48,10 +50,68 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
     nino = None
   )
 
-  private def notReadyIndividual(id: Long): Subcontractor =
-    readyIndividual(id).copy(utr = None)
+  private def readyCurrentIndividual(id: Long): SubcontractorCurrentVerification =
+    SubcontractorCurrentVerification(
+      subcontractorId = id,
+      subbieResourceRef = None,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = Some("Acme"),
+      utr = Some("1234567890"),
+      nino = None,
+      crn = None,
+      partnerUtr = None,
+      partnershipTradingName = None,
+      subcontractorType = Some("soletrader"),
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
 
-  private def batchResponse(
+  private def notReadyCurrentIndividual(id: Long): SubcontractorCurrentVerification =
+    readyCurrentIndividual(id).copy(utr = None)
+
+  private def currentBatchResponse(
+    subs: Seq[SubcontractorCurrentVerification]
+  ): GetCurrentVerificationBatchResponse =
+    GetCurrentVerificationBatchResponse(
+      subcontractors = subs,
+      verificationBatch = None,
+      verifications = subs.map { sub =>
+        VerificationCurrentVerification(
+          verificationId = sub.subcontractorId,
+          verificationBatchId = None,
+          subcontractorId = Some(sub.subcontractorId),
+          verificationResourceRef = Some(sub.subcontractorId + 1000L),
+          subcontractorName = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          actionIndicator = None,
+          proceed = None,
+          matched = None
+        )
+      }
+    )
+
+  private def newestBatchResponse(
     subs: Seq[Subcontractor],
     emailAddress: Option[String] = None
   ): GetNewestVerificationBatchResponse =
@@ -75,8 +135,15 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
+            CurrentVerificationBatchResponsePage,
+            currentBatchResponse(Seq(readyCurrentIndividual(1)))
+          )
+          .setOrException(
             NewestVerificationBatchResponsePage,
-            batchResponse(Seq(readyIndividual(1)), emailAddress = Some("agent@example.com"))
+            newestBatchResponse(
+              Seq(readyIndividual(1)),
+              emailAddress = Some("agent@example.com")
+            )
           )
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
@@ -93,8 +160,12 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
+            CurrentVerificationBatchResponsePage,
+            currentBatchResponse(Seq(readyCurrentIndividual(1)))
+          )
+          .setOrException(
             NewestVerificationBatchResponsePage,
-            batchResponse(Seq(readyIndividual(1)), emailAddress = Some("agent@example.com"))
+            newestBatchResponse(Seq(readyIndividual(1)), emailAddress = Some("agent@example.com"))
           )
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
@@ -112,8 +183,12 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
+            CurrentVerificationBatchResponsePage,
+            currentBatchResponse(Seq(readyCurrentIndividual(1)))
+          )
+          .setOrException(
             NewestVerificationBatchResponsePage,
-            batchResponse(Seq(readyIndividual(1)), emailAddress = None)
+            newestBatchResponse(Seq(readyIndividual(1)), emailAddress = None)
           )
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
@@ -129,24 +204,26 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
     "batch not ready" - {
 
-      "must redirect to Journey Recovery" in {
+      "must redirect to ReviewInsufficientInfoSubcontractorsController" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
-          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(notReadyIndividual(1))))
+          .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(notReadyCurrentIndividual(1))))
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
           val result = route(application, FakeRequest(GET, normalModeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
         }
       }
 
       "must set VerificationBatchReadinessPage to false in session" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
-          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(notReadyIndividual(1))))
+          .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(notReadyCurrentIndividual(1))))
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -162,7 +239,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
       "must redirect to Journey Recovery" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
-          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(readyIndividual(99))))
+          .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(readyCurrentIndividual(99))))
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -178,7 +255,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery" in {
         val ua = emptyUserAnswers
-          .setOrException(NewestVerificationBatchResponsePage, batchResponse(Seq(readyIndividual(1))))
+          .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(readyCurrentIndividual(1))))
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
         running(application) {
@@ -190,7 +267,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
       }
     }
 
-    "NewestVerificationBatchResponsePage missing from session" - {
+    "CurrentVerificationBatchResponsePage missing from session" - {
 
       "must redirect to Journey Recovery" in {
         val ua = emptyUserAnswers
@@ -212,10 +289,9 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
-            NewestVerificationBatchResponsePage,
-            batchResponse(
-              Seq(readyIndividual(1)),
-              emailAddress = Some("agent@example.com")
+            CurrentVerificationBatchResponsePage,
+            currentBatchResponse(
+              Seq(readyCurrentIndividual(1))
             )
           )
 
@@ -225,7 +301,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           val controller = application.injector.instanceOf[CheckVerificationBatchReadinessController]
 
           val result =
-            controller.checkVerificationBatchReadinessInCheckMode()(FakeRequest(GET, "/test-only"))
+            controller.checkVerificationBatchReadiness(CheckMode)(FakeRequest(GET, "/test-only"))
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
@@ -240,8 +316,8 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(
-            NewestVerificationBatchResponsePage,
-            batchResponse(Seq(readyIndividual(1)), emailAddress = Some("agent@example.com"))
+            CurrentVerificationBatchResponsePage,
+            currentBatchResponse(Seq(readyCurrentIndividual(1)))
           )
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()

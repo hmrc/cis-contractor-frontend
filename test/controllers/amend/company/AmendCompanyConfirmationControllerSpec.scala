@@ -1,0 +1,379 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.amend.company
+
+import base.SpecBase
+import models.UserAnswers
+import models.amend.company.OriginalCompanyAnswers
+import pages.add.company.CompanyNamePage
+import pages.amend.AmendCheckYourAnswersSubmittedPage
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
+import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
+import viewmodels.amend.company.CompanyAmendConfirmationViewModel
+import views.html.amend.AmendConfirmationView
+import scala.concurrent.Future
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import repositories.SessionRepository
+import config.FrontendAppConfig
+import models.amend.AmendJourneyType
+import pages.amend.AmendJourneyTypePage
+import services.VerificationService
+import viewmodels.amend.AmendConfirmationLinks
+
+class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  private val companyName = "Company Ltd"
+  private val cisId       = "contractor-123"
+
+  private val mockSessionRepository =
+    mock[SessionRepository]
+
+  private val mockVerificationService =
+    mock[VerificationService]
+
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockSessionRepository, mockVerificationService)
+  }
+
+  private val original =
+    OriginalCompanyAnswers(
+      companyName = Some(companyName),
+      addressYesNo = None,
+      address = None,
+      companyContactMethodsYesNo = None,
+      companyContactMethod = Set.empty,
+      email = None,
+      phone = None,
+      mobile = None,
+      utrYesNo = None,
+      utr = None,
+      crnYesNo = None,
+      crn = None,
+      worksReferenceYesNo = None,
+      worksReference = None,
+      verificationNumber = None
+    )
+
+  private def userAnswersWithOriginal: UserAnswers =
+    emptyUserAnswers
+      .set(OriginalCompanyAnswersQuery, original)
+      .success
+      .value
+      .set(CisIdQuery, cisId)
+      .success
+      .value
+      .set(CompanyNamePage, companyName)
+      .success
+      .value
+      .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+      .success
+      .value
+      .set(AmendCheckYourAnswersSubmittedPage, true)
+      .success
+      .value
+
+  private lazy val confirmationRoute =
+    controllers.amend.company.routes.AmendCompanyConfirmationController
+      .onPageLoad()
+      .url
+
+  private def application(userAnswers: UserAnswers) =
+    applicationBuilder(userAnswers = Some(userAnswers))
+      .overrides(
+        bind[SessionRepository]
+          .toInstance(mockSessionRepository),
+        bind[VerificationService]
+          .toInstance(mockVerificationService)
+      )
+      .build()
+
+  "AmendCompanyConfirmationController" - {
+
+    "must return OK and the correct view for a GET" in {
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        val view =
+          app.injector.instanceOf[AmendConfirmationView]
+
+        status(result) mustEqual OK
+
+        val confirmationLink =
+          AmendConfirmationLinks.build(
+            AmendJourneyType.Standard,
+            cisId,
+            app.injector.instanceOf[FrontendAppConfig]
+          )
+
+        contentAsString(result) mustEqual
+          view(
+            CompanyAmendConfirmationViewModel.rows(
+              original,
+              userAnswersWithOriginal
+            )(messages(app)),
+            companyName,
+            confirmationLink
+          )(request, messages(app)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when accessed without prior CYA submission" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalCompanyAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Journey Recovery when the original answers are missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must redirect to Journey Recovery when the CIS id is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalCompanyAnswersQuery, original)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(OriginalCompanyAnswersQuery, original)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyNamePage, companyName)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must refresh verification batches and render the insufficient info confirmation link" in {
+
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      }
+    }
+
+    "must refresh verification batches and render the unmatched info confirmation link" in {
+
+      when(
+        mockVerificationService
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      ).thenReturn(
+        Future.successful(userAnswersWithOriginal)
+      )
+
+      val userAnswers =
+        userAnswersWithOriginal
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val app = application(userAnswers)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+        )
+
+        contentAsString(result) must not include
+          messages(app)(
+            "amendConfirmation.beforeYouGo.h2"
+          )
+
+        verify(mockVerificationService)
+          .refreshVerificationBatches(any[UserAnswers])(any())
+      }
+    }
+
+    "must not refresh verification batches for standard amend journey" in {
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustBe OK
+
+        verifyNoInteractions(mockVerificationService)
+      }
+    }
+  }
+}

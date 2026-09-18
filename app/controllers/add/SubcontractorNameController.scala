@@ -19,9 +19,10 @@ package controllers.add
 import controllers.actions.*
 import forms.add.SubcontractorNameFormProvider
 import models.Mode
+import models.add.IndividualNamesOptions.SubcontractorName
 import models.add.SubcontractorName.format
 import navigation.Navigator
-import pages.add.SubcontractorNamePage
+import pages.add.{IndividualNamesOptionsPage, SubcontractorNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -39,6 +40,7 @@ class SubcontractorNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SubcontractorNameFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorNameView
 )(implicit ec: ExecutionContext)
@@ -47,18 +49,27 @@ class SubcontractorNameController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
-      case Some(subcontractorName) => form.fill(subcontractorName)
-      case None                    => form
+      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
+
+      namesOptions match {
+        case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
+          val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
+            case Some(subcontractorName) => form.fill(subcontractorName)
+            case None                    => form
+          }
+
+          Ok(view(preparedForm, mode))
+
+        case _ =>
+          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+      }
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

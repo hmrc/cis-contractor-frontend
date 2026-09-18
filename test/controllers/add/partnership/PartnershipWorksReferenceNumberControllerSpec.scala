@@ -24,7 +24,7 @@ import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage}
+import pages.add.partnership.{PartnershipNamePage, PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -49,6 +49,9 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
       .set(PartnershipNamePage, partnershipName)
       .success
       .value
+      .set(PartnershipWorksReferenceNumberYesNoPage, true)
+      .success
+      .value
 
   lazy val partnershipWorksReferenceNumberRoute: String =
     controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onPageLoad(NormalMode).url
@@ -71,6 +74,46 @@ class PartnershipWorksReferenceNumberControllerSpec extends SpecBase with Mockit
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(PartnershipWorksReferenceNumberYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipWorksReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(
+          result
+        ).value mustEqual controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(PartnershipNamePage, partnershipName).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipWorksReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

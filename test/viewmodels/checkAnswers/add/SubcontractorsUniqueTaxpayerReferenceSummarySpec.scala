@@ -27,6 +27,7 @@ import pages.add.SubcontractorsUniqueTaxpayerReferencePage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import models.info.IndividualAnswers
 
 class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -121,6 +122,196 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
 
       assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
       assertNoDoubleEncoding(html)
+    }
+
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage, utr)
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+  }
+
+  "ViewOnly - SubcontractorsUniqueTaxpayerReferenceSummary.row" - {
+
+    "must return a SummaryListRow when UTR exists" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set.empty,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("1234567890"),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorsUniqueTaxpayerReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must return None when UTR does not exist" in {
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set.empty,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      SubcontractorsUniqueTaxpayerReferenceSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly for ViewOnly UTR" in {
+
+      val utr = "1234567890 & Ref'01"
+
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set.empty,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some(utr),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        SubcontractorsUniqueTaxpayerReferenceSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+
+      row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+
+    "must prevent Safari from detecting the UTR for UserAnswers" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "123456789")
+          .success
+          .value
+
+      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
+    }
+
+    "must prevent Safari from detecting the UTR for IndividualAnswers" in {
+      val answers =
+        IndividualAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
+          showVerificationDetails = false,
+          individualNamesOptions = Set.empty,
+          tradingName = None,
+          subcontractorName = None,
+          addressYesNo = None,
+          address = None,
+          individualContactMethodsYesNo = None,
+          individualContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = Some(true),
+          utr = Some("123456789"),
+          ninoYesNo = None,
+          nino = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers).value
+
+      row.value.content.asHtml.toString should include(
+        """x-apple-data-detectors="false""""
+      )
     }
   }
 }

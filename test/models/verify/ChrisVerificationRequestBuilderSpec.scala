@@ -26,6 +26,7 @@ import models.requests.*
 import models.*
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import pages.verify.{ContractorEmailConfirmationStoredPage, CurrentVerificationBatchResponsePage, EmailAddressPage}
+import play.api.i18n.Messages
 import queries.CisIdQuery
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -34,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
   implicit private val ec: ExecutionContext = ExecutionContext.global
   implicit private val hc: HeaderCarrier    = HeaderCarrier()
+  implicit private val msgs: Messages       = messages(app)
 
   private val mockConnector = mock[ConstructionIndustrySchemeConnector]
   private val builder       = new ChrisVerificationRequestBuilder(mockConnector)
@@ -61,7 +63,20 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
           addressLine4 = None,
           country = None,
           postcode = None,
-          worksReferenceNumber = None
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
         )
 
       val currentVerificationBatchResponse =
@@ -78,7 +93,13 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
               verificationId = 3001L,
               verificationBatchId = Some(1001L),
               subcontractorId = Some(10L),
-              verificationResourceRef = Some(4001L)
+              verificationResourceRef = Some(4001L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = Some("Y"),
+              matched = None
             )
           )
         )
@@ -137,7 +158,7 @@ class ChrisVerificationRequestBuilderSpec extends SpecBase with MockitoSugar {
 
       result.verifications mustBe Seq(
         VerificationDetails(
-          subcontractorName = "TBC",
+          subcontractorName = "Subcontractor, Test",
           verificationResourceRef = "4001",
           proceedVerification = true
         )

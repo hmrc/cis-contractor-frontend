@@ -25,6 +25,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.info.trust.TrustAnswers
 
 class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
 
@@ -81,8 +82,8 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       actions.items must have size 1
 
       val action: ActionItem = actions.items.head
-      action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
-        .onPageLoad(AmendMode)
+      action.href mustBe controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+        .onPageLoad("address")
         .url
       action.content mustBe Text(messages("site.change"))
       action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))
@@ -117,9 +118,143 @@ class TrustAddressYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuite {
       action.attributes must contain("id" -> "add-trust-address")
     }
 
+    "return a row with key, value = no, and change action pointing to add flow when the answer is false in AmendMode" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(TrustAddressYesNoPage, false)
+          .success
+          .value
+
+      val maybeRow = TrustAddressYesNoSummary.row(ua, AmendMode)
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(content = Text(messages("trustAddressYesNo.checkYourAnswersLabel")))
+      row.value mustBe Value(content = Text(messages("site.no")))
+
+      row.actions must not be empty
+      val actions: Actions = row.actions.value
+      actions.items must have size 1
+
+      val action: ActionItem = actions.items.head
+      action.href mustBe controllers.add.trust.routes.TrustAddressYesNoController
+        .onPageLoad(AmendMode)
+        .url
+      action.content mustBe Text(messages("site.change"))
+      action.visuallyHiddenText mustBe Some(messages("trustAddressYesNo.change.hidden"))
+      action.attributes must contain("id" -> "add-trust-address")
+    }
+
     "return None when the answer is missing" in {
       val ua: UserAnswers = emptyUserAnswers
       TrustAddressYesNoSummary.row(ua) mustBe None
+    }
+  }
+
+  "ViewOnly - TrustAddressYesNoSummary.row" - {
+
+    "must return a SummaryListRow with 'Yes' for ViewOnlyTrustAnswers" in {
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = Some(true),
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustAddressYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe
+        Key(
+          content = Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+        )
+
+      row.value mustBe
+        Value(
+          content = Text(messages("site.yes"))
+        )
+
+      row.actions mustBe None
+    }
+
+    "must return a SummaryListRow with 'No' for ViewOnlyTrustAnswers" in {
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = Some(false),
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustAddressYesNoSummary.row(answers)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe
+        Key(
+          content = Text(messages("trustAddressYesNo.checkYourAnswersLabel"))
+        )
+
+      row.value mustBe
+        Value(
+          content = Text(messages("site.no"))
+        )
+
+      row.actions mustBe None
+    }
+
+    "must return None when addressYesNo is missing in ViewOnlyTrustAnswers" in {
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustAddressYesNoSummary.row(answers) mustBe None
     }
   }
 }

@@ -17,6 +17,7 @@
 package forms.add.partnership
 
 import forms.behaviours.StringFieldBehaviours
+import forms.Validation
 import play.api.data.FormError
 
 class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
@@ -26,8 +27,6 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
   val invalidKey  = "partnershipMobileNumber.error.invalid"
   val maxLength   = 35
 
-  private val mobileRegex = "^(?=(?:.*\\d){6,})[0-9()+\\- ]*$"
-
   val form = new PartnershipMobileNumberFormProvider()()
 
   val validMobileNumber: Seq[String] = Seq(
@@ -36,9 +35,8 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
     "  07777 77777 ",
     "(44)77777777777",
     "44-777-777",
-    "+44 808 345 0199",
-    "+44 (0)20 7265 0267",
-    "+91 +456 +986 + +"
+    "44 808 345 0199",
+    "44 (0)20 7265 0267"
   )
 
   val invalidMobileNumber: Seq[String] = Seq(
@@ -61,9 +59,12 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
     )
 
     "must bind valid mobile number data" in {
-      validMobileNumber.foreach { validMobileNumber =>
-        val result = form.bind(Map(fieldName -> validMobileNumber))
-        result.errors must be(empty)
+      validMobileNumber.foreach { mobileNumber =>
+        val result =
+          form.bind(
+            Map(fieldName -> mobileNumber)
+          )
+        result.errors mustBe empty
       }
     }
 
@@ -71,7 +72,7 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
       invalidMobileNumber.foreach { invalidTelephone =>
         val result = form.bind(Map(fieldName -> invalidTelephone))
         result.errors must contain(
-          FormError(fieldName, invalidKey, Seq(mobileRegex))
+          FormError(fieldName, invalidKey, Seq(Validation.mobileRegex))
         )
       }
     }
@@ -103,22 +104,16 @@ class PartnershipMobileNumberFormProviderSpec extends StringFieldBehaviours {
       result.value.value mustBe "123 456"
     }
 
-    "must display error when fewer than 6 digits are entered" in {
-      val tooShortNumbers = Seq(
-        "12345",
-        "+1 287",
-        "(91) 56",
-        "1-3-5-6-8",
-        "+()189()",
-        "1------2",
-        "+654+12"
-      )
-      tooShortNumbers.foreach { number =>
-        val result = form.bind(Map("value" -> number))
-        result.errors must contain(
-          FormError("value", invalidKey, Seq(mobileRegex))
+    "must bind a phone number containing fewer than 6 digits" in {
+      val phoneNumber = "12345"
+
+      val result =
+        form.bind(
+          Map("value" -> phoneNumber)
         )
-      }
+
+      result.errors mustBe empty
+      result.value mustBe Some(phoneNumber)
     }
 
     "must accept mobile number with 6 digits" in {

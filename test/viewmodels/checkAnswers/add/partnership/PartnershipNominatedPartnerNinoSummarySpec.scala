@@ -28,6 +28,8 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import org.scalatest.matchers.must.Matchers.must
+import models.TypeOfSubcontractor
+import models.info.partnership.PartnershipAnswers
 
 class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
 
@@ -80,6 +82,65 @@ class PartnershipNominatedPartnerNinoSummarySpec extends AnyFreeSpec with Matche
     "must return None when the answer does not exist" in {
       val ua = UserAnswers("test-id")
       PartnershipNominatedPartnerNinoSummary.row(ua) mustBe None
+    }
+  }
+
+  "PartnershipNominatedPartnerNinoSummary.row(ViewOnlyPartnershipAnswers)" - {
+
+    def viewOnlyAnswers(
+      nominatedPartnerNino: Option[String]
+    ): PartnershipAnswers =
+      PartnershipAnswers(
+        subcontractorType = TypeOfSubcontractor.Partnership,
+        showVerificationDetails = false,
+        partnershipName = None,
+        addressYesNo = None,
+        address = None,
+        partnershipContactMethodsYesNo = None,
+        partnershipContactMethodOptions = Set.empty,
+        email = None,
+        phone = None,
+        mobile = None,
+        hasUtrYesNo = None,
+        utr = None,
+        nominatedPartnerName = None,
+        nominatedPartnerUtrYesNo = None,
+        nominatedPartnerUtr = None,
+        nominatedPartnerNinoYesNo = None,
+        nominatedPartnerNino = nominatedPartnerNino,
+        nominatedPartnerCrnYesNo = None,
+        nominatedPartnerCrn = None,
+        nominatedPartnerWorksReferenceYesNo = None,
+        nominatedPartnerWorksReference = None,
+        verificationNumber = None
+      )
+
+    "must return a SummaryListRow when the nominated partner NINO exists" in {
+
+      val answers = viewOnlyAnswers(Some("QQ123456C"))
+
+      val maybeRow =
+        PartnershipNominatedPartnerNinoSummary.row(answers)
+
+      maybeRow mustBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString must include(
+        messages("partnershipNominatedPartnerNino.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString must include("QQ123456C")
+
+      row.actions mustBe defined
+      row.actions.value.items mustBe empty
+    }
+
+    "must return None when the nominated partner NINO does not exist" in {
+
+      val answers = viewOnlyAnswers(None)
+
+      PartnershipNominatedPartnerNinoSummary.row(answers) mustBe None
     }
   }
 }

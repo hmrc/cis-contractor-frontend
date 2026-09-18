@@ -17,6 +17,7 @@
 package controllers.verify
 
 import controllers.actions.*
+import controllers.AgentClientChecks
 import forms.verify.SelectSubcontractorFormProvider
 import models.requests.DataRequest
 import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
@@ -24,9 +25,11 @@ import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import models.CheckMode
+import pages.verify.RebuildVerificationFromWarningPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.{CheckboxPaginationResult, PaginationService}
+import services.{CheckboxPaginationResult, CisManageService, PaginationService, VerificationPreSelectionService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
@@ -35,46 +38,124 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SelectSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
+  override protected val sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
+  verificationPreSelectionService: VerificationPreSelectionService,
+  verificationService: VerificationService,
+  override protected val cisManageService: CisManageService,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with AgentClientChecks {
 
   private val form = formProvider()
 
   def onPageLoad(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData).async { implicit request =>
+      request.userAnswers match {
 
-      val userAnswers = request.userAnswers
+        case Some(userAnswers) =>
+          renderSelectSubcontractorPage(
+            userAnswers,
+            mode,
+            page
+          )
 
-      getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
-        case Right(unverifiedSubcontractors) =>
-          val subcontractorsVm =
-            SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
+        case None =>
+          val userAnswers = UserAnswers(request.userId)
 
-          val preparedForm =
+          withAgentClientChecks(
+            request.userId,
+            request.isAgent,
             userAnswers
-              .get(SelectSubcontractorPage)
-              .map(subs => form.fill(subs.map(_.id)))
-              .getOrElse(form)
+          ).flatMap {
 
-          val result =
-            paginationService.paginateCheckboxItems(
-              SubcontractorViewModel.checkboxItems(subcontractorsVm),
-              page
+            case Left(redirect) =>
+              Future.successful(redirect)
+
+            case Right(checkedAnswers) =>
+              verificationService
+                .refreshNewestVerificationBatch(checkedAnswers)
+                .flatMap { updatedAnswers =>
+                  renderSelectSubcontractorPage(
+                    updatedAnswers,
+                    mode,
+                    page
+                  )
+                }
+          }.recover { case t =>
+            logger.error(
+              "[SelectSubcontractorController.onPageLoad] Failed to initialise verification data",
+              t
             )
 
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+      }
+    }
+
+  private def renderSelectSubcontractorPage(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: Int
+  )(implicit request: Request[_]): Future[Result] =
+    getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
+
+      case Right(unverifiedSubcontractors) =>
+        val subcontractorsVm =
+          SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
+
+        val selectedSubcontractors =
+          userAnswers.get(SelectSubcontractorPage) match {
+
+            case Some(subs) =>
+              Future.successful(subs)
+
+            case None =>
+              val selectedIds =
+                verificationPreSelectionService.preSelectedSubcontractorIds(
+                  unverifiedSubcontractors,
+                  userAnswers
+                )
+
+              val defaultSelections =
+                subcontractorsVm
+                  .filter(sub => selectedIds.contains(sub.id))
+                  .toSet
+
+              Future
+                .fromTry(
+                  userAnswers.set(
+                    SelectSubcontractorPage,
+                    defaultSelections
+                  )
+                )
+                .flatMap { updatedAnswers =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map(_ => defaultSelections)
+                }
+          }
+
+        val result =
+          paginationService.paginateCheckboxItems(
+            SubcontractorViewModel.checkboxItems(subcontractorsVm),
+            page
+          )
+
+        selectedSubcontractors.map { selected =>
           Ok(
             view(
-              preparedForm,
+              form.fill(selected.map(_.id)),
               mode,
               result.paginatedData,
               result.paginationViewModel,
@@ -83,11 +164,12 @@ class SelectSubcontractorController @Inject() (
               result.totalCount
             )
           )
+        }
 
-        case Left(redirectResult) =>
-          redirectResult
-      }
+      case Left(redirectResult) =>
+        Future.successful(redirectResult)
     }
+
   private def hasAnyVerifiedSubcontractor(
     request: DataRequest[_]
   ): Boolean =
@@ -151,19 +233,50 @@ class SelectSubcontractorController @Inject() (
             case None =>
               if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
                 for {
-                  updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(SelectSubcontractorPage, mode, updatedAnswers))
+                  answersWithSelections <- Future.fromTry(
+                                             ua.set(SelectSubcontractorPage, mergedValues)
+                                           )
+
+                  nextPage =
+                    navigator.nextPage(
+                      SelectSubcontractorPage,
+                      mode,
+                      answersWithSelections
+                    )
+
+                  updatedAnswers <-
+                    if (
+                      mode == CheckMode &&
+                      answersWithSelections
+                        .get(RebuildVerificationFromWarningPage)
+                        .contains(true)
+                    ) {
+                      Future.fromTry(
+                        answersWithSelections.remove(RebuildVerificationFromWarningPage)
+                      )
+                    } else {
+                      Future.successful(answersWithSelections)
+                    }
+
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(nextPage)
               } else {
                 val formWithErrors =
                   form
                     .fill(currentSelectedValues.map(_.id))
-                    .withError("value", "verify.selectSubcontractor.error.required")
+                    .withError(
+                      "value",
+                      "verify.selectSubcontractor.error.required"
+                    )
 
                 Future.successful(
-                  renderPageWithError(formWithErrors, mode, page, result)
+                  renderPageWithError(
+                    formWithErrors,
+                    mode,
+                    page,
+                    result
+                  )
                 )
-
               }
           }
       }

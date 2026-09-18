@@ -38,6 +38,7 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipNominatedPartnerUtrYesNoFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNominatedPartnerUtrYesNoView
 )(implicit ec: ExecutionContext)
@@ -46,22 +47,23 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNominatedPartnerNamePage)
-      .map { nominatedPartnershipName =>
-        val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      request.userAnswers
+        .get(PartnershipNominatedPartnerNamePage)
+        .map { nominatedPartnershipName =>
+          val preparedForm = request.userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, nominatedPartnershipName))
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-        Ok(view(preparedForm, mode, nominatedPartnershipName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(PartnershipNominatedPartnerNamePage)
         .map { nominatedPartnershipName =>
@@ -78,5 +80,5 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

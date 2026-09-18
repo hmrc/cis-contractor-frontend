@@ -38,6 +38,7 @@ class CompanyUtrYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyUtrYesNoFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrYesNoView
 )(implicit ec: ExecutionContext)
@@ -46,22 +47,23 @@ class CompanyUtrYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyUtrYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      request.userAnswers
+        .get(CompanyNamePage)
+        .map { companyName =>
+          val preparedForm = request.userAnswers.get(CompanyUtrYesNoPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, companyName))
         }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
-        Ok(view(preparedForm, mode, companyName))
-      }
-      .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       request.userAnswers
         .get(CompanyNamePage)
         .map { companyName =>
@@ -77,5 +79,5 @@ class CompanyUtrYesNoController @Inject() (
             )
         }
         .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
-  }
+    }
 }

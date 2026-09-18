@@ -181,7 +181,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when trust name is missing" in {
+    "must redirect to Journey Recovery for a GET when trust name and contact options are missing" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
@@ -212,9 +212,11 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when TrustContactMethodOptions is missing" in {
+    "must redirect to Journey Recovery for a GET when trust name is missing" in {
 
-      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(TrustContactMethodOptionsPage, Set(ContactMethodOptions.Mobile)).success.value)
+      ).build()
 
       running(application) {
         val request = FakeRequest(GET, trustMobileNumberRoute)
@@ -226,7 +228,7 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET when Mobile is not in TrustContactMethodOptions" in {
+    "must redirect to contact method option page for a GET when Mobile is not in TrustContactMethodOptions" in {
 
       val userAnswers =
         uaWithName
@@ -242,7 +244,9 @@ class TrustMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.add.trust.routes.AddTrustContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 

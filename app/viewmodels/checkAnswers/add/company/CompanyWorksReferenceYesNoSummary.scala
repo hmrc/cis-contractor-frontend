@@ -16,12 +16,14 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.company.AmendCompanyRemoveDetail
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.company.CompanyAnswers
 
 object CompanyWorksReferenceYesNoSummary {
 
@@ -36,11 +38,29 @@ object CompanyWorksReferenceYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                .onPageLoad(AmendCompanyRemoveDetail.WorksReferenceNumber.key)
+                .url
+            else controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("companyWorksReferenceYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-works-reference")
         )
+      )
+    }
+
+  def row(
+    answers: CompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.worksReferenceYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "companyWorksReferenceYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

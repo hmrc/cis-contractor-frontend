@@ -22,7 +22,7 @@ import models.address.{Address, Country}
 import models.amend.trust.OriginalTrustAnswers
 import models.{TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
@@ -32,12 +32,17 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.OriginalTrustAnswersQuery
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 import models.contact.ContactMethodOptions
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
+import org.mockito.ArgumentCaptor
+import queries.CisIdQuery
+import utils.AmendmentHelper
+import config.FrontendAppConfig
+import models.amend.AmendJourneyType
 
 class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val address =
@@ -86,7 +91,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       .set(TrustWorksReferenceYesNoPage, true)
       .success
       .value
-      .set(TrustWorksReferencePage, "WRN-1")
+      .set(TrustWorksReferencePage, "WRN-11")
       .success
       .value
       .set(ShowVerificationDetailsPage, false)
@@ -109,6 +114,18 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           worksReference = Some("WRN-1"),
           verificationNumber = None
         )
+      )
+      .success
+      .value
+      .set(
+        AmendJourneyTypePage,
+        AmendJourneyType.Standard
+      )
+      .success
+      .value
+      .set(
+        CisIdQuery,
+        "cis-123"
       )
       .success
       .value
@@ -146,7 +163,7 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include("Trust")
         page must include("Test Trust")
         page must include("11111111")
-        page must include("WRN-1")
+        page must include("WRN-11")
         page must include("test@test.com")
         page must include("12 Harbor View Road")
         page must include("Amity Island")
@@ -231,7 +248,60 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
         page must include(msg("trustWorksReferenceYesNo.checkYourAnswersLabel"))
         page must include(msg("trustWorksReference.checkYourAnswersLabel"))
         page must include(msg("site.no"))
-        page must include("WRN-1")
+        page must include("WRN-11")
+      }
+    }
+
+    "must not render the verification number row when the trust is pending verifications" in {
+
+      val verifiedUa =
+        minUa
+          .set(ShowVerificationDetailsPage, true)
+          .success
+          .value
+          .set(
+            OriginalTrustAnswersQuery,
+            OriginalTrustAnswers(
+              trustName = Some("Test Trust"),
+              addressYesNo = Some(false),
+              address = None,
+              trustContactMethodsYesNo = Some(false),
+              trustContactMethod = Set.empty,
+              email = None,
+              phone = None,
+              mobile = None,
+              utrYesNo = Some(false),
+              utr = None,
+              worksReferenceYesNo = Some(false),
+              worksReference = None,
+              verificationNumber = None
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(verifiedUa)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+          )
+
+        val msg = application.injector.instanceOf[MessagesApi].preferred(request)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must not include msg("amendCheckYourAnswers.verificationNumber.label")
+        page must not include "VRN123456"
+        page must include(msg("trustUtr.verified.checkYourAnswersLabel"))
       }
     }
 
@@ -259,18 +329,28 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect back to amend CYA after successful submit" in {
+    "must redirect to AmendTrustConfirmationController after successful submit" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
-
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
+      val mockAuditService         = mock[AuditService]
+      val captor                   = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(())
+      )
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(minUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -284,22 +364,336 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+          controllers.amend.trust.routes.AmendTrustConfirmationController.onPageLoad().url
       }
 
       verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+      verify(mockAuditService).amendSubcontractorEvent(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(captor.capture())
 
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(true)
       verifyNoMoreInteractions(mockSubcontractorService)
+    }
+
+    "must redirect to Journey Recovery when the check your answers page has already been submitted" in {
+
+      val ua = minUa
+        .set(AmendCheckYourAnswersSubmittedPage, true)
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockAuditService         = mock[AuditService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must clear answers and redirect to Manage Your Subcontractors when no changes have been made" in {
+      val cisId = "cis-123"
+
+      val ua =
+        minUa
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      AmendmentHelper.trustHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .configure(
+            "urls.manage-your-subcontractors" ->
+              s"http://localhost:6996/construction-industry-scheme/management/subcontractors/$cisId/your-subcontractors"
+          )
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6996/construction-industry-scheme/management/subcontractors/cis-123/your-subcontractors"
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockSessionRepository).set(captor.capture())
+
+      val updatedUa = captor.getValue
+      updatedUa.id mustBe ua.id
+      updatedUa.get(CisIdQuery) mustBe Some(cisId)
+      updatedUa.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+
+    "must clear answers and redirect to ReviewInsufficientInfoSubcontractorsController when no changes have been made in an insufficient information journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      AmendmentHelper.trustHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository).set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+    }
+
+    "must clear answers and redirect to ReviewUnmatchedSubcontractorsRoutingController when no changes have been made in an unmatched journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+          .set(TrustWorksReferencePage, "WRN-1")
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      AmendmentHelper.trustHasChanges(ua) mustBe false
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository).set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+    }
+
+    "must redirect to Journey Recovery when AmendJourneyTypePage is missing on submit" in {
+
+      val ua =
+        minUa
+          .remove(AmendJourneyTypePage)
+          .success
+          .value
+
+      val mockSubcontractorService =
+        mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SubcontractorService]
+              .toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            POST,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onSubmit()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when the service fails" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
-      when(mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockSubcontractorService.submitAmendSubcontractor(
+          any[AmendJourneyType],
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService)
+        .submitAmendSubcontractor(
+          any[AmendJourneyType],
+          any[UserAnswers],
+          any[Option[Long]]
+        )(any[HeaderCarrier])
+    }
+
+    "must redirect to Journey Recovery and not update subcontractor when saving submitted marker fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.failed(new RuntimeException("session write failed")))
 
       val application =
         applicationBuilder(userAnswers = Some(minUa))
@@ -321,8 +715,8 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService)
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verifyNoInteractions(mockSubcontractorService)
     }
 
     "must redirect to Journey Recovery when POST validation fails" in {
@@ -332,14 +726,22 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
           .success
           .value
+          .set(
+            CisIdQuery,
+            "cis-123"
+          )
+          .success
+          .value
 
       val mockSubcontractorService = mock[SubcontractorService]
       val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
 
       val application =
         applicationBuilder(userAnswers = Some(invalidUa))
           .overrides(
             bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -356,37 +758,248 @@ class AmendTrustCheckYourAnswersControllerSpec extends SpecBase with MockitoSuga
           routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService, never())
-        .createAndUpdateSubcontractor(any[UserAnswers])(any[HeaderCarrier])
+      verify(
+        mockSubcontractorService,
+        never()
+      ).updateSubcontractor(
+        any[UserAnswers],
+        any[Option[Long]]
+      )(any[HeaderCarrier])
     }
 
-    "must clear answers and redirect to Index on cancel" in {
+    "must clean amend answers and redirect to Manage Your Subcontractors on cancel for a standard journey" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val ua =
+        minUa
+          .set(CisIdQuery, "cis-123")
+          .success
+          .value
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
 
       val application =
-        applicationBuilder(userAnswers = Some(minUa))
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
 
         val request =
-          FakeRequest(GET, controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onCancel().url)
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onCancel()
+              .url
+          )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.IndexController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          application.injector
+            .instanceOf[FrontendAppConfig]
+            .manageYourSubcontractorsUrl("cis-123")
       }
 
-      verify(mockSessionRepository).set(any[UserAnswers])
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      val cleanedUa =
+        captor.getValue
+
+      cleanedUa.id mustBe ua.id
+
+      cleanedUa.get(OriginalTrustAnswersQuery) mustBe None
+      cleanedUa.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+
+      cleanedUa.get(CisIdQuery) mustBe Some("cis-123")
+    }
+
+    "must clean amend answers and redirect to ReviewInsufficientInfoSubcontractorsController on cancel for an insufficient information journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua)
+        )
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+      }
+
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+
+      captor.getValue.get(OriginalTrustAnswersQuery) mustBe None
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+
+    "must clean amend answers and redirect to ReviewUnmatchedSubcontractorsRoutingController on cancel for an unmatched journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua)
+        )
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+      }
+
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+
+      captor.getValue.get(OriginalTrustAnswersQuery) mustBe None
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+
+    "must redirect to Journey Recovery when saving cleaned amend answers fails on cancel" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
+      verify(mockSessionRepository)
+        .set(any[UserAnswers])
     }
   }
 }

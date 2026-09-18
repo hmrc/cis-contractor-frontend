@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -116,6 +117,72 @@ class TrustMobileNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       assertEscaped(html, "07700 900000 &amp; ext&#x27;45")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - TrustMobileNumberSummary.row" - {
+
+    "must return a SummaryListRow when mobile exists in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = Some("07700 900000"),
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustMobileNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustMobileNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        "07700 900000"
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when mobile does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustMobileNumberSummary.row(answers) shouldBe None
     }
   }
 }

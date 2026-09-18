@@ -17,8 +17,6 @@
 package controllers.verify
 
 import base.SpecBase
-import forms.verify.VerificationDeclarationFormProvider
-import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import org.scalatest.matchers.must.Matchers._
@@ -27,8 +25,6 @@ import views.html.verify.VerificationDeclarationView
 class VerificationDeclarationControllerSpec extends SpecBase {
 
   "VerificationDeclarationController" - {
-
-    val mode = NormalMode
 
     "must return OK and the correct view for a GET" in {
 
@@ -50,14 +46,9 @@ class VerificationDeclarationControllerSpec extends SpecBase {
         val view =
           application.injector.instanceOf[VerificationDeclarationView]
 
-        val form =
-          application.injector
-            .instanceOf[VerificationDeclarationFormProvider]
-            .apply()
-
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form, mode)(request, messages(application)).toString
+          view()(request, messages(application)).toString
       }
     }
 

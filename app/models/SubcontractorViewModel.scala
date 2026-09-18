@@ -39,56 +39,12 @@ object SubcontractorViewModel {
       )
     }
 
-  def fromSubcontractors(
-    subcontractors: Seq[Subcontractor]
-  )(implicit messages: Messages): Seq[SubcontractorViewModel] =
+  def fromSubcontractors(subcontractors: Seq[Subcontractor])(implicit messages: Messages): Seq[SubcontractorViewModel] =
     subcontractors.map(fromSubcontractor)
 
   private def fromSubcontractor(subcontractor: Subcontractor)(implicit messages: Messages): SubcontractorViewModel =
-    val NoName = messages("verify.noName")
-    val name   = getSubcontractorType(subcontractor)
-      .flatMap(subcontractorType => getSubcontractorName(subcontractor, subcontractorType))
-      .getOrElse(NoName)
-
     SubcontractorViewModel(
       id = subcontractor.subcontractorId.toString,
-      name = name
+      name = Subcontractor.resolveName(subcontractor).getOrElse(messages("verify.noName"))
     )
-
-  private def getSubcontractorName(
-    subcontractor: Subcontractor,
-    subcontractorType: TypeOfSubcontractor
-  ): Option[String] = {
-
-    def nonBlank(field: Option[String]): Option[String] =
-      field.map(_.trim).filter(_.nonEmpty)
-
-    subcontractorType match {
-      case Individualorsoletrader =>
-        val soleTraderName: Option[String] =
-          nonBlank(subcontractor.surname).map { surname =>
-            nonBlank(subcontractor.firstName) match {
-              case Some(firstName) => s"$surname, $firstName"
-              case None            => surname
-            }
-          }
-
-        soleTraderName
-          .orElse(nonBlank(subcontractor.tradingName))
-
-      case Limitedcompany =>
-        nonBlank(subcontractor.tradingName)
-
-      case Partnership =>
-        nonBlank(subcontractor.partnershipTradingName)
-          .orElse(nonBlank(subcontractor.tradingName))
-
-      case Trust =>
-        nonBlank(subcontractor.tradingName)
-    }
-  }
-
-  private def getSubcontractorType(subcontractor: Subcontractor): Option[TypeOfSubcontractor] =
-    subcontractor.subcontractorType
-      .flatMap(TypeOfSubcontractor.fromString)
 }

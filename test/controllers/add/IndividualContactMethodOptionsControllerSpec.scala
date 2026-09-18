@@ -25,7 +25,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage, IndividualPhoneNumberPage, SubcontractorNamePage}
+import pages.add.{AddIndividualContactMethodsYesNoPage, IndividualContactMethodOptionsPage, IndividualEmailAddressPage, IndividualPhoneNumberPage, SubcontractorNamePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -51,6 +51,9 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
       .set(SubcontractorNamePage, subcontractName)
       .success
       .value
+      .set(AddIndividualContactMethodsYesNoPage, true)
+      .success
+      .value
 
   "IndividualContactMethodOptions Controller" - {
 
@@ -71,6 +74,44 @@ class IndividualContactMethodOptionsControllerSpec extends SpecBase with Mockito
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(uaWithName.set(AddIndividualContactMethodsYesNoPage, false).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.routes.AddIndividualContactMethodsYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(SubcontractorNamePage, subcontractName).success.value)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualContactMethodOptionsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 

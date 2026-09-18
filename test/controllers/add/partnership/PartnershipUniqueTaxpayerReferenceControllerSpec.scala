@@ -23,10 +23,12 @@ import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.add.partnership.{PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.amend.ShowVerificationDetailsPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
@@ -48,12 +50,20 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
   lazy private val partnershipUniqueTaxpayerReferenceRouteAmend =
     controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
+  private lazy val partnershipAmendCYA                          =
+    controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad().url
 
   "PartnershipUniqueTaxpayerReferenceControllerSpec Controller" - {
 
     "must return OK and the correct view for a GET" in {
       val userAnswers =
-        UserAnswers(userAnswersId).set(PartnershipNamePage, partnershipName).success.value
+        UserAnswers(userAnswersId)
+          .set(PartnershipNamePage, partnershipName)
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,6 +89,9 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         .flatMap(_.set(PartnershipNamePage, partnershipName))
         .success
         .value
+        .set(PartnershipHasUtrYesNoPage, true)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -94,6 +107,41 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to yesOrNo page when yesorno page has No for a GET" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName.set(PartnershipHasUtrYesNoPage, false).success.value)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          .onPageLoad(NormalMode)
+          .url
+
+      }
+    }
+
+    "must redirect to journey recovery page when none for yesorno page for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 
@@ -231,7 +279,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual partnershipAmendCYA
       }
 
       verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier])
@@ -259,7 +307,7 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value must include("/subcontractor/there-is-a-problem") // TODO when AmendCYA available
+        redirectLocation(result).value mustEqual partnershipAmendCYA
       }
     }
 
@@ -361,6 +409,110 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when subcontractor is verified" in {
+
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a Post when subcontractor is verified" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, true).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRoute)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET when subcontractor is unverified in amend mode" in {
+
+      val userAnswers =
+        uaWithName
+          .set(ShowVerificationDetailsPage, false)
+          .success
+          .value
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipUniqueTaxpayerReferenceRouteAmend)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, AmendMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to the AmendPartnershipCheckYourAnswers page when valid data is submitted when subcontractor is unverified in amend mode" in {
+      val userAnswers =
+        uaWithName.set(ShowVerificationDetailsPage, false).success.value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipUniqueTaxpayerReferenceRouteAmend)
+            .withFormUrlEncodedBody(("value", "7777777777"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(
+          result
+        ).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+          .onPageLoad()
+          .url
       }
     }
   }

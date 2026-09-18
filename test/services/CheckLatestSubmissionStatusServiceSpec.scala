@@ -39,6 +39,16 @@ class CheckLatestSubmissionStatusServiceSpec extends SpecBase {
       CheckLatestSubmissionStatusService.check(Some(Validated)) mustEqual Continue
     }
 
+    "must return Continue when status is FatalError" in {
+
+      CheckLatestSubmissionStatusService.check(Some(FatalError)) mustEqual Continue
+    }
+
+    "must return Continue when status is DepartmentalError" in {
+
+      CheckLatestSubmissionStatusService.check(Some(DepartmentalError)) mustEqual Continue
+    }
+
     "must return ShowPendingVerificationWarning when status is Pending" in {
 
       CheckLatestSubmissionStatusService.check(Some(Pending)) mustEqual ShowPendingVerificationWarning
@@ -47,6 +57,16 @@ class CheckLatestSubmissionStatusServiceSpec extends SpecBase {
     "must return ShowPendingVerificationWarning when status is Accepted" in {
 
       CheckLatestSubmissionStatusService.check(Some(Accepted)) mustEqual ShowPendingVerificationWarning
+    }
+
+    "must return CheckUnmatchedSubcontractors when status is Submitted" in {
+
+      CheckLatestSubmissionStatusService.check(Some(Submitted)) mustEqual CheckUnmatchedSubcontractors
+    }
+
+    "must return CheckUnmatchedSubcontractors when status is SubmittedNoReceipt" in {
+
+      CheckLatestSubmissionStatusService.check(Some(SubmittedNoReceipt)) mustEqual CheckUnmatchedSubcontractors
     }
   }
 }

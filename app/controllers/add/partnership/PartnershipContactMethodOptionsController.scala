@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.add.partnership.PartnershipContactMethodOptionsFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipNamePage}
+import pages.add.partnership.{AddPartnershipContactMethodsYesNoPage, PartnershipContactMethodOptionsPage, PartnershipNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipContactMethodOptionsView
 
@@ -38,6 +39,7 @@ class PartnershipContactMethodOptionsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: PartnershipContactMethodOptionsFormProvider,
+  yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipContactMethodOptionsView
 )(implicit ec: ExecutionContext)
@@ -47,6 +49,9 @@ class PartnershipContactMethodOptionsController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val yesOrNoPage       = AddPartnershipContactMethodsYesNoPage
+    val yesOrNoPageOption = request.userAnswers.get(AddPartnershipContactMethodsYesNoPage)
+
     request.userAnswers
       .get(PartnershipNamePage)
       .map { partnershipName =>
@@ -55,7 +60,8 @@ class PartnershipContactMethodOptionsController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, partnershipName))
+        val result = Ok(view(preparedForm, mode, partnershipName))
+        yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
       }
       .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
   }

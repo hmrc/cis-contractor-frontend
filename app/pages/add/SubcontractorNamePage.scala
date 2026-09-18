@@ -25,4 +25,5 @@ case object SubcontractorNamePage extends QuestionPage[SubcontractorName] with I
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "subcontractorName"
+
 }

@@ -45,7 +45,7 @@ class VerificationRequestSubmittedController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationService
-        .refreshNewestVerificationBatch(request.userAnswers)
+        .refreshSubmittedVerificationRequest(request.userAnswers)
         .map { updatedAnswers =>
           val viewModel =
             VerificationRequestSubmittedViewModel.fromUserAnswers(
@@ -59,7 +59,7 @@ class VerificationRequestSubmittedController @Inject() (
         }
         .recover { case t =>
           logger.error(
-            "[VerificationRequestSubmittedController.onPageLoad] Failed to refresh newest verification batch",
+            "[VerificationRequestSubmittedController.onPageLoad] Failed to refresh submitted verification request",
             t
           )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

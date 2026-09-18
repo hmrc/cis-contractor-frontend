@@ -40,7 +40,7 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
   private val verificationBatch =
     VerificationBatch(
       verificationBatchId = 1L,
-      status = Some("Submitted"),
+      status = Some("SUBMITTED"),
       verificationNumber = Some("VB00000001")
     )
 
@@ -49,7 +49,7 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
       submissionId = 1L,
       activeObjectId = Some(1L),
       submissionRequestDate = Some(LocalDateTime.now()),
-      status = Some("Submitted")
+      status = Some("SUBMITTED")
     )
 
   private val newestBatchResponse =
@@ -80,7 +80,7 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
         mock[VerificationService]
 
       when(
-        mockVerificationService.refreshNewestVerificationBatch(
+        mockVerificationService.refreshSubmittedVerificationRequest(
           any[UserAnswers]
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(ua))
@@ -105,6 +105,50 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
           route(application, request).value
 
         status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to journey recovery when the submitted status check fails" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, newestBatchResponse)
+          .success
+          .value
+
+      val mockVerificationService =
+        mock[VerificationService]
+
+      when(
+        mockVerificationService.refreshSubmittedVerificationRequest(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new IllegalStateException("invalid status")))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua),
+          additionalBindings = Seq(
+            bind[VerificationService].toInstance(mockVerificationService)
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.VerificationRequestSubmittedController.onPageLoad().url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

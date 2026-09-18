@@ -17,7 +17,6 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.ContactGuard
 import forms.add.trust.TrustPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -44,23 +43,28 @@ class TrustPhoneNumberController @Inject() (
   view: TrustPhoneNumberView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport
-    with ContactGuard {
+    with I18nSupport {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      requireContactMethodInSet(
-        request.userAnswers.get(TrustNamePage),
-        request.userAnswers.get(TrustContactMethodOptionsPage),
-        ContactMethodOptions.Phone
-      ) { trustName =>
 
-        val preparedForm =
-          request.userAnswers.get(TrustPhoneNumberPage).fold(form)(form.fill)
+      val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
+      val trustName     = request.userAnswers.get(TrustNamePage)
 
-        Ok(view(preparedForm, mode, trustName))
+      (trustName, contactOption) match {
+        case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
+          val preparedForm = request.userAnswers.get(TrustPhoneNumberPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, mode, trustName))
+
+        case (Some(_), _) =>
+          Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
+        case _            =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 

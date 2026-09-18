@@ -16,7 +16,9 @@
 
 package viewmodels.checkAnswers.add.company
 
-import models.{CheckMode, Mode, UserAnswers}
+import models.amend.company.AmendCompanyRemoveDetail
+import models.info.company.CompanyAnswers
+import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,11 +38,29 @@ object AddCompanyContactMethodsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode).url
+            if answer && mode == AmendMode then
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                .onPageLoad(AmendCompanyRemoveDetail.ContactDetails.key)
+                .url
+            else controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode).url
           )
             .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
             .withAttribute("id" -> "add-company-contact-details")
         )
+      )
+    }
+
+  def row(
+    answers: CompanyAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.companyContactMethodsYesNo.map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addCompanyContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq.empty
       )
     }
 }

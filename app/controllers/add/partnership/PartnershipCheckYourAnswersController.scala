@@ -22,8 +22,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
 import viewmodels.checkAnswers.add.partnership.{PartnershipWorksReferenceNumberYesNoSummary, *}
@@ -42,6 +41,7 @@ class PartnershipCheckYourAnswersController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   subcontractorService: SubcontractorService,
   sessionRepository: SessionRepository,
+  auditService: AuditService,
   view: PartnershipCheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -96,6 +96,7 @@ class PartnershipCheckYourAnswersController @Inject() (
             subcontractorService
               .createAndUpdateSubcontractor(request.userAnswers)
               .flatMap { _ =>
+                auditService.addSubcontractorEvent(request.userAnswers)
                 Future
                   .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage, true))
                   .flatMap(updated => sessionRepository.set(updated).map(_ => ()))

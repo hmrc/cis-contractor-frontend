@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
+import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -116,6 +117,72 @@ class TrustPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEnco
 
       assertEscaped(html, "020 7946 0958 &amp; ext&#x27;78")
       assertNoDoubleEncoding(html)
+    }
+  }
+
+  "ViewOnly - TrustPhoneNumberSummary.row" - {
+
+    "must return a SummaryListRow when phone exists in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = Some("020 7946 0958"),
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      val maybeRow =
+        TrustPhoneNumberSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustPhoneNumber.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        "020 7946 0958"
+      )
+
+      row.actions shouldBe None
+    }
+
+    "must return None when phone does not exist in ViewOnlyTrustAnswers" in {
+
+      val answers =
+        TrustAnswers(
+          subcontractorType = models.TypeOfSubcontractor.Trust,
+          showVerificationDetails = false,
+          trustName = None,
+          addressYesNo = None,
+          address = None,
+          trustContactMethodsYesNo = None,
+          trustContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      TrustPhoneNumberSummary.row(answers) shouldBe None
     }
   }
 }

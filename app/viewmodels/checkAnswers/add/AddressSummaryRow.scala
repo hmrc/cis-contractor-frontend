@@ -30,27 +30,50 @@ import viewmodels.implicits.*
   */
 object AddressSummaryRow {
 
-  def row(address: Address, key: String, changeCall: Call, hiddenTextKey: String, id: String)(implicit
-    messages: Messages
-  ): SummaryListRow = {
-    val addressHtml: String =
-      Seq(
-        address.addressLine1,
-        address.addressLine2.getOrElse(""),
-        address.addressLine3.getOrElse(""),
-        address.addressLine4.getOrElse(""),
-        address.postcode.getOrElse(""),
-        address.country.flatMap(_.name).getOrElse("")
-      ).filter(_.trim.nonEmpty).map(line => HtmlFormat.escape(line).body).mkString("<br/>")
+  private def addressHtml(address: Address): String =
+    Seq(
+      address.addressLine1,
+      address.addressLine2.getOrElse(""),
+      address.addressLine3.getOrElse(""),
+      address.addressLine4.getOrElse(""),
+      address.postcode.getOrElse(""),
+      address.country.flatMap(_.name).getOrElse("")
+    )
+      .filter(_.trim.nonEmpty)
+      .map(line => HtmlFormat.escape(line).body)
+      .mkString("<br/>")
 
+  def row(
+    address: Address,
+    key: String,
+    changeCall: Call,
+    hiddenTextKey: String,
+    id: String
+  )(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
       key = key,
-      value = ValueViewModel(HtmlContent(addressHtml)),
+      value = ValueViewModel(
+        HtmlContent(addressHtml(address))
+      ),
       actions = Seq(
-        ActionItemViewModel("site.change", changeCall.url)
+        ActionItemViewModel(
+          "site.change",
+          changeCall.url
+        )
           .withVisuallyHiddenText(messages(hiddenTextKey))
           .withAttribute("id" -> id)
       )
     )
-  }
+
+  def viewOnlyRow(
+    address: Address,
+    key: String
+  )(implicit messages: Messages): SummaryListRow =
+    SummaryListRowViewModel(
+      key,
+      ValueViewModel(
+        HtmlContent(addressHtml(address))
+      ),
+      Seq.empty
+    )
 }

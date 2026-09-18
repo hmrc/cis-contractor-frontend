@@ -23,15 +23,18 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import models.info.partnership.PartnershipAnswers
+import viewmodels.checkAnswers.UtrViewModel
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
+      val value = UtrViewModel(answer)
+      if (showActions) {
+        val actions = Seq(
           ActionItemViewModel(
             "site.change",
             routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url
@@ -39,6 +42,34 @@ object PartnershipUniqueTaxpayerReferenceSummary {
             .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
             .withAttribute("id" -> "partnership-unique-taxpayer-reference")
         )
+        SummaryListRowViewModel(
+          key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
+          value = value,
+          actions = actions
+        )
+      } else {
+        SummaryListRowViewModel(
+          key = "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel",
+          value = value,
+          actions = Seq.empty
+        )
+      }
+
+    }
+
+  def row(
+    answers: PartnershipAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    answers.utr.map { answer =>
+      SummaryListRowViewModel(
+        key = if (isVerified) {
+          "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel"
+        } else {
+          "partnershipUniqueTaxpayerReference.checkYourAnswersLabel"
+        },
+        value = UtrViewModel(answer),
+        actions = Seq.empty
       )
     }
 }

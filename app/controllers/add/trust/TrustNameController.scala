@@ -38,6 +38,7 @@ class TrustNameController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TrustNameFormProvider,
+  redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
   view: TrustNameView
 )(implicit ec: ExecutionContext)
@@ -46,18 +47,19 @@ class TrustNameController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(TrustNamePage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.userAnswers.get(TrustNamePage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -68,5 +70,5 @@ class TrustNameController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustNamePage, mode, updatedAnswers))
         )
-  }
+    }
 }
