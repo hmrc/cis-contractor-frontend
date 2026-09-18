@@ -18,7 +18,7 @@ package controllers.amend.trust
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.{AmendMode, UserAnswers}
 import models.amend.AmendJourneyType
@@ -155,5 +155,5 @@ class AmendTrustConfirmationController @Inject() (
     }
 
   private def trustDisplayName(ua: UserAnswers)(implicit messages: Messages): String =
-    TrustNameDisplayHelper.displayName(ua, AmendMode)
+    SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
 }

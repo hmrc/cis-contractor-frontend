@@ -17,7 +17,7 @@
 package controllers.amend.partnership
 
 import controllers.actions.*
-import controllers.helpers.PartnershipNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
 import models.{AmendMode, UserAnswers}
 import models.amend.partnership.AmendPartnershipRemoveDetail
@@ -71,12 +71,12 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
   private def getPartnershipName(
     userAnswers: UserAnswers
   )(implicit messages: Messages): Option[String] =
-    PartnershipNameDisplayHelper.getDisplayName(userAnswers, AmendMode)
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode)
 
   private def getNominatedPartnerName(
     userAnswers: UserAnswers
   )(implicit messages: Messages): Option[String] =
-    PartnershipNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
+    SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
 
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,

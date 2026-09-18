@@ -18,14 +18,33 @@ package controllers.helpers
 
 import models.{AmendMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
+import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
 
-object PartnershipNameDisplayHelper {
+object SubcontractorNameDisplayHelper {
 
-  def getDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
+  def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
+    userAnswers.get(TrustNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+      if (mode == AmendMode) {
+        Some(messages("verify.noName"))
+      } else {
+        None
+      }
+    }
+
+  def trustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
+    userAnswers
+      .get(TrustNamePage)
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse {
+        if (mode == AmendMode) messages("verify.noName") else ""
+      }
+      
+  def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(PartnershipNamePage).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode) {
-        Some(messages("partnershipName.noNameProvided"))
+        Some(messages("verify.noName"))
       } else {
         None
       }
@@ -34,19 +53,19 @@ object PartnershipNameDisplayHelper {
   def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode) {
-        Some(messages("partnershipName.noNameProvided"))
+        Some(messages("verify.noName"))
       } else {
         None
       }
     }
 
-  def displayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
+  def partnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
     userAnswers
       .get(PartnershipNamePage)
       .map(_.trim)
       .filter(_.nonEmpty)
       .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty))
       .getOrElse {
-        if (mode == AmendMode) messages("partnershipName.noNameProvided") else ""
+        if (mode == AmendMode) messages("verify.noName") else ""
       }
 }

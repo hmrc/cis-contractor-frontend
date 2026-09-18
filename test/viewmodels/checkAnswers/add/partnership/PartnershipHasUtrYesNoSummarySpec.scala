@@ -300,7 +300,7 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
         content = Text(
           messages(
             "partnershipHasUtrYesNo.checkYourAnswersLabel",
-            messages("partnershipName.noNameProvided")
+            messages("verify.noName")
           )
         )
       )

@@ -18,7 +18,7 @@ package controllers.amend.partnership
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.helpers.PartnershipNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.AmendMode
 import models.amend.AmendJourneyType
@@ -95,7 +95,7 @@ class AmendPartnershipConfirmationController @Inject() (
                       )
 
                     val partnershipName =
-                      PartnershipNameDisplayHelper.displayName(ua, AmendMode)
+                      SubcontractorNameDisplayHelper.partnershipDisplayName(ua, AmendMode)
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(

@@ -17,7 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import controllers.helpers.TrustNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustMobileNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
@@ -52,7 +52,7 @@ class TrustMobileNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
-      val trustName     = TrustNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
 
       (trustName, contactOption) match {
         case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Mobile) =>
@@ -72,7 +72,7 @@ class TrustMobileNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        trustName      <- TrustNameDisplayHelper.getDisplayName(request.userAnswers, mode)
+        trustName      <- SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
         contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Mobile)
       } yield form

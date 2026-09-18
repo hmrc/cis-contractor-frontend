@@ -34,7 +34,7 @@ object PartnershipHasUtrYesNoSummary {
         answers.get(PartnershipNamePage) match {
           case Some(name)                => name.trim
           case None if mode == AmendMode =>
-            messages("partnershipName.noNameProvided")
+            messages("verify.noName")
           case None                      =>
             throw MissingRequiredAnswer("PartnershipNamePage")
         }

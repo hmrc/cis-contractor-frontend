@@ -18,7 +18,7 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import controllers.helpers.PartnershipNameDisplayHelper
+import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
 import models.{AmendMode, Mode, UserAnswers}
@@ -50,7 +50,7 @@ class PartnershipAddressController @Inject() (
   override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
     messages: Messages
   ): Option[String] =
-    PartnershipNameDisplayHelper.getDisplayName(userAnswers, mode)
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.PartnershipAddressController.addressLookupCallback()

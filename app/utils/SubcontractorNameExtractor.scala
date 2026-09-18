@@ -45,9 +45,13 @@ class SubcontractorNameExtractor {
   def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
     getSubcontractorName(userAnswers)
       .getOrElse(messages("verify.noName"))
-
+  
   def getCompanyName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    userAnswers
-      .get(CompanyNamePage)
-      .orElse(Option.when(mode == AmendMode)(messages("verify.noName")))
+    userAnswers.get(CompanyNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+      if (mode == AmendMode) {
+        Some(messages("verify.noName"))
+      } else {
+        None
+      }
+    }
 }
