@@ -42,9 +42,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
   private val cisId   = "1"
   private val draftId = "draft-id"
 
-  private val onwardRoute =
-    Call("GET", "/foo")
-
   private val payload =
     FinalValidationHandoffPayload(
       draftId = draftId,
@@ -81,6 +78,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
   private def userAnswersForCommit(
     source: VerifyFinalValidationSource,
+    continuation: String,
     mode: String = "NormalMode"
   ): UserAnswers =
     userAnswers(source, mode)
@@ -95,6 +93,10 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       .setOrException(
         FinalValidationChangeTargetPage,
         FinalValidationChangeTarget.Utr
+      )
+      .setOrException(
+        VerifyFinalValidationContinuationPage,
+        continuation
       )
 
   private def cleanedAnswers(
@@ -117,6 +119,12 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       .success
       .value
       .remove(FinalValidationChangeTargetPage)
+      .success
+      .value
+      .remove(FinalValidationBaseUtrPage)
+      .success
+      .value
+      .remove(VerifyFinalValidationContinuationPage)
       .success
       .value
 
@@ -170,8 +178,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
   private def applicationWith(
     userAnswers: Option[UserAnswers],
     finalValidationDraftService: FinalValidationDraftService,
-    sessionRepository: SessionRepository,
-    navigator: Navigator
+    sessionRepository: SessionRepository
   ) =
     applicationBuilder(userAnswers = userAnswers)
       .configure(
@@ -181,9 +188,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         bind[FinalValidationDraftService]
           .toInstance(finalValidationDraftService),
         bind[SessionRepository]
-          .toInstance(sessionRepository),
-        bind[Navigator]
-          .toInstance(navigator)
+          .toInstance(sessionRepository)
       )
       .build()
 
@@ -195,9 +200,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
       val sessionRepository =
         mock[SessionRepository]
-
-      val navigator =
-        mock[Navigator]
 
       val answers =
         userAnswers(
@@ -223,8 +225,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -284,9 +285,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswers(
           source = VerifyFinalValidationSource.SelectSubcontractorsToReverify,
@@ -311,8 +309,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -366,9 +363,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswersWithCisId
           .setOrException(
@@ -384,8 +378,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -418,9 +411,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswersWithCisId
           .setOrException(
@@ -436,8 +426,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -470,9 +459,6 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswers(
           source = VerifyFinalValidationSource.SelectSubcontractor,
@@ -483,8 +469,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -517,15 +502,11 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val application =
         applicationWith(
           userAnswers = None,
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -557,12 +538,10 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
-        userAnswers(
-          VerifyFinalValidationSource.SelectSubcontractor
+        userAnswersForCommit(
+          source = VerifyFinalValidationSource.SelectSubcontractor,
+          continuation = VerifyFinalValidationContinuation.ContractorEmailConfirmationStored
         )
 
       when(
@@ -583,8 +562,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -605,25 +583,22 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
             .url
 
         verifyNoInteractions(
-          sessionRepository,
-          navigator
+          sessionRepository
         )
       }
     }
 
-    "must commit, clean the session and continue from SelectSubcontractor" in {
+    "must commit, clean the session and continue to ContractorEmailConfirmationStored" in {
       val finalValidationDraftService =
         mock[FinalValidationDraftService]
 
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswersForCommit(
           source = VerifyFinalValidationSource.SelectSubcontractor,
+          continuation = VerifyFinalValidationContinuation.ContractorEmailConfirmationStored,
           mode = "NormalMode"
         )
 
@@ -661,22 +636,11 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         Future.successful(true)
       )
 
-      when(
-        navigator.nextPage(
-          SelectSubcontractorPage,
-          NormalMode,
-          expectedAnswers
-        )
-      ).thenReturn(
-        onwardRoute
-      )
-
       val application =
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -692,7 +656,9 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          onwardRoute.url
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoadAfterFinalValidation(NormalMode)
+            .url
 
         verify(finalValidationDraftService)
           .commit(
@@ -704,29 +670,20 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
           .set(
             expectedAnswers
           )
-
-        verify(navigator)
-          .nextPage(
-            SelectSubcontractorPage,
-            NormalMode,
-            expectedAnswers
-          )
       }
     }
 
-    "must commit, clean the session and continue from SelectSubcontractorsToReverify" in {
+    "must commit, clean the session and continue to ContractorEmailConfirmationNotStored" in {
       val finalValidationDraftService =
         mock[FinalValidationDraftService]
 
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswersForCommit(
           source = VerifyFinalValidationSource.SelectSubcontractorsToReverify,
+          continuation = VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored,
           mode = "CheckMode"
         )
 
@@ -764,22 +721,11 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         Future.successful(true)
       )
 
-      when(
-        navigator.nextPage(
-          SelectSubcontractorsToReverifyPage,
-          CheckMode,
-          expectedAnswers
-        )
-      ).thenReturn(
-        onwardRoute
-      )
-
       val application =
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -795,7 +741,9 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          onwardRoute.url
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+            .onPageLoadAfterFinalValidation(CheckMode)
+            .url
 
         verify(finalValidationDraftService)
           .commit(
@@ -807,25 +755,15 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
           .set(
             expectedAnswers
           )
-
-        verify(navigator)
-          .nextPage(
-            SelectSubcontractorsToReverifyPage,
-            CheckMode,
-            expectedAnswers
-          )
       }
     }
 
-    "must redirect to Journey Recovery when the source is ReviewUnmatchedSubcontractors" in {
+    "must redirect to Journey Recovery when the continuation is missing" in {
       val finalValidationDraftService =
         mock[FinalValidationDraftService]
 
       val sessionRepository =
         mock[SessionRepository]
-
-      val navigator =
-        mock[Navigator]
 
       val answers =
         userAnswers(
@@ -836,8 +774,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -859,56 +796,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
         verifyNoInteractions(
           finalValidationDraftService,
-          sessionRepository,
-          navigator
-        )
-      }
-    }
-
-    "must redirect to Journey Recovery when the source is ReviewInsufficientInfoSubcontractors" in {
-      val finalValidationDraftService =
-        mock[FinalValidationDraftService]
-
-      val sessionRepository =
-        mock[SessionRepository]
-
-      val navigator =
-        mock[Navigator]
-
-      val answers =
-        userAnswers(
-          VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
-        )
-
-      val application =
-        applicationWith(
-          userAnswers = Some(answers),
-          finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
-        )
-
-      running(application) {
-        val request =
-          FakeRequest(
-            POST,
-            submitRoute
-          )
-
-        val result =
-          route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-
-        redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-
-        verifyNoInteractions(
-          finalValidationDraftService,
-          sessionRepository,
-          navigator
+          sessionRepository
         )
       }
     }
@@ -920,14 +808,11 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
         userAnswersWithCisId
           .setOrException(
-            VerifyFinalValidationSourcePage,
-            VerifyFinalValidationSource.SelectSubcontractor
+            VerifyFinalValidationContinuationPage,
+            VerifyFinalValidationContinuation.ContractorEmailConfirmationStored
           )
           .setOrException(
             VerifyFinalValidationModePage,
@@ -938,8 +823,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -961,8 +845,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
         verifyNoInteractions(
           finalValidationDraftService,
-          sessionRepository,
-          navigator
+          sessionRepository
         )
       }
     }
@@ -974,12 +857,10 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val answers =
-        userAnswers(
+        userAnswersForCommit(
           source = VerifyFinalValidationSource.SelectSubcontractor,
+          continuation = VerifyFinalValidationContinuation.ContractorEmailConfirmationStored,
           mode = "InvalidMode"
         )
 
@@ -987,8 +868,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
         applicationWith(
           userAnswers = Some(answers),
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {
@@ -1010,8 +890,7 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
         verifyNoInteractions(
           finalValidationDraftService,
-          sessionRepository,
-          navigator
+          sessionRepository
         )
       }
     }
@@ -1023,15 +902,11 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       val sessionRepository =
         mock[SessionRepository]
 
-      val navigator =
-        mock[Navigator]
-
       val application =
         applicationWith(
           userAnswers = None,
           finalValidationDraftService = finalValidationDraftService,
-          sessionRepository = sessionRepository,
-          navigator = navigator
+          sessionRepository = sessionRepository
         )
 
       running(application) {

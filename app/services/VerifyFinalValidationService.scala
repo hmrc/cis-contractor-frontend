@@ -46,45 +46,38 @@ class VerifyFinalValidationService @Inject() (
     instanceId: String,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[VerifyFinalValidationResult] =
-    userAnswers.get(VerifyFinalValidationSourcePage) match {
-
-      case Some(source) =>
+    Future
+      .fromTry(selectedReferences(userAnswers))
+      .flatMap { references =>
         Future
-          .fromTry(selectedReferences(userAnswers, source))
-          .flatMap { references =>
-            Future
-              .traverse(references) { reference =>
-                subcontractorService
-                  .getSubcontractor(instanceId, reference.subbieResourceRef)
-                  .flatMap { response =>
-                    response.subcontractor match {
+          .traverse(references) { reference =>
+            subcontractorService
+              .getSubcontractor(instanceId, reference.subbieResourceRef)
+              .flatMap { response =>
+                response.subcontractor match {
 
-                      case Some(subcontractor) if subcontractor.subcontractorId == reference.subcontractorId =>
-                        Future.successful(subcontractor)
+                  case Some(subcontractor) if subcontractor.subcontractorId == reference.subcontractorId =>
+                    Future.successful(subcontractor)
 
-                      case Some(subcontractor) =>
-                        Future.failed(
-                          new IllegalStateException(
-                            s"Expected subcontractorId ${reference.subcontractorId} " +
-                              s"but got ${subcontractor.subcontractorId}"
-                          )
-                        )
+                  case Some(subcontractor) =>
+                    Future.failed(
+                      new IllegalStateException(
+                        s"Expected subcontractorId ${reference.subcontractorId} " +
+                          s"but got ${subcontractor.subcontractorId}"
+                      )
+                    )
 
-                      case None =>
-                        Future.failed(
-                          new IllegalStateException(
-                            s"Subcontractor not found for subbieResourceRef ${reference.subbieResourceRef}"
-                          )
-                        )
-                    }
-                  }
+                  case None =>
+                    Future.failed(
+                      new IllegalStateException(
+                        s"Subcontractor not found for subbieResourceRef ${reference.subbieResourceRef}"
+                      )
+                    )
+                }
               }
-              .map(validateSelectedSubcontractors)
           }
-
-      case None =>
-        Future.failed(new IllegalStateException("VerifyFinalValidationSourcePage not found"))
-    }
+          .map(validateSelectedSubcontractors)
+      }
 
   def validateDraftSubcontractor(
     draft: FinalValidationDraft,
@@ -252,6 +245,69 @@ class VerifyFinalValidationService @Inject() (
       lastMonthlyReturnDate = None,
       pendingVerifications = None
     )
+  }
+
+  private def selectedReferences(
+                                  userAnswers: UserAnswers
+                                ): Try[Seq[SelectedReference]] =
+    for {
+      selectedUnverified <- selectedUnverifiedReferences(userAnswers)
+      selectedReverify <- selectedReverifyReferences(userAnswers)
+    } yield (selectedUnverified ++ selectedReverify)
+      .distinctBy(_.subcontractorId)
+
+  private def selectedUnverifiedReferences(
+    userAnswers: UserAnswers
+  ): Try[Seq[SelectedReference]] = {
+
+    val selected = userAnswers.get(SelectSubcontractorPage).getOrElse(Set.empty)
+
+    if (selected.isEmpty) {
+      Success(Seq.empty)
+    } else {
+      for {
+        available   <- userAnswers.get(UnverifiedSubcontractorsPage)
+                       .map(Success(_))
+                       .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
+        selectedIds <- ids(selected.map(_.id))
+        references  <- referencesFor(
+                         selectedIds,
+                         available.map { subcontractor =>
+                           (
+                             subcontractor.subcontractorId,
+                             subcontractor.subbieResourceRef
+                           )
+                         }
+                       )
+      } yield references
+    }
+  }
+
+  private def selectedReverifyReferences(
+    userAnswers: UserAnswers
+  ): Try[Seq[SelectedReference]] = {
+
+    val selected = userAnswers.get(SelectSubcontractorsToReverifyPage).getOrElse(Set.empty)
+
+    if (selected.isEmpty) {
+      Success(Seq.empty)
+    } else {
+      for {
+        response    <- userAnswers.get(NewestVerificationBatchResponsePage)
+                         .map(Success(_))
+                         .getOrElse(Failure(new IllegalStateException("NewestVerificationBatchResponsePage not found")))
+        selectedIds <- ids(selected.map(_.id))
+        references  <- referencesFor(
+                         selectedIds,
+                         response.subcontractors.map { subcontractor =>
+                           (
+                             subcontractor.subcontractorId,
+                             subcontractor.subbieResourceRef
+                           )
+                         }
+                       )
+      } yield references
+    }
   }
 
   private def selectedReferences(

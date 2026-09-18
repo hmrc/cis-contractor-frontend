@@ -20,9 +20,7 @@ import controllers.actions.*
 import models.{CheckMode, Mode, NormalMode}
 import models.finalvalidation.VerifyFinalValidationSource.*
 import models.finalvalidation.*
-import navigation.Navigator
 import pages.finalvalidation.*
-import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
@@ -44,13 +42,12 @@ class ReviewSubcontractorDetailsController @Inject() (
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   finalValidationDraftService: FinalValidationDraftService,
   pageModelBuilder: UpdateSubcontractorDetailsPageModelBuilder,
   val controllerComponents: MessagesControllerComponents,
   view: ReviewSubcontractorDetailsView
 )(using ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =
@@ -101,73 +98,57 @@ class ReviewSubcontractorDetailsController @Inject() (
 
       (
         request.userAnswers.get(FinalValidationDraftIdPage),
-        request.userAnswers.get(VerifyFinalValidationSourcePage),
+        request.userAnswers.get(VerifyFinalValidationContinuationPage),
         request.userAnswers.get(VerifyFinalValidationModePage).flatMap(modeFromString)
       ) match {
 
-        case (Some(draftId), Some(source), Some(mode)) =>
-          source match {
+        case (Some(draftId), Some(continuation), Some(mode)) =>
+          finalValidationDraftService.get(request.cisId, draftId).flatMap { draft =>
+            if (!draft.allComplete) {
+              Future.successful(
+                Redirect(
+                  controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                )
+              )
+            } else {
+              finalValidationDraftService.commit(request.cisId, draftId).flatMap { _ =>
 
-            case SelectSubcontractor | SelectSubcontractorsToReverify =>
-              finalValidationDraftService.get(request.cisId, draftId).flatMap { draft =>
-                if (!draft.allComplete) {
-                  Future.successful(
-                    Redirect(
-                      controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
-                    )
-                  )
-                } else {
-                  finalValidationDraftService.commit(request.cisId, draftId).flatMap { _ =>
+                val cleanedAnswers =
+                  for {
+                    withoutDraftId      <- request.userAnswers.remove(FinalValidationDraftIdPage)
+                    withoutSource       <- withoutDraftId.remove(VerifyFinalValidationSourcePage)
+                    withoutMode         <- withoutSource.remove(VerifyFinalValidationModePage)
+                    withoutContext      <- withoutMode.remove(FinalValidationContextPage)
+                    withoutPayload      <- withoutContext.remove(VerifyFinalValidationPayloadPage)
+                    withoutChangeTarget <- withoutPayload.remove(FinalValidationChangeTargetPage)
+                    withoutBaseUtr      <- withoutChangeTarget.remove(FinalValidationBaseUtrPage)
+                    withoutContinuation <- withoutBaseUtr.remove(VerifyFinalValidationContinuationPage)
+                  } yield withoutContinuation
 
-                    val cleanedAnswers =
-                      for {
-                        withoutDraftId      <- request.userAnswers.remove(FinalValidationDraftIdPage)
-                        withoutSource       <- withoutDraftId.remove(VerifyFinalValidationSourcePage)
-                        withoutMode         <- withoutSource.remove(VerifyFinalValidationModePage)
-                        withoutContext      <- withoutMode.remove(FinalValidationContextPage)
-                        withoutPayload      <- withoutContext.remove(VerifyFinalValidationPayloadPage)
-                        withoutChangeTarget <- withoutPayload.remove(FinalValidationChangeTargetPage)
-                        withBaseUtr         <- withoutChangeTarget.remove(FinalValidationBaseUtrPage)
-                      } yield withBaseUtr
+                Future.fromTry(cleanedAnswers).flatMap { answers =>
+                  sessionRepository.set(answers).map { _ =>
+                    continuation match {
+                      case VerifyFinalValidationContinuation.ContractorEmailConfirmationStored =>
+                        Redirect(
+                          controllers.verify.routes.ContractorEmailConfirmationStoredController
+                            .onPageLoadAfterFinalValidation(mode)
+                        )
 
-                    Future.fromTry(cleanedAnswers).flatMap { answers =>
-                      sessionRepository.set(answers).map { _ =>
-                        source match {
-                          case SelectSubcontractor =>
-                            Redirect(
-                              navigator.nextPage(
-                                SelectSubcontractorPage,
-                                mode,
-                                answers
-                              )
-                            )
+                      case VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored =>
+                        Redirect(
+                          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+                            .onPageLoadAfterFinalValidation(mode)
+                        )
 
-                          case SelectSubcontractorsToReverify =>
-                            Redirect(
-                              navigator.nextPage(
-                                SelectSubcontractorsToReverifyPage,
-                                mode,
-                                answers
-                              )
-                            )
-
-                          case _ =>
-                            Redirect(
-                              controllers.routes.JourneyRecoveryController.onPageLoad()
-                            )
-                        }
-                      }
+                      case _ =>
+                        Redirect(
+                          controllers.routes.JourneyRecoveryController.onPageLoad()
+                        )
                     }
                   }
                 }
               }
-
-            case ReviewUnmatchedSubcontractors | ReviewInsufficientInfoSubcontractors =>
-              // TODO: Redirect to the appropriate next page once the onSubmit journeys for
-              // ReviewUnmatchedSubcontractors(DTR-5226) and ReviewInsufficientInfoSubcontractors(DTR-6949) implemented
-              Future.successful(
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              )
+            }
           }
 
         case _ =>

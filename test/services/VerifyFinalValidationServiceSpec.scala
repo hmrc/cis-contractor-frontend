@@ -17,14 +17,16 @@
 package services
 
 import base.SpecBase
-import models.{SubcontractorCurrentVerification, UserAnswers}
+import models.{Subcontractor, SubcontractorCurrentVerification, UserAnswers}
 import models.finalvalidation.*
 import models.finalvalidation.VerifyFinalValidationSource.*
-import models.response.{GetSubcontractorResponse, SubcontractorResponse}
+import models.response.{GetNewestVerificationBatchResponse, GetSubcontractorResponse, SubcontractorResponse}
 import models.validation.SubcontractorValidationField
+import models.verify.SelectedSubcontractors
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.finalvalidation.VerifyFinalValidationSourcePage
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorsToReverifyPage}
 import play.api.libs.json.{JsObject, Json}
 import services.finalvalidation.SubcontractorValidator
 import uk.gov.hmrc.http.HeaderCarrier
@@ -148,9 +150,6 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
     UserAnswers(
       "id",
       Json.obj(
-        "finalvalidations"         -> Json.obj(
-          "verifyFinalValidationSource" -> "SelectSubcontractor"
-        ),
         "selectSubcontractor"      -> Json.arr(
           Json.obj(
             "id"   -> selectedId,
@@ -163,6 +162,50 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
       )
     )
   }
+
+  private def subcontractor(
+    subcontractorId: Long,
+    subbieResourceRef: Option[Long]
+  ): Subcontractor =
+    Subcontractor(
+      subcontractorId = subcontractorId,
+      firstName = None,
+      secondName = None,
+      surname = None,
+      tradingName = Some("Smith Construction"),
+      partnershipTradingName = None,
+      verified = Some("Y"),
+      verificationNumber = None,
+      taxTreatment = None,
+      verificationDate = None,
+      lastMonthlyReturnDate = None,
+      createDate = None,
+      subcontractorType = Some("soletrader"),
+      subbieResourceRef = subbieResourceRef,
+      utr = Some("1234567890"),
+      partnerUtr = None,
+      crn = None,
+      nino = None
+    )
+
+  private def newestBatchResponse(
+    subcontractorId: Long = 2L,
+    subbieResourceRef: Option[Long] = Some(20L)
+  ): GetNewestVerificationBatchResponse =
+    GetNewestVerificationBatchResponse(
+      scheme = None,
+      subcontractors = Seq(
+        subcontractor(
+          subcontractorId,
+          subbieResourceRef
+        )
+      ),
+      verificationBatch = None,
+      verifications = Seq.empty,
+      submission = None,
+      monthlyReturn = None,
+      monthlyReturnSubmission = None
+    )
 
   private def draft(
     proposed: JsObject
@@ -372,7 +415,7 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
         )
     }
 
-    "must fail when VerifyFinalValidationSourcePage is not present" in {
+    "must validate subcontractors selected from both selection pages" in {
 
       val subcontractorService   = mock[SubcontractorService]
       val subcontractorValidator = mock[SubcontractorValidator]
@@ -383,56 +426,108 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
           subcontractorValidator
         )
 
-      val exception =
-        finalValidationService
-          .validate(
-            "instance-id",
-            UserAnswers("id")
-          )
-          .failed
-          .futureValue
+      val unverifiedSubcontractor =
+        subcontractorResponse(
+          subcontractorId = 1L,
+          subbieResourceRef = Some(10L)
+        )
 
-      exception.getMessage mustBe
-        "VerifyFinalValidationSourcePage not found"
-
-      verifyNoInteractions(subcontractorService)
-      verifyNoInteractions(subcontractorValidator)
-    }
-
-    "must fail when SelectSubcontractorPage is not present" in {
-
-      val subcontractorService   = mock[SubcontractorService]
-      val subcontractorValidator = mock[SubcontractorValidator]
-
-      val finalValidationService =
-        service(
-          subcontractorService,
-          subcontractorValidator
+      val reverifySubcontractor =
+        subcontractorResponse(
+          subcontractorId = 2L,
+          subbieResourceRef = Some(20L)
         )
 
       val userAnswers =
-        UserAnswers("id")
+        selectedUserAnswers()
           .set(
-            VerifyFinalValidationSourcePage,
-            SelectSubcontractor
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors(
+                "2",
+                "Jane Smith"
+              )
+            )
+          )
+          .success
+          .value
+          .set(
+            NewestVerificationBatchResponsePage,
+            newestBatchResponse()
           )
           .success
           .value
 
-      val exception =
+      val expectedCurrentVerifications =
+        Seq(
+          currentVerification(unverifiedSubcontractor),
+          currentVerification(reverifySubcontractor)
+        )
+
+      when(
+        subcontractorService.getSubcontractor(
+          "instance-id",
+          10L
+        )(hc)
+      ).thenReturn(
+        Future.successful(
+          GetSubcontractorResponse(
+            scheme = None,
+            subcontractor = Some(unverifiedSubcontractor)
+          )
+        )
+      )
+
+      when(
+        subcontractorService.getSubcontractor(
+          "instance-id",
+          20L
+        )(hc)
+      ).thenReturn(
+        Future.successful(
+          GetSubcontractorResponse(
+            scheme = None,
+            subcontractor = Some(reverifySubcontractor)
+          )
+        )
+      )
+
+      when(
+        subcontractorValidator.validateFields(
+          expectedCurrentVerifications
+        )
+      ).thenReturn(Map.empty)
+
+      val result =
         finalValidationService
           .validate(
             "instance-id",
             userAnswers
           )
-          .failed
           .futureValue
 
-      exception.getMessage mustBe
-        "SelectSubcontractorPage not found"
+      result mustBe
+        VerifyFinalValidationResult(
+          subcontractors = Seq(
+            unverifiedSubcontractor,
+            reverifySubcontractor
+          ),
+          failures = Seq.empty
+        )
 
-      verifyNoInteractions(subcontractorService)
-      verifyNoInteractions(subcontractorValidator)
+      verify(subcontractorService).getSubcontractor(
+        "instance-id",
+        10L
+      )(hc)
+
+      verify(subcontractorService).getSubcontractor(
+        "instance-id",
+        20L
+      )(hc)
+
+      verify(subcontractorValidator).validateFields(
+        expectedCurrentVerifications
+      )
     }
 
     "must fail when UnverifiedSubcontractorsPage is not present" in {
@@ -450,9 +545,6 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
         UserAnswers(
           "id",
           Json.obj(
-            "finalvalidations"    -> Json.obj(
-              "verifyFinalValidationSource" -> "SelectSubcontractor"
-            ),
             "selectSubcontractor" -> Json.arr(
               Json.obj(
                 "id"   -> "1",
@@ -651,7 +743,7 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
       verifyNoInteractions(subcontractorValidator)
     }
 
-    "must fail when SelectSubcontractorsToReverifyPage is not present" in {
+    "must fail when NewestVerificationBatchResponsePage is not present for a selected reverify subcontractor" in {
 
       val subcontractorService   = mock[SubcontractorService]
       val subcontractorValidator = mock[SubcontractorValidator]
@@ -665,8 +757,13 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
       val userAnswers =
         UserAnswers("id")
           .set(
-            VerifyFinalValidationSourcePage,
-            SelectSubcontractorsToReverify
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors(
+                "2",
+                "Jane Smith"
+              )
+            )
           )
           .success
           .value
@@ -681,83 +778,7 @@ class VerifyFinalValidationServiceSpec extends SpecBase {
           .futureValue
 
       exception.getMessage mustBe
-        "SelectSubcontractorsToReverifyPage not found"
-
-      verifyNoInteractions(subcontractorService)
-      verifyNoInteractions(subcontractorValidator)
-    }
-
-    "must fail for ReviewUnmatchedSubcontractors" in {
-
-      val subcontractorService   = mock[SubcontractorService]
-      val subcontractorValidator = mock[SubcontractorValidator]
-
-      val finalValidationService =
-        service(
-          subcontractorService,
-          subcontractorValidator
-        )
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(
-            VerifyFinalValidationSourcePage,
-            ReviewUnmatchedSubcontractors
-          )
-          .success
-          .value
-
-      val exception =
-        finalValidationService
-          .validate(
-            "instance-id",
-            userAnswers
-          )
-          .failed
-          .futureValue
-
-      exception mustBe a[UnsupportedOperationException]
-
-      exception.getMessage mustBe
-        "ReviewUnmatchedSubcontractors FinalValidation is not implemented yet"
-
-      verifyNoInteractions(subcontractorService)
-      verifyNoInteractions(subcontractorValidator)
-    }
-
-    "must fail for ReviewInsufficientInfoSubcontractors" in {
-
-      val subcontractorService   = mock[SubcontractorService]
-      val subcontractorValidator = mock[SubcontractorValidator]
-
-      val finalValidationService =
-        service(
-          subcontractorService,
-          subcontractorValidator
-        )
-
-      val userAnswers =
-        UserAnswers("id")
-          .set(
-            VerifyFinalValidationSourcePage,
-            ReviewInsufficientInfoSubcontractors
-          )
-          .success
-          .value
-
-      val exception =
-        finalValidationService
-          .validate(
-            "instance-id",
-            userAnswers
-          )
-          .failed
-          .futureValue
-
-      exception mustBe a[UnsupportedOperationException]
-
-      exception.getMessage mustBe
-        "ReviewInsufficientInfoSubcontractors FinalValidation is not implemented yet"
+        "NewestVerificationBatchResponsePage not found"
 
       verifyNoInteractions(subcontractorService)
       verifyNoInteractions(subcontractorValidator)

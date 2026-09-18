@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
-import models.finalvalidation.{FinalValidationContext, FinalValidationDraftRequestBuilder, VerifyFinalValidationSource}
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
@@ -32,16 +32,13 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.{PaginationToReverifyService, VerificationPreSelectionService, VerifyFinalValidationService}
+import services.{PaginationToReverifyService, VerificationPreSelectionService}
 import models.requests.DataRequest
 import models.verify.*
 import pages.finalvalidation.*
 import pages.verify.*
 import play.api.data.Form
 import rules.verify.ReverificationRules
-import services.finalvalidation.FinalValidationDraftService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import java.time.{Clock, LocalDate}
 import java.util.Locale
@@ -55,10 +52,6 @@ class SelectSubcontractorsToReverifyController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  requireCisId: CisIdRequiredAction,
-  verifyFinalValidationService: VerifyFinalValidationService,
-  finalValidationDraftService: FinalValidationDraftService,
-  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: SelectSubcontractorsToReverifyFormProvider,
   paginationToReverifyService: PaginationToReverifyService,
   verificationPreSelectionService: VerificationPreSelectionService,
@@ -66,7 +59,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorsToReverifyView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with I18nSupport {
 
   private def dateFmt(implicit messages: Messages) =
@@ -221,10 +214,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
     }
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val allRows: Seq[SubcontractorReverifyRow] =
         request.userAnswers
@@ -335,55 +325,11 @@ class SelectSubcontractorsToReverifyController @Inject() (
                                 )
                               )
 
-                validation <- verifyFinalValidationService.validate(
-                                request.cisId,
-                                withSource
-                              )
+                _ <- sessionRepository.set(withSource)
 
-                result <-
-                  if (validation.hasErrors) {
-                    for {
-                      createRequest <- Future.fromTry(
-                                         finalValidationDraftRequestBuilder.build(
-                                           request.cisId,
-                                           validation
-                                         )
-                                       )
-
-                      draftId <- finalValidationDraftService.create(createRequest)
-
-                      withDraftId <- Future.fromTry(
-                                       withSource.set(
-                                         FinalValidationDraftIdPage,
-                                         draftId
-                                       )
-                                     )
-
-                      withMode <- Future.fromTry(
-                                    withDraftId.set(
-                                      VerifyFinalValidationModePage,
-                                      mode.toString
-                                    )
-                                  )
-
-                      _ <- sessionRepository.set(withMode)
-
-                    } yield Redirect(
-                      controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
-                    )
-
-                  } else {
-                    sessionRepository.set(withSource).map { _ =>
-                      Redirect(
-                        navigator.nextPage(
-                          SelectSubcontractorsToReverifyPage,
-                          mode,
-                          withSource
-                        )
-                      )
-                    }
-                  }
-              } yield result
+              } yield Redirect(
+                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, withSource)
+              )
           )
       }
     }

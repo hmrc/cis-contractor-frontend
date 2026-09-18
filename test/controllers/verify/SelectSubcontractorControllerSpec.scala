@@ -55,30 +55,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   val form: Form[Set[String]] = formProvider()
   val paginationService       = new PaginationService()
 
-  private val verifyFinalValidationService = mock[VerifyFinalValidationService]
-
-  when(
-    verifyFinalValidationService.validate(
-      any[String],
-      any[UserAnswers]
-    )(any[HeaderCarrier])
-  ).thenReturn(
-    Future.successful(
-      VerifyFinalValidationResult(
-        subcontractors = Seq.empty,
-        failures = Seq.empty
-      )
-    )
-  )
-
-  private def applicationBuilderWithSuccessfulFinalValidation(
-    userAnswers: UserAnswers
-  ) =
-    applicationBuilder(userAnswers = Some(userAnswers))
-      .overrides(
-        bind[VerifyFinalValidationService].toInstance(verifyFinalValidationService)
-      )
-
   def url(page: Int = 1): String =
     controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode, page).url
 
@@ -220,7 +196,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(uaWithSubcontractors)
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -609,7 +585,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -640,7 +616,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -682,7 +658,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -732,7 +708,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .value
 
       val appWithAnswers =
-        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -792,7 +768,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(userAnswers)
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
@@ -838,7 +814,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilderWithSuccessfulFinalValidation(ua)
+        applicationBuilder(userAnswers = Some(ua))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)

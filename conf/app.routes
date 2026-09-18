@@ -574,6 +574,8 @@ GET   /subcontractor/verify/confirmation-email-not-stored         controllers.ve
 POST  /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-not-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-not-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
@@ -601,6 +603,8 @@ GET   /subcontractor/verify/confirmation-email-stored         controllers.verify
 POST  /subcontractor/verify/confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-stored  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-stored  controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)

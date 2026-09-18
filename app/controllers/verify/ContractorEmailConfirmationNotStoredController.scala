@@ -20,16 +20,21 @@ import controllers.actions.*
 import forms.verify.ContractorEmailConfirmationNotStoredFormProvider
 import models.Mode
 import models.UserAnswers
+import models.finalvalidation.{FinalValidationDraftRequestBuilder, VerifyFinalValidationContinuation}
 import navigation.Navigator
+import pages.finalvalidation.{FinalValidationDraftIdPage, VerifyFinalValidationContinuationPage, VerifyFinalValidationModePage}
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
+import services.VerifyFinalValidationService
+import services.finalvalidation.FinalValidationDraftService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ContractorEmailConfirmationNotStoredView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
 
 class ContractorEmailConfirmationNotStoredController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,11 +43,15 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  verifyFinalValidationService: VerifyFinalValidationService,
+  finalValidationDraftService: FinalValidationDraftService,
+  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: ContractorEmailConfirmationNotStoredFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorEmailConfirmationNotStoredView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -54,17 +63,95 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
   private def redirectToStored(mode: Mode): Result =
     Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      if (hasStoredEmail(request.userAnswers)) {
-        redirectToStored(mode)
-      } else {
-        val preparedForm = request.userAnswers.get(ContractorEmailConfirmationNotStoredPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  private def redirectToStoredAfterFinalValidation(mode: Mode): Result =
+    Redirect(
+      controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode)
+    )
 
-        Ok(view(preparedForm, mode))
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      if (hasStoredEmail(request.userAnswers)) {
+        Future.successful(redirectToStored(mode))
+      } else {
+        for {
+          validation <- verifyFinalValidationService.validate(
+            request.cisId,
+            request.userAnswers
+          )
+
+          result <-
+            if (validation.hasErrors) {
+              for {
+                createRequest <- Future.fromTry(
+                  finalValidationDraftRequestBuilder.build(
+                    request.cisId,
+                    validation
+                  )
+                )
+
+                draftId <- finalValidationDraftService.create(createRequest)
+
+                withContinuation <- Future.fromTry(
+                  request.userAnswers.set(
+                    VerifyFinalValidationContinuationPage,
+                    VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+                  )
+                )
+
+                withDraftId <- Future.fromTry(
+                  withContinuation.set(
+                    FinalValidationDraftIdPage,
+                    draftId
+                  )
+                )
+
+                withMode <- Future.fromTry(
+                  withDraftId.set(
+                    VerifyFinalValidationModePage,
+                    mode.toString
+                  )
+                )
+
+                _ <- sessionRepository.set(withMode)
+
+              } yield Redirect(
+                controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+              )
+            } else {
+              val preparedForm = request.userAnswers.get(ContractorEmailConfirmationNotStoredPage) match {
+                case None        => form
+                case Some(value) => form.fill(value)
+              }
+
+              Future.successful(Ok(view(preparedForm, mode)))
+            }
+
+        } yield result
+      }
+    }
+
+  def onPageLoadAfterFinalValidation(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      if (hasStoredEmail(request.userAnswers)) {
+        Future.successful(redirectToStoredAfterFinalValidation(mode))
+      } else {
+        for {
+          updatedAnswers <- Future.fromTry(
+            request.userAnswers.remove(
+              VerifyFinalValidationContinuationPage
+            )
+          )
+
+          _ <- sessionRepository.set(updatedAnswers)
+
+        } yield {
+          val preparedForm = updatedAnswers.get(ContractorEmailConfirmationNotStoredPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode))
+        }
       }
     }
 

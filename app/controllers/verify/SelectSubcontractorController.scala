@@ -24,16 +24,13 @@ import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPag
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import models.CheckMode
-import models.finalvalidation.{FinalValidationContext, FinalValidationDraftRequestBuilder, VerifyFinalValidationSource}
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import pages.finalvalidation.*
 import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.finalvalidation.FinalValidationDraftService
 import services.{CheckboxPaginationResult, PaginationService, VerificationPreSelectionService, VerifyFinalValidationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.verify.SelectSubcontractorView
 
 import javax.inject.Inject
@@ -46,17 +43,13 @@ class SelectSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  requireCisId: CisIdRequiredAction,
-  verifyFinalValidationService: VerifyFinalValidationService,
-  finalValidationDraftService: FinalValidationDraftService,
-  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
   verificationPreSelectionService: VerificationPreSelectionService,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -122,9 +115,7 @@ class SelectSubcontractorController @Inject() (
       .exists(_.subcontractors.exists(_.isVerified))
 
   def onSubmit(mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val ua = request.userAnswers
 
@@ -179,16 +170,14 @@ class SelectSubcontractorController @Inject() (
             case None =>
               if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(ua)) {
                 for {
-                  answersWithSelections <- Future.fromTry(
-                                             ua.set(SelectSubcontractorPage, mergedValues)
-                                           )
+                  answersWithSelections <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
 
                   cleanedAnswers <-
                     if (
                       mode == CheckMode &&
-                      answersWithSelections
-                        .get(RebuildVerificationFromWarningPage)
-                        .contains(true)
+                        answersWithSelections
+                          .get(RebuildVerificationFromWarningPage)
+                          .contains(true)
                     ) {
                       Future.fromTry(
                         answersWithSelections.remove(RebuildVerificationFromWarningPage)
@@ -211,55 +200,10 @@ class SelectSubcontractorController @Inject() (
                                   )
                                 )
 
-                  validation <- verifyFinalValidationService.validate(
-                                  request.cisId,
-                                  withSource
-                                )
-
-                  result <-
-                    if (validation.hasErrors) {
-                      for {
-                        createRequest <- Future.fromTry(
-                                           finalValidationDraftRequestBuilder.build(
-                                             request.cisId,
-                                             validation
-                                           )
-                                         )
-
-                        draftId <- finalValidationDraftService.create(createRequest)
-
-                        withDraftId <- Future.fromTry(
-                                         withSource.set(
-                                           FinalValidationDraftIdPage,
-                                           draftId
-                                         )
-                                       )
-
-                        withMode <- Future.fromTry(
-                                      withDraftId.set(
-                                        VerifyFinalValidationModePage,
-                                        mode.toString
-                                      )
-                                    )
-
-                        _ <- sessionRepository.set(withMode)
-
-                      } yield Redirect(
-                        controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
-                      )
-
-                    } else {
-                      sessionRepository.set(withSource).map { _ =>
-                        Redirect(
-                          navigator.nextPage(
-                            SelectSubcontractorPage,
-                            mode,
-                            withSource
-                          )
-                        )
-                      }
-                    }
-                } yield result
+                  _ <- sessionRepository.set(withSource)
+                } yield Redirect(
+                  navigator.nextPage(SelectSubcontractorPage, mode, withSource)
+                )
               } else {
                 val formWithErrors =
                   form
@@ -269,14 +213,7 @@ class SelectSubcontractorController @Inject() (
                       "verify.selectSubcontractor.error.required"
                     )
 
-                Future.successful(
-                  renderPageWithError(
-                    formWithErrors,
-                    mode,
-                    page,
-                    result
-                  )
-                )
+                Future.successful(renderPageWithError(formWithErrors, mode, page, result))
               }
           }
       }
