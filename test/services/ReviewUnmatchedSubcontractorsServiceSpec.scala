@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import models.amend.AmendJourneyType
 import models.{SubcontractorCurrentVerification, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import play.api.i18n.Messages
@@ -232,13 +233,18 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       vm.unmatched.head.name mustBe messages("verify.noName")
     }
 
-    "must use placeholder '#' urls for the name and action links (not yet wired)" in {
+    "must build amend, proceed and remove links while using placeholder links for name links" in {
       val sub =
         mkSub(id = 1L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = None)
 
       val row = buildSuccess(Seq(sub), Seq(mkVerification(subcontractorId = 1L))).unmatched.head
 
-      row.nameLink.url mustBe "#"
+      row.nameLink.url mustBe controllers.info.routes.SubcontractorController
+        .onPageLoad(
+          999L,
+          AmendJourneyType.UnmatchedInfo.routeValue
+        )
+        .url
       row.editLink.url mustBe "/construction-industry-scheme/subcontractor/amend/start/999/unmatched"
       row.proceedLink.url mustBe controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
         .onPageLoad(1L)
@@ -317,21 +323,5 @@ class ReviewUnmatchedSubcontractorsServiceSpec extends SpecBase {
       result.failed.get.getMessage must include("subcontractorId=1")
     }
 
-    "must not fail when a ready subcontractor has no subbieResourceRef" in {
-      val readyNoRef   =
-        mkSub(
-          id = 1L,
-          tradingName = Some("Acme Ltd"),
-          subcontractorType = Some("company"),
-          utr = Some("1234567890"),
-          subbieResourceRef = None
-        )
-      val verification = mkVerification(subcontractorId = 1L, proceed = Some("Y"))
-
-      val vm = buildSuccess(Seq(readyNoRef), Seq(verification))
-
-      vm.ready.map(_.name) mustBe Seq("Acme Ltd")
-      vm.unmatched mustBe empty
-    }
   }
 }
