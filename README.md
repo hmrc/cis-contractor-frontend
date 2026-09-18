@@ -1,39 +1,58 @@
+cis-contractor-frontend
+=======================
+![](https://img.shields.io/github/v/release/hmrc/cis-contractor-frontend)
 
-# cis-contractor-frontend
+A Scala/Play frontend service for the Construction Industry Scheme (CIS), enabling contractors to manage their subcontractors on the HMRC Tax Platform.
 
-This is the new cis-contractor-frontend repository
+The service supports the following journeys:
+
+* Adding subcontractors — individuals, companies, partnerships, and trusts
+* Verifying subcontractor details with HMRC
+* Amending existing subcontractor records
+* Managing contractor details
+
+The service is bilingual, supporting both English and Welsh.
 
 ## Running the service
 
-Service Manager: `sm2 --start CIS_ALL`
+Start all dependent services via Service Manager:
 
+```shell
+sm2 --start CIS_ALL
+```
 
-To start the server locally: `sbt run`
+To run locally (default port 6998):
+
+```shell
+sbt run
+```
 
 ## Testing
 
-Run unit tests with:
+Run unit tests:
+
 ```shell
 sbt test
 ```
 
-Check code coverage with:
-```shell
-sbt clean coverage test it/test coverageReport
-```
+Run integration tests:
 
-Run integration tests with:
 ```shell
 sbt it/test
 ```
 
-Before committing code, please ensure all tests pass and code coverage is satisfactory and the code has been formatted
-using `sbt scalafmtAll`. Alternatively, you can run the following script in the root directory, which does all
-these steps for you:
+Check code coverage (minimum 78% statement coverage required):
+
+```shell
+sbt clean coverage test it/test coverageOff coverageReport
+```
+
+Before committing, run the full pre-commit script which formats code, compiles, runs all tests, and checks coverage:
+
 ```shell
 ./run_all_tests.sh
 ```
 
-### License
+## License
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+This code is open source software licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).
