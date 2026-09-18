@@ -63,8 +63,8 @@ class ContractorDetailsFinalValidationService @Inject() (
                          else Future.failed(new RuntimeException("Contractor details final validations are incomplete"))
       versionResponse <- contractorDetailsService.updateSchemeVersion(
                            UpdateSchemeVersionRequest(
-                             currentVersion = scheme.version.getOrElse(0),
-                             instanceId = scheme.instanceId
+                             instanceId = scheme.instanceId,
+                             version = scheme.version.getOrElse(0)
                            )
                          )
       _               <- contractorDetailsService.updateScheme(

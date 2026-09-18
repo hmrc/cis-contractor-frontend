@@ -203,7 +203,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       when(http.post(any())(any())).thenReturn(rb)
       when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
 
-      val request  = UpdateSchemeVersionRequest(currentVersion = 3, instanceId = "INST-123")
+      val request  = UpdateSchemeVersionRequest(instanceId = "INST-123", version = 3)
       val response = UpdateSchemeVersionResponse(newVersion = 4)
 
       when(rb.execute[UpdateSchemeVersionResponse](any(), any()))
