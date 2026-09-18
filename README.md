@@ -27,6 +27,16 @@ To run locally (default port 6998):
 sbt run
 ```
 
+### Upstream dependencies
+
+| Service                                    | Port |
+|--------------------------------------------|------|
+| `auth`                                     | 8500 |
+| `construction-industry-scheme`             | 6994 |
+| `construction-industry-scheme-external-stub` | 6997 |
+| `address-lookup-frontend`                  | 9028 |
+| `feedback-frontend`                        | 9514 |
+
 ## Testing
 
 Run unit tests:
