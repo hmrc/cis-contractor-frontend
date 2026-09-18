@@ -18,11 +18,11 @@ package controllers.amend
 
 import controllers.actions.*
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
-import models.add.IndividualNamesOptions.{SubcontractorName, TradingName}
 import models.UserAnswers
+import models.add.IndividualNamesOptions.{SubcontractorName, TradingName}
 import models.amend.AmendIndividualRemoveDetail
 import pages.add.*
-import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
+import pages.amend.AmendIndividualRemoveDetailYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -83,9 +83,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(TradingNameOfSubcontractorPage)
           .isDefined &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.SubcontractorName =>
         userAnswers
@@ -97,9 +95,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(TradingNameOfSubcontractorPage)
           .isDefined &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers
@@ -115,9 +111,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(UniqueTaxpayerReferenceYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
         userAnswers

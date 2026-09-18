@@ -79,7 +79,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
                           )
                           .map { _ =>
                             Redirect(
-                              controllers.routes.UnmatchedSubcontractorsController
+                              controllers.verify.routes.ReviewUnmatchedSubcontractorsController
                                 .onPageLoad()
                             )
                           }

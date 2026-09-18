@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package models.requests
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
+final case class UpdateSubcontractorForEditRequest(
+  cisId: String,
+  subcontractor: SubcontractorRequest,
+  verificationForEdit: Option[UpdateVerificationForEditRequest] = None
+)
 
-  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+object UpdateSubcontractorForEditRequest {
+  given format: OFormat[UpdateSubcontractorForEditRequest] =
+    Json.format[UpdateSubcontractorForEditRequest]
 }

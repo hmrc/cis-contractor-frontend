@@ -64,7 +64,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           surname = Some("Doe")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -92,7 +92,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           partnerTradingName = Some("Nominated Partner")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -120,7 +120,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           tradingName = Some("Company Name")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -401,7 +401,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         worksReferenceNumber = Some("WRN-TRUST")
       )
 
-    connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+    connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
     val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
     verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -429,7 +429,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         createVerifications = None
       )
 
-      connector.modifyVerificationBatch(req).futureValue mustBe (())
+      connector.modifyVerificationBatch(req).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -455,7 +455,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         createVerifications = None
       )
 
-      connector.modifyVerificationBatch(req).futureValue mustBe (())
+      connector.modifyVerificationBatch(req).futureValue mustBe ()
     }
 
     "fail when CIS responds with a non-200/204 status" in {
@@ -540,7 +540,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
-      connector.updateSubcontractor(request).futureValue mustBe (())
+      connector.updateSubcontractor(request).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -560,7 +560,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
-      connector.updateSubcontractor(request).futureValue mustBe (())
+      connector.updateSubcontractor(request).futureValue mustBe ()
     }
 
     "fail when CIS responds with a non-200/204 status" in {
@@ -622,7 +622,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
   "ConstructionIndustrySchemeConnector.updateSubcontractorForEdit" should {
 
     val request =
-      UpdateSubcontractorRequest(
+      UpdateSubcontractorForEditRequest(
         cisId = "INST-123",
         subcontractor = SubcontractorRequest(
           subcontractorId = 123L,
@@ -1035,10 +1035,10 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           version = Some(1)
         )
 
-      val result =
+      val result: Unit =
         connector.updateContractorDetails(request).futureValue
 
-      result mustBe (())
+      result mustBe ()
 
       val urlCaptor: ArgumentCaptor[URL] =
         ArgumentCaptor.forClass(classOf[URL])
@@ -1090,7 +1090,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       connector
         .updateContractorDetails(request)
-        .futureValue mustBe (())
+        .futureValue mustBe ()
     }
 
     "throw an exception when the API returns a non-success status" in {

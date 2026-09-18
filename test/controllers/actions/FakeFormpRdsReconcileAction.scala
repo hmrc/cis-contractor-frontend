@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package controllers.actions
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.requests.DataRequest
+import play.api.mvc.Result
 
-case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+class FakeFormpRdsReconcileAction extends FormpRdsReconcileAction {
+
+  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+    Future.successful(None)
+
+  override protected def executionContext: ExecutionContext = global
 }
