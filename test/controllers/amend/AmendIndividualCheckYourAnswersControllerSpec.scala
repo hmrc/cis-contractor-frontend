@@ -1212,40 +1212,239 @@ class AmendIndividualCheckYourAnswersControllerSpec extends SpecBase with Mockit
       )(any[HeaderCarrier])
     }
 
-    "must clear answers and redirect to Index on cancel" in {
+    "must clean amend answers and redirect to Manage Your Subcontractors on cancel for a standard journey" in {
 
-      val ua                    =
+      val ua =
         minUa
           .set(CisIdQuery, "cis-123")
           .success
           .value
-      val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
 
         val request =
-          FakeRequest(GET, controllers.amend.routes.AmendIndividualCheckYourAnswersController.onCancel().url)
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onCancel()
+              .url
+          )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          app.injector
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          application.injector
             .instanceOf[FrontendAppConfig]
             .manageYourSubcontractorsUrl("cis-123")
       }
 
-      verify(mockSessionRepository).set(any[UserAnswers])
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      val cleanedUa =
+        captor.getValue
+
+      cleanedUa.id mustBe ua.id
+
+      cleanedUa.get(OriginalIndividualAnswersQuery) mustBe None
+      cleanedUa.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+
+      cleanedUa.get(CisIdQuery) mustBe Some("cis-123")
     }
+
+    "must clean amend answers and redirect to ReviewInsufficientInfoSubcontractorsController on cancel for an insufficient information journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua)
+        )
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+      }
+
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+
+      captor.getValue.get(OriginalIndividualAnswersQuery) mustBe None
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+    "must clean amend answers and redirect to ReviewUnmatchedSubcontractorsRoutingController on cancel for an unmatched journey" in {
+
+      val ua =
+        minUa
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua)
+        )
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+            .onPageLoad()
+            .url
+      }
+
+      val captor =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(mockSessionRepository)
+        .set(captor.capture())
+
+      captor.getValue.id mustBe ua.id
+
+      captor.getValue.get(OriginalIndividualAnswersQuery) mustBe None
+      captor.getValue.get(AmendCheckYourAnswersSubmittedPage) mustBe Some(false)
+    }
+
+    "must redirect to Journey Recovery when saving cleaned amend answers fails on cancel" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      when(
+        mockSessionRepository.set(any[UserAnswers])
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUa))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.routes.AmendIndividualCheckYourAnswersController
+              .onCancel()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+
+      verify(mockSessionRepository)
+        .set(any[UserAnswers])
+    }
+
   }
 }

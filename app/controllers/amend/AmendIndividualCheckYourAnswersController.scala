@@ -272,37 +272,23 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   ): Future[Result] = {
 
     val redirectCall =
-      request.userAnswers.get(AmendJourneyTypePage) match {
-
-        case Some(AmendJourneyType.InsufficientInfo) =>
-          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-
-        case Some(AmendJourneyType.UnmatchedInfo) =>
-          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
-
-        case Some(AmendJourneyType.Standard) =>
-          Call(
-            "GET",
-            appConfig.manageYourSubcontractorsUrl(request.cisId)
-          )
-
-        case None =>
-          logger.error(
-            "[AmendIndividualCheckYourAnswersController.handleNoChanges] Missing AmendJourneyTypePage"
-          )
-
-          controllers.routes.JourneyRecoveryController.onPageLoad()
-      }
+      amendJourneyExitRedirect(
+        request.userAnswers,
+        request.cisId
+      )
 
     Future
       .fromTry(
         cleanupService.cleanAmend(request.userAnswers)
       )
       .flatMap(sessionRepository.set)
-      .map(_ => Redirect(redirectCall))
+      .map { _ =>
+        Redirect(redirectCall)
+      }
       .recover { case t =>
         logger.error(
-          s"[AmendIndividualCheckYourAnswersController.handleNoChanges] Failed to clean amend data for session ${request.userAnswers.id}",
+          s"[AmendIndividualCheckYourAnswersController.handleNoChanges] " +
+            s"Failed to clean amend data for session ${request.userAnswers.id}",
           t
         )
 
@@ -312,23 +298,63 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       }
   }
 
-  private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
-    Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
+  private def amendJourneyExitRedirect(
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call =
+    userAnswers.get(AmendJourneyTypePage) match {
+
+      case Some(AmendJourneyType.Standard) =>
+        Call(
+          "GET",
+          appConfig.manageYourSubcontractorsUrl(cisId)
+        )
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoad()
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoad()
+
+      case None =>
+        logger.error(
+          "[AmendIndividualCheckYourAnswersController] " +
+            "Missing AmendJourneyTypePage when exiting amend journey"
+        )
+
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def submittedSubbieResourceRef(
+    subbieResourceRef: Long
+  ): Option[Long] =
+    Option.when(subbieResourceRef >= 0L)(
+      subbieResourceRef
+    )
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-      sessionRepository
-        .set(UserAnswers(request.userAnswers.id))
+
+      val redirectCall =
+        amendJourneyExitRedirect(
+          request.userAnswers,
+          request.cisId
+        )
+
+      Future
+        .fromTry(
+          cleanupService.cleanAmend(request.userAnswers)
+        )
+        .flatMap(sessionRepository.set)
         .map { _ =>
-          Redirect(
-            appConfig.manageYourSubcontractorsUrl(
-              request.cisId
-            )
-          )
+          Redirect(redirectCall)
         }
         .recover { case t =>
           logger.error(
-            s"[AmendIndividualCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            s"[AmendIndividualCheckYourAnswersController.onCancel] " +
+              s"Failed to clean amend user answers for session ${request.userAnswers.id}",
             t
           )
 
