@@ -171,11 +171,13 @@ class ContractorDetailsFinalValidationController @Inject() (
 
   private def redirectToTarget(target: ContractorDetailsValidationTarget): Result =
     target match {
-      case FileMonthlyReturn | FileNilReturn =>
-        Redirect(appConfig.cisReturnDashboardUrl)
-      case VerifySubcontractors              =>
+      case FileMonthlyReturn             =>
+        Redirect(appConfig.fileStandardReturnUrl)
+      case FileNilReturn                 =>
+        Redirect(appConfig.fileNilReturnUrl)
+      case VerifySubcontractors          =>
         Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad())
-      case ReviewUnmatchedSubcontractors     =>
+      case ReviewUnmatchedSubcontractors =>
         Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad())
     }
 }

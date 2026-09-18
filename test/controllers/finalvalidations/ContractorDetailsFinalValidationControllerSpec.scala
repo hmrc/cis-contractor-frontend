@@ -58,6 +58,12 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
     applicationBuilder(userAnswers = Some(userAnswers))
       .configure("urls.cisReturnDashboard" -> "http://localhost:9557/return-dashboard")
+      .configure(
+        "urls.fileStandardReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+      )
+      .configure(
+        "urls.fileNilReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+      )
       .overrides(
         bind[ContractorDetailsFinalValidationService].toInstance(finalValidationService),
         bind[CisManageService].toInstance(mockCisManageService),
@@ -102,7 +108,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must redirect to return target when file nil return validations pass" in {
+    "must redirect to nil return target when file nil return validations pass" in {
       val userAnswers =
         emptyUserAnswers
           .set(CisIdQuery, "cisId")
@@ -131,7 +137,42 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
           ).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe "http://localhost:9557/return-dashboard"
+        redirectLocation(result).value mustBe
+          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+      }
+    }
+
+    "must redirect to standard return target when file monthly return validations pass" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+
+      val mockFinalValidationService =
+        mock[ContractorDetailsFinalValidationService]
+
+      when(
+        mockFinalValidationService.refreshAndValidate(
+          any[UserAnswers],
+          any[ContractorDetailsValidationTarget]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful((userAnswers, ContractorDetailsFinalValidation(true, true, true)))
+      )
+
+      val application = app(userAnswers, mockFinalValidationService)
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ContractorDetailsFinalValidationController.startFileMonthlyReturn().url)
+          ).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
       }
     }
 
@@ -207,6 +248,94 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.verify.routes.NewestVerificationBatchController.onPageLoad().url
+      }
+
+      verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
+    }
+
+    "must update scheme and redirect to standard return target when final action is clicked" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorDetailsValidationTargetPage, ContractorDetailsValidationTarget.FileMonthlyReturn)
+          .success
+          .value
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(ContractorUtrPage, "1234567890")
+          .success
+          .value
+          .set(SchemeNamePage, "Scheme")
+          .success
+          .value
+          .set(EnterContractorEmailAddressPage, "test@example.com")
+          .success
+          .value
+
+      val mockFinalValidationService =
+        mock[ContractorDetailsFinalValidationService]
+
+      when(mockFinalValidationService.validate(any[UserAnswers]))
+        .thenReturn(ContractorDetailsFinalValidation(true, true, true))
+      when(mockFinalValidationService.updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      val application = app(userAnswers, mockFinalValidationService)
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ContractorDetailsFinalValidationController.onContinue().url)
+          ).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+      }
+
+      verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
+    }
+
+    "must update scheme and redirect to nil return target when final action is clicked" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorDetailsValidationTargetPage, ContractorDetailsValidationTarget.FileNilReturn)
+          .success
+          .value
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(ContractorUtrPage, "1234567890")
+          .success
+          .value
+          .set(SchemeNamePage, "Scheme")
+          .success
+          .value
+          .set(EnterContractorEmailAddressPage, "test@example.com")
+          .success
+          .value
+
+      val mockFinalValidationService =
+        mock[ContractorDetailsFinalValidationService]
+
+      when(mockFinalValidationService.validate(any[UserAnswers]))
+        .thenReturn(ContractorDetailsFinalValidation(true, true, true))
+      when(mockFinalValidationService.updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      val application = app(userAnswers, mockFinalValidationService)
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ContractorDetailsFinalValidationController.onContinue().url)
+          ).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
       }
 
       verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
