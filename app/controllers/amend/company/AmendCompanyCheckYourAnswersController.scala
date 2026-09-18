@@ -319,18 +319,25 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   def onCancel(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-      sessionRepository
-        .set(UserAnswers(request.userAnswers.id))
+
+      val redirectCall =
+        noChangesRedirect(
+          request.userAnswers,
+          request.cisId
+        )
+
+      Future
+        .fromTry(
+          cleanupService.cleanAmend(request.userAnswers)
+        )
+        .flatMap(sessionRepository.set)
         .map { _ =>
-          Redirect(
-            appConfig.manageYourSubcontractorsUrl(
-              request.cisId
-            )
-          )
+          Redirect(redirectCall)
         }
         .recover { case t =>
           logger.error(
-            s"[AmendCompanyCheckYourAnswersController.onCancel] Failed to clear user answers for session ${request.userAnswers.id}",
+            s"[AmendCompanyCheckYourAnswersController.onCancel] " +
+              s"Failed to clean amend user answers for session ${request.userAnswers.id}",
             t
           )
 

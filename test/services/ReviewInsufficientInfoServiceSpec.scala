@@ -264,7 +264,13 @@ class ReviewInsufficientInfoServiceSpec extends SpecBase with MockitoSugar with 
       val row =
         viewModel.missing.head
 
-      row.nameLink.url mustBe "#"
+      row.nameLink.url mustBe
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            100L,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
 
       row.editLink.url mustBe
         controllers.amend.routes.AmendSubcontractorController
