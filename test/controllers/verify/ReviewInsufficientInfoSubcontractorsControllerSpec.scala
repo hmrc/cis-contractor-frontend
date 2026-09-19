@@ -18,6 +18,8 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
+import models.UserAnswers
+import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
 import models.{ContractorScheme, MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, SubcontractorCurrentVerification, Submission, Verification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
@@ -28,7 +30,8 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfoService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 import scala.concurrent.Future
@@ -114,6 +117,28 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
   private val readySub =
     mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
+  private def applicationWithFinalValidation(
+    userAnswers: Option[UserAnswers],
+    validation: ContractorDetailsFinalValidation = ContractorDetailsFinalValidation(true, true, true)
+  ) = {
+    val mockFinalValidationService =
+      mock[ContractorDetailsFinalValidationService]
+
+    userAnswers.foreach { answers =>
+      when(
+        mockFinalValidationService.refreshAndValidate(
+          any[UserAnswers],
+          any[ContractorDetailsValidationTarget]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful((answers, validation))
+      )
+    }
+
+    applicationBuilder(userAnswers = userAnswers)
+      .overrides(bind[ContractorDetailsFinalValidationService].toInstance(mockFinalValidationService))
+  }
+
   private def newestBatchResponse(
     subcontractors: Seq[Subcontractor],
     verifications: Seq[Verification] = Seq.empty,
@@ -148,7 +173,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -176,7 +201,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -203,7 +228,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -221,7 +246,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when CurrentVerificationBatchResponsePage is missing" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationWithFinalValidation(Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -240,7 +265,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -253,7 +278,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when no user answers are found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationWithFinalValidation(None).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -261,6 +286,29 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to review contractor details when final contractor validations fail" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage, batchOf(missingSub, readySub))
+          .success
+          .value
+
+      val application = applicationWithFinalValidation(
+        Some(userAnswers),
+        ContractorDetailsFinalValidation(utrComplete = false, schemeNameComplete = true, emailComplete = true)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad().url
       }
     }
 
