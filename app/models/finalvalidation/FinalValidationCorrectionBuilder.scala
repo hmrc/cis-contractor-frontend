@@ -27,6 +27,7 @@ import pages.add.trust.*
 import play.api.libs.json.Reads
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
+import models.add.IndividualNamesOptions
 
 import javax.inject.{Inject, Singleton}
 import scala.util.{Failure, Success, Try}
@@ -61,6 +62,9 @@ class FinalValidationCorrectionBuilder @Inject() {
     (subcontractorType, target) match {
 
       // Individual or Sole Trader
+      case (Individualorsoletrader, Names) =>
+        buildIndividualNamesPatch(userAnswers)
+
       case (Individualorsoletrader, SubcontractorName) =>
         update(userAnswers, SubcontractorNamePage) { name =>
           FinalValidationSubcontractorPatch(
@@ -425,6 +429,63 @@ class FinalValidationCorrectionBuilder @Inject() {
           new RuntimeException(
             s"Unsupported combination of subcontractor type: $subcontractorType " +
               s"and change target: $target"
+          )
+        )
+    }
+
+  private def buildIndividualNamesPatch(
+    userAnswers: UserAnswers
+  ): Try[FinalValidationSubcontractorPatch] =
+    userAnswers.get(IndividualNamesOptionsPage) match {
+
+      case Some(selected) =>
+        val subcontractorName =
+          if (selected.contains(IndividualNamesOptions.SubcontractorName)) {
+            userAnswers.get(SubcontractorNamePage)
+          } else {
+            None
+          }
+
+        val tradingName =
+          if (selected.contains(IndividualNamesOptions.TradingName)) {
+            userAnswers.get(TradingNameOfSubcontractorPage)
+          } else {
+            None
+          }
+
+        if (
+          selected.contains(IndividualNamesOptions.SubcontractorName) &&
+            subcontractorName.isEmpty
+        ) {
+          Failure(
+            new RuntimeException(
+              s"${SubcontractorNamePage.toString} not found"
+            )
+          )
+        } else if (
+          selected.contains(IndividualNamesOptions.TradingName) &&
+            tradingName.isEmpty
+        ) {
+          Failure(
+            new RuntimeException(
+              s"${TradingNameOfSubcontractorPage.toString} not found"
+            )
+          )
+        } else {
+          Success(
+            FinalValidationSubcontractorPatch(
+              firstName = subcontractorName.map(_.firstName),
+              secondName = subcontractorName.flatMap(_.middleName),
+              surname = subcontractorName.map(_.lastName),
+              tradingName = tradingName
+            )
+          )
+        }
+
+      case None =>
+        Failure(
+          new RuntimeException(
+            s"${IndividualNamesOptionsPage.toString} not found"
           )
         )
     }

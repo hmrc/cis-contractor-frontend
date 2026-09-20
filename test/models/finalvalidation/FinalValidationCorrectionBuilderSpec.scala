@@ -18,6 +18,7 @@ package models.finalvalidation
 
 import base.SpecBase
 import models.TypeOfSubcontractor.*
+import models.add.IndividualNamesOptions
 import pages.add.*
 import pages.add.company.CompanyCrnPage
 import pages.add.partnership.PartnershipNominatedPartnerUtrPage
@@ -67,6 +68,41 @@ class FinalValidationCorrectionBuilderSpec extends SpecBase {
       result mustBe FinalValidationCorrection(
         subcontractorId = 101L,
         changeTarget = FinalValidationChangeTarget.TradingName,
+        patch = FinalValidationSubcontractorPatch(
+          tradingName = Some("Smith Trading")
+        )
+      )
+    }
+
+    "must build an Individual names correction" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .setOrException(
+            TypeOfSubcontractorPage,
+            Individualorsoletrader
+          )
+          .setOrException(
+            IndividualNamesOptionsPage,
+            Set(IndividualNamesOptions.TradingName)
+          )
+          .setOrException(
+            TradingNameOfSubcontractorPage,
+            "Smith Trading"
+          )
+
+      val result =
+        builder
+          .build(
+            userAnswers,
+            payload(FinalValidationChangeTarget.Names)
+          )
+          .success
+          .value
+
+      result mustBe FinalValidationCorrection(
+        subcontractorId = 101L,
+        changeTarget = FinalValidationChangeTarget.Names,
         patch = FinalValidationSubcontractorPatch(
           tradingName = Some("Smith Trading")
         )

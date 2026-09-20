@@ -53,6 +53,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
       MobilePhoneNumber
     )
 
+  private val soleTraderAllNameFields =
+    soleTraderNameFields + TradingName
+
   def build(
     subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
@@ -73,6 +76,64 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     rows ++ sharedRows(subcontractor, changeUrl)
   }
 
+  private def soleTraderNameRows(
+    subcontractor: FinalValidationDraftSubcontractor,
+    changeUrl: ChangeUrl
+  )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
+    firstIssue(subcontractor, soleTraderAllNameFields).toSeq.flatMap { failedField =>
+      val details = subcontractor.proposed
+      val subcontractorName = soleTraderName(details)
+      val tradingName = details.tradingName.map(_.trim).filter(_.nonEmpty)
+
+      val selectedNames =
+        Seq(
+          Option.when(subcontractorName.nonEmpty)(
+            messages("finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName")
+          ),
+          Option.when(tradingName.nonEmpty)(
+            messages("finalvalidations.updateSubcontractorDetails.soleTrader.tradingName")
+          )
+        ).flatten
+
+      val namesValue =
+        selectedNames match {
+          case Seq() =>
+            messages("finalvalidations.updateSubcontractorDetails.soleTrader.names.noneSelected")
+
+          case Seq(name) =>
+            name
+
+          case names =>
+            names.map(name => s"• $name").mkString("\n")
+        }
+
+      val subcontractorNameField = firstIssue(subcontractor, soleTraderNameFields).getOrElse(FirstName)
+
+      Seq(
+        row(
+          field = failedField,
+          labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.names",
+          value = Some(namesValue),
+          target = FinalValidationChangeTarget.Names,
+          changeUrl = changeUrl
+        )
+      ) ++
+        presentRow(
+          field = subcontractorNameField,
+          labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName",
+          value = subcontractorName,
+          target = FinalValidationChangeTarget.SubcontractorName,
+          changeUrl = changeUrl
+        ) ++
+        presentRow(
+          field = TradingName,
+          labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.tradingName",
+          value = tradingName,
+          target = FinalValidationChangeTarget.TradingName,
+          changeUrl = changeUrl
+        )
+    }
+
   private def soleTraderRows(
     subcontractor: FinalValidationDraftSubcontractor,
     changeUrl: ChangeUrl
@@ -81,21 +142,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     val details = subcontractor.proposed
 
     Seq(
-      groupedRow(
-        subcontractor = subcontractor,
-        fields = soleTraderNameFields,
-        labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName",
-        value = soleTraderName(details),
-        target = FinalValidationChangeTarget.SubcontractorName,
-        changeUrl = changeUrl
-      ),
-      valueRow(
-        subcontractor = subcontractor,
-        field = TradingName,
-        labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.tradingName",
-        value = details.tradingName,
-        target = FinalValidationChangeTarget.TradingName,
-        changeUrl = changeUrl
+      soleTraderNameRows(
+        subcontractor,
+        changeUrl
       ),
       optionalRows(
         subcontractor = subcontractor,
@@ -456,18 +505,6 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
       Seq.empty
     }
 
-  private def groupedRow(
-    subcontractor: FinalValidationDraftSubcontractor,
-    fields: Set[FinalValidationField],
-    labelKey: String,
-    value: Option[String],
-    target: FinalValidationChangeTarget,
-    changeUrl: ChangeUrl
-  ): Seq[UpdateSubcontractorDetailsRow] =
-    firstIssue(subcontractor, fields).toSeq.map { failedField =>
-      row(failedField, labelKey, value, target, changeUrl)
-    }
-
   private def presentRow(
     field: FinalValidationField,
     labelKey: String,
@@ -573,7 +610,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     val currentDisplayName =
       subcontractorType(subcontractor) match {
         case Individualorsoletrader =>
-          soleTraderName(details)
+          soleTraderName(details).orElse(details.tradingName)
 
         case Limitedcompany =>
           details.tradingName

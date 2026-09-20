@@ -109,9 +109,21 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
       result mustBe Seq(
         UpdateSubcontractorDetailsRow(
           field = FinalValidationField.TradingName,
+          labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.names",
+          value = Some(
+            summon[Messages](
+              "finalvalidations.updateSubcontractorDetails.soleTrader.tradingName"
+            )
+          ),
+          changeUrl =
+            s"/change/${FinalValidationField.TradingName.key}/${FinalValidationChangeTarget.Names.key}"
+        ),
+        UpdateSubcontractorDetailsRow(
+          field = FinalValidationField.TradingName,
           labelKey = "finalvalidations.updateSubcontractorDetails.soleTrader.tradingName",
           value = Some("Smith Trading"),
-          changeUrl = s"/change/${FinalValidationField.TradingName.key}/${FinalValidationChangeTarget.TradingName.key}"
+          changeUrl =
+            s"/change/${FinalValidationField.TradingName.key}/${FinalValidationChangeTarget.TradingName.key}"
         )
       )
     }

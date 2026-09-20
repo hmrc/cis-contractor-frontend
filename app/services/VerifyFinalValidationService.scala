@@ -22,7 +22,6 @@ import models.finalvalidation.*
 import models.finalvalidation.FinalValidationField.*
 import models.finalvalidation.VerifyFinalValidationSource.*
 import models.response.SubcontractorResponse
-import pages.finalvalidation.VerifyFinalValidationSourcePage
 import pages.verify.*
 import services.finalvalidation.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -248,8 +247,8 @@ class VerifyFinalValidationService @Inject() (
   }
 
   private def selectedReferences(
-                                  userAnswers: UserAnswers
-                                ): Try[Seq[SelectedReference]] =
+    userAnswers: UserAnswers
+  ): Try[Seq[SelectedReference]] =
     for {
       selectedUnverified <- selectedUnverifiedReferences(userAnswers)
       selectedReverify <- selectedReverifyReferences(userAnswers)

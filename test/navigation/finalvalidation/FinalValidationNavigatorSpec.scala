@@ -126,6 +126,26 @@ class FinalValidationNavigatorSpec extends SpecBase {
           controllers.routes.JourneyRecoveryController
             .onPageLoad()
       }
+
+      "must go to the sole trader names options page" in {
+
+        val navigator =
+          new FinalValidationNavigator()
+
+        val answers =
+          emptyUserAnswers
+            .setOrException(
+              TypeOfSubcontractorPage,
+              Individualorsoletrader
+            )
+
+        navigator.startPage(
+          FinalValidationChangeTarget.Names,
+          answers
+        ) mustBe
+          controllers.add.routes.IndividualNamesOptionsController
+            .onPageLoad(FinalValidationMode)
+      }
     }
 
     "nextPage" - {

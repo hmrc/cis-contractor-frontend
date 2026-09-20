@@ -24,6 +24,7 @@ import models.{FinalValidationMode, Mode, UserAnswers}
 import models.finalvalidation.FinalValidationChangeTarget
 import models.finalvalidation.FinalValidationChangeTarget.*
 import models.TypeOfSubcontractor.*
+import models.add.IndividualNamesOptions
 import models.contact.ContactMethodOptions
 import navigation.NavigatorForJourney
 import pages.add.*
@@ -61,6 +62,8 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
     mode match {
       case FinalValidationMode =>
         userAnswers.get(FinalValidationChangeTargetPage) match {
+          case Some(Names)               =>
+            individualNamesNextPage(page, userAnswers)
           case Some(AddressYesNo)        =>
             addressYesNoNextPage(page, userAnswers)
           case Some(ContactDetailsYesNo) =>
@@ -179,6 +182,41 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       case _                                        =>
         complete
     }
+
+  private def individualNamesNextPage(
+    page: Page,
+    userAnswers: UserAnswers
+  ): Call = {
+
+    val selected =
+      userAnswers
+        .get(IndividualNamesOptionsPage)
+        .getOrElse(Set.empty)
+
+    page match {
+      case IndividualNamesOptionsPage =>
+        if (selected.contains(IndividualNamesOptions.SubcontractorName)) {
+          soleTraderRoutes.SubcontractorNameController.onPageLoad(FinalValidationMode)
+        } else if (selected.contains(IndividualNamesOptions.TradingName)) {
+          soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoad(FinalValidationMode)
+        } else {
+          recovery
+        }
+
+      case SubcontractorNamePage =>
+        if (selected.contains(IndividualNamesOptions.TradingName)) {
+          soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoad(FinalValidationMode)
+        } else {
+          complete
+        }
+
+      case TradingNameOfSubcontractorPage =>
+        complete
+
+      case _ =>
+        recovery
+    }
+  }
 
   private def addressYesNoNextPage(page: Page, userAnswers: UserAnswers): Call =
     page match {
@@ -453,6 +491,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
 
   private def soleTraderStartPage(target: FinalValidationChangeTarget): Call =
     target match {
+      case Names                     => soleTraderRoutes.IndividualNamesOptionsController.onPageLoad(FinalValidationMode)
       case SubcontractorName         => soleTraderRoutes.SubcontractorNameController.onPageLoad(FinalValidationMode)
       case TradingName               => soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoad(FinalValidationMode)
       case AddressYesNo              => soleTraderRoutes.SubAddressYesNoController.onPageLoad(FinalValidationMode)

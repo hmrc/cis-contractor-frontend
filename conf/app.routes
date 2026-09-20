@@ -693,6 +693,8 @@ GET   /subcontractor/final-validation/individual/name                           
 POST  /subcontractor/final-validation/individual/name                                                 controllers.add.SubcontractorNameController.onSubmit(mode: Mode = FinalValidationMode)
 GET   /subcontractor/final-validation/individual/trading-name                                         controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/trading-name                                         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/names                                                           controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/names                                                           controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = FinalValidationMode)
 GET   /subcontractor/final-validation/individual/check-address                                        controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/check-address                                        controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 GET   /subcontractor/final-validation/individual/address                                              controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)

@@ -19,6 +19,7 @@ package services
 import base.SpecBase
 import models.UserAnswers
 import models.TypeOfSubcontractor.Individualorsoletrader
+import models.add.IndividualNamesOptions
 import models.finalvalidation.*
 import pages.add.*
 import pages.add.partnership.*
@@ -419,6 +420,40 @@ class FinalValidationSubcontractorServiceSpec extends SpecBase {
       result
         .get(PartnershipNominatedPartnerNinoPage)
         .value mustBe "PX123456A"
+    }
+
+    "must populate the names target" in {
+
+      val draftSubcontractor =
+        subcontractor(
+          proposed = Json.obj(
+            "firstName" -> "John",
+            "surname" -> "Smith",
+            "tradingName" -> "Smith Construction"
+          )
+        )
+
+      val result =
+        service
+          .populateFinalValidationUserAnswers(
+            userAnswers = UserAnswers("id"),
+            instanceId = "CIS-123",
+            subcontractor = draftSubcontractor,
+            changeTarget = FinalValidationChangeTarget.Names
+          )
+          .success
+          .value
+
+      result
+        .get(IndividualNamesOptionsPage)
+        .value mustBe Set(
+        IndividualNamesOptions.SubcontractorName,
+        IndividualNamesOptions.TradingName
+      )
+
+      result
+        .get(TradingNameOfSubcontractorPage)
+        .value mustBe "Smith Construction"
     }
   }
 }

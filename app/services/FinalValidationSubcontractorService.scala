@@ -19,7 +19,7 @@ package services
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.UserAnswers
-import models.add.SubcontractorName as AddSubcontractorName
+import models.add.{IndividualNamesOptions, SubcontractorName as AddSubcontractorName}
 import models.address.{Address, Country}
 import models.finalvalidation.{FinalValidationChangeTarget, FinalValidationDraftSubcontractor, FinalValidationSubcontractorDetails}
 import models.finalvalidation.FinalValidationChangeTarget.{Address as AddressTarget, SubcontractorName as SubcontractorNameTarget, *}
@@ -106,11 +106,23 @@ class FinalValidationSubcontractorService @Inject() {
     target: FinalValidationChangeTarget
   ): Try[UserAnswers] =
     target match {
+      case Names =>
+        subcontractorType match {
+          case Individualorsoletrader =>
+            populateIndividualNamesOptions(userAnswers, details)
+          case _                      =>
+            Failure(
+              new RuntimeException(
+                s"Names not applicable for subcontractor type: $subcontractorType"
+              )
+            )
+        }
+
       case SubcontractorNameTarget | TradingName | PartnershipTradingName =>
         populateNameTarget(userAnswers, subcontractorType, details, target)
 
       case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn |
-          WorksReferenceNumberYesNo | WorksReferenceNumber =>
+           WorksReferenceNumberYesNo | WorksReferenceNumber =>
         populateIdentifierTarget(userAnswers, subcontractorType, details, target)
 
       case AddressYesNo | AddressTarget =>
@@ -324,8 +336,8 @@ class FinalValidationSubcontractorService @Inject() {
     }
 
   private def worksReferenceNumberPages(
-    subcontractorType: TypeOfSubcontractor
-  ): (QuestionPage[Boolean], QuestionPage[String]) =
+                                         subcontractorType: TypeOfSubcontractor
+                                       ): (QuestionPage[Boolean], QuestionPage[String]) =
     subcontractorType match {
       case Individualorsoletrader => (WorksReferenceNumberYesNoPage, WorksReferenceNumberPage)
       case Limitedcompany         => (CompanyWorksReferenceYesNoPage, CompanyWorksReferencePage)
@@ -345,10 +357,10 @@ class FinalValidationSubcontractorService @Inject() {
 
   private def contactPages(subcontractorType: TypeOfSubcontractor): (
     QuestionPage[Boolean],
-    QuestionPage[String],
-    QuestionPage[String],
-    QuestionPage[String]
-  ) =
+      QuestionPage[String],
+      QuestionPage[String],
+      QuestionPage[String]
+    ) =
     subcontractorType match {
       case Individualorsoletrader =>
         (
@@ -374,8 +386,8 @@ class FinalValidationSubcontractorService @Inject() {
     hasValue(details.addressLine1)
 
   private def toAddress(
-    details: FinalValidationSubcontractorDetails
-  ): Option[Address] =
+                         details: FinalValidationSubcontractorDetails
+                       ): Option[Address] =
     if (!hasAddress(details)) {
       None
     } else {
@@ -439,5 +451,44 @@ class FinalValidationSubcontractorService @Inject() {
       case None                    =>
         Failure(new RuntimeException(s"Unsupported subcontractor type: ${subcontractor.subcontractorType}"))
     }
+
+  private def populateIndividualNamesOptions(
+    userAnswers: UserAnswers,
+    details: FinalValidationSubcontractorDetails
+  ): Try[UserAnswers] = {
+
+    val hasSubcontractorName =
+      Seq(
+        details.firstName,
+        details.secondName,
+        details.surname
+      ).flatten
+        .exists(_.trim.nonEmpty)
+
+    val hasTradingName =
+      details.tradingName
+        .exists(_.trim.nonEmpty)
+
+    val selected =
+      Set.empty[IndividualNamesOptions] ++
+        Option.when(hasSubcontractorName)(
+          IndividualNamesOptions.SubcontractorName
+        ) ++
+        Option.when(hasTradingName)(
+          IndividualNamesOptions.TradingName
+        )
+
+    for {
+      withNames <- userAnswers.set(
+        IndividualNamesOptionsPage,
+        selected
+      )
+      result <- setStringOrRemove(
+        withNames,
+        TradingNameOfSubcontractorPage,
+        details.tradingName
+      )
+    } yield result
+  }
 
 }
