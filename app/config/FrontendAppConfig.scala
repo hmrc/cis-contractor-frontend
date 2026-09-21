@@ -78,6 +78,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisGeneralEnquiries: String                       = configuration.get[String]("urls.cisGeneralEnquiries")
   lazy val payeCisForAgentsOnlineService: String             = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisReturnDashboardUrl: String                     = configuration.get[String]("urls.cisReturnDashboard")
+  lazy val cisFrontendBaseUrl: String                        = configuration.get[String]("urls.cisFrontendBaseUrl")
+  lazy val fileStandardReturnUrl: String                     = configuration.get[String]("urls.fileStandardReturn")
+  lazy val fileNilReturnUrl: String                          = configuration.get[String]("urls.fileNilReturn")
   lazy val findUtr: String                                   = configuration.get[String]("urls.findUtr")
   lazy val manageFrontendBaseUrl: String                     = configuration.get[String]("urls.manageFrontendBaseUrl")
   lazy val verificationHistoryUrl: String                    = s"$manageFrontendBaseUrl/verify/history/all"

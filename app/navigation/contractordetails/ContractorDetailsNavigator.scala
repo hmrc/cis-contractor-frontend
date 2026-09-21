@@ -30,9 +30,13 @@ import javax.inject.{Inject, Singleton}
 class ContractorDetailsNavigator @Inject() () extends NavigatorForJourney {
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
-    mode match {
-      case NormalMode            => normalRoutes(page)(userAnswers)
-      case CheckMode | AmendMode => checkRoutes(page)(userAnswers)
+    if (userAnswers.get(ContractorDetailsValidationTargetPage).isDefined && finalValidationPage(page)) {
+      controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
+    } else {
+      mode match {
+        case NormalMode            => normalRoutes(page)(userAnswers)
+        case CheckMode | AmendMode => checkRoutes(page)(userAnswers)
+      }
     }
 
   private def checkAnswers: Call =
@@ -83,4 +87,9 @@ class ContractorDetailsNavigator @Inject() () extends NavigatorForJourney {
       case _                                    =>
         routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def finalValidationPage(page: Page): Boolean =
+    page == ContractorUtrPage ||
+      page == SchemeNamePage ||
+      page == EnterContractorEmailAddressPage
 }

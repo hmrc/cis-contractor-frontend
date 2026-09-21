@@ -19,9 +19,7 @@ package pages.unmatched
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object RemoveSubcontractorVerifyRequestPage extends QuestionPage[Boolean] {
+case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "removeSubcontractorVerifyRequest"
+  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
 }

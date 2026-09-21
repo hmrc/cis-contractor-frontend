@@ -17,11 +17,11 @@
 package controllers.amend.trust
 
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
 import models.UserAnswers
 import models.amend.trust.AmendTrustRemoveDetail
 import pages.add.trust.*
-import pages.amend.ShowVerificationDetailsPage
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -85,9 +85,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(TrustUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendTrustRemoveDetail.WorksReferenceNumber =>
         userAnswers
