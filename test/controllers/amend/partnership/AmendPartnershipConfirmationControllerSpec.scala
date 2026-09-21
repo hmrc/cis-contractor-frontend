@@ -33,15 +33,22 @@ import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
+import utils.DefaultSubcontractorCleanupService
+
 import scala.concurrent.Future
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
+import scala.util.{Failure, Success}
+
 class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val cisId           = "123456789"
   private val partnershipName = "ABC Partnership"
+
+  private val mockCleanupService =
+    mock[DefaultSubcontractorCleanupService]
 
   private val mockSessionRepository =
     mock[SessionRepository]
@@ -51,12 +58,14 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockSessionRepository, mockVerificationService)
+    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
+        bind[DefaultSubcontractorCleanupService]
+          .toInstance(mockCleanupService),
         bind[SessionRepository]
           .toInstance(mockSessionRepository),
         bind[VerificationService]
