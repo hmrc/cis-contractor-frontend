@@ -17,9 +17,10 @@
 package controllers.amend
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.UserAnswers
-import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
 import models.add.{IndividualNamesOptions, SubcontractorName}
+import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
@@ -31,14 +32,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
-import utils.DefaultSubcontractorCleanupService
+import services.VerificationService
 import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
-import config.FrontendAppConfig
-import services.VerificationService
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
@@ -74,7 +72,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       verificationNumber = None
     )
 
-  private def userAnswersWithOriginal =
+  private def userAnswersWithOriginal: UserAnswers =
     emptyUserAnswers
       .set(OriginalIndividualAnswersQuery, original)
       .success
@@ -93,10 +91,9 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
       .value
 
   private lazy val confirmationRoute =
-    controllers.amend.routes.AmendIndividualConfirmationController.onPageLoad().url
-
-  private val mockCleanupService =
-    mock[DefaultSubcontractorCleanupService]
+    controllers.amend.routes.AmendIndividualConfirmationController
+      .onPageLoad()
+      .url
 
   private val mockSessionRepository =
     mock[SessionRepository]
@@ -106,14 +103,12 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
+    reset(mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService]
-          .toInstance(mockCleanupService),
         bind[SessionRepository]
           .toInstance(mockSessionRepository),
         bind[VerificationService]
@@ -124,9 +119,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
   "AmendIndividualConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -158,9 +150,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
             displayName,
             confirmationLink
           )(request, messages(app)).toString
-
-        verify(mockCleanupService).cleanAmend(any())
-        verify(mockSessionRepository).set(any())
       }
     }
 
@@ -174,8 +163,13 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -199,8 +193,13 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .set(SubcontractorNamePage, subcontractorName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -228,7 +227,9 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .success
           .value
 
-      val app = application(userAnswers)
+      val app = applicationBuilder(
+        userAnswers = Some(userAnswers)
+      ).build()
 
       running(app) {
 
@@ -239,29 +240,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verifyNoInteractions(mockCleanupService)
-        verifyNoInteractions(mockSessionRepository)
-      }
-    }
-
-    "must redirect to Journey Recovery when cleanup fails" in {
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Failure(new RuntimeException("cleanup failed")))
-
-      val app = application(userAnswersWithOriginal)
-
-      running(app) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockSessionRepository, never()).set(any())
       }
     }
 
@@ -294,15 +272,11 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
       }
     }
 
     "must not refresh verification batches for standard amend journey" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -324,9 +298,6 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
     }
 
     "must refresh verification batches and render the insufficient info confirmation link" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(
         mockVerificationService.refreshVerificationBatches(
@@ -373,16 +344,10 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
           .refreshVerificationBatches(
             any[UserAnswers]
           )(any())
-
-        verify(mockCleanupService)
-          .cleanAmend(any[UserAnswers])
       }
     }
 
     "must refresh verification batches for unmatched journey" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(
         mockVerificationService.refreshVerificationBatches(
@@ -414,7 +379,7 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
 
         status(result) mustBe OK
 
-        verify(mockVerificationService)
+        verify(mockVerificationService, times(1))
           .refreshVerificationBatches(any[UserAnswers])(any())
       }
     }

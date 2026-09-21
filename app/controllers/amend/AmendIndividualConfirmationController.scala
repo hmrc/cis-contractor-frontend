@@ -24,18 +24,17 @@ import models.amend.AmendJourneyType
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
+import utils.SubcontractorNameExtractor
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.{CisIdQuery, OriginalIndividualAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
 import viewmodels.amend.{AmendConfirmationLinks, IndividualAmendedViewModel}
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class AmendIndividualConfirmationController @Inject() (
   identify: IdentifierAction,
@@ -43,7 +42,6 @@ class AmendIndividualConfirmationController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AmendConfirmationView,
-  cleanupService: DefaultSubcontractorCleanupService,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
   appConfig: FrontendAppConfig,
@@ -98,58 +96,44 @@ class AmendIndividualConfirmationController @Inject() (
         val individualName =
           subcontractorNameExtractor.displaySubcontractorName(userAnswers)
 
-        val link =
+        val confirmationLink =
           AmendConfirmationLinks.build(
             journeyType,
             cisId,
             appConfig
           )
-        cleanupService.cleanAmend(userAnswers) match {
 
-          case Success(cleanedUserAnswers) =>
-            val persistFinalUserAnswers =
-              journeyType match {
+        val persistFinalUserAnswers =
+          journeyType match {
 
-                case AmendJourneyType.Standard =>
-                  sessionRepository
-                    .set(cleanedUserAnswers)
-                    .map(_ => cleanedUserAnswers)
+            case AmendJourneyType.Standard =>
+              sessionRepository
+                .set(userAnswers)
+                .map(_ => userAnswers)
 
-                case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                  verificationService.refreshVerificationBatches(
-                    cleanedUserAnswers
-                  )
-              }
+            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+              verificationService.refreshVerificationBatches(userAnswers)
+          }
 
-            persistFinalUserAnswers
-              .map { _ =>
-                Ok(
-                  view(
-                    rows = tableRows,
-                    subcontractorName = individualName,
-                    confirmationLink = link
-                  )
-                )
-              }
-              .recover { case exception =>
-                logger.error(
-                  "[AmendIndividualConfirmationController.onPageLoad] " +
-                    "Failed to persist confirmation session data",
-                  exception
-                )
-
-                journeyRecoveryRedirect
-              }
-
-          case Failure(exception) =>
-            logger.warn(
+        persistFinalUserAnswers
+          .map { _ =>
+            Ok(
+              view(
+                rows = tableRows,
+                subcontractorName = individualName,
+                confirmationLink = confirmationLink
+              )
+            )
+          }
+          .recover { case exception =>
+            logger.error(
               "[AmendIndividualConfirmationController.onPageLoad] " +
-                "Failed to clean user answers",
+                "Failed to persist confirmation session data",
               exception
             )
 
-            Future.successful(journeyRecoveryRedirect)
-        }
+            journeyRecoveryRedirect
+          }
 
       case (None, _, _) =>
         logger.error(
