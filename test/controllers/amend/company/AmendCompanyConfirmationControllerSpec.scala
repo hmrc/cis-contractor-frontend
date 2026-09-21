@@ -194,7 +194,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
           .success
           .value
 
-      val noNameProvided =  messages("verify.noName")
+      val noNameProvided = messages("verify.noName")
 
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))

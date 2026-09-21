@@ -190,15 +190,15 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
         .remove(CompanyNamePage)
         .success
         .value
-      
+
       val application =
         applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
           FakeRequest(GET, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url)
-        val msg = app.injector.instanceOf[MessagesApi].preferred(request)
-        val result = route(application, request).value
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
 
         status(result) mustEqual OK
 
@@ -206,11 +206,10 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
 
         page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
         page must include(msg("companyName.checkYourAnswersLabel"))
-        
+
         page must include(msg("verify.noName"))
       }
     }
-    
 
     "must render the correct summary for a verified company" in {
 
