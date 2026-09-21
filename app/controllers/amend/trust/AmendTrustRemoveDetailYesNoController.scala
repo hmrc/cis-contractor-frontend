@@ -19,7 +19,7 @@ package controllers.amend.trust
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.trust.AmendTrustRemoveDetail
 import pages.add.trust.*
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
@@ -40,6 +40,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: AmendTrustRemoveDetailYesNoFormProvider,
+  redirectUnmatchSubbieRefActionFilter: RedirectUnmatchSubbieRefActionFilterProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AmendTrustRemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
@@ -98,8 +99,9 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
       controllers.routes.JourneyRecoveryController.onPageLoad()
     )
 
-  def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  def onPageLoad(subcontractorDetail: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -117,15 +119,18 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
               val subcontractorDetailTitle =
                 messages(detailType.messageKey)
 
-              Future.successful(Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form)))
+              Future.successful(
+                Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form, subbieResourceRef))
+              )
             }
           }
         }
         .getOrElse(Future.successful(journeyRecovery))
     }
 
-  def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(subcontractorDetail: String, subbieResourceRef: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen
+      redirectUnmatchSubbieRefActionFilter(AmendMode, subbieResourceRef)).async { implicit request =>
       request.userAnswers
         .get(TrustNamePage)
         .map { trustName =>
@@ -146,7 +151,15 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                       messages(detailType.messageKey)
 
                     Future.successful(
-                      BadRequest(view(trustName, subcontractorDetail, subcontractorDetailTitle, formWithErrors))
+                      BadRequest(
+                        view(
+                          trustName,
+                          subcontractorDetail,
+                          subcontractorDetailTitle,
+                          formWithErrors,
+                          subbieResourceRef
+                        )
+                      )
                     )
                   ,
                   value =>
@@ -159,7 +172,9 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoad().url
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+                        .onPageLoad(subbieResourceRef)
+                        .url
                     )).recover { case ex =>
                       logger.error(
                         s"Failed to save remove detail answer for '$subcontractorDetail'",
@@ -172,5 +187,5 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
           }
         }
         .getOrElse(Future.successful(journeyRecovery))
-  }
+    }
 }
