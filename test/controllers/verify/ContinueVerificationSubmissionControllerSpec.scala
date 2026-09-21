@@ -204,7 +204,7 @@ class ContinueVerificationSubmissionControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect back to ReviewUnmatchedSubcontractors when the unmatched batch is not ready" in {
+      "must continue to CheckVerificationBatchReadiness without performing a second unmatched batch readiness check" in {
 
         val userAnswers =
           emptyUserAnswers
@@ -215,6 +215,9 @@ class ContinueVerificationSubmissionControllerSpec extends SpecBase {
 
         val sessionRepository =
           mockSessionRepository(Some(userAnswers))
+
+        when(sessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
 
         val application =
           applicationBuilder(
@@ -235,11 +238,11 @@ class ContinueVerificationSubmissionControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual
-            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-              .onPageLoad()
+            controllers.verify.routes.CheckVerificationBatchReadinessController
+              .checkVerificationBatchReadiness(NormalMode)
               .url
 
-          verify(sessionRepository, never())
+          verify(sessionRepository)
             .set(any[UserAnswers])
         }
       }

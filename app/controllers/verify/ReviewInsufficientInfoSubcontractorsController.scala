@@ -17,9 +17,8 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.NormalMode
 import models.contractordetails.ContractorDetailsValidationTarget
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, VerificationBatchReadinessPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import models.{NormalMode, UserAnswers}
-import models.verify.{SelectedSubcontractors, UnmatchedBatchReadiness}
+import models.verify.SelectedSubcontractors
 import models.response.GetCurrentVerificationBatchResponse
 import pages.verify.*
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -73,15 +73,6 @@ class ContinueVerificationSubmissionController @Inject() (
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               )
             }
-
-          } else if (!UnmatchedBatchReadiness.isBatchReady(currentBatch)) {
-
-            Future.successful(
-              Redirect(
-                controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-                  .onPageLoad()
-              )
-            )
 
           } else {
 
