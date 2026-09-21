@@ -455,7 +455,7 @@ class FinalValidationCorrectionBuilder @Inject() {
 
         if (
           selected.contains(IndividualNamesOptions.SubcontractorName) &&
-            subcontractorName.isEmpty
+          subcontractorName.isEmpty
         ) {
           Failure(
             new RuntimeException(
@@ -464,7 +464,7 @@ class FinalValidationCorrectionBuilder @Inject() {
           )
         } else if (
           selected.contains(IndividualNamesOptions.TradingName) &&
-            tradingName.isEmpty
+          tradingName.isEmpty
         ) {
           Failure(
             new RuntimeException(

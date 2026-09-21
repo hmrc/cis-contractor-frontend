@@ -122,7 +122,7 @@ class FinalValidationSubcontractorService @Inject() {
         populateNameTarget(userAnswers, subcontractorType, details, target)
 
       case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn |
-           WorksReferenceNumberYesNo | WorksReferenceNumber =>
+          WorksReferenceNumberYesNo | WorksReferenceNumber =>
         populateIdentifierTarget(userAnswers, subcontractorType, details, target)
 
       case AddressYesNo | AddressTarget =>
@@ -336,8 +336,8 @@ class FinalValidationSubcontractorService @Inject() {
     }
 
   private def worksReferenceNumberPages(
-                                         subcontractorType: TypeOfSubcontractor
-                                       ): (QuestionPage[Boolean], QuestionPage[String]) =
+    subcontractorType: TypeOfSubcontractor
+  ): (QuestionPage[Boolean], QuestionPage[String]) =
     subcontractorType match {
       case Individualorsoletrader => (WorksReferenceNumberYesNoPage, WorksReferenceNumberPage)
       case Limitedcompany         => (CompanyWorksReferenceYesNoPage, CompanyWorksReferencePage)
@@ -357,10 +357,10 @@ class FinalValidationSubcontractorService @Inject() {
 
   private def contactPages(subcontractorType: TypeOfSubcontractor): (
     QuestionPage[Boolean],
-      QuestionPage[String],
-      QuestionPage[String],
-      QuestionPage[String]
-    ) =
+    QuestionPage[String],
+    QuestionPage[String],
+    QuestionPage[String]
+  ) =
     subcontractorType match {
       case Individualorsoletrader =>
         (
@@ -386,8 +386,8 @@ class FinalValidationSubcontractorService @Inject() {
     hasValue(details.addressLine1)
 
   private def toAddress(
-                         details: FinalValidationSubcontractorDetails
-                       ): Option[Address] =
+    details: FinalValidationSubcontractorDetails
+  ): Option[Address] =
     if (!hasAddress(details)) {
       None
     } else {
@@ -480,14 +480,14 @@ class FinalValidationSubcontractorService @Inject() {
 
     for {
       withNames <- userAnswers.set(
-        IndividualNamesOptionsPage,
-        selected
-      )
-      result <- setStringOrRemove(
-        withNames,
-        TradingNameOfSubcontractorPage,
-        details.tradingName
-      )
+                     IndividualNamesOptionsPage,
+                     selected
+                   )
+      result    <- setStringOrRemove(
+                     withNames,
+                     TradingNameOfSubcontractorPage,
+                     details.tradingName
+                   )
     } yield result
   }
 

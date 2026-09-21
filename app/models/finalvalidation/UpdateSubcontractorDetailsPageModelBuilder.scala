@@ -81,9 +81,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     changeUrl: ChangeUrl
   )(implicit messages: Messages): Seq[UpdateSubcontractorDetailsRow] =
     firstIssue(subcontractor, soleTraderAllNameFields).toSeq.flatMap { failedField =>
-      val details = subcontractor.proposed
+      val details           = subcontractor.proposed
       val subcontractorName = soleTraderName(details)
-      val tradingName = details.tradingName.map(_.trim).filter(_.nonEmpty)
+      val tradingName       = details.tradingName.map(_.trim).filter(_.nonEmpty)
 
       val selectedNames =
         Seq(

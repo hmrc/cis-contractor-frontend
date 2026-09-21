@@ -59,7 +59,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorsToReverifyView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   private def dateFmt(implicit messages: Messages) =

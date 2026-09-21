@@ -47,7 +47,7 @@ class ReviewSubcontractorDetailsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: ReviewSubcontractorDetailsView
 )(using ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =

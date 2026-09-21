@@ -35,7 +35,6 @@ import views.html.verify.ContractorEmailConfirmationNotStoredView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
 class ContractorEmailConfirmationNotStoredController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
@@ -51,7 +50,7 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: ContractorEmailConfirmationNotStoredView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -75,42 +74,42 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
       } else {
         for {
           validation <- verifyFinalValidationService.validate(
-            request.cisId,
-            request.userAnswers
-          )
+                          request.cisId,
+                          request.userAnswers
+                        )
 
           result <-
             if (validation.hasErrors) {
               for {
                 createRequest <- Future.fromTry(
-                  finalValidationDraftRequestBuilder.build(
-                    request.cisId,
-                    validation
-                  )
-                )
+                                   finalValidationDraftRequestBuilder.build(
+                                     request.cisId,
+                                     validation
+                                   )
+                                 )
 
                 draftId <- finalValidationDraftService.create(createRequest)
 
                 withContinuation <- Future.fromTry(
-                  request.userAnswers.set(
-                    VerifyFinalValidationContinuationPage,
-                    VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
-                  )
-                )
+                                      request.userAnswers.set(
+                                        VerifyFinalValidationContinuationPage,
+                                        VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+                                      )
+                                    )
 
                 withDraftId <- Future.fromTry(
-                  withContinuation.set(
-                    FinalValidationDraftIdPage,
-                    draftId
-                  )
-                )
+                                 withContinuation.set(
+                                   FinalValidationDraftIdPage,
+                                   draftId
+                                 )
+                               )
 
                 withMode <- Future.fromTry(
-                  withDraftId.set(
-                    VerifyFinalValidationModePage,
-                    mode.toString
-                  )
-                )
+                              withDraftId.set(
+                                VerifyFinalValidationModePage,
+                                mode.toString
+                              )
+                            )
 
                 _ <- sessionRepository.set(withMode)
 
@@ -137,10 +136,10 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
       } else {
         for {
           updatedAnswers <- Future.fromTry(
-            request.userAnswers.remove(
-              VerifyFinalValidationContinuationPage
-            )
-          )
+                              request.userAnswers.remove(
+                                VerifyFinalValidationContinuationPage
+                              )
+                            )
 
           _ <- sessionRepository.set(updatedAnswers)
 

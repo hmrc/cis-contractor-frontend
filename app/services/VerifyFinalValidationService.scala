@@ -251,7 +251,7 @@ class VerifyFinalValidationService @Inject() (
   ): Try[Seq[SelectedReference]] =
     for {
       selectedUnverified <- selectedUnverifiedReferences(userAnswers)
-      selectedReverify <- selectedReverifyReferences(userAnswers)
+      selectedReverify   <- selectedReverifyReferences(userAnswers)
     } yield (selectedUnverified ++ selectedReverify)
       .distinctBy(_.subcontractorId)
 
@@ -265,9 +265,10 @@ class VerifyFinalValidationService @Inject() (
       Success(Seq.empty)
     } else {
       for {
-        available   <- userAnswers.get(UnverifiedSubcontractorsPage)
-                       .map(Success(_))
-                       .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
+        available   <- userAnswers
+                         .get(UnverifiedSubcontractorsPage)
+                         .map(Success(_))
+                         .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
         selectedIds <- ids(selected.map(_.id))
         references  <- referencesFor(
                          selectedIds,
@@ -292,7 +293,8 @@ class VerifyFinalValidationService @Inject() (
       Success(Seq.empty)
     } else {
       for {
-        response    <- userAnswers.get(NewestVerificationBatchResponsePage)
+        response    <- userAnswers
+                         .get(NewestVerificationBatchResponsePage)
                          .map(Success(_))
                          .getOrElse(Failure(new IllegalStateException("NewestVerificationBatchResponsePage not found")))
         selectedIds <- ids(selected.map(_.id))

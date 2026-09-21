@@ -427,8 +427,8 @@ class FinalValidationSubcontractorServiceSpec extends SpecBase {
       val draftSubcontractor =
         subcontractor(
           proposed = Json.obj(
-            "firstName" -> "John",
-            "surname" -> "Smith",
+            "firstName"   -> "John",
+            "surname"     -> "Smith",
             "tradingName" -> "Smith Construction"
           )
         )

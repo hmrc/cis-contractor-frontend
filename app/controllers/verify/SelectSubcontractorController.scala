@@ -52,7 +52,7 @@ class SelectSubcontractorController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport
     with AgentClientChecks {
 
@@ -239,9 +239,9 @@ class SelectSubcontractorController @Inject() (
                   cleanedAnswers <-
                     if (
                       mode == CheckMode &&
-                        answersWithSelections
-                          .get(RebuildVerificationFromWarningPage)
-                          .contains(true)
+                      answersWithSelections
+                        .get(RebuildVerificationFromWarningPage)
+                        .contains(true)
                     ) {
                       Future.fromTry(
                         answersWithSelections.remove(RebuildVerificationFromWarningPage)
