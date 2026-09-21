@@ -38,6 +38,16 @@ class FrontendAppConfigSpec extends SpecBase {
       applicationConfig.cisStubUrl mustBe "http://localhost:6997"
     }
 
+    "fileStandardReturnUrl must point to the monthly return journey" in {
+      applicationConfig.fileStandardReturnUrl mustBe
+        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+    }
+
+    "fileNilReturnUrl must point to the nil return journey" in {
+      applicationConfig.fileNilReturnUrl mustBe
+        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+    }
+
     "getConfString" - {
 
       "must return the configured value when present" in {

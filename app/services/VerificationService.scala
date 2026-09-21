@@ -18,11 +18,12 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{EmployerReference, Subcontractor, UserAnswers}
 import models.requests.*
 import models.response.*
 import models.verify.*
+import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
+import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
@@ -39,7 +40,8 @@ class VerificationService @Inject() (
   cisManageService: CisManageService,
   chrisVerificationRequestBuilder: ChrisVerificationRequestBuilder,
   sessionRepository: SessionRepository
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def refreshNewestVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
@@ -366,6 +368,25 @@ class VerificationService @Inject() (
         error => Future.failed(error),
         updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
       )
+
+  def resetUserAnswers(userAnswers: UserAnswers): Future[Unit] =
+    userAnswers.get(CisIdQuery) match {
+      case None =>
+        logger.warn("CisId not found in session data, skipping UserAnswers reset")
+        Future.successful(())
+
+      case Some(cisId) =>
+        UserAnswers(userAnswers.id)
+          .set(CisIdQuery, cisId)
+          .fold(
+            _ => Future.successful(()),
+            resetUserAnswers =>
+              sessionRepository
+                .set(resetUserAnswers)
+                .map(_ => ())
+                .recover { case _ => () }
+          )
+    }
 
   private def required[A](value: Option[A], errorMsg: String): Future[A] =
     value match {

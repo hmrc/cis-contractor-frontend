@@ -47,6 +47,22 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
 
+  def prepopulateContractorKnownFacts(
+    instanceId: String,
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId")
+      .execute[HttpResponse]
+      .flatMap { response =>
+        if (response.status / 100 == 2) {
+          Future.unit
+        } else {
+          Future.failed(UpstreamErrorResponse(response.body, response.status, response.status))
+        }
+      }
+
   def getCisTaxpayer()(implicit hc: HeaderCarrier): Future[CisTaxpayerResponse] =
     http
       .get(url"$cisBaseUrl/taxpayer")
@@ -233,6 +249,30 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/scheme/$instanceId")
       .execute[Scheme]
 
+  def updateSchemeVersion(
+    request: UpdateSchemeVersionRequest
+  )(implicit hc: HeaderCarrier): Future[UpdateSchemeVersionResponse] =
+    http
+      .post(url"$cisBaseUrl/scheme/version-update")
+      .withBody(Json.toJson(request))
+      .execute[UpdateSchemeVersionResponse]
+
+  def updateScheme(
+    request: UpdateSchemeRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/scheme/update")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT | OK =>
+            Future.successful(())
+          case other           =>
+            Future.failed(new RuntimeException(s"Update scheme failed, returned $other: ${response.body}"))
+        }
+      }
+
   def submitVerificationToChris(
     submissionId: Long,
     request: ChrisVerificationRequest
@@ -395,7 +435,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
   }
 
   def updateSubcontractorForEdit(
-    request: UpdateSubcontractorRequest
+    request: UpdateSubcontractorForEditRequest
   )(implicit hc: HeaderCarrier): Future[Unit] = {
 
     logger.info(
