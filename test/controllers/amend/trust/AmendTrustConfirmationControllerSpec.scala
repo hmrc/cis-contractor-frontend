@@ -352,7 +352,7 @@ class AmendTrustConfirmationControllerSpec extends SpecBase with MockitoSugar wi
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsController
             .onPageLoad()
             .url
         )

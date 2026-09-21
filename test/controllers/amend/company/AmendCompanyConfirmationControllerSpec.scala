@@ -343,7 +343,7 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsController
             .onPageLoad()
             .url
         )
