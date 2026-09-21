@@ -287,7 +287,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad().url
       }
     }
-    
+
     "must redirect to ContinueVerificationSubmissionController when the user continues" in {
 
       val application =
