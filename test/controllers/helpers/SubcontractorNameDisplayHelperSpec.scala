@@ -21,8 +21,7 @@ import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.test.FakeRequest
+import play.api.i18n.Messages
 
 class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
 
