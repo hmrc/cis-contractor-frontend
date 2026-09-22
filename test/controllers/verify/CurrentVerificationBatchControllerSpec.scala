@@ -24,7 +24,7 @@ import models.validation.{FieldValidationFailure, SubcontractorValidationFailure
 import models.validation.SubcontractorValidationField.{EmailAddress, PartnershipTradingName}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.validation.SubcontractorValidationFailuresPage
 import pages.verify.CurrentVerificationBatchResponsePage
@@ -65,6 +65,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(emptyUserAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
+
       val application =
         buildApplication(
           userAnswers = Some(emptyUserAnswers),
@@ -87,6 +89,14 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
             .onPageLoad()
             .url
       }
+
+      verify(mockService, times(2))
+        .refreshNewestVerificationBatch(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+
+      verify(mockService)
+        .latestBatchCanBeModified(any[UserAnswers])
 
       verify(mockService)
         .getCurrentVerificationBatch(
@@ -121,6 +131,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         )
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
+
       val application =
         buildApplication(
           userAnswers = Some(emptyUserAnswers),
@@ -143,6 +155,14 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
             .onPageLoad()
             .url
       }
+
+      verify(mockService)
+        .refreshNewestVerificationBatch(
+          any[UserAnswers]
+        )(any[HeaderCarrier])
+
+      verify(mockService)
+        .latestBatchCanBeModified(any[UserAnswers])
 
       verify(mockService)
         .getCurrentVerificationBatch(
@@ -252,6 +272,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+
       when(
         mockValidator.validate(subcontractors)
       ).thenReturn(failures)
@@ -353,6 +375,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       ).thenReturn(
         Future.successful(updatedAnswers)
       )
+
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
 
       when(
         mockValidator.validate(subcontractors)
@@ -459,6 +483,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+
       when(
         mockValidator.validate(subcontractors)
       ).thenReturn(Nil)
@@ -536,6 +562,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+
       when(
         mockValidator.validate(
           response.subcontractors
@@ -602,6 +630,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       ).thenReturn(
         Future.successful(updatedAnswers)
       )
+
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
 
       when(
         mockValidator.validate(
@@ -683,6 +713,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+
       when(
         mockValidator.validate(
           response.subcontractors
@@ -750,6 +782,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
+      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+
       when(
         mockValidator.validate(
           response.subcontractors
@@ -807,6 +841,37 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       bind[SessionRepository]
         .toInstance(sessionRepository)
     ).build()
+
+  private def stubLatestAllowsModify(
+    service: VerificationService,
+    firstRefresh: UserAnswers,
+    secondRefresh: UserAnswers
+  ): Unit = {
+    when(service.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(firstRefresh), Future.successful(secondRefresh))
+    when(service.latestBatchCanBeModified(any[UserAnswers]))
+      .thenReturn(true)
+  }
+
+  private def stubLatestAllowsModify(
+    service: VerificationService,
+    refreshedAnswers: UserAnswers
+  ): Unit = {
+    when(service.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(refreshedAnswers))
+    when(service.latestBatchCanBeModified(any[UserAnswers]))
+      .thenReturn(true)
+  }
+
+  private def stubLatestRequiresCreate(
+    service: VerificationService,
+    refreshedAnswers: UserAnswers
+  ): Unit = {
+    when(service.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(refreshedAnswers))
+    when(service.latestBatchCanBeModified(any[UserAnswers]))
+      .thenReturn(false)
+  }
 
   private def currentSubcontractor(
     subcontractorId: Long

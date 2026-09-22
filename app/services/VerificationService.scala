@@ -21,6 +21,7 @@ import models.agent.AgentClientData
 import models.requests.*
 import models.response.*
 import models.verify.*
+import models.verify.VerificationBatchStatus.*
 import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
 import play.api.Logging
@@ -138,6 +139,25 @@ class VerificationService @Inject() (
       _        <- sessionRepository.set(updated)
     } yield updated
 
+  def latestBatchCanBeModified(userAnswers: UserAnswers): Boolean =
+    latestBatchStatus(userAnswers).exists {
+      case Started | Validated => true
+      case _                   => false
+    }
+
+  private def latestBatchCanBeRecreated(userAnswers: UserAnswers): Boolean =
+    latestBatchStatus(userAnswers).exists {
+      case Submitted | SubmittedNoReceipt | DepartmentalError | FatalError => true
+      case _                                                               => false
+    }
+
+  private def latestBatchStatus(userAnswers: UserAnswers): Option[VerificationBatchStatus] =
+    userAnswers
+      .get(NewestVerificationBatchResponsePage)
+      .flatMap(_.verificationBatch)
+      .flatMap(_.status)
+      .flatMap(VerificationBatchStatus.from)
+
   def createVerificationBatchAndVerifications(
     userAnswers: UserAnswers,
     selectedSubcontractorIds: Seq[Long],
@@ -152,15 +172,7 @@ class VerificationService @Inject() (
       _ <- if (selectedSubcontractorIds.nonEmpty) Future.successful(())
            else Future.failed(new RuntimeException("No subcontractors selected"))
 
-      current <-
-        userAnswers
-          .get(CurrentVerificationBatchResponsePage)
-          .map(Future.successful)
-          .getOrElse(
-            Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data"))
-          )
-
-      idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
+      idToRef <- subcontractorResourceRefs(userAnswers)
 
       verificationResourceRefs <- Future.fromTry {
                                     scala.util.Try {
@@ -187,6 +199,35 @@ class VerificationService @Inject() (
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
+
+  private def subcontractorResourceRefs(userAnswers: UserAnswers): Future[Map[Long, Long]] =
+    userAnswers
+      .get(NewestVerificationBatchResponsePage)
+      .map { newest =>
+        Future.successful(
+          newest.subcontractors
+            .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
+            .toMap
+        )
+      }
+      .orElse {
+        userAnswers
+          .get(CurrentVerificationBatchResponsePage)
+          .map { current =>
+            Future.successful(
+              current.subcontractors
+                .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
+                .toMap
+            )
+          }
+      }
+      .getOrElse(
+        Future.failed(
+          new RuntimeException(
+            "Neither CurrentVerificationBatchResponsePage nor NewestVerificationBatchResponsePage found in session data"
+          )
+        )
+      )
 
   private def unverifiedSubcontractors(
     subcontractors: Seq[Subcontractor]
@@ -422,41 +463,41 @@ class VerificationService @Inject() (
           )
       }
 
-      refreshedUa <- getCurrentVerificationBatch(userAnswers)
-
-      current <- refreshedUa
-                   .get(CurrentVerificationBatchResponsePage)
-                   .map(Future.successful)
-                   .getOrElse(
-                     Future.failed(
-                       new RuntimeException(
-                         "CurrentVerificationBatchResponsePage not found in session data"
-                       )
-                     )
-                   )
-
-      verificationBatchRefOpt =
-        current.verificationBatch.flatMap(_.verifBatchResourceRef)
+      latestUa <- refreshNewestVerificationBatch(userAnswers)
 
       _ <-
-        verificationBatchRefOpt match {
+        if (latestBatchCanBeModified(latestUa)) {
+          for {
+            refreshedUa  <- getCurrentVerificationBatch(latestUa)
+            afterRefresh <- refreshNewestVerificationBatch(refreshedUa)
 
-          case None =>
-            cisConnector.createVerificationBatchAndVerifications(
-              CreateVerificationBatchAndVerificationsRequest(
-                instanceId = cisId,
-                verificationResourceReferences = submittedSubbieRefs,
-                actionIndicator = None
-              )
-            )
+            current <- afterRefresh
+                         .get(CurrentVerificationBatchResponsePage)
+                         .map(Future.successful)
+                         .getOrElse(
+                           Future.failed(
+                             new RuntimeException(
+                               "CurrentVerificationBatchResponsePage not found in session data"
+                             )
+                           )
+                         )
 
-          case Some(verificationBatchRef) =>
-            val existingVerificationRefs =
+            verificationBatchRef <-
+              current.verificationBatch
+                .flatMap(_.verifBatchResourceRef)
+                .map(Future.successful)
+                .getOrElse(
+                  Future.failed(
+                    new RuntimeException("Missing verifBatchResourceRef in current verification batch")
+                  )
+                )
+
+            existingVerificationRefs =
               current.verifications
                 .flatMap(_.verificationResourceRef)
                 .distinct
 
-            val modifyRequest =
+            modifyRequest =
               ModifyVerificationsRequest(
                 instanceId = cisId,
                 deleteVerifications =
@@ -471,10 +512,25 @@ class VerificationService @Inject() (
                 )
               )
 
-            cisConnector.modifyVerificationBatch(modifyRequest)
+            _ <- cisConnector.modifyVerificationBatch(modifyRequest)
+          } yield ()
+        } else if (latestBatchCanBeRecreated(latestUa)) {
+          cisConnector
+            .createVerificationBatchAndVerifications(
+              CreateVerificationBatchAndVerificationsRequest(
+                instanceId = cisId,
+                verificationResourceReferences = submittedSubbieRefs,
+                actionIndicator = None
+              )
+            )
+            .map(_ => ())
+        } else {
+          Future.failed(
+            new RuntimeException("Latest verification batch status does not allow unmatched batch recreation")
+          )
         }
 
-      afterCurrent <- getCurrentVerificationBatch(refreshedUa)
+      afterCurrent <- getCurrentVerificationBatch(latestUa)
       afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
       _            <- sessionRepository.set(afterNewest)
 
