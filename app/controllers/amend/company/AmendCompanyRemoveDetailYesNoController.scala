@@ -19,7 +19,7 @@ package controllers.amend.company
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
 import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.company.AmendCompanyRemoveDetail
 import pages.add.company.*
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
@@ -28,6 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.amend.company.AmendCompanyRemoveDetailYesNoView
 
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: AmendCompanyRemoveDetailYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: AmendCompanyRemoveDetailYesNoView
 )(implicit ec: ExecutionContext)
@@ -105,8 +107,8 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
 
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, AmendMode)
         .map { companyName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
@@ -131,8 +133,8 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
 
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, AmendMode)
         .map { companyName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {

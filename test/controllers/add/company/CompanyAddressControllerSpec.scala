@@ -18,7 +18,7 @@ package controllers.add.company
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{AmendMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +31,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AddressLookupService
-import models.UserAnswers
 import queries.AddressLookupAmendReturnQuery
 
 import scala.concurrent.Future
@@ -54,10 +53,10 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private lazy val redirectRoute =
-    controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup().url
+    controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode).url
 
   private lazy val redirectChangeRoute =
-    controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(Some("change")).url
+    controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode, Some("change")).url
 
   private lazy val callbackRoute =
     controllers.add.company.routes.CompanyAddressController.addressLookupCallback("addr-id").url
@@ -428,7 +427,7 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.company.routes.CompanyAddressController
-              .redirectToAddressLookup(Some("change"))
+              .redirectToAddressLookup(AmendMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

@@ -538,6 +538,17 @@ unmatchedSubcontractors.p1                                                      
 unmatchedSubcontractors.p2                                                          =  Ni allwch greu cais dilysu newydd nes eich bod wedi adolygu a chywiro’r canlyniadau hyn nad ydynt yn cyfateb.
 unmatchedSubcontractors.verificationResults.link                                    =  Gwirio’ch canlyniadau dilysu diweddaraf
 
+finalValidations.reviewContractorDetails.title                                      =  Adolygu manylion y contractwr
+finalValidations.reviewContractorDetails.heading                                    =  Adolygu manylion y contractwr
+finalValidations.reviewContractorDetails.task.utr                                   =  Cyfeirnod Unigryw y Trethdalwr
+finalValidations.reviewContractorDetails.task.schemeName                            =  Enw’r cynllun
+finalValidations.reviewContractorDetails.task.email                                 =  Cyfeiriad e-bost
+finalValidations.reviewContractorDetails.task.fileReturn                            =  Ffeilio ffurflen
+finalValidations.reviewContractorDetails.task.verifySubcontractors                  =  Gwirio is-gontractwyr
+finalValidations.reviewContractorDetails.status.complete                            =  Wedi cwblhau
+finalValidations.reviewContractorDetails.status.incomplete                          =  Anghyflawn
+finalValidations.reviewContractorDetails.status.cannotStart                         =  Methu dechrau eto
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  xxxxxxxxxxxxxxxxxxxx
 addPartnershipContactMethodsYesNo.heading                          =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
@@ -1263,15 +1274,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  enw’r cynllun
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
-
-# Final contractor validations
-finalValidations.reviewContractorDetails.title                                 =  Adolygu manylion y contractwr
-finalValidations.reviewContractorDetails.heading                               =  Adolygu manylion y contractwr
-finalValidations.reviewContractorDetails.task.utr                              =  Cyfeirnod Unigryw y Trethdalwr
-finalValidations.reviewContractorDetails.task.schemeName                       =  Enw’r cynllun
-finalValidations.reviewContractorDetails.task.email                            =  Cyfeiriad e-bost
-finalValidations.reviewContractorDetails.task.fileReturn                       =  Ffeilio ffurflen
-finalValidations.reviewContractorDetails.task.verifySubcontractors             =  Gwirio is-gontractwyr
-finalValidations.reviewContractorDetails.status.complete                       =  Wedi cwblhau
-finalValidations.reviewContractorDetails.status.incomplete                     =  Anghyflawn
-finalValidations.reviewContractorDetails.status.cannotStart                    =  Methu dechrau eto

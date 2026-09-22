@@ -19,13 +19,12 @@ package controllers.amend.trust
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.add.trust.ValidatedTrust
 import models.amend.AmendJourneyType
 import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
-import pages.add.*
-import pages.add.trust.TrustNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -67,10 +66,10 @@ class AmendTrustCheckYourAnswersController @Inject() (
     implicit request =>
       val ua = request.userAnswers
 
-      ValidatedTrust.build(ua) match {
+      ValidatedTrust.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val trustName  = ua.get(TrustNamePage).getOrElse("")
+          val trustName  = SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -166,7 +165,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-      ValidatedTrust.build(request.userAnswers) match {
+      ValidatedTrust.buildForAmend(request.userAnswers) match {
 
         case Left(error) =>
           logger.error(

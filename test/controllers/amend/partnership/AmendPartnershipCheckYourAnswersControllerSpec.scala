@@ -391,6 +391,32 @@ class AmendPartnershipCheckYourAnswersControllerSpec extends SpecBase with Mocki
       }
     }
 
+    "must return OK when both partnership name and partner name are missing for amend" in {
+      val ua =
+        minUa
+          .remove(PartnershipNamePage)
+          .success
+          .value
+          .remove(PartnershipNominatedPartnerNamePage)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad().url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
     "must redirect back to amend CYA after successful submit" in {
 
       val mockSubcontractorService = mock[SubcontractorService]
