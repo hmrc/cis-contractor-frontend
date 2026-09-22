@@ -21,32 +21,27 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import models.amend.AmendJourneyType
 import models.amend.partnership.OriginalPartnershipAnswers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
-import utils.DefaultSubcontractorCleanupService
+import scala.concurrent.Future
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
-
 class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
   private val cisId           = "123456789"
   private val partnershipName = "ABC Partnership"
-
-  private val mockCleanupService =
-    mock[DefaultSubcontractorCleanupService]
 
   private val mockSessionRepository =
     mock[SessionRepository]
@@ -56,14 +51,12 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
+    reset(mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
-        bind[DefaultSubcontractorCleanupService]
-          .toInstance(mockCleanupService),
         bind[SessionRepository]
           .toInstance(mockSessionRepository),
         bind[VerificationService]
@@ -95,7 +88,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       verificationNumber = None
     )
 
-  private def userAnswersWithOriginal =
+  private def userAnswersWithOriginal: UserAnswers =
     emptyUserAnswers
       .set(OriginalPartnershipAnswersQuery, original)
       .success
@@ -112,27 +105,28 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       .set(AmendCheckYourAnswersSubmittedPage, true)
       .success
       .value
-  private lazy val confirmationRoute  =
-    controllers.amend.partnership.routes.AmendPartnershipConfirmationController.onPageLoad().url
+
+  private lazy val confirmationRoute =
+    controllers.amend.partnership.routes.AmendPartnershipConfirmationController
+      .onPageLoad()
+      .url
 
   "AmendPartnershipConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
-
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
-      val app = this.application(userAnswersWithOriginal)
+      val app = application(userAnswersWithOriginal)
 
       running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
         val result  = route(app, request).value
 
-        val view = app.injector.instanceOf[AmendConfirmationView]
+        val view =
+          app.injector.instanceOf[AmendConfirmationView]
 
         status(result) mustEqual OK
 
@@ -156,7 +150,6 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
             messages(app)
           ).toString
 
-        verify(mockCleanupService).cleanAmend(any())
         verify(mockSessionRepository).set(any())
       }
     }
@@ -175,18 +168,22 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
           .success
           .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val app =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
 
-      running(application) {
+      running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -200,19 +197,26 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
           .set(PartnershipNamePage, partnershipName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val app =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
 
-      running(application) {
+      running(app) {
 
         val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -226,28 +230,11 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
           .set(PartnershipNamePage, partnershipName)
           .success
           .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, confirmationRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery when cleanup fails" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Failure(new RuntimeException("cleanup failed")))
-
-      val app = application(userAnswersWithOriginal)
+      val app = application(userAnswers)
 
       running(app) {
 
@@ -257,9 +244,9 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockSessionRepository, never()).set(any())
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -294,15 +281,11 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
             .onPageLoad()
             .url
 
-        verifyNoInteractions(mockCleanupService)
         verifyNoInteractions(mockSessionRepository)
       }
     }
 
     "must refresh verification batches and render the insufficient info confirmation link" in {
-
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
 
       when(
         mockVerificationService
@@ -347,9 +330,6 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
     "must refresh verification batches and render the unmatched info confirmation link" in {
 
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
-
       when(
         mockVerificationService
           .refreshVerificationBatches(any[UserAnswers])(any())
@@ -376,7 +356,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
         status(result) mustEqual OK
 
         contentAsString(result) must include(
-          controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          controllers.verify.routes.ReviewUnmatchedSubcontractorsController
             .onPageLoad()
             .url
         )
@@ -393,9 +373,6 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
     "must not refresh verification batches for standard amend journey" in {
 
-      when(mockCleanupService.cleanAmend(any[UserAnswers]))
-        .thenReturn(Success(userAnswersWithOriginal))
-
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
@@ -407,6 +384,9 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
         val result  = route(app, request).value
 
         status(result) mustBe OK
+
+        verify(mockSessionRepository)
+          .set(any[UserAnswers])
 
         verifyNoInteractions(mockVerificationService)
       }

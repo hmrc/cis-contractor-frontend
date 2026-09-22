@@ -550,6 +550,17 @@ agent.agentLostAccess.bullet.item.2.suffix                                      
 agent.agentLostAccess.p2                                                            =  It can take up to 5 working days for new authorisations to appear in your account.
 agent.agentLostAccess.return.link                                                   =  Return to client list
 
+finalValidations.reviewContractorDetails.title                                      =  Review contractor details
+finalValidations.reviewContractorDetails.heading                                    =  Review contractor details
+finalValidations.reviewContractorDetails.task.utr                                   =  Unique Taxpayer Reference
+finalValidations.reviewContractorDetails.task.schemeName                            =  Scheme name
+finalValidations.reviewContractorDetails.task.email                                 =  Email address
+finalValidations.reviewContractorDetails.task.fileReturn                            =  File a return
+finalValidations.reviewContractorDetails.task.verifySubcontractors                  =  Verify subcontractors
+finalValidations.reviewContractorDetails.status.complete                            =  Complete
+finalValidations.reviewContractorDetails.status.incomplete                          =  Incomplete
+finalValidations.reviewContractorDetails.status.cannotStart                         =  Cannot start yet
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
 addPartnershipContactMethodsYesNo.heading                          =  Do you want to add contact details for {0}?
@@ -1149,7 +1160,7 @@ verify.noSubcontractorsSelectedWarning.cancel                                   
 verify.verificationRequestSubmitted.title                                          =  Verification request submitted
 verify.verificationRequestSubmitted.heading                                        =  Verification request submitted
 verify.verificationRequestSubmitted.reference                                      =  Your verification reference number
-verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0}
+verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0} on {1}
 verify.verificationRequestSubmitted.details.subHeading                             =  Verification request details
 verify.verificationRequestSubmitted.subcontractorsToVerify.label                   =  Subcontractors to verify
 verify.verificationRequestSubmitted.subcontractorsToReverify.label                 =  Subcontractors to reverify

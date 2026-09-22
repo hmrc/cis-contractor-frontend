@@ -341,29 +341,27 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
-    (
-      identify
-        andThen getData
-        andThen requireData
-        andThen cisIdRequiredAction
-    ).async { implicit request =>
-      sessionRepository
-        .set(
-          UserAnswers(request.userAnswers.id)
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
+
+      val redirectCall =
+        noChangesRedirect(
+          request.userAnswers,
+          request.cisId
         )
+
+      Future
+        .fromTry(
+          cleanupService.cleanAmend(request.userAnswers)
+        )
+        .flatMap(sessionRepository.set)
         .map { _ =>
-          Redirect(
-            appConfig.manageYourSubcontractorsUrl(
-              request.cisId
-            )
-          )
+          Redirect(redirectCall)
         }
-        .recover { case throwable =>
+        .recover { case t =>
           logger.error(
             s"[AmendPartnershipCheckYourAnswersController.onCancel] " +
-              s"Failed to clear user answers for session " +
-              s"${request.userAnswers.id}",
-            throwable
+              s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+            t
           )
 
           Redirect(

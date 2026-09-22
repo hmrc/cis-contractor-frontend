@@ -31,9 +31,6 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class ReviewInsufficientInfoService @Inject() extends Logging {
 
-  // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
-  private val dummyUrl = "#"
-
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
   )(implicit messages: Messages): Try[ReviewInsufficientInfoViewModel] = {
@@ -84,11 +81,18 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
         .map { ref =>
           controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(ref).url
         }
-        .getOrElse(dummyUrl)
+        .getOrElse("#")
 
     MissingSubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
+      ),
       utr = utrDisplay(sub),
       editLink = LinkViewModel(
         controllers.amend.routes.AmendSubcontractorController
@@ -111,7 +115,14 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
     val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url
+      ),
       utr = utrDisplay(sub)
     )
   }
