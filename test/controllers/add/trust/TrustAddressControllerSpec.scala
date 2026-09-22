@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import base.SpecBase
 import controllers.routes
-import models.{FinalValidationMode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -470,7 +470,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.trust.routes.TrustAddressController
-              .redirectToAddressLookup(NormalMode, Some("change"))
+              .redirectToAddressLookup(AmendMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

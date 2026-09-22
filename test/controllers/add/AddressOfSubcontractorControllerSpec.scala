@@ -18,7 +18,7 @@ package controllers.add
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{AmendMode, NormalMode, UserAnswers}
 import models.add.SubcontractorName
 import models.address.{Address, Country}
 import models.FinalValidationMode
@@ -33,7 +33,6 @@ import play.api.test.Helpers.*
 import pages.add.SubcontractorNamePage
 import repositories.SessionRepository
 import services.AddressLookupService
-import models.UserAnswers
 import queries.AddressLookupAmendReturnQuery
 
 import scala.concurrent.Future
@@ -509,7 +508,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.routes.AddressOfSubcontractorController
-              .redirectToAddressLookup(NormalMode, Some("change"))
+              .redirectToAddressLookup(AmendMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

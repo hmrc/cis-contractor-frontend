@@ -21,12 +21,13 @@ import forms.add.company.CompanyEmailAddressFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyEmailAddressView
 
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class CompanyEmailAddressController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyEmailAddressFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyEmailAddressView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,8 @@ class CompanyEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = request.userAnswers.get(CompanyNamePage)
+      val companyName   = subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -73,18 +76,19 @@ class CompanyEmailAddressController @Inject() (
       }
     }
 
+
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
-        companyName <- request.userAnswers.get(CompanyNamePage)
+        companyName <- companyName
         if emailIsAvailable
       } yield form
         .bindFromRequest()

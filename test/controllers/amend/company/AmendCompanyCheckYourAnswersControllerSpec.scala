@@ -185,6 +185,32 @@ class AmendCompanyCheckYourAnswersControllerSpec extends SpecBase with MockitoSu
       }
     }
 
+    "must return OK and render the page with the correct summary list for GET when validation succeeds for unverified company with no name" in {
+      val userAnswers = minUa
+        .remove(CompanyNamePage)
+        .success
+        .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onPageLoad().url)
+        val msg     = app.injector.instanceOf[MessagesApi].preferred(request)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page = contentAsString(result)
+
+        page must include(msg("typeOfSubcontractor.checkYourAnswersLabel"))
+        page must include(msg("companyName.checkYourAnswersLabel"))
+
+        page must include(msg("verify.noName"))
+      }
+    }
+
     "must render the correct summary for a verified company" in {
 
       val verifiedUa  =

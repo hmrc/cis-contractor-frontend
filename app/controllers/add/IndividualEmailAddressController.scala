@@ -55,7 +55,7 @@ class IndividualEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
-      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -79,15 +79,15 @@ class IndividualEmailAddressController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
-        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+        subcontractorName <- subcontractorName
         if emailIsAvailable
       } yield form
         .bindFromRequest()

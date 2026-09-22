@@ -17,11 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage, PartnershipNamePage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,7 +52,7 @@ class PartnershipEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-      val partnershipName = request.userAnswers.get(PartnershipNamePage)
+    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -75,15 +76,15 @@ class PartnershipEmailAddressController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
-        partnershipName <- request.userAnswers.get(PartnershipNamePage)
+        partnershipName <- partnershipName
         if emailIsAvailable
       } yield form
         .bindFromRequest()

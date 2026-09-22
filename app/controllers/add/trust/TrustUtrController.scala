@@ -17,6 +17,7 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, FinalValidationMode, Mode}
@@ -66,8 +67,8 @@ class TrustUtrController @Inject() (
       val yesOrNoPage       = TrustUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
 
-      request.userAnswers
-        .get(TrustNamePage)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           val preparedForm = request.userAnswers.get(TrustUtrPage) match {
             case None        => form
@@ -81,8 +82,8 @@ class TrustUtrController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()

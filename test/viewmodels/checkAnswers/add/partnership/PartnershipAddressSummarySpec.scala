@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import helpers.CyaEncodingSpecHelper
 import controllers.add.partnership.routes
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,7 +28,6 @@ import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import models.TypeOfSubcontractor
 import models.info.partnership.PartnershipAnswers
 
 class PartnershipAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {

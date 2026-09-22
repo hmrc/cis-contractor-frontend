@@ -59,7 +59,7 @@ class WorksReferenceNumberYesNoController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, mode)
         .fold(recoveryRedirect) { subcontractorName =>
           Ok(view(preparedForm, mode, subcontractorName))
         }
@@ -68,7 +68,7 @@ class WorksReferenceNumberYesNoController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, mode)
         .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
           form
             .bindFromRequest()

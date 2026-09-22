@@ -17,11 +17,12 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustPhoneNumberFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustNamePage, TrustPhoneNumberPage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,7 +52,7 @@ class TrustPhoneNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
-      val trustName     = request.userAnswers.get(TrustNamePage)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
 
       val phoneIsAvailable =
         mode == FinalValidationMode ||
@@ -75,15 +76,15 @@ class TrustPhoneNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(TrustContactMethodOptionsPage)
+      val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
 
       val phoneIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Phone))
 
       (for {
-        trustName <- request.userAnswers.get(TrustNamePage)
+        trustName <- trustName
         if phoneIsAvailable
       } yield form
         .bindFromRequest()

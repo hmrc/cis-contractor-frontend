@@ -17,11 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipNamePage, PartnershipPhoneNumberPage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -50,7 +51,7 @@ class PartnershipPhoneNumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-    val partnershipName = request.userAnswers.get(PartnershipNamePage)
+    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
     val phoneIsAvailable =
       mode == FinalValidationMode ||
@@ -74,15 +75,15 @@ class PartnershipPhoneNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
       val phoneIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Phone))
 
       (for {
-        partnershipName <- request.userAnswers.get(PartnershipNamePage)
+        partnershipName <- partnershipName
         if phoneIsAvailable
       } yield form
         .bindFromRequest()

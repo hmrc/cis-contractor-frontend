@@ -21,12 +21,13 @@ import forms.add.company.CompanyMobileNumberFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyMobileNumberPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyMobileNumberPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyMobileNumberView
 
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class CompanyMobileNumberController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyMobileNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyMobileNumberView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,8 @@ class CompanyMobileNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = request.userAnswers.get(CompanyNamePage)
+      val companyName   = subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
 
       val mobileIsAvailable =
         mode == FinalValidationMode ||
@@ -76,15 +79,15 @@ class CompanyMobileNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val contactOption =
-        request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
 
       val mobileIsAvailable =
         mode == FinalValidationMode ||
           contactOption.exists(_.contains(ContactMethodOptions.Mobile))
 
       (for {
-        companyName <- request.userAnswers.get(CompanyNamePage)
+        companyName <- companyName
         if mobileIsAvailable
       } yield form
         .bindFromRequest()

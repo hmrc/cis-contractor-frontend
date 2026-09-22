@@ -23,7 +23,7 @@ import models.amend.AmendJourneyType
 import pages.add.company.CompanyNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
@@ -92,7 +92,7 @@ class AmendCompanyConfirmationController @Inject() (
                       )
 
                     val companyName =
-                      ua.get(CompanyNamePage).getOrElse("")
+                      ua.get(CompanyNamePage).getOrElse(Messages("verify.noName"))
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(

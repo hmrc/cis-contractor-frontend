@@ -28,6 +28,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyUtrView
 
 import javax.inject.Inject
@@ -44,6 +45,7 @@ class CompanyUtrController @Inject() (
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -67,8 +69,8 @@ class CompanyUtrController @Inject() (
       val yesOrNoPage       = CompanyUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
 
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
             case None        => form
@@ -84,8 +86,8 @@ class CompanyUtrController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
