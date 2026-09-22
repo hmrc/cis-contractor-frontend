@@ -25,11 +25,14 @@ import models.{EmployerReference, Subcontractor, UserAnswers}
 import pages.verify.*
 import play.api.Logging
 import play.api.i18n.Messages
+import play.api.libs.json.*
 import play.api.mvc.AnyContent
 import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.SubmissionUtils
 
+import java.time.{Clock, LocalDateTime, ZoneId}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -39,9 +42,13 @@ class VerificationService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
   cisManageService: CisManageService,
   chrisVerificationRequestBuilder: ChrisVerificationRequestBuilder,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  submissionUtils: SubmissionUtils,
+  clock: Clock
 )(implicit ec: ExecutionContext)
     extends Logging {
+
+  private val ukZone = ZoneId.of("Europe/London")
 
   def refreshNewestVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
@@ -276,11 +283,40 @@ class VerificationService @Inject() (
     submissionDetails: VerificationSubmissionDetails
   )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
     for {
-      pollUrl       <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
-      response      <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
-      updatedDetails = VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, response)
-      updatedUa     <- saveVerificationPollDetailsToSession(ua, updatedDetails)
-    } yield response
+      pollUrl          <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
+      response         <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
+      effectiveResponse = response.copy(status = effectivePollStatus(response, submissionDetails.submittedAt))
+      updatedDetails    = VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, effectiveResponse)
+      updatedUa        <- saveVerificationPollDetailsToSession(ua, updatedDetails)
+    } yield effectiveResponse
+
+  // F18: while ChRIS is still processing (or its poll endpoint is erroring) the backend keeps
+  // reporting ACCEPTED/PENDING; once the polling window is exhausted the user must be routed
+  // to "send error" (SM-06) if polls were failing with timeOut errors, or "in progress" otherwise.
+  private def effectivePollStatus(
+    response: ChrisPollResponse,
+    submittedAt: LocalDateTime
+  ): SubmissionStatus =
+    response.status match {
+      case SubmissionStatus.ACCEPTED | SubmissionStatus.PENDING if pollingWindowExhausted(submittedAt) =>
+        if (isTimeoutError(response)) SubmissionStatus.SEND_ERROR else SubmissionStatus.TIMED_OUT
+      case other                                                                                       =>
+        other
+    }
+
+  private def pollingWindowExhausted(submittedAt: LocalDateTime): Boolean =
+    !LocalDateTime.now(clock.withZone(ukZone)).isBefore(submissionUtils.calculateTimeoutDateTime(submittedAt))
+
+  private def isTimeoutError(response: ChrisPollResponse): Boolean = {
+    val hasTimeoutGovTalkError = response.error.exists { error =>
+      (error \ "type").asOpt[String].exists(_.equalsIgnoreCase("timeOut"))
+    }
+    val hasNoResponseStatus    = response.govTalkErrorStatus.exists {
+      case GovTalkErrorStatus.ServerError(_) | GovTalkErrorStatus.NoResponse => true
+      case _                                                                 => false
+    }
+    hasTimeoutGovTalkError || hasNoResponseStatus
+  }
 
   private def createSubmissionForVerification(
     request: CreateSubmissionForVerificationRequest

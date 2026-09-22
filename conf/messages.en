@@ -513,7 +513,7 @@ individualNamesOptions.heading                                                  
 individualNamesOptions.subcontractorName                                            =  Subcontractor name
 individualNamesOptions.tradingName                                                  =  Trading name
 individualNamesOptions.noSelection                                                  =  None selected
-individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
+individualNamesOptions.hint                                                         =  You can add a person’s name, a trading name or both
 individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
 individualNamesOptions.checkYourAnswersLabel                                        =  Names
 individualNamesOptions.change.hidden                                                =  names
