@@ -182,6 +182,72 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns FATAL_ERROR with error code 1000" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "FATAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "1000",
+              errorText = "Fatal error"
+            )
+          )
+        )
+      )
+
+      val application = applicationWith(mockService)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns FATAL_ERROR with error code 2005" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "FATAL_ERROR",
+          hmrcMarkGenerated = "hmrc-mark",
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "2005",
+              errorText = "Fatal error"
+            )
+          )
+        )
+      )
+
+      val application = applicationWith(mockService)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
     "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns DEPARTMENTAL_ERROR with error code 3000" in {
       val mockService = mock[VerificationService]
 
@@ -436,6 +502,76 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           govTalkErrorStatus = Some(
             FatalError(
               errorCode = "3000",
+              errorText = "Fatal error"
+            )
+          )
+        )
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when poll returns FATAL_ERROR with error code 1000" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.FATAL_ERROR,
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "1000",
+              errorText = "Fatal error"
+            )
+          )
+        )
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerifyDepartmentalErrorSubmitAgainController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to VerifyDepartmentalErrorSubmitAgainController when poll returns FATAL_ERROR with error code 2005" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponse(
+        mockService,
+        pollResponse(
+          status = SubmissionStatus.FATAL_ERROR,
+          govTalkErrorStatus = Some(
+            FatalError(
+              errorCode = "2005",
               errorText = "Fatal error"
             )
           )
