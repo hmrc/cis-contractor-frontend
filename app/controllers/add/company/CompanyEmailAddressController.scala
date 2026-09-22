@@ -76,7 +76,6 @@ class CompanyEmailAddressController @Inject() (
       }
     }
 
-
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 

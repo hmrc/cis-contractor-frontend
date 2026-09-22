@@ -21,8 +21,8 @@ import controllers.add.AddressLookupJourneyController
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
-import models.{AmendMode, FinalValidationMode, Mode, NormalMode, UserAnswers}
-import pages.add.trust.{TrustAddressPage, TrustNamePage}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
+import pages.add.trust.TrustAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}

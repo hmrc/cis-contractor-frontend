@@ -20,7 +20,6 @@ import models.{SubcontractorCurrentVerification, UserAnswers}
 import models.TypeOfSubcontractor.*
 import models.finalvalidation.*
 import models.finalvalidation.FinalValidationField.*
-import models.finalvalidation.VerifyFinalValidationSource.*
 import models.response.SubcontractorResponse
 import pages.verify.*
 import services.finalvalidation.*
@@ -310,68 +309,6 @@ class VerifyFinalValidationService @Inject() (
       } yield references
     }
   }
-
-  private def selectedReferences(
-    userAnswers: UserAnswers,
-    source: VerifyFinalValidationSource
-  ): Try[Seq[SelectedReference]] =
-    source match {
-      case SelectSubcontractor =>
-        for {
-          selected    <- userAnswers
-                           .get(SelectSubcontractorPage)
-                           .map(Success(_))
-                           .getOrElse(Failure(new IllegalStateException("SelectSubcontractorPage not found")))
-          available   <- userAnswers
-                           .get(UnverifiedSubcontractorsPage)
-                           .map(Success(_))
-                           .getOrElse(Failure(new IllegalStateException("UnverifiedSubcontractorsPage not found")))
-          selectedIds <- ids(selected.map(_.id))
-          references  <- referencesFor(
-                           selectedIds,
-                           available.map { subcontractor =>
-                             (
-                               subcontractor.subcontractorId,
-                               subcontractor.subbieResourceRef
-                             )
-                           }
-                         )
-        } yield references
-
-      case SelectSubcontractorsToReverify =>
-        for {
-          selected    <- userAnswers
-                           .get(SelectSubcontractorsToReverifyPage)
-                           .map(Success(_))
-                           .getOrElse(Failure(new IllegalStateException("SelectSubcontractorsToReverifyPage not found")))
-          response    <- userAnswers
-                           .get(NewestVerificationBatchResponsePage)
-                           .map(Success(_))
-                           .getOrElse(Failure(new IllegalStateException("NewestVerificationBatchResponsePage not found")))
-          selectedIds <- ids(selected.map(_.id))
-          references  <- referencesFor(
-                           selectedIds,
-                           response.subcontractors.map { subcontractor =>
-                             (
-                               subcontractor.subcontractorId,
-                               subcontractor.subbieResourceRef
-                             )
-                           }
-                         )
-        } yield references
-
-      case ReviewUnmatchedSubcontractors =>
-        Failure(
-          new UnsupportedOperationException("ReviewUnmatchedSubcontractors FinalValidation is not implemented yet")
-        )
-
-      case ReviewInsufficientInfoSubcontractors =>
-        Failure(
-          new UnsupportedOperationException(
-            "ReviewInsufficientInfoSubcontractors FinalValidation is not implemented yet"
-          )
-        )
-    }
 
   private def ids(values: Set[String]): Try[Set[Long]] =
     Try(

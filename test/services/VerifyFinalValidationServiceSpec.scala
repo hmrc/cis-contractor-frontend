@@ -19,13 +19,11 @@ package services
 import base.SpecBase
 import models.{Subcontractor, SubcontractorCurrentVerification, UserAnswers}
 import models.finalvalidation.*
-import models.finalvalidation.VerifyFinalValidationSource.*
 import models.response.{GetNewestVerificationBatchResponse, GetSubcontractorResponse, SubcontractorResponse}
 import models.validation.SubcontractorValidationField
 import models.verify.SelectedSubcontractors
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.finalvalidation.VerifyFinalValidationSourcePage
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorsToReverifyPage}
 import play.api.libs.json.{JsObject, Json}
 import services.finalvalidation.SubcontractorValidator

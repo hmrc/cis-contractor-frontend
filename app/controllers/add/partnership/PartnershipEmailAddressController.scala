@@ -52,7 +52,7 @@ class PartnershipEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+      val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||

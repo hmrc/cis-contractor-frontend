@@ -18,7 +18,6 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.finalvalidation.VerifyFinalValidationResult
 import models.{NormalMode, Subcontractor, SubcontractorViewModel, TypeOfSubcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
@@ -34,8 +33,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.i18n.Messages
 import repositories.SessionRepository
-import services.VerifyFinalValidationService
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.verify.SubcontractorReverifyRow
 
 import java.time.{Clock, Instant, LocalDateTime, ZoneOffset}

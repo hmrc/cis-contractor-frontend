@@ -22,7 +22,7 @@ import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, FinalValidationMode, Mode}
 import navigation.Navigator
-import pages.add.trust.{TrustNamePage, TrustUtrPage, TrustUtrYesNoPage}
+import pages.add.trust.{TrustUtrPage, TrustUtrYesNoPage}
 import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

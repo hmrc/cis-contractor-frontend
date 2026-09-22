@@ -18,7 +18,6 @@ package controllers.verify
 
 import base.SpecBase
 import forms.verify.SelectSubcontractorFormProvider
-import models.finalvalidation.VerifyFinalValidationResult
 import models.response.GetNewestVerificationBatchResponse
 import models.{CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
 import navigation.{FakeNavigator, Navigator}
@@ -38,7 +37,6 @@ import repositories.SessionRepository
 import services.*
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.SelectSubcontractorView
-import play.api.i18n.Messages
 import models.agent.AgentClientData
 
 import javax.inject.Inject

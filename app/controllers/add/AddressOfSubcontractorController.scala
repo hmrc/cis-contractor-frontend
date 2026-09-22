@@ -19,7 +19,7 @@ package controllers.add
 import controllers.actions.*
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
-import models.{AmendMode, FinalValidationMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}

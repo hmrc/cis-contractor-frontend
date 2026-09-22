@@ -18,11 +18,10 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{FinalValidationMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import models.{AmendMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}

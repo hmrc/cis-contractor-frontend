@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{AmendMode, FinalValidationMode, Mode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.CompanyAddressPage
