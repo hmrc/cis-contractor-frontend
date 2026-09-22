@@ -17,11 +17,12 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.Mode
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipNamePage, PartnershipPhoneNumberPage}
+import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -50,7 +51,7 @@ class PartnershipPhoneNumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-    val partnershipName = request.userAnswers.get(PartnershipNamePage)
+    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
     (partnershipName, contactOption) match {
       case (Some(partnershipName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
@@ -70,7 +71,7 @@ class PartnershipPhoneNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       (for {
-        partnershipName <- request.userAnswers.get(PartnershipNamePage)
+        partnershipName <- SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
         contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
         if contactMethods.contains(ContactMethodOptions.Phone)
       } yield form

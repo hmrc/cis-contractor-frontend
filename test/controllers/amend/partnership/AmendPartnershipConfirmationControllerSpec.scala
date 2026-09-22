@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import models.amend.AmendJourneyType
 import models.amend.partnership.OriginalPartnershipAnswers
-import pages.add.partnership.PartnershipNamePage
+import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -33,15 +33,22 @@ import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
+import utils.DefaultSubcontractorCleanupService
+
 import scala.concurrent.Future
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
+import scala.util.Success
+
 class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private val cisId           = "123456789"
   private val partnershipName = "ABC Partnership"
+
+  private val mockCleanupService =
+    mock[DefaultSubcontractorCleanupService]
 
   private val mockSessionRepository =
     mock[SessionRepository]
@@ -51,12 +58,14 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    reset(mockSessionRepository, mockVerificationService)
+    reset(mockCleanupService, mockSessionRepository, mockVerificationService)
   }
 
   private def application(userAnswers: UserAnswers) =
     applicationBuilder(userAnswers = Some(userAnswers))
       .overrides(
+        bind[DefaultSubcontractorCleanupService]
+          .toInstance(mockCleanupService),
         bind[SessionRepository]
           .toInstance(mockSessionRepository),
         bind[VerificationService]
@@ -389,6 +398,35 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
           .set(any[UserAnswers])
 
         verifyNoInteractions(mockVerificationService)
+      }
+    }
+
+    "must return OK when partnership name and partner name is missing in amend mode" in {
+
+      when(mockCleanupService.cleanAmend(any[UserAnswers]))
+        .thenReturn(
+          Success(
+            userAnswersWithOriginal
+              .remove(PartnershipNamePage)
+              .success
+              .value
+              .remove(PartnershipNominatedPartnerNamePage)
+              .success
+              .value
+          )
+        )
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
       }
     }
   }

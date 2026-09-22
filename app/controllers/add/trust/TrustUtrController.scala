@@ -17,11 +17,12 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustUtrFormProvider
 import models.requests.DataRequest
 import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.trust.{TrustNamePage, TrustUtrPage, TrustUtrYesNoPage}
+import pages.add.trust.{TrustUtrPage, TrustUtrYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -65,8 +66,8 @@ class TrustUtrController @Inject() (
       val yesOrNoPage       = TrustUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(TrustUtrYesNoPage)
 
-      request.userAnswers
-        .get(TrustNamePage)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           val preparedForm = request.userAnswers.get(TrustUtrPage) match {
             case None        => form
@@ -80,8 +81,8 @@ class TrustUtrController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()
