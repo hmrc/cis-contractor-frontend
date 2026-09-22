@@ -91,15 +91,13 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             sub.subbieResourceRef.get,
             AmendJourneyType.UnmatchedInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
       proceedLink = LinkViewModel(
         controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
           .onPageLoad(sub.subcontractorId)
-          .url,
-        name
+          .url
       ),
       editLink = LinkViewModel(
         controllers.amend.routes.AmendSubcontractorController
@@ -107,14 +105,12 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             sub.subbieResourceRef.get,
             AmendJourneyType.UnmatchedInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       removeLink = LinkViewModel(
         controllers.unmatched.routes.RemoveSubcontractorVerifyRequestController
           .onPageLoad(sub.subcontractorId)
-          .url,
-        name
+          .url
       )
     )
   }
@@ -132,8 +128,7 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
             sub.subbieResourceRef.get,
             AmendJourneyType.UnmatchedInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey)
     )
