@@ -91,7 +91,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[String]("urls.constructionIndustryAgentAccount")
   lazy val constructionIndustryOrgAccountUrl: String         = configuration.get[String]("urls.constructionIndustryOrgAccount")
   lazy val cisContractorGuideUrl: String                     = configuration.get[String]("urls.cisContractorGuide")
-  lazy val signIntoCISURL: String                            = configuration.get[String]("urls.signIntoCIS")
   lazy val portalAccountBaseUrl: String                      = configuration.get[String]("portal-account.host")
   lazy val authoriseClientRequestPath: String                = configuration.get[String]("urls.authoriseClientRequest")
   lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String =
