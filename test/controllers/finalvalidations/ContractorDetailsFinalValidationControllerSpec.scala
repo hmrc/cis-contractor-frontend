@@ -59,10 +59,10 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
     applicationBuilder(userAnswers = Some(userAnswers))
       .configure("urls.cisReturnDashboard" -> "http://localhost:9557/return-dashboard")
       .configure(
-        "urls.fileStandardReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+        "urls.fileStandardReturn" -> "/construction-industry-scheme/monthly-return/file-your-monthly-return"
       )
       .configure(
-        "urls.fileNilReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+        "urls.fileNilReturn" -> "/construction-industry-scheme/monthly-return/file-your-nil-return"
       )
       .overrides(
         bind[ContractorDetailsFinalValidationService].toInstance(finalValidationService),
@@ -138,7 +138,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+          "/construction-industry-scheme/monthly-return/file-your-nil-return"
       }
     }
 
@@ -172,7 +172,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+          "/construction-industry-scheme/monthly-return/file-your-monthly-return"
       }
     }
 
@@ -293,7 +293,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+          "/construction-industry-scheme/monthly-return/file-your-monthly-return"
       }
 
       verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
@@ -337,7 +337,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+          "/construction-industry-scheme/monthly-return/file-your-nil-return"
       }
 
       verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
