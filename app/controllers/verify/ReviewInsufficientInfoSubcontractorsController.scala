@@ -17,7 +17,6 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.NormalMode
 import models.contractordetails.ContractorDetailsValidationTarget
 import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
@@ -117,35 +116,22 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val nextPage =
-        if (
-          request.userAnswers
-            .get(NewestVerificationBatchResponsePage)
-            .flatMap(_.scheme)
-            .flatMap(_.emailAddress)
-            .isDefined
-        ) {
-          controllers.verify.routes.ContractorEmailConfirmationStoredController
-            .onPageLoad(NormalMode)
-        } else {
-          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
-            .onPageLoad(NormalMode)
-        }
-
       for {
         withContext <- Future.fromTry(
-                         request.userAnswers.set(
-                           FinalValidationContextPage,
-                           FinalValidationContext.VerifySubcontractor
-                         )
-                       )
+          request.userAnswers.set(
+            FinalValidationContextPage,
+            FinalValidationContext.VerifySubcontractor
+          )
+        )
         withSource  <- Future.fromTry(
-                         withContext.set(
-                           VerifyFinalValidationSourcePage,
-                           VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
-                         )
-                       )
+          withContext.set(
+            VerifyFinalValidationSourcePage,
+            VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+          )
+        )
         _           <- sessionRepository.set(withSource)
-      } yield Redirect(nextPage)
+      } yield Redirect(
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
+      )
     }
 }

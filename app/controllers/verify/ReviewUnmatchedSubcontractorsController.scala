@@ -70,22 +70,23 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
 
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+
       for {
         withContext <- Future.fromTry(
-                         request.userAnswers.set(
-                           FinalValidationContextPage,
-                           FinalValidationContext.VerifySubcontractor
-                         )
-                       )
+          request.userAnswers.set(
+            FinalValidationContextPage,
+            FinalValidationContext.VerifySubcontractor
+          )
+        )
         withSource  <- Future.fromTry(
-                         withContext.set(
-                           VerifyFinalValidationSourcePage,
-                           VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
-                         )
-                       )
+          withContext.set(
+            VerifyFinalValidationSourcePage,
+            VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+          )
+        )
         _           <- sessionRepository.set(withSource)
       } yield Redirect(
-        controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode)
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
       )
     }
 }

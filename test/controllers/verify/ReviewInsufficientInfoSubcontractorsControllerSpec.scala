@@ -142,30 +142,6 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       .overrides(bind[ContractorDetailsFinalValidationService].toInstance(mockFinalValidationService))
   }
 
-  private def newestBatchResponse(
-    subcontractors: Seq[Subcontractor],
-    verifications: Seq[Verification] = Seq.empty,
-    submission: Option[Submission] = None,
-    monthlyReturn: Option[MonthlyReturn] = None,
-    monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
-    status: Option[String] = None
-  ) =
-    GetNewestVerificationBatchResponse(
-      scheme = None,
-      subcontractors = subcontractors,
-      verificationBatch = Some(
-        models.VerificationBatch(
-          verificationBatchId = 1L,
-          status = status,
-          verificationNumber = Some("VB123")
-        )
-      ),
-      verifications = verifications,
-      submission = submission,
-      monthlyReturn = monthlyReturn,
-      monthlyReturnSubmission = monthlyReturnSubmission
-    )
-
   "ReviewInsufficientInfoSubcontractorsController" - {
 
     "must return OK and the correct view for a GET" in {
@@ -315,36 +291,14 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "must set the final validation source and context in session and redirect to ContractorEmailConfirmationStored when a stored email address exists" in {
-      val newestBatch =
-        newestBatchResponse(
-          subcontractors = Seq.empty
-        ).copy(
-          scheme = Some(
-            ContractorScheme(
-              accountsOfficeReference = Some("instance-123"),
-              utr = Some("123PA00123456"),
-              name = Some("xyz"),
-              emailAddress = Some("test@test.com")
-            )
-          )
-        )
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(
-            NewestVerificationBatchResponsePage,
-            newestBatch
-          )
-          .success
-          .value
+    "must set the final validation source and context in session and redirect to ContinueVerificationSubmissionController when the user continues" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
       when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -364,69 +318,8 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.ContractorEmailConfirmationStoredController
-            .onPageLoad(NormalMode)
-            .url
-
-        val savedAnswers = savedAnswersCaptor.getValue
-        savedAnswers
-          .get(VerifyFinalValidationSourcePage)
-          .value mustEqual VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
-        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
-      }
-    }
-
-    "must set the final validation source and context in session and redirect to ContractorEmailConfirmationNotStored when no stored email address exists" in {
-
-      val newestBatch =
-        newestBatchResponse(
-          subcontractors = Seq.empty
-        ).copy(
-          scheme = Some(
-            ContractorScheme(
-              accountsOfficeReference = Some("instance-123"),
-              utr = Some("123PA00123456"),
-              name = Some("xyz")
-            )
-          )
-        )
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(
-            NewestVerificationBatchResponsePage,
-            newestBatch
-          )
-          .success
-          .value
-
-      val mockSessionRepository = mock[SessionRepository]
-      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
-      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            POST,
-            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-              .onSubmit()
-              .url
-          )
-
-        val result =
-          route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-
-        redirectLocation(result).value mustBe
-          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
-            .onPageLoad(NormalMode)
+          controllers.verify.routes.ContinueVerificationSubmissionController
+            .onSubmit()
             .url
 
         val savedAnswers = savedAnswersCaptor.getValue

@@ -71,7 +71,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "onSubmit must set the final validation source and context in session and redirect to the contractor email confirmation stored page" in {
+    "onSubmit must set the final validation source and context in session and redirect to the submit unmatched endpoint" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
@@ -87,7 +87,7 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(models.NormalMode).url
+          controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
 
         val savedAnswers = savedAnswersCaptor.getValue
         savedAnswers
