@@ -23,20 +23,18 @@ import models.amend.AmendJourneyType
 import pages.add.company.CompanyNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class AmendCompanyConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,7 +42,6 @@ class AmendCompanyConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  cleanupService: DefaultSubcontractorCleanupService,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
@@ -56,22 +53,32 @@ class AmendCompanyConfirmationController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
-      val ua               = request.userAnswers
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+      val ua = request.userAnswers
 
       if (!ua.get(AmendCheckYourAnswersSubmittedPage).contains(true)) {
-        logger.warn("[AmendCompanyConfirmationController] Accessed without prior CYA submission")
+        logger.warn(
+          "[AmendCompanyConfirmationController] Accessed without prior CYA submission"
+        )
         Future.successful(recoveryRedirect)
       } else {
         ua.get(OriginalCompanyAnswersQuery) match {
-          case None                         =>
-            logger.error("[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery")
+
+          case None =>
+            logger.error(
+              "[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery"
+            )
             Future.successful(recoveryRedirect)
+
           case Some(originalCompanyAnswers) =>
             ua.get(CisIdQuery) match {
 
               case None =>
-                logger.error("[AmendCompanyConfirmationController] Missing CisIdQuery")
+                logger.error(
+                  "[AmendCompanyConfirmationController] Missing CisIdQuery"
+                )
                 Future.successful(recoveryRedirect)
 
               case Some(cisId) =>
@@ -85,7 +92,7 @@ class AmendCompanyConfirmationController @Inject() (
                       )
 
                     val companyName =
-                      ua.get(CompanyNamePage).getOrElse("")
+                      ua.get(CompanyNamePage).getOrElse(Messages("verify.noName"))
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(
@@ -94,52 +101,39 @@ class AmendCompanyConfirmationController @Inject() (
                         appConfig
                       )
 
-                    cleanupService.cleanAmend(ua) match {
+                    val persistFinalUserAnswers =
+                      journeyType match {
 
-                      case Success(cleanedUserAnswers) =>
-                        val persistFinalUserAnswers =
-                          journeyType match {
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
 
-                            case AmendJourneyType.Standard =>
-                              sessionRepository
-                                .set(cleanedUserAnswers)
-                                .map(_ => cleanedUserAnswers)
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(
+                            ua
+                          )
+                      }
 
-                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                              verificationService.refreshVerificationBatches(
-                                cleanedUserAnswers
-                              )
-                          }
-
-                        persistFinalUserAnswers
-                          .map { _ =>
-                            Ok(
-                              view(
-                                tableRows,
-                                companyName,
-                                confirmationLink
-                              )
-                            )
-                          }
-                          .recover { case exception =>
-                            logger.error(
-                              "[AmendCompanyConfirmationController.onPageLoad] " +
-                                "Failed to persist confirmation session data",
-                              exception
-                            )
-
-                            recoveryRedirect
-                          }
-
-                      case Failure(exception) =>
-                        logger.warn(
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            companyName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
                           "[AmendCompanyConfirmationController.onPageLoad] " +
-                            "Failed to clean user answers",
+                            "Failed to persist confirmation session data",
                           exception
                         )
 
-                        Future.successful(recoveryRedirect)
-                    }
+                        recoveryRedirect
+                      }
 
                   case None =>
                     logger.error(

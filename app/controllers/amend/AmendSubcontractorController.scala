@@ -22,6 +22,7 @@ import controllers.helpers.AmendSubcontractorPopulator
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.amend.AmendJourneyType
 import models.{TypeOfSubcontractor, UserAnswers}
+import utils.DefaultSubcontractorCleanupService
 import models.response.{GetSubcontractorResponse, SubcontractorResponse}
 import pages.amend.AmendJourneyTypePage
 import play.api.Logging
@@ -33,12 +34,13 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class AmendSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   subcontractorService: SubcontractorService,
+  cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
   override protected val cisManageService: CisManageService,
   override protected val sessionRepository: SessionRepository
@@ -167,41 +169,61 @@ class AmendSubcontractorController @Inject() (
     amendJourneyType: AmendJourneyType,
     subcontractor: SubcontractorResponse
   ): Future[Result] =
-    populateUserAnswers(
-      subcontractorType,
-      userAnswers,
-      cisId,
-      subcontractor
-    ).fold(
-      error => {
+    cleanupService.cleanAmend(userAnswers) match {
+
+      case Success(cleanedUserAnswers) =>
+        populateUserAnswers(
+          subcontractorType,
+          cleanedUserAnswers,
+          cisId,
+          subcontractor
+        ).fold(
+          error => {
+            logger.error(
+              s"[AmendSubcontractorController] Failed to populate UserAnswers " +
+                s"for type=$subcontractorType, " +
+                s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+              error
+            )
+
+            Future.successful(recovery)
+          },
+          updatedAnswers =>
+            updatedAnswers
+              .set(AmendJourneyTypePage, amendJourneyType)
+              .fold(
+                error => {
+                  logger.error(
+                    s"[AmendSubcontractorController] Failed to set AmendJourneyTypePage " +
+                      s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+
+                  Future.successful(recovery)
+                },
+                updatedAnswersWithJourneyType =>
+                  sessionRepository
+                    .set(updatedAnswersWithJourneyType)
+                    .map(_ =>
+                      Redirect(
+                        onwardRoute(
+                          subcontractorType,
+                          subbieResourceRef
+                        )
+                      )
+                    )
+              )
+        )
+
+      case Failure(error) =>
         logger.error(
-          s"[AmendSubcontractorController] Failed to populate UserAnswers " +
-            s"for type=$subcontractorType, " +
-            s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+          s"[AmendSubcontractorController] Failed to clean amend UserAnswers " +
+            s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
           error
         )
 
         Future.successful(recovery)
-      },
-      updatedAnswers =>
-        updatedAnswers
-          .set(AmendJourneyTypePage, amendJourneyType)
-          .fold(
-            error => {
-              logger.error(
-                s"[AmendSubcontractorController] Failed to set AmendJourneyTypePage " +
-                  s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-                error
-              )
-
-              Future.successful(recovery)
-            },
-            updatedAnswersWithJourneyType =>
-              sessionRepository
-                .set(updatedAnswersWithJourneyType)
-                .map(_ => Redirect(onwardRoute(subcontractorType, subbieResourceRef)))
-          )
-    )
+    }
 
   private def populateUserAnswers(
     subcontractorType: TypeOfSubcontractor,

@@ -21,13 +21,14 @@ import forms.amend.company.AmendCompanyRemoveDetailYesNoFormProvider
 import models.amend.company.AmendCompanyRemoveDetail
 import models.UserAnswers
 import models.address.Address
+import models.amend.AmendJourneyType
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.*
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 import pages.amend.company.AmendCompanyRemoveDetailYesNoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -480,6 +481,120 @@ class AmendCompanyRemoveDetailYesNoControllerSpec extends SpecBase with MockitoS
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a POST when subcontractor is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoUtrRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+              .onPageLoad()
+              .url
+        }
+      }
+
+      "must allow access for a POST when subcontractor is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, removeDetailYesNoUtrRoute)
+              .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+              .onPageLoad()
+              .url
         }
       }
     }

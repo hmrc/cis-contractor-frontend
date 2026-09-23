@@ -18,11 +18,12 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
+import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import pages.add.partnership.{PartnershipAddressPage, PartnershipNamePage}
-import play.api.i18n.MessagesApi
+import models.{AmendMode, Mode, UserAnswers}
+import pages.add.partnership.PartnershipAddressPage
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
@@ -46,8 +47,10 @@ class PartnershipAddressController @Inject() (
 
   override protected def addressPage: Settable[Address] = PartnershipAddressPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(PartnershipNamePage)
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, mode)
 
   override protected def standardCallback: Call =
     routes.PartnershipAddressController.addressLookupCallback()
@@ -70,7 +73,7 @@ class PartnershipAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.PartnershipAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.PartnershipAddressController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 

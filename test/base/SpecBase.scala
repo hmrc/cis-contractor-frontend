@@ -75,6 +75,7 @@ trait SpecBase
     isAgent: Boolean = false,
     hasAgentRef: Boolean = true,
     hasEmployeeRef: Boolean = true,
+    formpRdsReconcileAction: FormpRdsReconcileAction = new FakeFormpRdsReconcileAction,
     agentCode: Option[String] = Some("agentCode")
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
@@ -90,7 +91,8 @@ trait SpecBase
             .qualifiedWith("ContractorIdentifier")
             .to(new FakeIdentifierAction(false, false, true)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl]
+          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl],
+          bind[FormpRdsReconcileAction].toInstance(formpRdsReconcileAction)
         ) ++ additionalBindings
       )
 }

@@ -19,13 +19,12 @@ package controllers.amend.partnership
 import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.add.partnership.ValidatedPartnership
 import models.amend.AmendJourneyType
 import models.requests.CisIdDataRequest
 import models.{AmendMode, UserAnswers}
-import pages.add.*
-import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -67,11 +66,11 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     implicit request =>
       val ua = request.userAnswers
 
-      ValidatedPartnership.build(ua) match {
+      ValidatedPartnership.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified = AmendControllerUtils.isVerifiedForAmendJourney(ua)
 
-          val partnershipName              = ua.get(PartnershipNamePage).getOrElse("")
+          val partnershipName              = SubcontractorNameDisplayHelper.partnershipDisplayName(ua, AmendMode)
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
 
@@ -178,7 +177,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         andThen requireData
         andThen cisIdRequiredAction
     ).async { implicit request =>
-      ValidatedPartnership.build(request.userAnswers) match {
+      ValidatedPartnership.buildForAmend(request.userAnswers) match {
 
         case Left(error) =>
           logger.error(
@@ -341,29 +340,27 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
   def onCancel(): Action[AnyContent] =
-    (
-      identify
-        andThen getData
-        andThen requireData
-        andThen cisIdRequiredAction
-    ).async { implicit request =>
-      sessionRepository
-        .set(
-          UserAnswers(request.userAnswers.id)
+    (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
+
+      val redirectCall =
+        noChangesRedirect(
+          request.userAnswers,
+          request.cisId
         )
+
+      Future
+        .fromTry(
+          cleanupService.cleanAmend(request.userAnswers)
+        )
+        .flatMap(sessionRepository.set)
         .map { _ =>
-          Redirect(
-            appConfig.manageYourSubcontractorsUrl(
-              request.cisId
-            )
-          )
+          Redirect(redirectCall)
         }
-        .recover { case throwable =>
+        .recover { case t =>
           logger.error(
             s"[AmendPartnershipCheckYourAnswersController.onCancel] " +
-              s"Failed to clear user answers for session " +
-              s"${request.userAnswers.id}",
-            throwable
+              s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+            t
           )
 
           Redirect(

@@ -18,7 +18,7 @@ package controllers.add.trust
 
 import base.SpecBase
 import controllers.routes
-import models.NormalMode
+import models.{AmendMode, NormalMode}
 import models.address.{Address, Country}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -54,10 +54,10 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private lazy val redirectRoute =
-    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup().url
+    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(NormalMode).url
 
   private lazy val redirectChangeRoute =
-    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some("change")).url
+    controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(NormalMode, Some("change")).url
 
   private lazy val callbackRoute =
     controllers.add.trust.routes.TrustAddressController.addressLookupCallback("addr-id").url
@@ -428,7 +428,7 @@ class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.add.trust.routes.TrustAddressController
-              .redirectToAddressLookup(Some("change"))
+              .redirectToAddressLookup(AmendMode, Some("change"))
               .url
 
           verify(mockSessionRepository).set(captor.capture())

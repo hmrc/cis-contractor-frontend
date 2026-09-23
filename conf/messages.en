@@ -128,10 +128,10 @@ typeOfSubcontractor.change.hidden                                               
 
 tradingNameOfSubcontractor.title                                                    =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading                                                  =  What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Subcontractor trading name
+tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Trading name
 tradingNameOfSubcontractor.error.required                                           =  Enter a trading name like ABC Construction Ltd
 tradingNameOfSubcontractor.error.length                                             =  Enter a trading name up to 56 characters
-tradingNameOfSubcontractor.change.hidden                                            =  subcontractor trading name
+tradingNameOfSubcontractor.change.hidden                                            =  trading name
 tradingNameOfSubcontractor.error.invalidCharacters                                  =  Enter a trading name like ABC Construction Ltd
 
 subAddressYesNo.title                                                               =  Do you want to add an address for this subcontractor?
@@ -548,6 +548,17 @@ agent.agentLostAccess.bullet.item.2.link                                        
 agent.agentLostAccess.bullet.item.2.suffix                                          =  to authorise you by post
 agent.agentLostAccess.p2                                                            =  It can take up to 5 working days for new authorisations to appear in your account.
 agent.agentLostAccess.return.link                                                   =  Return to client list
+
+finalValidations.reviewContractorDetails.title                                      =  Review contractor details
+finalValidations.reviewContractorDetails.heading                                    =  Review contractor details
+finalValidations.reviewContractorDetails.task.utr                                   =  Unique Taxpayer Reference
+finalValidations.reviewContractorDetails.task.schemeName                            =  Scheme name
+finalValidations.reviewContractorDetails.task.email                                 =  Email address
+finalValidations.reviewContractorDetails.task.fileReturn                            =  File a return
+finalValidations.reviewContractorDetails.task.verifySubcontractors                  =  Verify subcontractors
+finalValidations.reviewContractorDetails.status.complete                            =  Complete
+finalValidations.reviewContractorDetails.status.incomplete                          =  Incomplete
+finalValidations.reviewContractorDetails.status.cannotStart                         =  Cannot start yet
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
@@ -1140,7 +1151,7 @@ verify.noSubcontractorsSelectedWarning.cancel                                   
 verify.verificationRequestSubmitted.title                                          =  Verification request submitted
 verify.verificationRequestSubmitted.heading                                        =  Verification request submitted
 verify.verificationRequestSubmitted.reference                                      =  Your verification reference number
-verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0}
+verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0} on {1}
 verify.verificationRequestSubmitted.details.subHeading                             =  Verification request details
 verify.verificationRequestSubmitted.subcontractorsToVerify.label                   =  Subcontractors to verify
 verify.verificationRequestSubmitted.subcontractorsToReverify.label                 =  Subcontractors to reverify

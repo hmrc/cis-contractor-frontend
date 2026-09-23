@@ -17,6 +17,7 @@
 package controllers.verify
 
 import base.SpecBase
+import controllers.actions.FormpRdsReconcileAction
 import models.UserAnswers
 import models.requests.DataRequest
 import models.response.*
@@ -28,13 +29,15 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.VerificationSubmissionDetailsPage
 import play.api.i18n.Messages
 import play.api.inject.bind
-import play.api.mvc.AnyContent
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
@@ -330,6 +333,40 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
             .url
       }
     }
+
+    "must run the FORMP/RDS reconciliation before submitting to ChRIS and honour its redirect" in {
+      val mockService = mock[VerificationService]
+
+      val redirectingReconcile = new FormpRdsReconcileAction {
+        override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+          Future.successful(
+            Some(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))
+          )
+        override protected def executionContext: ExecutionContext                         = scala.concurrent.ExecutionContext.Implicits.global
+      }
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          formpRdsReconcileAction = redirectingReconcile
+        )
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+
+        verify(mockService, never).createSubmitAndPersistVerificationSubmission(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier],
+          any[Messages]
+        )
+      }
+    }
   }
 
   "SubmissionSendingController.onPollAndRedirect" - {
@@ -357,13 +394,16 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to submitted page when poll returns SUBMITTED" in {
+    "must reset user answers and redirect to submitted page when poll returns SUBMITTED" in {
       val mockService = mock[VerificationService]
 
       mockPollResponse(
         mockService,
         pollResponse(SubmissionStatus.SUBMITTED)
       )
+
+      when(mockService.resetUserAnswers(any[UserAnswers]))
+        .thenReturn(Future.successful(()))
 
       val application =
         applicationWith(
@@ -381,6 +421,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           controllers.verify.routes.VerificationRequestSubmittedController
             .onPageLoad()
             .url
+        verify(mockService).resetUserAnswers(any[UserAnswers])
       }
     }
 

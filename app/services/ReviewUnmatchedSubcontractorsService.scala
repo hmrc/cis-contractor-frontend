@@ -30,9 +30,6 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class ReviewUnmatchedSubcontractorsService @Inject() {
 
-  // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
-  private val dummyUrl = "#"
-
   private val noneProvidedKey = "verify.reviewUnmatched.noneProvided"
 
   def buildViewModel(
@@ -88,7 +85,15 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
     val name = resolveName(sub, verification)
     MissingSubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.UnmatchedInfo.routeValue
+          )
+          .url,
+        name
+      ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey),
       proceedLink = LinkViewModel(
         controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
@@ -105,7 +110,12 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
           .url,
         name
       ),
-      removeLink = LinkViewModel(dummyUrl, name)
+      removeLink = LinkViewModel(
+        controllers.unmatched.routes.RemoveSubcontractorVerifyRequestController
+          .onPageLoad(sub.subcontractorId)
+          .url,
+        name
+      )
     )
   }
 
@@ -116,7 +126,15 @@ class ReviewUnmatchedSubcontractorsService @Inject() {
     val name = resolveName(sub, verification)
     ReadySubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.UnmatchedInfo.routeValue
+          )
+          .url,
+        name
+      ),
       utr = SubcontractorDisplay.utrDisplay(sub, noneProvidedKey)
     )
   }

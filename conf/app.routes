@@ -4,6 +4,7 @@
 ->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
 
 GET   /subcontractor  controllers.IndexController.onPageLoad()
+GET   /subcontractor/service-home  controllers.ServiceHomeController.onPageLoad()
 
 GET   /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -35,6 +36,7 @@ GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorCon
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/individual-address-lookup   controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/address-change              controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
@@ -87,7 +89,7 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
-GET   /subcontractor/info/start/:cisId/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long, journeyType: String)
+GET   /subcontractor/info/start/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
 GET   /subcontractor/info/partnership/subcontractor-information-read-only/:journeyType  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad(journeyType: String)
 
@@ -136,8 +138,8 @@ GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers
 
 GET   /subcontractor/unmatched/subcontractor-details-updated  controllers.unmatched.UnmatchedSubcontractorDetailsUpdatedController.onPageLoad()
 
-GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
 GET   /subcontractor/proceed-verifying-unmatched-subcontractor/:subcontractorId  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long,mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-unmatched-subcontractor/:subcontractorId  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long,mode: Mode = NormalMode)
@@ -148,6 +150,12 @@ POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsControll
 GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
 
 GET   /agent/no-longer-authorised  controllers.AgentLostAccessController.onPageLoad()
+
+GET   /final-validations/file-monthly-return             controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileMonthlyReturn()
+GET   /final-validations/file-nil-return                 controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileNilReturn()
+GET   /final-validations/verify-subcontractors           controllers.finalvalidations.ContractorDetailsFinalValidationController.startVerifySubcontractors()
+GET   /final-validations/review-contractor-details       controllers.finalvalidations.ContractorDetailsFinalValidationController.onPageLoad()
+GET   /final-validations/review-contractor-details/next  controllers.finalvalidations.ContractorDetailsFinalValidationController.onContinue()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -262,6 +270,7 @@ POST  /subcontractor/amend/company/check-address       controllers.add.company.C
 GET   /subcontractor/add/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/company/address              controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/company/address-change       controllers.add.company.CompanyAddressController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
@@ -400,6 +409,7 @@ GET   /subcontractor/add/partnership/address                controllers.add.part
 GET   /subcontractor/add/partnership/address-return         controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/partnership/address-change       controllers.add.partnership.PartnershipAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/partnership/address              controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 
 GET   /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
@@ -501,6 +511,7 @@ POST  /subcontractor/amend/trust/check-address       controllers.add.trust.Trust
 GET   /subcontractor/add/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/trust/address              controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/trust/address-change       controllers.add.trust.TrustAddressController.redirectToAmendAddressLookup()
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
@@ -681,11 +692,15 @@ POST  /contractor-details/introduction  controllers.contractordetails.Contractor
 
 GET   /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
@@ -696,6 +711,8 @@ POST  /contractor-details/contractor-details-added  controllers.contractordetail
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 

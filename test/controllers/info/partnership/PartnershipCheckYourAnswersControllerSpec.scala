@@ -411,6 +411,36 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSug
       }
     }
 
+    "must redirect to Journey Recovery when required PartnershipAnswers are missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(PartnershipAnswersQuery, answers.copy(nominatedPartnerName = None))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, insufficientRouteUrl)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
     "must render the correct back to message and Url when the journey is insufficient" in {
 
       val userAnswers =
