@@ -21,14 +21,14 @@ import controllers.routes
 import models.UserAnswers
 import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
 import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
+import models.response.GetCurrentVerificationBatchResponse
 import models.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

@@ -20,7 +20,7 @@ import controllers.actions.*
 import models.contractordetails.ContractorDetailsValidationTarget
 import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, VerificationBatchReadinessPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -115,20 +115,19 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       for {
         withContext <- Future.fromTry(
-          request.userAnswers.set(
-            FinalValidationContextPage,
-            FinalValidationContext.VerifySubcontractor
-          )
-        )
+                         request.userAnswers.set(
+                           FinalValidationContextPage,
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
         withSource  <- Future.fromTry(
-          withContext.set(
-            VerifyFinalValidationSourcePage,
-            VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
-          )
-        )
+                         withContext.set(
+                           VerifyFinalValidationSourcePage,
+                           VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+                         )
+                       )
         _           <- sessionRepository.set(withSource)
       } yield Redirect(
         controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
