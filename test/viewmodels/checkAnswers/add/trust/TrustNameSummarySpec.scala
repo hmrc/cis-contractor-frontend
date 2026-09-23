@@ -157,7 +157,7 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
       row.actions shouldBe None
     }
 
-    "must return None when trust name does not exist in ViewOnlyTrustAnswers" in {
+    "must return a row with the no name message when trust name does not exist in ViewOnlyTrustAnswers" in {
 
       val answers =
         TrustAnswers(
@@ -178,7 +178,22 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
           verificationNumber = None
         )
 
-      TrustNameSummary.row(answers) shouldBe None
+      val maybeRow =
+        TrustNameSummary.row(answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("trustName.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(
+        messages("verify.noName")
+      )
+
+      row.actions shouldBe None
     }
   }
 }

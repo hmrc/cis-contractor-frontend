@@ -42,10 +42,12 @@ object TrustNameSummary {
   def row(
     answers: TrustAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
-    answers.trustName.map { answer =>
+    Some(
       SummaryListRowViewModel(
         key = "trustName.checkYourAnswersLabel",
-        value = ValueViewModel(answer)
+        value = ValueViewModel(
+          answers.trustName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
+        )
       )
-    }
+    )
 }
