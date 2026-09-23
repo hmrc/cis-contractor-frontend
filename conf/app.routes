@@ -38,6 +38,8 @@ GET   /subcontractor/individual-address-return         controllers.add.AddressOf
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/individual-address-lookup   controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/address-change              controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/individual-address-return   controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/individual-address-return/change   controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
@@ -272,6 +274,8 @@ GET   /subcontractor/add/company/address-return         controllers.add.company.
 GET   /subcontractor/add/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/company/address              controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/company/address-change       controllers.add.company.CompanyAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/company/address-return       controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
@@ -410,6 +414,8 @@ GET   /subcontractor/add/partnership/address-return         controllers.add.part
 GET   /subcontractor/add/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/partnership/address-change       controllers.add.partnership.PartnershipAddressController.redirectToAmendAddressLookup()
 GET   /subcontractor/amend/partnership/address              controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/amend/partnership/address-return       controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
@@ -513,6 +519,8 @@ GET   /subcontractor/add/trust/address-return         controllers.add.trust.Trus
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/trust/address              controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/trust/address-change       controllers.add.trust.TrustAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/trust/address-return       controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
