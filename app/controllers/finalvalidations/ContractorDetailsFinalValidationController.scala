@@ -129,19 +129,25 @@ class ContractorDetailsFinalValidationController @Inject() (
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.utr",
           statusKey = statusKey(validation.utrComplete),
-          href = Option.when(!validation.utrComplete)("/contractor-details/enter-contractors-utr"),
+          href = Option.when(!validation.utrComplete)(
+            "/construction-industry-scheme/contractor-details/enter-contractors-utr"
+          ),
           id = "contractor-utr"
         ),
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.schemeName",
           statusKey = statusKey(validation.schemeNameComplete),
-          href = Option.when(!validation.schemeNameComplete)("/contractor-details/enter-contractors-scheme-name"),
+          href = Option.when(!validation.schemeNameComplete)(
+            "/construction-industry-scheme/contractor-details/enter-contractors-scheme-name"
+          ),
           id = "scheme-name"
         ),
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.email",
           statusKey = statusKey(validation.emailComplete),
-          href = Option.when(!validation.emailComplete)("/contractor-details/enter-contractors-email"),
+          href = Option.when(!validation.emailComplete)(
+            "/construction-industry-scheme/contractor-details/enter-contractors-email"
+          ),
           id = "contractor-email"
         )
       ),
