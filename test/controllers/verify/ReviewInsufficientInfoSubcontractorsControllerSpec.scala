@@ -20,11 +20,14 @@ import base.SpecBase
 import controllers.routes
 import models.UserAnswers
 import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{ContractorScheme, MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, SubcontractorCurrentVerification, Submission, Verification, VerificationCurrentVerification}
+import models.*
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
 import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -312,7 +315,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to ContractorEmailConfirmationStored when a stored email address exists" in {
+    "must set the final validation source and context in session and redirect to ContractorEmailConfirmationStored when a stored email address exists" in {
       val newestBatch =
         newestBatchResponse(
           subcontractors = Seq.empty
@@ -336,8 +339,13 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
+
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -359,10 +367,16 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           controllers.verify.routes.ContractorEmailConfirmationStoredController
             .onPageLoad(NormalMode)
             .url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
       }
     }
 
-    "must redirect to ContractorEmailConfirmationNotStored when no stored email address exists" in {
+    "must set the final validation source and context in session and redirect to ContractorEmailConfirmationNotStored when no stored email address exists" in {
 
       val newestBatch =
         newestBatchResponse(
@@ -386,8 +400,13 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
+
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -409,6 +428,12 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           controllers.verify.routes.ContractorEmailConfirmationNotStoredController
             .onPageLoad(NormalMode)
             .url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
       }
     }
   }
