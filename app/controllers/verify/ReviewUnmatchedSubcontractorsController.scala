@@ -17,15 +17,19 @@
 package controllers.verify
 
 import controllers.actions.*
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.ReviewUnmatchedSubcontractorsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewUnmatchedSubcontractorsView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class ReviewUnmatchedSubcontractorsController @Inject() (
@@ -34,9 +38,11 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  sessionRepository: SessionRepository,
   reviewUnmatchedSubcontractorsService: ReviewUnmatchedSubcontractorsService,
   view: ReviewUnmatchedSubcontractorsView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -62,7 +68,23 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
     }
 
   def onSubmit: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { _ =>
-      Redirect(controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit())
+    (identify andThen getData andThen requireData).async { implicit request =>
+      for {
+        withContext <- Future.fromTry(
+                         request.userAnswers.set(
+                           FinalValidationContextPage,
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
+        withSource  <- Future.fromTry(
+                         withContext.set(
+                           VerifyFinalValidationSourcePage,
+                           VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+                         )
+                       )
+        _           <- sessionRepository.set(withSource)
+      } yield Redirect(
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
+      )
     }
 }

@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.IndividualPhoneNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.{IndividualContactMethodOptionsPage, IndividualPhoneNumberPage}
@@ -55,27 +55,38 @@ class IndividualPhoneNumberController @Inject() (
       val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
       val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
 
-      (subcontractorName, contactOption) match {
-        case (Some(subcontractorName), Some(options)) if options.contains(ContactMethodOptions.Phone) =>
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (subcontractorName, phoneIsAvailable) match {
+        case (Some(subcontractorName), true) =>
           val preparedForm = request.userAnswers.get(IndividualPhoneNumberPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, subcontractorName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
+
+      val phoneIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
       (for {
-        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
-        contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Phone)
+        subcontractorName <- subcontractorName
+        if phoneIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

@@ -20,11 +20,14 @@ import base.SpecBase
 import controllers.routes
 import models.UserAnswers
 import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{MonthlyReturn, MonthlyReturnSubmission, Subcontractor, SubcontractorCurrentVerification, Submission, Verification, VerificationCurrentVerification}
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
+import models.response.GetCurrentVerificationBatchResponse
+import models.*
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -288,10 +291,15 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to ContinueVerificationSubmissionController when the user continues" in {
+    "must set the final validation source and context in session and redirect to ContinueVerificationSubmissionController when the user continues" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -313,6 +321,12 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           controllers.verify.routes.ContinueVerificationSubmissionController
             .onSubmit()
             .url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
       }
     }
   }

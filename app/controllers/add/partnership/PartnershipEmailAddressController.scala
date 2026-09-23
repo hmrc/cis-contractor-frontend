@@ -19,7 +19,7 @@ package controllers.add.partnership
 import controllers.actions.*
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipEmailAddressFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage}
@@ -46,34 +46,46 @@ class PartnershipEmailAddressController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
-    val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+      val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
 
-    (partnershipName, contactOption) match {
-      case (Some(partnershipName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
-        val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, mode, partnershipName))
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
 
-      case (Some(_), _) =>
-        Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
-      case _            =>
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      (partnershipName, emailIsAvailable) match {
+        case (Some(partnershipName), true) =>
+          val preparedForm = request.userAnswers.get(PartnershipEmailAddressPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, mode, partnershipName))
+
+        case (Some(_), false) =>
+          Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
+        case _                =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     }
-  }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
+      val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
       (for {
-        partnershipName <- SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
-        contactMethods  <- request.userAnswers.get(PartnershipContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Email)
+        partnershipName <- partnershipName
+        if emailIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

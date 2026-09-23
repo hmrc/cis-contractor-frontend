@@ -19,7 +19,7 @@ package controllers.add.trust
 import controllers.actions.*
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustEmailAddressFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.trust.{TrustContactMethodOptionsPage, TrustEmailAddressPage}
@@ -46,7 +46,7 @@ class TrustEmailAddressController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -54,27 +54,38 @@ class TrustEmailAddressController @Inject() (
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
       val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
 
-      (trustName, contactOption) match {
-        case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (trustName, emailIsAvailable) match {
+        case (Some(trustName), true) =>
           val preparedForm = request.userAnswers.get(TrustEmailAddressPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, trustName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
+
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
       (for {
-        trustName      <- SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
-        contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Email)
+        trustName <- trustName
+        if emailIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

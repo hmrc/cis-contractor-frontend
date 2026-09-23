@@ -21,7 +21,7 @@ import controllers.add.AddressLookupJourneyController
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
-import models.{AmendMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -52,14 +52,19 @@ class TrustAddressController @Inject() (
   ): Option[String] =
     SubcontractorNameDisplayHelper.getTrustDisplayName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.TrustAddressController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.TrustAddressController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.TrustAddressController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.TrustAddressController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {

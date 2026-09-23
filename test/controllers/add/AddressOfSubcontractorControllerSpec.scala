@@ -21,6 +21,7 @@ import controllers.routes
 import models.{AmendMode, NormalMode, UserAnswers}
 import models.add.SubcontractorName
 import models.address.{Address, Country}
+import models.FinalValidationMode
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
@@ -57,16 +58,24 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private lazy val redirectRoute =
-    controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(NormalMode).url
+    controllers.add.routes.AddressOfSubcontractorController
+      .redirectToAddressLookup(NormalMode, None)
+      .url
 
   private lazy val redirectChangeRoute =
-    controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(NormalMode, Some("change")).url
+    controllers.add.routes.AddressOfSubcontractorController
+      .redirectToAddressLookup(NormalMode, Some("change"))
+      .url
 
   private lazy val callbackRoute =
-    controllers.add.routes.AddressOfSubcontractorController.addressLookupCallback("addr-id").url
+    controllers.add.routes.AddressOfSubcontractorController
+      .addressLookupCallback("addr-id", NormalMode)
+      .url
 
   private lazy val callbackChangeRoute =
-    controllers.add.routes.AddressOfSubcontractorController.addressLookupCallbackChange("addr-id").url
+    controllers.add.routes.AddressOfSubcontractorController
+      .addressLookupCallbackChange("addr-id", NormalMode)
+      .url
 
   "AddressOfSubcontractor Controller" - {
 
@@ -100,6 +109,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
           val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
+
           verify(mockAddressLookupService)
             .getJourneyUrl(
               any(),
@@ -114,7 +124,10 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
-            controllers.add.routes.AddressOfSubcontractorController.addressLookupCallback().url
+            controllers.add.routes.AddressOfSubcontractorController
+              .addressLookupCallback("", NormalMode)
+              .url
+
           optNameCaptor.getValue mustBe Some(subcontractorName)
         }
       }
@@ -147,6 +160,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
           val optNameCaptor  = ArgumentCaptor.forClass(classOf[Option[String]])
+
           verify(mockAddressLookupService)
             .getJourneyUrl(
               any(),
@@ -161,7 +175,10 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             )(any(), any(), any())
 
           callbackCaptor.getValue.url mustBe
-            controllers.add.routes.AddressOfSubcontractorController.addressLookupCallbackChange().url
+            controllers.add.routes.AddressOfSubcontractorController
+              .addressLookupCallbackChange("", NormalMode)
+              .url
+
           optNameCaptor.getValue mustBe Some(subcontractorName)
         }
       }
@@ -274,11 +291,47 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe
-            controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode).url
+            controllers.add.routes.AddIndividualContactMethodsYesNoController
+              .onPageLoad(NormalMode)
+              .url
 
           val idCaptor = ArgumentCaptor.forClass(classOf[String])
-          verify(mockAddressLookupService).getAddressById(idCaptor.capture())(any(), any())
+
+          verify(mockAddressLookupService)
+            .getAddressById(idCaptor.capture())(any(), any())
+
           idCaptor.getValue mustBe "addr-id"
+        }
+      }
+
+      "must retrieve and persist the address then redirect to Final Validation Complete in Final Validation mode" in {
+
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.saveAddressDetails(any(), any())(any(), any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[AddressLookupService].toInstance(mockAddressLookupService))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              GET,
+              controllers.add.routes.AddressOfSubcontractorController
+                .addressLookupCallback("addr-id", FinalValidationMode)
+                .url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.finalvalidations.routes.FinalValidationCompleteController
+              .onPageLoad()
+              .url
         }
       }
 
@@ -423,6 +476,7 @@ class AddressOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         }
       }
     }
+
     "redirectToAmendAddressLookup" - {
 
       "must set AddressLookupAmendReturnQuery and redirect to the change address lookup journey" in {

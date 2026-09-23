@@ -294,7 +294,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
           mode,
           userAnswers.get(PartnershipAddressYesNoPage),
           userAnswers.get(PartnershipAddressPage).isDefined,
-          onYes = controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(NormalMode),
+          onYes =
+            controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(NormalMode, None),
           onYesChange = controllers.add.partnership.routes.PartnershipAddressController
             .redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
           onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(NormalMode),

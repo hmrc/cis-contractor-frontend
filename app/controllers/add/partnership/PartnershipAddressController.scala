@@ -18,10 +18,10 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.partnershipQuestionsAddress
-import models.{AmendMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -52,14 +52,19 @@ class PartnershipAddressController @Inject() (
   ): Option[String] =
     SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.PartnershipAddressController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.PartnershipAddressController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.PartnershipAddressController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.PartnershipAddressController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
