@@ -684,6 +684,15 @@ GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.Unmatche
 
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
+GET   /subcontractor/verify/continue-verification-submission  controllers.verify.ContinueVerificationSubmissionController.onSubmit()
+
+# Final validations
+GET   /final-validations/file-monthly-return             controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileMonthlyReturn()
+GET   /final-validations/file-nil-return                 controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileNilReturn()
+GET   /final-validations/verify-subcontractors           controllers.finalvalidations.ContractorDetailsFinalValidationController.startVerifySubcontractors()
+GET   /final-validations/review-contractor-details       controllers.finalvalidations.ContractorDetailsFinalValidationController.onPageLoad()
+GET   /final-validations/review-contractor-details/next  controllers.finalvalidations.ContractorDetailsFinalValidationController.onContinue()
+
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
 
