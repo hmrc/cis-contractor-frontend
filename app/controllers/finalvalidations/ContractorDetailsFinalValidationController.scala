@@ -25,7 +25,7 @@ import models.contractordetails.ContractorDetailsValidationTarget.*
 import pages.contractordetails.ContractorDetailsValidationTargetPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader, Result}
 import repositories.SessionRepository
 import services.{CisManageService, ContractorDetailsFinalValidationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -175,15 +175,21 @@ class ContractorDetailsFinalValidationController @Inject() (
         "finalValidations.reviewContractorDetails.task.verifySubcontractors"
     }
 
-  private def redirectToTarget(target: ContractorDetailsValidationTarget): Result =
+  private def redirectToTarget(target: ContractorDetailsValidationTarget)(implicit request: RequestHeader): Result =
     target match {
       case FileMonthlyReturn             =>
-        Redirect(appConfig.fileStandardReturnUrl)
+        Redirect(returnJourneyUrl(appConfig.fileStandardReturnUrl))
       case FileNilReturn                 =>
-        Redirect(appConfig.fileNilReturnUrl)
+        Redirect(returnJourneyUrl(appConfig.fileNilReturnUrl))
       case VerifySubcontractors          =>
         Redirect(controllers.verify.routes.NewestVerificationBatchController.onPageLoad())
       case ReviewUnmatchedSubcontractors =>
         Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad())
     }
+
+  private def returnJourneyUrl(path: String)(implicit request: RequestHeader): String =
+    if (isLocalRequest) s"${appConfig.cisFrontendBaseUrl}$path" else path
+
+  private def isLocalRequest(implicit request: RequestHeader): Boolean =
+    request.host.startsWith("localhost") || request.host.startsWith("127.0.0.1")
 }

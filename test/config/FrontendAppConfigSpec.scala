@@ -38,6 +38,10 @@ class FrontendAppConfigSpec extends SpecBase {
       applicationConfig.cisStubUrl mustBe "http://localhost:6997"
     }
 
+    "cisFrontendBaseUrl must resolve from the cis-frontend config" in {
+      applicationConfig.cisFrontendBaseUrl mustBe "http://localhost:6993"
+    }
+
     "fileStandardReturnUrl must point to the monthly return journey" in {
       applicationConfig.fileStandardReturnUrl mustBe
         "/construction-industry-scheme/monthly-return/file-your-monthly-return"
