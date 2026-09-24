@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.trust
 
 import helpers.CyaEncodingSpecHelper
-import models.{AmendMode, CheckMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
@@ -152,45 +152,6 @@ class TrustNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpe
 
       row.value.content.asHtml.toString should include(
         "Acme Trust"
-      )
-
-      row.actions shouldBe None
-    }
-
-    "must return a row with the no name message when trust name does not exist in ViewOnlyTrustAnswers" in {
-
-      val answers =
-        TrustAnswers(
-          subcontractorType = models.TypeOfSubcontractor.Trust,
-          showVerificationDetails = false,
-          trustName = None,
-          addressYesNo = None,
-          address = None,
-          trustContactMethodsYesNo = None,
-          trustContactMethod = Set.empty,
-          email = None,
-          phone = None,
-          mobile = None,
-          utrYesNo = None,
-          utr = None,
-          worksReferenceYesNo = None,
-          worksReference = None,
-          verificationNumber = None
-        )
-
-      val maybeRow =
-        TrustNameSummary.row(answers)
-
-      maybeRow shouldBe defined
-
-      val row = maybeRow.value
-
-      row.key.content.asHtml.toString should include(
-        messages("trustName.checkYourAnswersLabel")
-      )
-
-      row.value.content.asHtml.toString should include(
-        messages("verify.noName")
       )
 
       row.actions shouldBe None
