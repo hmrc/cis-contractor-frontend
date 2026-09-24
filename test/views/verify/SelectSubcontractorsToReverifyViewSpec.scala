@@ -138,6 +138,46 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
 
       doc.select(".govuk-error-summary").size() mustBe 1
     }
+
+    "must include the current page number in the title when there are multiple pages" in new Setup {
+
+      val html =
+        view(
+          form,
+          mode,
+          rows,
+          pagination,
+          page = 4,
+          startIndex = 19,
+          totalCount = 42,
+          totalPages = 7
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("verify.selectSubcontractorsToReverify.title")} ${messages("site.pagination.pageTitle", 4, 7)} - ${messages("service.name")} - ${messages("site.govuk")}"
+    }
+
+    "must not include a page number in the title when there is only one page" in new Setup {
+
+      val html = view(
+        form,
+        mode,
+        rows,
+        PaginationViewModel(),
+        page = 1,
+        startIndex = 1,
+        totalCount = rows.size,
+        totalPages = 1
+      )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("verify.selectSubcontractorsToReverify.title")} - ${messages("service.name")} - ${messages("site.govuk")}"
+      doc.title must not include messages("site.pagination.pageTitle", 1, 1)
+    }
   }
 
   trait Setup {
