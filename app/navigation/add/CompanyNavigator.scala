@@ -137,7 +137,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
           mode,
           userAnswers.get(CompanyAddressYesNoPage),
           userAnswers.get(CompanyAddressPage).isDefined,
-          onYes = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode),
+          onYes = controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode, None),
           onYesChange = controllers.add.company.routes.CompanyAddressController
             .redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
           onNo = controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(NormalMode),

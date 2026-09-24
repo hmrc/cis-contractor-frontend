@@ -136,6 +136,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     }
   }
 
+  def cisFrontendFinalValidationReturnUrl(handoffId: String): String =
+    s"$cisFrontendFinalValidationReturn/$handoffId"
+
+  lazy val cisFrontendFinalValidationReturn: String =
+    configuration.get[String]("urls.cisFrontendFinalValidationReturn")
+
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", URLEncoder.encode(agentCode, "UTF-8"))}"
 

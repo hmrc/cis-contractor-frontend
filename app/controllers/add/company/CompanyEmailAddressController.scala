@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import forms.add.company.CompanyEmailAddressFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.company.{CompanyContactMethodOptionsPage, CompanyEmailAddressPage}
@@ -57,28 +57,38 @@ class CompanyEmailAddressController @Inject() (
       val companyName   = subcontractorNameExtractor
         .getCompanyName(request.userAnswers, mode)
 
-      (companyName, contactOption) match {
-        case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (companyName, emailIsAvailable) match {
+        case (Some(companyName), true) =>
           val preparedForm = request.userAnswers.get(CompanyEmailAddressPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, companyName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
+
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
       (for {
-        companyName    <- subcontractorNameExtractor
-                            .getCompanyName(request.userAnswers, mode)
-        contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Email)
+        companyName <- companyName
+        if emailIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

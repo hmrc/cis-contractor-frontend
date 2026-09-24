@@ -205,7 +205,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
           mode,
           ua.get(SubAddressYesNoPage),
           ua.get(AddressOfSubcontractorPage).isDefined,
-          onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(NormalMode),
+          onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup(NormalMode, None),
           onYesChange = controllers.add.routes.AddressOfSubcontractorController
             .redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
           onNo = controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(NormalMode),
