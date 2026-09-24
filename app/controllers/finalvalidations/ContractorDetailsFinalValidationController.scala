@@ -19,6 +19,7 @@ package controllers.finalvalidations
 import config.FrontendAppConfig
 import controllers.AgentClientChecks
 import controllers.actions.*
+import models.NormalMode
 import models.UserAnswers
 import models.contractordetails.ContractorDetailsValidationTarget
 import models.contractordetails.ContractorDetailsValidationTarget.*
@@ -130,7 +131,7 @@ class ContractorDetailsFinalValidationController @Inject() (
           titleKey = "finalValidations.reviewContractorDetails.task.utr",
           statusKey = statusKey(validation.utrComplete),
           href = Option.when(!validation.utrComplete)(
-            "/construction-industry-scheme/contractor-details/enter-contractors-utr"
+            controllers.contractordetails.routes.ContractorUtrController.onPageLoad(NormalMode).url
           ),
           id = "contractor-utr"
         ),
@@ -146,7 +147,7 @@ class ContractorDetailsFinalValidationController @Inject() (
           titleKey = "finalValidations.reviewContractorDetails.task.email",
           statusKey = statusKey(validation.emailComplete),
           href = Option.when(!validation.emailComplete)(
-            "/construction-industry-scheme/contractor-details/enter-contractors-email"
+            controllers.contractordetails.routes.EnterContractorEmailAddressController.onPageLoad(NormalMode).url
           ),
           id = "contractor-email"
         )

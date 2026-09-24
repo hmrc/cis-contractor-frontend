@@ -206,9 +206,9 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
         body must include("Scheme name")
         body must include("Email address")
         body must include("Cannot start yet")
-        body must include("/construction-industry-scheme/contractor-details/enter-contractors-utr")
+        body must include("/contractor-details/enter-contractor-utr")
         body must include("/construction-industry-scheme/contractor-details/enter-contractors-scheme-name")
-        body must include("/construction-industry-scheme/contractor-details/enter-contractors-email")
+        body must include("/contractor-details/enter-contractor-email-address")
       }
     }
 
