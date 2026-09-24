@@ -18,13 +18,16 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.ContractorEmailConfirmationStoredFormProvider
-import models.Mode
-import models.requests.DataRequest
+import models.{Mode, UserAnswers}
+import models.finalvalidation.{FinalValidationDraftRequestBuilder, VerifyFinalValidationContinuation}
 import navigation.Navigator
+import pages.finalvalidation.{FinalValidationDraftIdPage, VerifyFinalValidationContinuationPage, VerifyFinalValidationModePage}
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.VerifyFinalValidationService
+import services.finalvalidation.FinalValidationDraftService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ContractorEmailConfirmationStoredView
 
@@ -38,6 +41,10 @@ class ContractorEmailConfirmationStoredController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  verifyFinalValidationService: VerifyFinalValidationService,
+  finalValidationDraftService: FinalValidationDraftService,
+  finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
   formProvider: ContractorEmailConfirmationStoredFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorEmailConfirmationStoredView
@@ -53,26 +60,115 @@ class ContractorEmailConfirmationStoredController @Inject() (
     controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(mode)
   )
 
-  private def preparedForm(implicit request: DataRequest[?]) =
-    request.userAnswers.get(ContractorEmailConfirmationStoredPage).fold(form)(form.fill)
+  private def emailNotStoredAfterFinalValidationRedirect(mode: Mode) = Redirect(
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode)
+  )
 
-  private def getEmailAddress(implicit request: DataRequest[?]): Either[Unit, Option[String]] =
-    request.userAnswers.get(NewestVerificationBatchResponsePage) match {
+  private def preparedForm(userAnswers: UserAnswers) =
+    userAnswers.get(ContractorEmailConfirmationStoredPage).fold(form)(form.fill)
+
+  private def getEmailAddress(userAnswers: UserAnswers): Either[Unit, Option[String]] =
+    userAnswers.get(NewestVerificationBatchResponsePage) match {
       case None           => Left(())
       case Some(response) => Right(response.scheme.flatMap(_.emailAddress))
     }
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getEmailAddress match {
-      case Left(_)            => recoveryRedirect
-      case Right(None)        => emailNotStoredRedirect(mode)
-      case Right(Some(email)) => Ok(view(preparedForm, mode, email))
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      getEmailAddress(request.userAnswers) match {
+        case Left(_) =>
+          Future.successful(recoveryRedirect)
+
+        case Right(None) =>
+          Future.successful(emailNotStoredRedirect(mode))
+
+        case Right(Some(email)) =>
+          for {
+            validation <- verifyFinalValidationService.validate(
+                            request.cisId,
+                            request.userAnswers
+                          )
+
+            result <-
+              if (validation.hasErrors) {
+                for {
+                  createRequest <- Future.fromTry(
+                                     finalValidationDraftRequestBuilder.build(
+                                       request.cisId,
+                                       validation
+                                     )
+                                   )
+
+                  draftId <- finalValidationDraftService.create(createRequest)
+
+                  withContinuation <- Future.fromTry(
+                                        request.userAnswers.set(
+                                          VerifyFinalValidationContinuationPage,
+                                          VerifyFinalValidationContinuation.ContractorEmailConfirmationStored
+                                        )
+                                      )
+
+                  withDraftId <- Future.fromTry(
+                                   withContinuation.set(
+                                     FinalValidationDraftIdPage,
+                                     draftId
+                                   )
+                                 )
+
+                  withMode <- Future.fromTry(
+                                withDraftId.set(
+                                  VerifyFinalValidationModePage,
+                                  mode.toString
+                                )
+                              )
+
+                  _ <- sessionRepository.set(withMode)
+
+                } yield Redirect(
+                  controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                )
+              } else {
+                Future.successful(
+                  Ok(view(preparedForm(request.userAnswers), mode, email))
+                )
+              }
+
+          } yield result
+      }
     }
-  }
+
+  def onPageLoadAfterFinalValidation(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      getEmailAddress(request.userAnswers) match {
+        case Left(_) =>
+          Future.successful(recoveryRedirect)
+
+        case Right(None) =>
+          Future.successful(emailNotStoredAfterFinalValidationRedirect(mode))
+
+        case Right(Some(email)) =>
+          for {
+            updatedAnswers <- Future.fromTry(
+                                request.userAnswers.remove(
+                                  VerifyFinalValidationContinuationPage
+                                )
+                              )
+
+            _ <- sessionRepository.set(updatedAnswers)
+
+          } yield Ok(
+            view(
+              preparedForm(updatedAnswers),
+              mode,
+              email
+            )
+          )
+      }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      getEmailAddress.toOption.flatten
+      getEmailAddress(request.userAnswers).toOption.flatten
         .fold(Future.successful(recoveryRedirect)) { emailAddress =>
           form
             .bindFromRequest()

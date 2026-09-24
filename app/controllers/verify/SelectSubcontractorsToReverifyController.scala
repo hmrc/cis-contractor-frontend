@@ -18,6 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.SelectSubcontractorsToReverifyFormProvider
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
@@ -34,6 +35,7 @@ import pages.verify.SelectSubcontractorPage
 import services.{PaginationToReverifyService, VerificationPreSelectionService}
 import models.requests.DataRequest
 import models.verify.*
+import pages.finalvalidation.*
 import pages.verify.*
 import play.api.data.Form
 import rules.verify.ReverificationRules
@@ -301,9 +303,33 @@ class SelectSubcontractorsToReverifyController @Inject() (
           boundForm.fold(
             formWithErrors => Future.successful(renderForm(formWithErrors)),
             _ =>
-              saveSelectionsAndRedirect { updatedAnswers =>
-                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, updatedAnswers)
-              }
+              for {
+                withSelections <- Future.fromTry(
+                                    request.userAnswers.set(
+                                      SelectSubcontractorsToReverifyPage,
+                                      mergedSelections
+                                    )
+                                  )
+
+                withContext <- Future.fromTry(
+                                 withSelections.set(
+                                   FinalValidationContextPage,
+                                   FinalValidationContext.VerifySubcontractor
+                                 )
+                               )
+
+                withSource <- Future.fromTry(
+                                withContext.set(
+                                  VerifyFinalValidationSourcePage,
+                                  VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                )
+                              )
+
+                _ <- sessionRepository.set(withSource)
+
+              } yield Redirect(
+                navigator.nextPage(SelectSubcontractorsToReverifyPage, mode, withSource)
+              )
           )
       }
     }

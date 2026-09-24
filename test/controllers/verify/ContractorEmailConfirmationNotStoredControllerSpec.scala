@@ -37,19 +37,24 @@ import controllers.routes
 import forms.verify.ContractorEmailConfirmationNotStoredFormProvider
 import models.NormalMode
 import models.UserAnswers
+import models.finalvalidation.{VerifyFinalValidationContinuation, VerifyFinalValidationResult}
 import models.verify.ContractorEmailConfirmationStored
 import models.response.GetNewestVerificationBatchResponse
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.finalvalidation.VerifyFinalValidationContinuationPage
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
+import services.VerifyFinalValidationService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.ContractorEmailConfirmationNotStoredView
 
 import scala.concurrent.Future
@@ -61,8 +66,15 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
   private val formProvider = new ContractorEmailConfirmationNotStoredFormProvider()
   private val form         = formProvider()
 
+  private val cisId = "123"
+
   private lazy val routeUrl =
     controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
+
+  private lazy val finalValidationCompleteRouteUrl =
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+      .onPageLoadAfterFinalValidation(NormalMode)
+      .url
 
   private def newestResponse(email: Option[String]): GetNewestVerificationBatchResponse =
     GetNewestVerificationBatchResponse(
@@ -82,17 +94,46 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
       monthlyReturnSubmission = None
     )
 
+  private def verifyFinalValidationServiceWithNoErrors(): VerifyFinalValidationService = {
+    val mockVerifyFinalValidationService = mock[VerifyFinalValidationService]
+
+    val validationResult =
+      VerifyFinalValidationResult(
+        subcontractors = Seq.empty,
+        failures = Seq.empty
+      )
+
+    when(
+      mockVerifyFinalValidationService.validate(
+        any[String],
+        any[UserAnswers]
+      )(any[HeaderCarrier])
+    ) thenReturn Future.successful(validationResult)
+
+    mockVerifyFinalValidationService
+  }
+
   "ContractorEmailConfirmationNotStored Controller" - {
 
     "must redirect to ContractorEmailConfirmationStoredController on GET when stored email exists" in {
 
       val ua =
         emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
           .set(NewestVerificationBatchResponsePage, newestResponse(Some("stored@test.com")))
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val mockVerifyFinalValidationService = mock[VerifyFinalValidationService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[VerifyFinalValidationService].toInstance(mockVerifyFinalValidationService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -101,6 +142,8 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
+
+        verifyNoInteractions(mockVerifyFinalValidationService)
       }
     }
 
@@ -134,15 +177,25 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
       }
     }
 
-    "must return OK and the correct view for a GET when no stored email exists" in {
+    "must return OK and the correct view for a GET when no stored email exists and Final Validation has no errors" in {
 
       val ua =
         emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
           .set(NewestVerificationBatchResponsePage, newestResponse(None))
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val mockVerifyFinalValidationService = verifyFinalValidationServiceWithNoErrors()
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[VerifyFinalValidationService].toInstance(mockVerifyFinalValidationService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -156,10 +209,13 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered (no stored email)" in {
+    "must populate the view correctly on a GET when the question has previously been answered and Final Validation has no errors" in {
 
       val ua =
         emptyUserAnswers
+          .set(CisIdQuery, cisId)
+          .success
+          .value
           .set(NewestVerificationBatchResponsePage, newestResponse(None))
           .success
           .value
@@ -167,7 +223,14 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val mockVerifyFinalValidationService = verifyFinalValidationServiceWithNoErrors()
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[VerifyFinalValidationService].toInstance(mockVerifyFinalValidationService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -178,6 +241,125 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view after Final Validation when no stored email exists" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestResponse(None))
+          .success
+          .value
+          .set(
+            VerifyFinalValidationContinuationPage,
+            VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+          )
+          .success
+          .value
+
+      val mockSessionRepository               = mock[SessionRepository]
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(captor.capture())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, finalValidationCompleteRouteUrl)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[ContractorEmailConfirmationNotStoredView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+
+        val savedAnswers = captor.getValue
+        savedAnswers.get(VerifyFinalValidationContinuationPage) mustEqual None
+      }
+    }
+
+    "must populate the view correctly after Final Validation when the question has previously been answered" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestResponse(None))
+          .success
+          .value
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+          .set(
+            VerifyFinalValidationContinuationPage,
+            VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+          )
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, finalValidationCompleteRouteUrl)
+
+        val view = application.injector.instanceOf[ContractorEmailConfirmationNotStoredView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to ContractorEmailConfirmationStoredController after Final Validation when stored email exists" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(NewestVerificationBatchResponsePage, newestResponse(Some("stored@test.com")))
+          .success
+          .value
+          .set(
+            VerifyFinalValidationContinuationPage,
+            VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+          )
+          .success
+          .value
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val application =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, finalValidationCompleteRouteUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.ContractorEmailConfirmationStoredController
+            .onPageLoadAfterFinalValidation(NormalMode)
+            .url
+
+        verify(mockSessionRepository, never()).set(any())
       }
     }
 

@@ -126,19 +126,12 @@ typeOfSubcontractor.checkYourAnswersLabel                                       
 typeOfSubcontractor.error.required                                                  =  Select how the subcontractor is operating
 typeOfSubcontractor.change.hidden                                                   =  type
 
-subTradingNameYesNo.title                                                           =  Does the subcontractor use a trading name?
-subTradingNameYesNo.heading                                                         =  Does the subcontractor use a trading name?
-subTradingNameYesNo.hint                                                            =  This is a business name, different from their own name.
-subTradingNameYesNo.checkYourAnswersLabel                                           =  Does subcontractor use a trading name?
-subTradingNameYesNo.error.required                                                  =  Select whether or not the subcontractor uses a trading name
-subTradingNameYesNo.change.hidden                                                   =  does subcontractor use a trading name?
-
 tradingNameOfSubcontractor.title                                                    =  What is the subcontractor’s trading name?
 tradingNameOfSubcontractor.heading                                                  =  What is the subcontractor’s trading name?
-tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Subcontractor trading name
+tradingNameOfSubcontractor.checkYourAnswersLabel                                    =  Trading name
 tradingNameOfSubcontractor.error.required                                           =  Enter a trading name like ABC Construction Ltd
 tradingNameOfSubcontractor.error.length                                             =  Enter a trading name up to 56 characters
-tradingNameOfSubcontractor.change.hidden                                            =  subcontractor trading name
+tradingNameOfSubcontractor.change.hidden                                            =  trading name
 tradingNameOfSubcontractor.error.invalidCharacters                                  =  Enter a trading name like ABC Construction Ltd
 
 subAddressYesNo.title                                                               =  Do you want to add an address for this subcontractor?
@@ -193,8 +186,8 @@ subNationalInsuranceNumber.heading                                              
 subNationalInsuranceNumber.hint                                                     =  National Insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 subNationalInsuranceNumber.checkYourAnswersLabel                                    =  National Insurance number
 subNationalInsuranceNumber.error.required                                           =  Enter a National Insurance number
-subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number
-subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number
+subNationalInsuranceNumber.error.length                                             =  Enter a valid National Insurance number like QQ 12 34 56 C
+subNationalInsuranceNumber.error.invalidCharacters                                  =  Enter a valid National Insurance number like QQ 12 34 56 C
 subNationalInsuranceNumber.change.hidden                                            =  National Insurance number
 
 worksReferenceNumber.title                                                          =  What is the works reference number associated with this subcontractor?
@@ -513,6 +506,17 @@ unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors               
 
 info.CheckYourAnswers.backTo                                                        =  Back to
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
+info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Review unmatched subcontractors
+
+individualNamesOptions.title                                                        =  Which names do you want to add for this subcontractor?
+individualNamesOptions.heading                                                      =  Which names do you want to add for this subcontractor?
+individualNamesOptions.subcontractorName                                            =  Subcontractor name
+individualNamesOptions.tradingName                                                  =  Trading name
+individualNamesOptions.noSelection                                                  =  None selected
+individualNamesOptions.hint                                                         =  You can add a person's name, a trading name or both
+individualNamesOptions.error.required                                               =  Select which names you want to add for this subcontractor
+individualNamesOptions.checkYourAnswersLabel                                        =  Names
+individualNamesOptions.change.hidden                                                =  names
 
 insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
 insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
@@ -531,6 +535,19 @@ insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback               
 insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  Review unmatched subcontractors
 insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
 insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
+
+agent.agentLostAccess.title                                                         =  Sorry, you are unable to use this service
+agent.agentLostAccess.heading                                                       =  Sorry, you are unable to use this service
+agent.agentLostAccess.p1                                                            =  You are no longer authorised.
+agent.agentLostAccess.h2                                                            =  What you need to do
+agent.agentLostAccess.bullet.title                                                  =  Ask your client to authorise you. They can do this by either:
+agent.agentLostAccess.bullet.item.1.prefix                                          =  authorising you through their
+agent.agentLostAccess.bullet.item.1.link                                            =  HMRC online account
+agent.agentLostAccess.bullet.item.2.prefix                                          =  downloading and completing
+agent.agentLostAccess.bullet.item.2.link                                            =  form 64—8
+agent.agentLostAccess.bullet.item.2.suffix                                          =  to authorise you by post
+agent.agentLostAccess.p2                                                            =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.agentLostAccess.return.link                                                   =  Return to client list
 
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  Do you want to add contact details for this partnership?
@@ -592,8 +609,8 @@ partnershipNominatedPartnerNino.title                              =  What is th
 partnershipNominatedPartnerNino.heading                            =  What is the National Insurance number for {0}?
 partnershipNominatedPartnerNino.hint                               =  National insurance numbers can be found on payslips, P60s and other tax documents. For example, ‘QQ 12 34 56 C’
 partnershipNominatedPartnerNino.error.required                     =  Enter a National Insurance number
-partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number
-partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number
+partnershipNominatedPartnerNino.error.invalidCharacters            =  Enter a valid National Insurance number like QQ 12 34 56 C
+partnershipNominatedPartnerNino.error.length                       =  Enter a valid National Insurance number like QQ 12 34 56 C
 partnershipNominatedPartnerNino.checkYourAnswersLabel              =  National Insurance number for nominated partner
 partnershipNominatedPartnerNino.change.hidden                      =  National Insurance number for nominated partner
 
@@ -1095,7 +1112,7 @@ verify.reverifyExistingSubcontractorsYesNo.change.hidden                        
 verify.verifyDepartmentalError.title                                               =  There was a problem with your verification request
 verify.verifyDepartmentalError.heading                                             =  There was a problem with your verification request
 verify.verifyDepartmentalError.p1                                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
-verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help.
+verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help quoting error 7912.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Contact HMRC by phone
 verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Manage your subcontractors
@@ -1124,7 +1141,7 @@ verify.noSubcontractorsSelectedWarning.cancel                                   
 verify.verificationRequestSubmitted.title                                          =  Verification request submitted
 verify.verificationRequestSubmitted.heading                                        =  Verification request submitted
 verify.verificationRequestSubmitted.reference                                      =  Your verification reference number
-verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0}
+verify.verificationRequestSubmitted.submittedAt                                    =  Submitted at {0} on {1}
 verify.verificationRequestSubmitted.details.subHeading                             =  Verification request details
 verify.verificationRequestSubmitted.subcontractorsToVerify.label                   =  Subcontractors to verify
 verify.verificationRequestSubmitted.subcontractorsToReverify.label                 =  Subcontractors to reverify
@@ -1258,3 +1275,83 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+# Final contractor validations
+
+finalValidations.reviewContractorDetails.title                                 =  Review contractor details
+finalValidations.reviewContractorDetails.heading                               =  Review contractor details
+finalValidations.reviewContractorDetails.task.utr                              =  Unique Taxpayer Reference
+finalValidations.reviewContractorDetails.task.schemeName                       =  Scheme name
+finalValidations.reviewContractorDetails.task.email                            =  Email address
+finalValidations.reviewContractorDetails.task.fileReturn                       =  File a return
+finalValidations.reviewContractorDetails.task.verifySubcontractors             =  Verify subcontractors
+finalValidations.reviewContractorDetails.status.complete                       =  Complete
+finalValidations.reviewContractorDetails.status.incomplete                     =  Incomplete
+finalValidations.reviewContractorDetails.status.cannotStart                    =  Cannot start yet
+
+# Final validation - Subcontractors
+
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.completed         = Completed
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.incomplete        = Incomplete
+finalValidations.verify.reviewSubcontractorDetails.title                             = Review subcontractor details
+finalValidations.verify.reviewSubcontractorDetails.heading                           = Review subcontractor details
+finalValidations.verify.reviewSubcontractorDetails.intro                             = You need to review the subcontractor details
+finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      = Verify your subcontractors
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet = Cannot continue yet
+finalValidations.verify.reviewSubcontractorDetails.backLink                          = Back to select your subcontractors
+finalValidations.verify.reviewSubcontractorDetails.taskList.review                   = Review
+
+finalvalidations.updateSubcontractorDetails.title                              = {0}
+finalvalidations.updateSubcontractorDetails.heading                            = {0}
+finalvalidations.updateSubcontractorDetails.intro                              = To verify your subcontractors, you must review and update the subcontractor details.
+finalvalidations.updateSubcontractorDetails.confirmChanges.heading             = Confirm changes
+finalvalidations.updateSubcontractorDetails.confirmChanges.body                = By changing this subcontractor’s details you are confirming that, to the best of your knowledge, the details you are providing are correct.
+finalvalidations.updateSubcontractorDetails.acceptAndSubmit                    = Accept and submit
+finalvalidations.updateSubcontractorDetails.cancelChanges                      = Cancel changes
+
+# Final validation - Shared
+finalvalidations.updateSubcontractorDetails.address                            = Address
+finalvalidations.updateSubcontractorDetails.addContactDetails                  = Add contact details?
+finalvalidations.updateSubcontractorDetails.emailAddress                       = Email address
+finalvalidations.updateSubcontractorDetails.phoneNumber                        = Phone number
+finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                  = Mobile number
+finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber            = Add works reference number?
+finalvalidations.updateSubcontractorDetails.worksReferenceNumber               = Works reference number
+
+# Final validation - Sole trader
+finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName       = Subcontractor name
+finalvalidations.updateSubcontractorDetails.soleTrader.tradingName             = Trading name
+finalvalidations.updateSubcontractorDetails.soleTrader.names                   = Names
+finalvalidations.updateSubcontractorDetails.soleTrader.names.noneSelected      = None selected
+finalvalidations.updateSubcontractorDetails.soleTrader.addAddress              = Add subcontractor address?
+finalvalidations.updateSubcontractorDetails.soleTrader.addUtr                  = Add UTR?
+finalvalidations.updateSubcontractorDetails.soleTrader.utr                     = UTR
+finalvalidations.updateSubcontractorDetails.soleTrader.addNino                 = Add National Insurance number?
+finalvalidations.updateSubcontractorDetails.soleTrader.nino                    = National Insurance number
+
+# Final validation - Company
+finalvalidations.updateSubcontractorDetails.company.name                       = Company name
+finalvalidations.updateSubcontractorDetails.company.addAddress                 = Add company address?
+finalvalidations.updateSubcontractorDetails.company.addUtr                     = Add UTR?
+finalvalidations.updateSubcontractorDetails.company.utr                        = Corporation Tax UTR
+finalvalidations.updateSubcontractorDetails.company.addCrn                     = Add company registration number?
+finalvalidations.updateSubcontractorDetails.company.crn                        = Company registration number
+
+# Final validation - Trust
+finalvalidations.updateSubcontractorDetails.trust.name                         = Trust name
+finalvalidations.updateSubcontractorDetails.trust.addAddress                   = Add trust address?
+finalvalidations.updateSubcontractorDetails.trust.addUtr                       = Add UTR?
+finalvalidations.updateSubcontractorDetails.trust.utr                          = Trust UTR
+
+# Final validation - Partnership
+finalvalidations.updateSubcontractorDetails.partnership.name                   = Partnership name
+finalvalidations.updateSubcontractorDetails.partnership.nominatedPartner       = Nominated partner
+finalvalidations.updateSubcontractorDetails.partnership.addAddress             = Add partnership address?
+finalvalidations.updateSubcontractorDetails.partnership.addUtr                 = Add UTR?
+finalvalidations.updateSubcontractorDetails.partnership.utr                    = Partnership UTR
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerUtr          = Add UTR for nominated partner?
+finalvalidations.updateSubcontractorDetails.partnership.partnerUtr             = UTR for nominated partner
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerNino         = Add National Insurance number for nominated partner?
+finalvalidations.updateSubcontractorDetails.partnership.partnerNino            = National Insurance number for nominated partner
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerCrn          = Add company registration number for nominated partner?
+finalvalidations.updateSubcontractorDetails.partnership.partnerCrn             = Company registration number for nominated partner

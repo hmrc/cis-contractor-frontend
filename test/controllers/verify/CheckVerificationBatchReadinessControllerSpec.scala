@@ -18,8 +18,9 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
+import models.verify.SelectedSubcontractors
 import models.{AmendMode, CheckMode, ContractorScheme, NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel, VerificationCurrentVerification}
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -127,6 +128,8 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
   private val selectedSub = SubcontractorViewModel("1", "Acme")
 
+  private val selectedReverifySub = SelectedSubcontractors("1", "Acme")
+
   "CheckVerificationBatchReadinessController" - {
 
     "NormalMode — batch ready, stored email exists" - {
@@ -175,6 +178,51 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           // Readiness flag is verified indirectly: CYA can now be reached and ValidatedVerify succeeds
         }
       }
+
+      "NormalMode — unmatched/reverify-only batch ready" - {
+
+        "must redirect to ContractorEmailConfirmationStored when only SelectSubcontractorsToReverifyPage is populated" in {
+
+          val ua =
+            emptyUserAnswers
+              .setOrException(
+                SelectSubcontractorsToReverifyPage,
+                Set(selectedReverifySub)
+              )
+              .setOrException(
+                CurrentVerificationBatchResponsePage,
+                currentBatchResponse(
+                  Seq(readyCurrentIndividual(1))
+                )
+              )
+              .setOrException(
+                NewestVerificationBatchResponsePage,
+                newestBatchResponse(
+                  Seq(readyIndividual(1)),
+                  emailAddress = Some("agent@example.com")
+                )
+              )
+
+          val application =
+            applicationBuilder(userAnswers = Some(ua)).build()
+
+          running(application) {
+
+            val result =
+              route(
+                application,
+                FakeRequest(GET, normalModeUrl)
+              ).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              controllers.verify.routes.ContractorEmailConfirmationStoredController
+                .onPageLoad(NormalMode)
+                .url
+          }
+        }
+      }
     }
 
     "NormalMode — batch ready, no stored email" - {
@@ -204,7 +252,7 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
 
     "batch not ready" - {
 
-      "must redirect to Journey Recovery" in {
+      "must redirect to ReviewInsufficientInfoSubcontractorsController" in {
         val ua = emptyUserAnswers
           .setOrException(SelectSubcontractorPage, Set(selectedSub))
           .setOrException(CurrentVerificationBatchResponsePage, currentBatchResponse(Seq(notReadyCurrentIndividual(1))))
@@ -214,7 +262,9 @@ class CheckVerificationBatchReadinessControllerSpec extends SpecBase {
           val result = route(application, FakeRequest(GET, normalModeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
         }
       }
 

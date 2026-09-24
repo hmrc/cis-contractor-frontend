@@ -19,19 +19,18 @@ package controllers.insufficient
 import controllers.actions.*
 import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
-import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor}
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
+import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor}
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
 import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
 import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
 import javax.inject.Inject
@@ -46,7 +45,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: RemoveInsufficientSubcontractorNameYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: RemoveInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
@@ -64,69 +62,80 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef))
       .fold(form)(form.fill)
 
-  def onPageLoad(verificationResourceRef: Long = -1L, mode: Mode = NormalMode): Action[AnyContent] =
+  def onPageLoad(
+    verificationResourceRef: Long = -1L,
+    mode: Mode = NormalMode
+  ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      subcontractorName(request, verificationResourceRef)
-        .fold(recoveryRedirect) { subcontractorName =>
-          Ok(
-            view(
-              preparedForm(verificationResourceRef),
-              mode,
-              subcontractorName,
-              verificationResourceRef
-            )
-          )
-        }
+
+      val subcontractorName =
+        getSubcontractorName(request, verificationResourceRef)
+
+      Ok(
+        view(
+          preparedForm(verificationResourceRef),
+          mode,
+          subcontractorName,
+          verificationResourceRef
+        )
+      )
     }
 
-  def onSubmit(verificationResourceRef: Long = -1L, mode: Mode = NormalMode): Action[AnyContent] =
+  def onSubmit(
+    verificationResourceRef: Long = -1L,
+    mode: Mode = NormalMode
+  ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorName(request, verificationResourceRef)
-        .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      mode,
-                      subcontractorName,
-                      verificationResourceRef
+
+      val subcontractorName =
+        getSubcontractorName(request, verificationResourceRef)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  subcontractorName,
+                  verificationResourceRef
+                )
+              )
+            ),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
+                    RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
+                    value
+                  )
+                )
+
+              cleanedAnswers <-
+                Future.fromTry(
+                  updatedAnswers.remove(
+                    RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
+                  )
+                )
+
+              _ <- sessionRepository.set(cleanedAnswers)
+
+              redirect <-
+                if (value) {
+                  deleteAndRedirect(cleanedAnswers, verificationResourceRef)
+                } else {
+                  Future.successful(
+                    Redirect(
+                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+                        .onPageLoad()
                     )
                   )
-                ),
-              value =>
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      request.userAnswers.set(
-                        RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef),
-                        value
-                      )
-                    )
-                  cleanedAnswers <- Future.fromTry(
-                                      updatedAnswers.remove(
-                                        RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
-                                      )
-                                    )
-
-                  _ <- sessionRepository.set(cleanedAnswers)
-
-                  redirect <-
-                    if (value) {
-                      deleteAndRedirect(cleanedAnswers, verificationResourceRef)
-                    } else {
-                      Future.successful(
-                        Redirect(
-                          controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-                        )
-                      )
-                    }
-                } yield redirect
-            )
-        }
+                }
+            } yield redirect
+        )
     }
 
   private def deleteAndRedirect(
@@ -197,9 +206,12 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         Redirect(redirect)
       }
 
-  private def subcontractorName(request: DataRequest[?], verificationResourceRef: Long): Option[String] =
+  private def getSubcontractorName(
+    request: DataRequest[?],
+    verificationResourceRef: Long
+  )(implicit messages: Messages): String =
     nameFromCurrentBatch(request, verificationResourceRef)
-      .orElse(subcontractorNameExtractor.getSubcontractorName(request.userAnswers))
+      .getOrElse(messages("verify.noName"))
 
   private def nameFromCurrentBatch(request: DataRequest[?], verificationResourceRef: Long): Option[String] =
     if (verificationResourceRef < 0) {

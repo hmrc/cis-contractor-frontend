@@ -20,7 +20,7 @@ import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.address.{Address, Country}
 import models.info.IndividualAnswers
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, NormalMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -76,7 +76,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       action.href shouldBe
         routes.AddressOfSubcontractorController
-          .redirectToAddressLookup(Some("change"))
+          .redirectToAddressLookup(NormalMode, Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe
@@ -240,7 +240,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(true),
@@ -289,7 +289,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(false),
@@ -326,7 +326,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
         IndividualAnswers(
           subcontractorType = models.TypeOfSubcontractor.Individualorsoletrader,
           showVerificationDetails = false,
-          usesTradingName = None,
+          individualNamesOptions = Set.empty,
           tradingName = None,
           subcontractorName = None,
           addressYesNo = Some(true),

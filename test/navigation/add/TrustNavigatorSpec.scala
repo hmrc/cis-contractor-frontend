@@ -53,7 +53,8 @@ class TrustNavigatorSpec extends SpecBase {
           TrustAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup()
+        ) mustBe controllers.add.trust.routes.TrustAddressController
+          .redirectToAddressLookup(NormalMode, None)
       }
 
       "must go from a TrustAddressYesNoPage to AddTrustContactMethodsYesNoController when false" in {
@@ -856,7 +857,8 @@ class TrustNavigatorSpec extends SpecBase {
           TrustAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(TrustAddressYesNoPage, true)
-        ) mustBe controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString))
+        ) mustBe controllers.add.trust.routes.TrustAddressController
+          .redirectToAddressLookup(NormalMode, Some(CheckMode.toString))
       }
 
       "must go from a TrustAddressYesNoPage to TrustCheckYourAnswers when true and address already answered" in {

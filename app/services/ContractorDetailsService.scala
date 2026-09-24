@@ -18,6 +18,9 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.Scheme
+import models.requests.{UpdateSchemeRequest, UpdateSchemeVersionRequest}
+import models.response.UpdateSchemeVersionResponse
+import models.requests.UpdateContractorSchemeParams
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -33,4 +36,18 @@ class ContractorDetailsService @Inject() (
   )(implicit hc: HeaderCarrier): Future[Scheme] =
     cisConnector.getScheme(instanceId)
 
+  def updateSchemeVersion(
+    request: UpdateSchemeVersionRequest
+  )(implicit hc: HeaderCarrier): Future[UpdateSchemeVersionResponse] =
+    cisConnector.updateSchemeVersion(request)
+
+  def updateScheme(
+    request: UpdateSchemeRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    cisConnector.updateScheme(request)
+
+  def updateContractorDetails(
+    request: UpdateContractorSchemeParams
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    cisConnector.updateContractorDetails(request)
 }

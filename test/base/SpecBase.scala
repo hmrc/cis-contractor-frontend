@@ -74,7 +74,9 @@ trait SpecBase
     additionalBindings: Seq[Binding[_]] = Nil,
     isAgent: Boolean = false,
     hasAgentRef: Boolean = true,
-    hasEmployeeRef: Boolean = true
+    hasEmployeeRef: Boolean = true,
+    formpRdsReconcileAction: FormpRdsReconcileAction = new FakeFormpRdsReconcileAction,
+    agentCode: Option[String] = Some("agentCode")
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure("play.http.router" -> "app.Routes")
@@ -84,12 +86,13 @@ trait SpecBase
           bind[IdentifierAction].to(new FakeIdentifierAction(isAgent, hasAgentRef, hasEmployeeRef)(parsers)),
           bind[IdentifierAction]
             .qualifiedWith("AgentIdentifier")
-            .to(new FakeIdentifierAction(true, true, false)(parsers)),
+            .to(new FakeIdentifierAction(true, true, false, agentCode)(parsers)),
           bind[IdentifierAction]
             .qualifiedWith("ContractorIdentifier")
             .to(new FakeIdentifierAction(false, false, true)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl]
+          bind[CisIdRequiredAction].to[CisIdRequiredActionImpl],
+          bind[FormpRdsReconcileAction].toInstance(formpRdsReconcileAction)
         ) ++ additionalBindings
       )
 }

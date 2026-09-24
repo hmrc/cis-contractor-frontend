@@ -17,8 +17,12 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.address.Address
+import models.add.SubcontractorName as AddSubcontractorName
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
+import models.add.IndividualNamesOptions
+import models.amend.AmendJourneyType
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
@@ -28,8 +32,9 @@ import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
-import queries.{AmendIndividualSubcontractorNameRemovedQuery, AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
+import models.requests.{SubcontractorRequest, UpdateSubcontractorForEditRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
+import pages.verify.CurrentVerificationBatchResponsePage
+import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -210,6 +215,131 @@ class SubcontractorService @Inject() (
           )
         )
     } yield response
+
+  def updateSubcontractorForEdit(
+    amendJourneyType: AmendJourneyType,
+    userAnswers: UserAnswers,
+    subbieResourceRef: Option[Long] = None
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    for {
+      cisId             <- getCisId(userAnswers)
+      subcontractorType <- getSubcontractorType(userAnswers)
+      original          <- getOriginalSubcontractor(userAnswers)
+
+      _ <-
+        validateAmendSubbieResourceRef(
+          userAnswers = userAnswers,
+          original = original,
+          submittedSubbieResourceRef = subbieResourceRef
+        )
+
+      verificationForEdit <-
+        getVerificationForEdit(
+          amendJourneyType = amendJourneyType,
+          subcontractorId = original.subcontractorId,
+          userAnswers = userAnswers
+        )
+
+      subcontractor =
+        updateSubcontractorFromUserAnswers(
+          original = original,
+          subcontractorType = subcontractorType,
+          userAnswers = userAnswers
+        )
+
+      _ <-
+        cisConnector.updateSubcontractorForEdit(
+          UpdateSubcontractorForEditRequest(
+            cisId = cisId,
+            subcontractor = subcontractor,
+            verificationForEdit = verificationForEdit
+          )
+        )
+    } yield ()
+
+  private def getVerificationForEdit(
+    amendJourneyType: AmendJourneyType,
+    subcontractorId: Long,
+    userAnswers: UserAnswers
+  ): Future[Option[UpdateVerificationForEditRequest]] =
+    amendJourneyType match {
+      case AmendJourneyType.InsufficientInfo =>
+        Future.successful(None)
+
+      case AmendJourneyType.UnmatchedInfo =>
+        getVerificationForUnmatchedEdit(
+          subcontractorId = subcontractorId,
+          userAnswers = userAnswers
+        ).map(Some(_))
+
+      case AmendJourneyType.Standard =>
+        Future.failed(
+          new IllegalArgumentException(
+            "Standard amend journey must use updateSubcontractor"
+          )
+        )
+    }
+
+  def submitAmendSubcontractor(
+    amendJourneyType: AmendJourneyType,
+    userAnswers: UserAnswers,
+    subbieResourceRef: Option[Long] = None
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    amendJourneyType match {
+      case AmendJourneyType.Standard =>
+        updateSubcontractor(
+          userAnswers = userAnswers,
+          subbieResourceRef = subbieResourceRef
+        )
+
+      case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+        updateSubcontractorForEdit(
+          amendJourneyType = amendJourneyType,
+          userAnswers = userAnswers,
+          subbieResourceRef = subbieResourceRef
+        )
+    }
+
+  private def getVerificationForUnmatchedEdit(
+    subcontractorId: Long,
+    userAnswers: UserAnswers
+  ): Future[UpdateVerificationForEditRequest] =
+    userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      case Some(batch) =>
+        (
+          for {
+            verificationBatchResourceRef <-
+              batch.verificationBatch.flatMap(_.verifBatchResourceRef)
+
+            verificationResourceRef <-
+              batch.verifications
+                .find(_.subcontractorId.contains(subcontractorId))
+                .flatMap(_.verificationResourceRef)
+          } yield UpdateVerificationForEditRequest(
+            verificationBatchResourceRef = verificationBatchResourceRef,
+            verificationResourceRef = verificationResourceRef
+          )
+        ) match {
+          case Some(request) =>
+            Future.successful(request)
+
+          case None =>
+            Future.failed(
+              new RuntimeException(
+                s"Unable to update unmatched verification. " +
+                  s"Missing verification resource references for subcontractorId=$subcontractorId"
+              )
+            )
+        }
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            s"CurrentVerificationBatchResponsePage not found in session data " +
+              s"for subcontractorId=$subcontractorId"
+          )
+        )
+    }
 
   private def validateAmendSubbieResourceRef(
     userAnswers: UserAnswers,
@@ -557,8 +687,8 @@ class SubcontractorService @Inject() (
     val address =
       userAnswers.get(AddressOfSubcontractorPage)
 
-    val removeName =
-      userAnswers.get(AmendIndividualSubcontractorNameRemovedQuery).contains(true)
+    val individualNamesOptions =
+      userAnswers.get(IndividualNamesOptionsPage)
 
     val removeAddress =
       userAnswers.get(SubAddressYesNoPage).contains(false)
@@ -570,13 +700,29 @@ class SubcontractorService @Inject() (
       userAnswers.get(IndividualContactMethodOptionsPage)
 
     existing.copy(
-      firstName = updatedGroupedField(name.map(_.firstName), existing.firstName, removeName, name.isDefined),
-      secondName = updatedGroupedField(name.flatMap(_.middleName), existing.secondName, removeName, name.isDefined),
-      surname = updatedGroupedField(name.map(_.lastName), existing.surname, removeName, name.isDefined),
-      tradingName = updatedOptionalField(
+      firstName = updateNameField(
+        name.map(_.firstName),
+        existing.firstName,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      secondName = updateNameField(
+        name.flatMap(_.middleName),
+        existing.secondName,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      surname = updateNameField(
+        name.map(_.lastName),
+        existing.surname,
+        individualNamesOptions,
+        IndividualNamesOptions.SubcontractorName
+      ),
+      tradingName = updateNameField(
         userAnswers.get(TradingNameOfSubcontractorPage),
         existing.tradingName,
-        userAnswers.get(SubTradingNameYesNoPage).contains(false)
+        individualNamesOptions,
+        IndividualNamesOptions.TradingName
       ),
       nino = updatedOptionalField(
         userAnswers.get(SubNationalInsuranceNumberPage),
@@ -632,22 +778,27 @@ class SubcontractorService @Inject() (
     )
   }
 
-  private def updatedGroupedField(
-    amended: Option[String],
-    existing: Option[String],
-    removeGroup: Boolean,
-    groupAmended: Boolean
-  ): Option[String] =
-    if (removeGroup) Some("")
-    else if (groupAmended) amended.orElse(existing.map(_ => ""))
-    else existing
-
   private def updatedOptionalField(
     amended: Option[String],
     existing: Option[String],
     removeField: Boolean
   ): Option[String] =
     if (removeField) Some("") else amended.orElse(existing)
+
+  private def updateNameField(
+    amended: Option[String],
+    existing: Option[String],
+    namesOptions: Option[Set[IndividualNamesOptions]],
+    namesOption: IndividualNamesOptions
+  ): Option[String] =
+    namesOptions match {
+      case Some(selectedMethods) if selectedMethods.contains(namesOption) =>
+        amended.orElse(existing.map(_ => ""))
+      case Some(_)                                                        =>
+        existing.map(_ => "")
+      case None                                                           =>
+        amended.orElse(existing)
+    }
 
   private def updatedContactField(
     amended: Option[String],

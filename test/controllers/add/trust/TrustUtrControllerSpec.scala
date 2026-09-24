@@ -19,12 +19,14 @@ package controllers.add.trust
 import base.SpecBase
 import controllers.routes
 import forms.add.trust.TrustUtrFormProvider
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.{TrustNamePage, TrustUtrPage, TrustUtrYesNoPage}
 import pages.amend.ShowVerificationDetailsPage
+import pages.finalvalidation.{FinalValidationBaseUtrPage, FinalValidationChangeTargetPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -42,9 +44,11 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
 
   private val trustName = "Test Trust"
 
-  private lazy val trustUtrRoute: String      = controllers.add.trust.routes.TrustUtrController.onPageLoad(NormalMode).url
-  private lazy val trustUtrRouteAmend: String =
+  private lazy val trustUtrRoute: String                = controllers.add.trust.routes.TrustUtrController.onPageLoad(NormalMode).url
+  private lazy val trustUtrRouteAmend: String           =
     controllers.add.trust.routes.TrustUtrController.onPageLoad(AmendMode).url
+  private lazy val trustUtrRouteFinalValidation: String =
+    controllers.add.trust.routes.TrustUtrController.onPageLoad(FinalValidationMode).url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers
@@ -506,5 +510,146 @@ class TrustUtrControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must save and continue without duplicate validation when UTR is the same as the previous value in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(TrustUtrPage, validValue)
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustUtrRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must save and continue without duplicate validation when UTR is the same as the base value in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(FinalValidationBaseUtrPage, validValue)
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustUtrRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must perform duplicate validation when UTR is different from the previous and base values in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(TrustUtrPage, "5860920997")
+          .success
+          .value
+          .set(FinalValidationBaseUtrPage, "5860920996")
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(
+        mockSubcontractorService.isDuplicateUTR(
+          any[UserAnswers],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, trustUtrRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(
+          any[UserAnswers],
+          any[String]
+        )(any[HeaderCarrier])
+
+      verifyNoMoreInteractions(mockSubcontractorService)
+    }
   }
 }

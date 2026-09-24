@@ -301,4 +301,60 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       ValidatedPartnership.build(ua) mustBe Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
     }
   }
+
+  "ValidatedPartnership.buildForAmend" - {
+
+    "build successfully when all required answers are present" in {
+      ValidatedPartnership.buildForAmend(minRequired) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully when PartnershipNamePage is missing" in {
+      val ua = minRequired
+        .remove(PartnershipNamePage)
+        .success
+        .value
+
+      ValidatedPartnership.buildForAmend(ua) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully when PartnershipNominatedPartnerNamePage is missing" in {
+      val ua = minRequired
+        .remove(PartnershipNominatedPartnerNamePage)
+        .success
+        .value
+
+      ValidatedPartnership.buildForAmend(ua) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully when both PartnershipNamePage and PartnershipNominatedPartnerNamePage are missing" in {
+      val ua = minRequired
+        .remove(PartnershipNamePage)
+        .success
+        .value
+        .remove(PartnershipNominatedPartnerNamePage)
+        .success
+        .value
+
+      ValidatedPartnership.buildForAmend(ua) mustBe a[Right[?, ?]]
+    }
+
+    "return empty partnership name when PartnershipNamePage is missing" in {
+      val ua = minRequired
+        .remove(PartnershipNamePage)
+        .success
+        .value
+
+      ValidatedPartnership.buildForAmend(ua).toOption.value.partnershipName mustBe ""
+    }
+
+    "return empty nominated partner name when PartnershipNominatedPartnerNamePage is missing" in {
+      val ua = minRequired
+        .remove(PartnershipNominatedPartnerNamePage)
+        .success
+        .value
+
+      ValidatedPartnership.buildForAmend(ua).toOption.value.partnershipNominatedPartnerName mustBe ""
+    }
+  }
+
 }

@@ -95,7 +95,7 @@ class ReviewUnmatchedSubcontractorsViewSpec extends SpecBase {
       val table = document.getElementById("ready-table")
       table must not be null
 
-      table.select("thead th").text must include(messagesImpl("verify.reviewUnmatched.utr.full"))
+      table.select("thead th").text must include(messagesImpl("verify.reviewUnmatched.utr"))
       table.text                    must include("Smith, John")
       table.text                    must include("1234567890")
     }

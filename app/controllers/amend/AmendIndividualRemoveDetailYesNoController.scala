@@ -18,10 +18,11 @@ package controllers.amend
 
 import controllers.actions.*
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
-import models.{AmendMode, UserAnswers}
+import models.add.IndividualNamesOptions.{SubcontractorName, TradingName}
 import models.amend.AmendIndividualRemoveDetail
+import models.{AmendMode, UserAnswers}
 import pages.add.*
-import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
+import pages.amend.AmendIndividualRemoveDetailYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -74,25 +75,27 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 
       case AmendIndividualRemoveDetail.TradingName =>
         userAnswers
-          .get(SubTradingNameYesNoPage)
-          .contains(false) &&
-        userAnswers
-          .get(TradingNameOfSubcontractorPage)
-          .isDefined &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
-
-      case AmendIndividualRemoveDetail.SubcontractorName =>
-        userAnswers
-          .get(SubTradingNameYesNoPage)
-          .contains(true) &&
+          .get(IndividualNamesOptionsPage)
+          .exists(_.contains(SubcontractorName)) &&
         userAnswers
           .get(SubcontractorNamePage)
           .isDefined &&
         userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+          .get(TradingNameOfSubcontractorPage)
+          .isDefined &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
+
+      case AmendIndividualRemoveDetail.SubcontractorName =>
+        userAnswers
+          .get(IndividualNamesOptionsPage)
+          .exists(_.contains(TradingName)) &&
+        userAnswers
+          .get(SubcontractorNamePage)
+          .isDefined &&
+        userAnswers
+          .get(TradingNameOfSubcontractorPage)
+          .isDefined &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers
@@ -108,9 +111,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(UniqueTaxpayerReferenceYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
         userAnswers
@@ -131,7 +132,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
   def onPageLoad(subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
@@ -157,7 +158,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
   def onSubmit(subcontractorDetail: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
           withValidDetail(subcontractorDetail) { detailType =>
             if (!detailIsPresent(detailType, request.userAnswers)) {
@@ -188,26 +189,14 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                             .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(detailType)))
                         )
                       _              <- sessionRepository.set(updatedAnswers)
-                    } yield
-                      if (value && subcontractorDetail == "trading-name") {
-                        Redirect(
-                          controllers.add.routes.SubcontractorNameController.onPageLoad(AmendMode)
+                    } yield Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()))
+                      .recover { case ex =>
+                        logger.error(
+                          s"Failed to save remove detail answer for '$subcontractorDetail'",
+                          ex
                         )
-                      } else if (value && subcontractorDetail == "subcontractor-name") {
-                        Redirect(
-                          controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode)
-                        )
-                      } else {
-                        Redirect(
-                          controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
-                        )
-                      }).recover { case ex =>
-                      logger.error(
-                        s"Failed to save remove detail answer for '$subcontractorDetail'",
-                        ex
-                      )
-                      journeyRecovery
-                    }
+                        journeyRecovery
+                      }
                 )
             }
           }

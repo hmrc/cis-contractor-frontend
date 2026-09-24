@@ -17,12 +17,22 @@
 package controllers.verify
 
 import base.SpecBase
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.response.GetCurrentVerificationBatchResponse
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
+import pages.verify.CurrentVerificationBatchResponsePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import pages.verify.CurrentVerificationBatchResponsePage
+import repositories.SessionRepository
+import models.UserAnswers
 
-class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoSugar {
 
   private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
 
@@ -61,15 +71,29 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "onSubmit must redirect to the contractor email confirmation stored page" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "onSubmit must set the final validation source and context in session and redirect to the submit unmatched endpoint" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
 
       running(application) {
         val result = route(application, FakeRequest(POST, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(models.NormalMode).url
+          controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
       }
     }
   }

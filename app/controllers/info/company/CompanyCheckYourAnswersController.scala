@@ -19,6 +19,8 @@ package controllers.info.company
 import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
+import models.amend.AmendJourneyType
+import models.info.CheckYourAnswersValidation
 import models.info.company.CompanyAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -44,11 +46,11 @@ class CompanyCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(journeyType: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CompanyAnswersQuery) match {
 
-        case Some(answers) =>
+        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -59,18 +61,43 @@ class CompanyCheckYourAnswersController @Inject() (
               rows = detailsRows(answers).flatten
             )
 
-          Ok(
-            view(
-              subcontractorInformationList,
-              detailsList,
-              answers.companyName.getOrElse("")
-            )
-          )
+          val messages = request.messages
 
-        case None =>
+          AmendJourneyType.fromString(journeyType) match {
+            case Some(AmendJourneyType.InsufficientInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  answers.companyName.getOrElse(""),
+                  controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+                )
+              )
+
+            case Some(AmendJourneyType.UnmatchedInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  answers.companyName.getOrElse(""),
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+                )
+              )
+
+            case _ =>
+              logger.error(
+                "[CompanyCheckYourAnswersController.onPageLoad] " +
+                  "journeyType is invalid"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+
+        case Some(_) | None =>
           logger.error(
             "[CompanyCheckYourAnswersController.onPageLoad] " +
-              "CompanyAnswersQuery is missing"
+              "CompanyAnswersQuery is missing or invalid"
           )
 
           Redirect(

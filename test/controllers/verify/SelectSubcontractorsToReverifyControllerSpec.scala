@@ -258,7 +258,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         when(mockRepo.set(any())) thenReturn Future.successful(true)
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(UnverifiedSubcontractorsPage, Seq.empty)
             .success
             .value
@@ -288,6 +288,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
       "must redirect to the next page when valid data is submitted (uses rows stored in SubcontractorReverifyRowsPage)" in {
         val mockRepo = mock[SessionRepository]
+
         when(mockRepo.set(any())) thenReturn Future.successful(true)
 
         val rows: Seq[SubcontractorReverifyRow] =
@@ -304,7 +305,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(SubcontractorReverifyRowsPage, rows)
             .success
             .value
@@ -354,7 +355,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           )
 
         val ua =
-          emptyUserAnswers
+          userAnswersWithCisId
             .set(SubcontractorReverifyRowsPage, rows)
             .success
             .value
@@ -1016,7 +1017,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value
@@ -1052,6 +1053,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
     "must allow empty submission when UnverifiedSubcontractorsPage is non-empty" in {
       val mockRepo = mock[SessionRepository]
+
       when(mockRepo.set(any())) thenReturn Future.successful(true)
 
       val rows: Seq[SubcontractorReverifyRow] =
@@ -1078,7 +1080,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value
@@ -1113,6 +1115,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
     "must allow empty submission when SelectSubcontractorPage already contains selections" in {
       val mockRepo = mock[SessionRepository]
+
       when(mockRepo.set(any())) thenReturn Future.successful(true)
 
       val rows: Seq[SubcontractorReverifyRow] =
@@ -1129,7 +1132,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(SubcontractorReverifyRowsPage, rows)
           .success
           .value

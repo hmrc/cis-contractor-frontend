@@ -19,14 +19,16 @@ package controllers.add.company
 import controllers.actions.*
 import forms.add.company.CompanyUtrFormProvider
 import models.requests.DataRequest
-import models.{AmendMode, Mode}
+import models.{AmendMode, FinalValidationMode, Mode}
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyUtrPage, CompanyUtrYesNoPage}
+import pages.add.company.{CompanyUtrPage, CompanyUtrYesNoPage}
+import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyUtrView
 
 import javax.inject.Inject
@@ -43,6 +45,7 @@ class CompanyUtrController @Inject() (
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyUtrView
 )(implicit ec: ExecutionContext)
@@ -66,8 +69,8 @@ class CompanyUtrController @Inject() (
       val yesOrNoPage       = CompanyUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(CompanyUtrYesNoPage)
 
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           val preparedForm = request.userAnswers.get(CompanyUtrPage) match {
             case None        => form
@@ -83,8 +86,8 @@ class CompanyUtrController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
@@ -92,11 +95,14 @@ class CompanyUtrController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
               value =>
                 val prevValue = request.userAnswers.get(CompanyUtrPage)
+                val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
-                  case AmendMode if prevValue.contains(value) =>
+                  case AmendMode if prevValue.contains(value)                                        =>
                     saveAndContinue(mode, value)
-                  case _                                      =>
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                    saveAndContinue(mode, value)
+                  case _                                                                             =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
                       case true  =>
                         val errorForm = form

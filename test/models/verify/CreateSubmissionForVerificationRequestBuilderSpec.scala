@@ -23,15 +23,53 @@ import models.response.*
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import pages.*
 import pages.verify.*
+import play.api.i18n.Messages
 import queries.CisIdQuery
 
 class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
+
+  implicit private val msgs: Messages = messages(app)
 
   "CreateSubmissionForVerificationRequestBuilder" - {
 
     "must build request from user answers" in {
       val currentBatch = GetCurrentVerificationBatchResponse(
-        subcontractors = Seq.empty,
+        subcontractors = Seq(
+          SubcontractorCurrentVerification(
+            subcontractorId = 10L,
+            subbieResourceRef = Some(4001L),
+            firstName = Some("Test"),
+            secondName = None,
+            surname = Some("Subcontractor"),
+            tradingName = None,
+            utr = Some("1234567890"),
+            nino = None,
+            crn = None,
+            partnerUtr = None,
+            partnershipTradingName = None,
+            subcontractorType = Some("Individual"),
+            addressLine1 = None,
+            addressLine2 = None,
+            addressLine3 = None,
+            addressLine4 = None,
+            country = None,
+            postcode = None,
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = None,
+            matched = None,
+            autoVerified = None,
+            verified = None,
+            verificationNumber = None,
+            taxTreatment = None,
+            verificationDate = None,
+            version = None,
+            updatedTaxTreatment = None,
+            lastMonthlyReturnDate = None,
+            pendingVerifications = None
+          )
+        ),
         verificationBatch = Some(
           VerificationBatchCurrentVerification(
             verificationBatchId = 1001L,
@@ -48,7 +86,7 @@ class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
             verificationNumber = None,
             taxTreatment = None,
             actionIndicator = None,
-            proceed = None,
+            proceed = Some("Y"),
             matched = None
           )
         )
@@ -83,7 +121,7 @@ class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
         irMarkGenerated = None,
         verifications = Seq(
           VerificationToUpdate(
-            subcontractorName = "Unknown",
+            subcontractorName = "Subcontractor, Test",
             verificationResourceRef = 4001L,
             proceedVerification = "Y"
           )

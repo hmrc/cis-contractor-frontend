@@ -4,6 +4,7 @@
 ->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
 
 GET   /subcontractor  controllers.IndexController.onPageLoad()
+GET   /subcontractor/service-home  controllers.ServiceHomeController.onPageLoad()
 
 GET   /subcontractor/assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -35,10 +36,10 @@ GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorCon
 GET   /subcontractor/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/individual-address-lookup   controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/address-change              controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
-
-GET   /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = AmendMode)
+GET   /subcontractor/amend/individual-address-return   controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/individual-address-return/change   controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
@@ -88,17 +89,17 @@ POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/amend/start/:subbieResourceRef  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long)
+GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
-GET   /subcontractor/info/start/:cisId/:subbieResourceRef  controllers.info.SubcontractorController.onPageLoad(cisId: String, subbieResourceRef: Long)
+GET   /subcontractor/info/start/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
-GET   /subcontractor/info/partnership/subcontractor-information-read-only  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/partnership/subcontractor-information-read-only/:journeyType  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/company/subcontractor-information-read-only  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/company/subcontractor-information-read-only/:journeyType  controllers.info.company.CompanyCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/trust/subcontractor-information-read-only  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/trust/subcontractor-information-read-only/:journeyType  controllers.info.trust.TrustCheckYourAnswersController.onPageLoad(journeyType: String)
 
-GET   /subcontractor/info/subcontractor-information-read-only  controllers.info.IndividualCheckYourAnswersController.onPageLoad()
+GET   /subcontractor/info/subcontractor-information-read-only/:journeyType  controllers.info.IndividualCheckYourAnswersController.onPageLoad(journeyType: String)
 
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
@@ -127,8 +128,8 @@ GET   /subcontractor/amend/trust/subcontractor-details-updated  controllers.amen
 GET   /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  controllers.amend.partnership.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
-GET   /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
-POST  /subcontractor/proceed-verifying-subcontractor  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
+GET   /subcontractor/proceed-verifying-subcontractor/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-subcontractor/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
@@ -139,13 +140,24 @@ GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers
 
 GET   /subcontractor/unmatched/subcontractor-details-updated  controllers.unmatched.UnmatchedSubcontractorDetailsUpdatedController.onPageLoad()
 
-GET   /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
-GET   /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/proceed-verifying-unmatched-subcontractor/:subcontractorId  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long,mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-unmatched-subcontractor/:subcontractorId  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long,mode: Mode = NormalMode)
+
+GET   /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = AmendMode)
+POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = AmendMode)
 
 GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
+
+GET   /agent/no-longer-authorised  controllers.AgentLostAccessController.onPageLoad()
+
+GET   /final-validations/file-monthly-return             controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileMonthlyReturn()
+GET   /final-validations/file-nil-return                 controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileNilReturn()
+GET   /final-validations/verify-subcontractors           controllers.finalvalidations.ContractorDetailsFinalValidationController.startVerifySubcontractors()
+GET   /final-validations/review-contractor-details       controllers.finalvalidations.ContractorDetailsFinalValidationController.onPageLoad()
+GET   /final-validations/review-contractor-details/next  controllers.finalvalidations.ContractorDetailsFinalValidationController.onContinue()
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()
@@ -158,11 +170,6 @@ GET   /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSub
 POST  /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
-
-GET   /subcontractor/add/check-trading-name         controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/check-trading-name         controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/change-check-trading-name  controllers.add.SubTradingNameYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/change-check-trading-name  controllers.add.SubTradingNameYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET   /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
@@ -240,6 +247,11 @@ POST  /subcontractor/add/select-contact-details         controllers.add.Individu
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = CheckMode)
+POST  /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = CheckMode)
+
 # Company
 GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
 
@@ -260,7 +272,10 @@ POST  /subcontractor/amend/company/check-address       controllers.add.company.C
 GET   /subcontractor/add/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/company/address              controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/company/address-change       controllers.add.company.CompanyAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/company/address-return       controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
@@ -398,6 +413,9 @@ GET   /subcontractor/add/partnership/address                controllers.add.part
 GET   /subcontractor/add/partnership/address-return         controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/amend/partnership/address-change       controllers.add.partnership.PartnershipAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/partnership/address              controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/amend/partnership/address-return       controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/partnership/address-return/change  controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/partnership/nominated-partner         controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = NormalMode)
@@ -499,7 +517,10 @@ POST  /subcontractor/amend/trust/check-address       controllers.add.trust.Trust
 GET   /subcontractor/add/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/amend/trust/address              controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/amend/trust/address-change       controllers.add.trust.TrustAddressController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/trust/address-return       controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address         controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = NormalMode)
@@ -572,6 +593,8 @@ GET   /subcontractor/verify/confirmation-email-not-stored         controllers.ve
 POST  /subcontractor/verify/confirmation-email-not-stored         controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-not-stored  controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-not-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-not-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
@@ -599,6 +622,8 @@ GET   /subcontractor/verify/confirmation-email-stored         controllers.verify
 POST  /subcontractor/verify/confirmation-email-stored         controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-stored  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-stored  controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
@@ -671,6 +696,163 @@ GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.Unmatche
 
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
+GET   /subcontractor/verify/continue-verification-submission  controllers.verify.ContinueVerificationSubmissionController.onSubmit()
+
+# Final validations
+GET   /final-validations/file-monthly-return             controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileMonthlyReturn()
+GET   /final-validations/file-nil-return                 controllers.finalvalidations.ContractorDetailsFinalValidationController.startFileNilReturn()
+GET   /final-validations/verify-subcontractors           controllers.finalvalidations.ContractorDetailsFinalValidationController.startVerifySubcontractors()
+GET   /final-validations/review-contractor-details       controllers.finalvalidations.ContractorDetailsFinalValidationController.onPageLoad()
+GET   /final-validations/review-contractor-details/next  controllers.finalvalidations.ContractorDetailsFinalValidationController.onContinue()
+
+# Final Validations - Subcontractors
+
+GET   /subcontractor/final-validations/handoff/:handoffId                                             controllers.finalvalidations.FinalValidationHandoffController.onPageLoad(handoffId: String)
+GET   /subcontractor/final-validations/complete                                                       controllers.finalvalidations.FinalValidationCompleteController.onPageLoad()
+GET   /subcontractor/final-validations/review-subcontractor-details                                   controllers.finalvalidations.ReviewSubcontractorDetailsController.onPageLoad()
+POST  /final-validations/review-subcontractor-details                                                 controllers.finalvalidations.ReviewSubcontractorDetailsController.onSubmit
+GET   /subcontractor/final-validations/update-subcontractor-details/:subcontractorId                  controllers.finalvalidations.UpdateSubcontractorDetailsController.onPageLoad(subcontractorId: Long)
+POST  /subcontractor/final-validations/update-subcontractor-details/:subcontractorId                  controllers.finalvalidations.UpdateSubcontractorDetailsController.onSubmit(subcontractorId: Long)
+GET   /final-validations/change/:subcontractorId/:fieldKey/:targetKey                                 controllers.finalvalidations.FinalValidationChangeController.onPageLoad(subcontractorId: Long, fieldKey: String, targetKey: String)
+
+# Final Validations - Individual / Sole trader
+
+GET   /subcontractor/final-validation/individual/name                                                 controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/name                                                 controllers.add.SubcontractorNameController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/trading-name                                         controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/trading-name                                         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/names                                                           controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/names                                                           controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/check-address                                        controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-address                                        controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/address                                              controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/individual/address-return                                       controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/address-return/change                                controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/add-contact-details                                  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/add-contact-details                                  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/select-contact-details                               controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/select-contact-details                               controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/email-address                                        controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/email-address                                        controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/phone-number                                         controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/phone-number                                         controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/mobile-number                                        controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/mobile-number                                        controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/check-unique-taxpayer-reference                      controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-unique-taxpayer-reference                      controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/unique-taxpayer-reference                            controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/unique-taxpayer-reference                            controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/check-national-insurance-number                      controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-national-insurance-number                      controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/national-insurance-number                            controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/national-insurance-number                            controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/check-works-reference-number                         controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-works-reference-number                         controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/works-reference-number                               controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/works-reference-number                               controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Final Validations - Limited company
+
+GET   /subcontractor/final-validation/company/company-name                                            controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-name                                            controllers.add.company.CompanyNameController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/check-address                                           controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/check-address                                           controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/address                                                 controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/company/address-return                                          controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/address-return/change                                   controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/add-contact-details                                     controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/add-contact-details                                     controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/select-contact-details                                  controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/select-contact-details                                  controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/email-address                                           controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/email-address                                           controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/phone-number                                            controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/phone-number                                            controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/mobile-number                                           controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/mobile-number                                           controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-has-utr                                         controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-utr                                         controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-utr                                             controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-utr                                             controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-has-registration-number                         controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-registration-number                         controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-registration-number                             controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-registration-number                             controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-has-works-reference                             controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-works-reference                             controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/company-works-reference                                 controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-works-reference                                 controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Final Validations - Partnership
+
+GET   /subcontractor/final-validation/partnership/partnership-name                                    controllers.add.partnership.PartnershipNameController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/partnership-name                                    controllers.add.partnership.PartnershipNameController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner                                   controllers.add.partnership.PartnershipNominatedPartnerNameController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner                                   controllers.add.partnership.PartnershipNominatedPartnerNameController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/check-address                                       controllers.add.partnership.PartnershipAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/check-address                                       controllers.add.partnership.PartnershipAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/address                                             controllers.add.partnership.PartnershipAddressController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/partnership/address-return                                      controllers.add.partnership.PartnershipAddressController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/address-return/change                               controllers.add.partnership.PartnershipAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/add-contact-details                                 controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/add-contact-details                                 controllers.add.partnership.AddPartnershipContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/select-contact-details                              controllers.add.partnership.PartnershipContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/select-contact-details                              controllers.add.partnership.PartnershipContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/email-address                                       controllers.add.partnership.PartnershipEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/email-address                                       controllers.add.partnership.PartnershipEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/phone-number                                        controllers.add.partnership.PartnershipPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/phone-number                                        controllers.add.partnership.PartnershipPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/mobile-number                                       controllers.add.partnership.PartnershipMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/mobile-number                                       controllers.add.partnership.PartnershipMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/partnership-has-utr                                 controllers.add.partnership.PartnershipHasUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/partnership-has-utr                                 controllers.add.partnership.PartnershipHasUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/partnership-utr                                     controllers.add.partnership.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/partnership-utr                                     controllers.add.partnership.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-has-utr                           controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-has-utr                           controllers.add.partnership.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-utr                               controllers.add.partnership.PartnershipNominatedPartnerUtrController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-utr                               controllers.add.partnership.PartnershipNominatedPartnerUtrController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-has-national-insurance-number     controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-has-national-insurance-number     controllers.add.partnership.PartnershipNominatedPartnerNinoYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-national-insurance-number         controllers.add.partnership.PartnershipNominatedPartnerNinoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-has-company-registration-number   controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-has-company-registration-number   controllers.add.partnership.PartnershipNominatedPartnerCrnYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/nominated-partner-company-registration-number       controllers.add.partnership.PartnershipNominatedPartnerCrnController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/nominated-partner-company-registration-number       controllers.add.partnership.PartnershipNominatedPartnerCrnController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/partnership-has-works-reference                     controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/partnership-has-works-reference                     controllers.add.partnership.PartnershipWorksReferenceNumberYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/partnership/partnership-works-reference                         controllers.add.partnership.PartnershipWorksReferenceNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/partnership/partnership-works-reference                         controllers.add.partnership.PartnershipWorksReferenceNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Final Validations - Trust
+
+GET   /subcontractor/final-validation/trust/trust-name                                                controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-name                                                controllers.add.trust.TrustNameController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/check-address                                             controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/check-address                                             controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/address                                                   controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/trust/address-return                                            controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/address-return/change                                     controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/add-contact-details                                       controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/add-contact-details                                       controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/select-contact-details                                    controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/select-contact-details                                    controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/email-address                                             controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/email-address                                             controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/phone-number                                              controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/phone-number                                              controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/mobile-number                                             controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/mobile-number                                             controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/trust-has-utr                                             controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-has-utr                                             controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/trust-utr                                                 controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-utr                                                 controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/trust-has-works-reference                                 controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-has-works-reference                                 controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/trust-works-reference                                     controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-works-reference                                     controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+
 # Contractor Details
 GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
 
@@ -679,11 +861,15 @@ POST  /contractor-details/introduction  controllers.contractordetails.Contractor
 
 GET   /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
 
 GET   /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
@@ -694,6 +880,8 @@ POST  /contractor-details/contractor-details-added  controllers.contractordetail
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
+GET   /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
+POST  /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
 GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
 POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
 

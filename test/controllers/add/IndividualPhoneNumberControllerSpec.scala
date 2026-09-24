@@ -21,11 +21,13 @@ import controllers.routes
 import forms.add.IndividualPhoneNumberFormProvider
 import models.add.SubcontractorName
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{IndividualContactMethodOptionsPage, IndividualPhoneNumberPage, SubcontractorNamePage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -43,6 +45,9 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   lazy val individualPhoneNumberRoute: String =
     controllers.add.routes.IndividualPhoneNumberController.onPageLoad(NormalMode).url
 
+  lazy val individualPhoneNumberFinalValidationRoute: String =
+    controllers.add.routes.IndividualPhoneNumberController.onPageLoad(FinalValidationMode).url
+
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
   private val name = "John Smith"
@@ -56,6 +61,9 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
       .success
       .value
+
+  private def uaWithNameAndFinalValidationPhoneTarget: UserAnswers =
+    uaWithName.set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber).success.value
 
   "IndividualPhoneNumberController" - {
 
@@ -253,6 +261,54 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when Phone contact choice is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualPhoneNumberFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IndividualPhoneNumberView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, name)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when Phone contact choice is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationPhoneTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, individualPhoneNumberFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "0123456789"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }

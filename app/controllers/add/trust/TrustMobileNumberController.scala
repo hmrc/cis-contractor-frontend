@@ -17,11 +17,12 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustMobileNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage, TrustNamePage}
+import pages.add.trust.{TrustContactMethodOptionsPage, TrustMobileNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -51,29 +52,40 @@ class TrustMobileNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
-      val trustName     = request.userAnswers.get(TrustNamePage)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
 
-      (trustName, contactOption) match {
-        case (Some(trustName), Some(options)) if options.contains(ContactMethodOptions.Mobile) =>
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (trustName, mobileIsAvailable) match {
+        case (Some(trustName), true) =>
           val preparedForm = request.userAnswers.get(TrustMobileNumberPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, trustName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption = request.userAnswers.get(TrustContactMethodOptionsPage)
+      val trustName     = SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode)
+
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
       (for {
-        trustName      <- request.userAnswers.get(TrustNamePage)
-        contactMethods <- request.userAnswers.get(TrustContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Mobile)
+        trustName <- trustName
+        if mobileIsAvailable
       } yield form
         .bindFromRequest()
         .fold(
