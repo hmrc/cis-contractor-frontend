@@ -19,13 +19,14 @@ package controllers.verify
 import controllers.actions.*
 import controllers.AgentClientChecks
 import forms.verify.SelectSubcontractorFormProvider
-import models.requests.DataRequest
 import models.{Mode, Subcontractor, SubcontractorViewModel, UserAnswers}
 import navigation.Navigator
 import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import models.CheckMode
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
+import pages.finalvalidation.*
 import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
@@ -171,9 +172,9 @@ class SelectSubcontractorController @Inject() (
     }
 
   private def hasAnyVerifiedSubcontractor(
-    request: DataRequest[_]
+    userAnswers: UserAnswers
   ): Boolean =
-    request.userAnswers
+    userAnswers
       .get(NewestVerificationBatchResponsePage)
       .exists(_.subcontractors.exists(_.isVerified))
 
@@ -231,20 +232,11 @@ class SelectSubcontractorController @Inject() (
               } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
 
             case None =>
-              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(request)) {
+              if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(ua)) {
                 for {
-                  answersWithSelections <- Future.fromTry(
-                                             ua.set(SelectSubcontractorPage, mergedValues)
-                                           )
+                  answersWithSelections <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
 
-                  nextPage =
-                    navigator.nextPage(
-                      SelectSubcontractorPage,
-                      mode,
-                      answersWithSelections
-                    )
-
-                  updatedAnswers <-
+                  cleanedAnswers <-
                     if (
                       mode == CheckMode &&
                       answersWithSelections
@@ -258,8 +250,24 @@ class SelectSubcontractorController @Inject() (
                       Future.successful(answersWithSelections)
                     }
 
-                  _ <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(nextPage)
+                  withContext <- Future.fromTry(
+                                   cleanedAnswers.set(
+                                     FinalValidationContextPage,
+                                     FinalValidationContext.VerifySubcontractor
+                                   )
+                                 )
+
+                  withSource <- Future.fromTry(
+                                  withContext.set(
+                                    VerifyFinalValidationSourcePage,
+                                    VerifyFinalValidationSource.SelectSubcontractor
+                                  )
+                                )
+
+                  _ <- sessionRepository.set(withSource)
+                } yield Redirect(
+                  navigator.nextPage(SelectSubcontractorPage, mode, withSource)
+                )
               } else {
                 val formWithErrors =
                   form
@@ -269,14 +277,7 @@ class SelectSubcontractorController @Inject() (
                       "verify.selectSubcontractor.error.required"
                     )
 
-                Future.successful(
-                  renderPageWithError(
-                    formWithErrors,
-                    mode,
-                    page,
-                    result
-                  )
-                )
+                Future.successful(renderPageWithError(formWithErrors, mode, page, result))
               }
           }
       }
@@ -287,7 +288,7 @@ class SelectSubcontractorController @Inject() (
     mode: Mode,
     page: Int,
     result: CheckboxPaginationResult
-  )(implicit request: DataRequest[_]): Result =
+  )(implicit request: Request[_]): Result =
     BadRequest(
       view(
         formWithErrors,

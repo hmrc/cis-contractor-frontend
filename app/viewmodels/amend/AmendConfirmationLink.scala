@@ -52,7 +52,7 @@ object AmendConfirmationLinks {
 
       case AmendJourneyType.UnmatchedInfo =>
         AmendConfirmationLink(
-          url = controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          url = controllers.verify.routes.ReviewUnmatchedSubcontractorsController
             .onPageLoad()
             .url,
           textKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",

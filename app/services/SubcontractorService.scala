@@ -17,6 +17,8 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.address.Address
+import models.add.SubcontractorName as AddSubcontractorName
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.add.IndividualNamesOptions
@@ -30,7 +32,8 @@ import pages.add.company.*
 import pages.add.trust.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import models.requests.{SubcontractorRequest, UpdateSubcontractorRequest}
+import models.requests.{SubcontractorRequest, UpdateSubcontractorForEditRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
+import pages.verify.CurrentVerificationBatchResponsePage
 import queries.{AmendSubbieResourceRefQuery, CisIdQuery, OriginalSubcontractorQuery}
 
 import javax.inject.{Inject, Singleton}
@@ -214,6 +217,7 @@ class SubcontractorService @Inject() (
     } yield response
 
   def updateSubcontractorForEdit(
+    amendJourneyType: AmendJourneyType,
     userAnswers: UserAnswers,
     subbieResourceRef: Option[Long] = None
   )(implicit hc: HeaderCarrier): Future[Unit] =
@@ -221,7 +225,20 @@ class SubcontractorService @Inject() (
       cisId             <- getCisId(userAnswers)
       subcontractorType <- getSubcontractorType(userAnswers)
       original          <- getOriginalSubcontractor(userAnswers)
-      _                 <- validateAmendSubbieResourceRef(userAnswers, original, subbieResourceRef)
+
+      _ <-
+        validateAmendSubbieResourceRef(
+          userAnswers = userAnswers,
+          original = original,
+          submittedSubbieResourceRef = subbieResourceRef
+        )
+
+      verificationForEdit <-
+        getVerificationForEdit(
+          amendJourneyType = amendJourneyType,
+          subcontractorId = original.subcontractorId,
+          userAnswers = userAnswers
+        )
 
       subcontractor =
         updateSubcontractorFromUserAnswers(
@@ -230,14 +247,38 @@ class SubcontractorService @Inject() (
           userAnswers = userAnswers
         )
 
-      response <-
+      _ <-
         cisConnector.updateSubcontractorForEdit(
-          UpdateSubcontractorRequest(
+          UpdateSubcontractorForEditRequest(
             cisId = cisId,
-            subcontractor = subcontractor
+            subcontractor = subcontractor,
+            verificationForEdit = verificationForEdit
           )
         )
-    } yield response
+    } yield ()
+
+  private def getVerificationForEdit(
+    amendJourneyType: AmendJourneyType,
+    subcontractorId: Long,
+    userAnswers: UserAnswers
+  ): Future[Option[UpdateVerificationForEditRequest]] =
+    amendJourneyType match {
+      case AmendJourneyType.InsufficientInfo =>
+        Future.successful(None)
+
+      case AmendJourneyType.UnmatchedInfo =>
+        getVerificationForUnmatchedEdit(
+          subcontractorId = subcontractorId,
+          userAnswers = userAnswers
+        ).map(Some(_))
+
+      case AmendJourneyType.Standard =>
+        Future.failed(
+          new IllegalArgumentException(
+            "Standard amend journey must use updateSubcontractor"
+          )
+        )
+    }
 
   def submitAmendSubcontractor(
     amendJourneyType: AmendJourneyType,
@@ -245,17 +286,58 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Option[Long] = None
   )(implicit hc: HeaderCarrier): Future[Unit] =
     amendJourneyType match {
-
       case AmendJourneyType.Standard =>
         updateSubcontractor(
-          userAnswers,
-          subbieResourceRef
+          userAnswers = userAnswers,
+          subbieResourceRef = subbieResourceRef
         )
 
       case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
         updateSubcontractorForEdit(
-          userAnswers,
-          subbieResourceRef
+          amendJourneyType = amendJourneyType,
+          userAnswers = userAnswers,
+          subbieResourceRef = subbieResourceRef
+        )
+    }
+
+  private def getVerificationForUnmatchedEdit(
+    subcontractorId: Long,
+    userAnswers: UserAnswers
+  ): Future[UpdateVerificationForEditRequest] =
+    userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      case Some(batch) =>
+        (
+          for {
+            verificationBatchResourceRef <-
+              batch.verificationBatch.flatMap(_.verifBatchResourceRef)
+
+            verificationResourceRef <-
+              batch.verifications
+                .find(_.subcontractorId.contains(subcontractorId))
+                .flatMap(_.verificationResourceRef)
+          } yield UpdateVerificationForEditRequest(
+            verificationBatchResourceRef = verificationBatchResourceRef,
+            verificationResourceRef = verificationResourceRef
+          )
+        ) match {
+          case Some(request) =>
+            Future.successful(request)
+
+          case None =>
+            Future.failed(
+              new RuntimeException(
+                s"Unable to update unmatched verification. " +
+                  s"Missing verification resource references for subcontractorId=$subcontractorId"
+              )
+            )
+        }
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            s"CurrentVerificationBatchResponsePage not found in session data " +
+              s"for subcontractorId=$subcontractorId"
+          )
         )
     }
 

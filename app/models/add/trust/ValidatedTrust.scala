@@ -37,10 +37,19 @@ final case class ValidatedTrust(
 object ValidatedTrust extends Validation {
 
   def build(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
+    buildTrust(answers, getPageValue(answers, TrustNamePage))
+
+  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
+    buildTrust(answers, getAmendPageValue(answers, TrustNamePage))
+
+  private def buildTrust(
+    answers: UserAnswers,
+    trustName: Either[ValidationError, String]
+  ): Either[ValidationError, ValidatedTrust] =
     for {
       _ <- validateType(answers)
 
-      trustName <- getPageValue(answers, TrustNamePage)
+      trustName <- trustName
 
       trustAddress <- getOptionalPageValue(answers, TrustAddressPage, TrustAddressYesNoPage)
 

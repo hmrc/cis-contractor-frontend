@@ -18,9 +18,10 @@ package controllers.amend.partnership
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
+import models.AmendMode
 import models.amend.AmendJourneyType
-import pages.add.partnership.PartnershipNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -29,14 +30,12 @@ import queries.{CisIdQuery, OriginalPartnershipAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class AmendPartnershipConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,7 +43,6 @@ class AmendPartnershipConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  cleanupService: DefaultSubcontractorCleanupService,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
@@ -94,7 +92,7 @@ class AmendPartnershipConfirmationController @Inject() (
                       )
 
                     val partnershipName =
-                      ua.get(PartnershipNamePage).getOrElse("")
+                      SubcontractorNameDisplayHelper.partnershipDisplayName(ua, AmendMode)
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(
@@ -103,52 +101,39 @@ class AmendPartnershipConfirmationController @Inject() (
                         appConfig
                       )
 
-                    cleanupService.cleanAmend(ua) match {
+                    val persistFinalUserAnswers =
+                      journeyType match {
 
-                      case Success(cleanedUserAnswers) =>
-                        val persistFinalUserAnswers =
-                          journeyType match {
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
 
-                            case AmendJourneyType.Standard =>
-                              sessionRepository
-                                .set(cleanedUserAnswers)
-                                .map(_ => cleanedUserAnswers)
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(
+                            ua
+                          )
+                      }
 
-                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                              verificationService.refreshVerificationBatches(
-                                cleanedUserAnswers
-                              )
-                          }
-
-                        persistFinalUserAnswers
-                          .map { _ =>
-                            Ok(
-                              view(
-                                tableRows,
-                                partnershipName,
-                                confirmationLink
-                              )
-                            )
-                          }
-                          .recover { case exception =>
-                            logger.error(
-                              "[AmendPartnershipConfirmationController.onPageLoad] " +
-                                "Failed to persist confirmation session data",
-                              exception
-                            )
-
-                            recoveryRedirect
-                          }
-
-                      case Failure(exception) =>
-                        logger.warn(
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            partnershipName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
                           "[AmendPartnershipConfirmationController.onPageLoad] " +
-                            "Failed to clean user answers",
+                            "Failed to persist confirmation session data",
                           exception
                         )
 
-                        Future.successful(recoveryRedirect)
-                    }
+                        recoveryRedirect
+                      }
 
                   case None =>
                     logger.error(

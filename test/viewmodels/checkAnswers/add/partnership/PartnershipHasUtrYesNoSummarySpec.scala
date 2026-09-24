@@ -282,6 +282,34 @@ class PartnershipHasUtrYesNoSummarySpec extends SpecBase with GuiceOneAppPerSuit
       row.actions.value.items mustBe empty
     }
 
+    "return a row with no name provided when the partnership name is missing in AmendMode" in {
+      val ua: UserAnswers =
+        emptyUserAnswers
+          .set(PartnershipHasUtrYesNoPage, true)
+          .success
+          .value
+
+      val maybeRow =
+        PartnershipHasUtrYesNoSummary.row(ua, AmendMode)
+
+      maybeRow must not be empty
+
+      val row: SummaryListRow = maybeRow.value
+
+      row.key mustBe Key(
+        content = Text(
+          messages(
+            "partnershipHasUtrYesNo.checkYourAnswersLabel",
+            messages("verify.noName")
+          )
+        )
+      )
+
+      row.value mustBe Value(
+        content = Text(messages("site.yes"))
+      )
+    }
+
     "return a row with an empty partnership name when partnership name is missing" in {
 
       val answers = PartnershipAnswers(
