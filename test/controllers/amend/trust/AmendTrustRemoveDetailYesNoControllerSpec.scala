@@ -20,6 +20,7 @@ import base.SpecBase
 import forms.amend.trust.AmendTrustRemoveDetailYesNoFormProvider
 import models.address.Address
 import models.UserAnswers
+import models.amend.AmendJourneyType
 import models.amend.trust.AmendTrustRemoveDetail
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -28,7 +29,7 @@ import org.mockito.Mockito.{verify, when}
 import pages.amend.trust.AmendTrustRemoveDetailYesNoPage
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.trust.*
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -458,6 +459,64 @@ class AmendTrustRemoveDetailYesNoControllerSpec extends SpecBase with MockitoSug
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          uaWithName
+            .set(TrustUtrPage, "7777777777")
+            .success
+            .value
+            .set(TrustUtrYesNoPage, true)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          uaWithName
+            .set(TrustUtrPage, "7777777777")
+            .success
+            .value
+            .set(TrustUtrYesNoPage, true)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
         }
       }
     }

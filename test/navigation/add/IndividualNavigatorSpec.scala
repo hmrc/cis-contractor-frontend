@@ -143,7 +143,8 @@ class IndividualNavigatorSpec extends SpecBase {
           SubAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
-        ) mustBe controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookup()
+        ) mustBe controllers.add.routes.AddressOfSubcontractorController
+          .redirectToAddressLookup(NormalMode, None)
       }
 
       "must go from a SubAddressYesNoPage to AddIndividualContactMethodsYesNoController when false" in {
@@ -1416,7 +1417,7 @@ class IndividualNavigatorSpec extends SpecBase {
           CheckMode,
           emptyUserAnswers.setOrException(SubAddressYesNoPage, true)
         ) mustBe controllers.add.routes.AddressOfSubcontractorController
-          .redirectToAddressLookup(Some(CheckMode.toString))
+          .redirectToAddressLookup(NormalMode, Some(CheckMode.toString))
       }
 
       "must go from a SubAddressYesNoPage to CYA page when false" in {

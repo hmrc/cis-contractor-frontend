@@ -17,6 +17,8 @@
 package controllers.verify
 
 import base.SpecBase
+import models.UserAnswers
+import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.VerificationLastVerification
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -27,7 +29,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
-import services.VerificationService
+import services.{ContractorDetailsFinalValidationService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -65,9 +67,31 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
       submission = None
     )
 
+  private def applicationWithFinalValidation(
+    userAnswers: Option[UserAnswers],
+    validation: ContractorDetailsFinalValidation = ContractorDetailsFinalValidation(true, true, true)
+  ) = {
+    val mockFinalValidationService =
+      mock[ContractorDetailsFinalValidationService]
+
+    userAnswers.foreach { answers =>
+      when(
+        mockFinalValidationService.refreshAndValidate(
+          any[UserAnswers],
+          any[ContractorDetailsValidationTarget]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful((answers, validation))
+      )
+    }
+
+    applicationBuilder(userAnswers = userAnswers)
+      .overrides(bind[ContractorDetailsFinalValidationService].toInstance(mockFinalValidationService))
+  }
+
   "ReviewUnmatchedSubcontractorsRoutingController" - {
 
-    "AC2: must redirect to UnmatchedSubcontractors when unmatched resource refs are still on the live list" in {
+    "AC2: must redirect to ReviewUnmatchedSubcontractors when unmatched resource refs are still on the live list" in {
       val mockService = mock[VerificationService]
       val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
       val userAnswers = emptyUserAnswers
@@ -93,7 +117,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(userAnswers))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
         .build()
 
@@ -101,7 +125,9 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.UnmatchedSubcontractorsController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+          .onPageLoad()
+          .url
         verify(mockService)
           .anyUnmatchedResourceRefsStillPresent(
             eqTo("900063"),
@@ -149,7 +175,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationWithFinalValidation(Some(userAnswers))
           .overrides(bind[VerificationService].toInstance(mockService))
           .build()
 
@@ -178,7 +204,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
       when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
         .build()
 
@@ -205,7 +231,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
       when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
         .thenReturn(Future.successful(false))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
         .build()
 
@@ -229,7 +255,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         .success
         .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
         .build()
 
@@ -256,7 +282,7 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
       when(mockService.anyUnmatchedResourceRefsStillPresent(eqTo("900063"), eqTo(response))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[VerificationService].toInstance(mockService))
         .build()
 
@@ -276,13 +302,37 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, endpointUrl)).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to review contractor details when final contractor validations fail" in {
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
+      val userAnswers = emptyUserAnswers
+        .set(LastSubmittedVerificationBatchResponsePage, response)
+        .success
+        .value
+        .set(CisIdQuery, "900063")
+        .success
+        .value
+
+      val application = applicationWithFinalValidation(
+        Some(userAnswers),
+        ContractorDetailsFinalValidation(utrComplete = false, schemeNameComplete = true, emailComplete = true)
+      ).build()
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, endpointUrl)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad().url
       }
     }
   }

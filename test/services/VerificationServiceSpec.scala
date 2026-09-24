@@ -2175,4 +2175,79 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       )
     }
   }
+
+  "VerificationService.resetUserAnswers" - {
+
+    "must reset UserAnswers keeping only CisIdQuery and persist them" in {
+      val mockConnector     = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo          = mock[SessionRepository]
+      val service           = buildService(mockConnector, mockRepo)
+      val submissionDetails =
+        VerificationSubmissionDetails(
+          submissionId = "13602",
+          status = "ACCEPTED",
+          hmrcMarkGenerated = "hmrc-mark",
+          hmrcMarkGgis = None,
+          correlationId = None,
+          pollUrl = None,
+          pollIntervalSeconds = None,
+          submittedAt = LocalDateTime.now(),
+          lastMessageDate = None,
+          timedOut = false
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(VerificationSubmissionDetailsPage, submissionDetails)
+          .success
+          .value
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      service.resetUserAnswers(userAnswers).futureValue
+
+      val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockRepo).set(captor.capture())
+
+      val resetAnswers = captor.getValue
+
+      resetAnswers.get(CisIdQuery) mustBe Some(instanceId)
+      resetAnswers.get(VerificationSubmissionDetailsPage) mustBe None
+    }
+
+    "must log and gracefully recover when CisIdQuery is missing and not persist UserAnswers" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      service
+        .resetUserAnswers(emptyUserAnswers)
+        .futureValue
+
+      verify(mockRepo, never()).set(any[UserAnswers])
+    }
+
+    "must silently consume session repository failure" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.failed(new RuntimeException("session save failed")))
+
+      service.resetUserAnswers(userAnswers).futureValue mustBe ()
+
+      verify(mockRepo).set(any[UserAnswers])
+    }
+  }
 }

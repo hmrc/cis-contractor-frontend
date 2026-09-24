@@ -18,27 +18,25 @@ package controllers.amend.trust
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
-import models.UserAnswers
+import models.{AmendMode, UserAnswers}
 import models.amend.AmendJourneyType
-import pages.add.trust.TrustNamePage
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.json.Reads
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.{CisIdQuery, OriginalTrustAnswersQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DefaultSubcontractorCleanupService
 import viewmodels.amend.AmendConfirmationLinks
 import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class AmendTrustConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -46,7 +44,6 @@ class AmendTrustConfirmationController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  cleanupService: DefaultSubcontractorCleanupService,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
   view: AmendConfirmationView,
@@ -72,9 +69,10 @@ class AmendTrustConfirmationController @Inject() (
             Future.successful(recoveryRedirect)
           case Some(originalTrustAnswers) =>
             ua.get(CisIdQuery) match {
-              case None        =>
+              case None =>
                 logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
                 Future.successful(recoveryRedirect)
+
               case Some(cisId) =>
                 ua.get(AmendJourneyTypePage) match {
 
@@ -95,52 +93,37 @@ class AmendTrustConfirmationController @Inject() (
                         appConfig
                       )
 
-                    cleanupService.cleanAmend(ua) match {
+                    val persistFinalUserAnswers =
+                      journeyType match {
 
-                      case Success(cleanedUserAnswers) =>
-                        val persistFinalUserAnswers =
-                          journeyType match {
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
 
-                            case AmendJourneyType.Standard =>
-                              sessionRepository
-                                .set(cleanedUserAnswers)
-                                .map(_ => cleanedUserAnswers)
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(ua)
+                      }
 
-                            case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
-                              verificationService.refreshVerificationBatches(
-                                cleanedUserAnswers
-                              )
-                          }
-
-                        persistFinalUserAnswers
-                          .map { _ =>
-                            Ok(
-                              view(
-                                tableRows,
-                                trustName,
-                                confirmationLink
-                              )
-                            )
-                          }
-                          .recover { case exception =>
-                            logger.error(
-                              "[AmendTrustConfirmationController.onPageLoad] " +
-                                "Failed to persist confirmation session data",
-                              exception
-                            )
-
-                            recoveryRedirect
-                          }
-
-                      case Failure(exception) =>
-                        logger.warn(
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            trustName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
                           "[AmendTrustConfirmationController.onPageLoad] " +
-                            "Failed to clean user answers",
+                            "Failed to persist confirmation session data",
                           exception
                         )
 
-                        Future.successful(recoveryRedirect)
-                    }
+                        recoveryRedirect
+                      }
 
                   case None =>
                     logger.error(
@@ -154,6 +137,6 @@ class AmendTrustConfirmationController @Inject() (
       }
     }
 
-  private def trustDisplayName(ua: UserAnswers): String =
-    ua.get(TrustNamePage).getOrElse("")
+  private def trustDisplayName(ua: UserAnswers)(implicit messages: Messages): String =
+    SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
 }

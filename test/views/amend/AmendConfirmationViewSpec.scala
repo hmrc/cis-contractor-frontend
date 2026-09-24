@@ -16,14 +16,15 @@
 
 package views.amend
 
-import config.FrontendAppConfig
 import org.jsoup.Jsoup
+import config.FrontendAppConfig
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import org.jsoup.nodes.Element
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table.TableRow
 import viewmodels.amend.AmendConfirmationLink
@@ -113,7 +114,10 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       val doc =
         Jsoup.parse(html.toString())
 
-      doc.select("p.govuk-body").first().text() mustBe
+      val confirmationParagraph: Element =
+        doc.select("p.govuk-body").first()
+
+      confirmationParagraph.text() mustBe
         messages(
           "amendConfirmation.p1",
           subcontractorName

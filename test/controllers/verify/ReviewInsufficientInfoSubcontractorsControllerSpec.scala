@@ -18,17 +18,23 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.response.{GetCurrentVerificationBatchResponse, GetNewestVerificationBatchResponse}
-import models.{ContractorScheme, MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, SubcontractorCurrentVerification, Submission, Verification, VerificationCurrentVerification}
+import models.UserAnswers
+import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
+import models.response.GetCurrentVerificationBatchResponse
+import models.*
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage}
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
+import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfoService}
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 import scala.concurrent.Future
@@ -114,29 +120,27 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
   private val readySub =
     mkSub(id = 2L, tradingName = Some("Acme Ltd"), subcontractorType = Some("company"), utr = Some("1234567890"))
 
-  private def newestBatchResponse(
-    subcontractors: Seq[Subcontractor],
-    verifications: Seq[Verification] = Seq.empty,
-    submission: Option[Submission] = None,
-    monthlyReturn: Option[MonthlyReturn] = None,
-    monthlyReturnSubmission: Option[MonthlyReturnSubmission] = None,
-    status: Option[String] = None
-  ) =
-    GetNewestVerificationBatchResponse(
-      scheme = None,
-      subcontractors = subcontractors,
-      verificationBatch = Some(
-        models.VerificationBatch(
-          verificationBatchId = 1L,
-          status = status,
-          verificationNumber = Some("VB123")
-        )
-      ),
-      verifications = verifications,
-      submission = submission,
-      monthlyReturn = monthlyReturn,
-      monthlyReturnSubmission = monthlyReturnSubmission
-    )
+  private def applicationWithFinalValidation(
+    userAnswers: Option[UserAnswers],
+    validation: ContractorDetailsFinalValidation = ContractorDetailsFinalValidation(true, true, true)
+  ) = {
+    val mockFinalValidationService =
+      mock[ContractorDetailsFinalValidationService]
+
+    userAnswers.foreach { answers =>
+      when(
+        mockFinalValidationService.refreshAndValidate(
+          any[UserAnswers],
+          any[ContractorDetailsValidationTarget]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful((answers, validation))
+      )
+    }
+
+    applicationBuilder(userAnswers = userAnswers)
+      .overrides(bind[ContractorDetailsFinalValidationService].toInstance(mockFinalValidationService))
+  }
 
   "ReviewInsufficientInfoSubcontractorsController" - {
 
@@ -148,7 +152,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -176,7 +180,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationWithFinalValidation(Some(userAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -203,7 +207,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -221,7 +225,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when CurrentVerificationBatchResponsePage is missing" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationWithFinalValidation(Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -240,7 +244,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationWithFinalValidation(Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -253,7 +257,7 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery when no user answers are found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationWithFinalValidation(None).build()
 
       running(application) {
         val request = FakeRequest(GET, endpointUrl)
@@ -264,82 +268,38 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to ContractorEmailConfirmationStored when a stored email address exists" in {
-      val newestBatch =
-        newestBatchResponse(
-          subcontractors = Seq.empty
-        ).copy(
-          scheme = Some(
-            ContractorScheme(
-              accountsOfficeReference = Some("instance-123"),
-              utr = Some("123PA00123456"),
-              name = Some("xyz"),
-              emailAddress = Some("test@test.com")
-            )
-          )
-        )
+    "must redirect to review contractor details when final contractor validations fail" in {
 
       val userAnswers =
         emptyUserAnswers
-          .set(
-            NewestVerificationBatchResponsePage,
-            newestBatch
-          )
+          .set(CurrentVerificationBatchResponsePage, batchOf(missingSub, readySub))
           .success
           .value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .build()
+      val application = applicationWithFinalValidation(
+        Some(userAnswers),
+        ContractorDetailsFinalValidation(utrComplete = false, schemeNameComplete = true, emailComplete = true)
+      ).build()
 
       running(application) {
+        val request = FakeRequest(GET, endpointUrl)
+        val result  = route(application, request).value
 
-        val request =
-          FakeRequest(
-            POST,
-            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-              .onSubmit()
-              .url
-          )
-
-        val result =
-          route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-
-        redirectLocation(result).value mustBe
-          controllers.verify.routes.ContractorEmailConfirmationStoredController
-            .onPageLoad(NormalMode)
-            .url
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad().url
       }
     }
 
-    "must redirect to ContractorEmailConfirmationNotStored when no stored email address exists" in {
+    "must set the final validation source and context in session and redirect to ContinueVerificationSubmissionController when the user continues" in {
 
-      val newestBatch =
-        newestBatchResponse(
-          subcontractors = Seq.empty
-        ).copy(
-          scheme = Some(
-            ContractorScheme(
-              accountsOfficeReference = Some("instance-123"),
-              utr = Some("123PA00123456"),
-              name = Some("xyz")
-            )
-          )
-        )
-
-      val userAnswers =
-        emptyUserAnswers
-          .set(
-            NewestVerificationBatchResponsePage,
-            newestBatch
-          )
-          .success
-          .value
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -358,9 +318,15 @@ class ReviewInsufficientInfoSubcontractorsControllerSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
-            .onPageLoad(NormalMode)
+          controllers.verify.routes.ContinueVerificationSubmissionController
+            .onSubmit()
             .url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
       }
     }
   }

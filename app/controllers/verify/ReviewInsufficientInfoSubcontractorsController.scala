@@ -17,13 +17,15 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.NormalMode
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, VerificationBatchReadinessPage}
+import models.contractordetails.ContractorDetailsValidationTarget
+import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
+import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationSourcePage}
+import pages.verify.{CurrentVerificationBatchResponsePage, VerificationBatchReadinessPage}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.ReviewInsufficientInfoService
+import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfoService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
@@ -36,6 +38,7 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
+  contractorDetailsFinalValidationService: ContractorDetailsFinalValidationService,
   val controllerComponents: MessagesControllerComponents,
   sessionRepository: SessionRepository,
   view: ReviewInsufficientInfoSubcontractorsView
@@ -46,71 +49,88 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+        .flatMap { case (validatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad())
+            )
+          } else {
+            validatedAnswers.get(CurrentVerificationBatchResponsePage) match {
 
-        case Some(batch) =>
-          reviewInsufficientInfoService.buildViewModel(batch) match {
+              case Some(batch) =>
+                reviewInsufficientInfoService.buildViewModel(batch) match {
 
-            case Success(viewModel) =>
-              if (viewModel.hasMissing || viewModel.hasReady) {
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(
-                      request.userAnswers.set(
-                        VerificationBatchReadinessPage,
-                        viewModel.allReady
+                  case Success(viewModel) =>
+                    if (viewModel.hasMissing || viewModel.hasReady) {
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            validatedAnswers.set(
+                              VerificationBatchReadinessPage,
+                              viewModel.allReady
+                            )
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Ok(view(viewModel))
+                    } else {
+                      Future.successful(
+                        Redirect(
+                          controllers.routes.JourneyRecoveryController.onPageLoad()
+                        )
+                      )
+                    }
+
+                  case Failure(error) =>
+                    logger.error(
+                      "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed to build view model",
+                      error
+                    )
+
+                    Future.successful(
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController.onPageLoad()
                       )
                     )
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Ok(view(viewModel))
-              } else {
+                }
+
+              case None =>
                 Future.successful(
                   Redirect(
                     controllers.routes.JourneyRecoveryController.onPageLoad()
                   )
                 )
-              }
-
-            case Failure(error) =>
-              logger.error(
-                "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed to build view model",
-                error
-              )
-
-              Future.successful(
-                Redirect(
-                  controllers.routes.JourneyRecoveryController.onPageLoad()
-                )
-              )
+            }
           }
-
-        case None =>
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
+        }
+        .recover { case t =>
+          logger.error(
+            "[ReviewInsufficientInfoSubcontractorsController.onPageLoad] Failed final contractor validation",
+            t
           )
-      }
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-
-      val nextPage =
-        if (
-          request.userAnswers
-            .get(NewestVerificationBatchResponsePage)
-            .flatMap(_.scheme)
-            .flatMap(_.emailAddress)
-            .isDefined
-        ) {
-          controllers.verify.routes.ContractorEmailConfirmationStoredController
-            .onPageLoad(NormalMode)
-        } else {
-          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
-            .onPageLoad(NormalMode)
-        }
-
-      Redirect(nextPage)
+    (identify andThen getData andThen requireData).async { implicit request =>
+      for {
+        withContext <- Future.fromTry(
+                         request.userAnswers.set(
+                           FinalValidationContextPage,
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
+        withSource  <- Future.fromTry(
+                         withContext.set(
+                           VerifyFinalValidationSourcePage,
+                           VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+                         )
+                       )
+        _           <- sessionRepository.set(withSource)
+      } yield Redirect(
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
+      )
     }
 }

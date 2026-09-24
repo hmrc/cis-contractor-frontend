@@ -22,20 +22,22 @@ import models.response.GetNewestVerificationBatchResponse
 import models.{CheckMode, NormalMode, Subcontractor, SubcontractorViewModel, UserAnswers, Verification}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{NewestVerificationBatchResponsePage, RebuildVerificationFromWarningPage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Forms.*
 import play.api.data.Form
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.PaginationService
+import services.*
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.verify.SelectSubcontractorView
-import play.api.i18n.Messages
+import models.agent.AgentClientData
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -108,7 +110,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     )
 
   private def uaWithSubcontractors: UserAnswers =
-    emptyUserAnswers
+    userAnswersWithCisId
       .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
       .success
       .value
@@ -117,8 +119,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
-  private val brodyMartin      = allSubs.head // first subcontractor, on page 1
-  private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
+  private val brodyMartin      = allSubs.head
+  private val epsilonCarpentry = allSubs(6)
 
   "SelectSubcontractor Controller" - {
 
@@ -295,6 +297,167 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       status(result) mustBe BAD_REQUEST
     }
 
+    "must initialise verification data and render the page for a GET if no existing data is found" in {
+
+      val mockVerificationService = mock[VerificationService]
+      val mockCisManageService    = mock[CisManageService]
+      val mockSessionRepository   = mock[SessionRepository]
+
+      when(
+        mockCisManageService
+          .ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(emptyUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockVerificationService
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(uaWithSubcontractors))
+
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[VerificationService].toInstance(mockVerificationService),
+            bind[CisManageService].toInstance(mockCisManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url())
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        verify(mockCisManageService)
+          .ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+
+        verify(mockVerificationService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      }
+    }
+
+    "must not initialise verification data when existing session data is available" in {
+
+      val mockVerificationService = mock[VerificationService]
+      val mockCisManageService    = mock[CisManageService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithSubcontractors))
+          .overrides(
+            bind[VerificationService].toInstance(mockVerificationService),
+            bind[CisManageService].toInstance(mockCisManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url())
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        verifyNoInteractions(mockVerificationService)
+        verifyNoInteractions(mockCisManageService)
+      }
+    }
+
+    "must redirect to Journey Recovery when initialising verification data fails" in {
+
+      val mockVerificationService = mock[VerificationService]
+      val mockCisManageService    = mock[CisManageService]
+
+      when(
+        mockCisManageService
+          .ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("failed to initialise CIS ID")))
+
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[VerificationService].toInstance(mockVerificationService),
+            bind[CisManageService].toInstance(mockCisManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url())
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must initialise verification data and render the page for an authorised agent with no existing data" in {
+
+      val mockVerificationService = mock[VerificationService]
+      val mockCisManageService    = mock[CisManageService]
+      val mockSessionRepository   = mock[SessionRepository]
+
+      val ton = "754"
+      val tor = "EZ10800"
+
+      when(
+        mockCisManageService
+          .getAgentClient(any[String])(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          Some(
+            AgentClientData(
+              uniqueId = "client-instance-id",
+              taxOfficeNumber = ton,
+              taxOfficeReference = tor,
+              schemeName = None
+            )
+          )
+        )
+      )
+
+      when(
+        mockCisManageService
+          .hasClient(eqTo(ton), eqTo(tor))(any[HeaderCarrier])
+      ).thenReturn(Future.successful(true))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockVerificationService
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(uaWithSubcontractors))
+
+      val application =
+        applicationBuilder(
+          userAnswers = None,
+          isAgent = true
+        )
+          .overrides(
+            bind[VerificationService].toInstance(mockVerificationService),
+            bind[CisManageService].toInstance(mockCisManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, url())
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+
+        verify(mockCisManageService)
+          .getAgentClient(any[String])(any[HeaderCarrier])
+
+        verify(mockCisManageService)
+          .hasClient(eqTo(ton), eqTo(tor))(any[HeaderCarrier])
+
+        verify(mockVerificationService)
+          .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      }
+    }
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
@@ -442,7 +605,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -464,7 +627,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val subcontractorCount = 0
 
       def uaWithNoUnverifiedSubcontractor: UserAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(UnverifiedSubcontractorsPage, generateSubcontractors(subcontractorCount))
           .success
           .value
@@ -754,7 +917,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val userAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value
@@ -800,7 +963,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value
