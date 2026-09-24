@@ -74,5 +74,33 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
       )
       document.select("#final-action-status .govuk-tag").size() mustBe 0
     }
+
+    "must highlight final task when it has incomplete status" in {
+      val viewModel =
+        ReviewContractorDetailsViewModel(
+          tasks = Seq(
+            ContractorDetailsTaskViewModel(
+              titleKey = "finalValidations.reviewContractorDetails.task.utr",
+              statusKey = "finalValidations.reviewContractorDetails.status.complete",
+              href = None,
+              id = "contractor-utr"
+            )
+          ),
+          finalTask = ContractorDetailsTaskViewModel(
+            titleKey = "finalValidations.reviewContractorDetails.task.fileReturn",
+            statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
+            href = Some("/construction-industry-scheme/final-validations/review-contractor-details/next"),
+            id = "final-action"
+          )
+        )
+
+      val document = doc(viewModel)
+
+      document.select("#final-action-status .govuk-tag").text mustBe messagesImpl(
+        "finalValidations.reviewContractorDetails.status.incomplete"
+      )
+      document.select("a#final-action").attr("href") mustBe
+        "/construction-industry-scheme/final-validations/review-contractor-details/next"
+    }
   }
 }

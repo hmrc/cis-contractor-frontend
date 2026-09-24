@@ -44,12 +44,12 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "fileStandardReturnUrl must point to the monthly return journey" in {
       applicationConfig.fileStandardReturnUrl mustBe
-        "/construction-industry-scheme/monthly-return/file-your-monthly-return"
+        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
     }
 
     "fileNilReturnUrl must point to the nil return journey" in {
       applicationConfig.fileNilReturnUrl mustBe
-        "/construction-industry-scheme/monthly-return/file-your-nil-return"
+        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
     }
 
     "getConfString" - {
