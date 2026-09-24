@@ -502,7 +502,9 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     if (hasIssue(subcontractor, field)) {
       val displayName =
         Some(
-          value.map(_.trim).filter(_.nonEmpty)
+          value
+            .map(_.trim)
+            .filter(_.nonEmpty)
             .getOrElse(messages("finalvalidations.updateSubcontractorDetails.noNameProvided"))
         )
 
@@ -609,7 +611,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
 
   def displayName(
     subcontractor: FinalValidationDraftSubcontractor
-  ): String = {
+  )(implicit messages: Messages): String = {
 
     val details = subcontractor.proposed
 
@@ -631,7 +633,7 @@ class UpdateSubcontractorDetailsPageModelBuilder @Inject() {
     currentDisplayName
       .map(_.trim)
       .filter(_.nonEmpty)
-      .getOrElse(subcontractor.displayName)
+      .getOrElse(messages("finalvalidations.updateSubcontractorDetails.noNameProvided"))
   }
 
 }

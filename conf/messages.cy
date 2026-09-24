@@ -1274,3 +1274,83 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  enw’r cynllun
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
+
+# Final contractor validations
+finalValidations.reviewContractorDetails.title                                 =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.heading                               =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.task.utr                              =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.task.schemeName                       =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.task.email                            =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.task.fileReturn                       =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.task.verifySubcontractors             =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.status.complete                       =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.status.incomplete                     =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.reviewContractorDetails.status.cannotStart                    =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Subcontractors
+
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.completed         =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.incomplete        =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.title                             =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.heading                           =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.intro                             =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.backLink                          =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.taskList.review                   =  xxxxxxxxxxxxxxxxxxxx
+
+finalvalidations.updateSubcontractorDetails.title                              =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.heading                            =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.intro                              =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.confirmChanges.heading             =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.confirmChanges.body                =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.acceptAndSubmit                    =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.cancelChanges                      =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Shared
+finalvalidations.updateSubcontractorDetails.address                            =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.addContactDetails                  =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.emailAddress                       =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.phoneNumber                        =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                  =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber            =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.worksReferenceNumber               =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.noNameProvided                     =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Sole trader
+finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName       =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.tradingName             =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.names                   =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.names.noneSelected      =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.addAddress              =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.addUtr                  =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.utr                     =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.addNino                 =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.nino                    =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Company
+finalvalidations.updateSubcontractorDetails.company.name                       =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.addAddress                 =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.addUtr                     =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.utr                        =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.addCrn                     =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.crn                        =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Trust
+finalvalidations.updateSubcontractorDetails.trust.name                         =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.trust.addAddress                   =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.trust.addUtr                       =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.trust.utr                          =  xxxxxxxxxxxxxxxxxxxx
+
+# Final validation - Partnership
+finalvalidations.updateSubcontractorDetails.partnership.name                   =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.nominatedPartner       =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.addAddress             =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.addUtr                 =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.utr                    =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerUtr          =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.partnerUtr             =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerNino         =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.partnerNino            =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerCrn          =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.partnerCrn             =  xxxxxxxxxxxxxxxxxxxx
