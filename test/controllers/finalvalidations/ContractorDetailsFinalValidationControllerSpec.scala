@@ -20,6 +20,7 @@ import base.SpecBase
 import models.Scheme
 import models.UserAnswers
 import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -35,6 +36,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.Future
 
 class ContractorDetailsFinalValidationControllerSpec extends SpecBase with MockitoSugar {
+
+  private val fileStandardReturnUrl =
+    "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+
+  private val fileNilReturnUrl =
+    "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
 
   private val scheme =
     Scheme(
@@ -58,12 +65,8 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
     applicationBuilder(userAnswers = Some(userAnswers))
       .configure("urls.cisReturnDashboard" -> "http://localhost:9557/return-dashboard")
-      .configure(
-        "urls.fileStandardReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
-      )
-      .configure(
-        "urls.fileNilReturn" -> "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
-      )
+      .configure("urls.fileStandardReturn" -> fileStandardReturnUrl)
+      .configure("urls.fileNilReturn" -> fileNilReturnUrl)
       .overrides(
         bind[ContractorDetailsFinalValidationService].toInstance(finalValidationService),
         bind[CisManageService].toInstance(mockCisManageService),
@@ -137,8 +140,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
           ).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+        redirectLocation(result).value mustBe fileNilReturnUrl
       }
     }
 
@@ -171,8 +173,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
           ).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+        redirectLocation(result).value mustBe fileStandardReturnUrl
       }
     }
 
@@ -205,7 +206,45 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
         body must include("Scheme name")
         body must include("Email address")
         body must include("Cannot start yet")
-        body must include("/contractor-details/enter-contractors-utr")
+        body must include("/contractor-details/enter-contractor-utr")
+        body must include("/construction-industry-scheme/contractor-details/enter-contractors-scheme-name")
+        body must include("/contractor-details/enter-contractor-email-address")
+      }
+    }
+
+    "must not render links for complete tasks when some contractor details are incomplete" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorDetailsValidationTargetPage, ContractorDetailsValidationTarget.FileMonthlyReturn)
+          .success
+          .value
+
+      val mockFinalValidationService =
+        mock[ContractorDetailsFinalValidationService]
+
+      when(mockFinalValidationService.validate(any[UserAnswers]))
+        .thenReturn(
+          ContractorDetailsFinalValidation(utrComplete = true, schemeNameComplete = false, emailComplete = true)
+        )
+
+      val application = app(userAnswers, mockFinalValidationService)
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ContractorDetailsFinalValidationController.onPageLoad().url)
+          ).value
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        status(result) mustBe OK
+        doc.select("a#contractor-utr").isEmpty mustBe true
+        doc.select("span#contractor-utr").text() mustBe "Unique Taxpayer Reference"
+        doc.select("a#scheme-name").attr("href") mustBe
+          "/construction-industry-scheme/contractor-details/enter-contractors-scheme-name"
+        doc.select("a#contractor-email").isEmpty mustBe true
+        doc.select("span#contractor-email").text() mustBe "Email address"
       }
     }
 
@@ -290,8 +329,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
           ).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+        redirectLocation(result).value mustBe fileStandardReturnUrl
       }
 
       verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
@@ -334,8 +372,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
           ).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+        redirectLocation(result).value mustBe fileNilReturnUrl
       }
 
       verify(mockFinalValidationService).updateSchemeFromAnswers(any[UserAnswers])(any[HeaderCarrier])
