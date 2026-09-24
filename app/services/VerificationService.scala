@@ -67,15 +67,15 @@ class VerificationService @Inject() (
   private def cleanupSelectionsNoLongerInNewestBatch(
     response: models.response.GetNewestVerificationBatchResponse
   )(userAnswers: UserAnswers): Try[UserAnswers] = {
-    val newestVerificationSubcontractorIds =
-      response.verifications.flatMap(_.subcontractorId).map(_.toString).toSet
+    val newestSubcontractorIds =
+      response.subcontractors.map(_.subcontractorId.toString).toSet
 
     val withSelectedSubcontractors =
       userAnswers.get(SelectSubcontractorPage) match {
         case Some(selected) =>
           userAnswers.set(
             SelectSubcontractorPage,
-            selected.filter(subcontractor => newestVerificationSubcontractorIds.contains(subcontractor.id))
+            selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
           )
 
         case None =>
@@ -87,7 +87,7 @@ class VerificationService @Inject() (
         case Some(selected) =>
           updatedAnswers.set(
             SelectSubcontractorsToReverifyPage,
-            selected.filter(subcontractor => newestVerificationSubcontractorIds.contains(subcontractor.id))
+            selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
           )
 
         case None =>
