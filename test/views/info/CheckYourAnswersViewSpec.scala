@@ -88,7 +88,7 @@ class CheckYourAnswersViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
         backLink.parent()
 
       backLinkContainer.text() mustBe
-        s"${messages("info.CheckYourAnswers.backTo")} " +
+        s"${messages("site.backTo")} " +
         messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors") +
         "."
     }

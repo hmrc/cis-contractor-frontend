@@ -94,7 +94,7 @@ class VerificationResultsViewSpec extends SpecBase {
         )
       }
 
-      doc.select("p").text()         must include(messages("verify.verificationResults.backTo"))
+      doc.select("p").text()         must include(messages("site.backTo"))
       doc.select(".govuk-link").text must include(messages("verify.verificationResults.manageYourSubcontractors.link"))
     }
 
