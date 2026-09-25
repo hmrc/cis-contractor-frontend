@@ -23,7 +23,7 @@ import forms.unmatched.ProceedSubcontractorVerifyRequestFormProvider
 import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.unmatched.ProceedSubcontractorVerifyRequestPage
 import pages.verify.CurrentVerificationBatchResponsePage
@@ -42,21 +42,27 @@ import scala.concurrent.Future
 
 class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val formProvider =
+    new ProceedSubcontractorVerifyRequestFormProvider()
 
-  val formProvider        = new ProceedSubcontractorVerifyRequestFormProvider()
-  val form: Form[Boolean] = formProvider()
-  val subcontractorName   = "Test Subcontractor"
+  private val form: Form[Boolean] =
+    formProvider()
 
-  private val subcontractorId = 10
+  private val subcontractorName = "Test Subcontractor"
 
-  private val unmappedSubcontractorId = 999999L
+  private val subcontractorId: Long =
+    10L
+
+  private val unmappedSubcontractorId: Long =
+    999999L
 
   private lazy val proceedSubcontractorVerifyRequestRoute =
-    unmatchedRoutes.ProceedSubcontractorVerifyRequestController.onPageLoad(subcontractorId).url
+    unmatchedRoutes.ProceedSubcontractorVerifyRequestController
+      .onPageLoad(subcontractorId)
+      .url
 
-  private lazy val proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorIdUrl =
-    controllers.unmatched.routes.ProceedSubcontractorVerifyRequestController
+  private lazy val proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorId =
+    unmatchedRoutes.ProceedSubcontractorVerifyRequestController
       .onPageLoad(unmappedSubcontractorId)
       .url
 
@@ -120,316 +126,505 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
       )
     )
 
+  private def currentBatchResponseWithProceed(
+    proceed: Option[String]
+  ): GetCurrentVerificationBatchResponse =
+    currentBatchResponse.copy(
+      verifications = currentBatchResponse.verifications.map(
+        _.copy(proceed = proceed)
+      )
+    )
+
+  private def userAnswersWithCurrentBatch(
+    response: GetCurrentVerificationBatchResponse = currentBatchResponse
+  ): UserAnswers =
+    emptyUserAnswers
+      .set(CurrentVerificationBatchResponsePage, response)
+      .success
+      .value
+
+  private def userAnswersWithCisIdAndCurrentBatch(
+    response: GetCurrentVerificationBatchResponse = currentBatchResponse
+  ): UserAnswers =
+    emptyUserAnswers
+      .set(CisIdQuery, "1")
+      .success
+      .value
+      .set(CurrentVerificationBatchResponsePage, response)
+      .success
+      .value
+
   "ProceedSubcontractorVerifyRequest Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "onPageLoad" - {
 
-      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
+      "must return OK and the correct view when the question has not previously been answered" in {
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val userAnswers =
+          userAnswersWithCurrentBatch()
 
-      running(application) {
-        val request = FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
 
-        val result = route(application, request).value
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
 
-        val view = application.injector.instanceOf[ProceedSubcontractorVerifyRequestView]
+          val result =
+            route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, subcontractorName, subcontractorId)(
-          request,
-          messages(application)
-        ).toString
+          val view =
+            application.injector
+              .instanceOf[ProceedSubcontractorVerifyRequestView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(
+              form,
+              subcontractorName,
+              subcontractorId
+            )(
+              request,
+              messages(application)
+            ).toString
+        }
+      }
+
+      "must populate the view when the question has previously been answered NO" in {
+
+        val userAnswers =
+          userAnswersWithCurrentBatch()
+            .set(
+              ProceedSubcontractorVerifyRequestPage(
+                subcontractorId.toString
+              ),
+              false
+            )
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+
+          val result =
+            route(application, request).value
+
+          val view =
+            application.injector
+              .instanceOf[ProceedSubcontractorVerifyRequestView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(
+              form.fill(false),
+              subcontractorName,
+              subcontractorId
+            )(
+              request,
+              messages(application)
+            ).toString
+        }
+      }
+
+      "must populate the view when the stored answer is YES but the verification has not proceeded" in {
+
+        val response =
+          currentBatchResponseWithProceed(None)
+
+        val userAnswers =
+          userAnswersWithCurrentBatch(response)
+            .set(
+              ProceedSubcontractorVerifyRequestPage(
+                subcontractorId.toString
+              ),
+              true
+            )
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+
+          val result =
+            route(application, request).value
+
+          val view =
+            application.injector
+              .instanceOf[ProceedSubcontractorVerifyRequestView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(
+              form.fill(true),
+              subcontractorName,
+              subcontractorId
+            )(
+              request,
+              messages(application)
+            ).toString
+        }
+      }
+
+      "must return OK when the verification proceed value is N" in {
+
+        val response =
+          currentBatchResponseWithProceed(Some("N"))
+
+        val userAnswers =
+          userAnswersWithCurrentBatch(response)
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+
+          val result =
+            route(application, request).value
+
+          val view =
+            application.injector
+              .instanceOf[ProceedSubcontractorVerifyRequestView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(
+              form,
+              subcontractorName,
+              subcontractorId
+            )(
+              request,
+              messages(application)
+            ).toString
+        }
+      }
+
+      "must redirect to Review Unmatched Subcontractors when the verification has already proceeded" in {
+
+        val response =
+          currentBatchResponseWithProceed(Some("Y"))
+
+        val userAnswers =
+          userAnswersWithCurrentBatch(response)
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+              .onPageLoad()
+              .url
+        }
+      }
+
+      "must redirect to Journey Recovery when the current verification batch is missing" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+        }
+      }
+
+      "must redirect to Journey Recovery when the subcontractor ID is not found" in {
+
+        val userAnswers =
+          userAnswersWithCurrentBatch()
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              GET,
+              proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorId
+            )
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+        }
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered NO" in {
+    "onSubmit" - {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
-        .set(ProceedSubcontractorVerifyRequestPage(subcontractorId.toString), false)
-        .success
-        .value
+      "must save the answer, proceed with the verification and redirect when YES is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val userAnswers =
+          userAnswersWithCisIdAndCurrentBatch()
 
-      running(application) {
-        val request = FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+        val mockSessionRepository =
+          mock[SessionRepository]
 
-        val view = application.injector.instanceOf[ProceedSubcontractorVerifyRequestView]
+        val mockVerificationService =
+          mock[VerificationService]
 
-        val result = route(application, request).value
+        when(
+          mockVerificationService
+            .proceedUnmatchedVerification(any(), any(), any())(any())
+        ).thenReturn(Future.successful(()))
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(false), subcontractorName, subcontractorId)(
-          request,
-          messages(application)
-        ).toString
+        when(
+          mockVerificationService
+            .getCurrentVerificationBatch(
+              any[UserAnswers]
+            )(
+              any[HeaderCarrier]
+            )
+        ).thenReturn(Future.successful(userAnswers))
+
+        when(
+          mockVerificationService
+            .refreshNewestVerificationBatch(
+              any[UserAnswers]
+            )(
+              any[HeaderCarrier]
+            )
+        ).thenReturn(Future.successful(userAnswers))
+
+        when(
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository),
+              bind[VerificationService]
+                .toInstance(mockVerificationService)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              proceedSubcontractorVerifyRequestRoute
+            ).withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+              .onPageLoad()
+              .url
+
+          verify(mockVerificationService)
+            .proceedUnmatchedVerification(
+              any(),
+              any(),
+              any()
+            )(
+              any()
+            )
+
+          verify(mockSessionRepository)
+            .set(any[UserAnswers])
+        }
       }
-    }
 
-    "must populate the view correctly on a GET when the question has previously been answered YES" in {
+      "must save the answer and redirect without proceeding the verification when NO is submitted" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
-        .set(ProceedSubcontractorVerifyRequestPage(subcontractorId.toString), true)
-        .success
-        .value
+        val userAnswers =
+          userAnswersWithCisIdAndCurrentBatch()
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val mockSessionRepository =
+          mock[SessionRepository]
 
-      running(application) {
-        val request = FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+        val mockVerificationService =
+          mock[VerificationService]
 
-        val result = route(application, request).value
+        when(
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(Future.successful(true))
 
-        redirectLocation(
-          result
-        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-          .onPageLoad()
-          .url
-      }
-    }
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[SessionRepository]
+                .toInstance(mockSessionRepository),
+              bind[VerificationService]
+                .toInstance(mockVerificationService)
+            )
+            .build()
 
-    "must redirect to the next page on a POST and update CurrentVerificationBatch when valid data is submitted and answer = YES" in {
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              proceedSubcontractorVerifyRequestRoute
+            ).withFormUrlEncodedBody(
+              "value" -> "false"
+            )
 
-      val userAnswers = emptyUserAnswers
-        .set(CisIdQuery, "1")
-        .success
-        .value
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
+          val result =
+            route(application, request).value
 
-      val mockSessionRepository = mock[SessionRepository]
+          status(result) mustEqual SEE_OTHER
 
-      val mockBatchService = mock[VerificationService]
+          redirectLocation(result).value mustEqual
+            controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+              .onPageLoad()
+              .url
 
-      when(
-        mockBatchService.proceedUnmatchedVerification(any(), any(), any())(any())
-      ).thenReturn(Future.successful(()))
-      when(mockBatchService.getCurrentVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(userAnswers))
-      when(mockBatchService.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(userAnswers))
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[VerificationService].toInstance(mockBatchService)
+          verify(
+            mockVerificationService,
+            never()
+          ).proceedUnmatchedVerification(
+            any(),
+            any(),
+            any()
+          )(
+            any()
           )
-          .build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(
-          result
-        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-          .onPageLoad()
-          .url
+          verify(mockSessionRepository)
+            .set(any[UserAnswers])
+        }
       }
-    }
 
-    "must redirect to the next page on a POST and valid data is submitted and answer = NO" in {
+      "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val userAnswers = emptyUserAnswers
-        .set(CisIdQuery, "1")
-        .success
-        .value
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      val mockSessionRepository = mock[SessionRepository]
+        running(application) {
+          val request =
+            FakeRequest(POST, proceedSubcontractorVerifyRequestRoute)
+              .withFormUrlEncodedBody(("value", "true"))
 
-      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+          val result = route(application, request).value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "false")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(
-          result
-        ).value mustEqual controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-          .onPageLoad()
-          .url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
-    }
 
-    "must return a Bad Request and errors on a POST  when invalid data is submitted" in {
+      "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
 
-      val userAnswers = emptyUserAnswers
-        .set(CisIdQuery, "1")
-        .success
-        .value
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+          .success
+          .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRoute)
-            .withFormUrlEncodedBody(("value", ""))
+        running(application) {
 
-        val boundForm = form.bind(Map("value" -> ""))
+          val request =
+            FakeRequest(POST, proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorId).withFormUrlEncodedBody(
+              "value" -> "true"
+            )
 
-        val view = application.injector.instanceOf[ProceedSubcontractorVerifyRequestView]
+          val result = route(application, request).value
 
-        val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, subcontractorName, subcontractorId)(
-          request,
-          messages(application)
-        ).toString
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+        }
       }
-    }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      "must redirect to Journey Recovery for a POST when api failed" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+          .success
+          .value
 
-      running(application) {
-        val request = FakeRequest(GET, proceedSubcontractorVerifyRequestRoute)
+        val mockSessionRepository = mock[SessionRepository]
 
-        val result = route(application, request).value
+        val mockBatchService = mock[VerificationService]
+        when(
+          mockBatchService.proceedUnmatchedVerification(any(), any(), any())(any())
+        ).thenReturn(Future.successful(()))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+        when(mockSessionRepository.set(any())).thenReturn(Future.failed(new RuntimeException("boom")))
 
-    "must redirect to Journey Recovery for a GET if subcontractorId is not found" in {
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[VerificationService].toInstance(mockBatchService)
+            )
+            .build()
 
-      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, currentBatchResponse).success.value
+        running(application) {
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
+          val request =
+            FakeRequest(POST, proceedSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
 
-      running(application) {
+          val result = route(application, request).value
 
-        val request = FakeRequest(GET, proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorIdUrl)
+          status(result) mustEqual SEE_OTHER
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
-
-      val userAnswers = emptyUserAnswers
-        .set(CisIdQuery, "1")
-        .success
-        .value
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRouteUnmappedSubcontractorIdUrl).withFormUrlEncodedBody(
-            "value" -> "true"
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST when api failed" in {
-
-      val userAnswers = emptyUserAnswers
-        .set(CisIdQuery, "1")
-        .success
-        .value
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
-        .success
-        .value
-
-      val mockSessionRepository = mock[SessionRepository]
-
-      val mockBatchService = mock[VerificationService]
-      when(
-        mockBatchService.proceedUnmatchedVerification(any(), any(), any())(any())
-      ).thenReturn(Future.successful(()))
-
-      when(mockSessionRepository.set(any())).thenReturn(Future.failed(new RuntimeException("boom")))
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[VerificationService].toInstance(mockBatchService)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, proceedSubcontractorVerifyRequestRoute).withFormUrlEncodedBody("value" -> "true")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+        }
       }
     }
   }
