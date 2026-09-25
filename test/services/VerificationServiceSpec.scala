@@ -83,6 +83,17 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       monthlyReturnSubmission = None
     )
 
+  private def newestResponseWithBatchStatus(status: String): GetNewestVerificationBatchResponse =
+    responseWithSubcontractors.copy(
+      verificationBatch = Some(
+        VerificationBatch(
+          verificationBatchId = 1L,
+          status = Some(status),
+          verificationNumber = None
+        )
+      )
+    )
+
   private def buildService(
     connector: ConstructionIndustrySchemeConnector,
     repo: SessionRepository,
@@ -167,7 +178,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verifyNoMoreInteractions(mockConnector)
     }
 
-    "must remove selected subcontractors that no longer exist in the newest verification batch" in {
+    "must remove selected subcontractors that no longer exist in the newest subcontractor list" in {
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
@@ -198,28 +209,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           .value
 
       val newestResponse =
-        responseWithSubcontractors.copy(
-          verifications = Seq(
-            Verification(
-              verificationId = 1L,
-              matched = None,
-              verificationNumber = None,
-              taxTreatment = None,
-              verificationBatchId = None,
-              subcontractorId = Some(1L),
-              verificationResourceRef = None
-            ),
-            Verification(
-              verificationId = 2L,
-              matched = None,
-              verificationNumber = None,
-              taxTreatment = None,
-              verificationBatchId = None,
-              subcontractorId = Some(2L),
-              verificationResourceRef = None
-            )
-          )
-        )
+        responseWithSubcontractors.copy(verifications = Seq.empty)
 
       when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.successful(newestResponse))
@@ -774,6 +764,61 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockRepo, org.mockito.Mockito.times(3)).set(any[UserAnswers])
     }
 
+    "must map selected subcontractor ids to resource refs from the newest batch when current batch data is absent" in {
+
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+
+      val newestResponse =
+        responseWithSubcontractors.copy(
+          subcontractors = Seq(
+            unverifiedSub1.copy(subcontractorId = 2L, subbieResourceRef = Some(2222L))
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage, newestResponse)
+          .success
+          .value
+
+      val createResp = CreateVerificationBatchAndVerificationsResponse(verificationBatchResourceReference = 12345L)
+
+      when(
+        mockConnector.createVerificationBatchAndVerifications(any[CreateVerificationBatchAndVerificationsRequest])(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(createResp))
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentBatchResponse))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(responseWithSubcontractors))
+
+      when(mockRepo.set(any[UserAnswers])).thenReturn(Future.successful(true))
+
+      service
+        .createVerificationBatchAndVerifications(
+          userAnswers = ua,
+          selectedSubcontractorIds = Seq(2L),
+          actionIndicator = None
+        )
+        .futureValue
+
+      val captor: ArgumentCaptor[CreateVerificationBatchAndVerificationsRequest] =
+        ArgumentCaptor.forClass(classOf[CreateVerificationBatchAndVerificationsRequest])
+
+      verify(mockConnector).createVerificationBatchAndVerifications(captor.capture())(any[HeaderCarrier])
+
+      captor.getValue.verificationResourceReferences mustBe Seq(2222L)
+    }
+
     "must fail when no subcontractors selected" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
@@ -795,7 +840,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockRepo, never()).set(any())
     }
 
-    "must fail when CurrentVerificationBatchResponsePage is missing" in {
+    "must fail when no verification batch data is available" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
@@ -812,7 +857,9 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           .failed
           .futureValue
 
-      ex.getMessage must include("CurrentVerificationBatchResponsePage not found in session data")
+      ex.getMessage must include(
+        "Neither CurrentVerificationBatchResponsePage nor NewestVerificationBatchResponsePage found in session data"
+      )
 
       verify(mockConnector, never()).createVerificationBatchAndVerifications(any())(any())
       verify(mockRepo, never()).set(any())
@@ -1407,13 +1454,19 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         mockConnector.createVerificationBatchAndVerifications(
           any[CreateVerificationBatchAndVerificationsRequest]
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(()))
+      ).thenReturn(
+        Future.successful(
+          CreateVerificationBatchAndVerificationsResponse(
+            verificationBatchResourceReference = 12345L
+          )
+        )
+      )
 
       when(
         mockConnector.getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(responseWithSubcontractors))
+      ).thenReturn(Future.successful(newestResponseWithBatchStatus("SUBMITTED")))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1439,12 +1492,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           actionIndicator = None
         )
 
-      verify(mockConnector, times(2))
+      verify(mockConnector)
         .getCurrentVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
 
-      verify(mockConnector)
+      verify(mockConnector, times(2))
         .getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
@@ -1507,7 +1560,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         mockConnector.getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(responseWithSubcontractors))
+      ).thenReturn(Future.successful(newestResponseWithBatchStatus("SUBMITTED")))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1665,7 +1718,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         mockConnector.getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(responseWithSubcontractors))
+      ).thenReturn(Future.successful(newestResponseWithBatchStatus("STARTED")))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1705,7 +1758,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           eqTo(instanceId)
         )(any[HeaderCarrier])
 
-      verify(mockConnector)
+      verify(mockConnector, times(3))
         .getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
@@ -1752,13 +1805,19 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         mockConnector.createVerificationBatchAndVerifications(
           any[CreateVerificationBatchAndVerificationsRequest]
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(()))
+      ).thenReturn(
+        Future.successful(
+          CreateVerificationBatchAndVerificationsResponse(
+            verificationBatchResourceReference = 12345L
+          )
+        )
+      )
 
       when(
         mockConnector.getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(responseWithSubcontractors))
+      ).thenReturn(Future.successful(newestResponseWithBatchStatus("SUBMITTED")))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1891,13 +1950,19 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         mockConnector.createVerificationBatchAndVerifications(
           any[CreateVerificationBatchAndVerificationsRequest]
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(()))
+      ).thenReturn(
+        Future.successful(
+          CreateVerificationBatchAndVerificationsResponse(
+            verificationBatchResourceReference = 12345L
+          )
+        )
+      )
 
       when(
         mockConnector.getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(responseWithSubcontractors))
+      ).thenReturn(Future.successful(newestResponseWithBatchStatus("SUBMITTED")))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
