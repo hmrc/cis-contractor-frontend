@@ -28,15 +28,15 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{NewestVerificationBatchResponsePage, RebuildVerificationFromWarningPage, SelectSubcontractorPage, UnverifiedSubcontractorsPage}
 import play.api.data.Forms.*
 import play.api.data.Form
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.{CisManageService, PaginationService, VerificationService}
-import views.html.verify.SelectSubcontractorView
-import play.api.i18n.Messages
+import services.*
 import uk.gov.hmrc.http.HeaderCarrier
+import views.html.verify.SelectSubcontractorView
 import models.agent.AgentClientData
 
 import javax.inject.Inject
@@ -110,7 +110,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     )
 
   private def uaWithSubcontractors: UserAnswers =
-    emptyUserAnswers
+    userAnswersWithCisId
       .set(NewestVerificationBatchResponsePage, getNewestVerificationBatchResponse)
       .success
       .value
@@ -119,8 +119,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .value
 
   private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
-  private val brodyMartin      = allSubs.head // first subcontractor, on page 1
-  private val epsilonCarpentry = allSubs(6) // seventh subcontractor, on page 2 (pageSize = 6)
+  private val brodyMartin      = allSubs.head
+  private val epsilonCarpentry = allSubs(6)
 
   "SelectSubcontractor Controller" - {
 
@@ -152,7 +152,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.paginationViewModel,
           1,
           paginationResult.startIndex,
-          paginationResult.totalCount
+          paginationResult.totalCount,
+          paginationResult.totalPages
         )(request, messages(application)).toString
       }
     }
@@ -185,7 +186,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.paginationViewModel,
           1,
           paginationResult.startIndex,
-          paginationResult.totalCount
+          paginationResult.totalCount,
+          paginationResult.totalPages
         )(request, messages(application)).toString
       }
     }
@@ -245,7 +247,8 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.paginationViewModel,
           1,
           paginationResult.startIndex,
-          paginationResult.totalCount
+          paginationResult.totalCount,
+          paginationResult.totalPages
         )(request, messages(application)).toString
       }
     }
@@ -605,7 +608,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -627,7 +630,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val subcontractorCount = 0
 
       def uaWithNoUnverifiedSubcontractor: UserAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(UnverifiedSubcontractorsPage, generateSubcontractors(subcontractorCount))
           .success
           .value
@@ -917,7 +920,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val userAnswers =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value
@@ -963,7 +966,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
       val ua =
-        emptyUserAnswers
+        userAnswersWithCisId
           .set(NewestVerificationBatchResponsePage, responseWithVerified)
           .success
           .value

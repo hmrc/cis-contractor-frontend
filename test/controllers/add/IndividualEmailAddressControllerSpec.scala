@@ -21,11 +21,13 @@ import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
 import models.contact.ContactMethodOptions
 import models.add.SubcontractorName
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage, SubcontractorNamePage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -46,6 +48,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   lazy val individualEmailAddressRoute: String =
     controllers.add.routes.IndividualEmailAddressController.onPageLoad(NormalMode).url
 
+  lazy val individualEmailAddressFinalValidationRoute: String =
+    controllers.add.routes.IndividualEmailAddressController.onPageLoad(FinalValidationMode).url
+
   private val subContractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
   private val name = "John Smith"
@@ -61,6 +66,12 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithNameAndEmailChoice: UserAnswers =
     uaWithName
       .set(IndividualContactMethodOptionsPage, Set(ContactMethodOptions.Email))
+      .success
+      .value
+
+  private def uaWithNameAndFinalValidationEmailTarget: UserAnswers =
+    uaWithName
+      .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.EmailAddress)
       .success
       .value
 
@@ -269,6 +280,53 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when Email contact choice is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, individualEmailAddressFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IndividualEmailAddressView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, name)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when Email contact choice is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationEmailTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, individualEmailAddressFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "abc@xyz.com"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }

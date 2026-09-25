@@ -19,7 +19,7 @@ package controllers.add
 import controllers.actions.*
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
-import models.{AmendMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -52,14 +52,19 @@ class AddressOfSubcontractorController @Inject() (
   ): Option[String] =
     subcontractorNameExtractor.getSubcontractorName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.AddressOfSubcontractorController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.AddressOfSubcontractorController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()

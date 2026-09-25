@@ -23,33 +23,42 @@ class ModeSpec extends AnyWordSpec with Matchers {
 
   "Mode PathBindable" should {
 
-    "bind NormalMode" in {
-      Mode.pathBindable.bind("mode", "NormalMode") mustBe Right(NormalMode)
-    }
+    val modes = Seq(
+      NormalMode          -> "NormalMode",
+      CheckMode           -> "CheckMode",
+      AmendMode           -> "AmendMode",
+      FinalValidationMode -> "FinalValidationMode"
+    )
 
-    "bind CheckMode" in {
-      Mode.pathBindable.bind("mode", "CheckMode") mustBe Right(CheckMode)
-    }
+    modes.foreach { case (mode, value) =>
+      s"bind $value" in {
+        Mode.pathBindable.bind("mode", value) mustBe Right(mode)
+      }
 
-    "bind AmendMode" in {
-      Mode.pathBindable.bind("mode", "AmendMode") mustBe Right(AmendMode)
+      s"unbind $value" in {
+        Mode.pathBindable.unbind("mode", mode) mustBe value
+      }
     }
 
     "return an error for an invalid mode" in {
       Mode.pathBindable.bind("mode", "InvalidMode") mustBe
         Left("Invalid mode: InvalidMode")
     }
+  }
 
-    "unbind NormalMode" in {
-      Mode.pathBindable.unbind("mode", NormalMode) mustBe "NormalMode"
-    }
+  "Mode JavascriptLiteral" should {
 
-    "unbind CheckMode" in {
-      Mode.pathBindable.unbind("mode", CheckMode) mustBe "CheckMode"
-    }
+    val modes = Seq(
+      NormalMode          -> "NormalMode",
+      CheckMode           -> "CheckMode",
+      AmendMode           -> "AmendMode",
+      FinalValidationMode -> "FinalValidationMode"
+    )
 
-    "unbind AmendMode" in {
-      Mode.pathBindable.unbind("mode", AmendMode) mustBe "AmendMode"
+    modes.foreach { case (mode, value) =>
+      s"convert $value" in {
+        Mode.jsLiteral.to(mode) mustBe value
+      }
     }
   }
 }

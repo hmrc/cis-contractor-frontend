@@ -19,10 +19,11 @@ package controllers.add.partnership
 import controllers.actions.*
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipUtrFormProvider
+import models.{AmendMode, FinalValidationMode, Mode}
 import models.requests.DataRequest
-import models.{AmendMode, Mode}
 import navigation.Navigator
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.*
+import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -90,9 +91,13 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
               value =>
                 val prevValue = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage)
+                val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
                   case AmendMode if prevValue.contains(value) => saveAndContinue(mode, value)
+
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                    saveAndContinue(mode, value)
 
                   case _ =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {

@@ -36,7 +36,7 @@
             }
         </div>
         <div class="govuk-task-list__status" id="@{taskItem.id}-status">
-            @if(taskItem.statusKey.endsWith(".complete")) {
+            @if(taskItem.statusKey == "finalValidations.reviewContractorDetails.status.incomplete") {
                 <strong class="govuk-tag">@messages(taskItem.statusKey)</strong>
             } else {
                 @messages(taskItem.statusKey)

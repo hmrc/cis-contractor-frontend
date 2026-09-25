@@ -18,7 +18,7 @@ package controllers.add.company
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{AmendMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
 import pages.add.company.CompanyAddressPage
@@ -54,14 +54,19 @@ class CompanyAddressController @Inject() (
     subcontractorNameExtractor
       .getCompanyName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.CompanyAddressController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.CompanyAddressController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {

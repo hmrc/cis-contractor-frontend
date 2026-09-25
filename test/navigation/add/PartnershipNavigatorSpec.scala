@@ -150,7 +150,8 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipAddressYesNoPage,
           NormalMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController
+          .redirectToAddressLookup(NormalMode, None)
       }
 
       "must go from PartnershipAddressYesNoPage to AddPartnershipContactMethodsYesNo Page when false in NormalMode" in {
@@ -1403,8 +1404,10 @@ class PartnershipNavigatorSpec extends SpecBase {
           PartnershipAddressYesNoPage,
           CheckMode,
           emptyUserAnswers.setOrException(PartnershipAddressYesNoPage, true)
-        ) mustBe controllers.add.partnership.routes.PartnershipAddressController
-          .redirectToAddressLookup(NormalMode, Some(CheckMode.toString))
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(
+          NormalMode,
+          Some(CheckMode.toString)
+        )
       }
 
       "must go from PartnershipAddressYesNoPage to PartnershipCheckYourAnswers when true and address already filled in CheckMode" in {

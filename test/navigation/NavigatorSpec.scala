@@ -17,9 +17,10 @@
 package navigation
 
 import base.SpecBase
-import models.{NormalMode, UserAnswers}
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import navigation.add.{CompanyNavigator, IndividualNavigator, PartnershipNavigator, SharedNavigator, TrustNavigator}
 import navigation.verify.VerifyNavigator
+import navigation.finalvalidation.FinalValidationNavigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatest.freespec.AnyFreeSpec
@@ -50,12 +51,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/individual")
       when(individual.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestIndividualPage, mode, ua) mustBe expected
 
@@ -64,6 +75,7 @@ class NavigatorSpec extends SpecBase {
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(trust, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
     }
 
     "must delegate to CompanyNavigator when page is a CompanyJourney" in {
@@ -76,12 +88,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/company")
       when(company.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestCompanyPage, mode, ua) mustBe expected
 
@@ -90,6 +112,7 @@ class NavigatorSpec extends SpecBase {
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(trust, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
     }
 
     "must delegate to PartnershipNavigator when page is a PartnershipPage" in {
@@ -102,12 +125,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/partnership")
       when(partnership.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestPartnershipPage, mode, ua) mustBe expected
 
@@ -116,6 +149,7 @@ class NavigatorSpec extends SpecBase {
       verify(company, never()).nextPage(any(), any(), any())
       verify(trust, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
     }
 
     "must delegate to TrustNavigator when page is a TrustJourney" in {
@@ -128,12 +162,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/trust")
       when(trust.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestTrustPage, mode, ua) mustBe expected
 
@@ -142,6 +186,7 @@ class NavigatorSpec extends SpecBase {
       verify(company, never()).nextPage(any(), any(), any())
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
     }
 
     "must delegate to VerifyNavigator when page is a VerifyJourney" in {
@@ -154,12 +199,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/verify")
       when(verifyNav.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestVerifyPage, mode, ua) mustBe expected
 
@@ -169,6 +224,7 @@ class NavigatorSpec extends SpecBase {
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(trust, never()).nextPage(any(), any(), any())
       verify(shared, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
     }
 
     "must delegate to SharedNavigator when page is not a journey-specific page" in {
@@ -181,12 +237,22 @@ class NavigatorSpec extends SpecBase {
       val shared               = mock[SharedNavigator]
       val verifyNav            = mock[VerifyNavigator]
       val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
 
       val expected = Call("GET", "/shared")
       when(shared.nextPage(any(), any(), any())).thenReturn(expected)
 
       val navigator =
-        new Navigator(individual, company, partnership, trust, shared, verifyNav, contractorDetailsNav)
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
 
       navigator.nextPage(TestUnknownPage, mode, ua) mustBe expected
 
@@ -195,6 +261,46 @@ class NavigatorSpec extends SpecBase {
       verify(company, never()).nextPage(any(), any(), any())
       verify(partnership, never()).nextPage(any(), any(), any())
       verify(trust, never()).nextPage(any(), any(), any())
+      verify(finalValidationNav, never()).nextPage(any(), any(), any())
+    }
+
+    "must delegate to FinalValidationNavigator when mode is FinalValidationMode" in {
+      case object TestFinalValidationPage extends Page
+
+      val individual           = mock[IndividualNavigator]
+      val company              = mock[CompanyNavigator]
+      val partnership          = mock[PartnershipNavigator]
+      val trust                = mock[TrustNavigator]
+      val shared               = mock[SharedNavigator]
+      val verifyNav            = mock[VerifyNavigator]
+      val contractorDetailsNav = mock[navigation.contractordetails.ContractorDetailsNavigator]
+      val finalValidationNav   = mock[FinalValidationNavigator]
+
+      val expected = Call("GET", "/final-validation")
+      when(finalValidationNav.nextPage(any(), any(), any())).thenReturn(expected)
+
+      val navigator =
+        new Navigator(
+          individual,
+          company,
+          partnership,
+          trust,
+          shared,
+          verifyNav,
+          contractorDetailsNav,
+          finalValidationNav
+        )
+
+      navigator.nextPage(TestFinalValidationPage, FinalValidationMode, ua) mustBe expected
+
+      verify(finalValidationNav).nextPage(TestFinalValidationPage, FinalValidationMode, ua)
+      verify(individual, never()).nextPage(any(), any(), any())
+      verify(company, never()).nextPage(any(), any(), any())
+      verify(partnership, never()).nextPage(any(), any(), any())
+      verify(trust, never()).nextPage(any(), any(), any())
+      verify(shared, never()).nextPage(any(), any(), any())
+      verify(verifyNav, never()).nextPage(any(), any(), any())
+      verify(contractorDetailsNav, never()).nextPage(any(), any(), any())
     }
   }
 }
