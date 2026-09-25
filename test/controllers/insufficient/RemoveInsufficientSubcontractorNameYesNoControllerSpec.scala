@@ -20,13 +20,11 @@ import base.SpecBase
 import controllers.routes
 import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
-import models.{NormalMode, Subcontractor, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
-import org.mockito.ArgumentCaptor
+import models.{NormalMode, Subcontractor, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
 import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -39,24 +37,12 @@ import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 import scala.concurrent.Future
 
 class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase with MockitoSugar {
+  private val formProvider = new RemoveInsufficientSubcontractorNameYesNoFormProvider()
+  private val form         = formProvider()
 
-  private val formProvider =
-    new RemoveInsufficientSubcontractorNameYesNoFormProvider()
-
-  private val form =
-    formProvider()
-
-  private val mode =
-    NormalMode
-
-  private val subcontractorName =
-    "Test Subcontractor"
-
-  private val verificationResourceRef =
-    12345L
-
-  private val subcontractorId =
-    10L
+  private val subcontractorName       = "Test Subcontractor"
+  private val verificationResourceRef = 12345L
+  private val subcontractorId         = 10L
 
   private val currentBatchResponse: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
@@ -196,110 +182,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               form,
-              mode,
-              subcontractorName,
-              verificationResourceRef
-            )(
-              request,
-              messages(application)
-            ).toString
-        }
-      }
-
-      "must populate the form when the question has previously been answered" in {
-
-        val userAnswers =
-          userAnswersWithCurrentBatch
-            .set(
-              RemoveInsufficientSubcontractorNameYesNoPage(
-                verificationResourceRef
-              ),
-              true
-            )
-            .success
-            .value
-
-        val application =
-          applicationBuilder(
-            userAnswers = Some(userAnswers)
-          ).build()
-
-        running(application) {
-
-          val request =
-            FakeRequest(
-              GET,
-              getRoute()
-            )
-
-          val result =
-            route(application, request).value
-
-          val view =
-            application.injector
-              .instanceOf[
-                RemoveInsufficientSubcontractorNameYesNoView
-              ]
-
-          status(result) mustEqual OK
-
-          contentAsString(result) mustEqual
-            view(
-              form.fill(true),
-              mode,
-              subcontractorName,
-              verificationResourceRef
-            )(
-              request,
-              messages(application)
-            ).toString
-        }
-      }
-
-      "must not populate the form with an answer saved for a different verification reference" in {
-
-        val otherVerificationResourceRef =
-          67890L
-
-        val userAnswers =
-          userAnswersWithCurrentBatch
-            .set(
-              RemoveInsufficientSubcontractorNameYesNoPage(
-                otherVerificationResourceRef
-              ),
-              false
-            )
-            .success
-            .value
-
-        val application =
-          applicationBuilder(
-            userAnswers = Some(userAnswers)
-          ).build()
-
-        running(application) {
-
-          val request =
-            FakeRequest(
-              GET,
-              getRoute()
-            )
-
-          val result =
-            route(application, request).value
-
-          val view =
-            application.injector
-              .instanceOf[
-                RemoveInsufficientSubcontractorNameYesNoView
-              ]
-
-          status(result) mustEqual OK
-
-          contentAsString(result) mustEqual
-            view(
-              form,
-              mode,
               subcontractorName,
               verificationResourceRef
             )(
@@ -341,7 +223,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               form,
-              mode,
               expectedName,
               verificationResourceRef
             )(
@@ -386,7 +267,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               form,
-              mode,
               expectedName,
               unknownVerificationResourceRef
             )(
@@ -430,7 +310,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               form,
-              mode,
               expectedName,
               -1L
             )(
@@ -508,7 +387,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               boundForm,
-              mode,
               subcontractorName,
               verificationResourceRef
             )(
@@ -559,7 +437,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           contentAsString(result) mustEqual
             view(
               boundForm,
-              mode,
               expectedName,
               verificationResourceRef
             )(
@@ -569,90 +446,12 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         }
       }
 
-      "must redirect to the insufficient subcontractors review page without deleting when the user selects no" in {
-
-        val mockSessionRepository =
-          mock[SessionRepository]
-
-        val mockVerificationService =
-          mock[VerificationService]
-
-        when(
-          mockSessionRepository.set(any[UserAnswers])
-        ).thenReturn(
-          Future.successful(true)
-        )
-
-        val application =
-          applicationBuilder(
-            userAnswers = Some(userAnswersWithCurrentBatch)
-          ).overrides(
-            bind[SessionRepository]
-              .toInstance(mockSessionRepository),
-            bind[VerificationService]
-              .toInstance(mockVerificationService)
-          ).build()
-
-        running(application) {
-
-          val request =
-            FakeRequest(
-              POST,
-              postRoute()
-            ).withFormUrlEncodedBody(
-              "value" -> "false"
-            )
-
-          val result =
-            route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual
-            controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-              .onPageLoad()
-              .url
-
-          verify(
-            mockVerificationService,
-            never()
-          ).deleteVerification(
-            any[UserAnswers],
-            any[Long]
-          )(
-            any[HeaderCarrier]
-          )
-
-          val savedAnswersCaptor =
-            ArgumentCaptor.forClass(
-              classOf[UserAnswers]
-            )
-
-          verify(mockSessionRepository)
-            .set(savedAnswersCaptor.capture())
-
-          savedAnswersCaptor.getValue
-            .get(
-              RemoveInsufficientSubcontractorNameYesNoPage(
-                verificationResourceRef
-              )
-            ) mustBe None
-        }
-      }
-
       "must delete the verification and return to the insufficient review page when verifications remain" in {
+        val mockSessionRepository   = mock[SessionRepository]
+        val mockVerificationService = mock[VerificationService]
+        val mockReadinessController = mock[CheckVerificationBatchReadinessController]
 
-        val mockSessionRepository =
-          mock[SessionRepository]
-
-        val mockVerificationService =
-          mock[VerificationService]
-
-        val mockReadinessController =
-          mock[CheckVerificationBatchReadinessController]
-
-        val answersAfterReadiness =
-          userAnswersWithCurrentBatch
+        val answersAfterReadiness = userAnswersWithCurrentBatch
 
         when(
           mockSessionRepository.set(any[UserAnswers])
@@ -749,26 +548,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
             )
 
           verify(mockVerificationService)
-            .refreshNewestVerificationBatch(
-              any[UserAnswers]
-            )(
-              any[HeaderCarrier]
-            )
-
-          val savedAnswersCaptor =
-            ArgumentCaptor.forClass(
-              classOf[UserAnswers]
-            )
-
-          verify(mockSessionRepository)
-            .set(savedAnswersCaptor.capture())
-
-          savedAnswersCaptor.getValue
-            .get(
-              RemoveInsufficientSubcontractorNameYesNoPage(
-                verificationResourceRef
-              )
-            ) mustBe None
+            .refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
         }
       }
 
@@ -1037,9 +817,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual
-            controllers.verify.routes.SelectSubcontractorsToReverifyController
-              .onPageLoad(NormalMode)
-              .url
+            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
 
           verify(
             mockReadinessController,
@@ -1153,10 +931,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual
-            controllers.verify.routes.SelectSubcontractorController
-              .onPageLoad(NormalMode)
-              .url
-
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
           verify(
             mockReadinessController,
             never()
