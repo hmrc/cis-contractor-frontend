@@ -225,6 +225,43 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
+    "must redirect to modify when the latest batch can be modified" in {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
+      when(mockService.latestBatchCanBeModified(eqTo(ua)))
+        .thenReturn(true)
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(app) {
+        val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
+
+        val request = FakeRequest(POST, "/test-only")
+        val result  = controller.onSubmit(NormalMode)(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+            .modifyVerificationBatch(NormalMode)
+            .url
+
+        verify(mockService, never())
+          .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())
+      }
+    }
+
     "must call service with distinct combined ids when current batch is empty and then redirect to CheckVerificationBatchReadiness" in {
       val mockService = mock[VerificationService]
 

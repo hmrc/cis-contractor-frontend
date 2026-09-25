@@ -61,49 +61,58 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       userAnswersWithNewestBatch(request.userAnswers)
         .flatMap { ua =>
+          if (verificationService.latestBatchCanBeModified(ua)) {
+            Future.successful(
+              Redirect(
+                controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+                  .modifyVerificationBatch(mode)
+              )
+            )
+          } else {
 
-          val verifyIdsRaw: Seq[String] =
-            ua.get(SelectSubcontractorPage)
-              .map(_.toSeq.map(_.id))
-              .getOrElse(Seq.empty)
+            val verifyIdsRaw: Seq[String] =
+              ua.get(SelectSubcontractorPage)
+                .map(_.toSeq.map(_.id))
+                .getOrElse(Seq.empty)
 
-          val reverifyIdsRaw: Seq[String] =
-            ua.get(SelectSubcontractorsToReverifyPage)
-              .map(_.toSeq.map(_.id))
-              .getOrElse(Seq.empty)
+            val reverifyIdsRaw: Seq[String] =
+              ua.get(SelectSubcontractorsToReverifyPage)
+                .map(_.toSeq.map(_.id))
+                .getOrElse(Seq.empty)
 
-          val selectedIdsEither =
-            for {
-              verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
-              reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
-            } yield (verifyIds ++ reverifyIds).distinct
+            val selectedIdsEither =
+              for {
+                verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
+                reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
+              } yield (verifyIds ++ reverifyIds).distinct
 
-          selectedIdsEither match {
+            selectedIdsEither match {
 
-            case Left(msg) =>
-              logger.error(s"[CreateVerificationBatchAndVerificationsController.onSubmit] $msg")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Left(msg) =>
+                logger.error(s"[CreateVerificationBatchAndVerificationsController.onSubmit] $msg")
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-            case Right(selectedIds) =>
-              verificationService
-                .createVerificationBatchAndVerifications(
-                  userAnswers = ua,
-                  selectedSubcontractorIds = selectedIds,
-                  actionIndicator = None
-                )
-                .map(_ =>
-                  Redirect(
-                    controllers.verify.routes.CheckVerificationBatchReadinessController
-                      .checkVerificationBatchReadiness(mode)
+              case Right(selectedIds) =>
+                verificationService
+                  .createVerificationBatchAndVerifications(
+                    userAnswers = ua,
+                    selectedSubcontractorIds = selectedIds,
+                    actionIndicator = None
                   )
-                )
-                .recover { case t =>
-                  logger.error(
-                    "[CreateVerificationBatchAndVerificationsController.onSubmit] Failed to create verification batch/verifications",
-                    t
+                  .map(_ =>
+                    Redirect(
+                      controllers.verify.routes.CheckVerificationBatchReadinessController
+                        .checkVerificationBatchReadiness(mode)
+                    )
                   )
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                }
+                  .recover { case t =>
+                    logger.error(
+                      "[CreateVerificationBatchAndVerificationsController.onSubmit] Failed to create verification batch/verifications",
+                      t
+                    )
+                    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  }
+            }
           }
         }
         .recover { case t =>
