@@ -72,7 +72,7 @@ class ProceedSubcontractorVerifyRequestController @Inject() (
                   _.subcontractorId.contains(subcontractorId)
                 )
 
-              if (verification.exists(_.proceed.contains("Y"))) {
+              if (verification.exists(_.proceed.exists(_.trim.equalsIgnoreCase("Y")))) {
 
                 Redirect(
                   navigator.nextPage(
