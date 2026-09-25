@@ -36,7 +36,7 @@ object AmendConfirmationLinks {
 
       case AmendJourneyType.Standard =>
         AmendConfirmationLink(
-          url = appConfig.manageYourSubcontractorsUrl(cisId),
+          url = appConfig.retrieveSubcontractorListUrl,
           textKey = "amendConfirmation.yourSubcontractors",
           showBeforeYouGo = true
         )
