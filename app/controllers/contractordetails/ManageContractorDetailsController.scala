@@ -47,7 +47,7 @@ class ManageContractorDetailsController @Inject() (
     with Logging
     with AgentClientChecks {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(target: Option[String] = None): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
 
       val userAnswers =
@@ -88,7 +88,7 @@ class ManageContractorDetailsController @Inject() (
                               .set(updatedAnswers)
                               .map(_ =>
                                 Redirect(
-                                  routes.ContractorDetailsCheckAnswersController.onPageLoad()
+                                  routes.ContractorDetailsCheckAnswersController.onPageLoad(target)
                                 )
                               )
                         )

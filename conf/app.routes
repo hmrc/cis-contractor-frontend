@@ -854,7 +854,7 @@ GET   /subcontractor/final-validation/trust/trust-works-reference               
 POST  /subcontractor/final-validation/trust/trust-works-reference                                     controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
 
 # Contractor Details
-GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad()
+GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad(target: Option[String] ?= None)
 
 GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
 POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
@@ -875,8 +875,8 @@ POST  /contractor-details/change-contractor-email-address  controllers.contracto
 
 GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
 
-GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad()
-POST  /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onSubmit()
+GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad(target: Option[String] ?= None)
+POST  /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onSubmit(target: Option[String] ?= None)
 
 GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
 POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
