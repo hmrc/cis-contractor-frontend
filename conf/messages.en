@@ -1070,7 +1070,6 @@ verify.reviewUnmatched.unmatched.subheading                                     
 verify.reviewUnmatched.ready.subheading                                            =  Ready for verification
 verify.reviewUnmatched.name                                                        =  Name
 verify.reviewUnmatched.utr                                                         =  UTR
-verify.reviewUnmatched.utr.full                                                    =  Unique Taxpayer Reference
 verify.reviewUnmatched.noneProvided                                                =  None provided
 verify.reviewUnmatched.actions                                                     =  Actions
 verify.reviewUnmatched.action.edit                                                 =  Edit
@@ -1078,7 +1077,6 @@ verify.reviewUnmatched.action.proceed                                           
 verify.reviewUnmatched.action.remove                                               =  Remove
 verify.reviewUnmatched.backToResults.prefix                                        =  Back to
 verify.reviewUnmatched.backToResults.link                                          =  Verification results
-
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.heading                                                 =  Which subcontractors do you want to verify?
 verify.selectSubcontractor.hint                                                    =  Select the unverified subcontractors you want to add to this verification request
