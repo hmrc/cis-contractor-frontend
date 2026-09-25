@@ -36,7 +36,7 @@ class NoVerificationResultsViewSpec extends SpecBase {
       doc.select("title").text       must include(messages("verify.noVerificationResults.title"))
       doc.select("h1").text          must include(messages("verify.noVerificationResults.heading"))
       doc.select("p").text           must include(messages("verify.noVerificationResults.p"))
-      doc.select("p").text           must include(messages("verify.noVerificationResults.backTo"))
+      doc.select("p").text           must include(messages("site.backTo"))
       doc.select(".govuk-link").text must include(
         messages("verify.noVerificationResults.manageYourSubcontractors.link")
       )

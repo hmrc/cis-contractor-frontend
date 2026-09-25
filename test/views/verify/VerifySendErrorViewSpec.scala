@@ -68,7 +68,7 @@ class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
       val manageText: String = manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.verifySendError.manageSubcontractors.p1")
+        messages("site.backTo")
       )
 
       manageText.trim.endsWith(".") mustBe true

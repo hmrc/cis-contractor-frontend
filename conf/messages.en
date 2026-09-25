@@ -2,6 +2,7 @@
 service.name                                            =  Construction Industry Scheme
 
 site.back                                               =  Back
+site.backTo                                             =  Back to
 site.remove                                             =  Remove
 site.change                                             =  Change
 site.no                                                 =  No
@@ -51,7 +52,6 @@ journeyRecovery.startAgain.guidance.p1                  =  Try again later.
 journeyRecovery.startAgain.guidance.p2                  =  Any information you have provided has not been saved. When the service is available, you will have to start again.
 journeyRecovery.startAgain.guidance.contactHMRC.link    =  Contact HMRC
 journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  for more help.
-journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Back to
 journeyRecovery.startAgain.guidance.cisAccount.link     =  Manage your CIS account
 
 signedOut.title                                         =  For your security, we signed you out
@@ -416,7 +416,6 @@ amendConfirmation.updatesMade.h2                                                
 amendConfirmation.table.hdr.previous                                                =  Previous
 amendConfirmation.table.hdr.updated                                                 =  Updated
 amendConfirmation.table.hdr.details                                                 =  Details
-amendConfirmation.backTo                                                            =  Back to
 amendConfirmation.yourSubcontractors                                                =  Your subcontractors
 amendConfirmation.beforeYouGo.h2                                                    =  Before you go
 amendConfirmation.beforeYouGo.p1                                                    =  Your feedback helps us make our service better.
@@ -484,7 +483,7 @@ noUnmatchedSubcontractors.title                                                 
 noUnmatchedSubcontractors.heading                                                   =  No unmatched subcontractors
 noUnmatchedSubcontractors.p1                                                        =  The subcontractors marked as unmatched in your most recent verification results have been deleted.
 noUnmatchedSubcontractors.p2                                                        =  You can now verify any of your other subcontractors by creating a new verification request.
-noUnmatchedSubcontractors.backTo                                                    =  Back to
+
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
 
 unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  Subcontractor details updated
@@ -496,7 +495,6 @@ unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous               
 unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  Updated
 unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  None provided
 unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  None selected
-unmatched.unmatchedSubcontractorDetailsUpdated.backTo                               =  Back to
 unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  Cannot verify all subcontractors
 unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  Before you go
 unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  Your feedback helps us make our service better.
@@ -505,7 +503,6 @@ unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback        
 unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  Review unmatched subcontractors
 unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  Your subcontractors
 
-info.CheckYourAnswers.backTo                                                        =  Back to
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
 info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Review unmatched subcontractors
 
@@ -528,7 +525,6 @@ insufficientSubcontractorDetailsUpdated.table.hdr.updated                       
 insufficientSubcontractorDetailsUpdated.noneProvided                                =  None provided
 insufficientSubcontractorDetailsUpdated.noneSelected                                =  None selected
 insufficientSubcontractorDetailsUpdated.noName                                      =  No name provided
-insufficientSubcontractorDetailsUpdated.backTo                                      =  Back to
 insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  Before you go
 insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  Your feedback helps us make our service better.
 insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  Take a short survey
@@ -998,7 +994,6 @@ verify.noSubcontractorsAdded.p1                                                 
 verify.noSubcontractorsAdded.p2                                                    =  You will need to
 verify.noSubcontractorsAdded.p2.link                                               =  add some subcontractors first
 verify.noSubcontractorsAdded.p2.end                                                =  before you can create a verification request or monthly return.
-verify.noSubcontractorsAdded.p3                                                    =  Back to
 verify.noSubcontractorsAdded.p3.link                                               =  Manage your subcontractors
 
 verify.contractorEmailConfirmationStored.title                                     =  Do you want an email confirmation of this verification request?
@@ -1029,7 +1024,6 @@ verify.verificationRequestInProgress.p1                                         
 verify.verificationRequestInProgress.p2                                            =  You must wait for this response before you can verify any more subcontractors.
 verify.verificationRequestInProgress.p3.link                                       =  Contact HMRC
 verify.verificationRequestInProgress.p3                                            =  if you have any questions about this verification request.
-verify.verificationRequestInProgress.p4                                            =  Back to
 verify.verificationRequestInProgress.p4.link                                       =  Manage your subcontractors
 
 verify.selectSubcontractorsToReverify.title                                        =  Which subcontractors do you want to reverify?
@@ -1086,7 +1080,6 @@ verify.reviewUnmatched.actions                                                  
 verify.reviewUnmatched.action.edit                                                 =  Edit
 verify.reviewUnmatched.action.proceed                                              =  Proceed
 verify.reviewUnmatched.action.remove                                               =  Remove
-verify.reviewUnmatched.backToResults.prefix                                        =  Back to
 verify.reviewUnmatched.backToResults.link                                          =  Verification results
 
 verify.selectSubcontractor.title                                                   =  Which subcontractors do you want to verify?
@@ -1125,7 +1118,6 @@ verify.verifyDepartmentalError.heading                                          
 verify.verifyDepartmentalError.p1                                                  =  The subcontractors that you selected have not been verified and your request has not been saved.
 verify.verifyDepartmentalError.contactHMRC.p1                                      =  for more help quoting error 7912.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Contact HMRC by phone
-verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Back to
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Manage your subcontractors
 
 verify.inactiveSchemeWarning.title                                                 =  Your scheme is not active
@@ -1141,7 +1133,6 @@ verify.verificationNotSubmittedWarning.link1.prefix                             
 verify.verificationNotSubmittedWarning.link1.text                                  =  contact HMRC
 verify.verificationNotSubmittedWarning.link1.suffix                                =  for more help.
 verify.verificationNotSubmittedWarning.link2.text                                  =  Manage your subcontractors
-verify.verificationNotSubmittedWarning.link2.prefix                                =  Back to
 
 verify.noSubcontractorsSelectedWarning.title                                       =  Select at least one subcontractor
 verify.noSubcontractorsSelectedWarning.heading                                     =  Your verification request cannot be submitted
@@ -1165,7 +1156,6 @@ verify.verificationRequestSubmitted.needHelp.subHeading                         
 verify.verificationRequestSubmitted.needHelp.contactHMRC.link                      =  contact HMRC
 verify.verificationRequestSubmitted.needHelp.p1                                    =  For any questions about your verification request,
 verify.verificationRequestSubmitted.needHelp.p2                                    =  You will need the reference number of this verification request.
-verify.verificationRequestSubmitted.needHelp.p3                                    =  Back to
 verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link             =  Manage your subcontractors
 verify.verificationRequestSubmitted.feedback.subHeading                            =  Before you go
 verify.verificationRequestSubmitted.feedback.p1                                    =  Your feedback helps us make our service better.
@@ -1177,7 +1167,6 @@ verify.verifySendError.heading                                                  
 verify.verifySendError.p1                                                          =  Your verification request has been sent, but HMRC has not received it yet.
 verify.verifySendError.verificationHistory.p1                                      =  When it has been received, you’ll find it in your
 verify.verifySendError.verificationHistory.p1.link                                 =  verification history
-verify.verifySendError.manageSubcontractors.p1                                     =  Back to
 verify.verifySendError.manageSubcontractors.p1.link                                =  Manage your subcontractors
 
 verify.verifyCheckYourAnswers.title                                                =  Check your answers before submitting your verification request
@@ -1190,7 +1179,6 @@ verify.noName                                                                   
 verify.noVerificationResults.title                                                 =  No verification results
 verify.noVerificationResults.heading                                               =  Verification results
 verify.noVerificationResults.p                                                     =  You do not have any verification results to show at the moment.
-verify.noVerificationResults.backTo                                                =  Back to
 verify.noVerificationResults.manageYourSubcontractors.link                         =  Manage your subcontractors
 
 verify.verificationResults.title                                                   =  Verification results
@@ -1201,7 +1189,6 @@ verify.verificationResults.status                                               
 verify.verificationResults.taxTreatment                                            =  Tax treatment
 verify.verificationResults.verificationNumber                                      =  Verification number
 verify.verificationResults.reviewUnmatchedSubcontractors.button                    =  Review unmatched subcontractors
-verify.verificationResults.backTo                                                  =  Back to
 verify.verificationResults.manageYourSubcontractors.link                           =  Manage your subcontractors
 verify.verificationResults.status.matched                                          =  Verified
 verify.verificationResults.status.unmatched                                        =  Unmatched
@@ -1213,7 +1200,6 @@ verify.verifyDepartmentalErrorSubmitAgainController.title                       
 verify.verifyDepartmentalErrorSubmitAgainController.heading                        =  There was a problem with your verification request
 verify.verifyDepartmentalErrorSubmitAgainController.p1                             =  The subcontractors that you selected have not been verified and your request has not been saved.
 verify.verifyDepartmentalErrorSubmitAgainController.p2                             =  To verify these subcontractors, you need to start again with a new verification request.
-verify.verifyDepartmentalErrorSubmitAgainController.backTo                         =  Back to
 verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link  =  Manage your subcontractors
 
 # Contractor Details

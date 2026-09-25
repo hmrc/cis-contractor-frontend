@@ -68,7 +68,7 @@ class VerifyDepartmentalErrorViewSpec extends AnyWordSpec with Matchers with Gui
       val manageText: String = manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.verifyDepartmentalError.manageSubcontractors.p1")
+        messages("site.backTo")
       )
 
       manageText.trim.endsWith(".") mustBe true

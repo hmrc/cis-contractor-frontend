@@ -2,6 +2,7 @@
 service.name                                            =  Cynllun y Diwydiant Adeiladu
 
 site.back                                               =  Yn ôl
+site.backTo                                             =  Yn ôl i
 site.remove                                             =  Dileu
 site.change                                             =  Newid
 site.no                                                 =  Na
@@ -59,7 +60,6 @@ journeyRecovery.startAgain.guidance.p1                  =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.startAgain.guidance.p2                  =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.startAgain.guidance.contactHMRC.link    =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.cisAccount.prefix   =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.startAgain.guidance.cisAccount.link     =  xxxxxxxxxxxxxxxxxxxx
 
 signedOut.title                                         =  xxxxxxxxxxxxxxxxxxxx
@@ -131,7 +131,6 @@ amendConfirmation.updatesMade.h2                                                
 amendConfirmation.table.hdr.previous                                                =  Blaenorol
 amendConfirmation.table.hdr.updated                                                 =  Wedi’i ddiweddaru
 amendConfirmation.table.hdr.details                                                 =  Manylion
-amendConfirmation.backTo                                                            =  Yn ôl i
 amendConfirmation.yourSubcontractors                                                =  Eich is-gontractwyr
 amendConfirmation.beforeYouGo.h2                                                    =  Cyn i chi fynd
 amendConfirmation.beforeYouGo.p1                                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
@@ -463,7 +462,6 @@ unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous               
 unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  xxxxxxxxxxxxxxxxxxxx
-unmatched.unmatchedSubcontractorDetailsUpdated.backTo                               =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  xxxxxxxxxxxxxxxxxxxx
 unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  xxxxxxxxxxxxxxxxxxxx
@@ -481,7 +479,6 @@ insufficientSubcontractorDetailsUpdated.table.hdr.updated                       
 insufficientSubcontractorDetailsUpdated.noneProvided                                =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.noneSelected                                =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.noName                                      =  xxxxxxxxxxxxxxxxxxxx
-insufficientSubcontractorDetailsUpdated.backTo                                      =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  xxxxxxxxxxxxxxxxxxxx
 insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  xxxxxxxxxxxxxxxxxxxx
@@ -504,7 +501,6 @@ noUnmatchedSubcontractors.title                                                 
 noUnmatchedSubcontractors.heading                                                   =  Dim is-gontractwyr sydd heb eu paru
 noUnmatchedSubcontractors.p1                                                        =  Mae’r is-gontractwyr sydd wedi cael eu nodi fel rhai sydd heb eu paru yn eich canlyniadau dilysu diweddaraf wedi cael eu dileu.
 noUnmatchedSubcontractors.p2                                                        =  Gallwch nawr ddilysu unrhyw un o’ch is-gontractwyr eraill drwy greu cais newydd am ddilysiad.
-noUnmatchedSubcontractors.backTo                                                    =  Yn ôl i
 noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Rheoli’ch is-gontractwyr
 
 unmatched.removeSubcontractorVerifyRequest.title                                    =  A ydych yn siŵr eich bod am ddileu’r is-gontractwr hwn o’r cais hwn am ddilysiad?
@@ -516,7 +512,6 @@ unmatched.proceedSubcontractorVerifyRequest.heading                             
 unmatched.proceedSubcontractorVerifyRequest.p1                                      =  Bydd hyn yn rhoi’r driniaeth dreth ar y gyfradd uwch i’r is-gontractwr hwn.
 unmatched.proceedSubcontractorVerifyRequest.error.required                          =  Dewiswch ‘Iawn’ os ydych chi am barhau i ddilysu’r is-gontractwr hwn
 
-info.CheckYourAnswers.backTo                                                        =  Yn ôl i
 info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Ni ellir dilysu pob is-gontractwr.
 info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Adolygiad o is-gontractwyr sydd heb eu paru
 
@@ -969,7 +964,6 @@ verify.verificationRequestInProgress.p1                                         
 verify.verificationRequestInProgress.p2                                            =  Mae’n rhaid i chi aros am yr ymateb hwn cyn i chi allu dilysu rhagor o is-gontractwyr.
 verify.verificationRequestInProgress.p3.link                                       =  Cysylltwch â CThEF
 verify.verificationRequestInProgress.p3                                            =  os oes gennych unrhyw gwestiynau am y cais dilysu hwn.
-verify.verificationRequestInProgress.p4                                            =  Yn ôl i
 verify.verificationRequestInProgress.p4.link                                       =  Rheoli’ch is-gontractwyr
 
 verify.inactiveSchemeWarning.title                                                 =  Nid yw’ch cynllun yn weithredol
@@ -1034,7 +1028,6 @@ verify.verifySendError.heading                                                  
 verify.verifySendError.p1                                                          =  Mae’ch cais dilysu wedi’i anfon, ond nid yw wedi dod i law CThEF eto.
 verify.verifySendError.verificationHistory.p1                                      =  Pan fydd CThEF wedi cael eich cais, byddwch yn gallu ei weld yn eich
 verify.verifySendError.verificationHistory.p1.link                                 =  hanes dilysu
-verify.verifySendError.manageSubcontractors.p1                                     =  Yn ôl i
 verify.verifySendError.manageSubcontractors.p1.link                                =  Rheoli’ch is-gontractwyr
 
 verify.verifyDepartmentalError.title                                               =  Mae problem gyda’ch cais dilysu
@@ -1042,7 +1035,6 @@ verify.verifyDepartmentalError.heading                                          
 verify.verifyDepartmentalError.p1                                                  =  Nid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
 verify.verifyDepartmentalError.contactHMRC.p1                                      =  rhagor o help.
 verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Cysylltwch â CThEF dros y ffôn i gael
-verify.verifyDepartmentalError.manageSubcontractors.p1                             =  Yn ôl i
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Rheoli’ch is-gontractwyr
 
 verify.verificationNotSubmittedWarning.title                                       =  Nid oes modd cyflwyno’ch cais dilysu
@@ -1051,7 +1043,6 @@ verify.verificationNotSubmittedWarning.link1.prefix                             
 verify.verificationNotSubmittedWarning.link1.text                                  =  gysylltu â CThEF
 verify.verificationNotSubmittedWarning.link1.suffix                                =  i gael rhagor o help.
 verify.verificationNotSubmittedWarning.link2.text                                  =  Rheoli’ch is-gontractwyr
-verify.verificationNotSubmittedWarning.link2.prefix                                =  Yn ôl i
 
 verify.selectSubcontractor.title                                                   =  Pa is-gontractwyr ydych am eu dilysu?
 verify.selectSubcontractor.heading                                                 =  Pa is-gontractwyr ydych am eu dilysu?
@@ -1110,7 +1101,6 @@ verify.noSubcontractorsAdded.p1                                                 
 verify.noSubcontractorsAdded.p2                                                    =  Bydd angen i chi
 verify.noSubcontractorsAdded.p2.link                                               =  ychwanegu is-gontractwyr yn gyntaf
 verify.noSubcontractorsAdded.p2.end                                                =  cyn y gallwch greu cais dilysu neu ddatganiad misol.
-verify.noSubcontractorsAdded.p3                                                    =  Yn ôl i
 verify.noSubcontractorsAdded.p3.link                                               =  Rheoli’ch is-gontractwyr
 
 verify.verificationRequestSubmitted.title                                          =  Cyflwyno cais dilysu
@@ -1129,7 +1119,6 @@ verify.verificationRequestSubmitted.needHelp.subHeading                         
 verify.verificationRequestSubmitted.needHelp.contactHMRC.link                      =  cysylltwch â CThEF.
 verify.verificationRequestSubmitted.needHelp.p1                                    =  Os oes gennych unrhyw gwestiynau am eich cais dilysu,
 verify.verificationRequestSubmitted.needHelp.p2                                    =  Bydd angen cyfeirnod y cais dilysu arnoch.
-verify.verificationRequestSubmitted.needHelp.p3                                    =  Yn ôl i
 verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link             =  Rheoli’ch is-gontractwyr
 verify.verificationRequestSubmitted.feedback.subHeading                            =  Cyn i chi fynd
 verify.verificationRequestSubmitted.feedback.p1                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
@@ -1139,14 +1128,12 @@ verify.verificationRequestSubmitted.feedback.survey.link                        
 verify.noVerificationResults.title                                                 =  Dim canlyniadau dilysu
 verify.noVerificationResults.heading                                               =  Canlyniadau dilysu
 verify.noVerificationResults.p                                                     =  Nid oes gennych unrhyw ganlyniadau dilysu i’w dangos ar hyn o bryd.
-verify.noVerificationResults.backTo                                                =  Yn ôl i
 verify.noVerificationResults.manageYourSubcontractors.link                         =  Rheoli’ch is-gontractwyr
 
 verify.verifyDepartmentalErrorSubmitAgainController.title                          =  Mae problem gyda’ch cais dilysu
 verify.verifyDepartmentalErrorSubmitAgainController.heading                        =  Mae problem gyda’ch cais dilysu
 verify.verifyDepartmentalErrorSubmitAgainController.p1                             =  Nid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
 verify.verifyDepartmentalErrorSubmitAgainController.p2                             =  I ddilysu’r is-gontractwyr hyn, mae angen i chi ddechrau eto gyda chais dilysu newydd.
-verify.verifyDepartmentalErrorSubmitAgainController.backTo                         =  Yn ôl i
 verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link  =  Rheoli’ch is-gontractwyr
 
 verify.noName                                                                      =  xxxxxxxxxxxxxxxxxxxx
@@ -1177,7 +1164,6 @@ verify.verificationResults.status                                               
 verify.verificationResults.taxTreatment                                            =  Triniaeth o ran treth
 verify.verificationResults.verificationNumber                                      =  Rhif dilysu
 verify.verificationResults.reviewUnmatchedSubcontractors.button                    =  Adolygiad o is-gontractwyr sydd heb eu paru
-verify.verificationResults.backTo                                                  =  Yn ôl i
 verify.verificationResults.manageYourSubcontractors.link                           =  Yn ôl i Rheoli’ch is-gontractwyr
 verify.verificationResults.status.matched                                          =  xxxxxxxxxxxxxxxxxxxx
 verify.verificationResults.status.unmatched                                        =  xxxxxxxxxxxxxxxxxxxx
@@ -1202,7 +1188,6 @@ verify.reviewUnmatched.actions                                                  
 verify.reviewUnmatched.action.edit                                                 =  Golygu
 verify.reviewUnmatched.action.proceed                                              =  Parhau
 verify.reviewUnmatched.action.remove                                               =  Dileu
-verify.reviewUnmatched.backToResults.prefix                                        =  Yn ôl i
 verify.reviewUnmatched.backToResults.link                                          =  Ganlyniadau dilysu
 
 # Contractor Details
