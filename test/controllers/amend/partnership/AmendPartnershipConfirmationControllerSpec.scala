@@ -97,7 +97,7 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
       verificationNumber = None
     )
 
-  private def userAnswersWithOriginal: UserAnswers =
+  private def userAnswersWithOriginal =
     emptyUserAnswers
       .set(OriginalPartnershipAnswersQuery, original)
       .success
@@ -204,9 +204,6 @@ class AmendPartnershipConfirmationControllerSpec extends SpecBase with MockitoSu
           .success
           .value
           .set(PartnershipNamePage, partnershipName)
-          .success
-          .value
-          .set(AmendCheckYourAnswersSubmittedPage, true)
           .success
           .value
 

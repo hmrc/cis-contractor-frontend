@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
 import models.amend.AmendJourneyType
-import models.info.{CheckYourAnswersValidation, IndividualAnswers}
+import models.info.IndividualAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -48,7 +48,7 @@ class IndividualCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(IndividualAnswersQuery) match {
 
-        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
+        case Some(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
