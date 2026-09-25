@@ -137,16 +137,14 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         Jsoup.parse(html.toString())
 
       val surveyLink =
-        doc.select("a[href='#']").last()
+        doc.select("a:contains(Take a short survey)").last()
 
       surveyLink.text() mustBe
         messages(
           "amendConfirmation.beforeYouGo.takeAShortSurvey"
         )
 
-      surveyLink.attr("href") mustBe "#"
-      surveyLink.attr("target") mustBe "_blank"
-      surveyLink.attr("rel") mustBe "noopener noreferrer"
+      surveyLink.attr("href") mustBe appConfig.feedbackUrl
     }
 
     "hide the before you go section for insufficient info journey" in new Setup {
