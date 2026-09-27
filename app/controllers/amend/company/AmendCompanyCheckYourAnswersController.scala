@@ -67,10 +67,10 @@ class AmendCompanyCheckYourAnswersController @Inject() (
     implicit request =>
       val ua = request.userAnswers
 
-      ValidatedCompany.build(ua) match {
+      ValidatedCompany.buildForAmend(ua) match {
         case Right(_) =>
           val isVerified  = AmendControllerUtils.isVerifiedForAmendJourney(ua)
-          val companyName = ua.get(CompanyNamePage).getOrElse("")
+          val companyName = ua.get(CompanyNamePage).getOrElse(Messages("verify.noName"))
 
           val subcontractorInformationList =
             SummaryListViewModel(rows = subcontractorInformationRows(ua, isVerified).flatten)
@@ -169,7 +169,7 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
   def onSubmit(subbieResourceRef: Long = -1L): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen cisIdRequiredAction).async { implicit request =>
-      ValidatedCompany.build(request.userAnswers) match {
+      ValidatedCompany.buildForAmend(request.userAnswers) match {
 
         case Left(error) =>
           logger.error(

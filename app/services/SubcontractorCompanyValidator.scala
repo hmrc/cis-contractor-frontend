@@ -17,6 +17,8 @@
 package services
 
 import models.SubcontractorCurrentVerification
+import models.TypeOfSubcontractor
+import models.TypeOfSubcontractor.Limitedcompany
 import models.validation.SubcontractorValidationFailure
 import utils.CompanyValidator
 
@@ -28,18 +30,25 @@ class SubcontractorCompanyValidator {
   def validate(
     subcontractors: Seq[SubcontractorCurrentVerification]
   ): List[SubcontractorValidationFailure] =
-    subcontractors.toList.flatMap { subcontractor =>
-      val failedFields =
-        CompanyValidator.validate(
-          subcontractorToValidate = subcontractor,
-          allSubcontractors = subcontractors
-        )
+    subcontractors.toList
+      .filter(isCompany)
+      .flatMap { subcontractor =>
+        val failedFields =
+          CompanyValidator.validate(
+            subcontractorToValidate = subcontractor,
+            allSubcontractors = subcontractors
+          )
 
-      Option.when(failedFields.nonEmpty) {
-        SubcontractorValidationFailure(
-          subcontractorId = subcontractor.subcontractorId,
-          failedFields = failedFields
-        )
+        Option.when(failedFields.nonEmpty) {
+          SubcontractorValidationFailure(
+            subcontractorId = subcontractor.subcontractorId,
+            failedFields = failedFields
+          )
+        }
       }
-    }
+
+  private def isCompany(subcontractor: SubcontractorCurrentVerification): Boolean =
+    subcontractor.subcontractorType
+      .flatMap(TypeOfSubcontractor.fromString)
+      .contains(Limitedcompany)
 }

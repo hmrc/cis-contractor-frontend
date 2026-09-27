@@ -64,7 +64,7 @@ class WorksReferenceNumberController @Inject() (
       val yesOrNoPageOption = request.userAnswers.get(WorksReferenceNumberYesNoPage)
 
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, mode)
         .fold(recoveryRedirect) { subcontractorName =>
           val result = Ok(view(preparedForm, mode, subcontractorName))
           yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
@@ -74,7 +74,7 @@ class WorksReferenceNumberController @Inject() (
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorNameExtractor
-        .getSubcontractorName(request.userAnswers)
+        .getSubcontractorName(request.userAnswers, mode)
         .fold(Future.successful(recoveryRedirect)) { subcontractorName =>
           form
             .bindFromRequest()

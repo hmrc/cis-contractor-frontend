@@ -19,13 +19,14 @@ package controllers.amend.company
 import base.SpecBase
 import models.UserAnswers
 import models.amend.company.OriginalCompanyAnswers
-import pages.add.company.CompanyNamePage
+import pages.add.company.{CompanyNamePage, CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage}
 import pages.amend.AmendCheckYourAnswersSubmittedPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.{CisIdQuery, OriginalCompanyAnswersQuery}
 import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
+
 import scala.concurrent.Future
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -36,10 +37,16 @@ import repositories.SessionRepository
 import config.FrontendAppConfig
 import models.amend.AmendJourneyType
 import pages.amend.AmendJourneyTypePage
+import play.api.i18n.{Messages, MessagesApi}
 import services.VerificationService
 import viewmodels.amend.AmendConfirmationLinks
 
 class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   private val companyName = "Company Ltd"
   private val cisId       = "contractor-123"
@@ -140,6 +147,84 @@ class AmendCompanyConfirmationControllerSpec extends SpecBase with MockitoSugar 
               userAnswersWithOriginal
             )(messages(app)),
             companyName,
+            confirmationLink
+          )(request, messages(app)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET when company name is missing" in {
+
+      val NoNameOriginal =
+        OriginalCompanyAnswers(
+          companyName = None,
+          addressYesNo = None,
+          address = None,
+          companyContactMethodsYesNo = None,
+          companyContactMethod = Set.empty,
+          email = None,
+          phone = None,
+          mobile = None,
+          utrYesNo = None,
+          utr = None,
+          crnYesNo = None,
+          crn = None,
+          worksReferenceYesNo = None,
+          worksReference = None,
+          verificationNumber = None
+        )
+
+      def userAnswersWithNoNameOriginal: UserAnswers =
+        emptyUserAnswers
+          .set(OriginalCompanyAnswersQuery, NoNameOriginal)
+          .success
+          .value
+          .set(CisIdQuery, cisId)
+          .success
+          .value
+          .set(CompanyWorksReferenceYesNoPage, true)
+          .success
+          .value
+          .set(CompanyWorksReferencePage, "123")
+          .success
+          .value
+          .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+          .success
+          .value
+          .set(AmendCheckYourAnswersSubmittedPage, true)
+          .success
+          .value
+
+      val noNameProvided = messages("verify.noName")
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val app = application(userAnswersWithNoNameOriginal)
+
+      running(app) {
+
+        val request = FakeRequest(GET, confirmationRoute)
+        val result  = route(app, request).value
+
+        val view =
+          app.injector.instanceOf[AmendConfirmationView]
+
+        status(result) mustEqual OK
+
+        val confirmationLink =
+          AmendConfirmationLinks.build(
+            AmendJourneyType.Standard,
+            cisId,
+            app.injector.instanceOf[FrontendAppConfig]
+          )
+
+        contentAsString(result) mustEqual
+          view(
+            CompanyAmendConfirmationViewModel.rows(
+              NoNameOriginal,
+              userAnswersWithNoNameOriginal
+            )(messages(app)),
+            noNameProvided,
             confirmationLink
           )(request, messages(app)).toString
       }

@@ -45,7 +45,7 @@ class IndexController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    val userAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+    val userAnswers = UserAnswers(request.userId)
 
     withAgentClientChecks(request.userId, request.isAgent, userAnswers)
       .map {

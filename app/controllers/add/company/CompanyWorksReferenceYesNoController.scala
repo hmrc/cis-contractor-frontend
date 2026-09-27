@@ -20,11 +20,12 @@ import controllers.actions.*
 import forms.add.company.CompanyWorksReferenceYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyNamePage, CompanyWorksReferenceYesNoPage}
+import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyWorksReferenceYesNoView
 
 import javax.inject.Inject
@@ -38,6 +39,7 @@ class CompanyWorksReferenceYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyWorksReferenceYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyWorksReferenceYesNoView
 )(implicit ec: ExecutionContext)
@@ -47,8 +49,8 @@ class CompanyWorksReferenceYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyWorksReferenceYesNoPage) match {
           case None        => form
@@ -62,8 +64,8 @@ class CompanyWorksReferenceYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()

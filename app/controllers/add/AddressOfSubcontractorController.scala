@@ -19,9 +19,9 @@ package controllers.add
 import controllers.actions.*
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
-import models.{Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
@@ -47,17 +47,24 @@ class AddressOfSubcontractorController @Inject() (
 
   override protected def addressPage: Settable[Address] = AddressOfSubcontractorPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
-    subcontractorNameExtractor.getSubcontractorName(userAnswers)
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
+    subcontractorNameExtractor.getSubcontractorName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.AddressOfSubcontractorController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.AddressOfSubcontractorController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoad()
@@ -68,7 +75,7 @@ class AddressOfSubcontractorController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.AddressOfSubcontractorController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 }

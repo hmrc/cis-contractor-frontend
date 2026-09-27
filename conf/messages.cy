@@ -17,6 +17,7 @@ site.unknown                                            =  Anhysbys
 site.pagination.previous                                =  Blaenorol
 site.pagination.next                                    =  Nesaf
 site.pagination.landmark                                =  Rhifo tudalennau
+site.pagination.pageTitle                               =  xxxxxxxxxxxxxxxxxxxx
 
 date.day                                                =  Diwrnod
 date.month                                              =  Mis

@@ -18,15 +18,16 @@ package controllers.add.company
 
 import controllers.actions.*
 import controllers.add.AddressLookupJourneyController
-import models.{Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.companyQuestionsAddress
-import pages.add.company.{CompanyAddressPage, CompanyNamePage}
-import play.api.i18n.MessagesApi
+import pages.add.company.CompanyAddressPage
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.{AddressLookupAmendReturnQuery, Settable}
 import repositories.SessionRepository
 import services.AddressLookupService
+import utils.SubcontractorNameExtractor
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,6 +39,7 @@ class CompanyAddressController @Inject() (
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
   override protected val addressLookupService: AddressLookupService,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
     extends AddressLookupJourneyController {
@@ -46,17 +48,25 @@ class CompanyAddressController @Inject() (
 
   override protected def addressPage: Settable[Address] = CompanyAddressPage
 
-  override protected def subcontractorName(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(CompanyNamePage)
+  override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
+    messages: Messages
+  ): Option[String] =
+    subcontractorNameExtractor
+      .getCompanyName(userAnswers, mode)
 
-  override protected def standardCallback: Call =
-    routes.CompanyAddressController.addressLookupCallback()
+  override protected def standardCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallback(id = "", mode = mode)
 
-  override protected def changeCallback: Call =
-    routes.CompanyAddressController.addressLookupCallbackChange()
+  override protected def changeCallback(mode: Mode): Call =
+    routes.CompanyAddressController.addressLookupCallbackChange(id = "", mode = mode)
 
   override protected def onCompletion(mode: Mode): Call =
-    routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoad()
+      case _                   =>
+        routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+    }
 
   override protected def onChangeCompletion(isAmend: Boolean): Call =
     if (isAmend) {
@@ -70,7 +80,7 @@ class CompanyAddressController @Inject() (
       (for {
         ua <- Future.fromTry(request.userAnswers.set(AddressLookupAmendReturnQuery, true))
         _  <- sessionRepository.set(ua)
-      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(Some("change"))))
+      } yield Redirect(routes.CompanyAddressController.redirectToAddressLookup(AmendMode, Some("change"))))
         .recover { case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()) }
     }
 

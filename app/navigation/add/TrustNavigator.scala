@@ -132,9 +132,9 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
           mode,
           ua.get(TrustAddressYesNoPage),
           ua.get(TrustAddressPage).isDefined,
-          onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(),
-          onYesChange =
-            controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(Some(CheckMode.toString)),
+          onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(NormalMode, None),
+          onYesChange = controllers.add.trust.routes.TrustAddressController
+            .redirectToAddressLookup(NormalMode, Some(CheckMode.toString)),
           onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(NormalMode),
           checkYourAnswers = controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
         )

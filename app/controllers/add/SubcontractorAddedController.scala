@@ -18,25 +18,22 @@ package controllers.add
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
-import pages.add.company.CompanyNamePage
 import pages.add.CheckYourAnswersSubmittedPage
+import pages.add.company.CompanyNamePage
 import pages.add.partnership.PartnershipNamePage
 import pages.add.trust.TrustNamePage
-import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import queries.CisIdQuery
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DefaultSubcontractorCleanupService, SubcontractorNameExtractor}
+import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorAddedView
 
-import scala.util.{Failure, Success, Try}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SubcontractorAddedController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,34 +41,31 @@ class SubcontractorAddedController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
-  sessionRepository: SessionRepository,
-  cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorAddedView,
   appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
-  def individualSubcontractorAdded: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def individualSubcontractorAdded: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Individualorsoletrader)
-  }
+    }
 
-  def companySubcontractorAdded: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def companySubcontractorAdded: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Limitedcompany)
-  }
+    }
 
-  def partnershipSubcontractorAdded: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def partnershipSubcontractorAdded: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Partnership)
-  }
+    }
 
-  def trustSubcontractorAdded: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def trustSubcontractorAdded: Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Trust)
-  }
+    }
 
   private def subcontractorAdded(
     subcontractorType: TypeOfSubcontractor
@@ -82,36 +76,47 @@ class SubcontractorAddedController @Inject() (
 
     if (request.userAnswers.get(CheckYourAnswersSubmittedPage).contains(true)) {
 
-      val (name: Option[String], subcontractorTypeTitle: String) = subcontractorType match {
+      val (name, subcontractorTypeTitle) = subcontractorType match {
         case Individualorsoletrader =>
           (
             subcontractorNameExtractor.getSubcontractorName(request.userAnswers),
             Messages("subcontractorAdded.individual")
           )
-        case Limitedcompany         => (request.userAnswers.get(CompanyNamePage), Messages("subcontractorAdded.company"))
-        case Partnership            => (request.userAnswers.get(PartnershipNamePage), Messages("subcontractorAdded.partnership"))
-        case Trust                  => (request.userAnswers.get(TrustNamePage), Messages("subcontractorAdded.trust"))
+
+        case Limitedcompany =>
+          (
+            request.userAnswers.get(CompanyNamePage),
+            Messages("subcontractorAdded.company")
+          )
+
+        case Partnership =>
+          (
+            request.userAnswers.get(PartnershipNamePage),
+            Messages("subcontractorAdded.partnership")
+          )
+
+        case Trust =>
+          (
+            request.userAnswers.get(TrustNamePage),
+            Messages("subcontractorAdded.trust")
+          )
       }
 
-      val cisId: Option[String] = request.userAnswers.get(CisIdQuery)
+      val cisId = request.userAnswers.get(CisIdQuery)
 
       (name, cisId) match {
         case (Some(name), Some(cisId)) =>
-          val manageSubcontractorsUrl        = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-          val cleanedUaTry: Try[UserAnswers] = cleanupService.clean(request.userAnswers)
+          val manageSubcontractorsUrl =
+            s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
-          cleanedUaTry match {
-            case Success(cleanedUa) =>
-              sessionRepository.set(cleanedUa).map { _ =>
-                Ok(view(name, subcontractorTypeTitle, manageSubcontractorsUrl))
-              }
-            case Failure(exception) =>
-              logger.warn(s"Failed to clean user answers: $exception")
-              Future.successful(recoveryRedirect)
-          }
-        case _                         =>
+          Future.successful(
+            Ok(view(name, subcontractorTypeTitle, manageSubcontractorsUrl))
+          )
+
+        case _ =>
           Future.successful(recoveryRedirect)
       }
+
     } else {
       Future.successful(recoveryRedirect)
     }

@@ -19,25 +19,16 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import models.UserAnswers
-import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentCaptor
-import org.scalatestplus.mockito.MockitoSugar
-import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
-import pages.add.{CheckYourAnswersSubmittedPage, SubAddressYesNoPage, TradingNameOfSubcontractorPage}
-import pages.add.partnership.{PartnershipAddressYesNoPage, PartnershipNamePage}
-import pages.add.trust.{TrustAddressYesNoPage, TrustNamePage}
+import pages.add.{CheckYourAnswersSubmittedPage, TradingNameOfSubcontractorPage}
+import pages.add.company.CompanyNamePage
+import pages.add.partnership.PartnershipNamePage
+import pages.add.trust.TrustNamePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
+import queries.CisIdQuery
 import views.html.add.SubcontractorAddedView
 
-import scala.concurrent.Future
-import play.api.inject.bind
-import queries.CisIdQuery
-import utils.DefaultSubcontractorCleanupService
-
-class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
+class SubcontractorAddedControllerSpec extends SpecBase {
 
   private val subcontractorName = "Test subcontractor"
   private val cisId             = "12345"
@@ -45,11 +36,13 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorAddedController.individualSubcontractorAdded" - {
 
     lazy val individualSubcontractorAddedRoute =
-      controllers.add.routes.SubcontractorAddedController.individualSubcontractorAdded().url
+      controllers.add.routes.SubcontractorAddedController
+        .individualSubcontractorAdded()
+        .url
 
-    "must return Ok and the correct view for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(individual) are in ua" in {
+    "must return OK and the correct view for a GET when CheckYourAnswersSubmittedPage is true, and the subcontractor name and CIS ID are present" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
           .success
@@ -61,26 +54,24 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
+        val request =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        val view = application.injector.instanceOf[SubcontractorAddedView]
+        val view =
+          application.injector.instanceOf[SubcontractorAddedView]
 
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.individual")
+        val subcontractorTypeTitle =
+          messages(application)("subcontractorAdded.individual")
 
         val result = route(application, request).value
+
         status(result) mustBe OK
+
         contentAsString(result) mustEqual view(
           subcontractorName,
           subcontractorTypeTitle,
@@ -89,84 +80,12 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
-
-        verify(mockRepo, times(1)).set(any())
       }
     }
 
-    "must clear all subcontractor journey ua (not CisId) for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(individual) are in ua" in {
+    "must return OK when the confirmation page is refreshed" in {
 
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
-          .success
-          .value
-          .set(CisIdQuery, "10")
-          .success
-          .value
-          .set(TradingNameOfSubcontractorPage, subcontractorName)
-          .success
-          .value
-          .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(CompanyAddressYesNoPage, true)
-          .success
-          .value
-          .set(PartnershipAddressYesNoPage, true)
-          .success
-          .value
-          .set(TrustAddressYesNoPage, true)
-          .success
-          .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-
-        val view = application.injector.instanceOf[SubcontractorAddedView]
-
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.individual")
-
-        val result = route(application, request).value
-        status(result) mustBe OK
-        contentAsString(result) mustEqual view(
-          subcontractorName,
-          subcontractorTypeTitle,
-          s"${applicationConfig.manageSubcontractorsUrl}/10"
-        )(
-          request,
-          messages(application)
-        ).toString
-
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
-
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CisIdQuery) mustBe Some("10")
-        savedAnswers.get(TradingNameOfSubcontractorPage) mustBe None
-        savedAnswers.get(SubAddressYesNoPage) mustBe None
-        savedAnswers.get(CompanyAddressYesNoPage) mustBe None
-        savedAnswers.get(PartnershipAddressYesNoPage) mustBe None
-        savedAnswers.get(TrustAddressYesNoPage) mustBe None
-
-        verify(mockRepo, times(1)).set(any())
-      }
-    }
-
-    "must change checkYourAnswersSubmitted in ua to false for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(individual) are in ua" in {
-
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
           .success
@@ -178,64 +97,61 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
+        val firstRequest =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        val result = route(application, request).value
-        status(result) mustBe OK
+        val firstResult =
+          route(application, firstRequest).value
 
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
+        status(firstResult) mustBe OK
 
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CheckYourAnswersSubmittedPage) mustBe Some(false)
+        val refreshRequest =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        verify(mockRepo, times(1)).set(any())
+        val refreshResult =
+          route(application, refreshRequest).value
+
+        status(refreshResult) mustBe OK
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is not in user answers" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is false" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
           .success
@@ -243,65 +159,32 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, false)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockRepo, times(0)).set(any())
-      }
-    }
-
-    "must not clear ua and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(individual) is not in ua " in {
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
+          .set(CisIdQuery, cisId)
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+    "must redirect to JourneyRecovery when the individual subcontractor name is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
-          .set(TradingNameOfSubcontractorPage, subcontractorName)
-          .success
-          .value
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
@@ -309,35 +192,27 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo    = mock[SessionRepository]
-      val mockCleanup = mock[DefaultSubcontractorCleanupService]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockCleanup, times(1)).clean(any())
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+    "must redirect to JourneyRecovery when the CIS ID is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TradingNameOfSubcontractorPage, subcontractorName)
           .success
@@ -346,25 +221,21 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, individualSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, individualSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
@@ -372,11 +243,13 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorAddedController.companySubcontractorAdded" - {
 
     lazy val companySubcontractorAddedRoute =
-      controllers.add.routes.SubcontractorAddedController.companySubcontractorAdded().url
+      controllers.add.routes.SubcontractorAddedController
+        .companySubcontractorAdded()
+        .url
 
-    "must return Ok and the correct view for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(company) are in ua" in {
+    "must return OK and the correct view for a GET when CheckYourAnswersSubmittedPage is true, and the company name and CIS ID are present" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
           .success
@@ -388,26 +261,25 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
+        val request =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        val view = application.injector.instanceOf[SubcontractorAddedView]
+        val view =
+          application.injector.instanceOf[SubcontractorAddedView]
 
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.company")
+        val subcontractorTypeTitle =
+          messages(application)("subcontractorAdded.company")
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
+
         status(result) mustBe OK
+
         contentAsString(result) mustEqual view(
           subcontractorName,
           subcontractorTypeTitle,
@@ -416,84 +288,12 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
-
-        verify(mockRepo, times(1)).set(any())
       }
     }
 
-    "must clear all subcontractor journey ua (not CisId) for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(company) are in ua" in {
+    "must return OK when the confirmation page is refreshed" in {
 
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
-          .success
-          .value
-          .set(CisIdQuery, "10")
-          .success
-          .value
-          .set(CompanyNamePage, subcontractorName)
-          .success
-          .value
-          .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(CompanyAddressYesNoPage, true)
-          .success
-          .value
-          .set(PartnershipAddressYesNoPage, true)
-          .success
-          .value
-          .set(TrustAddressYesNoPage, true)
-          .success
-          .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-
-        val view = application.injector.instanceOf[SubcontractorAddedView]
-
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.company")
-
-        val result = route(application, request).value
-        status(result) mustBe OK
-        contentAsString(result) mustEqual view(
-          subcontractorName,
-          subcontractorTypeTitle,
-          s"${applicationConfig.manageSubcontractorsUrl}/10"
-        )(
-          request,
-          messages(application)
-        ).toString
-
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
-
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CisIdQuery) mustBe Some("10")
-        savedAnswers.get(CompanyNamePage) mustBe None
-        savedAnswers.get(SubAddressYesNoPage) mustBe None
-        savedAnswers.get(CompanyAddressYesNoPage) mustBe None
-        savedAnswers.get(PartnershipAddressYesNoPage) mustBe None
-        savedAnswers.get(TrustAddressYesNoPage) mustBe None
-
-        verify(mockRepo, times(1)).set(any())
-      }
-    }
-
-    "must change checkYourAnswersSubmitted in ua to false for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(company) are in ua" in {
-
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
           .success
@@ -505,64 +305,61 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
+        val firstRequest =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        val result = route(application, request).value
-        status(result) mustBe OK
+        val firstResult =
+          route(application, firstRequest).value
 
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
+        status(firstResult) mustBe OK
 
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CheckYourAnswersSubmittedPage) mustBe Some(false)
+        val refreshRequest =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        verify(mockRepo, times(1)).set(any())
+        val refreshResult =
+          route(application, refreshRequest).value
+
+        status(refreshResult) mustBe OK
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is not in user answers" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is false" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
           .success
@@ -570,65 +367,32 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, false)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockRepo, times(0)).set(any())
-      }
-    }
-
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(company) is not in ua " in {
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
+          .set(CisIdQuery, cisId)
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+    "must redirect to JourneyRecovery when the company name is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
-          .set(CompanyNamePage, subcontractorName)
-          .success
-          .value
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
@@ -636,35 +400,27 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo    = mock[SessionRepository]
-      val mockCleanup = mock[DefaultSubcontractorCleanupService]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockCleanup, times(1)).clean(any())
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+    "must redirect to JourneyRecovery when the CIS ID is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(CompanyNamePage, subcontractorName)
           .success
@@ -673,25 +429,21 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, companySubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, companySubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
@@ -699,11 +451,13 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorAddedController.partnershipSubcontractorAdded" - {
 
     lazy val partnershipSubcontractorAddedRoute =
-      controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAdded().url
+      controllers.add.routes.SubcontractorAddedController
+        .partnershipSubcontractorAdded()
+        .url
 
-    "must return Ok and the correct view for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(partnership) are in ua" in {
+    "must return OK and the correct view for a GET when CheckYourAnswersSubmittedPage is true, and the partnership name and CIS ID are present" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
           .success
@@ -715,26 +469,25 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
+        val request =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        val view = application.injector.instanceOf[SubcontractorAddedView]
+        val view =
+          application.injector.instanceOf[SubcontractorAddedView]
 
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.partnership")
+        val subcontractorTypeTitle =
+          messages(application)("subcontractorAdded.partnership")
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
+
         status(result) mustBe OK
+
         contentAsString(result) mustEqual view(
           subcontractorName,
           subcontractorTypeTitle,
@@ -743,84 +496,12 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
-
-        verify(mockRepo, times(1)).set(any())
       }
     }
 
-    "must clear all subcontractor journey ua (not CisId) for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(partnership) are in ua" in {
+    "must return OK when the confirmation page is refreshed" in {
 
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
-          .success
-          .value
-          .set(CisIdQuery, "10")
-          .success
-          .value
-          .set(PartnershipNamePage, subcontractorName)
-          .success
-          .value
-          .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(CompanyAddressYesNoPage, true)
-          .success
-          .value
-          .set(PartnershipAddressYesNoPage, true)
-          .success
-          .value
-          .set(TrustAddressYesNoPage, true)
-          .success
-          .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-
-        val view = application.injector.instanceOf[SubcontractorAddedView]
-
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.partnership")
-
-        val result = route(application, request).value
-        status(result) mustBe OK
-        contentAsString(result) mustEqual view(
-          subcontractorName,
-          subcontractorTypeTitle,
-          s"${applicationConfig.manageSubcontractorsUrl}/10"
-        )(
-          request,
-          messages(application)
-        ).toString
-
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
-
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CisIdQuery) mustBe Some("10")
-        savedAnswers.get(PartnershipNamePage) mustBe None
-        savedAnswers.get(SubAddressYesNoPage) mustBe None
-        savedAnswers.get(CompanyAddressYesNoPage) mustBe None
-        savedAnswers.get(PartnershipAddressYesNoPage) mustBe None
-        savedAnswers.get(TrustAddressYesNoPage) mustBe None
-
-        verify(mockRepo, times(1)).set(any())
-      }
-    }
-
-    "must change checkYourAnswersSubmitted in ua to false for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(partnership) are in ua" in {
-
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
           .success
@@ -832,64 +513,61 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
+        val firstRequest =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        val result = route(application, request).value
-        status(result) mustBe OK
+        val firstResult =
+          route(application, firstRequest).value
 
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
+        status(firstResult) mustBe OK
 
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CheckYourAnswersSubmittedPage) mustBe Some(false)
+        val refreshRequest =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        verify(mockRepo, times(1)).set(any())
+        val refreshResult =
+          route(application, refreshRequest).value
+
+        status(refreshResult) mustBe OK
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is not in user answers" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is false" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
           .success
@@ -897,65 +575,32 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, false)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockRepo, times(0)).set(any())
-      }
-    }
-
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(partnership) is not in ua " in {
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
+          .set(CisIdQuery, cisId)
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+    "must redirect to JourneyRecovery when the partnership name is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
-          .set(PartnershipNamePage, subcontractorName)
-          .success
-          .value
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
@@ -963,35 +608,27 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo    = mock[SessionRepository]
-      val mockCleanup = mock[DefaultSubcontractorCleanupService]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockCleanup, times(1)).clean(any())
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+    "must redirect to JourneyRecovery when the CIS ID is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, subcontractorName)
           .success
@@ -1000,25 +637,21 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, partnershipSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, partnershipSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
@@ -1026,11 +659,13 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorAddedController.trustSubcontractorAdded" - {
 
     lazy val trustSubcontractorAddedRoute =
-      controllers.add.routes.SubcontractorAddedController.trustSubcontractorAdded().url
+      controllers.add.routes.SubcontractorAddedController
+        .trustSubcontractorAdded()
+        .url
 
-    "must return Ok and the correct view for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(trust) are in ua" in {
+    "must return OK and the correct view for a GET when CheckYourAnswersSubmittedPage is true, and the trust name and CIS ID are present" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TrustNamePage, subcontractorName)
           .success
@@ -1042,26 +677,25 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
+        val request =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        val view = application.injector.instanceOf[SubcontractorAddedView]
+        val view =
+          application.injector.instanceOf[SubcontractorAddedView]
 
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.trust")
+        val subcontractorTypeTitle =
+          messages(application)("subcontractorAdded.trust")
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
+
         status(result) mustBe OK
+
         contentAsString(result) mustEqual view(
           subcontractorName,
           subcontractorTypeTitle,
@@ -1070,84 +704,12 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
-
-        verify(mockRepo, times(1)).set(any())
       }
     }
 
-    "must clear all subcontractor journey ua (not CisId) for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(trust) are in ua" in {
+    "must return OK when the confirmation page is refreshed" in {
 
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
-          .success
-          .value
-          .set(CisIdQuery, "10")
-          .success
-          .value
-          .set(TrustNamePage, subcontractorName)
-          .success
-          .value
-          .set(SubAddressYesNoPage, true)
-          .success
-          .value
-          .set(CompanyAddressYesNoPage, true)
-          .success
-          .value
-          .set(PartnershipAddressYesNoPage, true)
-          .success
-          .value
-          .set(TrustAddressYesNoPage, true)
-          .success
-          .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-
-        val view = application.injector.instanceOf[SubcontractorAddedView]
-
-        val subcontractorTypeTitle = messages(application)("subcontractorAdded.trust")
-
-        val result = route(application, request).value
-        status(result) mustBe OK
-        contentAsString(result) mustEqual view(
-          subcontractorName,
-          subcontractorTypeTitle,
-          s"${applicationConfig.manageSubcontractorsUrl}/10"
-        )(
-          request,
-          messages(application)
-        ).toString
-
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
-
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CisIdQuery) mustBe Some("10")
-        savedAnswers.get(TrustNamePage) mustBe None
-        savedAnswers.get(SubAddressYesNoPage) mustBe None
-        savedAnswers.get(CompanyAddressYesNoPage) mustBe None
-        savedAnswers.get(PartnershipAddressYesNoPage) mustBe None
-        savedAnswers.get(TrustAddressYesNoPage) mustBe None
-
-        verify(mockRepo, times(1)).set(any())
-      }
-    }
-
-    "must change checkYourAnswersSubmitted in ua to false for a GET when CheckYourAnswersSubmittedPage(true) and subcontractorName(trust) are in ua" in {
-
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TrustNamePage, subcontractorName)
           .success
@@ -1159,64 +721,61 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
+        val firstRequest =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        val result = route(application, request).value
-        status(result) mustBe OK
+        val firstResult =
+          route(application, firstRequest).value
 
-        val captor: ArgumentCaptor[models.UserAnswers] = ArgumentCaptor.forClass(classOf[models.UserAnswers])
-        verify(mockRepo, atLeastOnce()).set(captor.capture())
+        status(firstResult) mustBe OK
 
-        val savedAnswers = captor.getValue
-        savedAnswers.get(CheckYourAnswersSubmittedPage) mustBe Some(false)
+        val refreshRequest =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        verify(mockRepo, times(1)).set(any())
+        val refreshResult =
+          route(application, refreshRequest).value
+
+        status(refreshResult) mustBe OK
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage is not in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is not in user answers" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TrustNamePage, subcontractorName)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
+          .set(CisIdQuery, cisId)
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(false) is in ua" in {
-      def ua: UserAnswers =
+    "must redirect to JourneyRecovery when CheckYourAnswersSubmittedPage is false" in {
+
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TrustNamePage, subcontractorName)
           .success
@@ -1224,65 +783,32 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .set(CheckYourAnswersSubmittedPage, false)
           .success
           .value
-
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
-      val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockRepo, times(0)).set(any())
-      }
-    }
-
-    "must not clear user answer and redirect to JourneyRecovery for a GET when CheckYourAnswersSubmittedPage(true) in ua and subcontractorName(trust) is not in ua " in {
-      def ua: UserAnswers =
-        emptyUserAnswers
-          .set(CheckYourAnswersSubmittedPage, true)
+          .set(CisIdQuery, cisId)
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery and not persist when cleanup fails" in {
+    "must redirect to JourneyRecovery when the trust name is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
-          .set(TrustNamePage, subcontractorName)
-          .success
-          .value
           .set(CheckYourAnswersSubmittedPage, true)
           .success
           .value
@@ -1290,34 +816,27 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo    = mock[SessionRepository]
-      val mockCleanup = mock[DefaultSubcontractorCleanupService]
-
-      when(mockCleanup.clean(any())).thenReturn(scala.util.Failure(new RuntimeException("boom")))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanup)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockCleanup, times(1)).clean(any())
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to JourneyRecovery for a GET when CisId is missing" in {
+    "must redirect to JourneyRecovery when the CIS ID is missing" in {
 
-      def ua: UserAnswers =
+      val userAnswers: UserAnswers =
         emptyUserAnswers
           .set(TrustNamePage, subcontractorName)
           .success
@@ -1326,25 +845,21 @@ class SubcontractorAddedControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val mockRepo = mock[SessionRepository]
-
-      when(mockRepo.set(any())).thenReturn(Future.successful(true))
-
       val application =
-        applicationBuilder(userAnswers = Some(ua))
-          .overrides(
-            bind[SessionRepository].toInstance(mockRepo)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, trustSubcontractorAddedRoute)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, trustSubcontractorAddedRoute)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        val result =
+          route(application, request).value
 
-        verify(mockRepo, times(0)).set(any())
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

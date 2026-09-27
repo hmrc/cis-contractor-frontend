@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.add.partnership
 
 import models.info.partnership.PartnershipAnswers
-import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -33,7 +33,8 @@ object PartnershipAddressSummary {
         changeCall = if (mode == AmendMode) {
           controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
         } else {
-          controllers.add.partnership.routes.PartnershipAddressController.redirectToAddressLookup(Some("change"))
+          controllers.add.partnership.routes.PartnershipAddressController
+            .redirectToAddressLookup(NormalMode, Some("change"))
         },
         hiddenTextKey = "partnershipAddress.change.hidden",
         id = "address-of-partnership"

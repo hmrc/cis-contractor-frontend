@@ -17,10 +17,11 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.partnership.{PartnershipAddressYesNoPage, PartnershipNamePage}
+import pages.add.partnership.PartnershipAddressYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -47,8 +48,8 @@ class PartnershipAddressYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(PartnershipNamePage)
+    SubcontractorNameDisplayHelper
+      .getPartnershipDisplayName(request.userAnswers, mode)
       .map { partnershipName =>
         val preparedForm = request.userAnswers.get(PartnershipAddressYesNoPage) match {
           case None        => form
@@ -62,8 +63,8 @@ class PartnershipAddressYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           form
             .bindFromRequest()
