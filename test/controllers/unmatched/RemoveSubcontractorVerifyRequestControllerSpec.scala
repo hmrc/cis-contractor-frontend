@@ -23,7 +23,7 @@ import controllers.unmatched.routes as unmatchedRoutes
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
 import models.{SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.unmatched.RemoveSubcontractorVerifyRequestPage

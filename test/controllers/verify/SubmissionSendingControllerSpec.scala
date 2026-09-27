@@ -33,7 +33,6 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 

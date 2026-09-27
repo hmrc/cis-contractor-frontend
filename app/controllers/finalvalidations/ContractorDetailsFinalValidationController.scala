@@ -19,6 +19,7 @@ package controllers.finalvalidations
 import config.FrontendAppConfig
 import controllers.AgentClientChecks
 import controllers.actions.*
+import models.NormalMode
 import models.UserAnswers
 import models.contractordetails.ContractorDetailsValidationTarget
 import models.contractordetails.ContractorDetailsValidationTarget.*
@@ -129,19 +130,25 @@ class ContractorDetailsFinalValidationController @Inject() (
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.utr",
           statusKey = statusKey(validation.utrComplete),
-          href = Option.when(!validation.utrComplete)("/contractor-details/enter-contractors-utr"),
+          href = Option.when(!validation.utrComplete)(
+            controllers.contractordetails.routes.ContractorUtrController.onPageLoad(NormalMode).url
+          ),
           id = "contractor-utr"
         ),
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.schemeName",
           statusKey = statusKey(validation.schemeNameComplete),
-          href = Option.when(!validation.schemeNameComplete)("/contractor-details/enter-contractors-scheme-name"),
+          href = Option.when(!validation.schemeNameComplete)(
+            "/construction-industry-scheme/contractor-details/enter-contractors-scheme-name"
+          ),
           id = "scheme-name"
         ),
         ContractorDetailsTaskViewModel(
           titleKey = "finalValidations.reviewContractorDetails.task.email",
           statusKey = statusKey(validation.emailComplete),
-          href = Option.when(!validation.emailComplete)("/contractor-details/enter-contractors-email"),
+          href = Option.when(!validation.emailComplete)(
+            controllers.contractordetails.routes.EnterContractorEmailAddressController.onPageLoad(NormalMode).url
+          ),
           id = "contractor-email"
         )
       ),

@@ -17,12 +17,14 @@
 package controllers
 
 import base.SpecBase
+import models.TypeOfSubcontractor.Individualorsoletrader
 import models.UserAnswers
 import models.agent.AgentClientData
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -316,6 +318,80 @@ class IndexControllerSpec extends SpecBase {
 
       verifyNoMoreInteractions(mockCisManagerService)
       verifyNoMoreInteractions(mockSessionRepository)
+    }
+
+    "must not carry over session data from a prior view flow when user is an Org user" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val viewFlowAnswers                 = emptyUserAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader).success.value
+      val updatedUserAnswers: UserAnswers = emptyUserAnswers
+
+      when(mockCisManagerService.ensureCisIdInUserAnswers(any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(updatedUserAnswers))
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(
+        userAnswers = Some(viewFlowAnswers),
+        hasAgentRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        val result  = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+      }
+
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockCisManagerService).ensureCisIdInUserAnswers(captor.capture())(any[HeaderCarrier])
+      captor.getValue.get(TypeOfSubcontractorPage) mustBe None
+    }
+
+    "must not carry over session data from a prior view flow when user is an Agent" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockCisManagerService = mock[CisManageService]
+
+      val uniqueId        = "unique-id-123"
+      val ton             = "taxOfficeNumber"
+      val tor             = "taxOfficeReference"
+      val viewFlowAnswers = emptyUserAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader).success.value
+
+      when(mockCisManagerService.getAgentClient(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            Some(
+              AgentClientData(uniqueId = uniqueId, taxOfficeNumber = ton, taxOfficeReference = tor, schemeName = None)
+            )
+          )
+        )
+      when(mockCisManagerService.hasClient(eqTo(ton.trim), eqTo(tor.trim))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(
+        userAnswers = Some(viewFlowAnswers),
+        isAgent = true,
+        hasEmployeeRef = false
+      ).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[CisManageService].toInstance(mockCisManagerService)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        val result  = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+      }
+
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(mockSessionRepository, times(1)).set(captor.capture())
+      captor.getValue.get(TypeOfSubcontractorPage) mustBe None
+      captor.getValue.get(CisIdQuery).value mustEqual uniqueId
     }
   }
 }

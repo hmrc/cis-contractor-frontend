@@ -19,7 +19,7 @@ package controllers.add
 import controllers.actions.*
 import controllers.routes
 import forms.add.IndividualEmailAddressFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
 import pages.add.{IndividualContactMethodOptionsPage, IndividualEmailAddressPage}
@@ -55,29 +55,40 @@ class IndividualEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
-      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
 
-      (subcontractorName, contactOption) match {
-        case (Some(subcontractorName), Some(options)) if options.contains(ContactMethodOptions.Email) =>
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (subcontractorName, emailIsAvailable) match {
+        case (Some(subcontractorName), true) =>
           val preparedForm = request.userAnswers.get(IndividualEmailAddressPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, subcontractorName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.routes.IndividualContactMethodOptionsController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption     = request.userAnswers.get(IndividualContactMethodOptionsPage)
+      val subcontractorName = subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode)
+
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
+
       (for {
-        subcontractorName <- subcontractorNameExtractor.getSubcontractorName(request.userAnswers)
-        contactMethods    <- request.userAnswers.get(IndividualContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Email)
+        subcontractorName <- subcontractorName
+        if emailIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

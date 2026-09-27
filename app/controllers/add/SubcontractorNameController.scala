@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.SubcontractorNameFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.add.IndividualNamesOptions.SubcontractorName
 import models.add.SubcontractorName.format
 import navigation.Navigator
@@ -51,20 +51,35 @@ class SubcontractorNameController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
-
-      val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage)
-
-      namesOptions match {
-        case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
-          val preparedForm = request.userAnswers.get(SubcontractorNamePage) match {
-            case Some(subcontractorName) => form.fill(subcontractorName)
-            case None                    => form
-          }
+      mode match {
+        case FinalValidationMode =>
+          val preparedForm =
+            request.userAnswers.get(SubcontractorNamePage) match {
+              case Some(subcontractorName) => form.fill(subcontractorName)
+              case None                    => form
+            }
 
           Ok(view(preparedForm, mode))
 
         case _ =>
-          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode))
+          val namesOptions =
+            request.userAnswers.get(IndividualNamesOptionsPage)
+
+          namesOptions match {
+            case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
+              val preparedForm =
+                request.userAnswers.get(SubcontractorNamePage) match {
+                  case Some(subcontractorName) => form.fill(subcontractorName)
+                  case None                    => form
+                }
+
+              Ok(view(preparedForm, mode))
+
+            case _ =>
+              Redirect(
+                controllers.add.routes.IndividualNamesOptionsController.onPageLoad(mode)
+              )
+          }
       }
     }
 
