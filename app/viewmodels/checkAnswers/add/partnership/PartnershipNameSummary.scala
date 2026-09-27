@@ -16,10 +16,10 @@
 
 package viewmodels.checkAnswers.add.partnership
 
-import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
+import controllers.helpers.SubcontractorNameDisplayHelper
+import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
-import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -28,7 +28,7 @@ import viewmodels.implicits.*
 object PartnershipNameSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNamePage).map { answer =>
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(answers, mode).map { answer =>
       SummaryListRowViewModel(
         key = "partnershipName.checkYourAnswersLabel",
         value = ValueViewModel(answer),

@@ -67,7 +67,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   }
 
   def manageYourSubcontractorsUrl(cisId: String): String =
-    s"$managefrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
+    s"$manageFrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
 
   lazy val loginUrl: String                                  = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String                          = configuration.get[String]("urls.loginContinue")
@@ -78,10 +78,13 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisGeneralEnquiries: String                       = configuration.get[String]("urls.cisGeneralEnquiries")
   lazy val payeCisForAgentsOnlineService: String             = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisReturnDashboardUrl: String                     = configuration.get[String]("urls.cisReturnDashboard")
+  lazy val cisFrontendBaseUrl: String                        = configuration.get[String]("cis-frontend.host")
+  lazy val fileStandardReturnUrl: String                     = configuration.get[String]("urls.fileStandardReturn")
+  lazy val fileNilReturnUrl: String                          = configuration.get[String]("urls.fileNilReturn")
   lazy val findUtr: String                                   = configuration.get[String]("urls.findUtr")
-  lazy val managefrontendBaseUrl: String                     = configuration.get[String]("urls.manageFrontendBaseUrl")
-  lazy val verificationHistoryUrl: String                    = s"$managefrontendBaseUrl/verification-history/retrieve"
-  lazy val retrieveSubcontractorListUrl: String              = s"$managefrontendBaseUrl/subcontractors/retrieve"
+  lazy val manageFrontendBaseUrl: String                     = configuration.get[String]("urls.manageFrontendBaseUrl")
+  lazy val verificationHistoryUrl: String                    = s"$manageFrontendBaseUrl/verify/history/all"
+  lazy val retrieveSubcontractorListUrl: String              = s"$manageFrontendBaseUrl/subcontractors/retrieve"
   lazy val subcontractorVerificationGuideUrl: String         = configuration.get[String]("urls.subcontractorVerificationGuide")
   lazy val contactHMRCUrl: String                            = configuration.get[String]("urls.contactHMRC")
   lazy val constructionIndustryAgentAccountUrl: String       =
@@ -131,6 +134,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
       case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }
+
+  def cisFrontendFinalValidationReturnUrl(handoffId: String): String =
+    s"$cisFrontendFinalValidationReturn/$handoffId"
+
+  lazy val cisFrontendFinalValidationReturn: String =
+    configuration.get[String]("urls.cisFrontendFinalValidationReturn")
 
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", URLEncoder.encode(agentCode, "UTF-8"))}"

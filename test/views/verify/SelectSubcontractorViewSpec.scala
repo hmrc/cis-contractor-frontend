@@ -236,6 +236,55 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__item--current").size mustBe 1
       doc.select(".govuk-pagination__item--current [aria-current=page]").size mustBe 1
     }
+
+    "must include the current page number in the title when there are multiple pages" in new Setup {
+
+      val pagination: PaginationViewModel = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", ""),
+          PaginationItemViewModel("2", ""),
+          PaginationItemViewModel("3", ""),
+          PaginationItemViewModel("4", "").withCurrent(true)
+        )
+      )
+
+      val html: HtmlFormat.Appendable =
+        view(
+          form,
+          mode,
+          checkboxItems,
+          pagination,
+          page = 4,
+          startIndex = 19,
+          totalCount = checkboxItems.size,
+          totalPages = 7
+        )
+
+      val doc: Document = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("verify.selectSubcontractor.title")} ${messages("site.pagination.pageTitle", 4, 7)} - ${messages("service.name")} - ${messages("site.govuk")}"
+    }
+
+    "must not include a page number in the title when there is only one page" in new Setup {
+
+      val html: HtmlFormat.Appendable = view(
+        form,
+        mode,
+        checkboxItems,
+        PaginationViewModel(),
+        page = 1,
+        startIndex = 1,
+        totalCount = checkboxItems.size,
+        totalPages = 1
+      )
+
+      val doc: Document = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("verify.selectSubcontractor.title")} - ${messages("service.name")} - ${messages("site.govuk")}"
+      doc.title must not include messages("site.pagination.pageTitle", 1, 1)
+    }
   }
 
   trait Setup {

@@ -21,14 +21,14 @@ import forms.mappings.Constants.MaxLength35
 import models.{Mode, UserAnswers}
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, Call, Result}
 import queries.Settable
 import repositories.SessionRepository
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-
 import queries.AddressLookupAmendReturnQuery
+
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type (individual, company,
@@ -51,13 +51,13 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
   protected def addressPage: Settable[Address]
 
   /** The subcontractor/company/partnership/trust name shown in the ALF page headings. */
-  protected def subcontractorName(userAnswers: UserAnswers): Option[String]
+  protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String]
 
   /** Callback ALF returns to for the standard (non-change) flow. */
-  protected def standardCallback: Call
+  protected def standardCallback(mode: Mode): Call
 
   /** Callback ALF returns to when amending an existing answer. */
-  protected def changeCallback: Call
+  protected def changeCallback(mode: Mode): Call
 
   /** Where to go after the address is saved in the standard flow. */
   protected def onCompletion(mode: Mode): Call
@@ -78,8 +78,8 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   def redirectToAddressLookup(mode: Mode, changeRoute: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val callback = if (changeRoute.isDefined) changeCallback else standardCallback
-      subcontractorName(request.userAnswers) match {
+      val callback = if (changeRoute.isDefined) changeCallback(mode) else standardCallback(mode)
+      subcontractorName(request.userAnswers, mode) match {
         case Some(name) =>
           addressLookupService
             .getJourneyUrl(

@@ -20,7 +20,7 @@ import base.SpecBase
 import forms.amend.AmendIndividualRemoveDetailYesNoFormProvider
 import models.address.Address
 import models.add.{IndividualNamesOptions, SubcontractorName}
-import models.amend.AmendIndividualRemoveDetail
+import models.amend.{AmendIndividualRemoveDetail, AmendJourneyType}
 import models.UserAnswers
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentCaptor
@@ -28,7 +28,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.*
-import pages.amend.{AmendIndividualRemoveDetailYesNoPage, ShowVerificationDetailsPage}
+import pages.amend.{AmendIndividualRemoveDetailYesNoPage, AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -524,6 +524,98 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
         }
       }
 
+      "must allow access for a GET when subcontractor name is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          emptyUserAnswers
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.TradingName)
+            )
+            .success
+            .value
+            .set(
+              SubcontractorNamePage,
+              SubcontractorName("John", Some("Paul"), "Smith")
+            )
+            .success
+            .value
+            .set(
+              TradingNameOfSubcontractorPage,
+              subcontractorTradingName
+            )
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(
+              AmendJourneyTypePage,
+              AmendJourneyType.InsufficientInfo
+            )
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when subcontractor name is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          emptyUserAnswers
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.TradingName)
+            )
+            .success
+            .value
+            .set(
+              SubcontractorNamePage,
+              SubcontractorName("John", Some("Paul"), "Smith")
+            )
+            .success
+            .value
+            .set(
+              TradingNameOfSubcontractorPage,
+              subcontractorTradingName
+            )
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(
+              AmendJourneyTypePage,
+              AmendJourneyType.UnmatchedInfo
+            )
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
       "must redirect to the next page when valid data with value Yes is submitted" in {
 
         val mockSessionRepository = mock[SessionRepository]
@@ -836,6 +928,80 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
             request,
             messages(application)
           ).toString
+        }
+      }
+
+      "must allow access for a GET when trading name is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          emptyUserAnswers
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName)
+            )
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when trading name is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          emptyUserAnswers
+            .set(
+              IndividualNamesOptionsPage,
+              Set(IndividualNamesOptions.SubcontractorName)
+            )
+            .success
+            .value
+            .set(SubcontractorNamePage, SubcontractorName("John", Some("Paul"), "Smith"))
+            .success
+            .value
+            .set(TradingNameOfSubcontractorPage, subcontractorTradingName)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(GET, removeDetailYesNoRoute)
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual OK
         }
       }
 
@@ -1164,6 +1330,46 @@ class AmendIndividualRemoveDetailYesNoControllerSpec extends SpecBase with Mocki
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in InsufficientInfo amend journey" in {
+
+        val insufficientInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(insufficientInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+        }
+      }
+
+      "must allow access for a GET when subcontractor is verified but in UnmatchedInfo amend journey" in {
+
+        val unmatchedInfoUa =
+          verifiedSubcontractorUa
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(unmatchedInfoUa)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, removeDetailYesNoUtrRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
         }
       }
     }

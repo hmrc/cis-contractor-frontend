@@ -23,6 +23,7 @@ import models.response.SubcontractorResponse
 import models.{TypeOfSubcontractor, UserAnswers}
 import play.api.Logging
 import play.api.mvc.*
+import queries.CisIdQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -43,56 +44,69 @@ class SubcontractorController @Inject() (
     with Logging {
 
   def onPageLoad(
-    cisId: String,
     subbieResourceRef: Long,
     journeyType: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      subcontractorService
-        .getSubcontractor(cisId, subbieResourceRef)
-        .flatMap { response =>
-          response.subcontractor match {
+      val userAnswers = request.userAnswers
 
-            case None =>
-              logger.error(
-                s"[ViewOnlySubcontractorController] No subcontractor returned " +
-                  s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
-              )
+      userAnswers.get(CisIdQuery) match {
 
-              Future.successful(recovery)
+        case None =>
+          logger.error(
+            "[SubcontractorController] CIS ID missing from UserAnswers"
+          )
 
-            case Some(subcontractor) =>
-              subcontractor.subcontractorType
-                .flatMap(TypeOfSubcontractor.fromString)
-                .fold[Future[Result]] {
+          Future.successful(recovery)
 
+        case Some(cisId) =>
+          subcontractorService
+            .getSubcontractor(
+              cisId,
+              subbieResourceRef
+            )
+            .flatMap { response =>
+              response.subcontractor match {
+
+                case None =>
                   logger.error(
-                    s"[ViewOnlySubcontractorController] Unsupported subcontractor type. " +
-                      s"type=${subcontractor.subcontractorType.getOrElse("missing")}, " +
-                      s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+                    s"[SubcontractorController] No subcontractor returned " +
+                      s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
                   )
 
                   Future.successful(recovery)
 
-                } { subcontractorType =>
-                  handleSubcontractor(
-                    subcontractorType = subcontractorType,
-                    userAnswers = request.userAnswers,
-                    subcontractor = subcontractor,
-                    journeyType = journeyType
-                  )
-                }
-          }
-        }
-        .recover { case error =>
-          logger.error(
-            s"[ViewOnlySubcontractorController] Failed to retrieve subcontractor. " +
-              s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
-            error
-          )
+                case Some(subcontractor) =>
+                  subcontractor.subcontractorType
+                    .flatMap(TypeOfSubcontractor.fromString)
+                    .fold[Future[Result]] {
+                      logger.error(
+                        s"[SubcontractorController] Unsupported subcontractor type. " +
+                          s"type=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                          s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+                      )
 
-          recovery
-        }
+                      Future.successful(recovery)
+                    } { subcontractorType =>
+                      handleSubcontractor(
+                        subcontractorType = subcontractorType,
+                        userAnswers = userAnswers,
+                        subcontractor = subcontractor,
+                        journeyType = journeyType
+                      )
+                    }
+              }
+            }
+            .recover { case error =>
+              logger.error(
+                s"[SubcontractorController] Failed to retrieve subcontractor. " +
+                  s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                error
+              )
+
+              recovery
+            }
+      }
     }
 
   private def handleSubcontractor(
@@ -108,7 +122,7 @@ class SubcontractorController @Inject() (
     ).fold(
       error => {
         logger.error(
-          s"[ViewOnlySubcontractorController] Failed to populate ViewOnly UserAnswers " +
+          s"[SubcontractorController] Failed to populate view-only UserAnswers " +
             s"for type=$subcontractorType",
           error
         )
@@ -118,7 +132,23 @@ class SubcontractorController @Inject() (
       updatedAnswers =>
         sessionRepository
           .set(updatedAnswers)
-          .map(_ => Redirect(onwardRoute(subcontractorType, journeyType)))
+          .map { _ =>
+            Redirect(
+              onwardRoute(
+                subcontractorType,
+                journeyType
+              )
+            )
+          }
+          .recover { case error =>
+            logger.error(
+              s"[SubcontractorController] Failed to persist view-only UserAnswers " +
+                s"for type=$subcontractorType, sessionId=${userAnswers.id}",
+              error
+            )
+
+            recovery
+          }
     )
 
   private def populateUserAnswers(

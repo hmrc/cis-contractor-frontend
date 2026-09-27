@@ -21,6 +21,7 @@ import play.api.libs.json.{Json, Writes}
 case class AddressLookupOptionsModel(
   continueUrl: String,
   signOutHref: Option[String] = None,
+  useNewGovUkServiceNavigation: Option[Boolean] = None,
   phaseFeedbackLink: Option[String] = None,
   accessibilityFooterUrl: Option[String] = None,
   deskProServiceName: Option[String] = None,

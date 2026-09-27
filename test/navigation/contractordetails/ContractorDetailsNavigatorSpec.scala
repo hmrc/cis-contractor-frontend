@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.contractordetails.{routes => contractorDetailsRoutes}
 import controllers.routes
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.contractordetails.ContractorDetailsValidationTarget
 import pages.Page
 import pages.contractordetails.*
 
@@ -84,6 +85,17 @@ class ContractorDetailsNavigatorSpec extends SpecBase {
       "must go from EnterContractorEmailAddressPage to check answers" in {
         navigator.nextPage(EnterContractorEmailAddressPage, NormalMode, emptyUserAnswers) mustEqual
           contractorDetailsRoutes.ContractorDetailsCheckAnswersController.onPageLoad()
+      }
+
+      "must go to review contractor details from ContractorUtrPage when final validations are active" in {
+        val userAnswers =
+          emptyUserAnswers
+            .set(ContractorDetailsValidationTargetPage, ContractorDetailsValidationTarget.FileMonthlyReturn)
+            .success
+            .value
+
+        navigator.nextPage(ContractorUtrPage, NormalMode, userAnswers) mustBe
+          controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
       }
     }
 

@@ -180,7 +180,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         content must include("Type")
         content must include("Names")
-        content must include("Subcontractor trading name")
+        content must include("Trading name")
         content must include("Subcontractor name")
         content must include("Add subcontractor address?")
         content must include("Address")

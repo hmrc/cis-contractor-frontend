@@ -30,9 +30,14 @@ object PartnershipHasUtrYesNoSummary {
 
   def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(PartnershipHasUtrYesNoPage).map { answer =>
-      val partnershipName = answers
-        .get(PartnershipNamePage)
-        .getOrElse(throw MissingRequiredAnswer("PartnershipNamePage"))
+      val partnershipName =
+        answers.get(PartnershipNamePage) match {
+          case Some(name)                => name.trim
+          case None if mode == AmendMode =>
+            messages("verify.noName")
+          case None                      =>
+            throw MissingRequiredAnswer("PartnershipNamePage")
+        }
 
       val yesNoText = if (answer) messages("site.yes") else messages("site.no")
 

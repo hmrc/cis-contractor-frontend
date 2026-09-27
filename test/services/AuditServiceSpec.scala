@@ -79,7 +79,7 @@ class AuditServiceSpec
       val result = service.sendEvent(auditEvent).futureValue
 
       result mustBe AuditResult.Success
-      auditEvent.auditType mustBe "authoriseServiceGuardFailure"
+      auditEvent.auditType mustBe "AuthoriseServiceGuardFailure"
     }
   }
 
@@ -96,7 +96,8 @@ class AuditServiceSpec
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
       (detail \ "cisId").toOption mustBe None
-      (detail \ "individualNamesOptions").toOption mustBe None
+      (detail \ "subcontractorNameSelected").toOption mustBe None
+      (detail \ "tradingNameSelected").toOption mustBe None
     }
 
     "must include all fields in the audit event when full individual answers are provided" in {
@@ -172,7 +173,8 @@ class AuditServiceSpec
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
-      (detail \ "individualNamesOptions").as[Seq[String]] mustBe Seq("subcontractorName", "tradingName")
+      (detail \ "subcontractorNameSelected").as[Boolean] mustBe true
+      (detail \ "tradingNameSelected").as[Boolean] mustBe true
       (detail \ "firstName").as[String] mustBe "John"
       (detail \ "middleName").as[String] mustBe "Paul"
       (detail \ "surname").as[String] mustBe "Smith"
@@ -180,7 +182,9 @@ class AuditServiceSpec
       (detail \ "subAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"
       (detail \ "addIndividualContactMethodsYesNo").as[Boolean] mustBe true
-      (detail \ "individualContactMethodOptions").as[Seq[String]] mustBe Seq("email", "phone", "mobile")
+      (detail \ "individualEmailContactMethod").as[Boolean] mustBe true
+      (detail \ "individualPhoneContactMethod").as[Boolean] mustBe true
+      (detail \ "individualMobileContactMethod").as[Boolean] mustBe true
       (detail \ "individualEmailAddress").as[String] mustBe "test@test.com"
       (detail \ "individualPhoneNumber").as[String] mustBe "+447960141611"
       (detail \ "individualMobileNumber").as[String] mustBe "01912170507"

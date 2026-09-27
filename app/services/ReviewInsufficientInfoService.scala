@@ -17,6 +17,7 @@
 package services
 
 import models.TypeOfSubcontractor.*
+import models.amend.AmendJourneyType
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.VerificationBatchReadiness
 import models.{SubcontractorCurrentVerification, TypeOfSubcontractor, VerificationCurrentVerification}
@@ -25,16 +26,15 @@ import play.api.i18n.Messages
 import viewmodels.verify.*
 
 import javax.inject.{Inject, Singleton}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class ReviewInsufficientInfoService @Inject() extends Logging {
 
-  // TODO: replace with real destinations once Edit / Proceed / Remove / view-details actions are built.
-  private val dummyUrl = "#"
-
   def buildViewModel(
     batch: GetCurrentVerificationBatchResponse
-  )(implicit messages: Messages): ReviewInsufficientInfoViewModel = {
+  )(implicit messages: Messages): Try[ReviewInsufficientInfoViewModel] = {
+
     val batchSubs =
       batch.verifications.flatMap { verification =>
         batch.subcontractors
@@ -47,29 +47,63 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
         VerificationBatchReadiness.isSubcontractorReady(sub, Some(verification))
       }
 
-    ReviewInsufficientInfoViewModel(
-      missing = missingSubs.map { case (sub, verification) => toMissingRow(sub, verification) },
-      ready = readySubs.map { case (sub, _) => toReadyRow(sub) }
-    )
+    missingSubs
+      .collectFirst {
+        case (sub, _) if sub.subbieResourceRef.isEmpty =>
+          Failure(
+            new IllegalStateException(
+              s"Missing subbieResourceRef for subcontractorId=${sub.subcontractorId}"
+            )
+          )
+      }
+      .getOrElse {
+        Success(
+          ReviewInsufficientInfoViewModel(
+            missing = missingSubs.map { case (sub, verification) =>
+              toMissingRow(sub, verification)
+            },
+            ready = readySubs.map { case (sub, _) =>
+              toReadyRow(sub)
+            }
+          )
+        )
+      }
   }
 
   private def toMissingRow(
     sub: SubcontractorCurrentVerification,
     verification: VerificationCurrentVerification
   )(implicit messages: Messages): MissingSubcontractorRow = {
+
     val name      = displayName(sub)
     val removeUrl =
       verification.verificationResourceRef
         .map { ref =>
           controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(ref).url
         }
-        .getOrElse(dummyUrl)
+        .getOrElse("#")
 
     MissingSubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url,
+        name
+      ),
       utr = utrDisplay(sub),
-      editLink = LinkViewModel(dummyUrl, name),
+      editLink = LinkViewModel(
+        controllers.amend.routes.AmendSubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url,
+        name
+      ),
       proceedLink = LinkViewModel(
         controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
           .onPageLoad(sub.subcontractorId)
@@ -84,7 +118,15 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
     val name = displayName(sub)
     ReadySubcontractorRow(
       name = name,
-      nameLink = LinkViewModel(dummyUrl, name),
+      nameLink = LinkViewModel(
+        controllers.info.routes.SubcontractorController
+          .onPageLoad(
+            sub.subbieResourceRef.get,
+            AmendJourneyType.InsufficientInfo.routeValue
+          )
+          .url,
+        name
+      ),
       utr = utrDisplay(sub)
     )
   }

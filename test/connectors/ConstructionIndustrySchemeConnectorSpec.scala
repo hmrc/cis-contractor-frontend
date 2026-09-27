@@ -64,7 +64,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           surname = Some("Doe")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -92,7 +92,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           partnerTradingName = Some("Nominated Partner")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -120,7 +120,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           tradingName = Some("Company Name")
         )
 
-      connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+      connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -188,6 +188,90 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
 
       urlCaptor.getValue.toString must include("/cis/verification-batch/newest/INST-123")
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateSchemeVersion" should {
+
+    "POST /cis/scheme/version-update with the request body and return the new version" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+
+      val request  = UpdateSchemeVersionRequest(currentVersion = 3, instanceId = "INST-123")
+      val response = UpdateSchemeVersionResponse(newVersion = 4)
+
+      when(rb.execute[UpdateSchemeVersionResponse](any(), any()))
+        .thenReturn(Future.successful(response))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateSchemeVersion(request).futureValue mustBe response
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateScheme" should {
+
+    val request =
+      UpdateSchemeRequest(
+        schemeId = 1,
+        instanceId = "INST-123",
+        taxOfficeNumber = "123",
+        taxOfficeReference = "AB456",
+        accountsOfficeReference = "AO123",
+        prePopCount = 2,
+        prePopSuccessful = "Y",
+        utr = "1234567890",
+        name = "Scheme name",
+        emailAddress = "test@example.com",
+        version = 4
+      )
+
+    "POST /cis/scheme/update with the request body and return Unit for 204" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any())).thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.updateScheme(request).futureValue mustBe (())
+
+      val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
+      verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "fail with the response body when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+
+      when(http.post(any())(any())).thenReturn(rb)
+      when(rb.withBody(any[JsValue]())(any(), any(), any())).thenReturn(rb)
+      when(rb.execute[HttpResponse](any(), any()))
+        .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "boom")))
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      val ex = connector.updateScheme(request).failed.futureValue
+      ex.getMessage mustBe s"Update scheme failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 
@@ -317,7 +401,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         worksReferenceNumber = Some("WRN-TRUST")
       )
 
-    connector.createAndUpdateSubcontractor(payload).futureValue mustBe (())
+    connector.createAndUpdateSubcontractor(payload).futureValue mustBe ()
 
     val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
     verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -345,7 +429,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         createVerifications = None
       )
 
-      connector.modifyVerificationBatch(req).futureValue mustBe (())
+      connector.modifyVerificationBatch(req).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -371,7 +455,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
         createVerifications = None
       )
 
-      connector.modifyVerificationBatch(req).futureValue mustBe (())
+      connector.modifyVerificationBatch(req).futureValue mustBe ()
     }
 
     "fail when CIS responds with a non-200/204 status" in {
@@ -456,7 +540,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
-      connector.updateSubcontractor(request).futureValue mustBe (())
+      connector.updateSubcontractor(request).futureValue mustBe ()
 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
@@ -476,7 +560,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       val connector = new ConstructionIndustrySchemeConnector(config, http)
 
-      connector.updateSubcontractor(request).futureValue mustBe (())
+      connector.updateSubcontractor(request).futureValue mustBe ()
     }
 
     "fail when CIS responds with a non-200/204 status" in {
@@ -532,6 +616,167 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
       val bodyCaptor: ArgumentCaptor[JsValue] = ArgumentCaptor.forClass(classOf[JsValue])
       verify(rb).withBody(bodyCaptor.capture())(any(), any(), any())
       bodyCaptor.getValue mustBe Json.toJson(req)
+    }
+  }
+
+  "ConstructionIndustrySchemeConnector.updateSubcontractorForEdit" should {
+
+    val request =
+      UpdateSubcontractorForEditRequest(
+        cisId = "INST-123",
+        subcontractor = SubcontractorRequest(
+          subcontractorId = 123L,
+          utr = None,
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = None,
+          nino = None,
+          secondName = None,
+          surname = None,
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = None,
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = None,
+          lastUpdate = None,
+          subbieResourceRef = Some(1001L),
+          matched = None,
+          autoVerified = None,
+          verified = None,
+          verificationNumber = None,
+          taxTreatment = None,
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      )
+
+    "return Unit when CIS responds with NO_CONTENT (204)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(NO_CONTENT, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      connector
+        .updateSubcontractorForEdit(request)
+        .futureValue mustBe (())
+
+      val bodyCaptor =
+        ArgumentCaptor.forClass(classOf[JsValue])
+
+      verify(rb)
+        .withBody(bodyCaptor.capture())(
+          any(),
+          any(),
+          any()
+        )
+
+      bodyCaptor.getValue mustBe Json.toJson(request)
+    }
+
+    "return Unit when CIS responds with OK (200)" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(OK, "")
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      connector
+        .updateSubcontractorForEdit(request)
+        .futureValue mustBe (())
+    }
+
+    "fail when CIS responds with a non-200/204 status" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme"))
+        .thenReturn("http://cis-host")
+
+      when(http.post(any())(any()))
+        .thenReturn(rb)
+
+      when(rb.withBody(any)(any(), any(), any()))
+        .thenReturn(rb)
+
+      when(rb.execute(any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              INTERNAL_SERVER_ERROR,
+              "boom"
+            )
+          )
+        )
+
+      val connector =
+        new ConstructionIndustrySchemeConnector(
+          config,
+          http
+        )
+
+      val ex =
+        connector
+          .updateSubcontractorForEdit(request)
+          .failed
+          .futureValue
+
+      ex.getMessage mustBe
+        s"Update subcontractor for edit failed, returned $INTERNAL_SERVER_ERROR: boom"
     }
   }
 
@@ -790,10 +1035,10 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
           version = Some(1)
         )
 
-      val result =
+      val result: Unit =
         connector.updateContractorDetails(request).futureValue
 
-      result mustBe (())
+      result mustBe ()
 
       val urlCaptor: ArgumentCaptor[URL] =
         ArgumentCaptor.forClass(classOf[URL])
@@ -845,7 +1090,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
 
       connector
         .updateContractorDetails(request)
-        .futureValue mustBe (())
+        .futureValue mustBe ()
     }
 
     "throw an exception when the API returns a non-success status" in {

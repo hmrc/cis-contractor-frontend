@@ -342,4 +342,58 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
       ValidatedCompany.build(ua) mustBe Left(InvalidAnswer(CompanyContactMethodOptionsPage))
     }
   }
+
+  "ValidatedCompany.buildForAmend" - {
+
+    "build successfully with minimum required answers (all optionals No)" in {
+      ValidatedCompany.buildForAmend(minRequired) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully when TrustNamePage is missing, defaulting the name to empty" in {
+      val ua =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage, false)
+          .success
+          .value
+          .set(AddCompanyContactMethodsYesNoPage, false)
+          .success
+          .value
+          .set(CompanyUtrYesNoPage, false)
+          .success
+          .value
+          .set(CompanyCrnYesNoPage, false)
+          .success
+          .value
+          .set(CompanyWorksReferenceYesNoPage, false)
+          .success
+          .value
+
+      ValidatedCompany.buildForAmend(ua) mustBe Right(
+        ValidatedCompany(
+          companyName = "",
+          companyAddress = None,
+          companyContactMethodOptions = None,
+          companyEmail = None,
+          companyPhone = None,
+          companyMobile = None,
+          companyUtr = None,
+          companyCrn = None,
+          companyWorksReferenceNumber = None
+        )
+      )
+    }
+
+    "fail when TypeOfSubcontractor is not Company" in {
+      val ua =
+        minRequired
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+          .success
+          .value
+
+      ValidatedCompany.buildForAmend(ua) mustBe Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+  }
 }

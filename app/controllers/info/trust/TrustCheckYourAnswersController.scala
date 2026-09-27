@@ -68,7 +68,7 @@ class TrustCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.trustName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
                 )
@@ -79,7 +79,7 @@ class TrustCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.trustName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
@@ -172,4 +172,9 @@ class TrustCheckYourAnswersController @Inject() (
         TrustWorksReferenceSummary.row(answers)
       )
   }
+
+  private def displayName(
+    answers: TrustAnswers
+  )(implicit messages: Messages): String =
+    answers.trustName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
 }

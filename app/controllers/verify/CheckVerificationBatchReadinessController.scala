@@ -59,8 +59,7 @@ class CheckVerificationBatchReadinessController @Inject() (
           Redirect(redirect)
 
         case Some(_) =>
-          // TODO(DTR-4685): Route to VF-05 once that page is built; for now redirecting to Journey Recovery
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Redirect(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
 
         case None =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

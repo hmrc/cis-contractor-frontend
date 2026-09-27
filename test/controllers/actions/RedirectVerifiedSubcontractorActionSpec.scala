@@ -18,8 +18,9 @@ package controllers.actions
 
 import base.SpecBase
 import models.UserAnswers
+import models.amend.AmendJourneyType
 import models.requests.DataRequest
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -31,25 +32,57 @@ class RedirectVerifiedSubcontractorActionSpec extends SpecBase {
 
   private class Harness extends RedirectVerifiedSubcontractorActionImpl() {
 
-    def callFilter(ua: UserAnswers): Future[Option[Result]] = {
-      val request = DataRequest(FakeRequest(), "userId", ua)
+    def callFilter(
+      ua: UserAnswers
+    ): Future[Option[Result]] = {
+      val request =
+        DataRequest(
+          FakeRequest(),
+          "userId",
+          ua
+        )
+
       filter(request)
     }
   }
 
   "RedirectVerifiedSubcontractorAction" - {
 
-    "return None ShowVerificationDetailsPage has no answer" in {
-      val action = new Harness()
-      val result = action.callFilter(emptyUserAnswers).futureValue
+    "return None when ShowVerificationDetailsPage has no answer" in {
+
+      val action =
+        new Harness()
+
+      val result =
+        action.callFilter(emptyUserAnswers).futureValue
+
       result mustBe None
     }
 
-    "return None when subcontractor is unverified (ShowVerificationDetailsPage is false)" in {
-      val action      = new Harness()
-      val baseAnswers = emptyUserAnswers.set(ShowVerificationDetailsPage, true).success.value
-      val result      = action.callFilter(baseAnswers).map(_.value)
-      redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+    "return None when subcontractor is unverified in standard amend journey" in {
+
+      val action =
+        new Harness()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.Standard
+          )
+          .success
+          .value
+          .set(
+            ShowVerificationDetailsPage,
+            false
+          )
+          .success
+          .value
+
+      val result =
+        action.callFilter(userAnswers).futureValue
+
+      result mustBe None
     }
 
     "redirect to JourneyRecovery when subcontractor is verified (ShowVerificationDetailsPage is true)" in {
@@ -57,6 +90,58 @@ class RedirectVerifiedSubcontractorActionSpec extends SpecBase {
       val baseAnswers = emptyUserAnswers.set(ShowVerificationDetailsPage, true).success.value
       val result      = action.callFilter(baseAnswers).map(_.value)
       redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
+
+    "return None for insufficient info amend journey even when ShowVerificationDetailsPage is true" in {
+
+      val action =
+        new Harness()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.InsufficientInfo
+          )
+          .success
+          .value
+          .set(
+            ShowVerificationDetailsPage,
+            true
+          )
+          .success
+          .value
+
+      val result =
+        action.callFilter(userAnswers).futureValue
+
+      result mustBe None
+    }
+
+    "return None for unmatched amend journey even when ShowVerificationDetailsPage is true" in {
+
+      val action =
+        new Harness()
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            AmendJourneyTypePage,
+            AmendJourneyType.UnmatchedInfo
+          )
+          .success
+          .value
+          .set(
+            ShowVerificationDetailsPage,
+            true
+          )
+          .success
+          .value
+
+      val result =
+        action.callFilter(userAnswers).futureValue
+
+      result mustBe None
     }
   }
 }

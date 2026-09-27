@@ -387,6 +387,39 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with MockitoSug
       }
     }
 
+    "must render the page with 'No name provided' when an unverified partnership has no name" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            PartnershipAnswersQuery,
+            answers.copy(partnershipName = None, nominatedPartnerName = None, showVerificationDetails = false)
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, insufficientRouteUrl)
+
+        val msg =
+          application.injector
+            .instanceOf[MessagesApi]
+            .preferred(request)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(msg("verify.noName"))
+      }
+    }
+
     "must redirect to Journey Recovery when ViewOnlyPartnershipAnswers are missing" in {
 
       val application =

@@ -398,6 +398,44 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "must redirect to Submission Sending when only unmatched subcontractors to reverify are selected" in {
+
+        val ua =
+          emptyUserAnswers
+            .setOrException(ReverifyExistingSubcontractorsYesNoPage, true)
+            .setOrException(
+              SelectSubcontractorsToReverifyPage,
+              Set(grantAlan, ingenResearch)
+            )
+            .setOrException(
+              ContractorEmailConfirmationStoredPage,
+              DoNotSend
+            )
+            .setOrException(
+              VerificationBatchReadinessPage,
+              true
+            )
+
+        val application =
+          applicationBuilder(userAnswers = Some(ua)).build()
+
+        running(application) {
+
+          val result =
+            route(
+              application,
+              FakeRequest(POST, onSubmitRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.SubmissionSendingController
+              .onPageLoad()
+              .url
+        }
+      }
+
       "must redirect to JourneyRecovery when answers fail validation" in {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 

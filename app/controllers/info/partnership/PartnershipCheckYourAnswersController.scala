@@ -68,7 +68,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.partnershipName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
                 )
@@ -79,7 +79,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.partnershipName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
@@ -184,4 +184,9 @@ class PartnershipCheckYourAnswersController @Inject() (
         PartnershipWorksReferenceNumberSummary.row(answers)
       )
   }
+
+  private def displayName(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): String =
+    answers.partnershipName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
 }

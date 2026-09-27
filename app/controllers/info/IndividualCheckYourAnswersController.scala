@@ -92,10 +92,10 @@ class IndividualCheckYourAnswersController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
-        case None =>
+        case Some(_) | None =>
           logger.error(
             "[IndividualCheckYourAnswersController.onPageLoad] " +
-              "IndividualAnswersQuery is missing"
+              "IndividualAnswersQuery is missing or invalid"
           )
 
           Redirect(
