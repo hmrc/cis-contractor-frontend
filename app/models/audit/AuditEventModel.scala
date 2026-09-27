@@ -96,7 +96,7 @@ object AddSubcontractorAuditEventModel {
       model.middleName.fold(Json.obj())(v => Json.obj("middleName" -> v)) ++
       model.surname.fold(Json.obj())(v => Json.obj("surname" -> v)) ++
       model.tradingNameOfSubcontractor.fold(Json.obj())(v => Json.obj("tradingNameOfSubcontractor" -> v)) ++
-      model.subAddressYesNo.fold(Json.obj())(v => Json.obj("subAddressYesNo" -> v)) ++
+      model.subAddressYesNo.fold(Json.obj())(v => Json.obj("subcontractorAddressYesNo" -> v)) ++
       model.addressOfSubcontractor.fold(Json.obj())(v =>
         Json.obj("addressOfSubcontractor" -> Json.toJson(v)(Address.auditWrites))
       ) ++
@@ -112,7 +112,7 @@ object AddSubcontractorAuditEventModel {
         Json.obj("subcontractorsUniqueTaxpayerReference" -> v)
       ) ++
       model.nationalInsuranceNumberYesNo.fold(Json.obj())(v => Json.obj("nationalInsuranceNumberYesNo" -> v)) ++
-      model.subNationalInsuranceNumber.fold(Json.obj())(v => Json.obj("subNationalInsuranceNumber" -> v)) ++
+      model.subNationalInsuranceNumber.fold(Json.obj())(v => Json.obj("subcontractorNationalInsuranceNumber" -> v)) ++
       model.worksReferenceNumberYesNo.fold(Json.obj())(v => Json.obj("worksReferenceNumberYesNo" -> v)) ++
       model.worksReferenceNumber.fold(Json.obj())(v => Json.obj("worksReferenceNumber" -> v))
   }
@@ -312,7 +312,7 @@ object IndividualSubcontractorDetails {
       (__ \ "middleName").writeNullable[String] and
       (__ \ "surname").writeNullable[String] and
       (__ \ "tradingNameOfSubcontractor").writeNullable[String] and
-      (__ \ "subAddressYesNo").writeNullable[Boolean] and
+      (__ \ "subcontractorAddressYesNo").writeNullable[Boolean] and
       (__ \ "addressOfSubcontractor").writeNullable(Address.auditWrites) and
       (__ \ "addIndividualContactMethodsYesNo").writeNullable[Boolean] and
       (__ \ "individualEmailContactMethod").writeNullable[Boolean] and
@@ -324,7 +324,7 @@ object IndividualSubcontractorDetails {
       (__ \ "uniqueTaxpayerReferenceYesNo").writeNullable[Boolean] and
       (__ \ "subcontractorsUniqueTaxpayerReference").writeNullable[String] and
       (__ \ "nationalInsuranceNumberYesNo").writeNullable[Boolean] and
-      (__ \ "subNationalInsuranceNumber").writeNullable[String] and
+      (__ \ "subcontractorNationalInsuranceNumber").writeNullable[String] and
       (__ \ "worksReferenceNumberYesNo").writeNullable[Boolean] and
       (__ \ "worksReferenceNumber").writeNullable[String]
   )(Tuple.fromProductTyped(_))
@@ -353,7 +353,7 @@ object AmendSubcontractorAuditEventModel {
       origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
       Json.obj("updatedDetails" -> updatedDiff)
     val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
-    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subbieResourceRef" -> ref))
+    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
 
@@ -420,7 +420,7 @@ object AmendCompanySubcontractorAuditEventModel {
       origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
       Json.obj("updatedDetails" -> updatedDiff)
     val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
-    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subbieResourceRef" -> ref))
+    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
 
@@ -497,7 +497,7 @@ object AmendPartnershipSubcontractorAuditEventModel {
       origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
       Json.obj("updatedDetails" -> updatedDiff)
     val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
-    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subbieResourceRef" -> ref))
+    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
 
@@ -560,6 +560,6 @@ object AmendTrustSubcontractorAuditEventModel {
       origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
       Json.obj("updatedDetails" -> updatedDiff)
     val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
-    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subbieResourceRef" -> ref))
+    model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }

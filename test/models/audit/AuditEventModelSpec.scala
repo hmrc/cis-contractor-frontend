@@ -123,7 +123,7 @@ class AuditEventModelSpec extends SpecBase {
         "middleName"                            -> "Paul",
         "surname"                               -> "Smith",
         "tradingNameOfSubcontractor"            -> "TradingName",
-        "subAddressYesNo"                       -> true,
+        "subcontractorAddressYesNo"             -> true,
         "addressOfSubcontractor"                -> Json.toJson(address)(Address.auditWrites),
         "addIndividualContactMethodsYesNo"      -> true,
         "individualEmailContactMethod"          -> true,
@@ -135,7 +135,7 @@ class AuditEventModelSpec extends SpecBase {
         "uniqueTaxpayerReferenceYesNo"          -> true,
         "subcontractorsUniqueTaxpayerReference" -> "1111122222",
         "nationalInsuranceNumberYesNo"          -> true,
-        "subNationalInsuranceNumber"            -> "NH112233D",
+        "subcontractorNationalInsuranceNumber"  -> "NH112233D",
         "worksReferenceNumberYesNo"             -> true,
         "worksReferenceNumber"                  -> "WORKREF-001"
       )
@@ -486,7 +486,7 @@ class AuditEventModelSpec extends SpecBase {
       (Json.toJson(model) \ "cisId").toOption mustBe None
     }
 
-    "must include subbieResourceRef in JSON when present" in {
+    "must include subcontractorResourceRef in JSON when present" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = Some("1"),
         subbieResourceRef = Some(42L),
@@ -494,10 +494,10 @@ class AuditEventModelSpec extends SpecBase {
         originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
-      (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 42
+      (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 42
     }
 
-    "must omit subbieResourceRef when absent" in {
+    "must omit subcontractorResourceRef when absent" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
@@ -505,7 +505,7 @@ class AuditEventModelSpec extends SpecBase {
         originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
-      (Json.toJson(model) \ "subbieResourceRef").toOption mustBe None
+      (Json.toJson(model) \ "subcontractorResourceRef").toOption mustBe None
     }
 
     "must have auditType AmendSubcontractor" in {
@@ -548,7 +548,7 @@ class AuditEventModelSpec extends SpecBase {
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(baseCompanyDetails).as[JsObject]
     }
 
-    "must include subbieResourceRef in JSON when present" in {
+    "must include subcontractorResourceRef in JSON when present" in {
       val model = AmendCompanySubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = Some(7L),
@@ -556,7 +556,7 @@ class AuditEventModelSpec extends SpecBase {
         originalDetails = None,
         updatedDetails = baseCompanyDetails
       )
-      (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 7
+      (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 7
     }
 
     "must have auditType AmendSubcontractor" in {
@@ -601,7 +601,7 @@ class AuditEventModelSpec extends SpecBase {
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(basePartnershipDetails).as[JsObject]
     }
 
-    "must include subbieResourceRef in JSON when present" in {
+    "must include subcontractorResourceRef in JSON when present" in {
       val model = AmendPartnershipSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = Some(3L),
@@ -609,7 +609,7 @@ class AuditEventModelSpec extends SpecBase {
         originalDetails = None,
         updatedDetails = basePartnershipDetails
       )
-      (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 3
+      (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 3
     }
 
     "must have auditType AmendSubcontractor" in {
@@ -652,7 +652,7 @@ class AuditEventModelSpec extends SpecBase {
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(baseTrustDetails).as[JsObject]
     }
 
-    "must include subbieResourceRef in JSON when present" in {
+    "must include subcontractorResourceRef in JSON when present" in {
       val model = AmendTrustSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = Some(99L),
@@ -660,7 +660,7 @@ class AuditEventModelSpec extends SpecBase {
         originalDetails = None,
         updatedDetails = baseTrustDetails
       )
-      (Json.toJson(model) \ "subbieResourceRef").as[Int] mustBe 99
+      (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 99
     }
 
     "must have auditType AmendSubcontractor" in {
