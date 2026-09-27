@@ -247,7 +247,7 @@ class AuditServiceSpec
 
   ".amendSubcontractorEvent" - {
 
-    "must send an individual amend event with only the changed fields diffed" in {
+    "must send an individual amend event with updatedDetails" in {
       val original = OriginalIndividualAnswers(
         individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
         tradingName = None,
@@ -309,10 +309,8 @@ class AuditServiceSpec
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
       (detail \ "cisId").as[String] mustBe "cis-001"
       (detail \ "subcontractorResourceRef").as[Long] mustBe 99999L
-      (detail \ "originalDetails" \ "firstName").as[String] mustBe "John"
+      (detail \ "originalDetails").toOption mustBe None
       (detail \ "updatedDetails" \ "firstName").as[String] mustBe "Jane"
-      (detail \ "originalDetails" \ "surname").toOption mustBe None
-      (detail \ "updatedDetails" \ "surname").toOption mustBe None
     }
 
     "must omit subcontractorResourceRef from the event when AmendSubbieResourceRefQuery is not set" in {

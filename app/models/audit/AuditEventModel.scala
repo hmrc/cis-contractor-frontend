@@ -18,7 +18,7 @@ package models.audit
 
 import models.address.Address
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Format, JsObject, JsValue, Json, OWrites, __}
+import play.api.libs.json.{Format, JsValue, Json, OWrites, __}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 trait AuditEvent {
@@ -48,14 +48,6 @@ case class AuthFailureAuditEventModel() extends AuditEventModel {
 object AuthFailureAuditEventModel {
   implicit val formats: Format[AuthFailureAuditEventModel] =
     Json.format[AuthFailureAuditEventModel]
-}
-
-private def diffDetails(original: JsObject, updated: JsObject): (JsObject, JsObject) = {
-  val allKeys     = original.keys ++ updated.keys
-  val changedKeys = allKeys.filter(k => (original \ k).toOption != (updated \ k).toOption)
-  val origDiff    = JsObject(changedKeys.flatMap(k => (original \ k).toOption.map(k -> _)).toSeq)
-  val updDiff     = JsObject(changedKeys.flatMap(k => (updated \ k).toOption.map(k -> _)).toSeq)
-  (origDiff, updDiff)
 }
 
 case class AddSubcontractorAuditEventModel(
@@ -334,7 +326,6 @@ case class AmendSubcontractorAuditEventModel(
   cisId: Option[String],
   subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
-  originalDetails: Option[IndividualSubcontractorDetails],
   updatedDetails: IndividualSubcontractorDetails
 ) extends AuditEvent {
   override val auditType: String = "AmendSubcontractor"
@@ -342,17 +333,9 @@ case class AmendSubcontractorAuditEventModel(
 
 object AmendSubcontractorAuditEventModel {
   implicit val writes: OWrites[AmendSubcontractorAuditEventModel] = OWrites { model =>
-    val updatedJson                = Json.toJson(model.updatedDetails).as[JsObject]
-    val (origDiffOpt, updatedDiff) = model.originalDetails match {
-      case Some(orig) =>
-        val (o, u) = diffDetails(Json.toJson(orig).as[JsObject], updatedJson)
-        (Some(o), u)
-      case None       => (None, updatedJson)
-    }
-    val base                       = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
-      origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
-      Json.obj("updatedDetails" -> updatedDiff)
-    val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
+    val base      = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
+      Json.obj("updatedDetails" -> Json.toJson(model.updatedDetails))
+    val withCisId = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
     model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
@@ -401,7 +384,6 @@ case class AmendCompanySubcontractorAuditEventModel(
   cisId: Option[String],
   subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
-  originalDetails: Option[CompanySubcontractorDetails],
   updatedDetails: CompanySubcontractorDetails
 ) extends AuditEvent {
   override val auditType: String = "AmendSubcontractor"
@@ -409,17 +391,9 @@ case class AmendCompanySubcontractorAuditEventModel(
 
 object AmendCompanySubcontractorAuditEventModel {
   implicit val writes: OWrites[AmendCompanySubcontractorAuditEventModel] = OWrites { model =>
-    val updatedJson                = Json.toJson(model.updatedDetails).as[JsObject]
-    val (origDiffOpt, updatedDiff) = model.originalDetails match {
-      case Some(orig) =>
-        val (o, u) = diffDetails(Json.toJson(orig).as[JsObject], updatedJson)
-        (Some(o), u)
-      case None       => (None, updatedJson)
-    }
-    val base                       = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
-      origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
-      Json.obj("updatedDetails" -> updatedDiff)
-    val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
+    val base      = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
+      Json.obj("updatedDetails" -> Json.toJson(model.updatedDetails))
+    val withCisId = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
     model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
@@ -478,7 +452,6 @@ case class AmendPartnershipSubcontractorAuditEventModel(
   cisId: Option[String],
   subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
-  originalDetails: Option[PartnershipSubcontractorDetails],
   updatedDetails: PartnershipSubcontractorDetails
 ) extends AuditEvent {
   override val auditType: String = "AmendSubcontractor"
@@ -486,17 +459,9 @@ case class AmendPartnershipSubcontractorAuditEventModel(
 
 object AmendPartnershipSubcontractorAuditEventModel {
   implicit val writes: OWrites[AmendPartnershipSubcontractorAuditEventModel] = OWrites { model =>
-    val updatedJson                = Json.toJson(model.updatedDetails).as[JsObject]
-    val (origDiffOpt, updatedDiff) = model.originalDetails match {
-      case Some(orig) =>
-        val (o, u) = diffDetails(Json.toJson(orig).as[JsObject], updatedJson)
-        (Some(o), u)
-      case None       => (None, updatedJson)
-    }
-    val base                       = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
-      origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
-      Json.obj("updatedDetails" -> updatedDiff)
-    val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
+    val base      = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
+      Json.obj("updatedDetails" -> Json.toJson(model.updatedDetails))
+    val withCisId = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
     model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }
@@ -541,7 +506,6 @@ case class AmendTrustSubcontractorAuditEventModel(
   cisId: Option[String],
   subbieResourceRef: Option[Long],
   typeOfSubcontractor: String,
-  originalDetails: Option[TrustSubcontractorDetails],
   updatedDetails: TrustSubcontractorDetails
 ) extends AuditEvent {
   override val auditType: String = "AmendSubcontractor"
@@ -549,17 +513,9 @@ case class AmendTrustSubcontractorAuditEventModel(
 
 object AmendTrustSubcontractorAuditEventModel {
   implicit val writes: OWrites[AmendTrustSubcontractorAuditEventModel] = OWrites { model =>
-    val updatedJson                = Json.toJson(model.updatedDetails).as[JsObject]
-    val (origDiffOpt, updatedDiff) = model.originalDetails match {
-      case Some(orig) =>
-        val (o, u) = diffDetails(Json.toJson(orig).as[JsObject], updatedJson)
-        (Some(o), u)
-      case None       => (None, updatedJson)
-    }
-    val base                       = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
-      origDiffOpt.fold(Json.obj())(o => Json.obj("originalDetails" -> o)) ++
-      Json.obj("updatedDetails" -> updatedDiff)
-    val withCisId                  = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
+    val base      = Json.obj("typeOfSubcontractor" -> model.typeOfSubcontractor) ++
+      Json.obj("updatedDetails" -> Json.toJson(model.updatedDetails))
+    val withCisId = model.cisId.fold(base)(id => Json.obj("cisId" -> id) ++ base)
     model.subbieResourceRef.fold(withCisId)(ref => withCisId ++ Json.obj("subcontractorResourceRef" -> ref))
   }
 }

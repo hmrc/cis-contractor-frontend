@@ -411,68 +411,16 @@ class AuditEventModelSpec extends SpecBase {
 
   "AmendSubcontractorAuditEventModel" - {
 
-    "must only emit the changed field in each section when one field differs" in {
-      val updated = baseIndividualDetails.copy(individualMobileNumber = Some("07123456999"))
-      val model   = AmendSubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "soletrader",
-        originalDetails = Some(baseIndividualDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails").as[JsObject] mustEqual Json.obj("individualMobileNumber" -> "07123456789")
-      (json \ "updatedDetails").as[JsObject] mustEqual Json.obj("individualMobileNumber" -> "07123456999")
-    }
-
-    "must emit all changed fields when multiple values differ" in {
-      val updated = baseIndividualDetails.copy(
-        individualEmailAddress = Some("new@example.com"),
-        worksReferenceNumber = Some("WR-999")
-      )
-      val model   = AmendSubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "soletrader",
-        originalDetails = Some(baseIndividualDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails").as[JsObject].keys mustBe Set("individualEmailAddress", "worksReferenceNumber")
-      (json \ "updatedDetails").as[JsObject].keys mustBe Set("individualEmailAddress", "worksReferenceNumber")
-      (json \ "originalDetails" \ "individualEmailAddress").as[String] mustBe "sub@example.com"
-      (json \ "updatedDetails" \ "individualEmailAddress").as[String] mustBe "new@example.com"
-      (json \ "originalDetails" \ "worksReferenceNumber").as[String] mustBe "WR-123"
-      (json \ "updatedDetails" \ "worksReferenceNumber").as[String] mustBe "WR-999"
-    }
-
-    "must include original value in originalDetails when a field is removed in the update" in {
-      val updated = baseIndividualDetails.copy(worksReferenceNumberYesNo = Some(false), worksReferenceNumber = None)
-      val model   = AmendSubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "soletrader",
-        originalDetails = Some(baseIndividualDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe true
-      (json \ "originalDetails" \ "worksReferenceNumber").as[String] mustBe "WR-123"
-      (json \ "updatedDetails" \ "worksReferenceNumberYesNo").as[Boolean] mustBe false
-      (json \ "updatedDetails" \ "worksReferenceNumber").toOption mustBe None
-    }
-
-    "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
+    "must serialise updatedDetails in full" in {
       val model = AmendSubcontractorAuditEventModel(
         cisId = Some("1"),
         subbieResourceRef = None,
         typeOfSubcontractor = "soletrader",
-        originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
       val json  = Json.toJson(model)
-      (json \ "originalDetails").toOption mustBe None
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(baseIndividualDetails).as[JsObject]
+      (json \ "originalDetails").toOption mustBe None
     }
 
     "must omit cisId when absent" in {
@@ -480,7 +428,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "soletrader",
-        originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
       (Json.toJson(model) \ "cisId").toOption mustBe None
@@ -491,7 +438,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = Some("1"),
         subbieResourceRef = Some(42L),
         typeOfSubcontractor = "soletrader",
-        originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
       (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 42
@@ -502,7 +448,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "soletrader",
-        originalDetails = None,
         updatedDetails = baseIndividualDetails
       )
       (Json.toJson(model) \ "subcontractorResourceRef").toOption mustBe None
@@ -513,7 +458,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "soletrader",
-        originalDetails = None,
         updatedDetails = baseIndividualDetails
       ).auditType mustBe "AmendSubcontractor"
     }
@@ -521,31 +465,16 @@ class AuditEventModelSpec extends SpecBase {
 
   "AmendCompanySubcontractorAuditEventModel" - {
 
-    "must only emit the changed field in each section when one field differs" in {
-      val updated = baseCompanyDetails.copy(companyEmailAddress = Some("new@example.com"))
-      val model   = AmendCompanySubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "company",
-        originalDetails = Some(baseCompanyDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails").as[JsObject] mustEqual Json.obj("companyEmailAddress" -> "company@example.com")
-      (json \ "updatedDetails").as[JsObject] mustEqual Json.obj("companyEmailAddress" -> "new@example.com")
-    }
-
-    "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
+    "must serialise updatedDetails in full" in {
       val model = AmendCompanySubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "company",
-        originalDetails = None,
         updatedDetails = baseCompanyDetails
       )
       val json  = Json.toJson(model)
-      (json \ "originalDetails").toOption mustBe None
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(baseCompanyDetails).as[JsObject]
+      (json \ "originalDetails").toOption mustBe None
     }
 
     "must include subcontractorResourceRef in JSON when present" in {
@@ -553,7 +482,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = Some(7L),
         typeOfSubcontractor = "company",
-        originalDetails = None,
         updatedDetails = baseCompanyDetails
       )
       (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 7
@@ -564,7 +492,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "company",
-        originalDetails = None,
         updatedDetails = baseCompanyDetails
       ).auditType mustBe "AmendSubcontractor"
     }
@@ -572,33 +499,16 @@ class AuditEventModelSpec extends SpecBase {
 
   "AmendPartnershipSubcontractorAuditEventModel" - {
 
-    "must only emit the changed field in each section when one field differs" in {
-      val updated = basePartnershipDetails.copy(partnershipEmailAddress = Some("new@example.com"))
-      val model   = AmendPartnershipSubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "partnership",
-        originalDetails = Some(basePartnershipDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails").as[JsObject] mustEqual Json.obj(
-        "partnershipEmailAddress" -> "partnership@example.com"
-      )
-      (json \ "updatedDetails").as[JsObject] mustEqual Json.obj("partnershipEmailAddress" -> "new@example.com")
-    }
-
-    "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
+    "must serialise updatedDetails in full" in {
       val model = AmendPartnershipSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "partnership",
-        originalDetails = None,
         updatedDetails = basePartnershipDetails
       )
       val json  = Json.toJson(model)
-      (json \ "originalDetails").toOption mustBe None
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(basePartnershipDetails).as[JsObject]
+      (json \ "originalDetails").toOption mustBe None
     }
 
     "must include subcontractorResourceRef in JSON when present" in {
@@ -606,7 +516,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = Some(3L),
         typeOfSubcontractor = "partnership",
-        originalDetails = None,
         updatedDetails = basePartnershipDetails
       )
       (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 3
@@ -617,7 +526,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "partnership",
-        originalDetails = None,
         updatedDetails = basePartnershipDetails
       ).auditType mustBe "AmendSubcontractor"
     }
@@ -625,31 +533,16 @@ class AuditEventModelSpec extends SpecBase {
 
   "AmendTrustSubcontractorAuditEventModel" - {
 
-    "must only emit the changed field in each section when one field differs" in {
-      val updated = baseTrustDetails.copy(trustEmailAddress = Some("new@example.com"))
-      val model   = AmendTrustSubcontractorAuditEventModel(
-        cisId = Some("1"),
-        subbieResourceRef = None,
-        typeOfSubcontractor = "trust",
-        originalDetails = Some(baseTrustDetails),
-        updatedDetails = updated
-      )
-      val json    = Json.toJson(model)
-      (json \ "originalDetails").as[JsObject] mustEqual Json.obj("trustEmailAddress" -> "trust@example.com")
-      (json \ "updatedDetails").as[JsObject] mustEqual Json.obj("trustEmailAddress" -> "new@example.com")
-    }
-
-    "must omit originalDetails and emit full updatedDetails when originalDetails is absent" in {
+    "must serialise updatedDetails in full" in {
       val model = AmendTrustSubcontractorAuditEventModel(
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "trust",
-        originalDetails = None,
         updatedDetails = baseTrustDetails
       )
       val json  = Json.toJson(model)
-      (json \ "originalDetails").toOption mustBe None
       (json \ "updatedDetails").as[JsObject] mustEqual Json.toJson(baseTrustDetails).as[JsObject]
+      (json \ "originalDetails").toOption mustBe None
     }
 
     "must include subcontractorResourceRef in JSON when present" in {
@@ -657,7 +550,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = Some(99L),
         typeOfSubcontractor = "trust",
-        originalDetails = None,
         updatedDetails = baseTrustDetails
       )
       (Json.toJson(model) \ "subcontractorResourceRef").as[Int] mustBe 99
@@ -668,7 +560,6 @@ class AuditEventModelSpec extends SpecBase {
         cisId = None,
         subbieResourceRef = None,
         typeOfSubcontractor = "trust",
-        originalDetails = None,
         updatedDetails = baseTrustDetails
       ).auditType mustBe "AmendSubcontractor"
     }
