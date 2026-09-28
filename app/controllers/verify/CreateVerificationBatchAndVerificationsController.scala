@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.Mode
-import pages.verify.{CurrentVerificationBatchResponsePage, NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -68,8 +68,6 @@ class CreateVerificationBatchAndVerificationsController @Inject() (
                   .modifyVerificationBatch(mode)
               )
             )
-          } else if (ua.get(CurrentVerificationBatchResponsePage).isDefined) {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           } else {
 
             val verifyIdsRaw: Seq[String] =

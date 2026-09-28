@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.{NormalMode, SubcontractorCurrentVerification, SubcontractorViewModel, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.GetCurrentVerificationBatchResponse
 import models.validation.{FieldValidationFailure, SubcontractorValidationFailure}
 import models.validation.SubcontractorValidationField.{EmailAddress, PartnershipTradingName}
@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.validation.SubcontractorValidationFailuresPage
-import pages.verify.CurrentVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -302,8 +302,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-            .onSubmit(NormalMode)
+          routes.JourneyRecoveryController
+            .onPageLoad()
             .url
       }
 
@@ -600,7 +600,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
-    "must redirect to CreateVerificationBatchAndVerificationsController when no current batch exists" in {
+    "must create a verification batch when latest batch cannot be modified" in {
       val mockService =
         mock[VerificationService]
 
@@ -610,40 +610,20 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       val mockSessionRepository =
         mock[SessionRepository]
 
-      val response =
-        GetCurrentVerificationBatchResponse(
-          verificationBatch = None,
-          verifications = Seq.empty,
-          subcontractors = Seq.empty
-        )
-
       val updatedAnswers =
-        emptyUserAnswers.setOrException(
-          CurrentVerificationBatchResponsePage,
-          response
-        )
+        emptyUserAnswers
+          .setOrException(
+            SelectSubcontractorPage,
+            Set(SubcontractorViewModel("1", "Subcontractor 1"))
+          )
+
+      stubLatestRequiresCreate(mockService, updatedAnswers)
 
       when(
-        mockService.getCurrentVerificationBatch(
-          any[UserAnswers]
-        )(any[HeaderCarrier])
-      ).thenReturn(
-        Future.successful(updatedAnswers)
-      )
-
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
-
-      when(
-        mockValidator.validate(
-          response.subcontractors
+        mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(
+          any[HeaderCarrier]
         )
-      ).thenReturn(Nil)
-
-      when(
-        mockSessionRepository.set(
-          any[UserAnswers]
-        )
-      ).thenReturn(Future.successful(true))
+      ).thenReturn(Future.successful(updatedAnswers))
 
       val application =
         buildApplication(
@@ -663,8 +643,8 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-            .onSubmit(NormalMode)
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness(NormalMode)
             .url
       }
     }
