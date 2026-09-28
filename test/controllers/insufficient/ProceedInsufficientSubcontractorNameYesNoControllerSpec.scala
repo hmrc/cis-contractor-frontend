@@ -366,26 +366,6 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
       }
     }
 
-    "must redirect to Journey Recovery for a POST if user answer data is found" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
-      }
-    }
-
     "must redirect to Journey Recovery for a POST if subcontractorId is not found" in {
 
       val userAnswers = emptyUserAnswers
@@ -456,6 +436,99 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
           routes.JourneyRecoveryController
             .onPageLoad()
             .url
+      }
+    }
+
+    "validate actions on multiple tabs" - {
+
+      "must redirect to the review page on a POST when select NO from the first tab and second tabs" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+          .success
+          .value
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(
+              userAnswers
+                .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), false)
+                .success
+                .value
+            )
+          )
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "false")
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(
+            result
+          ).value mustEqual controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+            .onPageLoad()
+            .url
+        }
+      }
+
+      "must redirect to the recovery page on a POST when select YES from the first tab and again YES from the second tab" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(CisIdQuery, "1")
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+          .success
+          .value
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(userAnswers =
+            Some(
+              userAnswers
+                .set(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString), true)
+                .success
+                .value
+            )
+          )
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
+            .build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(POST, proceedInsufficientSubcontractorNameYesNoRoute).withFormUrlEncodedBody("value" -> "true")
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(
+            result
+          ).value mustEqual controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+        }
       }
     }
   }
