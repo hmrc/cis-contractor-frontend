@@ -150,6 +150,8 @@ class AmendIndividualConfirmationControllerSpec extends SpecBase with MockitoSug
             displayName,
             confirmationLink
           )(request, messages(app)).toString
+
+        verify(mockSessionRepository).set(any())
       }
     }
 

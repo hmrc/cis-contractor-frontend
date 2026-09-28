@@ -78,7 +78,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisGeneralEnquiries: String                       = configuration.get[String]("urls.cisGeneralEnquiries")
   lazy val payeCisForAgentsOnlineService: String             = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisReturnDashboardUrl: String                     = configuration.get[String]("urls.cisReturnDashboard")
-  lazy val cisFrontendBaseUrl: String                        = configuration.get[String]("urls.cisFrontendBaseUrl")
+  lazy val cisFrontendBaseUrl: String                        = configuration.get[String]("cis-frontend.host")
   lazy val fileStandardReturnUrl: String                     = configuration.get[String]("urls.fileStandardReturn")
   lazy val fileNilReturnUrl: String                          = configuration.get[String]("urls.fileNilReturn")
   lazy val findUtr: String                                   = configuration.get[String]("urls.findUtr")
@@ -91,7 +91,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[String]("urls.constructionIndustryAgentAccount")
   lazy val constructionIndustryOrgAccountUrl: String         = configuration.get[String]("urls.constructionIndustryOrgAccount")
   lazy val cisContractorGuideUrl: String                     = configuration.get[String]("urls.cisContractorGuide")
-  lazy val signIntoCISURL: String                            = configuration.get[String]("urls.signIntoCIS")
   lazy val portalAccountBaseUrl: String                      = configuration.get[String]("portal-account.host")
   lazy val authoriseClientRequestPath: String                = configuration.get[String]("urls.authoriseClientRequest")
   lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String =
@@ -135,6 +134,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
       case other           => throw new RuntimeException(s"Unexpected format in JSON: $other")
     }
   }
+
+  def cisFrontendFinalValidationReturnUrl(handoffId: String): String =
+    s"$cisFrontendFinalValidationReturn/$handoffId"
+
+  lazy val cisFrontendFinalValidationReturn: String =
+    configuration.get[String]("urls.cisFrontendFinalValidationReturn")
 
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", URLEncoder.encode(agentCode, "UTF-8"))}"

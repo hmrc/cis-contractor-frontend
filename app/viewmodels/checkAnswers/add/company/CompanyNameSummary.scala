@@ -17,30 +17,36 @@
 package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, Mode, UserAnswers}
-import pages.add.company.CompanyNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.company.CompanyAnswers
+import utils.SubcontractorNameExtractor
 
 object CompanyNameSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyNamePage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyName.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] = {
+
+    val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+    subcontractorNameExtractor
+      .getCompanyName(answers, mode)
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "companyName.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+            )
+              .withVisuallyHiddenText(messages("companyName.change.hidden"))
+              .withAttribute("id" -> "company-name")
           )
-            .withVisuallyHiddenText(messages("companyName.change.hidden"))
-            .withAttribute("id" -> "company-name")
         )
-      )
-    }
+      }
+  }
 
   def row(
     answers: CompanyAnswers

@@ -39,23 +39,47 @@ final case class ValidatedPartnership(
 )
 
 object ValidatedPartnership extends Validation {
+
   def build(answers: UserAnswers): Either[ValidationError, ValidatedPartnership] =
+    buildPartnership(
+      answers,
+      getPageValue(answers, PartnershipNamePage),
+      getPageValue(answers, PartnershipNominatedPartnerNamePage)
+    )
+
+  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedPartnership] =
+    buildPartnership(
+      answers,
+      getAmendPageValue(answers, PartnershipNamePage),
+      getAmendPageValue(answers, PartnershipNominatedPartnerNamePage)
+    )
+
+  private def buildPartnership(
+    answers: UserAnswers,
+    partnershipName: Either[ValidationError, String],
+    partnershipNominatedPartnerName: Either[ValidationError, String]
+  ): Either[ValidationError, ValidatedPartnership] =
     for {
       _                               <- validateType(answers)
-      partnershipName                 <- getPageValue(answers, PartnershipNamePage)
-      partnershipAddress              <- getOptionalPageValue(answers, PartnershipAddressPage, PartnershipAddressYesNoPage)
+      partnershipName                 <- partnershipName
+      partnershipAddress              <- getOptionalPageValue(
+                                           answers,
+                                           PartnershipAddressPage,
+                                           PartnershipAddressYesNoPage
+                                         )
       partnershipContactMethodOptions <-
-        getOptionalPageValue(answers, PartnershipContactMethodOptionsPage, AddPartnershipContactMethodsYesNoPage)
-          .flatMap {
-            case Some(methods) if methods.nonEmpty =>
-              Right(Some(methods))
-
-            case Some(_) =>
-              Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
-
-            case None =>
-              Right(None)
-          }
+        getOptionalPageValue(
+          answers,
+          PartnershipContactMethodOptionsPage,
+          AddPartnershipContactMethodsYesNoPage
+        ).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+          case Some(_)                           =>
+            Left(InvalidAnswer(PartnershipContactMethodOptionsPage))
+          case None                              =>
+            Right(None)
+        }
       partnershipEmail                <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,
@@ -75,16 +99,36 @@ object ValidatedPartnership extends Validation {
                                            ContactMethodOptions.Mobile
                                          )
       partnershipUtr                  <-
-        getOptionalPageValue(answers, PartnershipUniqueTaxpayerReferencePage, PartnershipHasUtrYesNoPage)
-      partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage)
+        getOptionalPageValue(
+          answers,
+          PartnershipUniqueTaxpayerReferencePage,
+          PartnershipHasUtrYesNoPage
+        )
+      partnershipNominatedPartnerName <- partnershipNominatedPartnerName
       partnershipNominatedPartnerUtr  <-
-        getOptionalPageValue(answers, PartnershipNominatedPartnerUtrPage, PartnershipNominatedPartnerUtrYesNoPage)
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerUtrPage,
+          PartnershipNominatedPartnerUtrYesNoPage
+        )
       partnershipNominatedPartnerNino <-
-        getOptionalPageValue(answers, PartnershipNominatedPartnerNinoPage, PartnershipNominatedPartnerNinoYesNoPage)
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerNinoPage,
+          PartnershipNominatedPartnerNinoYesNoPage
+        )
       partnershipNominatedPartnerCrn  <-
-        getOptionalPageValue(answers, PartnershipNominatedPartnerCrnPage, PartnershipNominatedPartnerCrnYesNoPage)
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerCrnPage,
+          PartnershipNominatedPartnerCrnYesNoPage
+        )
       partnershipWorkRefNumber        <-
-        getOptionalPageValue(answers, PartnershipWorksReferenceNumberPage, PartnershipWorksReferenceNumberYesNoPage)
+        getOptionalPageValue(
+          answers,
+          PartnershipWorksReferenceNumberPage,
+          PartnershipWorksReferenceNumberYesNoPage
+        )
 
     } yield ValidatedPartnership(
       partnershipName,
@@ -106,5 +150,4 @@ object ValidatedPartnership extends Validation {
       case TypeOfSubcontractor.Partnership => Right(())
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
-
 }

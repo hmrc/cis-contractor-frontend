@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.add.TradingNameOfSubcontractorFormProvider
 import models.add.IndividualNamesOptions
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -46,6 +46,9 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
   private lazy val nameOfSubcontractorAmendRoute =
     controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url
 
+  private lazy val nameOfSubcontractorFinalValidationRoute =
+    controllers.add.routes.TradingNameOfSubcontractorController.onPageLoad(FinalValidationMode).url
+
   private def uaWithTradingNameOption: UserAnswers =
     emptyUserAnswers
       .set(IndividualNamesOptionsPage, Set(IndividualNamesOptions.TradingName))
@@ -53,6 +56,31 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
       .value
 
   "NameOfSubcontractor Controller" - {
+
+    "must return OK for a GET in FinalValidationMode when IndividualNamesOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, nameOfSubcontractorFinalValidationRoute)
+
+        val result =
+          route(application, request).value
+
+        val view =
+          application.injector.instanceOf[TradingNameOfSubcontractorView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(
+            form,
+            FinalValidationMode
+          )(request, messages(application)).toString
+      }
+    }
 
     "must return OK and the correct view for a GET" in {
 

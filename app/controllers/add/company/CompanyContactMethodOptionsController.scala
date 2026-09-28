@@ -20,12 +20,13 @@ import controllers.actions.*
 import forms.add.company.CompanyContactMethodOptionsFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{AddCompanyContactMethodsYesNoPage, CompanyContactMethodOptionsPage, CompanyNamePage}
+import pages.add.company.{AddCompanyContactMethodsYesNoPage, CompanyContactMethodOptionsPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.YesOrNoPageGuardService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyContactMethodOptionsView
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class CompanyContactMethodOptionsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyContactMethodOptionsFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   view: CompanyContactMethodOptionsView
@@ -53,8 +55,8 @@ class CompanyContactMethodOptionsController @Inject() (
     val yesOrNoPage       = AddCompanyContactMethodsYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(AddCompanyContactMethodsYesNoPage)
 
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyContactMethodOptionsPage) match {
           case None        => form
@@ -69,8 +71,8 @@ class CompanyContactMethodOptionsController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()

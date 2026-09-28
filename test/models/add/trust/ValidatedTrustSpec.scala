@@ -345,4 +345,54 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       ValidatedTrust.build(ua) mustBe Left(InvalidAnswer(TrustContactMethodOptionsPage))
     }
   }
+
+  "ValidatedTrust.buildForAmend" - {
+
+    "build successfully with minimum required answers (all optionals No)" in {
+      ValidatedTrust.buildForAmend(minRequired) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully when TrustNamePage is missing, defaulting the name to empty" in {
+      val ua =
+        emptyUserAnswers
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Trust)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, false)
+          .success
+          .value
+          .set(AddTrustContactMethodsYesNoPage, false)
+          .success
+          .value
+          .set(TrustUtrYesNoPage, false)
+          .success
+          .value
+          .set(TrustWorksReferenceYesNoPage, false)
+          .success
+          .value
+
+      ValidatedTrust.buildForAmend(ua) mustBe Right(
+        ValidatedTrust(
+          trustName = "",
+          trustAddress = None,
+          trustContactMethodOptions = None,
+          trustEmail = None,
+          trustPhone = None,
+          trustMobile = None,
+          trustUtr = None,
+          trustWorkRefNumber = None
+        )
+      )
+    }
+
+    "fail when TypeOfSubcontractor is not Trust" in {
+      val ua =
+        minRequired
+          .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)
+          .success
+          .value
+
+      ValidatedTrust.buildForAmend(ua) mustBe Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+  }
 }

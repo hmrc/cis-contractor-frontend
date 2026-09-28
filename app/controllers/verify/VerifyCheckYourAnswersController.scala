@@ -41,6 +41,7 @@ class VerifyCheckYourAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
+    // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
     ValidatedVerify.build(ua) match {
       case Right(_)    =>
         val list = SummaryListViewModel(
@@ -62,6 +63,7 @@ class VerifyCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
       ValidatedVerify.build(request.userAnswers) match {
 
         case Right(_) =>

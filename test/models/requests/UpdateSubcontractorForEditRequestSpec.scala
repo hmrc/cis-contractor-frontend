@@ -17,7 +17,7 @@
 package models.requests
 
 import base.SpecBase
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 
 import java.time.LocalDateTime
 
@@ -123,6 +123,7 @@ class UpdateSubcontractorForEditRequestSpec extends SpecBase {
       val result =
         Json.fromJson[UpdateSubcontractorForEditRequest](json)
 
+      result mustBe JsSuccess(request)
     }
 
     "must fail to deserialise when cisId is missing" in {

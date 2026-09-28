@@ -20,12 +20,14 @@ import base.SpecBase
 import controllers.routes
 import forms.add.UtrFormProvider
 import models.add.SubcontractorName
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.{SubcontractorNamePage, SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
 import pages.amend.ShowVerificationDetailsPage
+import pages.finalvalidation.{FinalValidationBaseUtrPage, FinalValidationChangeTargetPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -41,10 +43,12 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
   private val formProvider = new UtrFormProvider()
   private val form         = formProvider()
 
-  lazy private val subcontractorsUniqueTaxpayerReferenceRoute      =
+  lazy private val subcontractorsUniqueTaxpayerReferenceRoute                =
     controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(NormalMode).url
-  lazy private val subcontractorsUniqueTaxpayerReferenceRouteAmend =
+  lazy private val subcontractorsUniqueTaxpayerReferenceRouteAmend           =
     controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url
+  lazy private val subcontractorsUniqueTaxpayerReferenceRouteFinalValidation =
+    controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(FinalValidationMode).url
 
   private val subcontractorName = SubcontractorName("John", Some("Paul"), "Smith")
 
@@ -536,6 +540,151 @@ class SubcontractorsUniqueTaxpayerReferenceControllerSpec extends SpecBase with 
           .onPageLoad()
           .url
       }
+    }
+
+    "must save and continue without duplicate validation when UTR is the same as the previous value in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(SubcontractorsUniqueTaxpayerReferencePage, validValue)
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must save and continue without duplicate validation when UTR is the same as the base value in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(FinalValidationBaseUtrPage, validValue)
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verifyNoInteractions(mockSubcontractorService)
+    }
+
+    "must perform duplicate validation when UTR is different from the previous and base values in FinalValidationMode" in {
+
+      val validValue = "5860920998"
+
+      val userAnswers =
+        uaWithName
+          .set(SubcontractorsUniqueTaxpayerReferencePage, "5860920997")
+          .success
+          .value
+          .set(FinalValidationBaseUtrPage, "5860920996")
+          .success
+          .value
+          .set(
+            FinalValidationChangeTargetPage,
+            FinalValidationChangeTarget.Utr
+          )
+          .success
+          .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(
+        mockSubcontractorService.isDuplicateUTR(
+          any[UserAnswers],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorsUniqueTaxpayerReferenceRouteFinalValidation)
+            .withFormUrlEncodedBody(("value", validValue))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
+      }
+
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(
+          any[UserAnswers],
+          any[String]
+        )(any[HeaderCarrier])
+
+      verifyNoMoreInteractions(mockSubcontractorService)
     }
   }
 }

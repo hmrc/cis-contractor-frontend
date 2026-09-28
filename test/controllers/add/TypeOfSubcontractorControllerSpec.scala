@@ -17,215 +17,508 @@
 package controllers.add
 
 import base.SpecBase
+import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
 import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val subcontractorTypesRoute =
-    controllers.add.routes.TypeOfSubcontractorController.onPageLoad(NormalMode).url
+    controllers.add.routes.TypeOfSubcontractorController
+      .onPageLoad(NormalMode)
+      .url
 
-  val formProvider = new TypeOfSubcontractorFormProvider()
-  val form         = formProvider()
+  private val formProvider = new TypeOfSubcontractorFormProvider()
+  private val form         = formProvider()
 
-  "TypeOfSubcontractor Controller" - {
+  "TypeOfSubcontractorController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
 
       running(application) {
-        val request = FakeRequest(GET, subcontractorTypesRoute)
+        val request =
+          FakeRequest(GET, subcontractorTypesRoute)
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view =
+          application.injector.instanceOf[TypeOfSubcontractorView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
+        status(result) mustBe OK
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers =
-        UserAnswers(userAnswersId).set(TypeOfSubcontractorPage, TypeOfSubcontractor.values.head).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, subcontractorTypesRoute)
-
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(TypeOfSubcontractor.values.head), NormalMode)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode
+        )(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the SubTradingNameYesNo page when valid data Individualorsoletrader is submitted" in {
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(
+            TypeOfSubcontractorPage,
+            TypeOfSubcontractor.values.head
+          )
+          .success
+          .value
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+        applicationBuilder(userAnswers = Some(userAnswers))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Individualorsoletrader.toString))
+          FakeRequest(GET, subcontractorTypesRoute)
 
-        val result = route(application, request).value
+        val view =
+          application.injector.instanceOf[TypeOfSubcontractorView]
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.routes.IndividualNamesOptionsController
-          .onPageLoad(NormalMode)
-          .url
+        val result =
+          route(application, request).value
+
+        status(result) mustBe OK
+
+        contentAsString(result) mustEqual view(
+          form.fill(TypeOfSubcontractor.values.head),
+          NormalMode
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
-    "must redirect to the CompanyName page when valid data Limitedcompany is submitted" in {
+    "must redirect to the IndividualNamesOptions page when Individual or sole trader is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository =
+        mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(Success(emptyUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
           )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Limitedcompany.toString))
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Individualorsoletrader.toString
+            )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyNameController
-          .onPageLoad(NormalMode)
-          .url
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.add.routes.IndividualNamesOptionsController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, times(1))
+          .set(any())
       }
     }
 
-    "must redirect to the PartnershipName page when valid data Partnership is submitted" in {
+    "must redirect to the CompanyName page when Limited company is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(Success(emptyUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
           )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Partnership.toString))
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Limitedcompany.toString
+            )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.partnership.routes.PartnershipNameController
-          .onPageLoad(NormalMode)
-          .url
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.add.company.routes.CompanyNameController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, times(1))
+          .set(any())
       }
     }
 
-    "must redirect to the TrustName page when valid data Trust is submitted" in {
+    "must redirect to the PartnershipName page when Partnership is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionRepository =
+        mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(Success(emptyUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
           )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", TypeOfSubcontractor.Trust.toString))
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Partnership.toString
+            )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.trust.routes.TrustNameController
-          .onPageLoad(NormalMode)
-          .url
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.add.partnership.routes.PartnershipNameController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, times(1))
+          .set(any())
+      }
+    }
+
+    "must redirect to the TrustName page when Trust is submitted" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(Success(emptyUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Trust.toString
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.add.trust.routes.TrustNameController
+            .onPageLoad(NormalMode)
+            .url
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, times(1))
+          .set(any())
+      }
+    }
+
+    "must save the selected subcontractor type after cleaning the previous answers" in {
+
+      val cleanedUserAnswers =
+        UserAnswers(userAnswersId)
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(Success(cleanedUserAnswers))
+
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Limitedcompany.toString
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, times(1))
+          .set(captor.capture())
+
+        captor.getValue
+          .get(TypeOfSubcontractorPage) mustBe
+          Some(TypeOfSubcontractor.Limitedcompany)
+      }
+    }
+
+    "must redirect to JourneyRecovery and not persist answers when cleanup fails" in {
+
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      when(mockCleanupService.clean(any()))
+        .thenReturn(
+          Failure(
+            new RuntimeException("Unable to clean user answers")
+          )
+        )
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, subcontractorTypesRoute)
+            .withFormUrlEncodedBody(
+              "value" ->
+                TypeOfSubcontractor.Limitedcompany.toString
+            )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+
+        verify(mockCleanupService, times(1))
+          .clean(any())
+
+        verify(mockSessionRepository, never())
+          .set(any())
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
+          )
+          .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(
+              "value" -> "invalid value"
+            )
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm =
+          form.bind(
+            Map("value" -> "invalid value")
+          )
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view =
+          application.injector.instanceOf[TypeOfSubcontractorView]
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        status(result) mustBe BAD_REQUEST
+
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode
+        )(
+          request,
+          messages(application)
+        ).toString
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
       }
     }
 
     "must return a Bad Request and errors when no value is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val mockSessionRepository =
+        mock[SessionRepository]
+
+      val mockCleanupService =
+        mock[DefaultSubcontractorCleanupService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[DefaultSubcontractorCleanupService]
+              .toInstance(mockCleanupService)
+          )
+          .build()
 
       running(application) {
         val request =
           FakeRequest(POST, subcontractorTypesRoute)
             .withFormUrlEncodedBody()
 
-        val form      = new TypeOfSubcontractorFormProvider()()
-        val boundForm = form.bind(Map.empty)
+        val boundForm =
+          form.bind(Map.empty[String, String])
 
-        val view = application.injector.instanceOf[TypeOfSubcontractorView]
+        val view =
+          application.injector.instanceOf[TypeOfSubcontractorView]
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        status(result) mustBe BAD_REQUEST
 
-        contentAsString(result) must include(messages(application)("typeOfSubcontractor.error.required"))
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode
+        )(
+          request,
+          messages(application)
+        ).toString
+
+        contentAsString(result) must include(
+          messages(application)(
+            "typeOfSubcontractor.error.required"
+          )
+        )
+
+        verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
       }
     }
   }

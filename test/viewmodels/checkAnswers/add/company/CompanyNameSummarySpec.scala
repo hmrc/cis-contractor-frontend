@@ -105,6 +105,34 @@ class CompanyNameSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingS
       CompanyNameSummary.row(answers) shouldBe None
     }
 
+    "must return a SummaryListRow No name provided when the answer does not exists in Amend journey" in {
+      val answers = UserAnswers("test-id")
+
+      val maybeRow = CompanyNameSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("companyName.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include(messages("verify.noName"))
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       = routes.CompanyNameController.onPageLoad(AmendMode).url
+      val expectedHiddenText = messages("companyName.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                   must contain("id" -> "company-name")
+    }
+
     "must HTML-escape special characters correctly (single encoding only)" in {
 
       val name = "O'Reilly & Sons Ltd"

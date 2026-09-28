@@ -58,19 +58,26 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
-        case Some(batch) =>
+
+      val page =
+        ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString)
+
+      request.userAnswers
+        .get(CurrentVerificationBatchResponsePage)
+        .flatMap { batch =>
           batch.subcontractors
             .find(_.subcontractorId == subcontractorId)
             .map { subcontractor =>
-              if (
-                request.userAnswers
-                  .get(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString))
-                  .contains(true)
-              ) {
+
+              val verification =
+                batch.verifications.find(
+                  _.subcontractorId.contains(subcontractorId)
+                )
+
+              if (verification.exists(_.proceed.exists(_.trim.equalsIgnoreCase("Y")))) {
                 Redirect(
                   navigator.nextPage(
-                    ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString),
+                    page,
                     mode,
                     request.userAnswers
                   )
@@ -78,7 +85,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
               } else {
                 val preparedForm =
                   request.userAnswers
-                    .get(ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString))
+                    .get(page)
                     .fold(form)(form.fill)
 
                 Ok(
@@ -91,11 +98,8 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                 )
               }
             }
-            .getOrElse(recoveryRedirect)
-
-        case None =>
-          recoveryRedirect
-      }
+        }
+        .getOrElse(recoveryRedirect)
     }
 
   def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =

@@ -21,6 +21,9 @@ import forms.add.TypeOfSubcontractorFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
+import utils.DefaultSubcontractorCleanupService
+import scala.util.{Failure, Success}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -37,12 +40,14 @@ class TypeOfSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  cleanupService: DefaultSubcontractorCleanupService,
   formProvider: TypeOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TypeOfSubcontractorView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
@@ -56,17 +61,48 @@ class TypeOfSubcontractorController @Inject() (
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, mode))
+            ),
           value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(TypeOfSubcontractorPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TypeOfSubcontractorPage, mode, updatedAnswers))
+            cleanupService.clean(request.userAnswers) match {
+              case Success(cleanedAnswers) =>
+                Future
+                  .fromTry(
+                    cleanedAnswers.set(TypeOfSubcontractorPage, value)
+                  )
+                  .flatMap { updatedAnswers =>
+                    sessionRepository
+                      .set(updatedAnswers)
+                      .map { _ =>
+                        Redirect(
+                          navigator.nextPage(
+                            TypeOfSubcontractorPage,
+                            mode,
+                            updatedAnswers
+                          )
+                        )
+                      }
+                  }
+
+              case Failure(exception) =>
+                logger.error(
+                  "[TypeOfSubcontractorController][onSubmit] Failed to clean previous subcontractor answers",
+                  exception
+                )
+
+                Future.successful(
+                  Redirect(
+                    controllers.routes.JourneyRecoveryController.onPageLoad()
+                  )
+                )
+            }
         )
-  }
+    }
 }

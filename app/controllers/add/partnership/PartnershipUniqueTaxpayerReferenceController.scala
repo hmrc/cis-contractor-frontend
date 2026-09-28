@@ -17,11 +17,13 @@
 package controllers.add.partnership
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipUtrFormProvider
-import models.{AmendMode, Mode}
+import models.{AmendMode, FinalValidationMode, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.add.partnership.{PartnershipHasUtrYesNoPage, PartnershipNamePage, PartnershipUniqueTaxpayerReferencePage}
+import pages.add.partnership.*
+import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -65,8 +67,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
       val yesOrNoPage       = PartnershipHasUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
 
-      request.userAnswers
-        .get(PartnershipNamePage)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode)
         .map { partnershipName =>
           val preparedForm = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage) match {
             case None        => form
@@ -80,8 +82,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
-      request.userAnswers
-        .get(PartnershipNamePage)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()
@@ -89,9 +91,13 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
               value =>
                 val prevValue = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage)
+                val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
 
                 mode match {
                   case AmendMode if prevValue.contains(value) => saveAndContinue(mode, value)
+
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                    saveAndContinue(mode, value)
 
                   case _ =>
                     subcontractorService.isDuplicateUTR(request.userAnswers, value).flatMap {
