@@ -139,8 +139,6 @@ GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAns
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 
-GET   /subcontractor/unmatched/subcontractor-details-updated  controllers.unmatched.UnmatchedSubcontractorDetailsUpdatedController.onPageLoad()
-
 GET   /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
 POST  /subcontractor/remove-unmatched-subcontractor-from-request/:subcontractorId  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
@@ -149,8 +147,6 @@ POST  /subcontractor/proceed-verifying-unmatched-subcontractor/:subcontractorId 
 
 GET   /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/insufficient/subcontractor-details-updated  controllers.insufficient.InsufficientSubcontractorDetailsUpdatedController.onPageLoad()
 
 GET   /agent/no-longer-authorised  controllers.AgentLostAccessController.onPageLoad()
 
@@ -165,7 +161,7 @@ GET   /subcontractor/final-validations/handoff/:handoffId  controllers.finalvali
 GET   /subcontractor/final-validations/complete  controllers.finalvalidations.FinalValidationCompleteController.onPageLoad()
 
 GET   /subcontractor/final-validations/review-subcontractor-details  controllers.finalvalidations.ReviewSubcontractorDetailsController.onPageLoad()
-POST  /final-validations/review-subcontractor-details                controllers.finalvalidations.ReviewSubcontractorDetailsController.onSubmit
+POST  /subcontractor/final-validations/review-subcontractor-details  controllers.finalvalidations.ReviewSubcontractorDetailsController.onSubmit
 
 GET   /subcontractor/final-validations/update-subcontractor-details/:subcontractorId  controllers.finalvalidations.UpdateSubcontractorDetailsController.onPageLoad(subcontractorId: Long)
 POST  /subcontractor/final-validations/update-subcontractor-details/:subcontractorId  controllers.finalvalidations.UpdateSubcontractorDetailsController.onSubmit(subcontractorId: Long)
