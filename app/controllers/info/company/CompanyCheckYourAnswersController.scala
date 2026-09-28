@@ -20,7 +20,6 @@ import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
 import models.amend.AmendJourneyType
-import models.info.CheckYourAnswersValidation
 import models.info.company.CompanyAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -50,7 +49,7 @@ class CompanyCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CompanyAnswersQuery) match {
 
-        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
+        case Some(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -69,7 +68,7 @@ class CompanyCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.companyName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
                 )
@@ -80,7 +79,7 @@ class CompanyCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.companyName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
@@ -94,10 +93,10 @@ class CompanyCheckYourAnswersController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
-        case Some(_) | None =>
+        case None =>
           logger.error(
             "[CompanyCheckYourAnswersController.onPageLoad] " +
-              "CompanyAnswersQuery is missing or invalid"
+              "CompanyAnswersQuery is missing"
           )
 
           Redirect(
@@ -177,4 +176,9 @@ class CompanyCheckYourAnswersController @Inject() (
         CompanyWorksReferenceSummary.row(answers)
       )
   }
+
+  private def displayName(
+    answers: CompanyAnswers
+  )(implicit messages: Messages): String =
+    answers.companyName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
 }
