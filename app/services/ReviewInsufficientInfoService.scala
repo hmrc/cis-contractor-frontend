@@ -91,8 +91,7 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
             sub.subbieResourceRef.get,
             AmendJourneyType.InsufficientInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       utr = utrDisplay(sub),
       editLink = LinkViewModel(
@@ -101,16 +100,14 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
             sub.subbieResourceRef.get,
             AmendJourneyType.InsufficientInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       proceedLink = LinkViewModel(
         controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
           .onPageLoad(sub.subcontractorId)
-          .url,
-        name
+          .url
       ),
-      removeLink = LinkViewModel(removeUrl, name)
+      removeLink = LinkViewModel(removeUrl)
     )
   }
 
@@ -124,8 +121,7 @@ class ReviewInsufficientInfoService @Inject() extends Logging {
             sub.subbieResourceRef.get,
             AmendJourneyType.InsufficientInfo.routeValue
           )
-          .url,
-        name
+          .url
       ),
       utr = utrDisplay(sub)
     )

@@ -171,7 +171,7 @@ object PaginationFluency {
       PaginationLink(
         href = href,
         text = text.map(messages(_)),
-        labelText = labelText.map(messages(_)),
+        labelText = labelText,
         attributes = attributes
       )
   }

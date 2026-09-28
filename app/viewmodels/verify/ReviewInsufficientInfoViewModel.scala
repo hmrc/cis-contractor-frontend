@@ -17,8 +17,7 @@
 package viewmodels.verify
 
 final case class LinkViewModel(
-  url: String,
-  hiddenText: String
+  url: String
 )
 
 final case class MissingSubcontractorRow(
