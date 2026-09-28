@@ -153,6 +153,83 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must render Continue when a valid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      Seq(
+        "manageYourCisReturn",
+        "subcontractors"
+      ).foreach { target =>
+
+        val application =
+          applicationBuilder(Some(userAnswers)).build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            GET,
+            routes.ContractorDetailsCheckAnswersController
+              .onPageLoad(Some(target))
+              .url
+          )
+
+          val result = route(application, request).value
+          val body   = contentAsString(result)
+
+          status(result) mustEqual OK
+
+          body must include("Continue")
+          body must not include "Save and continue"
+        }
+      }
+    }
+
+    "must render Save and continue when an invalid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController
+            .onPageLoad(Some("invalidTarget"))
+            .url
+        )
+
+        val result = route(application, request).value
+        val body   = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        body must include("Save and continue")
+      }
+    }
+
     "must redirect to JourneyRecovery when ContractorSchemePage is missing" in {
 
       val application =
@@ -378,6 +455,118 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           prePopCount = scheme.prePopCount,
           prePopSuccessful = scheme.prePopSuccessful
         )
+      }
+    }
+
+    "must redirect to target without updating contractor details when a valid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      Seq(
+        (
+          "manageYourCisReturn",
+          applicationConfig.manageCisReturnUrl(scheme.instanceId)
+        ),
+        (
+          "subcontractors",
+          applicationConfig.manageSubcontractorsLandingUrl(scheme.instanceId)
+        )
+      ).foreach { case (target, expectedUrl) =>
+        val mockService =
+          mock[ContractorDetailsService]
+
+        val application =
+          applicationBuilder(Some(userAnswers))
+            .overrides(
+              inject
+                .bind[ContractorDetailsService]
+                .toInstance(mockService)
+            )
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            POST,
+            routes.ContractorDetailsCheckAnswersController
+              .onSubmit(Some(target))
+              .url
+          )
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual expectedUrl
+
+          verify(mockService, never())
+            .updateContractorDetails(any())(any())
+        }
+      }
+    }
+
+    "must submit contractor details when an invalid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val mockService =
+        mock[ContractorDetailsService]
+
+      val application =
+        applicationBuilder(Some(userAnswers))
+          .overrides(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
+          )
+          .build()
+
+      when(
+        mockService.updateContractorDetails(
+          any[UpdateContractorSchemeParams]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController
+            .onSubmit(Some("invalidTarget"))
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.ContractorDetailsUpdatedController.onPageLoad().url
+
+        verify(mockService)
+          .updateContractorDetails(
+            any[UpdateContractorSchemeParams]
+          )(any[HeaderCarrier])
       }
     }
 
