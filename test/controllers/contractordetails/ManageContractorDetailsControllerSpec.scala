@@ -357,5 +357,56 @@ class ManageContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
             .url
       }
     }
+
+    "must preserve target when redirecting to ContractorDetailsCheckAnswers" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery, "cisId")
+          .success
+          .value
+
+      when(
+        mockContractorDetailsService.getScheme(eqTo("cisId"))(any())
+      ).thenReturn(
+        Future.successful(schemeWithUtr)
+      )
+
+      when(
+        mockSessionRepository.set(any())
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationWith(
+          userAnswers,
+          mockContractorDetailsService,
+          mockSessionRepository
+        ).build()
+
+      running(application) {
+
+        val target = "manageYourCisReturn"
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.ManageContractorDetailsController
+              .onPageLoad(Some(target))
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+            .onPageLoad(Some(target))
+            .url
+      }
+    }
   }
 }

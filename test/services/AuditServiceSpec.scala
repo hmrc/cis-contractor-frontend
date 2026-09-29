@@ -179,7 +179,7 @@ class AuditServiceSpec
       (detail \ "middleName").as[String] mustBe "Paul"
       (detail \ "surname").as[String] mustBe "Smith"
       (detail \ "tradingNameOfSubcontractor").as[String] mustBe "TradingName"
-      (detail \ "subAddressYesNo").as[Boolean] mustBe true
+      (detail \ "subcontractorAddressYesNo").as[Boolean] mustBe true
       (detail \ "addressOfSubcontractor" \ "addressLine1").as[String] mustBe "4 Other Place"
       (detail \ "addIndividualContactMethodsYesNo").as[Boolean] mustBe true
       (detail \ "individualEmailContactMethod").as[Boolean] mustBe true
@@ -191,7 +191,7 @@ class AuditServiceSpec
       (detail \ "uniqueTaxpayerReferenceYesNo").as[Boolean] mustBe true
       (detail \ "subcontractorsUniqueTaxpayerReference").as[String] mustBe "1111122222"
       (detail \ "nationalInsuranceNumberYesNo").as[Boolean] mustBe true
-      (detail \ "subNationalInsuranceNumber").as[String] mustBe "NH112233D"
+      (detail \ "subcontractorNationalInsuranceNumber").as[String] mustBe "NH112233D"
       (detail \ "worksReferenceNumberYesNo").as[Boolean] mustBe true
       (detail \ "worksReferenceNumber").as[String] mustBe "WORKREF-001"
     }
@@ -247,7 +247,7 @@ class AuditServiceSpec
 
   ".amendSubcontractorEvent" - {
 
-    "must send an individual amend event with only the changed fields diffed" in {
+    "must send an individual amend event with updatedDetails" in {
       val original = OriginalIndividualAnswers(
         individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName),
         tradingName = None,
@@ -308,14 +308,12 @@ class AuditServiceSpec
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "soletrader"
       (detail \ "cisId").as[String] mustBe "cis-001"
-      (detail \ "subbieResourceRef").as[Long] mustBe 99999L
-      (detail \ "originalDetails" \ "firstName").as[String] mustBe "John"
+      (detail \ "subcontractorResourceRef").as[Long] mustBe 99999L
+      (detail \ "originalDetails").toOption mustBe None
       (detail \ "updatedDetails" \ "firstName").as[String] mustBe "Jane"
-      (detail \ "originalDetails" \ "surname").toOption mustBe None
-      (detail \ "updatedDetails" \ "surname").toOption mustBe None
     }
 
-    "must omit subbieResourceRef from the event when AmendSubbieResourceRefQuery is not set" in {
+    "must omit subcontractorResourceRef from the event when AmendSubbieResourceRefQuery is not set" in {
       val ua = emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Individualorsoletrader)
         .success
@@ -324,7 +322,7 @@ class AuditServiceSpec
       service.amendSubcontractorEvent(ua)
 
       val detail = captureDetail()
-      (detail \ "subbieResourceRef").toOption mustBe None
+      (detail \ "subcontractorResourceRef").toOption mustBe None
     }
 
     "must send a company amend event for a limited company" in {

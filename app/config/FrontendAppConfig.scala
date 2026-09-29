@@ -69,6 +69,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def manageYourSubcontractorsUrl(cisId: String): String =
     s"$manageFrontendBaseUrl/subcontractors/$cisId/your-subcontractors"
 
+  def manageCisReturnUrl(cisId: String): String =
+    s"$manageCisReturnBaseUrl$cisId"
+
+  def manageSubcontractorsLandingUrl(cisId: String): String =
+    s"$manageSubcontractorsLandingBaseUrl$cisId"
+
   lazy val loginUrl: String                                  = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String                          = configuration.get[String]("urls.loginContinue")
   lazy val signOutUrl: String                                = configuration.get[String]("urls.signOut")
@@ -91,15 +97,16 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[String]("urls.constructionIndustryAgentAccount")
   lazy val constructionIndustryOrgAccountUrl: String         = configuration.get[String]("urls.constructionIndustryOrgAccount")
   lazy val cisContractorGuideUrl: String                     = configuration.get[String]("urls.cisContractorGuide")
-  lazy val signIntoCISURL: String                            = configuration.get[String]("urls.signIntoCIS")
   lazy val portalAccountBaseUrl: String                      = configuration.get[String]("portal-account.host")
   lazy val authoriseClientRequestPath: String                = configuration.get[String]("urls.authoriseClientRequest")
   lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String =
     configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
   lazy val clientListSearchUrl: String                       = configuration.get[String]("urls.clientListSearch")
+  lazy val manageCisReturnBaseUrl: String                    = configuration.get[String]("urls.manageCisReturn")
 
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
+  lazy val manageSubcontractorsLandingBaseUrl: String = configuration.get[String]("urls.manageSubcontractorsLanding")
+  private val exitSurveyBaseUrl: String               = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  lazy val exitSurveyUrl: String                      = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
