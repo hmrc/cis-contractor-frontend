@@ -44,41 +44,49 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
   view: VerifyYourSubcontractorsYesNoView
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with PendingVerificationRequestGuard {
 
   private val form = formProvider()
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    redirectIfVerificationRequestInProgress(request.userAnswers).getOrElse {
+      val preparedForm = request.userAnswers.get(VerifyYourSubcontractorsYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    val preparedForm = request.userAnswers.get(VerifyYourSubcontractorsYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      Ok(view(preparedForm))
     }
-
-    Ok(view(preparedForm))
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield
-            if (value) {
-              Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, updatedAnswers))
-            } else {
-              updatedAnswers.get(CisIdQuery) match {
-                case Some(cisId) =>
-                  Redirect(s"${appConfig.manageSubcontractorsUrl}/$cisId")
+    redirectIfVerificationRequestInProgress(request.userAnswers) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
 
-                case None =>
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
-            }
-      )
+      case None =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield
+                if (value) {
+                  Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage, NormalMode, updatedAnswers))
+                } else {
+                  updatedAnswers.get(CisIdQuery) match {
+                    case Some(cisId) =>
+                      Redirect(s"${appConfig.manageSubcontractorsUrl}/$cisId")
+
+                    case None =>
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  }
+                }
+          )
+    }
   }
 }
