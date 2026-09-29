@@ -32,9 +32,9 @@
     pageNavigator: components.PageNavigator
 )
 
-@(form: Form[Set[String]], mode: Mode, rows: Seq[SubcontractorReverifyRow], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int)(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[String]], mode: Mode, rows: Seq[SubcontractorReverifyRow], paginationViewModel: PaginationViewModel, page: Int, startIndex: Int, totalCount: Int, totalPages: Int = 1)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("verify.selectSubcontractorsToReverify.title"))) {
+@layout(pageTitle = title(form, withPagination(messages("verify.selectSubcontractorsToReverify.title"), page, totalPages))) {
 
     @formHelper(
         action = controllers.verify.routes.SelectSubcontractorsToReverifyController.onSubmit(mode, page),

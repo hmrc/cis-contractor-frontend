@@ -20,7 +20,6 @@ import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
 import models.amend.AmendJourneyType
-import models.info.CheckYourAnswersValidation
 import models.info.partnership.PartnershipAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -50,7 +49,7 @@ class PartnershipCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(PartnershipAnswersQuery) match {
 
-        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
+        case Some(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -69,7 +68,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.partnershipName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
                 )
@@ -80,7 +79,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.partnershipName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
@@ -94,10 +93,10 @@ class PartnershipCheckYourAnswersController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
-        case Some(_) | None =>
+        case None =>
           logger.error(
             "[PartnershipCheckYourAnswersController.onPageLoad] " +
-              "PartnershipAnswersQuery is missing or invalid"
+              "PartnershipAnswersQuery is missing"
           )
 
           Redirect(
@@ -185,4 +184,9 @@ class PartnershipCheckYourAnswersController @Inject() (
         PartnershipWorksReferenceNumberSummary.row(answers)
       )
   }
+
+  private def displayName(
+    answers: PartnershipAnswers
+  )(implicit messages: Messages): String =
+    answers.partnershipName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
 }

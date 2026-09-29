@@ -61,7 +61,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
+          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
           val doc  = Jsoup.parse(html.body)
 
           doc.select("h1").text must include(messages("contractordetails.contractorDetailsCheckAnswers.heading"))
@@ -107,7 +107,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
+          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
           val doc  = Jsoup.parse(html.body)
 
           doc.select(".govuk-summary-list__value").text mustBe ""
@@ -132,7 +132,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl)
+          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
           val doc  = Jsoup.parse(html.body)
 
           val hidden = doc.select(".govuk-visually-hidden").eachText()

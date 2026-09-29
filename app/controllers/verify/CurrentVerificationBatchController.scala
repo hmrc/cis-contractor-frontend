@@ -17,14 +17,14 @@
 package controllers.verify
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.Mode
+import models.{Mode, UserAnswers}
 import models.response.GetCurrentVerificationBatchResponse
 import models.validation.SubcontractorValidationFailure
 import pages.validation.SubcontractorValidationFailuresPage
-import pages.verify.CurrentVerificationBatchResponsePage
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader, Result}
 import repositories.SessionRepository
 import services.{SubcontractorDetailsValidator, SubcontractorPartnershipValidator, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -50,45 +50,51 @@ class CurrentVerificationBatchController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       verificationBatchService
-        .getCurrentVerificationBatch(
-          request.userAnswers
-        )
+        .refreshNewestVerificationBatch(request.userAnswers)
         .flatMap { updatedAnswers =>
-          updatedAnswers
-            .get(CurrentVerificationBatchResponsePage)
-            .map { response =>
-              val validationFailures =
-                SubcontractorValidationFailure.merge(
-                  subcontractorDetailsValidator.validate(
-                    response.subcontractors
-                  ),
-                  subcontractorPartnershipValidator.validate(
-                    response.subcontractors
-                  )
-                )
+          if (verificationBatchService.latestBatchCanBeModified(updatedAnswers)) {
+            verificationBatchService
+              .getCurrentVerificationBatch(updatedAnswers)
+              .flatMap { currentAnswers =>
+                currentAnswers
+                  .get(CurrentVerificationBatchResponsePage)
+                  .map { response =>
+                    val validationFailures =
+                      SubcontractorValidationFailure.merge(
+                        subcontractorDetailsValidator.validate(
+                          response.subcontractors
+                        ),
+                        subcontractorPartnershipValidator.validate(
+                          response.subcontractors
+                        )
+                      )
 
-              for {
-                answersWithFailures <-
-                  Future.fromTry(
-                    updatedAnswers.set(
-                      SubcontractorValidationFailuresPage,
-                      validationFailures
+                    for {
+                      answersWithFailures <-
+                        Future.fromTry(
+                          currentAnswers.set(
+                            SubcontractorValidationFailuresPage,
+                            validationFailures
+                          )
+                        )
+
+                      _ <- sessionRepository.set(
+                             answersWithFailures
+                           )
+                    } yield redirectFor(response, mode)
+                  }
+                  .getOrElse {
+                    Future.successful(
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController
+                          .onPageLoad()
+                      )
                     )
-                  )
-
-                _ <- sessionRepository.set(
-                       answersWithFailures
-                     )
-              } yield redirectFor(response, mode)
-            }
-            .getOrElse {
-              Future.successful(
-                Redirect(
-                  controllers.routes.JourneyRecoveryController
-                    .onPageLoad()
-                )
-              )
-            }
+                  }
+              }
+          } else {
+            createVerificationBatch(updatedAnswers, mode)
+          }
         }
         .recover { case throwable =>
           logger.error(
@@ -117,8 +123,57 @@ class CurrentVerificationBatchController @Inject() (
       )
     } else {
       Redirect(
-        controllers.verify.routes.CreateVerificationBatchAndVerificationsController
-          .onSubmit(mode)
+        controllers.routes.JourneyRecoveryController
+          .onPageLoad()
       )
     }
+
+  private def createVerificationBatch(
+    userAnswers: UserAnswers,
+    mode: Mode
+  )(implicit request: RequestHeader): Future[Result] = {
+    val verifyIdsRaw: Seq[String] =
+      userAnswers
+        .get(SelectSubcontractorPage)
+        .map(_.toSeq.map(_.id))
+        .getOrElse(Seq.empty)
+
+    val reverifyIdsRaw: Seq[String] =
+      userAnswers
+        .get(SelectSubcontractorsToReverifyPage)
+        .map(_.toSeq.map(_.id))
+        .getOrElse(Seq.empty)
+
+    val selectedIdsEither =
+      for {
+        verifyIds   <- parseIds("SelectSubcontractorPage", verifyIdsRaw)
+        reverifyIds <- parseIds("SelectSubcontractorsToReverifyPage", reverifyIdsRaw)
+      } yield (verifyIds ++ reverifyIds).distinct
+
+    selectedIdsEither match {
+      case Left(msg) =>
+        logger.error(s"[CurrentVerificationBatchController.createVerificationBatch] $msg")
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+      case Right(selectedIds) =>
+        verificationBatchService
+          .createVerificationBatchAndVerifications(
+            userAnswers = userAnswers,
+            selectedSubcontractorIds = selectedIds,
+            actionIndicator = None
+          )
+          .map(_ =>
+            Redirect(
+              controllers.verify.routes.CheckVerificationBatchReadinessController
+                .checkVerificationBatchReadiness(mode)
+            )
+          )
+    }
+  }
+
+  private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
+    val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
+    if (parsed.forall(_.isDefined)) Right(parsed.flatten)
+    else Left(s"Invalid subcontractor id(s) found in $label")
+  }
 }
