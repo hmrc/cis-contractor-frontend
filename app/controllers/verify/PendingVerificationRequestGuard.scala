@@ -30,8 +30,7 @@ trait PendingVerificationRequestGuard extends Results {
       .flatMap(_.verificationBatch.flatMap(_.status))
       .flatMap(VerificationBatchStatus.from)
       .map(status => CheckLatestSubmissionStatusService.check(Some(status)))
-      .collect {
-        case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
-          Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
+      .collect { case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
+        Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
       }
 }
