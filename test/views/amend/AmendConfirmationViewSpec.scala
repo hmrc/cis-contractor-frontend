@@ -144,7 +144,7 @@ class AmendConfirmationViewSpec extends AnyWordSpec with Matchers with GuiceOneA
           "amendConfirmation.beforeYouGo.takeAShortSurvey"
         )
 
-      surveyLink.attr("href") mustBe appConfig.feedbackUrl
+      surveyLink.attr("href") mustBe appConfig.exitSurveyUrl
     }
 
     "hide the before you go section for insufficient info journey" in new Setup {
