@@ -117,7 +117,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
 
   "CreateVerificationBatchAndVerificationsController.onSubmit" - {
 
-    "must get current verification batch when CurrentVerificationBatchResponsePage is missing and redirect to JourneyRecovery when service fails" in {
+    "must get newest verification batch when NewestVerificationBatchResponsePage is missing and redirect to JourneyRecovery when service fails" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -126,8 +126,8 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .success
           .value
 
-      when(mockService.getCurrentVerificationBatch(any[UserAnswers])(any()))
-        .thenReturn(Future.failed(new RuntimeException("current batch failed")))
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.failed(new RuntimeException("newest batch failed")))
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -143,7 +143,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockService).getCurrentVerificationBatch(eqTo(ua))(any())
+        verify(mockService).refreshNewestVerificationBatch(eqTo(ua))(any())
 
         verify(mockService, never())
           .createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], any())(any())
@@ -165,6 +165,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .success
           .value
 
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
       val app =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -184,7 +187,7 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
       }
     }
 
-    "must redirect to ModifyVerificationBatchAndVerificationsController when current batch exists and not call service" in {
+    "must create a new verification batch even when stale current batch data exists" in {
       val mockService = mock[VerificationService]
 
       val ua =
@@ -195,6 +198,50 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
           .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
           .success
           .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
+      when(
+        mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any())
+      ).thenReturn(Future.successful(ua))
+
+      val app =
+        applicationBuilder(userAnswers = Some(ua))
+          .overrides(bind[VerificationService].toInstance(mockService))
+          .build()
+
+      running(app) {
+        val controller = app.injector.instanceOf[CreateVerificationBatchAndVerificationsController]
+
+        val request = FakeRequest(POST, "/test-only")
+        val result  = controller.onSubmit(NormalMode)(request)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.CheckVerificationBatchReadinessController
+            .checkVerificationBatchReadiness(NormalMode)
+            .url
+
+        verify(mockService)
+          .createVerificationBatchAndVerifications(eqTo(ua), eqTo(Seq(10L)), eqTo(None))(any())
+      }
+    }
+
+    "must redirect to modify when the latest batch can be modified" in {
+      val mockService = mock[VerificationService]
+
+      val ua =
+        emptyUserAnswers
+          .set(SelectSubcontractorPage, Set(SubcontractorViewModel("10", "Name 10")))
+          .success
+          .value
+
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
+      when(mockService.latestBatchCanBeModified(eqTo(ua)))
+        .thenReturn(true)
 
       val app =
         applicationBuilder(userAnswers = Some(ua))
@@ -250,6 +297,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any())
       ).thenReturn(Future.successful(ua))
 
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
       val app =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -292,6 +342,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any())
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
+      when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
+        .thenReturn(Future.successful(ua))
+
       val app =
         applicationBuilder(userAnswers = Some(ua))
           .overrides(bind[VerificationService].toInstance(mockService))
@@ -328,6 +381,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         .value
 
     when(mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any()))
+      .thenReturn(Future.successful(ua))
+
+    when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
       .thenReturn(Future.successful(ua))
 
     val app =
@@ -373,6 +429,9 @@ class CreateVerificationBatchAndVerificationsControllerSpec extends SpecBase wit
         .value
 
     when(mockService.createVerificationBatchAndVerifications(any[UserAnswers], any[Seq[Long]], eqTo(None))(any()))
+      .thenReturn(Future.successful(ua))
+
+    when(mockService.refreshNewestVerificationBatch(any[UserAnswers])(any()))
       .thenReturn(Future.successful(ua))
 
     val app =
