@@ -90,7 +90,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
             .url
       }
 
-      verify(mockService, times(2))
+      verify(mockService)
         .refreshNewestVerificationBatch(
           any[UserAnswers]
         )(any[HeaderCarrier])
