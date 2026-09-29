@@ -55,9 +55,8 @@ class CurrentVerificationBatchController @Inject() (
           if (verificationBatchService.latestBatchCanBeModified(updatedAnswers)) {
             verificationBatchService
               .getCurrentVerificationBatch(updatedAnswers)
-              .flatMap(verificationBatchService.refreshNewestVerificationBatch)
-              .flatMap { refreshedAnswers =>
-                refreshedAnswers
+              .flatMap { currentAnswers =>
+                currentAnswers
                   .get(CurrentVerificationBatchResponsePage)
                   .map { response =>
                     val validationFailures =
@@ -73,7 +72,7 @@ class CurrentVerificationBatchController @Inject() (
                     for {
                       answersWithFailures <-
                         Future.fromTry(
-                          refreshedAnswers.set(
+                          currentAnswers.set(
                             SubcontractorValidationFailuresPage,
                             validationFailures
                           )

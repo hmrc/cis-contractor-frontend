@@ -272,7 +272,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(subcontractors)
@@ -376,7 +376,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(subcontractors)
@@ -483,7 +483,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(subcontractors)
@@ -562,7 +562,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(
@@ -693,7 +693,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(
@@ -762,7 +762,7 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
         Future.successful(updatedAnswers)
       )
 
-      stubLatestAllowsModify(mockService, emptyUserAnswers, updatedAnswers)
+      stubLatestAllowsModify(mockService, emptyUserAnswers)
 
       when(
         mockValidator.validate(
@@ -821,17 +821,6 @@ class CurrentVerificationBatchControllerSpec extends SpecBase with MockitoSugar 
       bind[SessionRepository]
         .toInstance(sessionRepository)
     ).build()
-
-  private def stubLatestAllowsModify(
-    service: VerificationService,
-    firstRefresh: UserAnswers,
-    secondRefresh: UserAnswers
-  ): Unit = {
-    when(service.refreshNewestVerificationBatch(any[UserAnswers])(any[HeaderCarrier]))
-      .thenReturn(Future.successful(firstRefresh), Future.successful(secondRefresh))
-    when(service.latestBatchCanBeModified(any[UserAnswers]))
-      .thenReturn(true)
-  }
 
   private def stubLatestAllowsModify(
     service: VerificationService,

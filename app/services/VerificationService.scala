@@ -504,10 +504,9 @@ class VerificationService @Inject() (
       _ <-
         if (latestBatchCanBeModified(latestUa)) {
           for {
-            refreshedUa  <- getCurrentVerificationBatch(latestUa)
-            afterRefresh <- refreshNewestVerificationBatch(refreshedUa)
+            refreshedUa <- getCurrentVerificationBatch(latestUa)
 
-            current <- afterRefresh
+            current <- refreshedUa
                          .get(CurrentVerificationBatchResponsePage)
                          .map(Future.successful)
                          .getOrElse(

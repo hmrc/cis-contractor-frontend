@@ -1880,7 +1880,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           eqTo(instanceId)
         )(any[HeaderCarrier])
 
-      verify(mockConnector, times(3))
+      verify(mockConnector, times(2))
         .getNewestVerificationBatch(
           eqTo(instanceId)
         )(any[HeaderCarrier])
