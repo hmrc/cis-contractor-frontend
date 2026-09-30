@@ -23,11 +23,11 @@ class RemoveSubcontractorVerifyRequestPageSpec extends SpecBase {
 
   "RemoveSubcontractorVerifyRequestPage" - {
 
-    val subcontractorId = 10
+    val verificationResourceRef = 10
 
     "must have the correct path" in {
-      RemoveSubcontractorVerifyRequestPage(subcontractorId).path mustBe (
-        JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
+      RemoveSubcontractorVerifyRequestPage(verificationResourceRef).path mustBe (
+        JsPath \ "removeSubcontractorVerifyRequest" \ verificationResourceRef.toString \ "removed"
       )
     }
   }

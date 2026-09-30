@@ -58,35 +58,29 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
         case Some(batch) =>
-          batch.subcontractors
-            .find(_.subcontractorId == subcontractorId)
-            .map { subcontractor =>
+          batch.verifications
+            .find(_.subcontractorId.contains(subcontractorId))
+            .flatMap(_.verificationResourceRef) match {
+            case Some(verificationResourceRef) =>
               if (
-                request.userAnswers
-                  .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
-                  .contains(true)
+                request.userAnswers.get(RemoveSubcontractorVerifyRequestPage(verificationResourceRef)).contains(true)
               ) {
-                Redirect(
-                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
-                )
+                Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
               } else {
-                val preparedForm =
-                  request.userAnswers
-                    .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
-                    .fold(form)(form.fill)
-
-                Ok(
-                  view(
-                    preparedForm,
-                    subcontractor.displayName,
-                    subcontractorId
-                  )
-                )
+                batch.subcontractors
+                  .find(_.subcontractorId == subcontractorId)
+                  .map { subcontractor =>
+                    val preparedForm =
+                      request.userAnswers
+                        .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
+                        .fold(form)(form.fill)
+                    Ok(view(preparedForm, subcontractor.displayName, subcontractorId))
+                  }
+                  .getOrElse(recoveryRedirect)
               }
-            }
-            .getOrElse(recoveryRedirect)
-
-        case None =>
+            case None                          => recoveryRedirect
+          }
+        case None        =>
           recoveryRedirect
       }
     }
@@ -114,7 +108,8 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                             for {
                               updatedAnswers <-
                                 Future.fromTry(
-                                  request.userAnswers.set(RemoveSubcontractorVerifyRequestPage(subcontractorId), value)
+                                  request.userAnswers
+                                    .set(RemoveSubcontractorVerifyRequestPage(verificationResourceRef), value)
                                 )
                               deleteResponse <-
                                 verificationService.deleteVerification(updatedAnswers, verificationResourceRef)

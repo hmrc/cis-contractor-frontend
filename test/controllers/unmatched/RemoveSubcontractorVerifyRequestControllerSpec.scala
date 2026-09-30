@@ -166,13 +166,13 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered YES" in {
+    "must redirect to ReviewUnmatchedSubcontractorsController when the question has previously been answered YES" in {
 
       val userAnswers = UserAnswers(userAnswersId)
         .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
         .success
         .value
-        .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), true)
+        .set(RemoveSubcontractorVerifyRequestPage(1111L), true)
         .success
         .value
 
