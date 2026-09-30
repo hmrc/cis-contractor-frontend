@@ -23,7 +23,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.contractordetails.{AddEmailAddressYesNoPage, AddSchemeNameYesNoPage, ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.CisIdPage
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -47,6 +48,67 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
 
   "ContractorDetailsCheckAnswersController" - {
 
+    "must return OK and the correct view for a GET when all required answers exist" in {
+      Seq(
+        (
+          "AGENT",
+          applicationConfig.constructionIndustryAgentAccountUrl + "1",
+          true,
+          Some(
+            emptyUserAnswers
+              .set(ContractorSchemePage, scheme)
+              .success
+              .value
+              .set(CisIdPage, "1")
+              .success
+              .value
+              .set(AddSchemeNameYesNoPage, false)
+              .success
+              .value
+              .set(AddEmailAddressYesNoPage, false)
+              .success
+              .value
+          )
+        ),
+        (
+          "ORGANISATION",
+          applicationConfig.constructionIndustryOrgAccountUrl,
+          false,
+          Some(
+            emptyUserAnswers
+              .set(ContractorSchemePage, scheme)
+              .success
+              .value
+              .set(AddSchemeNameYesNoPage, false)
+              .success
+              .value
+              .set(AddEmailAddressYesNoPage, false)
+              .success
+              .value
+          )
+        )
+      ).foreach { case (_, cisAccountUrl, isAgent, userAnswers) =>
+        val application =
+          applicationBuilder(
+            userAnswers = userAnswers,
+            isAgent = isAgent
+          ).build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              GET,
+              routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+            )
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) must include(cisAccountUrl)
+        }
+      }
+    }
+
     "must return OK and the correct view for a GET when answers exist" in {
 
       val userAnswers =
@@ -57,7 +119,13 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           .set(ContractorUtrPage, "1234567890")
           .success
           .value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
           .set(SchemeNamePage, "Scheme ABC")
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, true)
           .success
           .value
           .set(EnterContractorEmailAddressPage, "test@mail.com")
@@ -85,6 +153,83 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must render Continue when a valid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      Seq(
+        "manageYourCisReturn",
+        "subcontractors"
+      ).foreach { target =>
+
+        val application =
+          applicationBuilder(Some(userAnswers)).build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            GET,
+            routes.ContractorDetailsCheckAnswersController
+              .onPageLoad(Some(target))
+              .url
+          )
+
+          val result = route(application, request).value
+          val body   = contentAsString(result)
+
+          status(result) mustEqual OK
+
+          body must include("Continue")
+          body must not include "Save and continue"
+        }
+      }
+    }
+
+    "must render Save and continue when an invalid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController
+            .onPageLoad(Some("invalidTarget"))
+            .url
+        )
+
+        val result = route(application, request).value
+        val body   = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        body must include("Save and continue")
+      }
+    }
+
     "must redirect to JourneyRecovery when ContractorSchemePage is missing" in {
 
       val application =
@@ -106,11 +251,44 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must render the page when only ContractorSchemePage exists" in {
+    "must redirect to JourneyRecovery when required details are missing" in {
 
       val userAnswers =
         emptyUserAnswers
           .set(ContractorSchemePage, scheme)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must render the page when scheme name and email address are not required" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
           .success
           .value
 
@@ -134,6 +312,72 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must redirect to JourneyRecovery when AddSchemeNameYesNoPage is true but SchemeNamePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to JourneyRecovery when AddEmailAddressYesNoPage is true but EnterContractorEmailAddressPage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, true)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must submit contractor details and redirect to Contractor Details Updated page" in {
 
       val userAnswers =
@@ -144,12 +388,19 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           .set(ContractorUtrPage, "1234567890")
           .success
           .value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
           .set(SchemeNamePage, "Scheme ABC")
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, true)
           .success
           .value
           .set(EnterContractorEmailAddressPage, "test@mail.com")
           .success
           .value
+
       val mockService =
         mock[ContractorDetailsService]
 
@@ -206,7 +457,120 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
         )
       }
     }
-    "must redirect to journey recovery on submit when ContractorSchemePage is missing" in {
+
+    "must redirect to target without updating contractor details when a valid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      Seq(
+        (
+          "manageYourCisReturn",
+          applicationConfig.manageCisReturnUrl(scheme.instanceId)
+        ),
+        (
+          "subcontractors",
+          applicationConfig.manageSubcontractorsLandingUrl(scheme.instanceId)
+        )
+      ).foreach { case (target, expectedUrl) =>
+        val mockService =
+          mock[ContractorDetailsService]
+
+        val application =
+          applicationBuilder(Some(userAnswers))
+            .overrides(
+              inject
+                .bind[ContractorDetailsService]
+                .toInstance(mockService)
+            )
+            .build()
+
+        running(application) {
+
+          val request = FakeRequest(
+            POST,
+            routes.ContractorDetailsCheckAnswersController
+              .onSubmit(Some(target))
+              .url
+          )
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual expectedUrl
+
+          verify(mockService, never())
+            .updateContractorDetails(any())(any())
+        }
+      }
+    }
+
+    "must submit contractor details when an invalid target is supplied" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val mockService =
+        mock[ContractorDetailsService]
+
+      val application =
+        applicationBuilder(Some(userAnswers))
+          .overrides(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
+          )
+          .build()
+
+      when(
+        mockService.updateContractorDetails(
+          any[UpdateContractorSchemeParams]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController
+            .onSubmit(Some("invalidTarget"))
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.ContractorDetailsUpdatedController.onPageLoad().url
+
+        verify(mockService)
+          .updateContractorDetails(
+            any[UpdateContractorSchemeParams]
+          )(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to JourneyRecovery on submit when ContractorSchemePage is missing" in {
 
       val mockService =
         mock[ContractorDetailsService]
@@ -239,11 +603,152 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to journey recovery when submitContractorDetails fails" in {
+    "must redirect to JourneyRecovery on submit when required details are missing" in {
 
       val userAnswers =
         emptyUserAnswers
           .set(ContractorSchemePage, scheme)
+          .success
+          .value
+
+      val mockService =
+        mock[ContractorDetailsService]
+
+      val application =
+        applicationBuilder(Some(userAnswers))
+          .overrides(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController.onSubmit().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never())
+          .updateContractorDetails(any())(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery on submit when AddSchemeNameYesNoPage is true but SchemeNamePage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+
+      val mockService =
+        mock[ContractorDetailsService]
+
+      val application =
+        applicationBuilder(Some(userAnswers))
+          .overrides(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController.onSubmit().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never())
+          .updateContractorDetails(any())(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery on submit when AddEmailAddressYesNoPage is true but EnterContractorEmailAddressPage is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, true)
+          .success
+          .value
+
+      val mockService =
+        mock[ContractorDetailsService]
+
+      val application =
+        applicationBuilder(Some(userAnswers))
+          .overrides(
+            inject
+              .bind[ContractorDetailsService]
+              .toInstance(mockService)
+          )
+          .build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          POST,
+          routes.ContractorDetailsCheckAnswersController.onSubmit().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService, never())
+          .updateContractorDetails(any())(any())
+      }
+    }
+
+    "must redirect to JourneyRecovery when submitContractorDetails fails" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
+          .set(SchemeNamePage, "Scheme ABC")
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, true)
+          .success
+          .value
+          .set(EnterContractorEmailAddressPage, "test@mail.com")
           .success
           .value
 
@@ -282,6 +787,5 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
   }
 }

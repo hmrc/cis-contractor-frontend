@@ -25,6 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,10 +36,23 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   private val cisId             = "INST-123"
   private val subbieResourceRef = 1001L
+  private val journeyType       = "insufficient"
+
+  private val userAnswersWithCisId =
+    emptyUserAnswers
+      .set(
+        CisIdQuery,
+        cisId
+      )
+      .success
+      .value
 
   private lazy val viewOnlySubcontractorRoute =
     controllers.info.routes.SubcontractorController
-      .onPageLoad(cisId, subbieResourceRef)
+      .onPageLoad(
+        subbieResourceRef,
+        journeyType
+      )
       .url
 
   private val baseSubcontractor =
@@ -91,12 +105,16 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
   private def applicationWith(
     mockService: SubcontractorService,
     mockSessionRepository: SessionRepository,
-    userAnswers: Option[UserAnswers] = Some(emptyUserAnswers)
+    userAnswers: Option[UserAnswers] = Some(userAnswersWithCisId)
   ) =
-    applicationBuilder(userAnswers = userAnswers)
+    applicationBuilder(
+      userAnswers = userAnswers
+    )
       .overrides(
-        bind[SubcontractorService].toInstance(mockService),
-        bind[SessionRepository].toInstance(mockSessionRepository)
+        bind[SubcontractorService]
+          .toInstance(mockService),
+        bind[SessionRepository]
+          .toInstance(mockSessionRepository)
       )
       .build()
 
@@ -147,7 +165,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.routes.IndividualCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -204,7 +222,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.company.routes.CompanyCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -261,7 +279,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.partnership.routes.PartnershipCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -318,7 +336,7 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.info.trust.routes.TrustCheckYourAnswersController
-              .onPageLoad()
+              .onPageLoad(journeyType)
               .url
 
           verify(mockService, times(1))
@@ -514,6 +532,44 @@ class SubcontractorControllerSpec extends SpecBase with MockitoSugar {
             controllers.routes.JourneyRecoveryController
               .onPageLoad()
               .url
+
+          verify(mockSessionRepository, never())
+            .set(any[UserAnswers])
+        }
+      }
+
+      "must redirect to JourneyRecovery when CIS ID is missing from UserAnswers" in {
+
+        val mockService           = mock[SubcontractorService]
+        val mockSessionRepository = mock[SessionRepository]
+
+        val application =
+          applicationWith(
+            mockService,
+            mockSessionRepository,
+            Some(emptyUserAnswers)
+          )
+
+        running(application) {
+
+          val result =
+            route(
+              application,
+              FakeRequest(GET, viewOnlySubcontractorRoute)
+            ).value
+
+          status(result) mustBe SEE_OTHER
+
+          redirectLocation(result).value mustBe
+            controllers.routes.JourneyRecoveryController
+              .onPageLoad()
+              .url
+
+          verify(mockService, never())
+            .getSubcontractor(
+              any[String],
+              any[Long]
+            )(any[HeaderCarrier])
 
           verify(mockSessionRepository, never())
             .set(any[UserAnswers])

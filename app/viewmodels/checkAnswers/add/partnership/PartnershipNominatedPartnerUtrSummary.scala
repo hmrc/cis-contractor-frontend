@@ -22,6 +22,7 @@ import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipNominatedPartnerUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.checkAnswers.UtrViewModel
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -31,7 +32,7 @@ object PartnershipNominatedPartnerUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     answers.get(PartnershipNominatedPartnerUtrPage).map { answer =>
-      val value = ValueViewModel(answer)
+      val value = UtrViewModel(answer)
       if (showActions) {
         val actions = Seq(
           ActionItemViewModel(
@@ -66,7 +67,7 @@ object PartnershipNominatedPartnerUtrSummary {
         } else {
           "partnershipNominatedPartnerUtr.checkYourAnswersLabel"
         },
-        value = ValueViewModel(answer),
+        value = UtrViewModel(answer),
         actions = Seq.empty
       )
     }

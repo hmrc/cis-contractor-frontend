@@ -18,15 +18,16 @@ package controllers.add.company
 
 import controllers.actions.*
 import forms.add.company.CompanyMobileNumberFormProvider
-import models.Mode
+import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
 import navigation.Navigator
-import pages.add.company.{CompanyContactMethodOptionsPage, CompanyMobileNumberPage, CompanyNamePage}
+import pages.add.company.{CompanyContactMethodOptionsPage, CompanyMobileNumberPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyMobileNumberView
 
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class CompanyMobileNumberController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyMobileNumberFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyMobileNumberView
 )(implicit ec: ExecutionContext)
@@ -52,29 +54,41 @@ class CompanyMobileNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = request.userAnswers.get(CompanyNamePage)
+      val companyName   = subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
 
-      (companyName, contactOption) match {
-        case (Some(companyName), Some(options)) if options.contains(ContactMethodOptions.Mobile) =>
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (companyName, mobileIsAvailable) match {
+        case (Some(companyName), true) =>
           val preparedForm = request.userAnswers.get(CompanyMobileNumberPage) match {
             case None        => form
             case Some(value) => form.fill(value)
           }
           Ok(view(preparedForm, mode, companyName))
 
-        case (Some(_), _) =>
+        case (Some(_), false) =>
           Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
-        case _            =>
+        case _                =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
+      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
+
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
       (for {
-        companyName    <- request.userAnswers.get(CompanyNamePage)
-        contactMethods <- request.userAnswers.get(CompanyContactMethodOptionsPage)
-        if contactMethods.contains(ContactMethodOptions.Mobile)
+        companyName <- companyName
+        if mobileIsAvailable
       } yield form
         .bindFromRequest()
         .fold(

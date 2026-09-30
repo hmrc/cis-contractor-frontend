@@ -19,6 +19,7 @@ package controllers.info
 import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
+import models.amend.AmendJourneyType
 import models.info.IndividualAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -43,7 +44,7 @@ class IndividualCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(journeyType: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(IndividualAnswersQuery) match {
 
@@ -58,18 +59,43 @@ class IndividualCheckYourAnswersController @Inject() (
               rows = detailsRows(answers).flatten
             )
 
-          Ok(
-            view(
-              subcontractorInformationList,
-              detailsList,
-              displayName(answers)
-            )
-          )
+          val messages = request.messages
 
-        case None =>
+          AmendJourneyType.fromString(journeyType) match {
+            case Some(AmendJourneyType.InsufficientInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  displayName(answers),
+                  controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
+                )
+              )
+
+            case Some(AmendJourneyType.UnmatchedInfo) =>
+              Ok(
+                view(
+                  subcontractorInformationList,
+                  detailsList,
+                  displayName(answers),
+                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
+                  messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
+                )
+              )
+
+            case _ =>
+              logger.error(
+                "[IndividualCheckYourAnswersController.onPageLoad] " +
+                  "journeyType is invalid"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+
+        case Some(_) | None =>
           logger.error(
             "[IndividualCheckYourAnswersController.onPageLoad] " +
-              "IndividualAnswersQuery is missing"
+              "IndividualAnswersQuery is missing or invalid"
           )
 
           Redirect(

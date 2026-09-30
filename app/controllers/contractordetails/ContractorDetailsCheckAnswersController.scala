@@ -18,11 +18,13 @@ package controllers.contractordetails
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.requests.UpdateContractorSchemeParams
-import pages.contractordetails.{ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import models.Scheme
+import models.requests.{DataRequest, UpdateContractorSchemeParams}
+import pages.contractordetails.{AddEmailAddressYesNoPage, AddSchemeNameYesNoPage, ContractorSchemePage, ContractorUtrPage, EnterContractorEmailAddressPage, SchemeNamePage}
+import pages.CisIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.contractordetails.*
@@ -44,25 +46,44 @@ class ContractorDetailsCheckAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(target: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(ContractorSchemePage) match {
 
-        case Some(scheme) =>
-          val summaryRows = Seq(
-            ContractorUtrSummary.row(request.userAnswers),
-            AddSchemeNameYesNoSummary.row(request.userAnswers),
-            SchemeNameSummary.row(request.userAnswers),
-            AddEmailAddressYesNoSummary.row(request.userAnswers),
-            EnterContractorEmailAddressSummary.row(request.userAnswers)
-          ).flatten
-
-          Ok(
-            view(
-              scheme.accountsOfficeReference,
-              summaryRows
+      val cisAccountUrl =
+        if (!request.isAgent) {
+          appConfig.constructionIndustryOrgAccountUrl
+        } else {
+          request.userAnswers
+            .get(CisIdPage)
+            .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
             )
-          )
+        }
+
+      request.userAnswers.get(ContractorSchemePage) match {
+        case Some(scheme) =>
+          if (hasRequiredDetails(request)) {
+            val summaryRows = Seq(
+              ContractorUtrSummary.row(request.userAnswers),
+              AddSchemeNameYesNoSummary.row(request.userAnswers),
+              SchemeNameSummary.row(request.userAnswers),
+              AddEmailAddressYesNoSummary.row(request.userAnswers),
+              EnterContractorEmailAddressSummary.row(request.userAnswers)
+            ).flatten
+
+            Ok(
+              view(
+                scheme.accountsOfficeReference,
+                summaryRows,
+                cisAccountUrl,
+                validTarget(target)
+              )
+            )
+          } else {
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
 
         case None =>
           Redirect(
@@ -71,51 +92,80 @@ class ContractorDetailsCheckAnswersController @Inject() (
       }
     }
 
-  def onSubmit: Action[AnyContent] =
+  def onSubmit(target: Option[String] = None): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(ContractorSchemePage) match {
+        case Some(scheme) if hasRequiredDetails(request) =>
+          validTarget(target)
+            .map(target => Future.successful(Redirect(targetUrl(target, scheme.instanceId))))
+            .getOrElse(updateContractorDetails(scheme))
 
-        case Some(scheme) =>
-          val updateRequest =
-            UpdateContractorSchemeParams(
-              schemeId = scheme.schemeId,
-              instanceId = scheme.instanceId,
-              accountsOfficeReference = scheme.accountsOfficeReference,
-              taxOfficeNumber = scheme.taxOfficeNumber,
-              taxOfficeReference = scheme.taxOfficeReference,
-              utr = request.userAnswers.get(ContractorUtrPage),
-              name = request.userAnswers.get(SchemeNamePage),
-              emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
-              version = scheme.version,
-              displayWelcomePage = scheme.displayWelcomePage,
-              prePopCount = scheme.prePopCount,
-              prePopSuccessful = scheme.prePopSuccessful
-            )
-
-          service
-            .updateContractorDetails(updateRequest)
-            .map { _ =>
-              Redirect(
-                routes.ContractorDetailsUpdatedController.onPageLoad()
-              )
-            }
-            .recover { case t =>
-              logger.error(
-                "[ContractorDetailsCheckAnswersController.onSubmit] Failed to update contractor details",
-                t
-              )
-
-              Redirect(
-                controllers.routes.JourneyRecoveryController.onPageLoad()
-              )
-            }
-
-        case None =>
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-          )
+        case _ =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
+    }
+
+  private def updateContractorDetails(
+    scheme: Scheme
+  )(implicit request: DataRequest[AnyContent]): Future[Result] = {
+    val updateRequest = UpdateContractorSchemeParams(
+      schemeId = scheme.schemeId,
+      instanceId = scheme.instanceId,
+      accountsOfficeReference = scheme.accountsOfficeReference,
+      taxOfficeNumber = scheme.taxOfficeNumber,
+      taxOfficeReference = scheme.taxOfficeReference,
+      utr = request.userAnswers.get(ContractorUtrPage),
+      name = request.userAnswers.get(SchemeNamePage),
+      emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage),
+      version = scheme.version,
+      displayWelcomePage = scheme.displayWelcomePage,
+      prePopCount = scheme.prePopCount,
+      prePopSuccessful = scheme.prePopSuccessful
+    )
+
+    service
+      .updateContractorDetails(updateRequest)
+      .map(_ => Redirect(routes.ContractorDetailsUpdatedController.onPageLoad()))
+      .recover { case t =>
+        logger.error(
+          "[ContractorDetailsCheckAnswersController.onSubmit] Failed to update contractor details",
+          t
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+  }
+
+  private def hasRequiredDetails(request: DataRequest[AnyContent]): Boolean = {
+    val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(SchemeNamePage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
+      case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    schemeNameValid && emailAddressValid
+  }
+
+  private val ManageYourCisReturnTarget = "manageYourCisReturn"
+  private val SubcontractorsTarget      = "subcontractors"
+
+  private def validTarget(target: Option[String]): Option[String] =
+    target.filter {
+      case ManageYourCisReturnTarget | SubcontractorsTarget => true
+      case _                                                => false
+    }
+
+  private def targetUrl(target: String, instanceId: String): String =
+    target match {
+      case ManageYourCisReturnTarget =>
+        appConfig.manageCisReturnUrl(instanceId)
+
+      case SubcontractorsTarget =>
+        appConfig.manageSubcontractorsLandingUrl(instanceId)
     }
 }

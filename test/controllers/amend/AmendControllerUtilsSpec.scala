@@ -34,8 +34,9 @@ package controllers.amend
 
 import base.SpecBase
 import controllers.amend.AmendControllerUtils.*
+import models.amend.AmendJourneyType
 import models.response.SubcontractorResponse
-import pages.amend.ShowVerificationDetailsPage
+import pages.amend.{AmendJourneyTypePage, ShowVerificationDetailsPage}
 
 class AmendControllerUtilsSpec extends SpecBase {
 
@@ -300,6 +301,92 @@ class AmendControllerUtilsSpec extends SpecBase {
             pendingVerifications = Some(0)
           )
         ) mustBe false
+      }
+    }
+
+    "isVerifiedForAmendJourney" - {
+
+      "must return true when journey type is Standard and ShowVerificationDetailsPage is true" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe true
+      }
+
+      "must return false when journey type is Standard and ShowVerificationDetailsPage is false" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(AmendJourneyTypePage, AmendJourneyType.Standard)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, false)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe false
+      }
+
+      "must return false when journey type is InsufficientInfo and ShowVerificationDetailsPage is true" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(AmendJourneyTypePage, AmendJourneyType.InsufficientInfo)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe false
+      }
+
+      "must return false when journey type is UnmatchedInfo and ShowVerificationDetailsPage is true" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(AmendJourneyTypePage, AmendJourneyType.UnmatchedInfo)
+            .success
+            .value
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe false
+      }
+
+      "must fall back to ShowVerificationDetailsPage when AmendJourneyTypePage is missing and the value is true" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(ShowVerificationDetailsPage, true)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe true
+      }
+
+      "must fall back to ShowVerificationDetailsPage when AmendJourneyTypePage is missing and the value is false" in {
+
+        val ua =
+          emptyUserAnswers
+            .set(ShowVerificationDetailsPage, false)
+            .success
+            .value
+
+        isVerifiedForAmendJourney(ua) mustBe false
+      }
+
+      "must return false when both AmendJourneyTypePage and ShowVerificationDetailsPage are missing" in {
+
+        isVerifiedForAmendJourney(emptyUserAnswers) mustBe false
       }
     }
   }

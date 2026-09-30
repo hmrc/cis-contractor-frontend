@@ -20,12 +20,13 @@ import controllers.actions.*
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.company.{CompanyAddressYesNoPage, CompanyNamePage}
+import pages.add.company.CompanyAddressYesNoPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.SubcontractorNameExtractor
 import views.html.add.company.CompanyAddressYesNoView
 
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class CompanyAddressYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: CompanyAddressYesNoFormProvider,
+  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyAddressYesNoView
 )(implicit ec: ExecutionContext)
@@ -48,8 +50,8 @@ class CompanyAddressYesNoController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers
-      .get(CompanyNamePage)
+    subcontractorNameExtractor
+      .getCompanyName(request.userAnswers, mode)
       .map { companyName =>
         val preparedForm = request.userAnswers.get(CompanyAddressYesNoPage) match {
           case None        => form
@@ -63,8 +65,8 @@ class CompanyAddressYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(CompanyNamePage)
+      subcontractorNameExtractor
+        .getCompanyName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()

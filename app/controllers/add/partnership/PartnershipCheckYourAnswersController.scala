@@ -18,6 +18,7 @@ package controllers.add.partnership
 
 import controllers.actions.*
 import models.add.partnership.ValidatedPartnership
+import pages.add.CheckYourAnswersSubmittedPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -25,13 +26,12 @@ import repositories.SessionRepository
 import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.add.TypeOfSubcontractorSummary
-import viewmodels.checkAnswers.add.partnership.{PartnershipWorksReferenceNumberYesNoSummary, *}
+import viewmodels.checkAnswers.add.partnership.*
 import viewmodels.govuk.summarylist.*
 import views.html.add.partnership.PartnershipCheckYourAnswersView
-import pages.add.CheckYourAnswersSubmittedPage
 
-import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,

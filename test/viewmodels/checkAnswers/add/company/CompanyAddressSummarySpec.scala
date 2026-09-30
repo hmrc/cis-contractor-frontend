@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import helpers.CyaEncodingSpecHelper
 import controllers.add.company.routes
-import models.{AmendMode, UserAnswers}
+import models.{AmendMode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import models.address.{Address, Country}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
@@ -28,8 +28,8 @@ import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import models.TypeOfSubcontractor
 import models.info.company.CompanyAnswers
+import models.NormalMode
 
 class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -77,7 +77,7 @@ class CompanyAddressSummarySpec extends AnyWordSpec with Matchers with CyaEncodi
 
       action.href shouldBe
         routes.CompanyAddressController
-          .redirectToAddressLookup(Some("change"))
+          .redirectToAddressLookup(NormalMode, Some("change"))
           .url
 
       action.visuallyHiddenText.value shouldBe

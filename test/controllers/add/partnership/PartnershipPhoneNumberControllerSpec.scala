@@ -20,11 +20,13 @@ import base.SpecBase
 import controllers.routes
 import forms.add.partnership.PartnershipPhoneNumberFormProvider
 import models.contact.ContactMethodOptions
-import models.{NormalMode, UserAnswers}
+import models.finalvalidation.FinalValidationChangeTarget
+import models.{FinalValidationMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipNamePage, PartnershipPhoneNumberPage}
+import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,6 +45,9 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   private lazy val partnershipPhoneNumberRoute =
     controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(NormalMode).url
 
+  private lazy val partnershipPhoneNumberFinalValidationRoute =
+    controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(FinalValidationMode).url
+
   private def uaWithName: UserAnswers =
     emptyUserAnswers
       .set(PartnershipNamePage, partnershipName)
@@ -52,6 +57,12 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   private def uaWithNameAndPhoneOption: UserAnswers =
     uaWithName
       .set(PartnershipContactMethodOptionsPage, Set(ContactMethodOptions.Phone))
+      .success
+      .value
+
+  private def uaWithNameAndFinalValidationPhoneTarget: UserAnswers =
+    uaWithName
+      .set(FinalValidationChangeTargetPage, FinalValidationChangeTarget.PhoneNumber)
       .success
       .value
 
@@ -314,6 +325,54 @@ class PartnershipPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET in FinalValidationMode when PartnershipContactMethodOptions is missing" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithName)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, partnershipPhoneNumberFinalValidationRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[PartnershipPhoneNumberView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, FinalValidationMode, partnershipName)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must submit successfully in FinalValidationMode when PartnershipContactMethodOptions is missing" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithNameAndFinalValidationPhoneTarget))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, partnershipPhoneNumberFinalValidationRoute)
+            .withFormUrlEncodedBody(("value", "0123456789"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.finalvalidations.routes.FinalValidationCompleteController
+            .onPageLoad()
+            .url
       }
     }
   }

@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,7 @@
     appConfig: config.FrontendAppConfig
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(cisAccountUrl: String)(implicit request: Request[_], messages: Messages, appConfig: FrontendAppConfig)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsUpdated.title")), showBackLink = false, showSignOut = false) {
 
@@ -44,7 +45,7 @@
 
     @link(
         linkTextKey = "contractordetails.contractorDetailsUpdated.returnToDashboard.link",
-        linkUrl = "#"
+        linkUrl = cisAccountUrl
     )
 
     @link(

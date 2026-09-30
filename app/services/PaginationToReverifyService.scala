@@ -23,7 +23,9 @@ import viewmodels.govuk.PaginationFluency._
 class PaginationToReverifyService @Inject() () {
 
   private val defaultRecordsPerPage = 6
-  private val maxVisiblePages       = 6
+  private val maxVisiblePages       = 2 // max number of pages visible either side of current page
+  private val ellipsisPadding       = 1 // number of pages shown before/after ellipsis
+  private val minEllipsisSpread     = 2 // minimum number of pages that ellipsis should replace
 
   case class PaginatedResult[T](
     items: Seq[T],
@@ -65,6 +67,21 @@ class PaginationToReverifyService @Inject() () {
     )
   }
 
+  private def buildPartialPageSeq(
+    startIndex: Int,
+    endIndex: Int,
+    currentPage: Int,
+    baseUrl: String,
+    pageParam: String
+  ): IndexedSeq[PaginationItemViewModel] =
+    (startIndex to endIndex)
+      .map { p =>
+        PaginationItemViewModel(
+          number = p.toString,
+          href = s"$baseUrl?$pageParam=$p"
+        ).withCurrent(p == currentPage)
+      }
+
   private def buildPagination(
     page: Int,
     totalPages: Int,
@@ -75,56 +92,33 @@ class PaginationToReverifyService @Inject() () {
       PaginationViewModel()
     } else {
 
-      val windowSize = maxVisiblePages / 2
+      val windowSize      = maxVisiblePages / 2
+      val paginationStart = (page - windowSize).max(ellipsisPadding + 1)
+      val paginationEnd   = (page + windowSize).min(totalPages - ellipsisPadding)
 
-      val start = (page - windowSize).max(2)
-      val end   = (page + windowSize).min(totalPages - 1)
+      val leftEllipsisSpread  = paginationStart - (ellipsisPadding + 1)
+      val rightEllipsisSpread = totalPages - ellipsisPadding - paginationEnd
+
+      val hasLeftGap  = paginationStart > ellipsisPadding + 1
+      val hasRightGap = paginationEnd < (totalPages - ellipsisPadding)
+
+      val showLeftEllipsis  = hasLeftGap && (leftEllipsisSpread >= minEllipsisSpread)
+      val showRightEllipsis = hasRightGap && (rightEllipsisSpread >= minEllipsisSpread)
 
       val pages: Seq[PaginationItemViewModel] = {
-
-        val firstPage =
-          PaginationItemViewModel("1", s"$baseUrl?$pageParam=1")
-            .withCurrent(page == 1)
-
-        val lastPage =
-          PaginationItemViewModel(totalPages.toString, s"$baseUrl?$pageParam=$totalPages")
-            .withCurrent(page == totalPages)
-
-        val middlePages =
-          (start to end)
-            .filter(p => p > 1 && p < totalPages)
-            .map { p =>
-              PaginationItemViewModel(
-                number = p.toString,
-                href = s"$baseUrl?$pageParam=$p"
-              ).withCurrent(p == page)
-            }
-
-        val leftEllipsis =
-          if (start > 2)
-            Seq(
-              PaginationItemViewModel(
-                number = "...",
-                href = "#"
-              )
-            )
+        val firstPages  = buildPartialPageSeq(1, ellipsisPadding, page, baseUrl, pageParam)
+        val lastPages   = buildPartialPageSeq(totalPages - (ellipsisPadding - 1), totalPages, page, baseUrl, pageParam)
+        val middlePages = buildPartialPageSeq(paginationStart, paginationEnd, page, baseUrl, pageParam)
+        val leftFill    =
+          if (showLeftEllipsis) Seq(PaginationItemViewModel.ellipsis())
+          else if (hasLeftGap) buildPartialPageSeq(paginationStart - 1, paginationStart - 1, page, baseUrl, pageParam)
+          else Seq()
+        val rightFill   =
+          if (showRightEllipsis) Seq(PaginationItemViewModel.ellipsis())
+          else if (hasRightGap) buildPartialPageSeq(paginationEnd + 1, paginationEnd + 1, page, baseUrl, pageParam)
           else Seq()
 
-        val rightEllipsis =
-          if (end < totalPages - 1)
-            Seq(
-              PaginationItemViewModel(
-                number = "...",
-                href = "#"
-              )
-            )
-          else Seq()
-
-        Seq(firstPage) ++
-          leftEllipsis ++
-          middlePages ++
-          rightEllipsis ++
-          (if (totalPages > 1) Seq(lastPage) else Seq())
+        firstPages ++ leftFill ++ middlePages ++ rightFill ++ (if (totalPages > 1) lastPages else Seq())
       }
 
       PaginationViewModel()

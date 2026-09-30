@@ -17,17 +17,18 @@
 package controllers.amend.partnership
 
 import controllers.actions.*
+import controllers.amend.AmendControllerUtils
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.amend.partnership.AmendPartnershipRemoveDetailYesNoFormProvider
-import models.UserAnswers
 import models.amend.partnership.AmendPartnershipRemoveDetail
-import pages.add.partnership.*
 import models.requests.DataRequest
-import pages.amend.ShowVerificationDetailsPage
+import models.{AmendMode, UserAnswers}
+import pages.add.partnership.*
 import pages.amend.partnership.AmendPartnershipRemoveDetailYesNoPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import play.api.Logging
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.partnership.AmendPartnershipRemoveDetailYesNoView
 
@@ -69,18 +70,18 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
 
   private def getPartnershipName(
     userAnswers: UserAnswers
-  ): Option[String] =
-    userAnswers.get(PartnershipNamePage)
+  )(implicit messages: Messages): Option[String] =
+    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode)
 
   private def getNominatedPartnerName(
     userAnswers: UserAnswers
-  ): Option[String] =
-    userAnswers.get(PartnershipNominatedPartnerNamePage)
+  )(implicit messages: Messages): Option[String] =
+    SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
 
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,
     userAnswers: UserAnswers
-  ): Option[String] =
+  )(implicit messages: Messages): Option[String] =
     if (subcontractorDetail.isNominatedPartnerDetail) {
       getNominatedPartnerName(userAnswers)
     } else {
@@ -107,9 +108,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(PartnershipHasUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
         userAnswers
@@ -120,9 +119,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(PartnershipNominatedPartnerUtrYesNoPage)
           .contains(true) &&
-        userAnswers
-          .get(ShowVerificationDetailsPage)
-          .contains(false)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
         userAnswers
@@ -139,7 +136,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     subcontractorDetail: String
   )(
     block: (String, String) => Future[Result]
-  )(implicit request: DataRequest[_]): Future[Result] =
+  )(implicit request: DataRequest[_], messages: Messages): Future[Result] =
     withValidDetail(subcontractorDetail) { detailType =>
       if (!detailIsPresent(detailType, request.userAnswers)) {
         Future.successful(journeyRecovery)

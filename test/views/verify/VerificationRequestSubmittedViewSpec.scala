@@ -30,6 +30,7 @@ import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
 
 import java.time.LocalDateTime
+import utils.DateTimeFormats
 import java.time.format.DateTimeFormatter
 
 class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerSuite {
@@ -52,9 +53,8 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       doc.text must include(
         messages(
           "verify.verificationRequestSubmitted.submittedAt",
-          submittedAt.format(
-            DateTimeFormatter.ofPattern("HH:mm 'on' dd MMMM yyyy", messages.lang.locale)
-          )
+          submittedAt.format(DateTimeFormatter.ofPattern("HH:mm")),
+          submittedAt.format(DateTimeFormats.dateTimeFormat()(messages.lang))
         )
       )
 
@@ -105,12 +105,8 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       val surveyLink: Elements =
         doc.select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
 
-      surveyLink.size mustBe 1
-      surveyLink.attr("target") mustBe ""
-
-      surveyLink.first.parent.text must include(
-        messages("verify.verificationRequestSubmitted.feedback.p2")
-      )
+      surveyLink.text() mustBe messages("verify.verificationRequestSubmitted.feedback.survey.link")
+      surveyLink.attr("href") mustBe appConfig.cisFeedbackSurveyUrl
     }
 
     "not render reverify section or email paragraph when both are absent" in new Setup {
@@ -141,7 +137,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         app.injector.instanceOf[MessagesApi]
       )
 
-    implicit val appConfig: FrontendAppConfig =
+    val appConfig: FrontendAppConfig =
       app.injector.instanceOf[FrontendAppConfig]
 
     val view: VerificationRequestSubmittedView =

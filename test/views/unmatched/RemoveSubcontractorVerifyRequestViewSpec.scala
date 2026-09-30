@@ -29,7 +29,7 @@ class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
   "RemoveSubcontractorVerifyRequestView" - {
 
     "must render the page with the correct title, heading, paragraphs and link" in new Setup {
-      val html = view(form, subcontractorName)
+      val html = view(form, subcontractorName, subcontractorId)
       val doc  = Jsoup.parse(html.body)
 
       doc.title             must include(messages("unmatched.removeSubcontractorVerifyRequest.title"))
@@ -47,6 +47,7 @@ class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
     val formProvider                              = app.injector.instanceOf[RemoveSubcontractorVerifyRequestFormProvider]
     val form                                      = formProvider()
     val subcontractorName                         = "Test Subcontractor"
+    val subcontractorId                           = 12345L
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

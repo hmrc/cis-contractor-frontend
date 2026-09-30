@@ -17,10 +17,11 @@
 package controllers.add.trust
 
 import controllers.actions.*
+import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.trust.TrustWorksReferenceFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.add.trust.{TrustNamePage, TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
+import pages.add.trust.{TrustWorksReferencePage, TrustWorksReferenceYesNoPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -52,8 +53,8 @@ class TrustWorksReferenceController @Inject() (
     val yesOrNoPage       = TrustWorksReferenceYesNoPage
     val yesOrNoPageOption = request.userAnswers.get(TrustWorksReferenceYesNoPage)
 
-    request.userAnswers
-      .get(TrustNamePage)
+    SubcontractorNameDisplayHelper
+      .getTrustDisplayName(request.userAnswers, mode)
       .map { trustName =>
         val preparedForm = request.userAnswers.get(TrustWorksReferencePage) match {
           case None        => form
@@ -68,8 +69,8 @@ class TrustWorksReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers
-        .get(TrustNamePage)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode)
         .map { trustName =>
           form
             .bindFromRequest()

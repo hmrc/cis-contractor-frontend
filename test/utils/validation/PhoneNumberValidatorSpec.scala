@@ -46,9 +46,26 @@ class PhoneNumberValidatorSpec extends AnyWordSpec with Matchers {
         ) mustBe None
     }
 
-    "return a failure when the international phone number does not match the ticket regex" in {
+    "return no failure for a valid international phone number" in {
       val phoneNumber =
         "+44 (0)191 123-4567"
+
+      PhoneNumberValidator
+        .validatePhoneNumber(
+          Some(phoneNumber)
+        ) mustBe None
+    }
+
+    "return no failure when the phone number starts with +" in {
+      PhoneNumberValidator
+        .validatePhoneNumber(
+          Some("+441911234567")
+        ) mustBe None
+    }
+
+    "return a failure when + is not at the beginning of the phone number" in {
+      val phoneNumber =
+        "0191+1234567"
 
       PhoneNumberValidator
         .validatePhoneNumber(
@@ -165,6 +182,13 @@ class PhoneNumberValidatorSpec extends AnyWordSpec with Matchers {
             value = Some(mobilePhoneNumber)
           )
         )
+    }
+
+    "return no failure for a valid international mobile number" in {
+      PhoneNumberValidator
+        .validateMobilePhoneNumber(
+          Some("+447700900123")
+        ) mustBe None
     }
 
     "return a failure when the mobile number exceeds the maximum length" in {
