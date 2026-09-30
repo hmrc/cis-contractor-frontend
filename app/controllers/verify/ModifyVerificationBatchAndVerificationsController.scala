@@ -20,7 +20,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.Mode
 import models.requests.{CreateVerifications, DeleteVerifications, ModifyVerificationsRequest}
 import models.response.GetCurrentVerificationBatchResponse
-import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, NewestVerificationBatchResponsePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -79,7 +79,16 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
           instanceId <- instanceIdFromSession(request.userAnswers)
           current    <- currentBatchFromSession(request.userAnswers)
 
-          idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
+          idToRef =
+            request.userAnswers
+              .get(NewestVerificationBatchResponsePage)
+              .toSeq
+              .flatMap(_.subcontractors)
+              .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
+              .toMap ++
+              current.subcontractors
+                .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
+                .toMap
 
           selectedRefs <- selectedRefsFromIds(selectedSubcontractorIds, idToRef)
 
@@ -136,7 +145,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
           idToRef.getOrElse(
             id,
             throw new RuntimeException(
-              s"Missing subbieResourceRef for subcontractorId=$id in current verification batch"
+              s"Missing subbieResourceRef for subcontractorId=$id"
             )
           )
         }

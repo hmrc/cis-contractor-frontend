@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.verify.ReverifyExistingSubcontractorsYesNoPage
+import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorsToReverifyPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -64,9 +64,19 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ReverifyExistingSubcontractorsYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage, mode, updatedAnswers))
+              updatedAnswers <- Future.fromTry(
+                request.userAnswers
+                  .set(ReverifyExistingSubcontractorsYesNoPage, value)
+                  .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
+              )
+              _ <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(
+              navigator.nextPage(
+                ReverifyExistingSubcontractorsYesNoPage,
+                mode,
+                updatedAnswers
+              )
+            )
         )
     }
 }
