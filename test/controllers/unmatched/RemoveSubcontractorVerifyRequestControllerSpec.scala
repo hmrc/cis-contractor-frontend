@@ -466,7 +466,7 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must redirect to Journey Recovery for a GET if verification is not found" in {
+    "must redirect to Journey Recovery for a GET if subcontractor is not found" in {
 
       val batch       = currentBatchResponse.copy(subcontractors =
         Seq(currentBatchResponse.subcontractors.head.copy(subcontractorId = 20L))
