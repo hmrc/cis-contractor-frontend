@@ -65,11 +65,11 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
           value =>
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers
-                  .set(ReverifyExistingSubcontractorsYesNoPage, value)
-                  .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
-              )
-              _ <- sessionRepository.set(updatedAnswers)
+                                  request.userAnswers
+                                    .set(ReverifyExistingSubcontractorsYesNoPage, value)
+                                    .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
+                                )
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
                 ReverifyExistingSubcontractorsYesNoPage,
