@@ -20,7 +20,6 @@ import controllers.actions.*
 import controllers.routes
 import models.TypeOfSubcontractor
 import models.amend.AmendJourneyType
-import models.info.CheckYourAnswersValidation
 import models.info.trust.TrustAnswers
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages}
@@ -50,7 +49,7 @@ class TrustCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(TrustAnswersQuery) match {
 
-        case Some(answers) if CheckYourAnswersValidation.isValid(answers) =>
+        case Some(answers) =>
           val subcontractorInformationList =
             SummaryListViewModel(
               rows = subcontractorInformationRows(answers).flatten
@@ -69,7 +68,7 @@ class TrustCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.trustName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.cannotVerifyAllSubcontractors")
                 )
@@ -80,7 +79,7 @@ class TrustCheckYourAnswersController @Inject() (
                 view(
                   subcontractorInformationList,
                   detailsList,
-                  answers.trustName.getOrElse(""),
+                  displayName(answers),
                   controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url,
                   messages("info.CheckYourAnswers.reviewUnmatchedSubcontractors")
                 )
@@ -94,10 +93,10 @@ class TrustCheckYourAnswersController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
-        case Some(_) | None =>
+        case None =>
           logger.error(
             "[TrustCheckYourAnswersController.onPageLoad] " +
-              "TrustAnswersQuery is missing or invalid"
+              "TrustAnswersQuery is missing"
           )
 
           Redirect(
@@ -173,4 +172,9 @@ class TrustCheckYourAnswersController @Inject() (
         TrustWorksReferenceSummary.row(answers)
       )
   }
+
+  private def displayName(
+    answers: TrustAnswers
+  )(implicit messages: Messages): String =
+    answers.trustName.map(_.trim).filter(_.nonEmpty).getOrElse(messages("verify.noName"))
 }

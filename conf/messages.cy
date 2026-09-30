@@ -17,6 +17,7 @@ site.unknown                                            =  Anhysbys
 site.pagination.previous                                =  Blaenorol
 site.pagination.next                                    =  Nesaf
 site.pagination.landmark                                =  Rhifo tudalennau
+site.pagination.pageTitle                               =  xxxxxxxxxxxxxxxxxxxx
 
 date.day                                                =  Diwrnod
 date.month                                              =  Mis
@@ -52,102 +53,71 @@ journeyRecovery.continue.heading                        =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.continue.guidance.p1                    =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.continue.guidance.link                  =  xxxxxxxxxxxxxxxxxxxx
 journeyRecovery.continue.guidance.p2                    =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.title                        =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.heading                      =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.p1                  =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.p2                  =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.contactHMRC.link    =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.cisAccount.prefix   =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.startAgain.guidance.cisAccount.link     =  xxxxxxxxxxxxxxxxxxxx
+journeyRecovery.startAgain.title                        =  Mae yna broblem gyda’r gwasanaeth hwn
+journeyRecovery.startAgain.heading                      =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
+journeyRecovery.startAgain.guidance.p1                  =  Rhowch gynnig arall arni yn nes ymlaen.
+journeyRecovery.startAgain.guidance.p2                  =  Nid yw’r wybodaeth sydd wedi cael ei rhoi gennych wedi cael ei chadw. Pan fydd y gwasanaeth ar gael, bydd yn rhaid i chi ddechrau eto.
+journeyRecovery.startAgain.guidance.contactHMRC.link    =  Cysylltwch â CThEF
+journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  i gael rhagor o help.
+journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Yn ôl i
+journeyRecovery.startAgain.guidance.cisAccount.link     =  Rheoli’ch cyfrif CIS
 
 signedOut.title                                         =  xxxxxxxxxxxxxxxxxxxx
 signedOut.heading                                       =  xxxxxxxxxxxxxxxxxxxx
 signedOut.guidance                                      =  xxxxxxxxxxxxxxxxxxxx
 
 # Errors & Auth
-pageNotFound.title                       =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.heading                     =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.p1                          =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.p2                          =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.p3                          =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.link                        =  xxxxxxxxxxxxxxxxxxxx
-pageNotFound.p4                          =  xxxxxxxxxxxxxxxxxxxx
+pageNotFound.title                       =  Heb ddod o hyd i’r dudalen
+pageNotFound.heading                     =  Heb ddod o hyd i’r dudalen
+pageNotFound.p1                          =  Os gwnaethoch deipio’r cyfeiriad gwe, gwiriwch ei fod yn gywir.
+pageNotFound.p2                          =  Os gwnaethoch ludo’r cyfeiriad gwe, gwiriwch eich bod wedi copïo’r cyfeiriad yn llawn.
+pageNotFound.p3                          =  Os yw’r cyfeiriad gwe yn gywir, neu os dewisoch gysylltiad neu fotwm, cysylltwch â
+pageNotFound.link                        =  Desg Gymorth gwasanaethau ar-lein CThEF
+pageNotFound.p4                          =  os oes angen i chi siarad â rhywun.
 
-systemError.title                        =  xxxxxxxxxxxxxxxxxxxx
-systemError.heading                      =  xxxxxxxxxxxxxxxxxxxx
-systemError.p1                           =  xxxxxxxxxxxxxxxxxxxx
-systemError.p2                           =  xxxxxxxxxxxxxxxxxxxx
-systemError.link                         =  xxxxxxxxxxxxxxxxxxxx
-systemError.p3                           =  xxxxxxxxxxxxxxxxxxxx
+systemError.title                        =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
+systemError.heading                      =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
+systemError.p1                           =  Rhowch gynnig arall arni yn nes ymlaen.
+systemError.p2                           =  Cysylltwch â
+systemError.link                         =  Desg Gymorth gwasanaethau ar-lein CThEF
+systemError.p3                           =  os oes angen i chi siarad â rhywun ynghylch Cynllun y Diwydiant Adeiladu, a dyfynnu’r cyfeirnod:
 
-accessDenied.title                       =  xxxxxxxxxxxxxxxxxxxx
-accessDenied.heading                     =  xxxxxxxxxxxxxxxxxxxx
-accessDenied.link                        =  xxxxxxxxxxxxxxxxxxxx
+accessDenied.title                       =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+accessDenied.heading                     =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+accessDenied.paragraph                   =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.
+accessDenied.link                        =  Rhagor o wybodaeth am Gynllun y Diwydiant Adeiladu (CIS)
 
-unauthorised.title                       =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.heading                     =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.org.p1.prefix      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.org.p1.link        =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.org.p1.suffix      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.agent.p2.prefix    =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.agent.p2.link      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.guidance.agent.p2.suffix    =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.title                   =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.heading                 =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.p1                      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.guidance.p2.prefix      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.guidance.p2.link        =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.guidance.p2.suffix      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.standard.title          =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.standard.heading        =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.standard.paragraph      =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.org.standard.guidance.link  =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.individual.title            =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.individual.heading          =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.individual.p1               =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.title                 =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.heading               =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.p1                    =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.p2.prefix             =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.p2.link               =  xxxxxxxxxxxxxxxxxxxx
-unauthorised.agent.p2.suffix             =  xxxxxxxxxxxxxxxxxxxx
+unauthorised.title                       =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.heading                     =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.guidance.p1                 =  I ddefnyddio’r gwasanaeth hwn, bydd angen i chi wneud y canlynol:
+unauthorised.guidance.org.p1.prefix      =  cofrestru gyda’r
+unauthorised.guidance.org.p1.link        =  Cynllun Diwydiant Adeiladu
+unauthorised.guidance.org.p1.suffix      =  os ydych yn gontractwr neu’n is-gontractwr
+unauthorised.guidance.agent.p2.prefix    =  cael mynediad at
+unauthorised.guidance.agent.p2.link      =  TWE i Asiantau
+unauthorised.guidance.agent.p2.suffix    =  os ydych yn asiant
+unauthorised.org.title                   =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.org.heading                 =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.org.guidance.p2.prefix      =  Mae’n rhaid i chi gofrestru’r cyfrif hwn gyda
+unauthorised.org.guidance.p2.link        =  Cynllun y Diwydiant Adeiladu
+unauthorised.org.guidance.p2.suffix      =  cyn y gallwch ddefnyddio’r gwasanaeth hwn.
+unauthorised.org.standard.title          =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.org.standard.heading        =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.org.standard.p1             =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.
+unauthorised.org.standard.guidance.link  =  Rhagor o wybodaeth am Gynllun y Diwydiant Adeiladu (CIS)
+unauthorised.individual.title            =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.individual.heading          =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.individual.p1               =  Rydych wedi mewngofnodi gan ddefnyddio cyfrif unigolyn.
+unauthorised.individual.p2               =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.
+unauthorised.individual.link             =  Rhagor o wybodaeth am Gynllun y Diwydiant Adeiladu (CIS)
+unauthorised.agent.title                 =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.agent.heading               =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+unauthorised.agent.p1                    =  Rydych wedi mewngofnodi gan ddefnyddio cyfrif asiant.
+unauthorised.agent.p2.prefix             =  Mae’n rhaid i chi gael mynediad at
+unauthorised.agent.p2.link               =  TWE i Asiantau
+unauthorised.agent.p2.suffix             =  er mwyn defnyddio’r gwasanaeth hwn.
 
 # Individual and Common
-amendPartnershipRemoveDetailYesNo.heading                                           =  Ydych chi’n siŵr eich bod chi am dynnu’r {0} o gofnod {1}?
-amendPartnershipRemoveDetailYesNo.error.required                                    =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
-amendPartnershipRemoveDetailYesNo.detail.address                                    =  cyfeiriad
-amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  manylion cysylltu
-amendPartnershipRemoveDetailYesNo.detail.utr                                        =  UTR
-amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  cyfeirnod y gwaith
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  UTR y partner enwebedig
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  rhif Yswiriant Gwladol y partner enwebedig
-amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  rhif cofrestru’r cwmni y partner enwebedig
-
-amendConfirmation.panel.heading                                                     =  Manylion yr is-gontractwr wedi’u diweddaru
-amendConfirmation.p1                                                                =  Rydych chi wedi diweddaru’r manylion is-gontractwr ar gyfer {0}.
-amendConfirmation.updatesMade.h2                                                    =  Wedi’u diweddaru
-amendConfirmation.table.hdr.previous                                                =  Blaenorol
-amendConfirmation.table.hdr.updated                                                 =  Wedi’i ddiweddaru
-amendConfirmation.table.hdr.details                                                 =  Manylion
-amendConfirmation.backTo                                                            =  Yn ôl i
-amendConfirmation.yourSubcontractors                                                =  Eich is-gontractwyr
-amendConfirmation.beforeYouGo.h2                                                    =  Cyn i chi fynd
-amendConfirmation.beforeYouGo.p1                                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
-amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Llenwch arolwg byr
-amendConfirmation.beforeYouGo.shareFeedback                                         =  i rannu’ch adborth ar y gwasanaeth hwn.
-amendConfirmation.table.content.none                                                =  Heb roi un
-amendConfirmation.table.selectContent.none                                          =  Heb ddewis un
-
-amendCheckYourAnswers.title                                                         =  Gwybodaeth am yr is-gontractwr
-amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  Gwybodaeth am yr is-gontractwr
-amendCheckYourAnswers.heading.moreDetails.h2                                        =  Rhagor o fanylion
-amendCheckYourAnswers.confirm.h2                                                    =  Cadarnhau’r newidiadau
-amendCheckYourAnswers.confirm.p1                                                    =  Drwy newid manylion yr is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
-amendCheckYourAnswers.confirm                                                       =  Cadarnhau
-amendCheckYourAnswers.cancelChanges                                                 =  Canslo’r newidiadau
-amendCheckYourAnswers.verificationNumber.label                                      =  Rhif dilysu
-
 typeOfSubcontractor.title                                                           =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
 typeOfSubcontractor.heading                                                         =  Pa fath o is-gontractwr ydych chi’n ei ychwanegu?
 typeOfSubcontractor.soletrader                                                      =  Unigolyn neu unig fasnachwr
@@ -432,6 +402,30 @@ amendCompanyRemoveDetailYesNo.detail.utr                                        
 amendCompanyRemoveDetailYesNo.detail.companyRegistrationNumber                      =  xxxxxxxxxxxxxxxxxxxx
 amendCompanyRemoveDetailYesNo.detail.worksReferenceNumber                           =  xxxxxxxxxxxxxxxxxxxx
 
+amendCheckYourAnswers.title                                                         =  Gwybodaeth am yr is-gontractwr
+amendCheckYourAnswers.heading.subcontractorInformation.h2                           =  Gwybodaeth am yr is-gontractwr
+amendCheckYourAnswers.heading.moreDetails.h2                                        =  Rhagor o fanylion
+amendCheckYourAnswers.confirm.h2                                                    =  Cadarnhau’r newidiadau
+amendCheckYourAnswers.confirm.p1                                                    =  Drwy newid manylion yr is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
+amendCheckYourAnswers.confirm                                                       =  Cadarnhau
+amendCheckYourAnswers.cancelChanges                                                 =  Canslo’r newidiadau
+amendCheckYourAnswers.verificationNumber.label                                      =  Rhif dilysu
+
+amendConfirmation.panel.heading                                                     =  Manylion yr is-gontractwr wedi’u diweddaru
+amendConfirmation.p1                                                                =  Rydych chi wedi diweddaru’r manylion is-gontractwr ar gyfer {0}.
+amendConfirmation.updatesMade.h2                                                    =  Wedi’u diweddaru
+amendConfirmation.table.hdr.previous                                                =  Blaenorol
+amendConfirmation.table.hdr.updated                                                 =  Wedi’i ddiweddaru
+amendConfirmation.table.hdr.details                                                 =  Manylion
+amendConfirmation.backTo                                                            =  Yn ôl i
+amendConfirmation.yourSubcontractors                                                =  Eich is-gontractwyr
+amendConfirmation.beforeYouGo.h2                                                    =  Cyn i chi fynd
+amendConfirmation.beforeYouGo.p1                                                    =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
+amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Llenwch arolwg byr
+amendConfirmation.beforeYouGo.shareFeedback                                         =  i rannu’ch adborth ar y gwasanaeth hwn.
+amendConfirmation.table.content.none                                                =  Heb roi un
+amendConfirmation.table.selectContent.none                                          =  Heb ddewis un
+
 amendTrustRemoveDetailYesNo.title                                                   =  xxxxxxxxxxxxxxxxxxxx
 amendTrustRemoveDetailYesNo.heading                                                 =  xxxxxxxxxxxxxxxxxxxx
 amendTrustRemoveDetailYesNo.error.required                                          =  xxxxxxxxxxxxxxxxxxxx
@@ -441,6 +435,15 @@ amendTrustRemoveDetailYesNo.detail.utr                                          
 amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                             =  xxxxxxxxxxxxxxxxxxxx
 
 amendPartnershipRemoveDetailYesNo.title                                             =  xxxxxxxxxxxxxxxxxxxx
+amendPartnershipRemoveDetailYesNo.heading                                           =  Ydych chi’n siŵr eich bod chi am dynnu’r {0} o gofnod {1}?
+amendPartnershipRemoveDetailYesNo.error.required                                    =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
+amendPartnershipRemoveDetailYesNo.detail.address                                    =  cyfeiriad
+amendPartnershipRemoveDetailYesNo.detail.contactDetails                             =  manylion cysylltu
+amendPartnershipRemoveDetailYesNo.detail.utr                                        =  UTR
+amendPartnershipRemoveDetailYesNo.detail.worksReferenceNumber                       =  cyfeirnod y gwaith
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerUtr                        =  UTR y partner enwebedig
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                       =  rhif Yswiriant Gwladol y partner enwebedig
+amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber  =  rhif cofrestru’r cwmni y partner enwebedig
 
 amendIndividualRemoveDetailYesNo.title                                              =  xxxxxxxxxxxxxxxxxxxx
 amendIndividualRemoveDetailYesNo.heading                                            =  xxxxxxxxxxxxxxxxxxxx
@@ -1056,6 +1059,7 @@ verify.selectSubcontractor.title                                                
 verify.selectSubcontractor.heading                                                 =  Pa is-gontractwyr ydych am eu dilysu?
 verify.selectSubcontractor.hint                                                    =  Dewiswch yr is-gontractwyr sydd heb eu dilysu rydych am eu hychwanegu at y cais dilysu hwn.
 verify.selectSubcontractor.error.required                                          =  Dewiswch o leiaf un is-gontractwr i’w ddilysu
+
 verify.selectSubcontractor.checkYourAnswersLabel                                   =  xxxxxxxxxxxxxxxxxxxx
 verify.selectSubcontractor.showingResults                                          =  xxxxxxxxxxxxxxxxxxxx
 verify.selectSubcontractor.change.hidden                                           =  xxxxxxxxxxxxxxxxxxxx
@@ -1167,6 +1171,10 @@ verify.reviewInsufficientInfo.actions                                           
 verify.reviewInsufficientInfo.action.edit                                          =  Golygu
 verify.reviewInsufficientInfo.action.proceed                                       =  Parhau
 verify.reviewInsufficientInfo.action.remove                                        =  Dileu
+verify.reviewInsufficientInfo.hidden.subcontractor                                 =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.edit.hidden                                   =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.proceed.hidden                                =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewInsufficientInfo.action.remove.hidden                                 =  xxxxxxxxxxxxxxxxxxxx
 
 verify.verificationResults.title                                                   =  Canlyniadau dilysu
 verify.verificationResults.heading                                                 =  Canlyniadau dilysu
@@ -1203,6 +1211,10 @@ verify.reviewUnmatched.action.proceed                                           
 verify.reviewUnmatched.action.remove                                               =  Dileu
 verify.reviewUnmatched.backToResults.prefix                                        =  Yn ôl i
 verify.reviewUnmatched.backToResults.link                                          =  Ganlyniadau dilysu
+verify.reviewUnmatched.action.edit.hidden                                          =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.proceed.hidden                                       =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.action.remove.hidden                                        =  xxxxxxxxxxxxxxxxxxxx
+verify.reviewUnmatched.name.hidden                                                 =  xxxxxxxxxxxxxxxxxxxx
 
 # Contractor Details
 contractordetails.contractorDetailsIndex.title                                 =  Manylion y contractwr
@@ -1289,68 +1301,78 @@ finalValidations.reviewContractorDetails.status.cannotStart                    =
 
 # Final validation - Subcontractors
 
-finalValidations.verify.reviewSubcontractorDetails.taskList.status.completed         =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.taskList.status.incomplete        =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.title                             =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.heading                           =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.intro                             =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.backLink                          =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.verify.reviewSubcontractorDetails.taskList.review                   =  xxxxxxxxxxxxxxxxxxxx
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.completed         = Wedi’i gwblhau
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.incomplete        = Anghyflawn
+finalValidations.verify.reviewSubcontractorDetails.title                             = Adolygu manylion is-gontractwr
+finalValidations.verify.reviewSubcontractorDetails.heading                           = Adolygu manylion is-gontractwr
+finalValidations.verify.reviewSubcontractorDetails.intro                             = Mae angen i chi adolygu manylion yr is-gontractwr
+finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor      = Dilysu’ch is-gontractwyr
+finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet = Methu parhau eto
+finalValidations.verify.reviewSubcontractorDetails.backLink                          = Yn ôl i ddewis eich is-gontractwyr
+finalValidations.verify.reviewSubcontractorDetails.taskList.review                   = Adolygu
 
-finalvalidations.updateSubcontractorDetails.title                              =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.heading                            =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.intro                              =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.confirmChanges.heading             =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.confirmChanges.body                =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.acceptAndSubmit                    =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.cancelChanges                      =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.title                              = {0}
+finalvalidations.updateSubcontractorDetails.heading                            = {0}
+finalvalidations.updateSubcontractorDetails.intro                              = Er mwyn dilysu’ch is-gontractwyr, mae’n rhaid i chi adolygu a diweddaru manylion yr is-gontractwr.
+finalvalidations.updateSubcontractorDetails.confirmChanges.heading             = Cadarnhau’r newidiadau
+finalvalidations.updateSubcontractorDetails.confirmChanges.body                = Drwy newid manylion yr is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
+finalvalidations.updateSubcontractorDetails.acceptAndSubmit                    = Derbyn a chyflwyno
+finalvalidations.updateSubcontractorDetails.cancelChanges                      = Canslo’r newidiadau
 
 # Final validation - Shared
-finalvalidations.updateSubcontractorDetails.address                            =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.addContactDetails                  =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.emailAddress                       =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.phoneNumber                        =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                  =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber            =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.worksReferenceNumber               =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.noNameProvided                     =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.address                            = Cyfeiriad
+finalvalidations.updateSubcontractorDetails.addContactDetails                  = Ychwanegu manylion cysylltu?
+finalvalidations.updateSubcontractorDetails.emailAddress                       = Cyfeiriad e-bost
+finalvalidations.updateSubcontractorDetails.phoneNumber                        = Rhif ffôn
+finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                  = Rhif ffôn symudol
+finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber            = Ychwanegu cyfeirnod y gwaith?
+finalvalidations.updateSubcontractorDetails.worksReferenceNumber               = Cyfeirnod y gwaith
+finalvalidations.updateSubcontractorDetails.noNameProvided                     = xxxxxxxxxxxxxxxxxxxx
 
 # Final validation - Sole trader
-finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName       =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.tradingName             =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.names                   =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.names.noneSelected      =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.addAddress              =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.addUtr                  =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.utr                     =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.addNino                 =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.soleTrader.nino                    =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName       = Enw’r is-gontractwr
+finalvalidations.updateSubcontractorDetails.soleTrader.tradingName             = Enw masnachu
+finalvalidations.updateSubcontractorDetails.soleTrader.names                   = xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.names.noneSelected      = xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.soleTrader.addAddress              = Ychwanegu cyfeiriad yr is-gontractwr?
+finalvalidations.updateSubcontractorDetails.soleTrader.addUtr                  = Ychwanegu UTR?
+finalvalidations.updateSubcontractorDetails.soleTrader.utr                     = UTR
+finalvalidations.updateSubcontractorDetails.soleTrader.addNino                 = Ychwanegu rhif Yswiriant Gwladol?
+finalvalidations.updateSubcontractorDetails.soleTrader.nino                    = Rhif Yswiriant Gwladol
 
 # Final validation - Company
-finalvalidations.updateSubcontractorDetails.company.name                       =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.company.addAddress                 =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.company.addUtr                     =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.company.utr                        =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.company.addCrn                     =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.company.crn                        =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.company.name                       = Enw’r cwmni
+finalvalidations.updateSubcontractorDetails.company.addAddress                 = Ychwanegu cyfeiriad y cwmni?
+finalvalidations.updateSubcontractorDetails.company.addUtr                     = Ychwanegu UTR?
+finalvalidations.updateSubcontractorDetails.company.utr                        = UTR ar gyfer Treth Gorfforaeth
+finalvalidations.updateSubcontractorDetails.company.addCrn                     = Ychwanegu rhif cofrestru’r cwmni?
+finalvalidations.updateSubcontractorDetails.company.crn                        = Rhif cofrestru’r cwmni
 
 # Final validation - Trust
-finalvalidations.updateSubcontractorDetails.trust.name                         =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.trust.addAddress                   =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.trust.addUtr                       =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.trust.utr                          =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.trust.name                         = Enw’r ymddiriedolaeth
+finalvalidations.updateSubcontractorDetails.trust.addAddress                   = Ychwanegu cyfeiriad yr ymddiriedolaeth?
+finalvalidations.updateSubcontractorDetails.trust.addUtr                       = Ychwanegu UTR?
+finalvalidations.updateSubcontractorDetails.trust.utr                          = UTR Ymddiriedolaeth
 
 # Final validation - Partnership
-finalvalidations.updateSubcontractorDetails.partnership.name                   =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.nominatedPartner       =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.addAddress             =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.addUtr                 =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.utr                    =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.addPartnerUtr          =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.partnerUtr             =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.addPartnerNino         =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.partnerNino            =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.addPartnerCrn          =  xxxxxxxxxxxxxxxxxxxx
-finalvalidations.updateSubcontractorDetails.partnership.partnerCrn             =  xxxxxxxxxxxxxxxxxxxx
+finalvalidations.updateSubcontractorDetails.partnership.name                   = Enw’r bartneriaeth
+finalvalidations.updateSubcontractorDetails.partnership.nominatedPartner       = Partner enwebedig
+finalvalidations.updateSubcontractorDetails.partnership.addAddress             = Ychwanegu cyfeiriad y bartneriaeth?
+finalvalidations.updateSubcontractorDetails.partnership.addUtr                 = Ychwanegu UTR?
+finalvalidations.updateSubcontractorDetails.partnership.utr                    = UTR ar gyfer y bartneriaeth
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerUtr          = Ychwanegu UTR ar gyfer y partner enwebedig?
+finalvalidations.updateSubcontractorDetails.partnership.partnerUtr             = UTR ar gyfer y partner enwebedig
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerNino         = Ychwanegu rhif Yswiriant Gwladol ar gyfer y partner enwebedig?
+finalvalidations.updateSubcontractorDetails.partnership.partnerNino            = Rhif Yswiriant Gwladol ar gyfer y partner enwebedig
+finalvalidations.updateSubcontractorDetails.partnership.addPartnerCrn          = Ychwanegu rhif cofrestru’r cwmni ar gyfer y partner enwebedig?
+finalvalidations.updateSubcontractorDetails.partnership.partnerCrn             = Rhif cofrestru’r cwmni ar gyfer y partner enwebedig
+
+individualNamesOptions.title                                                        =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.heading                                                      =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.subcontractorName                                            =  Enw’r is-gontractwr
+individualNamesOptions.tradingName                                                  =  Enw masnachu
+individualNamesOptions.noSelection                                                  =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.hint                                                         =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.error.required                                               =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.checkYourAnswersLabel                                        =  xxxxxxxxxxxxxxxxxxxx
+individualNamesOptions.change.hidden                                                =  xxxxxxxxxxxxxxxxxxxx

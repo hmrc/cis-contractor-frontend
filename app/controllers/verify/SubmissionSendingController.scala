@@ -51,7 +51,7 @@ class SubmissionSendingController @Inject() (
     with I18nSupport
     with Logging {
 
-  private val SubmitAgainErrorCode = "3000"
+  private val SubmitAgainErrorCodes = Set("3000", "1000", "2005")
 
   private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -198,10 +198,10 @@ class SubmissionSendingController @Inject() (
   ): Boolean =
     govTalkErrorStatus.exists {
       case FatalError(errorCode, _) =>
-        errorCode == SubmitAgainErrorCode
+        SubmitAgainErrorCodes.contains(errorCode)
 
       case DepartmentalError(Some(errorCode), _) =>
-        errorCode == SubmitAgainErrorCode
+        SubmitAgainErrorCodes.contains(errorCode)
 
       case _ =>
         false

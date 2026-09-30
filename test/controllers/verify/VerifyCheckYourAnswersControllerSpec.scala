@@ -20,7 +20,7 @@ import base.SpecBase
 import models.verify.ContractorEmailConfirmationStored
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import models.verify.SelectedSubcontractors
-import models.{ContractorScheme, Subcontractor, SubcontractorViewModel}
+import models.{ContractorScheme, Subcontractor, SubcontractorViewModel, VerificationBatch}
 import models.response.GetNewestVerificationBatchResponse
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
@@ -75,9 +75,42 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
       monthlyReturnSubmission = None
     )
 
+  private val uaWithPendingVerification =
+    emptyUserAnswers
+      .setOrException(
+        NewestVerificationBatchResponsePage,
+        GetNewestVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Seq.empty,
+          verificationBatch = Some(
+            VerificationBatch(
+              verificationBatchId = 1L,
+              status = Some("PENDING"),
+              verificationNumber = Some("VB123")
+            )
+          ),
+          verifications = Seq.empty,
+          submission = None,
+          monthlyReturn = None,
+          monthlyReturnSubmission = None
+        )
+      )
+
   "VerifyCheckYourAnswersController" - {
 
     "onPageLoad" - {
+
+      "must redirect to verification request in progress when a verification is pending" in {
+        val application = applicationBuilder(userAnswers = Some(uaWithPendingVerification)).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+        }
+      }
 
       // ─── Scenario 1: single subcontractor, stored email, CurrentEmail ───────────
       "Scenario 1 — single subcontractor with stored email" - {
@@ -380,6 +413,18 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onSubmit" - {
+
+      "must redirect to verification request in progress when a verification is pending" in {
+        val application = applicationBuilder(userAnswers = Some(uaWithPendingVerification)).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(POST, onSubmitRoute)).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+        }
+      }
 
       "must redirect to Submission Sending when answers are valid" in {
         val ua = emptyUserAnswers

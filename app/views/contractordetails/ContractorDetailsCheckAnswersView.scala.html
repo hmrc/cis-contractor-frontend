@@ -26,11 +26,16 @@
     formHelper: FormWithCSRF
 )
 
-@(accountsOfficeReference: String, summaryRows: Seq[SummaryListRow], cisAccountUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(
+    accountsOfficeReference: String,
+    summaryRows: Seq[SummaryListRow],
+    cisAccountUrl: String,
+    target: Option[String]
+)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
-    @formHelper(action = controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onSubmit(target), Symbol("autoComplete") -> "off") {
 
         @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
         @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference))
@@ -38,7 +43,12 @@
         @govukSummaryList(SummaryListViewModel(summaryRows))
 
         @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue"))
+            ButtonViewModel(
+                messages(
+                    if (target.isDefined) "site.continue"
+                    else "site.saveAndContinue"
+                )
+            )
         )
     }
 

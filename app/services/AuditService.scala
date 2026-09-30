@@ -20,10 +20,6 @@ import com.google.inject.{Inject, Singleton}
 import models.TypeOfSubcontractor
 import models.UserAnswers
 import models.add.IndividualNamesOptions
-import models.amend.OriginalIndividualAnswers
-import models.amend.company.OriginalCompanyAnswers
-import models.amend.partnership.OriginalPartnershipAnswers
-import models.amend.trust.OriginalTrustAnswers
 import models.audit.*
 import models.contact.ContactMethodOptions
 import pages.add.*
@@ -191,7 +187,6 @@ class AuditService @Inject() (
       cisId = ua.get(CisIdQuery),
       subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      originalDetails = ua.get(OriginalIndividualAnswersQuery).map(toIndividualDetails),
       updatedDetails = IndividualSubcontractorDetails(
         subcontractorNameSelected = namesOpts.map(_.contains(IndividualNamesOptions.SubcontractorName)),
         tradingNameSelected = namesOpts.map(_.contains(IndividualNamesOptions.TradingName)),
@@ -218,48 +213,12 @@ class AuditService @Inject() (
     )
   }
 
-  private def toIndividualDetails(original: OriginalIndividualAnswers): IndividualSubcontractorDetails = {
-    val hasNamesOpts   = original.individualNamesOptions.nonEmpty
-    val hasContactOpts = original.individualContactMethod.nonEmpty
-    IndividualSubcontractorDetails(
-      subcontractorNameSelected =
-        if (hasNamesOpts) Some(original.individualNamesOptions.contains(IndividualNamesOptions.SubcontractorName))
-        else None,
-      tradingNameSelected =
-        if (hasNamesOpts) Some(original.individualNamesOptions.contains(IndividualNamesOptions.TradingName))
-        else None,
-      firstName = original.subcontractorName.map(_.firstName),
-      middleName = original.subcontractorName.flatMap(_.middleName),
-      surname = original.subcontractorName.map(_.lastName),
-      tradingNameOfSubcontractor = original.tradingName,
-      subAddressYesNo = original.addressYesNo,
-      addressOfSubcontractor = original.address,
-      addIndividualContactMethodsYesNo = original.individualContactMethodsYesNo,
-      individualEmailContactMethod =
-        if (hasContactOpts) Some(original.individualContactMethod.contains(ContactMethodOptions.Email)) else None,
-      individualPhoneContactMethod =
-        if (hasContactOpts) Some(original.individualContactMethod.contains(ContactMethodOptions.Phone)) else None,
-      individualMobileContactMethod =
-        if (hasContactOpts) Some(original.individualContactMethod.contains(ContactMethodOptions.Mobile)) else None,
-      individualEmailAddress = original.email,
-      individualPhoneNumber = original.phone,
-      individualMobileNumber = original.mobile,
-      uniqueTaxpayerReferenceYesNo = original.utrYesNo,
-      subcontractorsUniqueTaxpayerReference = original.utr,
-      nationalInsuranceNumberYesNo = original.ninoYesNo,
-      subNationalInsuranceNumber = original.nino,
-      worksReferenceNumberYesNo = original.worksReferenceYesNo,
-      worksReferenceNumber = original.worksReference
-    )
-  }
-
   private def buildAmendCompanyModel(ua: UserAnswers): AmendCompanySubcontractorAuditEventModel = {
     val contactOpts = ua.get(CompanyContactMethodOptionsPage)
     AmendCompanySubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      originalDetails = ua.get(OriginalCompanyAnswersQuery).map(toCompanyDetails),
       updatedDetails = CompanySubcontractorDetails(
         companyName = ua.get(CompanyNamePage),
         companyAddressYesNo = ua.get(CompanyAddressYesNoPage),
@@ -281,38 +240,12 @@ class AuditService @Inject() (
     )
   }
 
-  private def toCompanyDetails(original: OriginalCompanyAnswers): CompanySubcontractorDetails = {
-    val hasContactOpts = original.companyContactMethod.nonEmpty
-    CompanySubcontractorDetails(
-      companyName = original.companyName,
-      companyAddressYesNo = original.addressYesNo,
-      companyAddress = original.address,
-      addCompanyContactMethodsYesNo = original.companyContactMethodsYesNo,
-      companyEmailContactMethod =
-        if (hasContactOpts) Some(original.companyContactMethod.contains(ContactMethodOptions.Email)) else None,
-      companyPhoneContactMethod =
-        if (hasContactOpts) Some(original.companyContactMethod.contains(ContactMethodOptions.Phone)) else None,
-      companyMobileContactMethod =
-        if (hasContactOpts) Some(original.companyContactMethod.contains(ContactMethodOptions.Mobile)) else None,
-      companyEmailAddress = original.email,
-      companyPhoneNumber = original.phone,
-      companyMobileNumber = original.mobile,
-      companyUtrYesNo = original.utrYesNo,
-      companyUtr = original.utr,
-      companyCrnYesNo = original.crnYesNo,
-      companyCrn = original.crn,
-      companyWorksReferenceYesNo = original.worksReferenceYesNo,
-      companyWorksReference = original.worksReference
-    )
-  }
-
   private def buildAmendPartnershipModel(ua: UserAnswers): AmendPartnershipSubcontractorAuditEventModel = {
     val contactOpts = ua.get(PartnershipContactMethodOptionsPage)
     AmendPartnershipSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      originalDetails = ua.get(OriginalPartnershipAnswersQuery).map(toPartnershipDetails),
       updatedDetails = PartnershipSubcontractorDetails(
         partnershipName = ua.get(PartnershipNamePage),
         partnershipAddressYesNo = ua.get(PartnershipAddressYesNoPage),
@@ -339,46 +272,12 @@ class AuditService @Inject() (
     )
   }
 
-  private def toPartnershipDetails(original: OriginalPartnershipAnswers): PartnershipSubcontractorDetails = {
-    val hasContactOpts = original.partnershipContactMethodOptions.nonEmpty
-    PartnershipSubcontractorDetails(
-      partnershipName = original.partnershipName,
-      partnershipAddressYesNo = original.addressYesNo,
-      partnershipAddress = original.address,
-      addPartnershipContactMethodsYesNo = original.partnershipContactMethodsYesNo,
-      partnershipEmailContactMethod =
-        if (hasContactOpts) Some(original.partnershipContactMethodOptions.contains(ContactMethodOptions.Email))
-        else None,
-      partnershipPhoneContactMethod =
-        if (hasContactOpts) Some(original.partnershipContactMethodOptions.contains(ContactMethodOptions.Phone))
-        else None,
-      partnershipMobileContactMethod =
-        if (hasContactOpts) Some(original.partnershipContactMethodOptions.contains(ContactMethodOptions.Mobile))
-        else None,
-      partnershipEmailAddress = original.email,
-      partnershipPhoneNumber = original.phone,
-      partnershipMobileNumber = original.mobile,
-      partnershipHasUtrYesNo = original.hasUtrYesNo,
-      partnershipUniqueTaxpayerReference = original.utr,
-      partnershipNominatedPartnerName = original.nominatedPartnerName,
-      partnershipNominatedPartnerUtrYesNo = original.nominatedPartnerUtrYesNo,
-      partnershipNominatedPartnerUtr = original.nominatedPartnerUtr,
-      partnershipNominatedPartnerNinoYesNo = original.nominatedPartnerNinoYesNo,
-      nominatedPartnerNationalInsuranceNumber = original.nominatedPartnerNino,
-      partnershipNominatedPartnerCrnYesNo = original.nominatedPartnerCrnYesNo,
-      nominatedPartnerCompanyRegistrationNumber = original.nominatedPartnerCrn,
-      partnershipWorksReferenceNumberYesNo = original.nominatedPartnerWorksReferenceYesNo,
-      partnershipWorksReference = original.nominatedPartnerWorksReference
-    )
-  }
-
   private def buildAmendTrustModel(ua: UserAnswers): AmendTrustSubcontractorAuditEventModel = {
     val contactOpts = ua.get(TrustContactMethodOptionsPage)
     AmendTrustSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
       subbieResourceRef = ua.get(AmendSubbieResourceRefQuery),
       typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      originalDetails = ua.get(OriginalTrustAnswersQuery).map(toTrustDetails),
       updatedDetails = TrustSubcontractorDetails(
         trustName = ua.get(TrustNamePage),
         trustAddressYesNo = ua.get(TrustAddressYesNoPage),
@@ -398,26 +297,4 @@ class AuditService @Inject() (
     )
   }
 
-  private def toTrustDetails(original: OriginalTrustAnswers): TrustSubcontractorDetails = {
-    val hasContactOpts = original.trustContactMethod.nonEmpty
-    TrustSubcontractorDetails(
-      trustName = original.trustName,
-      trustAddressYesNo = original.addressYesNo,
-      trustAddress = original.address,
-      addTrustContactMethodsYesNo = original.trustContactMethodsYesNo,
-      trustEmailContactMethod =
-        if (hasContactOpts) Some(original.trustContactMethod.contains(ContactMethodOptions.Email)) else None,
-      trustPhoneContactMethod =
-        if (hasContactOpts) Some(original.trustContactMethod.contains(ContactMethodOptions.Phone)) else None,
-      trustMobileContactMethod =
-        if (hasContactOpts) Some(original.trustContactMethod.contains(ContactMethodOptions.Mobile)) else None,
-      trustEmailAddress = original.email,
-      trustPhoneNumber = original.phone,
-      trustMobileNumber = original.mobile,
-      trustUtrYesNo = original.utrYesNo,
-      trustUtr = original.utr,
-      trustWorksReferenceYesNo = original.worksReferenceYesNo,
-      trustWorksReference = original.worksReference
-    )
-  }
 }
