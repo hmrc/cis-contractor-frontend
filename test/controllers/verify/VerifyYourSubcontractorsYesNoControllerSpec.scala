@@ -20,13 +20,14 @@ import base.SpecBase
 import controllers.routes
 import forms.verify.VerifyYourSubcontractorsYesNoFormProvider
 import models.UserAnswers
+import models.response.GetNewestVerificationBatchResponse
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import config.FrontendAppConfig
 import queries.CisIdQuery
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.VerifyYourSubcontractorsYesNoPage
+import pages.verify.{NewestVerificationBatchResponsePage, VerifyYourSubcontractorsYesNoPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -42,6 +43,29 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
 
   val formProvider = new VerifyYourSubcontractorsYesNoFormProvider()
   private val form = formProvider()
+
+  private val pendingUserAnswers =
+    emptyUserAnswers
+      .set(
+        NewestVerificationBatchResponsePage,
+        GetNewestVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verificationBatch = Some(
+            models.VerificationBatch(
+              verificationBatchId = 1L,
+              status = Some("PENDING"),
+              verificationNumber = Some("VB123")
+            )
+          ),
+          verifications = Nil,
+          submission = None,
+          monthlyReturn = None,
+          monthlyReturnSubmission = None
+        )
+      )
+      .success
+      .value
 
   private lazy val verifyYourSubcontractorsRoute =
     controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad.url
@@ -82,6 +106,20 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must redirect to verification request in progress for a GET when a verification is pending" in {
+      val application = applicationBuilder(userAnswers = Some(pendingUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, verifyYourSubcontractorsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -105,6 +143,22 @@ class VerifyYourSubcontractorsYesNoControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to verification request in progress for a POST when a verification is pending" in {
+      val application = applicationBuilder(userAnswers = Some(pendingUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, verifyYourSubcontractorsRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
       }
     }
 

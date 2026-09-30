@@ -118,6 +118,26 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def uaWithPendingVerificationRequest: UserAnswers =
+    userAnswersWithCisId
+      .set(
+        NewestVerificationBatchResponsePage,
+        getNewestVerificationBatchResponse.copy(
+          verificationBatch = Some(
+            models.VerificationBatch(
+              verificationBatchId = 1L,
+              status = Some("PENDING"),
+              verificationNumber = Some("VB123")
+            )
+          )
+        )
+      )
+      .success
+      .value
+      .set(UnverifiedSubcontractorsPage, subcontractors)
+      .success
+      .value
+
   private val allSubs          = SubcontractorViewModel.fromSubcontractors(subcontractors)
   private val brodyMartin      = allSubs.head
   private val epsilonCarpentry = allSubs(6)
@@ -155,6 +175,19 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.totalCount,
           paginationResult.totalPages
         )(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to verification request in progress when GET is URL hopped during a pending verification" in {
+      val application = applicationBuilder(userAnswers = Some(uaWithPendingVerificationRequest)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, url())
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
       }
     }
 
@@ -214,6 +247,22 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to verification request in progress when POST is URL hopped during a pending verification" in {
+      val application = applicationBuilder(userAnswers = Some(uaWithPendingVerificationRequest)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url())
+            .withFormUrlEncodedBody("value[0]" -> allSubs.head.id)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
       }
     }
 

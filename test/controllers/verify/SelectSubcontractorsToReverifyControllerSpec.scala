@@ -61,6 +61,23 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       monthlyReturnSubmission = None
     )
 
+  private def pendingUserAnswers: UserAnswers =
+    emptyUserAnswers
+      .set(
+        NewestVerificationBatchResponsePage,
+        newestBatchResponse(Nil).copy(
+          verificationBatch = Some(
+            models.VerificationBatch(
+              verificationBatchId = 1L,
+              status = Some("PENDING"),
+              verificationNumber = Some("VB123")
+            )
+          )
+        )
+      )
+      .success
+      .value
+
   private def mkSub(
     id: Long,
     verified: Option[String],
@@ -128,6 +145,29 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockRepo, never()).set(any())
+        }
+      }
+
+      "must redirect to verification request in progress when a verification is pending" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val app =
+          applicationBuilder(userAnswers = Some(pendingUserAnswers))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val result = route(app, FakeRequest(GET, url())).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
 
           verify(mockRepo, never()).set(any())
         }
@@ -252,6 +292,33 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
     }
 
     "onSubmit" - {
+
+      "must redirect to verification request in progress when a verification is pending" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val app =
+          applicationBuilder(userAnswers = Some(pendingUserAnswers))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val result =
+            route(
+              app,
+              FakeRequest(POST, postUrl).withFormUrlEncodedBody("value[0]" -> "1")
+            ).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+
+          verify(mockRepo, never()).set(any())
+        }
+      }
 
       "must return BadRequest and not call repo when SubcontractorReverifyRowsPage is missing (getOrElse Seq.empty path) and selection is required" in {
         val mockRepo = mock[SessionRepository]
