@@ -14,7 +14,7 @@
 .govuk-table__container {
     width: calc(100vw - (2*var(--govuk-min-margin))) !important;
     max-width: var(--max-table-width);
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 #subcontractor-table {
