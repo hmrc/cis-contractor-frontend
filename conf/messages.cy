@@ -1287,18 +1287,6 @@ contractordetails.removeDetailYesNo.detail.schemeName                          =
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
 
-# Final contractor validations
-finalValidations.reviewContractorDetails.title                                 =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.heading                               =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.task.utr                              =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.task.schemeName                       =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.task.email                            =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.task.fileReturn                       =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.task.verifySubcontractors             =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.status.complete                       =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.status.incomplete                     =  xxxxxxxxxxxxxxxxxxxx
-finalValidations.reviewContractorDetails.status.cannotStart                    =  xxxxxxxxxxxxxxxxxxxx
-
 # Final validation - Subcontractors
 
 finalValidations.verify.reviewSubcontractorDetails.taskList.status.completed         = Wedi’i gwblhau
