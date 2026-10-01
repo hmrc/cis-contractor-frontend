@@ -19,10 +19,10 @@ package models.address
 import play.api.libs.json.{Json, Writes}
 
 case class AddressLookupTimeoutConfig(
-                                       timeoutAmount: Int,
-                                       timeoutUrl: String,
-                                       timeoutKeepAliveUrl: Option[String] = None
-                                     )
+  timeoutAmount: Int,
+  timeoutUrl: String,
+  timeoutKeepAliveUrl: Option[String] = None
+)
 
 object AddressLookupTimeoutConfig {
   implicit val writes: Writes[AddressLookupTimeoutConfig] =
