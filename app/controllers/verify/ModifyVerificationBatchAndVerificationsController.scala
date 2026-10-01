@@ -79,16 +79,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
           instanceId <- instanceIdFromSession(request.userAnswers)
           current    <- currentBatchFromSession(request.userAnswers)
 
-          idToRef =
-            request.userAnswers
-              .get(NewestVerificationBatchResponsePage)
-              .toSeq
-              .flatMap(_.subcontractors)
-              .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
-              .toMap ++
-              current.subcontractors
-                .flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref))
-                .toMap
+          idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
 
           selectedRefs <- selectedRefsFromIds(selectedSubcontractorIds, idToRef)
 
@@ -145,7 +136,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
           idToRef.getOrElse(
             id,
             throw new RuntimeException(
-              s"Missing subbieResourceRef for subcontractorId=$id"
+              s"Missing subbieResourceRef for subcontractorId=$id in current verification batch"
             )
           )
         }

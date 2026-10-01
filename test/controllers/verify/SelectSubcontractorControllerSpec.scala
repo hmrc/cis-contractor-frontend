@@ -146,7 +146,7 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          form.fill(allSubs.map(_.id).toSet),
+          form,
           NormalMode,
           paginationResult.paginatedData,
           paginationResult.paginationViewModel,
@@ -461,20 +461,6 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, url())
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to NoSubcontractorsAdded on GET when subcontractors list is empty" in {
 
       val getNewestVerificationBatchResponse: GetNewestVerificationBatchResponse =
@@ -736,15 +722,22 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to next page when Continue is submitted on page 2 with no selections but prior page selections saved" in {
+    "must preserve page 1 selections when submitting page 2 with no selections" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val page1Selection: Set[SubcontractorViewModel] = Set(brodyMartin)
-      val userAnswers                                 =
+      val allItems = SubcontractorViewModel.checkboxItems(allSubs)
+
+      val page1 =
+        paginationService.paginateCheckboxItems(allItems, 1)
+
+      val page1Subcontractor =
+        allSubs.find(_.id == page1.paginatedData.head.value).value
+
+      val userAnswers =
         uaWithSubcontractors
-          .set(SelectSubcontractorPage, page1Selection)
+          .set(SelectSubcontractorPage, Set(page1Subcontractor))
           .success
           .value
 
@@ -757,14 +750,24 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
+
         val request =
           FakeRequest(POST, url(2))
             .withFormUrlEncodedBody()
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe onwardRoute.url
+
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue
+          .get(SelectSubcontractorPage)
+          .value mustBe Set(page1Subcontractor)
       }
     }
 

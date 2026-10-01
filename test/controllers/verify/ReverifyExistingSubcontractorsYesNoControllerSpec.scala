@@ -21,11 +21,19 @@ import controllers.routes
 import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.{NormalMode, SubcontractorViewModel, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage}
+import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.verify.ReverifyExistingSubcontractorsYesNoView
+import models.verify.SelectedSubcontractors
+import navigation.Navigator
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
+import play.api.inject.bind
+import repositories.SessionRepository
+import scala.concurrent.Future
 
 class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with MockitoSugar {
 
@@ -87,6 +95,50 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must clear existing reverify selections when submitting the page" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val existingReverifySelection =
+        Set(
+          SelectedSubcontractors("100", "Alpha Ltd")
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            SelectSubcontractorsToReverifyPage,
+            existingReverifySelection
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        verify(mockSessionRepository).set(captor.capture())
+
+        captor.getValue.get(SelectSubcontractorsToReverifyPage) mustBe None
       }
     }
 
