@@ -181,13 +181,7 @@ class SubmissionSendingController @Inject() (
           )
         )
 
-      case TIMED_OUT =>
-        Future.successful(
-          Redirect(
-            controllers.verify.routes.VerificationRequestInProgressController
-              .onPageLoad()
-          )
-        )
+      case TIMED_OUT => Future.successful(Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad()))
 
       case _ =>
         Future.successful(recovery)
