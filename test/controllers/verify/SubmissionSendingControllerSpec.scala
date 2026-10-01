@@ -148,6 +148,38 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must reset user answers and redirect to submitted page when initial submission returns SUBMITTED_NO_RECEIPT" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmission(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "SUBMITTED_NO_RECEIPT",
+          hmrcMarkGenerated = "hmrc-mark"
+        )
+      )
+
+      when(mockService.resetUserAnswers(any[UserAnswers]))
+        .thenReturn(Future.successful(()))
+
+      val application = applicationWith(mockService)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoad()
+            .url
+
+        verify(mockService).resetUserAnswers(any[UserAnswers])
+      }
+    }
+
     "must redirect to VerifyDepartmentalErrorSubmitAgainController when initial submission returns FATAL_ERROR with error code 3000" in {
       val mockService = mock[VerificationService]
 
