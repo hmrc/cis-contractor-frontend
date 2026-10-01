@@ -758,7 +758,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to in progress page when poll returns TIMED_OUT" in {
+    "must redirect to verify-send-error when poll returns TIMED_OUT" in {
       val mockService = mock[VerificationService]
 
       mockPollResponse(
@@ -779,7 +779,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.verify.routes.VerificationRequestInProgressController
+          controllers.verify.routes.VerifySendErrorController
             .onPageLoad()
             .url
       }
@@ -831,9 +831,9 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         controllers.verify.routes.VerifySendErrorController.onPageLoad().url
     }
 
-    "must redirect to request-in-progress when poll returns TIMED_OUT" in {
+    "must redirect to verify-send-error (SM-06) when poll returns TIMED_OUT" in {
       redirectForPollStatus(SubmissionStatus.TIMED_OUT) mustBe
-        controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+        controllers.verify.routes.VerifySendErrorController.onPageLoad().url
     }
 
     "must redirect to departmental-error (SM-07) when poll returns DEPARTMENTAL_ERROR" in {
