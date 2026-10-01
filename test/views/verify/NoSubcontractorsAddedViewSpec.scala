@@ -92,7 +92,7 @@ class NoSubcontractorsAddedViewSpec extends AnyWordSpec with Matchers with Guice
       val manageText = manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.noSubcontractorsAdded.p3")
+        messages("site.backTo")
       )
 
       manageText.trim.endsWith(".") mustBe true

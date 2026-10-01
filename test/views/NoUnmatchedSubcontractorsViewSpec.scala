@@ -37,7 +37,7 @@ class NoUnmatchedSubcontractorsViewSpec extends SpecBase {
       doc.select("h1").text    must include(messages("noUnmatchedSubcontractors.heading"))
       doc.select("p").text     must include(messages("noUnmatchedSubcontractors.p1"))
       doc.select("p").text     must include(messages("noUnmatchedSubcontractors.p2"))
-      doc.select("p").text     must include(messages("noUnmatchedSubcontractors.backTo"))
+      doc.select("p").text     must include(messages("site.backTo"))
 
       val manageSubcontractorsLink = doc.select(s"a[href='$manageSubcontractorsUrl']")
       manageSubcontractorsLink.size() mustBe 1
