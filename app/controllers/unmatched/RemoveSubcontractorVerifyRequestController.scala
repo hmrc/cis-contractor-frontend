@@ -100,11 +100,11 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                     formWithErrors =>
                       Future.successful(BadRequest(view(formWithErrors, subcontractor.displayName, subcontractorId))),
                     value =>
-                      if (value) {
-                        batch.verifications
-                          .find(_.subcontractorId.contains(subcontractorId))
-                          .flatMap(_.verificationResourceRef) match {
-                          case Some(verificationResourceRef) =>
+                      batch.verifications
+                        .find(_.subcontractorId.contains(subcontractorId))
+                        .flatMap(_.verificationResourceRef) match {
+                        case Some(verificationResourceRef) =>
+                          if (value) {
                             for {
                               updatedAnswers <-
                                 Future.fromTry(
@@ -123,19 +123,21 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                               } else {
                                 recoveryRedirect
                               }
+                          } else {
+                            for {
+                              updatedAnswers <-
+                                Future.fromTry(
+                                  request.userAnswers
+                                    .set(RemoveSubcontractorVerifyRequestPage(verificationResourceRef), value)
+                                )
 
-                          case None =>
-                            Future.successful(recoveryRedirect)
-                        }
-                      } else {
-                        for {
-                          updatedAnswers <-
-                            Future.fromTry(
-                              request.userAnswers.set(RemoveSubcontractorVerifyRequestPage(subcontractorId), value)
+                              _ <- sessionRepository.set(updatedAnswers)
+                            } yield Redirect(
+                              controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
                             )
-
-                          _ <- sessionRepository.set(updatedAnswers)
-                        } yield Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
+                          }
+                        case None                          =>
+                          Future.successful(recoveryRedirect)
                       }
                   )
               }
