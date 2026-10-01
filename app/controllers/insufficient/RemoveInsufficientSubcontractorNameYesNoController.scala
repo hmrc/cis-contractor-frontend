@@ -151,11 +151,11 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     val withSelectionsRemoved =
       subcontractorId.fold[Try[UserAnswers]](Success(userAnswers)) { id =>
         for {
-          afterSelect <- userAnswers
-                           .get(SelectSubcontractorPage)
-                           .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
-                             userAnswers.set(SelectSubcontractorPage, selected.filterNot(_.id == id))
-                           )
+          afterSelect   <- userAnswers
+                             .get(SelectSubcontractorPage)
+                             .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
+                               userAnswers.set(SelectSubcontractorPage, selected.filterNot(_.id == id))
+                             )
           afterReverify <- afterSelect
                              .get(SelectSubcontractorsToReverifyPage)
                              .fold[Try[UserAnswers]](Success(afterSelect))(selected =>
