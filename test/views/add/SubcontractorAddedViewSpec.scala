@@ -16,6 +16,7 @@
 
 package views.add
 
+import config.FrontendAppConfig
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -59,6 +60,13 @@ class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOne
       doc.select("h2").text                     must include(messages("subcontractorAdded.helpAndSupport.h2"))
       doc.select("p").text                      must include(messages("subcontractorAdded.helpAndSupport.p1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorAdded.helpAndSupport.p1.link"))
+
+      doc.select("h2").text must include(messages("subcontractorAdded.beforeYouGo.h2"))
+      doc.select("p").text  must include(messages("subcontractorAdded.beforeYouGo.p1"))
+      doc.select("p").text  must include(messages("subcontractorAdded.beforeYouGo.shareFeedback"))
+
+      val surveyLink = doc.select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
+      surveyLink.text mustBe messages("subcontractorAdded.beforeYouGo.takeAShortSurvey")
     }
   }
 
@@ -72,5 +80,8 @@ class SubcontractorAddedViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
     val view: SubcontractorAddedView =
       app.injector.instanceOf[SubcontractorAddedView]
+
+    val appConfig: FrontendAppConfig =
+      app.injector.instanceOf[FrontendAppConfig]
   }
 }

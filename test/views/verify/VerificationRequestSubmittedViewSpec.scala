@@ -102,10 +102,11 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
         messages("verify.verificationRequestSubmitted.feedback.subHeading")
       )
 
-      val surveyLink = doc.select("a:contains(Take a short survey)").last()
+      val surveyLink: Elements =
+        doc.select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
 
       surveyLink.text() mustBe messages("verify.verificationRequestSubmitted.feedback.survey.link")
-      surveyLink.attr("href") mustBe appConfig.exitSurveyUrl
+      surveyLink.attr("href") mustBe appConfig.cisFeedbackSurveyUrl
     }
 
     "not render reverify section or email paragraph when both are absent" in new Setup {
