@@ -21,9 +21,9 @@ import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
-import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor}
+import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor, UserAnswers}
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
-import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -33,6 +33,7 @@ import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
+import scala.util.{Success, Try}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -105,6 +106,12 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
               )
             ),
           value =>
+            val subcontractorIdOpt = for {
+              batch        <- request.userAnswers.get(CurrentVerificationBatchResponsePage)
+              verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
+              subId        <- verification.subcontractorId
+            } yield subId.toString
+
             for {
               updatedAnswers <-
                 Future.fromTry(
@@ -116,9 +123,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
               cleanedAnswers <-
                 Future.fromTry(
-                  updatedAnswers.remove(
-                    RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef)
-                  )
+                  removeSubcontractorFromSelection(updatedAnswers, verificationResourceRef, subcontractorIdOpt)
                 )
 
               _ <- sessionRepository.set(cleanedAnswers)
@@ -137,6 +142,32 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
             } yield redirect
         )
     }
+
+  private def removeSubcontractorFromSelection(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long,
+    subcontractorId: Option[String]
+  ): Try[UserAnswers] = {
+    val withSelectionsRemoved =
+      subcontractorId.fold[Try[UserAnswers]](Success(userAnswers)) { id =>
+        for {
+          afterSelect   <- userAnswers
+                             .get(SelectSubcontractorPage)
+                             .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
+                               userAnswers.set(SelectSubcontractorPage, selected.filterNot(_.id == id))
+                             )
+          afterReverify <- afterSelect
+                             .get(SelectSubcontractorsToReverifyPage)
+                             .fold[Try[UserAnswers]](Success(afterSelect))(selected =>
+                               afterSelect.set(SelectSubcontractorsToReverifyPage, selected.filterNot(_.id == id))
+                             )
+        } yield afterReverify
+      }
+
+    withSelectionsRemoved.flatMap(
+      _.remove(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef))
+    )
+  }
 
   private def deleteAndRedirect(
     userAnswers: models.UserAnswers,
