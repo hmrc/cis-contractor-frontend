@@ -18,14 +18,21 @@ package controllers.verify
 
 import base.SpecBase
 import models.response.GetLastSubmittedVerificationBatchResponse
-import models.{SubcontractorLastVerification, VerificationLastVerification}
+import models.{SubcontractorLastVerification, UserAnswers, VerificationLastVerification}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import pages.verify.LastSubmittedVerificationBatchResponsePage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import repositories.SessionRepository
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
+
+import scala.concurrent.Future
 
 class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -59,18 +66,23 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
   "VerificationResults Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val cisId      = "1"
-      val userAnswer = emptyUserAnswers
+      val userAnswer = userAnswersWithCisId
         .set(LastSubmittedVerificationBatchResponsePage, batchResponse)
         .success
         .value
-        .set(CisIdQuery, cisId)
+        .set(RemoveSubcontractorVerifyRequestPage(123L), true)
         .success
         .value
 
-      val manageSubcontractorsUrl =
-        s"${applicationConfig.manageSubcontractorsUrl}/$cisId"
-      val application             = applicationBuilder(userAnswers = Some(userAnswer)).build()
+      val manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/1"
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswer))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
 
       running(application) {
         val request            = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
@@ -83,11 +95,18 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
           request,
           messages(application)
         ).toString
+
+        val userAnswersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(userAnswersCaptor.capture())
+
+        val updatedUserAnswers = userAnswersCaptor.getValue
+
+        updatedUserAnswers.get(RemoveSubcontractorVerifyRequestPage(123L)) mustBe None
       }
     }
 
-    "must redirect to Journey Recovery when CisId is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must redirect to Journey Recovery when LastSubmittedVerificationBatchResponsePage is missing" in {
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
 
       running(application) {
         val request = FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoad().url)
