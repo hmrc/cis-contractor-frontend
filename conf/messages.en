@@ -1353,3 +1353,6 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  scheme name
 contractordetails.removeDetailYesNo.error.required.email                       =  Select yes to remove the contractor’s email address
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Select yes to remove the contractor’s scheme name
+
+recruitmentBanner.title = You may receive a voucher for feedback
+recruitmentBanner.link.text = Join our research panel (opens in new tab)
