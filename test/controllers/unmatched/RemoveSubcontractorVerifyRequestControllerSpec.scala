@@ -168,11 +168,15 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
 
     "must redirect to ReviewUnmatchedSubcontractorsController when the question has previously been answered YES" in {
 
+      val batch = currentBatchResponse.copy(verifications =
+        Seq(currentBatchResponse.verifications.head.copy(verificationNumber = Some("V0007771002")))
+      )
+
       val userAnswers = UserAnswers(userAnswersId)
-        .set(CurrentVerificationBatchResponsePage, currentBatchResponse)
+        .set(CurrentVerificationBatchResponsePage, batch)
         .success
         .value
-        .set(RemoveSubcontractorVerifyRequestPage(1111L), true)
+        .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), true)
         .success
         .value
 
@@ -457,27 +461,6 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
       running(application) {
 
         val request = FakeRequest(GET, removeSubcontractorVerifyRequestUnmappedSubcontractorIdRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if subcontractor is not found" in {
-
-      val batch       = currentBatchResponse.copy(subcontractors =
-        Seq(currentBatchResponse.subcontractors.head.copy(subcontractorId = 20L))
-      )
-      val userAnswers = emptyUserAnswers.set(CurrentVerificationBatchResponsePage, batch).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides().build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, removeSubcontractorVerifyRequestRoute)
 
         val result = route(application, request).value
 

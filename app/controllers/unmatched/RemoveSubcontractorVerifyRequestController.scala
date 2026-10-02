@@ -26,7 +26,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.VerificationService
+import services.{CheckUnmatchedSubcontractorsService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
@@ -58,29 +58,29 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
         case Some(batch) =>
-          batch.verifications
-            .find(_.subcontractorId.contains(subcontractorId))
-            .flatMap(_.verificationResourceRef) match {
-            case Some(verificationResourceRef) =>
-              if (
-                request.userAnswers.get(RemoveSubcontractorVerifyRequestPage(verificationResourceRef)).contains(true)
-              ) {
-                Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
-              } else {
-                batch.subcontractors
-                  .find(_.subcontractorId == subcontractorId)
-                  .map { subcontractor =>
-                    val preparedForm =
-                      request.userAnswers
-                        .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
-                        .fold(form)(form.fill)
-                    Ok(view(preparedForm, subcontractor.displayName, subcontractorId))
-                  }
-                  .getOrElse(recoveryRedirect)
-              }
-            case None                          => recoveryRedirect
+          batch.verifications.find(_.subcontractorId.contains(subcontractorId)) match {
+
+            case Some(verification) if !CheckUnmatchedSubcontractorsService.isUnmatched(verification) =>
+              Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
+
+            case Some(_) =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map { subcontractor =>
+                  val preparedForm =
+                    request.userAnswers
+                      .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
+                      .fold(form)(form.fill)
+
+                  Ok(view(preparedForm, subcontractor.displayName, subcontractorId))
+                }
+                .getOrElse(recoveryRedirect)
+
+            case None =>
+              recoveryRedirect
           }
-        case None        =>
+
+        case None =>
           recoveryRedirect
       }
     }
@@ -109,7 +109,7 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                               updatedAnswers <-
                                 Future.fromTry(
                                   request.userAnswers
-                                    .set(RemoveSubcontractorVerifyRequestPage(verificationResourceRef), value)
+                                    .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), value)
                                 )
                               deleteResponse <-
                                 verificationService.deleteVerification(updatedAnswers, verificationResourceRef)
@@ -128,7 +128,7 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
                               updatedAnswers <-
                                 Future.fromTry(
                                   request.userAnswers
-                                    .set(RemoveSubcontractorVerifyRequestPage(verificationResourceRef), value)
+                                    .set(RemoveSubcontractorVerifyRequestPage(subcontractorId), value)
                                 )
 
                               _ <- sessionRepository.set(updatedAnswers)
