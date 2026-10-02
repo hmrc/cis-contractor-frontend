@@ -144,5 +144,19 @@ class AddressLookupConfigurationSpec extends SpecBase {
 
       (Json.toJson(result) \ "version").as[Int] mustBe 2
     }
+
+    "must configure the timeout settings for address lookup" in {
+      val timeoutConfig = configBuilder(
+        individualQuestionsAddress,
+        continueRoute,
+        useUkMode = true,
+        mandatoryFieldsConfigModel = mandatoryFields
+      ).options.timeoutConfig
+
+      timeoutConfig mustBe defined
+      timeoutConfig.get.timeoutAmount mustBe applicationConfig.timeout
+      timeoutConfig.get.timeoutUrl mustBe applicationConfig.feedbackUrl
+      timeoutConfig.get.timeoutKeepAliveUrl mustBe Some(applicationConfig.keepAliveUrl)
+    }
   }
 }

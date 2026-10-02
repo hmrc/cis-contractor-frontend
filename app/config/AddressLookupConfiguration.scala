@@ -51,6 +51,13 @@ class AddressLookupConfiguration @Inject() (implicit appConfig: FrontendAppConfi
         disableTranslations = Some(false),
         includeHMRCBranding = Some(false),
         ukMode = Some(useUkMode),
+        timeoutConfig = Some(
+          AddressLookupTimeoutConfig(
+            timeoutAmount = appConfig.timeout,
+            timeoutUrl = appConfig.feedbackUrl,
+            timeoutKeepAliveUrl = Some(appConfig.keepAliveUrl)
+          )
+        ),
         selectPageConfig = AddressLookupSelectConfigModel(
           showSearchAgainLink = Some(false)
         ),
