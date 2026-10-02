@@ -1363,3 +1363,6 @@ individualNamesOptions.hint                                                     
 individualNamesOptions.error.required                                               =  xxxxxxxxxxxxxxxxxxxx
 individualNamesOptions.checkYourAnswersLabel                                        =  xxxxxxxxxxxxxxxxxxxx
 individualNamesOptions.change.hidden                                                =  xxxxxxxxxxxxxxxxxxxx
+
+recruitmentBanner.title = Mae’n bosibl y byddwch yn cael taleb am roi adborth
+recruitmentBanner.link.text = Ymunwch â’n panel ymchwil (yn agor tab newydd)
