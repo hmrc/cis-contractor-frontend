@@ -1315,6 +1315,7 @@ finalvalidations.updateSubcontractorDetails.phoneNumber                        =
 finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                  = Rhif ffôn symudol
 finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber            = Ychwanegu cyfeirnod y gwaith?
 finalvalidations.updateSubcontractorDetails.worksReferenceNumber               = Cyfeirnod y gwaith
+finalvalidations.updateSubcontractorDetails.noNameProvided                     = xxxxxxxxxxxxxxxxxxxx
 
 # Final validation - Sole trader
 finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName       = Enw’r is-gontractwr
