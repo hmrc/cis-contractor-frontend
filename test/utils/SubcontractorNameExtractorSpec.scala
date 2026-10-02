@@ -17,7 +17,7 @@
 package utils
 
 import base.SpecBase
-import models.{AmendMode, CheckMode, NormalMode}
+import models.{AmendMode, CheckMode, FinalValidationMode, NormalMode}
 import models.add.SubcontractorName
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.CompanyNamePage
@@ -228,6 +228,19 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
         subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers, AmendMode)
 
       result mustBe Some("verify.noName")
+    }
+  }
+
+  "Final validation mode: SubcontractorNameExtractor.getSubcontractorName" - {
+
+    "should return No name provided when no subcontractor name exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getSubcontractorName(emptyUserAnswers, FinalValidationMode)
+
+      result mustBe Some(messages("verify.noName"))
     }
   }
 
@@ -479,6 +492,19 @@ class SubcontractorNameExtractorSpec extends SpecBase with MockitoSugar {
 
       val result =
         subcontractorNameExtractor.getCompanyName(emptyUserAnswers, AmendMode)
+
+      result mustBe Some(messages("verify.noName"))
+    }
+  }
+
+  "Final validation mode: SubcontractorNameExtractor.getCompanyName" - {
+
+    "should return No name provided when no companyName exists" in {
+
+      val subcontractorNameExtractor = new SubcontractorNameExtractor()
+
+      val result =
+        subcontractorNameExtractor.getCompanyName(emptyUserAnswers, FinalValidationMode)
 
       result mustBe Some(messages("verify.noName"))
     }
