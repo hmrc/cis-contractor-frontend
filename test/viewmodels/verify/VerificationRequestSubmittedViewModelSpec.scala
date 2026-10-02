@@ -71,7 +71,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
             confirmationEmail = Some("test@test.com")
@@ -87,7 +87,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
             confirmationEmail = None
@@ -106,7 +106,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
           )
@@ -120,7 +120,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now
           )
 
@@ -136,7 +136,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A"),
             subcontractorsToReverify = Seq("Sub B")
@@ -151,7 +151,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
           VerificationRequestSubmittedViewModel(
             manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
             verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-            referenceNumber = "REF123",
+            referenceNumber = Some("REF123"),
             submittedAt = now,
             subcontractorsToVerify = Seq("Sub A")
           )
@@ -176,7 +176,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val vm =
           VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig)
 
-        vm.referenceNumber        shouldBe "VB00000001"
+        vm.referenceNumber        shouldBe Some("VB00000001")
         vm.submittedAt            shouldBe now
         vm.verificationHistoryUrl shouldBe applicationConfig.verificationHistoryUrl
       }
@@ -225,7 +225,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         )
       }
 
-      "must throw when verificationNumber is missing" in {
+      "must return None for referenceNumber when verificationNumber is missing" in {
 
         val badBatch =
           verificationBatch.copy(verificationNumber = None)
@@ -233,7 +233,7 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
         val badResponse =
           newestBatchResponse.copy(verificationBatch = Some(badBatch))
 
-        val exception = intercept[IllegalStateException] {
+        val vm =
           VerificationRequestSubmittedViewModel.fromUserAnswers(
             UserAnswers("id")
               .set(CisIdQuery, cisId)
@@ -244,11 +244,8 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
               .value,
             applicationConfig
           )
-        }
 
-        exception.getMessage should include(
-          "[VerificationRequestSubmittedViewModel] verificationNumber missing"
-        )
+        vm.referenceNumber shouldBe None
       }
 
       "must throw when submissionRequestDate is missing" in {

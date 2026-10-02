@@ -172,7 +172,7 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       VerificationRequestSubmittedViewModel(
         manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/$cisId",
         verificationHistoryUrl = applicationConfig.verificationHistoryUrl,
-        referenceNumber = referenceNumber,
+        referenceNumber = Some(referenceNumber),
         submittedAt = submittedAt,
         subcontractorsToVerify = subcontractorsToVerify,
         subcontractorsToReverify = subcontractorsToReverify,
