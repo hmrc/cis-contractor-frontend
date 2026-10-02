@@ -616,6 +616,8 @@ individualNamesOptions.error.required                                           
 individualNamesOptions.checkYourAnswersLabel                                          =  xxxxxxxxxxxxxxxxxxxx
 individualNamesOptions.change.hidden                                                  =  xxxxxxxxxxxxxxxxxxxx
 
+finalvalidations.updateSubcontractorDetails.noNameProvided                            =  xxxxxxxxxxxxxxxxxxxx
+
 # Partnership
 addPartnershipContactMethodsYesNo.title                            =  xxxxxxxxxxxxxxxxxxxx
 addPartnershipContactMethodsYesNo.heading                          =  Ydych chi am ychwanegu manylion cysylltu ar gyfer {0}?
