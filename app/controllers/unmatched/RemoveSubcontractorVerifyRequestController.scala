@@ -26,7 +26,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.VerificationService
+import services.{CheckUnmatchedSubcontractorsService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
@@ -58,33 +58,27 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
         case Some(batch) =>
-          batch.subcontractors
-            .find(_.subcontractorId == subcontractorId)
-            .map { subcontractor =>
-              if (
-                request.userAnswers
-                  .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
-                  .contains(true)
-              ) {
-                Redirect(
-                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
-                )
-              } else {
-                val preparedForm =
-                  request.userAnswers
-                    .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
-                    .fold(form)(form.fill)
+          batch.verifications.find(_.subcontractorId.contains(subcontractorId)) match {
 
-                Ok(
-                  view(
-                    preparedForm,
-                    subcontractor.displayName,
-                    subcontractorId
-                  )
-                )
-              }
-            }
-            .getOrElse(recoveryRedirect)
+            case Some(verification) if !CheckUnmatchedSubcontractorsService.isUnmatched(verification) =>
+              Redirect(controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad())
+
+            case Some(_) =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map { subcontractor =>
+                  val preparedForm =
+                    request.userAnswers
+                      .get(RemoveSubcontractorVerifyRequestPage(subcontractorId))
+                      .fold(form)(form.fill)
+
+                  Ok(view(preparedForm, subcontractor.displayName, subcontractorId))
+                }
+                .getOrElse(recoveryRedirect)
+
+            case None =>
+              recoveryRedirect
+          }
 
         case None =>
           recoveryRedirect
