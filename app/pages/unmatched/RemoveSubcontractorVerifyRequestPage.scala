@@ -23,3 +23,11 @@ case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends Q
 
   override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
 }
+
+object RemoveSubcontractorVerifyRequestPage {
+
+  case object All extends QuestionPage[Map[String, Map[String, Boolean]]] {
+
+    override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest"
+  }
+}

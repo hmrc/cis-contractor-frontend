@@ -20,8 +20,9 @@ import base.SpecBase
 import controllers.routes
 import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.{NormalMode, SubcontractorViewModel, UserAnswers}
+import models.response.GetNewestVerificationBatchResponse
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage}
+import pages.verify.{NewestVerificationBatchResponsePage, ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -33,6 +34,29 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
   val formProvider = new ReverifyExistingSubcontractorsYesNoFormProvider()
   val form         = formProvider()
+
+  private val pendingUserAnswers =
+    emptyUserAnswers
+      .set(
+        NewestVerificationBatchResponsePage,
+        GetNewestVerificationBatchResponse(
+          scheme = None,
+          subcontractors = Nil,
+          verificationBatch = Some(
+            models.VerificationBatch(
+              verificationBatchId = 1L,
+              status = Some("PENDING"),
+              verificationNumber = Some("VB123")
+            )
+          ),
+          verifications = Nil,
+          submission = None,
+          monthlyReturn = None,
+          monthlyReturnSubmission = None
+        )
+      )
+      .success
+      .value
 
   lazy val reverifyExistingSubcontractorsYesNoRoute =
     controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(NormalMode).url
@@ -73,6 +97,20 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       }
     }
 
+    "must redirect to verification request in progress for a GET when a verification is pending" in {
+      val application = applicationBuilder(userAnswers = Some(pendingUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, reverifyExistingSubcontractorsYesNoRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
+      }
+    }
+
     "must redirect to SelectSubcontractorsToReverify on POST with true" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -87,6 +125,22 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to verification request in progress for a POST when a verification is pending" in {
+      val application = applicationBuilder(userAnswers = Some(pendingUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, reverifyExistingSubcontractorsYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url
       }
     }
 

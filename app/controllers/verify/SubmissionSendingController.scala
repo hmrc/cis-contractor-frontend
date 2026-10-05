@@ -61,7 +61,7 @@ class SubmissionSendingController @Inject() (
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       verificationService.createSubmitAndPersistVerificationSubmission
-        .map(redirectForInitialSubmissionResponse)
+        .flatMap(redirectForInitialSubmissionResponse)
         .recover { case ex =>
           logger.error(
             "[SubmissionSendingController.onPageLoad] Failed to create submission",
@@ -135,19 +135,26 @@ class SubmissionSendingController @Inject() (
 
   private def redirectForInitialSubmissionResponse(
     response: ChrisSubmissionResponse
-  ): Result =
+  )(implicit request: DataRequest[_]): Future[Result] =
     SubmissionStatus.fromString(response.status) match {
 
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Redirect(
-          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect
+        Future.successful(
+          Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
         )
 
+      case SUBMITTED_NO_RECEIPT =>
+        verificationService
+          .resetUserAnswers(request.userAnswers)
+          .map { _ =>
+            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+          }
+
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
-        redirectForErrorStatus(status, response.govTalkErrorStatus)
+        Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
 
       case _ =>
-        recovery
+        Future.successful(recovery)
     }
 
   private def redirectForPollSubmissionResponse(
@@ -168,8 +175,12 @@ class SubmissionSendingController @Inject() (
             Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
           }
 
-      case SUBMITTED_NO_RECEIPT => // TODO: matching screen not found
-        Future.successful(recovery)
+      case SUBMITTED_NO_RECEIPT =>
+        verificationService
+          .resetUserAnswers(request.userAnswers)
+          .map { _ =>
+            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+          }
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
@@ -181,13 +192,7 @@ class SubmissionSendingController @Inject() (
           )
         )
 
-      case TIMED_OUT =>
-        Future.successful(
-          Redirect(
-            controllers.verify.routes.VerificationRequestInProgressController
-              .onPageLoad()
-          )
-        )
+      case TIMED_OUT => Future.successful(Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad()))
 
       case _ =>
         Future.successful(recovery)

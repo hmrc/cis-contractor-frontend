@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 case class VerificationRequestSubmittedViewModel(
   manageSubcontractorsUrl: String,
   verificationHistoryUrl: String,
-  referenceNumber: String,
+  referenceNumber: Option[String],
   submittedAt: LocalDateTime,
   subcontractorsToVerify: Seq[String] = Seq.empty,
   subcontractorsToReverify: Seq[String] = Seq.empty,
@@ -63,14 +63,9 @@ object VerificationRequestSubmittedViewModel {
         )
       )
 
-    val referenceNumber: String =
+    val referenceNumber: Option[String] =
       newestBatch.verificationBatch
         .flatMap(_.verificationNumber)
-        .getOrElse(
-          throw new IllegalStateException(
-            "[VerificationRequestSubmittedViewModel] verificationNumber missing"
-          )
-        )
 
     val submittedAt: LocalDateTime =
       newestBatch.submission

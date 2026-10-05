@@ -37,22 +37,28 @@
         subHeading: H2,
         paragraph: Paragraph,
         printLink: PrintLink,
-        link: Link
+        link: Link,
+        appConfig: FrontendAppConfig,
 )
 
 @(vm: VerificationRequestSubmittedViewModel
-)(implicit request: Request[_],appConfig: FrontendAppConfig, messages: Messages)
+)(
+    implicit request: Request[_],
+    messages: Messages
+)
 
 @layout(pageTitle = titleNoForm(messages("verify.verificationRequestSubmitted.title")), showBackLink = false) {
 
     @govukPanel(
         Panel(
             title = Text(messages("verify.verificationRequestSubmitted.heading")),
-            content = HtmlContent(
-                s"""
-                ${messages("verify.verificationRequestSubmitted.reference")}<br>
-                <strong>${HtmlFormat.escape(vm.referenceNumber)}</strong>
-                """
+            content = vm.referenceNumber.fold(HtmlContent(""))(ref =>
+                HtmlContent(
+                    s"""
+                    ${messages("verify.verificationRequestSubmitted.reference")}<br>
+                    <strong>${HtmlFormat.escape(ref)}</strong>
+                    """
+                )
             )
         )
     )
@@ -182,7 +188,7 @@
 
     @link(
         "verify.verificationRequestSubmitted.feedback.survey.link",
-        appConfig.exitSurveyUrl, // TODO: Link to be confirmed & verified
+        appConfig.exitSurveyUrl,
         suffixTextKey = "verify.verificationRequestSubmitted.feedback.p2"
     )
 }

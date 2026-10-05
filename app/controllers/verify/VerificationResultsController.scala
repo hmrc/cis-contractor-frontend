@@ -18,39 +18,50 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.UserAnswers
+import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.CisIdQuery
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class VerificationResultsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
-)(implicit appConfig: FrontendAppConfig)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {
-      case Some(response) =>
-        request.userAnswers.get(CisIdQuery) match {
-          case Some(cisId) =>
-            val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-            Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
-          case None        => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-      case None           => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
+    implicit request =>
+      request.userAnswers.get(LastSubmittedVerificationBatchResponsePage) match {
+        case Some(response) =>
+          val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/${request.cisId}"
+          cleanseSessionPages(request.userAnswers)
+            .map { _ =>
+              Ok(view(VerificationResultsViewModel.from(response), manageSubcontractorsUrl))
+            }
+        case None           => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
+
+  private def cleanseSessionPages(userAnswers: UserAnswers): Future[UserAnswers] =
+    for {
+      updatedUserAnswers <- Future.fromTry(userAnswers.remove(RemoveSubcontractorVerifyRequestPage.All))
+      _                  <- sessionRepository.set(updatedUserAnswers)
+    } yield updatedUserAnswers
 }

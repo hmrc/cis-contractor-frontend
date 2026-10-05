@@ -22,9 +22,8 @@ import generators.ModelGenerators
 import models.*
 import models.requests.*
 import models.response.*
-import models.verify.{ChrisVerificationRequestBuilder, GovTalkErrorStatus, SubmissionStatus, VerificationSubmissionDetails}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
-import models.verify.{ChrisVerificationRequestBuilder, SelectedSubcontractors, SubmissionStatus, VerificationSubmissionDetails}
+import models.verify.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, *}
