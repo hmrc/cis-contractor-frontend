@@ -104,55 +104,54 @@ class SelectSubcontractorController @Inject() (
       }
     }
 
- 
-private def renderSelectSubcontractorPage(
-  userAnswers: UserAnswers,
-  mode: Mode,
-  page: Int
-)(implicit request: Request[_]): Future[Result] =
-  redirectIfVerificationRequestInProgress(userAnswers) match {
-    case Some(redirectResult) =>
-      Future.successful(redirectResult)
+  private def renderSelectSubcontractorPage(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: Int
+  )(implicit request: Request[_]): Future[Result] =
+    redirectIfVerificationRequestInProgress(userAnswers) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
 
-    case None =>
-      getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
+      case None =>
+        getUnverifiedSubcontractorsOrRedirect(userAnswers) match {
 
-        case Right(unverifiedSubcontractors) =>
-          val subcontractorsVm =
-            SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
+          case Right(unverifiedSubcontractors) =>
+            val subcontractorsVm =
+              SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
-          val selectedSubcontractors =
-            Future.successful(
-              userAnswers
-                .get(SelectSubcontractorPage)
-                .getOrElse(Set.empty[SubcontractorViewModel])
-            )
-
-          val result =
-            paginationService.paginateCheckboxItems(
-              SubcontractorViewModel.checkboxItems(subcontractorsVm),
-              page
-            )
-
-          selectedSubcontractors.map { selected =>
-            Ok(
-              view(
-                form.fill(selected.map(_.id)),
-                mode,
-                result.paginatedData,
-                result.paginationViewModel,
-                result.currentPage,
-                result.startIndex,
-                result.totalCount,
-                result.totalPages
+            val selectedSubcontractors =
+              Future.successful(
+                userAnswers
+                  .get(SelectSubcontractorPage)
+                  .getOrElse(Set.empty[SubcontractorViewModel])
               )
-            )
-          }
 
-        case Left(redirectResult) =>
-          Future.successful(redirectResult)
-      }
-  }
+            val result =
+              paginationService.paginateCheckboxItems(
+                SubcontractorViewModel.checkboxItems(subcontractorsVm),
+                page
+              )
+
+            selectedSubcontractors.map { selected =>
+              Ok(
+                view(
+                  form.fill(selected.map(_.id)),
+                  mode,
+                  result.paginatedData,
+                  result.paginationViewModel,
+                  result.currentPage,
+                  result.startIndex,
+                  result.totalCount,
+                  result.totalPages
+                )
+              )
+            }
+
+          case Left(redirectResult) =>
+            Future.successful(redirectResult)
+        }
+    }
 
   private def hasAnyVerifiedSubcontractor(
     userAnswers: UserAnswers

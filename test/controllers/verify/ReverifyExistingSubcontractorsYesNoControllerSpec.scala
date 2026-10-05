@@ -22,12 +22,7 @@ import forms.verify.ReverifyExistingSubcontractorsYesNoFormProvider
 import models.{NormalMode, SubcontractorViewModel, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{
-  NewestVerificationBatchResponsePage,
-  ReverifyExistingSubcontractorsYesNoPage,
-  SelectSubcontractorPage,
-  SelectSubcontractorsToReverifyPage
-}
+import pages.verify.{NewestVerificationBatchResponsePage, ReverifyExistingSubcontractorsYesNoPage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
