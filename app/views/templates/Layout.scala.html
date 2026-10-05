@@ -31,11 +31,19 @@
    stylesheets: Stylesheets,
    betaBanner: StandardBetaBanner,
    hmrcStandardPage: HmrcStandardPage,
+   hmrcUserResearchBanner : HmrcUserResearchBanner,
    twoThirdsMainContent: TwoThirdsMainContent,
    fullWidthMainContent: FullWidthMainContent
  )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, isFullWidth: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String,
+    showBackLink: Boolean = true,
+    timeout: Boolean = true,
+    showSignOut: Boolean = true,
+    showHmrcBanner: Boolean = false,
+    isFullWidth: Boolean = false,
+    urBanner: Option[UserResearchBanner] = None
+)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @scripts = {
   @hmrcScripts()
@@ -85,7 +93,8 @@
       ),
       banners = Banners(
         displayHmrcBanner = showHmrcBanner,
-        phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
+        phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
+        additionalBannersBlock = if(appConfig.features.showUserResearchBannerEnabled()) urBanner.map(hmrcUserResearchBanner(_)) else None
        ),
       isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
       backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None

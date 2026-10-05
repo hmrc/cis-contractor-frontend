@@ -48,11 +48,6 @@ class VerificationRequestSubmittedViewSpec extends SpecBase with GuiceOneAppPerS
       doc.select(".govuk-panel__title").text mustBe
         messages("verify.verificationRequestSubmitted.heading")
 
-      val recruitmentBanner: Elements = doc.select(".hmrc-user-research-banner")
-
-      recruitmentBanner.text() must include(messages("recruitmentBanner.title"))
-      recruitmentBanner.text() must include(messages("recruitmentBanner.link.text"))
-
       doc.select(".govuk-panel__body").text must include(referenceNumber)
 
       doc.text must include(

@@ -1351,6 +1351,3 @@ contractordetails.removeDetailYesNo.detail.email                               =
 contractordetails.removeDetailYesNo.detail.schemeName                          =  enw’r cynllun
 contractordetails.removeDetailYesNo.error.required.email                       =  Dewiswch ‘Iawn’ i dynnu cyfeiriad e-bost y contractwr
 contractordetails.removeDetailYesNo.error.required.schemeName                  =  Dewiswch ‘Iawn’ i dynnu enw cynllun y contractwr
-
-recruitmentBanner.title = Mae’n bosibl y byddwch yn cael taleb am roi adborth
-recruitmentBanner.link.text = Ymunwch â’n panel ymchwil (yn agor tab newydd)
