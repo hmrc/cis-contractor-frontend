@@ -37,51 +37,60 @@ class VerifyCheckYourAnswersController @Inject() (
   view: VerifyCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport
-    with Logging {
+    with Logging
+    with PendingVerificationRequestGuard {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val ua = request.userAnswers
-    // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
-    ValidatedVerify.build(ua) match {
-      case Right(_)    =>
-        val list = SummaryListViewModel(
-          rows = Seq(
-            SelectSubcontractorSummary.row(ua),
-            ReverifyExistingSubcontractorsYesNoSummary.row(ua),
-            SelectSubcontractorsToReverifySummary.row(ua),
-            ContractorEmailConfirmationStoredSummary.row(ua),
-            ContractorEmailConfirmationNotStoredSummary.row(ua),
-            EmailAddressSummary.row(ua)
-          ).flatten
-        )
-        Ok(view(list))
-      case Left(error) =>
-        logger.error(s"[VerifyCheckYourAnswersController.onPageLoad] Validation failed: $error")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    redirectIfVerificationRequestInProgress(request.userAnswers).getOrElse {
+      val ua = request.userAnswers
+      // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
+      ValidatedVerify.build(ua) match {
+        case Right(_)    =>
+          val list = SummaryListViewModel(
+            rows = Seq(
+              SelectSubcontractorSummary.row(ua),
+              ReverifyExistingSubcontractorsYesNoSummary.row(ua),
+              SelectSubcontractorsToReverifySummary.row(ua),
+              ContractorEmailConfirmationStoredSummary.row(ua),
+              ContractorEmailConfirmationNotStoredSummary.row(ua),
+              EmailAddressSummary.row(ua)
+            ).flatten
+          )
+          Ok(view(list))
+        case Left(error) =>
+          logger.error(s"[VerifyCheckYourAnswersController.onPageLoad] Validation failed: $error")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     }
   }
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
-      ValidatedVerify.build(request.userAnswers) match {
+      redirectIfVerificationRequestInProgress(request.userAnswers) match {
+        case Some(redirectResult) =>
+          Future.successful(redirectResult)
 
-        case Right(_) =>
-          Future.successful(
-            Redirect(
-              controllers.verify.routes.SubmissionSendingController.onPageLoad()
-            )
-          )
+        case None =>
+          // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
+          ValidatedVerify.build(request.userAnswers) match {
 
-        case Left(error) =>
-          logger.error(
-            s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
-          )
-          Future.successful(
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-          )
+            case Right(_) =>
+              Future.successful(
+                Redirect(
+                  controllers.verify.routes.SubmissionSendingController.onPageLoad()
+                )
+              )
+
+            case Left(error) =>
+              logger.error(
+                s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
+              )
+              Future.successful(
+                Redirect(
+                  controllers.routes.JourneyRecoveryController.onPageLoad()
+                )
+              )
+          }
       }
     }
 

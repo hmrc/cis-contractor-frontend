@@ -41,11 +41,15 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
-    with Logging {
+    with Logging
+    with PendingVerificationRequestGuard {
 
   def modifyVerificationBatch(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      runModifyLogic(mode)
+      redirectIfVerificationRequestInProgress(request.userAnswers) match {
+        case Some(redirectResult) => Future.successful(redirectResult)
+        case None                 => runModifyLogic(mode)
+      }
     }
 
   private def runModifyLogic(mode: Mode)(implicit request: models.requests.DataRequest[?]): Future[Result] = {

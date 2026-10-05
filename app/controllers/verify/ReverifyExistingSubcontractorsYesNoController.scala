@@ -42,41 +42,50 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
   view: ReverifyExistingSubcontractorsYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with PendingVerificationRequestGuard {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    redirectIfVerificationRequestInProgress(request.userAnswers).getOrElse {
+      val preparedForm = request.userAnswers.get(ReverifyExistingSubcontractorsYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    val preparedForm = request.userAnswers.get(ReverifyExistingSubcontractorsYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      Ok(view(preparedForm, mode))
     }
-
-    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(
-                                  request.userAnswers
-                                    .set(ReverifyExistingSubcontractorsYesNoPage, value)
-                                    .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
-                                )
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                ReverifyExistingSubcontractorsYesNoPage,
-                mode,
-                updatedAnswers
+  (identify andThen getData andThen requireData).async { implicit request =>
+    redirectIfVerificationRequestInProgress(request.userAnswers) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
+
+      case None =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+            value =>
+              for {
+                updatedAnswers <-
+                  Future.fromTry(
+                    request.userAnswers
+                      .set(ReverifyExistingSubcontractorsYesNoPage, value)
+                      .flatMap(_.remove(SelectSubcontractorsToReverifyPage))
+                  )
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(
+                  ReverifyExistingSubcontractorsYesNoPage,
+                  mode,
+                  updatedAnswers
+                )
               )
-            )
-        )
+          )
     }
+  }
 }

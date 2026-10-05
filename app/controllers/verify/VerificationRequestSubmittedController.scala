@@ -53,8 +53,6 @@ class VerificationRequestSubmittedController @Inject() (
               appConfig
             )
 
-          given FrontendAppConfig = appConfig
-
           Ok(view(viewModel))
         }
         .recover { case t =>

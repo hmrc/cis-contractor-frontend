@@ -59,7 +59,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
   view: SelectSubcontractorsToReverifyView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with PendingVerificationRequestGuard {
 
   private def dateFmt(implicit messages: Messages) =
     DateTimeFormats.shortDateFormat()(messages.lang)
@@ -188,62 +189,163 @@ class SelectSubcontractorsToReverifyController @Inject() (
   }
 
   def onPageLoad(
-    mode: Mode,
-    page: Int = 1
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      buildRowsFromSession match {
+  mode: Mode,
+  page: Int = 1
+): Action[AnyContent] =
+  (identify andThen getData andThen requireData).async { implicit request =>
+    redirectIfVerificationRequestInProgress(request.userAnswers) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
 
-        case Left(result) =>
-          Future.successful(result)
+      case None =>
+        buildRowsFromSession match {
 
-        case Right(rowsWithSubcontractors) =>
-          val sortedRowsWithSubcontractors =
-            rowsWithSubcontractors.sortBy { case (_, row) =>
-              row.name.toLowerCase(Locale.UK)
-            }
+          case Left(result) =>
+            Future.successful(result)
 
-          val sortedRows =
-            sortedRowsWithSubcontractors.map(_._2)
+          case Right(rowsWithSubcontractors) =>
+            val sortedRowsWithSubcontractors =
+              rowsWithSubcontractors.sortBy { case (_, row) =>
+                row.name.toLowerCase(Locale.UK)
+              }
 
-          val result =
-            paginationToReverifyService.paginate(
-              allItems = sortedRows,
-              currentPage = page,
-              baseUrl = routes.SelectSubcontractorsToReverifyController
-                .onPageLoad(mode)
-                .url
-            )
+            val sortedRows =
+              sortedRowsWithSubcontractors.map(_._2)
 
-          val selectedSubcontractors =
-            request.userAnswers
-              .get(SelectSubcontractorsToReverifyPage)
-              .getOrElse(Set.empty[SelectedSubcontractors])
+            val result =
+              paginationToReverifyService.paginate(
+                allItems = sortedRows,
+                currentPage = page,
+                baseUrl = routes.SelectSubcontractorsToReverifyController
+                  .onPageLoad(mode)
+                  .url
+              )
 
-          val preparedForm =
-            formProvider(requireSelection = false)
-              .fill(selectedSubcontractors.map(_.id))
+            val selectedSubcontractors =
+              request.userAnswers
+                .get(SelectSubcontractorsToReverifyPage)
+                .getOrElse(Set.empty[SelectedSubcontractors])
 
-          for {
-            updatedAnswers <- Future.fromTry(
-                                request.userAnswers
-                                  .set(
-                                    SubcontractorReverifyRowsPage,
-                                    sortedRows
-                                  )
-                                  .flatMap(
-                                    _.set(
-                                      SelectSubcontractorsToReverifyPage,
-                                      selectedSubcontractors
+            val preparedForm =
+              formProvider(requireSelection = false)
+                .fill(selectedSubcontractors.map(_.id))
+
+            for {
+              updatedAnswers <- Future.fromTry(
+                                  request.userAnswers
+                                    .set(
+                                      SubcontractorReverifyRowsPage,
+                                      sortedRows
                                     )
-                                  )
-                              )
+                                    .flatMap(
+                                      _.set(
+                                        SelectSubcontractorsToReverifyPage,
+                                        selectedSubcontractors
+                                      )
+                                    )
+                                )
 
-            _ <- sessionRepository.set(updatedAnswers)
+              _ <- sessionRepository.set(updatedAnswers)
 
-          } yield Ok(
+            } yield Ok(
+              view(
+                preparedForm,
+                mode,
+                result.items,
+                result.pagination,
+                result.currentPage,
+                result.startIndex,
+                result.totalCount,
+                result.totalPages
+              )
+            )
+        }
+    }
+  }
+
+  def onSubmit(
+  mode: Mode,
+  page: Int = 1
+): Action[AnyContent] =
+  (identify andThen getData andThen requireData).async { implicit request =>
+    redirectIfVerificationRequestInProgress(request.userAnswers) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
+
+      case None =>
+        val allRows: Seq[SubcontractorReverifyRow] =
+          request.userAnswers
+            .get(SubcontractorReverifyRowsPage)
+            .getOrElse(Seq.empty)
+            .sortBy(_.name.toLowerCase(Locale.UK))
+
+        val result =
+          paginationToReverifyService.paginate(
+            allItems = allRows,
+            currentPage = page,
+            baseUrl = routes.SelectSubcontractorsToReverifyController
+              .onPageLoad(mode)
+              .url
+          )
+
+        val hasUnverified: Boolean =
+          request.userAnswers
+            .get(UnverifiedSubcontractorsPage)
+            .exists(_.nonEmpty)
+
+        val hasSelectedUnverifiedEarlier: Boolean =
+          request.userAnswers
+            .get(SelectSubcontractorPage)
+            .exists(_.nonEmpty)
+
+        val requireSelection: Boolean =
+          !hasSelectedUnverifiedEarlier && !hasUnverified
+
+        val boundForm =
+          formProvider(requireSelection).bindFromRequest()
+
+        val selectedIdsThisPage: Set[String] =
+          boundForm.value.getOrElse(Set.empty[String])
+
+        val currentPageIds: Set[String] =
+          result.items.map(_.id).toSet
+
+        val existingSelections: Set[SelectedSubcontractors] =
+          request.userAnswers
+            .get(SelectSubcontractorsToReverifyPage)
+            .getOrElse(Set.empty)
+
+        val selectionsFromOtherPages: Set[SelectedSubcontractors] =
+          existingSelections.filterNot { selection =>
+            currentPageIds.contains(selection.id)
+          }
+
+        val selectionsFromCurrentPage: Set[SelectedSubcontractors] =
+          result.items
+            .filter(row => selectedIdsThisPage.contains(row.id))
+            .map { row =>
+              SelectedSubcontractors(
+                row.id,
+                row.name
+              )
+            }
+            .toSet
+
+        val updatedSelections: Set[SelectedSubcontractors] =
+          selectionsFromOtherPages ++ selectionsFromCurrentPage
+
+        val gotoPage: Option[Int] =
+          request.body.asFormUrlEncoded
+            .flatMap(_.get("gotoPage"))
+            .flatMap(_.headOption)
+            .flatMap(_.toIntOption)
+
+        def renderForm(
+          formWithErrors: Form[Set[String]]
+        ): Result =
+          BadRequest(
             view(
-              preparedForm,
+              formWithErrors,
               mode,
               result.items,
               result.pagination,
@@ -253,175 +355,65 @@ class SelectSubcontractorsToReverifyController @Inject() (
               result.totalPages
             )
           )
-      }
-    }
 
-  def onSubmit(
-    mode: Mode,
-    page: Int = 1
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-
-      val allRows: Seq[SubcontractorReverifyRow] =
-        request.userAnswers
-          .get(SubcontractorReverifyRowsPage)
-          .getOrElse(Seq.empty)
-          .sortBy(_.name.toLowerCase(Locale.UK))
-
-      val result =
-        paginationToReverifyService.paginate(
-          allItems = allRows,
-          currentPage = page,
-          baseUrl = routes.SelectSubcontractorsToReverifyController
-            .onPageLoad(mode)
-            .url
-        )
-
-      val hasUnverified: Boolean =
-        request.userAnswers
-          .get(UnverifiedSubcontractorsPage)
-          .exists(_.nonEmpty)
-
-      val hasSelectedUnverifiedEarlier: Boolean =
-        request.userAnswers
-          .get(SelectSubcontractorPage)
-          .exists(_.nonEmpty)
-
-      val submittedIds: Set[String] =
-        request.body.asFormUrlEncoded
-          .flatMap(_.get("value[]"))
-          .map(_.toSet)
-          .getOrElse {
-            request.body.asFormUrlEncoded.toSeq
-              .flatMap(
-                _.collect {
-                  case (key, values) if key.startsWith("value[") =>
-                    values
-                }
-              )
-              .flatten
-              .toSet
-          }
-
-      val currentPageIds: Set[String] =
-        result.items.map(_.id).toSet
-
-      val existingSelections: Set[SelectedSubcontractors] =
-        request.userAnswers
-          .get(SelectSubcontractorsToReverifyPage)
-          .getOrElse(Set.empty)
-
-      val selectionsFromOtherPages: Set[SelectedSubcontractors] =
-        existingSelections.filterNot { selection =>
-          currentPageIds.contains(selection.id)
-        }
-
-      val selectionsFromCurrentPage: Set[SelectedSubcontractors] =
-        result.items
-          .filter(row => submittedIds.contains(row.id))
-          .map { row =>
-            SelectedSubcontractors(
-              row.id,
-              row.name
-            )
-          }
-          .toSet
-
-      val updatedSelections: Set[SelectedSubcontractors] =
-        selectionsFromOtherPages ++ selectionsFromCurrentPage
-
-      val gotoPage: Option[Int] =
-        request.body.asFormUrlEncoded
-          .flatMap(_.get("gotoPage"))
-          .flatMap(_.headOption)
-          .flatMap(_.toIntOption)
-
-      def renderForm(
-        formWithErrors: Form[Set[String]]
-      ): Result =
-        BadRequest(
-          view(
-            formWithErrors,
-            mode,
-            result.items,
-            result.pagination,
-            result.currentPage,
-            result.startIndex,
-            result.totalCount,
-            result.totalPages
-          )
-        )
-
-      def saveSelections(
-        answers: UserAnswers
-      ): Future[UserAnswers] =
-        Future.fromTry(
-          answers.set(
-            SelectSubcontractorsToReverifyPage,
-            updatedSelections
-          )
-        )
-
-      def saveAndRedirect(
-        redirectTo: UserAnswers => Call
-      ): Future[Result] =
-        for {
-          updatedAnswers <- saveSelections(request.userAnswers)
-          _              <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(redirectTo(updatedAnswers))
-
-      gotoPage match {
-        case Some(targetPage) =>
-          saveAndRedirect { _ =>
-            routes.SelectSubcontractorsToReverifyController
-              .onPageLoad(mode, targetPage)
-          }
-        case None             =>
-          if (
-            hasSelectedUnverifiedEarlier ||
-            hasUnverified ||
-            updatedSelections.nonEmpty
-          ) {
-            for {
-
-              withSelections <-
-                saveSelections(request.userAnswers)
-
-              withContext <-
-                Future.fromTry(
-                  withSelections.set(
-                    FinalValidationContextPage,
-                    FinalValidationContext.VerifySubcontractor
-                  )
-                )
-
-              withSource <-
-                Future.fromTry(
-                  withContext.set(
-                    VerifyFinalValidationSourcePage,
-                    VerifyFinalValidationSource.SelectSubcontractorsToReverify
-                  )
-                )
-
-              _ <- sessionRepository.set(withSource)
-
-            } yield Redirect(
-              navigator.nextPage(
+        def saveSelectionsAndRedirect(
+          redirectTo: UserAnswers => Call
+        ): Future[Result] =
+          for {
+            updatedAnswers <- Future.fromTry(
+              request.userAnswers.set(
                 SelectSubcontractorsToReverifyPage,
-                mode,
-                withSource
+                updatedSelections
               )
             )
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(redirectTo(updatedAnswers))
 
-          } else {
-            val formWithErrors =
-              formProvider(requireSelection = true)
-                .bindFromRequest()
+        gotoPage match {
+          case Some(targetPage) =>
+            saveSelectionsAndRedirect { _ =>
+              routes.SelectSubcontractorsToReverifyController
+                .onPageLoad(mode, targetPage)
+            }
 
-            Future.successful(
-              renderForm(formWithErrors)
+          case None =>
+            boundForm.fold(
+              formWithErrors =>
+                Future.successful(renderForm(formWithErrors)),
+              _ =>
+                for {
+                  withSelections <- Future.fromTry(
+                    request.userAnswers.set(
+                      SelectSubcontractorsToReverifyPage,
+                      updatedSelections
+                    )
+                  )
+
+                  withContext <- Future.fromTry(
+                    withSelections.set(
+                      FinalValidationContextPage,
+                      FinalValidationContext.VerifySubcontractor
+                    )
+                  )
+
+                  withSource <- Future.fromTry(
+                    withContext.set(
+                      VerifyFinalValidationSourcePage,
+                      VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                    )
+                  )
+
+                  _ <- sessionRepository.set(withSource)
+
+                } yield Redirect(
+                  navigator.nextPage(
+                    SelectSubcontractorsToReverifyPage,
+                    mode,
+                    withSource
+                  )
+                )
             )
-          }
-      }
+        }
     }
-}
+  }
+      

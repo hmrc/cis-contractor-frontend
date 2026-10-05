@@ -341,6 +341,121 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
       )
     }
 
+    "must use no name provided when a company name is missing" in {
+
+      given Messages = messages(app)
+
+      val details =
+        FinalValidationSubcontractorDetails(
+          tradingName = None
+        )
+
+      val result =
+        builder.build(
+          subcontractor(
+            proposed = details,
+            issues = Seq(
+              FinalValidationDraftIssue(
+                fieldKey = FinalValidationField.TradingName.key,
+                value = None
+              )
+            ),
+            subcontractorType = "company"
+          ),
+          changeUrl
+        )
+
+      result mustBe Seq(
+        UpdateSubcontractorDetailsRow(
+          field = FinalValidationField.TradingName,
+          labelKey = "finalvalidations.updateSubcontractorDetails.company.name",
+          value = Some(
+            summon[Messages](
+              "finalvalidations.updateSubcontractorDetails.noNameProvided"
+            )
+          ),
+          changeUrl = s"/change/${FinalValidationField.TradingName.key}/${FinalValidationChangeTarget.TradingName.key}"
+        )
+      )
+    }
+
+    "must use no name provided when a trust name is empty" in {
+
+      given Messages = messages(app)
+
+      val details =
+        FinalValidationSubcontractorDetails(
+          tradingName = Some("")
+        )
+
+      val result =
+        builder.build(
+          subcontractor(
+            proposed = details,
+            issues = Seq(
+              FinalValidationDraftIssue(
+                fieldKey = FinalValidationField.TradingName.key,
+                value = Some("")
+              )
+            ),
+            subcontractorType = "trust"
+          ),
+          changeUrl
+        )
+
+      result mustBe Seq(
+        UpdateSubcontractorDetailsRow(
+          field = FinalValidationField.TradingName,
+          labelKey = "finalvalidations.updateSubcontractorDetails.trust.name",
+          value = Some(
+            summon[Messages](
+              "finalvalidations.updateSubcontractorDetails.noNameProvided"
+            )
+          ),
+          changeUrl = s"/change/${FinalValidationField.TradingName.key}/${FinalValidationChangeTarget.TradingName.key}"
+        )
+      )
+    }
+
+    "must use no name provided when a partnership name is blank" in {
+
+      given Messages = messages(app)
+
+      val details =
+        FinalValidationSubcontractorDetails(
+          partnershipTradingName = Some("   ")
+        )
+
+      val result =
+        builder.build(
+          subcontractor(
+            proposed = details,
+            issues = Seq(
+              FinalValidationDraftIssue(
+                fieldKey = FinalValidationField.PartnershipTradingName.key,
+                value = Some("   ")
+              )
+            ),
+            subcontractorType = "partnership"
+          ),
+          changeUrl
+        )
+
+      result mustBe Seq(
+        UpdateSubcontractorDetailsRow(
+          field = FinalValidationField.PartnershipTradingName,
+          labelKey = "finalvalidations.updateSubcontractorDetails.partnership.name",
+          value = Some(
+            summon[Messages](
+              "finalvalidations.updateSubcontractorDetails.noNameProvided"
+            )
+          ),
+          changeUrl =
+            s"/change/${FinalValidationField.PartnershipTradingName.key}/${FinalValidationChangeTarget.PartnershipTradingName.key}"
+        )
+      )
+    }
+
     "must return no rows when there are no issues" in {
 
       given Messages = messages(app)
@@ -383,6 +498,8 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
 
     "must use the proposed partnership name as the display name" in {
 
+      given Messages = messages(app)
+
       val subbie =
         subcontractor(
           proposed = FinalValidationSubcontractorDetails(
@@ -395,6 +512,27 @@ class UpdateSubcontractorDetailsPageModelBuilderSpec extends SpecBase {
         )
 
       builder.displayName(subbie) mustBe "Alice"
+    }
+
+    "must use no name provided as the display name when the proposed name is missing" in {
+
+      given Messages = messages(app)
+
+      val subbie =
+        subcontractor(
+          proposed = FinalValidationSubcontractorDetails(
+            tradingName = None
+          ),
+          issues = Seq.empty,
+          subcontractorType = "company"
+        ).copy(
+          displayName = "Old Company Name"
+        )
+
+      builder.displayName(subbie) mustBe
+        summon[Messages](
+          "finalvalidations.updateSubcontractorDetails.noNameProvided"
+        )
     }
   }
 }
