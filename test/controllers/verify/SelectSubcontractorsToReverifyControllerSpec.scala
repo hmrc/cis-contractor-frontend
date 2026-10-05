@@ -21,7 +21,6 @@ import controllers.routes
 import models.{NormalMode, Subcontractor, SubcontractorViewModel, TypeOfSubcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
-import models.NormalMode
 import org.jsoup.Jsoup
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
@@ -348,6 +347,62 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
           verify(mockRepo).set(uaCaptor.capture())
           uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value must contain(
+            SelectedSubcontractors("100", "Brody, Martin")
+          )
+        }
+      }
+
+      "must redirect to the next page when value[] contains selected subcontractors" in {
+        val mockRepo = mock[SessionRepository]
+
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Brody, Martin",
+              utr = "1234567890",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "11 May 2020"
+            )
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody(
+                "value[]" -> "100"
+              )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(
             SelectedSubcontractors("100", "Brody, Martin")
           )
         }
