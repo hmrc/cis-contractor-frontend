@@ -123,7 +123,11 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
               cleanedAnswers <-
                 Future.fromTry(
-                  removeSubcontractorFromSelection(updatedAnswers, verificationResourceRef, subcontractorIdOpt)
+                  if (value) {
+                    removeSubcontractorFromSelection(updatedAnswers, verificationResourceRef, subcontractorIdOpt)
+                  } else {
+                    updatedAnswers.remove(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef))
+                  }
                 )
 
               _ <- sessionRepository.set(cleanedAnswers)

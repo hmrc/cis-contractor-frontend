@@ -649,11 +649,8 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
         val mockVerificationService =
           mock[VerificationService]
 
-        when(
-          mockSessionRepository.set(any[UserAnswers])
-        ).thenReturn(
-          Future.successful(true)
-        )
+        val mockReadinessController =
+          mock[CheckVerificationBatchReadinessController]
 
         val removedId =
           subcontractorId.toString
@@ -685,6 +682,51 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
             .success
             .value
 
+        when(
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(
+          Future.successful(true)
+        )
+
+        when(
+          mockSessionRepository.get(eqTo(userAnswersId))
+        ).thenReturn(
+          Future.successful(Some(userAnswers))
+        )
+
+        when(
+          mockVerificationService.deleteVerification(
+            any[UserAnswers],
+            eqTo(verificationResourceRef)
+          )(
+            any[HeaderCarrier]
+          )
+        ).thenReturn(
+          Future.successful(
+            DeleteVerificationResponse(Some(1L))
+          )
+        )
+
+        when(
+          mockReadinessController
+            .updateVerificationBatchReadiness(
+              any[UserAnswers]
+            )
+        ).thenReturn(
+          Future.successful(Some(userAnswers))
+        )
+
+        when(
+          mockVerificationService
+            .refreshNewestVerificationBatch(
+              any[UserAnswers]
+            )(
+              any[HeaderCarrier]
+            )
+        ).thenReturn(
+          Future.successful(userAnswers)
+        )
+
         val application =
           applicationBuilder(
             userAnswers = Some(userAnswers)
@@ -692,7 +734,9 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
             bind[SessionRepository]
               .toInstance(mockSessionRepository),
             bind[VerificationService]
-              .toInstance(mockVerificationService)
+              .toInstance(mockVerificationService),
+            bind[CheckVerificationBatchReadinessController]
+              .toInstance(mockReadinessController)
           ).build()
 
         running(application) {
@@ -702,7 +746,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               POST,
               postRoute()
             ).withFormUrlEncodedBody(
-              "value" -> "false"
+              "value" -> "true"
             )
 
           val result =
