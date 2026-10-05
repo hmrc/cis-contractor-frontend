@@ -89,7 +89,7 @@ class VerificationNotSubmittedWarningViewSpec extends AnyWordSpec with Matchers 
 
       val secondLinkText = secondLink.first().parent().text()
       secondLinkText must include(
-        messages("verify.verificationNotSubmittedWarning.link2.prefix")
+        messages("site.backTo")
       )
       secondLinkText.trim.endsWith(".") mustBe true
     }
