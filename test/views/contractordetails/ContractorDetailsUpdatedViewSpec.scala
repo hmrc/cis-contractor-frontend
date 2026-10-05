@@ -74,6 +74,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
           val doc: Document               = Jsoup.parse(html.body)
 
           doc.getElementsByClass("govuk-back-link").size mustBe 0
+          doc.getElementsByClass("hmrc-sign-out-nav__link").size mustBe 0
         }
       }
     }
