@@ -39,6 +39,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
+  lazy val keepAliveUrl = s"$host/subcontractor/refresh-session"
+
   protected lazy val rootServices = "microservice.services"
 
   protected lazy val defaultProtocol: String =
