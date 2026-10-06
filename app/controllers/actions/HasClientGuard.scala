@@ -64,7 +64,14 @@ class HasClientGuard @Inject() (
                 case false =>
                   logger.warn(s"[HasClientGuard] hasClient=false for instanceId: ${client.uniqueId}")
                   auditService
-                    .sendEvent(AuthFailureAuditEventModel())
+                    .sendEvent(
+                      AuthFailureAuditEventModel(
+                        agentUserId = request.userId,
+                        taxOfficeNumber = taxOfficeNumber,
+                        taxOfficeReference = taxOfficeReference,
+                        clientUniqueId = client.uniqueId
+                      )
+                    )
                     .map(_ => Some(systemError))
                     .recover { case NonFatal(ex) =>
                       logger.error("[HasClientGuard] failed to send authoriseServiceGuardFailure audit", ex)
