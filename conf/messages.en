@@ -414,19 +414,19 @@ amendCheckYourAnswers.confirm                                                   
 amendCheckYourAnswers.cancelChanges                                                   =  Cancel changes
 amendCheckYourAnswers.verificationNumber.label                                        =  Verification number
 
-amendConfirmation.panel.heading                                                     =  Subcontractor details updated
-amendConfirmation.p1                                                                =  You have updated the subcontractor details for {0}.
-amendConfirmation.updatesMade.h2                                                    =  Updates made
-amendConfirmation.table.hdr.previous                                                =  Previous
-amendConfirmation.table.hdr.updated                                                 =  Updated
-amendConfirmation.table.hdr.details                                                 =  Details
-amendConfirmation.yourSubcontractors                                                =  Your subcontractors
-amendConfirmation.beforeYouGo.h2                                                    =  Before you go
-amendConfirmation.beforeYouGo.p1                                                    =  Your feedback helps us make our service better.
-amendConfirmation.beforeYouGo.takeAShortSurvey                                      =  Take a short survey
-amendConfirmation.beforeYouGo.shareFeedback                                         =  to share your feedback on this service.
-amendConfirmation.table.content.none                                                =  None provided
-amendConfirmation.table.selectContent.none                                          =  None selected
+amendConfirmation.panel.heading                                                       =  Subcontractor details updated
+amendConfirmation.p1                                                                  =  You have updated the subcontractor details for {0}.
+amendConfirmation.updatesMade.h2                                                      =  Updates made
+amendConfirmation.table.hdr.previous                                                  =  Previous
+amendConfirmation.table.hdr.updated                                                   =  Updated
+amendConfirmation.table.hdr.details                                                   =  Details
+amendConfirmation.yourSubcontractors                                                  =  Your subcontractors
+amendConfirmation.beforeYouGo.h2                                                      =  Before you go
+amendConfirmation.beforeYouGo.p1                                                      =  Your feedback helps us make our service better.
+amendConfirmation.beforeYouGo.takeAShortSurvey                                        =  Take a short survey
+amendConfirmation.beforeYouGo.shareFeedback                                           =  to share your feedback on this service.
+amendConfirmation.table.content.none                                                  =  None provided
+amendConfirmation.table.selectContent.none                                            =  None selected
 
 amendTrustRemoveDetailYesNo.title                                                     =  Are you sure you want to remove this information from this subcontractor?
 amendTrustRemoveDetailYesNo.heading                                                   =  Are you sure you want to remove the {1} for {0}?
@@ -483,32 +483,31 @@ unmatchedSubcontractors.p1                                                      
 unmatchedSubcontractors.p2                                                            =  You cannot create a new verification request until you have reviewed and fixed these unmatched results.
 unmatchedSubcontractors.verificationResults.link                                      =  Check your latest verification results
 
-noUnmatchedSubcontractors.title                                                     =  No unmatched subcontractors
-noUnmatchedSubcontractors.heading                                                   =  No unmatched subcontractors
-noUnmatchedSubcontractors.p1                                                        =  The subcontractors marked as unmatched in your most recent verification results have been deleted.
-noUnmatchedSubcontractors.p2                                                        =  You can now verify any of your other subcontractors by creating a new verification request.
+noUnmatchedSubcontractors.title                                                       =  No unmatched subcontractors
+noUnmatchedSubcontractors.heading                                                     =  No unmatched subcontractors
+noUnmatchedSubcontractors.p1                                                          =  The subcontractors marked as unmatched in your most recent verification results have been deleted.
+noUnmatchedSubcontractors.p2                                                          =  You can now verify any of your other subcontractors by creating a new verification request.
+noUnmatchedSubcontractors.manageYourSubcontractors.link                               =  Manage your subcontractors
 
-noUnmatchedSubcontractors.manageYourSubcontractors.link                             =  Manage your subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.title                                  =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.heading                                =  Subcontractor details updated
+unmatched.unmatchedSubcontractorDetailsUpdated.p1                                     =  You have updated the subcontractor details for {0}.
+unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2                         =  Updates made
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details                      =  Details
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous                     =  Previous
+unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                      =  Updated
+unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                           =  None provided
+unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                           =  None selected
+unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors          =  Cannot verify all subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                         =  Before you go
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                         =  Your feedback helps us make our service better.
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey           =  Take a short survey
+unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback              =  to share your feedback on this service.
+unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors          =  Review unmatched subcontractors
+unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                     =  Your subcontractors
 
-unmatched.unmatchedSubcontractorDetailsUpdated.title                                =  Subcontractor details updated
-unmatched.unmatchedSubcontractorDetailsUpdated.heading                              =  Subcontractor details updated
-unmatched.unmatchedSubcontractorDetailsUpdated.p1                                   =  You have updated the subcontractor details for {0}.
-unmatched.unmatchedSubcontractorDetailsUpdated.updatesMade.h2                       =  Updates made
-unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.details                    =  Details
-unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.previous                   =  Previous
-unmatched.unmatchedSubcontractorDetailsUpdated.table.hdr.updated                    =  Updated
-unmatched.unmatchedSubcontractorDetailsUpdated.noneProvided                         =  None provided
-unmatched.unmatchedSubcontractorDetailsUpdated.noneSelected                         =  None selected
-unmatched.unmatchedSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors        =  Cannot verify all subcontractors
-unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.h2                       =  Before you go
-unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.p1                       =  Your feedback helps us make our service better.
-unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey         =  Take a short survey
-unmatched.unmatchedSubcontractorDetailsUpdated.beforeYouGo.shareFeedback            =  to share your feedback on this service.
-unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors        =  Review unmatched subcontractors
-unmatched.unmatchedSubcontractorDetailsUpdated.yourSubcontractors                   =  Your subcontractors
-
-info.CheckYourAnswers.cannotVerifyAllSubcontractors                                 =  Cannot verify all subcontractors
-info.CheckYourAnswers.reviewUnmatchedSubcontractors                                 =  Review unmatched subcontractors
+info.CheckYourAnswers.cannotVerifyAllSubcontractors                                   =  Cannot verify all subcontractors
+info.CheckYourAnswers.reviewUnmatchedSubcontractors                                   =  Review unmatched subcontractors
 
 individualNamesOptions.title                                                          =  Which names do you want to add for this subcontractor?
 individualNamesOptions.heading                                                        =  Which names do you want to add for this subcontractor?
@@ -520,22 +519,22 @@ individualNamesOptions.error.required                                           
 individualNamesOptions.checkYourAnswersLabel                                          =  Names
 individualNamesOptions.change.hidden                                                  =  names
 
-insufficientSubcontractorDetailsUpdated.title                                       =  Subcontractor details updated
-insufficientSubcontractorDetailsUpdated.p1                                          =  You have updated the subcontractor details for {0}.
-insufficientSubcontractorDetailsUpdated.updatesMade.h2                              =  Updates made
-insufficientSubcontractorDetailsUpdated.table.hdr.details                           =  Details
-insufficientSubcontractorDetailsUpdated.table.hdr.previous                          =  Previous
-insufficientSubcontractorDetailsUpdated.table.hdr.updated                           =  Updated
-insufficientSubcontractorDetailsUpdated.noneProvided                                =  None provided
-insufficientSubcontractorDetailsUpdated.noneSelected                                =  None selected
-insufficientSubcontractorDetailsUpdated.noName                                      =  No name provided
-insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                              =  Before you go
-insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                              =  Your feedback helps us make our service better.
-insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                =  Take a short survey
-insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                   =  to share your feedback on this service.
-insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors               =  Review unmatched subcontractors
-insufficientSubcontractorDetailsUpdated.yourSubcontractors                          =  Your subcontractors
-insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors               =  Cannot verify all subcontractors
+insufficientSubcontractorDetailsUpdated.title                                         =  Subcontractor details updated
+insufficientSubcontractorDetailsUpdated.p1                                            =  You have updated the subcontractor details for {0}.
+insufficientSubcontractorDetailsUpdated.updatesMade.h2                                =  Updates made
+insufficientSubcontractorDetailsUpdated.table.hdr.details                             =  Details
+insufficientSubcontractorDetailsUpdated.table.hdr.previous                            =  Previous
+insufficientSubcontractorDetailsUpdated.table.hdr.updated                             =  Updated
+insufficientSubcontractorDetailsUpdated.noneProvided                                  =  None provided
+insufficientSubcontractorDetailsUpdated.noneSelected                                  =  None selected
+insufficientSubcontractorDetailsUpdated.noName                                        =  No name provided
+insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                                =  Before you go
+insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                                =  Your feedback helps us make our service better.
+insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                  =  Take a short survey
+insufficientSubcontractorDetailsUpdated.beforeYouGo.shareFeedback                     =  to share your feedback on this service.
+insufficientSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors                 =  Review unmatched subcontractors
+insufficientSubcontractorDetailsUpdated.yourSubcontractors                            =  Your subcontractors
+insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors                 =  Cannot verify all subcontractors
 
 agent.agentLostAccess.title                                                           =  Sorry, you are unable to use this service
 agent.agentLostAccess.heading                                                         =  Sorry, you are unable to use this service
