@@ -1774,7 +1774,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .set(any[UserAnswers])
     }
 
-    "must replace the current verification batch with unmatched subcontractors when a current batch exists" in {
+    "must return existing current verification batch without recreating it" in {
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
       val mockRepo      = mock[SessionRepository]
       val service       = buildService(mockConnector, mockRepo)
@@ -1820,74 +1820,26 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           )
           .success
           .value
-
-      when(
-        mockConnector.getCurrentVerificationBatch(
-          eqTo(instanceId)
-        )(any[HeaderCarrier])
-      )
-        .thenReturn(Future.successful(currentResponse))
-        .thenReturn(Future.successful(currentResponse))
-
-      when(
-        mockConnector.modifyVerificationBatch(
-          any[ModifyVerificationsRequest]
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(()))
-
-      when(
-        mockConnector.getNewestVerificationBatch(
-          eqTo(instanceId)
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(newestResponseWithBatchStatus("STARTED")))
-
-      when(mockRepo.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
-      val requestCaptor =
-        ArgumentCaptor.forClass(
-          classOf[ModifyVerificationsRequest]
-        )
-
-      service
-        .recreateCurrentBatchFromUnmatchedVerifications(instanceId, userAnswers)
-        .futureValue
-
-      verify(mockConnector)
-        .modifyVerificationBatch(
-          requestCaptor.capture()
-        )(any[HeaderCarrier])
-
-      requestCaptor.getValue mustBe
-        ModifyVerificationsRequest(
-          instanceId = instanceId,
-          deleteVerifications = Some(
-            DeleteVerifications(
-              verificationResourceReferences = Seq(999L)
-            )
-          ),
-          createVerifications = Some(
-            CreateVerifications(
-              verificationBatchResourceRef = 12345L,
-              verificationResourceReferences = Seq(222L)
-            )
+          .set(
+            CurrentVerificationBatchResponsePage,
+            currentResponse
           )
-        )
+          .success
+          .value
 
-      verify(mockConnector, times(2))
-        .getCurrentVerificationBatch(
-          eqTo(instanceId)
-        )(any[HeaderCarrier])
+      val result =
+        service
+          .recreateCurrentBatchFromUnmatchedVerifications(
+            instanceId,
+            userAnswers
+          )
+          .futureValue
 
-      verify(mockConnector, times(2))
-        .getNewestVerificationBatch(
-          eqTo(instanceId)
-        )(any[HeaderCarrier])
+      result mustBe userAnswers
+      result.get(CurrentVerificationBatchResponsePage) mustBe Some(currentResponse)
 
-      verify(mockConnector, never())
-        .createVerificationBatchAndVerifications(
-          any[CreateVerificationBatchAndVerificationsRequest]
-        )(any[HeaderCarrier])
+      verifyNoInteractions(mockConnector)
+      verifyNoInteractions(mockRepo)
     }
 
     "must ignore matched verifications and only recreate unmatched subcontractors" in {
