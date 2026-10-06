@@ -21,6 +21,7 @@ import controllers.routes
 import models.{NormalMode, Subcontractor, SubcontractorViewModel, TypeOfSubcontractor, UserAnswers}
 import models.response.GetNewestVerificationBatchResponse
 import models.verify.SelectedSubcontractors
+import org.jsoup.Jsoup
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -112,6 +113,20 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
       partnerUtr = None,
       crn = None,
       nino = None
+    )
+
+  private def mkVerifiedSubcontractor(
+    id: Long,
+    name: String
+  ): Subcontractor =
+    mkSub(
+      id = id,
+      verified = Some("Y"),
+      tradingName = Some(name),
+      subcontractorType = Some("company"),
+      utr = Some(s"$id$id$id$id$id$id$id$id$id$id"),
+      verificationDate = None,
+      createDate = Some(LocalDateTime.of(2024, 1, 1, 0, 0))
     )
 
   private def url(page: Int = 1): String =
@@ -400,6 +415,358 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
           verify(mockRepo).set(uaCaptor.capture())
           uaCaptor.getValue.get(SelectSubcontractorsToReverifyPage).value must contain(
             SelectedSubcontractors("100", "Brody, Martin")
+          )
+        }
+      }
+
+      "must redirect to the next page when value[] contains selected subcontractors" in {
+        val mockRepo = mock[SessionRepository]
+
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Brody, Martin",
+              utr = "1234567890",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "11 May 2020"
+            )
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody(
+                "value[]" -> "100"
+              )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(
+            SelectedSubcontractors("100", "Brody, Martin")
+          )
+        }
+      }
+
+      "must preserve selections made on page 1 when submitting page 2 with no selections" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val pageOneRows =
+          (1 to 6).map { i =>
+            SubcontractorReverifyRow(
+              id = (100 + i).toString,
+              name = f"Alpha $i%02d Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            )
+          }
+
+        val pageTwoRow =
+          SubcontractorReverifyRow(
+            id = "200",
+            name = "Zulu Ltd",
+            utr = "",
+            verified = "Yes",
+            verificationNumber = "Unknown",
+            taxTreatment = "Unknown",
+            dateAdded = "1 Jan 2024"
+          )
+
+        val rows = pageOneRows :+ pageTwoRow
+
+        val selectedPageOneSubcontractor =
+          SelectedSubcontractors("101", "Alpha 01 Ltd")
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage,
+              Set(selectedPageOneSubcontractor)
+            )
+            .success
+            .value
+            .set(
+              UnverifiedSubcontractorsPage,
+              Seq.empty
+            )
+            .success
+            .value
+            .set(
+              SelectSubcontractorPage,
+              Set(SubcontractorViewModel("999", "Earlier Selected"))
+            )
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(
+              POST,
+              url(page = 2)
+            ).withFormUrlEncodedBody()
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(selectedPageOneSubcontractor)
+        }
+      }
+
+      "must preserve page 1 selections when navigating to page 2" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Alpha Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            ),
+            SubcontractorReverifyRow(
+              id = "200",
+              name = "Beta Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            )
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(
+              POST,
+              url(page = 1)
+            ).withFormUrlEncodedBody(
+              "value[0]" -> "100",
+              "gotoPage" -> "2"
+            )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe url(2)
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(
+            SelectedSubcontractors("100", "Alpha Ltd")
+          )
+        }
+      }
+
+      "must replace selections from the current page while preserving selections from other pages" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Alpha Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            ),
+            SubcontractorReverifyRow(
+              id = "200",
+              name = "Beta Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            )
+          )
+
+        val existingSelections =
+          Set(
+            SelectedSubcontractors("100", "Alpha Ltd"),
+            SelectedSubcontractors("200", "Beta Ltd")
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+            .set(SelectSubcontractorsToReverifyPage, existingSelections)
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          // Page 1 contains both rows. User deselects Alpha and keeps Beta.
+          val request =
+            FakeRequest(
+              POST,
+              url(page = 1)
+            ).withFormUrlEncodedBody(
+              "value[0]" -> "200"
+            )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(
+            SelectedSubcontractors("200", "Beta Ltd")
+          )
+        }
+      }
+
+      "must allow submission when only SelectSubcontractorsToReverifyPage contains selections" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Alpha Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            )
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+            .set(UnverifiedSubcontractorsPage, Seq.empty)
+            .success
+            .value
+            .set(SelectSubcontractorPage, Set.empty[SubcontractorViewModel])
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage,
+              Set(SelectedSubcontractors("100", "Alpha Ltd"))
+            )
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody(
+                "value[0]" -> "100"
+              )
+
+          val result = route(app, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onwardRoute.url
+
+          val uaCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockRepo).set(uaCaptor.capture())
+
+          uaCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustBe Set(
+            SelectedSubcontractors("100", "Alpha Ltd")
           )
         }
       }
