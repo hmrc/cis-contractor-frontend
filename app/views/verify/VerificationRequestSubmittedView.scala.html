@@ -52,11 +52,13 @@
     @govukPanel(
         Panel(
             title = Text(messages("verify.verificationRequestSubmitted.heading")),
-            content = HtmlContent(
-                s"""
-                ${messages("verify.verificationRequestSubmitted.reference")}<br>
-                <strong>${HtmlFormat.escape(vm.referenceNumber)}</strong>
-                """
+            content = vm.referenceNumber.fold(HtmlContent(""))(ref =>
+                HtmlContent(
+                    s"""
+                    ${messages("verify.verificationRequestSubmitted.reference")}<br>
+                    <strong>${HtmlFormat.escape(ref)}</strong>
+                    """
+                )
             )
         )
     )
@@ -171,7 +173,7 @@
         linkTextKey = "verify.verificationRequestSubmitted.needHelp.manageSubcontractors.link",
         linkUrl = vm.manageSubcontractorsUrl,
         hasFullStop = true,
-        prefixTextKey = "verify.verificationRequestSubmitted.needHelp.p3",
+        prefixTextKey = "site.backTo",
     )
 
     @subHeading(

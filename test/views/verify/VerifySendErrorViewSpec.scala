@@ -29,7 +29,7 @@ import views.html.verify.VerifySendErrorView
 
 class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   private val cisManagementUrl       = "http://localhost:6996/construction-industry-scheme/management"
-  private val verificationHistoryUrl = s"$cisManagementUrl/verify/history/all"
+  private val verificationHistoryUrl = s"$cisManagementUrl/verify/history/select-tax-year"
 
   "VerifySendErrorView" should {
 
@@ -68,7 +68,7 @@ class VerifySendErrorViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
       val manageText: String = manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.verifySendError.manageSubcontractors.p1")
+        messages("site.backTo")
       )
 
       manageText.trim.endsWith(".") mustBe true

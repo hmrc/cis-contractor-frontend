@@ -27,7 +27,8 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import models.response.GetNewestVerificationBatchResponse
-import pages.verify.{EmailAddressPage, NewestVerificationBatchResponsePage}
+import models.verify.ContractorEmailConfirmationStored.DifferentEmail
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage, NewestVerificationBatchResponsePage}
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 
@@ -59,17 +60,26 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private def ua(email: Option[String]): UserAnswers =
     emptyUserAnswers
-      .set(
-        NewestVerificationBatchResponsePage,
-        response(email)
-      )
+      .set(NewestVerificationBatchResponsePage, response(email))
+      .success
+      .value
+
+  private def uaWithStoredEmailPath(email: Option[String]): UserAnswers =
+    ua(email)
+      .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+      .success
+      .value
+
+  private val uaWithNotStoredEmailPath: UserAnswers =
+    emptyUserAnswers
+      .set(ContractorEmailConfirmationNotStoredPage, true)
       .success
       .value
 
   "EmailAddressController" - {
 
     "must return OK and show stored hint when email exists" in {
-      val app = applicationBuilder(userAnswers = Some(ua(Some("stored@test.com")))).build()
+      val app = applicationBuilder(userAnswers = Some(uaWithStoredEmailPath(Some("stored@test.com")))).build()
 
       running(app) {
         val request = FakeRequest(GET, routeUrl)
@@ -83,7 +93,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK and show notStored hint when email missing" in {
-      val app = applicationBuilder(userAnswers = Some(ua(None))).build()
+      val app = applicationBuilder(userAnswers = Some(uaWithNotStoredEmailPath)).build()
 
       running(app) {
         val request = FakeRequest(GET, routeUrl)
@@ -105,7 +115,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockNavigator.nextPage(any(), any(), any())) thenReturn onwardRoute
 
       val app =
-        applicationBuilder(userAnswers = Some(ua(Some("stored@test.com"))))
+        applicationBuilder(userAnswers = Some(uaWithStoredEmailPath(Some("stored@test.com"))))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepo),
             bind[Navigator].toInstance(mockNavigator)
@@ -127,7 +137,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
     "must prefill the form when EmailAddressPage has a value" in {
 
       val userAnswers =
-        emptyUserAnswers
+        uaWithNotStoredEmailPath
           .set(EmailAddressPage, "stored@test.com")
           .success
           .value
@@ -148,7 +158,7 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must return BAD_REQUEST on invalid submit" in {
 
-      val app = applicationBuilder(userAnswers = Some(ua(Some("stored@test.com")))).build()
+      val app = applicationBuilder(userAnswers = Some(uaWithStoredEmailPath(Some("stored@test.com")))).build()
 
       running(app) {
         val request =
@@ -158,6 +168,20 @@ class EmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, request).value
 
         status(result) mustEqual BAD_REQUEST
+      }
+    }
+
+    "must redirect to VerifyCheckYourAnswers on a GET when neither email confirmation page grants access" in {
+
+      val app = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad().url
       }
     }
 

@@ -144,7 +144,7 @@ class ContractorDetailsCheckAnswersController @Inject() (
 
     val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
       case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
-      case Some(false) => true
+      case Some(false) => request.userAnswers.get(EnterContractorEmailAddressPage).isEmpty
       case None        => false
     }
 

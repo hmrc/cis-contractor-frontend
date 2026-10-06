@@ -17,7 +17,7 @@
 package controllers.helpers
 
 import base.SpecBase
-import models.{AmendMode, NormalMode}
+import models.{AmendMode, FinalValidationMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
@@ -59,6 +59,13 @@ class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
       SubcontractorNameDisplayHelper.getPartnershipDisplayName(
         emptyUserAnswers,
         AmendMode
+      ) mustBe Some(testMessages("verify.noName"))
+    }
+
+    "return no name provided when the partnership name is missing in final validation mode" in {
+      SubcontractorNameDisplayHelper.getPartnershipDisplayName(
+        emptyUserAnswers,
+        FinalValidationMode
       ) mustBe Some(testMessages("verify.noName"))
     }
 
@@ -115,6 +122,13 @@ class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
       SubcontractorNameDisplayHelper.getPartnerDisplayName(
         emptyUserAnswers,
         AmendMode
+      ) mustBe Some(testMessages("verify.noName"))
+    }
+
+    "return no name provided when the nominated partner name is missing in final validation mode" in {
+      SubcontractorNameDisplayHelper.getPartnerDisplayName(
+        emptyUserAnswers,
+        FinalValidationMode
       ) mustBe Some(testMessages("verify.noName"))
     }
 
@@ -216,6 +230,13 @@ class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
       ) mustBe testMessages("verify.noName")
     }
 
+    "return no name provided when both names are missing in final validation mode" in {
+      SubcontractorNameDisplayHelper.partnershipDisplayName(
+        emptyUserAnswers,
+        FinalValidationMode
+      ) mustBe testMessages("verify.noName")
+    }
+
     "return an empty string when both names are missing in normal mode" in {
       SubcontractorNameDisplayHelper.partnershipDisplayName(
         emptyUserAnswers,
@@ -291,6 +312,13 @@ class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
       ) mustBe Some(testMessages("verify.noName"))
     }
 
+    "return no name provided when the trust name is missing in final validation mode" in {
+      SubcontractorNameDisplayHelper.getTrustDisplayName(
+        emptyUserAnswers,
+        FinalValidationMode
+      ) mustBe Some(testMessages("verify.noName"))
+    }
+
     "return None when the trust name is missing in normal mode" in {
       SubcontractorNameDisplayHelper.getTrustDisplayName(
         emptyUserAnswers,
@@ -347,8 +375,15 @@ class SubcontractorNameDisplayHelperSpec extends SpecBase with Matchers {
       ) mustBe testMessages("verify.noName")
     }
 
+    "return no name provided when trust name is missing in final validation mode" in {
+      SubcontractorNameDisplayHelper.trustDisplayName(
+        emptyUserAnswers,
+        FinalValidationMode
+      ) mustBe testMessages("verify.noName")
+    }
+
     "return an empty string when trust name are missing in normal mode" in {
-      SubcontractorNameDisplayHelper.partnershipDisplayName(
+      SubcontractorNameDisplayHelper.trustDisplayName(
         emptyUserAnswers,
         NormalMode
       ) mustBe ""
