@@ -17,6 +17,7 @@
 package views.contractordetails
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
@@ -60,6 +61,10 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
             messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link")
           )
 
+          doc
+            .select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
+            .text must include(messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
+
           doc.select("a").text must include(
             messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link")
           )
@@ -82,6 +87,7 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
     trait Setup {
       val app: Application                          = applicationBuilder().build()
       val view: ContractorDetailsUpdatedView        = app.injector.instanceOf[ContractorDetailsUpdatedView]
+      val appConfig: FrontendAppConfig              = app.injector.instanceOf[FrontendAppConfig]
       implicit val request: play.api.mvc.Request[_] = FakeRequest()
       implicit val messages: Messages               = play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,

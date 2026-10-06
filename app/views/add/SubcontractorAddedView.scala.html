@@ -24,6 +24,7 @@
         paragraph: Paragraph,
         bulletList: BulletList,
         link: Link,
+        appConfig: config.FrontendAppConfig
 
 )
 
@@ -65,5 +66,15 @@
         hasFullStop = true,
         prefixTextKey = "subcontractorAdded.helpAndSupport.p1",
         isNewTab = false
+    )
+
+    @h2(messages("subcontractorAdded.beforeYouGo.h2"))
+
+    @paragraph(messages("subcontractorAdded.beforeYouGo.p1"))
+
+    @link(
+        linkTextKey = "subcontractorAdded.beforeYouGo.takeAShortSurvey",
+        linkUrl = appConfig.cisFeedbackSurveyUrl,
+        suffixTextKey = "subcontractorAdded.beforeYouGo.shareFeedback"
     )
 }
