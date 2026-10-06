@@ -345,6 +345,42 @@ class ContractorDetailsCheckAnswersControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must redirect to JourneyRecovery when AddEmailAddressYesNoPage is false but EnterContractorEmailAddressPage is set (url-hopping)" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(ContractorSchemePage, scheme)
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage, false)
+          .success
+          .value
+          .set(AddEmailAddressYesNoPage, false)
+          .success
+          .value
+          .set(EnterContractorEmailAddressPage, "stale@test.com")
+          .success
+          .value
+
+      val application =
+        applicationBuilder(Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(
+          GET,
+          routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to JourneyRecovery when AddEmailAddressYesNoPage is true but EnterContractorEmailAddressPage is missing" in {
 
       val userAnswers =

@@ -19,8 +19,9 @@ package controllers.verify
 import controllers.actions.*
 import forms.verify.EmailAddressFormProvider
 import models.Mode
+import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import navigation.Navigator
-import pages.verify.{EmailAddressPage, NewestVerificationBatchResponsePage}
+import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -62,12 +63,20 @@ class EmailAddressController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.userAnswers.get(EmailAddressPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+    val emailPageRequired =
+      request.userAnswers.get(ContractorEmailConfirmationStoredPage).contains(DifferentEmail) ||
+        request.userAnswers.get(ContractorEmailConfirmationNotStoredPage).contains(true)
 
-    Ok(view(preparedForm, mode, hintKey(request.userAnswers)))
+    if (!emailPageRequired) {
+      Redirect(controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad())
+    } else {
+      val preparedForm = request.userAnswers.get(EmailAddressPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, hintKey(request.userAnswers)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

@@ -24,7 +24,8 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.contractordetails.EnterContractorEmailAddressPage
+import pages.contractordetails.{AddEmailAddressYesNoPage, EnterContractorEmailAddressPage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -36,19 +37,21 @@ import scala.concurrent.Future
 
 class EnterContractorEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new EnterContractorEmailAddressFormProvider()
-  val form         = formProvider()
+  val formProvider       = new EnterContractorEmailAddressFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val enterContractorEmailAddressRoute =
+  lazy val enterContractorEmailAddressRoute: String =
     controllers.contractordetails.routes.EnterContractorEmailAddressController.onPageLoad(NormalMode).url
+
+  val userAnswersForEmailPage: UserAnswers = emptyUserAnswers.set(AddEmailAddressYesNoPage, true).success.value
 
   "EnterContractorEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersForEmailPage)).build()
 
       running(application) {
         val request = FakeRequest(GET, enterContractorEmailAddressRoute)
@@ -65,7 +68,7 @@ class EnterContractorEmailAddressControllerSpec extends SpecBase with MockitoSug
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers =
-        UserAnswers(userAnswersId).set(EnterContractorEmailAddressPage, "test@example.com").success.value
+        userAnswersForEmailPage.set(EnterContractorEmailAddressPage, "test@example.com").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -127,6 +130,21 @@ class EnterContractorEmailAddressControllerSpec extends SpecBase with MockitoSug
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to AddEmailAddressYesNo page on a GET when AddEmailAddressYesNoPage is not answered with true" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, enterContractorEmailAddressRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(NormalMode).url
       }
     }
 

@@ -20,7 +20,8 @@ import controllers.actions.*
 import forms.contractordetails.EnterContractorEmailAddressFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.contractordetails.EnterContractorEmailAddressPage
+import pages.contractordetails.{AddEmailAddressYesNoPage, EnterContractorEmailAddressPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -44,16 +45,19 @@ class EnterContractorEmailAddressController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    if (!request.userAnswers.get(AddEmailAddressYesNoPage).contains(true)) {
+      Redirect(controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(mode))
+    } else {
+      val preparedForm = request.userAnswers.get(EnterContractorEmailAddressPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    val preparedForm = request.userAnswers.get(EnterContractorEmailAddressPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      Ok(view(preparedForm, mode))
     }
-
-    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
