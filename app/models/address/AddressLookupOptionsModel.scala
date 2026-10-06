@@ -30,6 +30,7 @@ case class AddressLookupOptionsModel(
   disableTranslations: Option[Boolean] = None,
   includeHMRCBranding: Option[Boolean] = None,
   ukMode: Option[Boolean] = None,
+  timeoutConfig: Option[AddressLookupTimeoutConfig] = None,
   selectPageConfig: AddressLookupSelectConfigModel,
   confirmPageConfig: AddressLookupConfirmConfigModel,
   manualAddressEntryConfig: ManualAddressEntryConfig,

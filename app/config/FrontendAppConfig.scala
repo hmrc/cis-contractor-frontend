@@ -39,6 +39,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
+  lazy val keepAliveUrl = s"$host/subcontractor/refresh-session"
+
   protected lazy val rootServices = "microservice.services"
 
   protected lazy val defaultProtocol: String =
@@ -89,7 +91,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val fileNilReturnUrl: String                          = configuration.get[String]("urls.fileNilReturn")
   lazy val findUtr: String                                   = configuration.get[String]("urls.findUtr")
   lazy val manageFrontendBaseUrl: String                     = configuration.get[String]("urls.manageFrontendBaseUrl")
-  lazy val verificationHistoryUrl: String                    = s"$manageFrontendBaseUrl/verify/history/all"
+  lazy val verificationHistoryUrl: String                    = s"$manageFrontendBaseUrl/verify/history/select-tax-year"
   lazy val retrieveSubcontractorListUrl: String              = s"$manageFrontendBaseUrl/subcontractors/retrieve"
   lazy val subcontractorVerificationGuideUrl: String         = configuration.get[String]("urls.subcontractorVerificationGuide")
   lazy val contactHMRCUrl: String                            = configuration.get[String]("urls.contactHMRC")

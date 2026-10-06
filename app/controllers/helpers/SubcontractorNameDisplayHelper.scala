@@ -16,7 +16,7 @@
 
 package controllers.helpers
 
-import models.{AmendMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
@@ -25,7 +25,7 @@ object SubcontractorNameDisplayHelper {
 
   def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(TrustNamePage).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode) {
+      if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
         None
@@ -38,12 +38,12 @@ object SubcontractorNameDisplayHelper {
       .map(_.trim)
       .filter(_.nonEmpty)
       .getOrElse {
-        if (mode == AmendMode) messages("verify.noName") else ""
+        if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
       }
 
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(PartnershipNamePage).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode) {
+      if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
         None
@@ -52,7 +52,7 @@ object SubcontractorNameDisplayHelper {
 
   def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode) {
+      if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
         None
@@ -66,6 +66,6 @@ object SubcontractorNameDisplayHelper {
       .filter(_.nonEmpty)
       .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty))
       .getOrElse {
-        if (mode == AmendMode) messages("verify.noName") else ""
+        if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
       }
 }

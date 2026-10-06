@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package pages.unmatched
+package models.address
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, Writes}
 
-case class RemoveSubcontractorVerifyRequestPage(subcontractorId: Long) extends QuestionPage[Boolean] {
+case class AddressLookupTimeoutConfig(
+  timeoutAmount: Int,
+  timeoutUrl: String,
+  timeoutKeepAliveUrl: Option[String] = None
+)
 
-  override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest" \ subcontractorId.toString \ "removed"
-}
-
-object RemoveSubcontractorVerifyRequestPage {
-
-  case object All extends QuestionPage[Map[String, Map[String, Boolean]]] {
-
-    override def path: JsPath = JsPath \ "removeSubcontractorVerifyRequest"
-  }
+object AddressLookupTimeoutConfig {
+  implicit val writes: Writes[AddressLookupTimeoutConfig] =
+    Json.writes[AddressLookupTimeoutConfig]
 }

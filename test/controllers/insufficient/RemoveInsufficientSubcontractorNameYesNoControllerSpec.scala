@@ -20,14 +20,15 @@ import base.SpecBase
 import controllers.routes
 import controllers.verify.CheckVerificationBatchReadinessController
 import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
-import models.{NormalMode, Subcontractor, SubcontractorCurrentVerification, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.{NormalMode, Subcontractor, SubcontractorCurrentVerification, SubcontractorViewModel, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
 import models.response.{DeleteVerificationResponse, GetCurrentVerificationBatchResponse}
+import models.verify.SelectedSubcontractors
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
-import pages.verify.{CurrentVerificationBatchResponsePage, UnverifiedSubcontractorsPage}
+import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -637,6 +638,137 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
                 verificationResourceRef
               )
             ) mustBe None
+        }
+      }
+
+      "must remove the subcontractor from the verify and reverify selections so the remaining batch can continue" in {
+
+        val mockSessionRepository =
+          mock[SessionRepository]
+
+        val mockVerificationService =
+          mock[VerificationService]
+
+        val mockReadinessController =
+          mock[CheckVerificationBatchReadinessController]
+
+        val removedId =
+          subcontractorId.toString
+
+        val retainedSelected =
+          SubcontractorViewModel(id = "20", name = "Test Trust")
+
+        val retainedReverify =
+          SelectedSubcontractors(id = "30", name = "Another Ltd")
+
+        val userAnswers =
+          userAnswersWithCurrentBatch
+            .set(
+              SelectSubcontractorPage,
+              Set(
+                SubcontractorViewModel(id = removedId, name = subcontractorName),
+                retainedSelected
+              )
+            )
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage,
+              Set(
+                SelectedSubcontractors(id = removedId, name = subcontractorName),
+                retainedReverify
+              )
+            )
+            .success
+            .value
+
+        when(
+          mockSessionRepository.set(any[UserAnswers])
+        ).thenReturn(
+          Future.successful(true)
+        )
+
+        when(
+          mockSessionRepository.get(eqTo(userAnswersId))
+        ).thenReturn(
+          Future.successful(Some(userAnswers))
+        )
+
+        when(
+          mockVerificationService.deleteVerification(
+            any[UserAnswers],
+            eqTo(verificationResourceRef)
+          )(
+            any[HeaderCarrier]
+          )
+        ).thenReturn(
+          Future.successful(
+            DeleteVerificationResponse(Some(1L))
+          )
+        )
+
+        when(
+          mockReadinessController
+            .updateVerificationBatchReadiness(
+              any[UserAnswers]
+            )
+        ).thenReturn(
+          Future.successful(Some(userAnswers))
+        )
+
+        when(
+          mockVerificationService
+            .refreshNewestVerificationBatch(
+              any[UserAnswers]
+            )(
+              any[HeaderCarrier]
+            )
+        ).thenReturn(
+          Future.successful(userAnswers)
+        )
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(userAnswers)
+          ).overrides(
+            bind[SessionRepository]
+              .toInstance(mockSessionRepository),
+            bind[VerificationService]
+              .toInstance(mockVerificationService),
+            bind[CheckVerificationBatchReadinessController]
+              .toInstance(mockReadinessController)
+          ).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(
+              POST,
+              postRoute()
+            ).withFormUrlEncodedBody(
+              "value" -> "true"
+            )
+
+          val result =
+            route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          val savedAnswersCaptor =
+            ArgumentCaptor.forClass(
+              classOf[UserAnswers]
+            )
+
+          verify(mockSessionRepository)
+            .set(savedAnswersCaptor.capture())
+
+          savedAnswersCaptor.getValue
+            .get(SelectSubcontractorPage)
+            .value mustEqual Set(retainedSelected)
+
+          savedAnswersCaptor.getValue
+            .get(SelectSubcontractorsToReverifyPage)
+            .value mustEqual Set(retainedReverify)
         }
       }
 

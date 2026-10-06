@@ -16,7 +16,7 @@
 
 package utils
 
-import models.{AmendMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
 import pages.add.company.CompanyNamePage
 import pages.add.{SubcontractorNamePage, TradingNameOfSubcontractorPage}
 import play.api.i18n.Messages
@@ -40,7 +40,7 @@ class SubcontractorNameExtractor {
 
   def getSubcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     getSubcontractorName(userAnswers)
-      .orElse(Option.when(mode == AmendMode)(messages("verify.noName")))
+      .orElse(Option.when(mode == AmendMode || mode == FinalValidationMode)(messages("verify.noName")))
 
   def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
     getSubcontractorName(userAnswers)
@@ -48,7 +48,7 @@ class SubcontractorNameExtractor {
 
   def getCompanyName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     userAnswers.get(CompanyNamePage).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode) {
+      if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
         None

@@ -96,7 +96,7 @@ class VerificationRequestInProgressViewSpec extends AnyWordSpec with Matchers wi
         manageLink.first().parent().text()
 
       manageText must include(
-        messages("verify.verificationRequestInProgress.p4")
+        messages("site.backTo")
       )
 
       manageText.trim.endsWith(".") mustBe true

@@ -18,13 +18,13 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import models.{NormalMode, SubcontractorCurrentVerification, SubcontractorViewModel, UserAnswers, VerificationBatchCurrentVerification, VerificationCurrentVerification}
+import models.*
 import models.response.GetCurrentVerificationBatchResponse
 import models.validation.{FieldValidationFailure, SubcontractorValidationFailure}
 import models.validation.SubcontractorValidationField.{EmailAddress, PartnershipTradingName}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{never, times, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.validation.SubcontractorValidationFailuresPage
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage}
