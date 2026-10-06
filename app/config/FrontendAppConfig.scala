@@ -39,9 +39,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val userResearchUrl: String =
-    s"https://survey.take-part-in-research.service.gov.uk/jfe/form/SV_74GjifgnGv6GsMC?Source=BannerList_HMRC_DASS_CIS"
-
   protected lazy val rootServices = "microservice.services"
 
   protected lazy val defaultProtocol: String =
@@ -110,6 +107,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val manageSubcontractorsLandingBaseUrl: String = configuration.get[String]("urls.manageSubcontractorsLanding")
   private val exitSurveyBaseUrl: String               = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String                      = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
+
+  lazy val userResearchUrl: String                    = "https://survey.take-part-in-research.service.gov.uk/jfe/form/SV_74GjifgnGv6GsMC?Source=BannerList_HMRC_DASS_CIS"
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")

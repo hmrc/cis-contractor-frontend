@@ -31,7 +31,6 @@
    stylesheets: Stylesheets,
    betaBanner: StandardBetaBanner,
    hmrcStandardPage: HmrcStandardPage,
-   hmrcUserResearchBanner: HmrcUserResearchBanner,
    twoThirdsMainContent: TwoThirdsMainContent,
    fullWidthMainContent: FullWidthMainContent
  )
@@ -43,7 +42,6 @@
     showHmrcBanner: Boolean = false,
     isFullWidth: Boolean = false,
     showUrBanner: Boolean = false,
-    urBanner: Option[UserResearchBanner] = None
 )(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @scripts = {
@@ -92,11 +90,11 @@
        serviceUrl = Some(routes.ServiceHomeController.onPageLoad().url),
        signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None
       ),
-      banners = Banners(
+    banners = Banners(
         displayHmrcBanner = showHmrcBanner,
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
-        userResearchBanner = if(showUrBanner) urBanner else None
-       ),
+        userResearchBanner = if(showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
+    ),
       isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
       backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
      )
