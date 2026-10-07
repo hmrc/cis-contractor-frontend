@@ -331,6 +331,19 @@ class VerificationService @Inject() (
       updatedUa        <- saveVerificationPollDetailsToSession(ua, updatedDetails)
     } yield effectiveResponse
 
+  // The first poll must wait one poll interval after the submission to ChRIS, rather than
+  // polling immediately. Once a poll has been made (lastMessageDate is set) subsequent polls
+  // are paced by the "Refresh" response header on the sending view.
+  def isPollDue(submissionDetails: VerificationSubmissionDetails, pollInterval: Int): Boolean =
+    logger.info(s"[isPollDue] now=... submittedAt=${submissionDetails.submittedAt} interval=$pollInterval")
+    submissionDetails.lastMessageDate match {
+      case Some(_) => true
+      case None    =>
+        !LocalDateTime
+          .now(clock.withZone(ukZone))
+          .isBefore(submissionDetails.submittedAt.plusSeconds(pollInterval))
+    }
+
   // F18: while ChRIS is still processing (or its poll endpoint is erroring) the backend keeps
   // reporting ACCEPTED/PENDING; once the polling window is exhausted the user must be routed
   // to "send error" (SM-06) if polls were failing with timeOut errors, or "in progress" otherwise.
@@ -427,7 +440,10 @@ class VerificationService @Inject() (
     ua: UserAnswers,
     response: ChrisSubmissionResponse
   ): Future[UserAnswers] = {
-    val details = VerificationSubmissionDetailsBuilder.fromSubmissionResponse(response)
+    val details = VerificationSubmissionDetailsBuilder.fromSubmissionResponse(
+      response,
+      LocalDateTime.now(clock.withZone(ukZone))
+    )
 
     ua.set(VerificationSubmissionDetailsPage, details)
       .fold(

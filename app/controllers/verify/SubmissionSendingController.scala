@@ -84,18 +84,25 @@ class SubmissionSendingController @Inject() (
             submissionDetails.pollIntervalSeconds
               .getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
 
-          verificationService
-            .pollStatusAndPersist(request.userAnswers, submissionDetails)
-            .flatMap { response =>
-              redirectForPollSubmissionResponse(response, pollInterval)
-            }
-            .recover { case ex =>
-              logger.error(
-                "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
-                ex
-              )
-              recovery
-            }
+          if (!verificationService.isPollDue(submissionDetails, pollInterval)) {
+            Future.successful(
+              Ok(view())
+                .withHeaders("Refresh" -> pollInterval.toString)
+            )
+          } else {
+            verificationService
+              .pollStatusAndPersist(request.userAnswers, submissionDetails)
+              .flatMap { response =>
+                redirectForPollSubmissionResponse(response, pollInterval)
+              }
+              .recover { case ex =>
+                logger.error(
+                  "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
+                  ex
+                )
+                recovery
+              }
+          }
       }
     }
 
