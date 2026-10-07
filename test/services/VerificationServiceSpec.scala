@@ -1406,11 +1406,23 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       service.isPollDue(detailsWith(LocalDateTime.parse("2026-06-15T03:30:52"), None), 5) mustBe true
     }
 
-    "must return true once a poll has already been made regardless of the interval" in {
+    "must return false after a poll when the interval has not elapsed since the last message" in {
+      // lastMessageDate + 5s = 03:31:04, which is after now (03:31:00)
+      service.isPollDue(
+        detailsWith(
+          LocalDateTime.parse("2026-06-15T03:30:52"),
+          Some(LocalDateTime.parse("2026-06-15T03:30:59"))
+        ),
+        5
+      ) mustBe false
+    }
+
+    "must return true after a poll once the interval has elapsed since the last message" in {
+      // lastMessageDate + 5s = 03:30:57, which is before now (03:31:00)
       service.isPollDue(
         detailsWith(
           LocalDateTime.parse("2026-06-15T03:31:00"),
-          Some(LocalDateTime.parse("2026-06-15T03:30:59"))
+          Some(LocalDateTime.parse("2026-06-15T03:30:52"))
         ),
         5
       ) mustBe true

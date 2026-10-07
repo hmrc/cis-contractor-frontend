@@ -331,18 +331,14 @@ class VerificationService @Inject() (
       updatedUa        <- saveVerificationPollDetailsToSession(ua, updatedDetails)
     } yield effectiveResponse
 
-  // The first poll must wait one poll interval after the submission to ChRIS, rather than
-  // polling immediately. Once a poll has been made (lastMessageDate is set) subsequent polls
-  // are paced by the "Refresh" response header on the sending view.
-  def isPollDue(submissionDetails: VerificationSubmissionDetails, pollInterval: Int): Boolean =
-    logger.info(s"[isPollDue] now=... submittedAt=${submissionDetails.submittedAt} interval=$pollInterval")
-    submissionDetails.lastMessageDate match {
-      case Some(_) => true
-      case None    =>
-        !LocalDateTime
-          .now(clock.withZone(ukZone))
-          .isBefore(submissionDetails.submittedAt.plusSeconds(pollInterval))
-    }
+  // A poll is only due once the poll interval has elapsed since the last message from ChRIS:
+  // the acknowledgement time (submittedAt) for the first poll, then each poll response's
+  // timestamp thereafter. This delays the first poll and throttles subsequent polls rather
+  // than firing on every page refresh.
+  def isPollDue(submissionDetails: VerificationSubmissionDetails, pollInterval: Int): Boolean = {
+    val lastMessageTime = submissionDetails.lastMessageDate.getOrElse(submissionDetails.submittedAt)
+    !LocalDateTime.now(clock.withZone(ukZone)).isBefore(lastMessageTime.plusSeconds(pollInterval))
+  }
 
   // F18: while ChRIS is still processing (or its poll endpoint is erroring) the backend keeps
   // reporting ACCEPTED/PENDING; once the polling window is exhausted the user must be routed

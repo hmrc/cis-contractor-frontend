@@ -80,20 +80,22 @@ class SubmissionSendingController @Inject() (
           Future.successful(recovery)
 
         case Some(submissionDetails) =>
-          val pollInterval =
+          val gatePollInterval =
             submissionDetails.pollIntervalSeconds
               .getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
+          // Fixed page-refresh cadence, independent of the ChRIS poll interval used for the gate.
+          val refreshInterval  = appConfig.submissionPollDefaultIntervalSeconds
 
-          if (!verificationService.isPollDue(submissionDetails, pollInterval)) {
+          if (!verificationService.isPollDue(submissionDetails, gatePollInterval)) {
             Future.successful(
               Ok(view())
-                .withHeaders("Refresh" -> pollInterval.toString)
+                .withHeaders("Refresh" -> refreshInterval.toString)
             )
           } else {
             verificationService
               .pollStatusAndPersist(request.userAnswers, submissionDetails)
               .flatMap { response =>
-                redirectForPollSubmissionResponse(response, pollInterval)
+                redirectForPollSubmissionResponse(response, refreshInterval)
               }
               .recover { case ex =>
                 logger.error(
@@ -166,13 +168,13 @@ class SubmissionSendingController @Inject() (
 
   private def redirectForPollSubmissionResponse(
     response: ChrisPollResponse,
-    pollInterval: Int
+    refreshInterval: Int
   )(implicit request: DataRequest[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
         Future.successful(
           Ok(view())
-            .withHeaders("Refresh" -> pollInterval.toString)
+            .withHeaders("Refresh" -> refreshInterval.toString)
         )
 
       case SUBMITTED =>
