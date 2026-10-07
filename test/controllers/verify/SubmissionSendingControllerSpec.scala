@@ -492,7 +492,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe OK
-        headers(result).get("Refresh").value mustBe "20"
+        headers(result).get("Refresh").value mustBe "10"
       }
     }
 
@@ -959,7 +959,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           route(application, FakeRequest(GET, onPollRoute)).value
 
         status(result) mustBe OK
-        header("Refresh", result).value mustBe "20"
+        header("Refresh", result).value mustBe "10"
 
         verify(mockService, never()).pollStatusAndPersist(
           any[UserAnswers],
