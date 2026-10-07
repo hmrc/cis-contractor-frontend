@@ -17,14 +17,17 @@
 package controllers.finalvalidations
 
 import controllers.actions.*
-import models.{CheckMode, Mode, NormalMode}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.finalvalidation.VerifyFinalValidationSource.*
 import models.finalvalidation.*
+import models.RichJsObject
 import pages.finalvalidation.*
+import pages.verify.SelectSubcontractorPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.libs.json.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.finalvalidation.FinalValidationDraftService
@@ -33,6 +36,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.finalvalidations.ReviewSubcontractorDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class ReviewSubcontractorDetailsController @Inject() (
@@ -113,9 +117,13 @@ class ReviewSubcontractorDetailsController @Inject() (
             } else {
               finalValidationDraftService.commit(request.cisId, draftId).flatMap { _ =>
 
+                val answersWithCorrectedNames =
+                  syncSelectedSubcontractorNames(request.userAnswers, draft)
+
                 val cleanedAnswers =
                   for {
-                    withoutDraftId      <- request.userAnswers.remove(FinalValidationDraftIdPage)
+                    withCorrectedNames  <- answersWithCorrectedNames
+                    withoutDraftId      <- withCorrectedNames.remove(FinalValidationDraftIdPage)
                     withoutSource       <- withoutDraftId.remove(VerifyFinalValidationSourcePage)
                     withoutMode         <- withoutSource.remove(VerifyFinalValidationModePage)
                     withoutContext      <- withoutMode.remove(FinalValidationContextPage)
@@ -182,5 +190,48 @@ class ReviewSubcontractorDetailsController @Inject() (
       case "CheckMode"  => Some(CheckMode)
       case _            => None
     }
+
+  private def syncSelectedSubcontractorNames(
+    answers: UserAnswers,
+    draft: FinalValidationDraft
+  )(implicit messages: Messages): Try[UserAnswers] = {
+
+    val correctedNames =
+      draft.subcontractors.map { subcontractor =>
+        subcontractor.subcontractorId.toString ->
+          pageModelBuilder.displayName(subcontractor)
+      }.toMap
+
+    answers
+      .get(SelectSubcontractorPage)
+      .map { selectedSubcontractors =>
+        val updatedSelectedSubcontractors =
+          selectedSubcontractors.map { subcontractor =>
+            correctedNames
+              .get(subcontractor.id)
+              .map(name => subcontractor.copy(name = name))
+              .getOrElse(subcontractor)
+          }
+
+        answers.data
+          .setObject(
+            SelectSubcontractorPage.path,
+            Json.toJson(updatedSelectedSubcontractors)
+          ) match {
+          case JsSuccess(updatedData, _) =>
+            Success(
+              answers.copy(
+                data = updatedData
+              )
+            )
+
+          case JsError(errors) =>
+            Failure(JsResultException(errors))
+        }
+      }
+      .getOrElse(
+        Success(answers)
+      )
+  }
 
 }
