@@ -527,7 +527,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .value
             .set(
               SelectSubcontractorPage,
-              Set(SubcontractorViewModel("999", "Earlier Selected"))
+              Set.empty[SubcontractorViewModel]
             )
             .success
             .value
