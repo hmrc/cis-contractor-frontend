@@ -475,6 +475,17 @@ class VerificationService @Inject() (
     cisId: String,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    userAnswers.get(CurrentVerificationBatchResponsePage) match {
+      case Some(_) =>
+        Future.successful(userAnswers)
+      case None    =>
+        initialiseCurrentBatchFromUnmatchedVerifications(cisId, userAnswers)
+    }
+
+  private def initialiseCurrentBatchFromUnmatchedVerifications(
+    cisId: String,
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
       lastSubmitted <- userAnswers
                          .get(LastSubmittedVerificationBatchResponsePage)
