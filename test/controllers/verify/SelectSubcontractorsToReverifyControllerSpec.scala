@@ -527,7 +527,7 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .value
             .set(
               SelectSubcontractorPage,
-              Set(SubcontractorViewModel("999", "Earlier Selected"))
+              Set.empty[SubcontractorViewModel]
             )
             .success
             .value
@@ -701,6 +701,64 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
             .value mustBe Set(
             SelectedSubcontractors("200", "Beta Ltd")
           )
+        }
+      }
+
+      "must return BadRequest when submitting empty on same page that has existing session selections" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          Seq(
+            SubcontractorReverifyRow(
+              id = "100",
+              name = "Brody, Martin",
+              utr = "1234567890",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "11 May 2020"
+            )
+          )
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage,
+              Set(SelectedSubcontractors("100", "Brody, Martin"))
+            )
+            .success
+            .value
+            .set(UnverifiedSubcontractorsPage, Seq.empty)
+            .success
+            .value
+            .set(SelectSubcontractorPage, Set.empty[SubcontractorViewModel])
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[Clock].toInstance(fixedClock),
+              bind[SessionRepository].toInstance(mockRepo)
+            )
+            .build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, postUrl)
+              .withFormUrlEncodedBody()
+
+          val result = route(app, request).value
+
+          status(result) mustBe BAD_REQUEST
+          verify(mockRepo, never()).set(any())
+
+          val body = contentAsString(result)
+          body must include(messages("verify.selectSubcontractorsToReverify.error.required"))
         }
       }
 

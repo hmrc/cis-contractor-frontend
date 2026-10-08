@@ -298,22 +298,24 @@ class SelectSubcontractorsToReverifyController @Inject() (
               .get(SelectSubcontractorPage)
               .exists(_.nonEmpty)
 
+          val existingSelections: Set[SelectedSubcontractors] =
+            request.userAnswers
+              .get(SelectSubcontractorsToReverifyPage)
+              .getOrElse(Set.empty)
+
+          val currentPageIds: Set[String] =
+            result.items.map(_.id).toSet
+
           val requireSelection: Boolean =
-            !hasSelectedUnverifiedEarlier && !hasUnverified
+            !hasSelectedUnverifiedEarlier &&
+              !hasUnverified &&
+              existingSelections.filterNot(s => currentPageIds.contains(s.id)).isEmpty
 
           val boundForm =
             formProvider(requireSelection).bindFromRequest()
 
           val selectedIdsThisPage: Set[String] =
             boundForm.value.getOrElse(Set.empty[String])
-
-          val currentPageIds: Set[String] =
-            result.items.map(_.id).toSet
-
-          val existingSelections: Set[SelectedSubcontractors] =
-            request.userAnswers
-              .get(SelectSubcontractorsToReverifyPage)
-              .getOrElse(Set.empty)
 
           val selectionsFromOtherPages: Set[SelectedSubcontractors] =
             existingSelections.filterNot { selection =>
