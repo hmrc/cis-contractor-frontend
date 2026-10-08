@@ -135,8 +135,12 @@ class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         emptyUserAnswers
-          .set(AddSchemeNameYesNoPage, true).success.value
-          .set(SchemeNamePage, "Some Scheme").success.value
+          .set(AddSchemeNameYesNoPage, true)
+          .success
+          .value
+          .set(SchemeNamePage, "Some Scheme")
+          .success
+          .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))

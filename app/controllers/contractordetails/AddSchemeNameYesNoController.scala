@@ -66,7 +66,7 @@ class AddSchemeNameYesNoController @Inject() (
             for {
               withYesNo      <- Future.fromTry(request.userAnswers.set(AddSchemeNameYesNoPage, value))
               updatedAnswers <- if (!value) Future.fromTry(withYesNo.remove(SchemeNamePage))
-              else Future.successful(withYesNo)
+                                else Future.successful(withYesNo)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(AddSchemeNameYesNoPage, mode, updatedAnswers))
         )
