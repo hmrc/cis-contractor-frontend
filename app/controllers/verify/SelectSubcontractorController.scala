@@ -173,9 +173,13 @@ class SelectSubcontractorController @Inject() (
           ua.get(UnverifiedSubcontractorsPage) match {
 
             case None =>
+              logger.error(
+                "[SelectSubcontractorController][onSubmit] - UnverifiedSubcontractorsPage missing from userAnswers"
+              )
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
             case Some(unverifiedSubcontractors) if unverifiedSubcontractors.isEmpty =>
+              logger.error("[SelectSubcontractorController][onSubmit] - UnverifiedSubcontractorsPage is empty")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
             case Some(unverifiedSubcontractors) =>
@@ -298,6 +302,10 @@ class SelectSubcontractorController @Inject() (
   private def getUnverifiedSubcontractorsOrRedirect(userAnswers: UserAnswers): Either[Result, Seq[Subcontractor]] =
     userAnswers.get(NewestVerificationBatchResponsePage) match {
       case None =>
+        logger.error(
+          "[SelectSubcontractorController][getUnverifiedSubcontractorsOrRedirect] - " +
+            "NewestVerificationBatchResponsePage missing from userAnswers"
+        )
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
       case Some(newestVerificationBatchResponse) if newestVerificationBatchResponse.subcontractors.isEmpty =>
@@ -312,6 +320,10 @@ class SelectSubcontractorController @Inject() (
             Left(Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad))
 
           case None =>
+            logger.error(
+              "[SelectSubcontractorController][getUnverifiedSubcontractorsOrRedirect] - " +
+                "UnverifiedSubcontractorsPage missing from userAnswers"
+            )
             Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }

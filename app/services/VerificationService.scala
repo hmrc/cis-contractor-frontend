@@ -456,12 +456,18 @@ class VerificationService @Inject() (
         UserAnswers(userAnswers.id)
           .set(CisIdQuery, cisId)
           .fold(
-            _ => Future.successful(()),
+            _ => {
+              logger.error("[VerificationService][resetUserAnswers] - failed to set CisIdQuery on reset userAnswers")
+              Future.successful(())
+            },
             resetUserAnswers =>
               sessionRepository
                 .set(resetUserAnswers)
                 .map(_ => ())
-                .recover { case _ => () }
+                .recover { case ex =>
+                  logger.error("[VerificationService][resetUserAnswers] - failed to persist reset userAnswers", ex)
+                  ()
+                }
           )
     }
 

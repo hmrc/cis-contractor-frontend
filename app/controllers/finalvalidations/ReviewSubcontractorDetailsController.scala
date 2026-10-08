@@ -24,6 +24,7 @@ import models.RichJsObject
 import pages.finalvalidation.*
 import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.Logging
 
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -52,7 +53,8 @@ class ReviewSubcontractorDetailsController @Inject() (
   view: ReviewSubcontractorDetailsView
 )(using ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -89,6 +91,7 @@ class ReviewSubcontractorDetailsController @Inject() (
           }
 
         case _ =>
+          logger.error("[ReviewSubcontractorDetailsController][onPageLoad] - required session data missing")
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
@@ -149,6 +152,7 @@ class ReviewSubcontractorDetailsController @Inject() (
                         )
 
                       case _ =>
+                        logger.error("[ReviewSubcontractorDetailsController][onSubmit] - unexpected continuation")
                         Redirect(
                           controllers.routes.JourneyRecoveryController.onPageLoad()
                         )
@@ -160,6 +164,7 @@ class ReviewSubcontractorDetailsController @Inject() (
           }
 
         case _ =>
+          logger.error("[ReviewSubcontractorDetailsController][onSubmit] - required session data missing")
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
@@ -257,7 +262,7 @@ class ReviewSubcontractorDetailsController @Inject() (
     answers.data.setObject(path, Json.toJson(value)) match {
       case JsSuccess(updatedData, _) =>
         Success(answers.copy(data = updatedData))
-      case JsError(errors) =>
+      case JsError(errors)           =>
         Failure(JsResultException(errors))
     }
 
