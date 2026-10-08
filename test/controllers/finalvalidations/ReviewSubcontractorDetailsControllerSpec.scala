@@ -17,10 +17,11 @@
 package controllers.finalvalidations
 
 import base.SpecBase
-import models.{CheckMode, NormalMode, UserAnswers, SubcontractorViewModel}
+import models.{CheckMode, NormalMode, SubcontractorViewModel, UserAnswers}
 import models.finalvalidation.*
 import models.RichJsObject
-import pages.verify.{SelectSubcontractorPage, VerificationBatchReadinessPage}
+import models.verify.SelectedSubcontractors
+import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, VerificationBatchReadinessPage}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -119,6 +120,36 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
       answers.data
         .setObject(
           SelectSubcontractorPage.path,
+          Json.toJson(selectedSubcontractors)
+        )
+        .get
+
+    answers.copy(
+      data = updatedData
+    )
+  }
+
+  private def answersWithCorrectedReverifyName(
+    answers: UserAnswers,
+    name: String
+  ): UserAnswers = {
+
+    val selectedSubcontractors =
+      answers
+        .get(SelectSubcontractorsToReverifyPage)
+        .value
+        .map { subcontractor =>
+          if (subcontractor.id == "1") {
+            subcontractor.copy(name = name)
+          } else {
+            subcontractor
+          }
+        }
+
+    val updatedData =
+      answers.data
+        .setObject(
+          SelectSubcontractorsToReverifyPage.path,
           Json.toJson(selectedSubcontractors)
         )
         .get
@@ -1081,6 +1112,140 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
 
         expectedAnswers
           .get(SelectSubcontractorPage)
+          .value
+          .map(_.name) mustBe
+          Set("Corrected Subcontractor Name")
+
+        expectedAnswers
+          .get(VerificationBatchReadinessPage) mustBe
+          Some(true)
+      }
+    }
+
+    "must update the selected reverify subcontractor name and preserve verification batch readiness" in {
+      val finalValidationDraftService =
+        mock[FinalValidationDraftService]
+
+      val sessionRepository =
+        mock[SessionRepository]
+
+      val answers =
+        userAnswersForCommit(
+          source = VerifyFinalValidationSource.SelectSubcontractorsToReverify,
+          continuation = VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored,
+          mode = "CheckMode"
+        )
+          .setOrException(
+            SelectSubcontractorsToReverifyPage,
+            Set(
+              SelectedSubcontractors(
+                id = "1",
+                name = "Old Subcontractor Name"
+              )
+            )
+          )
+          .setOrException(
+            VerificationBatchReadinessPage,
+            true
+          )
+
+      val currentDraft =
+        Json
+          .obj(
+            "subcontractors" -> Json.arr(
+              Json.obj(
+                "subcontractorId" -> 1L,
+                "subbieResourceRef" -> 10L,
+                "baseVersion" -> 1,
+                "subcontractorType" -> "soletrader",
+                "displayName" -> "Old Subcontractor Name",
+                "base" -> Json.obj(
+                  "firstName" -> "Old",
+                  "surname" -> "Subcontractor Name"
+                ),
+                "proposed" -> Json.obj(
+                  "firstName" -> "Corrected",
+                  "surname" -> "Subcontractor Name"
+                ),
+                "changedTargets" -> Json.arr(),
+                "issues" -> Json.arr(),
+                "readiness" -> "Complete"
+              )
+            )
+          )
+          .as[FinalValidationDraft]
+
+      val expectedAnswers =
+        cleanedAnswers(
+          answersWithCorrectedReverifyName(
+            answers,
+            "Corrected Subcontractor Name"
+          )
+        )
+
+      when(
+        finalValidationDraftService.get(
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(currentDraft)
+      )
+
+      when(
+        finalValidationDraftService.commit(
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(())
+      )
+
+      when(
+        sessionRepository.set(
+          expectedAnswers
+        )
+      ).thenReturn(
+        Future.successful(true)
+      )
+
+      val application =
+        applicationWith(
+          userAnswers = Some(answers),
+          finalValidationDraftService = finalValidationDraftService,
+          sessionRepository = sessionRepository
+        )
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            submitRoute
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+            .onPageLoadAfterFinalValidation(CheckMode)
+            .url
+
+        verify(finalValidationDraftService)
+          .commit(
+            any[String],
+            any[String]
+          )(any[HeaderCarrier])
+
+        verify(sessionRepository)
+          .set(
+            expectedAnswers
+          )
+
+        expectedAnswers
+          .get(SelectSubcontractorsToReverifyPage)
           .value
           .map(_.name) mustBe
           Set("Corrected Subcontractor Name")

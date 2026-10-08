@@ -22,7 +22,7 @@ import models.finalvalidation.VerifyFinalValidationSource.*
 import models.finalvalidation.*
 import models.RichJsObject
 import pages.finalvalidation.*
-import pages.verify.SelectSubcontractorPage
+import pages.verify.{SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
@@ -202,36 +202,63 @@ class ReviewSubcontractorDetailsController @Inject() (
           pageModelBuilder.displayName(subcontractor)
       }.toMap
 
-    answers
-      .get(SelectSubcontractorPage)
-      .map { selectedSubcontractors =>
-        val updatedSelectedSubcontractors =
-          selectedSubcontractors.map { subcontractor =>
-            correctedNames
-              .get(subcontractor.id)
-              .map(name => subcontractor.copy(name = name))
-              .getOrElse(subcontractor)
-          }
+    for {
+      withSelectedSubcontractors <-
+        answers
+          .get(SelectSubcontractorPage)
+          .map { selectedSubcontractors =>
+            val updatedSelectedSubcontractors =
+              selectedSubcontractors.map { subcontractor =>
+                correctedNames
+                  .get(subcontractor.id)
+                  .map(name => subcontractor.copy(name = name))
+                  .getOrElse(subcontractor)
+              }
 
-        answers.data
-          .setObject(
-            SelectSubcontractorPage.path,
-            Json.toJson(updatedSelectedSubcontractors)
-          ) match {
-          case JsSuccess(updatedData, _) =>
-            Success(
-              answers.copy(
-                data = updatedData
-              )
+            updatePageData(
+              answers,
+              SelectSubcontractorPage.path,
+              updatedSelectedSubcontractors
             )
+          }
+          .getOrElse(
+            Success(answers)
+          )
 
-          case JsError(errors) =>
-            Failure(JsResultException(errors))
-        }
-      }
-      .getOrElse(
-        Success(answers)
-      )
+      withReverifySubcontractors <-
+        withSelectedSubcontractors
+          .get(SelectSubcontractorsToReverifyPage)
+          .map { selectedSubcontractors =>
+            val updatedSelectedSubcontractors =
+              selectedSubcontractors.map { subcontractor =>
+                correctedNames
+                  .get(subcontractor.id)
+                  .map(name => subcontractor.copy(name = name))
+                  .getOrElse(subcontractor)
+              }
+
+            updatePageData(
+              withSelectedSubcontractors,
+              SelectSubcontractorsToReverifyPage.path,
+              updatedSelectedSubcontractors
+            )
+          }
+          .getOrElse(
+            Success(withSelectedSubcontractors)
+          )
+    } yield withReverifySubcontractors
   }
+
+  private def updatePageData[A: Writes](
+    answers: UserAnswers,
+    path: JsPath,
+    value: A
+  ): Try[UserAnswers] =
+    answers.data.setObject(path, Json.toJson(value)) match {
+      case JsSuccess(updatedData, _) =>
+        Success(answers.copy(data = updatedData))
+      case JsError(errors) =>
+        Failure(JsResultException(errors))
+    }
 
 }
