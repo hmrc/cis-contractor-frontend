@@ -167,7 +167,9 @@ class AddressLookupConfigurationSpec extends SpecBase {
         mandatoryFieldsConfigModel = mandatoryFields
       )
 
-      result.options.serviceHref mustBe Some(applicationConfig.host + controllers.routes.ServiceHomeController.onPageLoad().url)
+      result.options.serviceHref mustBe Some(
+        applicationConfig.host + controllers.routes.ServiceHomeController.onPageLoad().url
+      )
     }
   }
 }
