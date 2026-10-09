@@ -147,11 +147,26 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and correct view for GET (page 1)" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val mockVerificationPreSelectionService =
+        mock[VerificationPreSelectionService]
+
+      when(
+        mockVerificationPreSelectionService.preSelectedSubcontractorIds(
+          any[Seq[Subcontractor]],
+          any[UserAnswers]
+        )
+      ).thenReturn(Set.empty[String])
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithSubcontractors))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[VerificationPreSelectionService]
+              .toInstance(mockVerificationPreSelectionService)
+          )
           .build()
 
       running(application) {
@@ -160,8 +175,11 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[SelectSubcontractorView]
 
-        val allItems         = SubcontractorViewModel.checkboxItems(allSubs)
-        val paginationResult = paginationService.paginateCheckboxItems(allItems, 1)
+        val allItems =
+          SubcontractorViewModel.checkboxItems(allSubs)
+
+        val paginationResult =
+          paginationService.paginateCheckboxItems(allItems, 1)
 
         status(result) mustEqual OK
 
@@ -175,6 +193,12 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.totalCount,
           paginationResult.totalPages
         )(request, messages(application)).toString
+
+        verify(mockVerificationPreSelectionService)
+          .preSelectedSubcontractorIds(
+            any[Seq[Subcontractor]],
+            any[UserAnswers]
+          )
       }
     }
 

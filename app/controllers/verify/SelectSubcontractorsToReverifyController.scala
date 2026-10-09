@@ -32,7 +32,7 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.PaginationToReverifyService
+import services.{PaginationToReverifyService, VerificationPreSelectionService}
 import models.requests.DataRequest
 import models.verify.*
 import pages.verify.*
@@ -54,6 +54,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorsToReverifyFormProvider,
   paginationToReverifyService: PaginationToReverifyService,
+  verificationPreSelectionService: VerificationPreSelectionService,
   clock: Clock,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorsToReverifyView
@@ -221,10 +222,22 @@ class SelectSubcontractorsToReverifyController @Inject() (
                     .url
                 )
 
+              val displayedSubcontractors =
+                sortedRowsWithSubcontractors.map(_._1)
+
               val selectedSubcontractors =
-                request.userAnswers
-                  .get(SelectSubcontractorsToReverifyPage)
-                  .getOrElse(Set.empty[SelectedSubcontractors])
+                request.userAnswers.get(SelectSubcontractorsToReverifyPage).getOrElse {
+                  val selectedIds =
+                    verificationPreSelectionService.preSelectedSubcontractorIds(
+                      displayedSubcontractors,
+                      request.userAnswers
+                    )
+
+                  sortedRows
+                    .filter(row => selectedIds.contains(row.id))
+                    .map(row => SelectedSubcontractors(row.id, row.name))
+                    .toSet
+                }
 
               val preparedForm =
                 formProvider(requireSelection = false)

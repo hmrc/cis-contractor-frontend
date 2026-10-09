@@ -30,7 +30,7 @@ import pages.finalvalidation.*
 import pages.verify.RebuildVerificationFromWarningPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.{CheckboxPaginationResult, CisManageService, PaginationService, VerificationService}
+import services.{CheckboxPaginationResult, CisManageService, PaginationService, VerificationPreSelectionService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SelectSubcontractorView
 
@@ -46,6 +46,7 @@ class SelectSubcontractorController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorFormProvider,
   paginationService: PaginationService,
+  verificationPreSelectionService: VerificationPreSelectionService,
   verificationService: VerificationService,
   override protected val cisManageService: CisManageService,
   val controllerComponents: MessagesControllerComponents,
@@ -121,11 +122,36 @@ class SelectSubcontractorController @Inject() (
               SubcontractorViewModel.fromSubcontractors(unverifiedSubcontractors)
 
             val selectedSubcontractors =
-              Future.successful(
-                userAnswers
-                  .get(SelectSubcontractorPage)
-                  .getOrElse(Set.empty[SubcontractorViewModel])
-              )
+              userAnswers.get(SelectSubcontractorPage) match {
+
+                case Some(subs) =>
+                  Future.successful(subs)
+
+                case None =>
+                  val selectedIds =
+                    verificationPreSelectionService.preSelectedSubcontractorIds(
+                      unverifiedSubcontractors,
+                      userAnswers
+                    )
+
+                  val defaultSelections =
+                    subcontractorsVm
+                      .filter(sub => selectedIds.contains(sub.id))
+                      .toSet
+
+                  Future
+                    .fromTry(
+                      userAnswers.set(
+                        SelectSubcontractorPage,
+                        defaultSelections
+                      )
+                    )
+                    .flatMap { updatedAnswers =>
+                      sessionRepository
+                        .set(updatedAnswers)
+                        .map(_ => defaultSelections)
+                    }
+              }
 
             val result =
               paginationService.paginateCheckboxItems(
