@@ -384,23 +384,23 @@ class SelectSubcontractorsToReverifyController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(redirectTo(updatedAnswers))
 
-          if (updatedSelections.size > 100) {
-            val formWithErrors =
-              boundForm.withError(
-                "value",
-                "verify.selectSubcontractorsToReverify.error.maxSelected"
-              )
+          gotoPage match {
+            case Some(targetPage) =>
+              saveSelectionsAndRedirect { _ =>
+                routes.SelectSubcontractorsToReverifyController
+                  .onPageLoad(mode, targetPage)
+              }
 
-            Future.successful(renderForm(formWithErrors))
-          } else {
-            gotoPage match {
-              case Some(targetPage) =>
-                saveSelectionsAndRedirect { _ =>
-                  routes.SelectSubcontractorsToReverifyController
-                    .onPageLoad(mode, targetPage)
-                }
+            case None =>
+              if (updatedSelections.size > 100) {
+                val formWithErrors =
+                  boundForm.withError(
+                    "value",
+                    "verify.selectSubcontractorsToReverify.error.maxSelected"
+                  )
 
-              case None =>
+                Future.successful(renderForm(formWithErrors))
+              } else {
                 boundForm.fold(
                   formWithErrors => Future.successful(renderForm(formWithErrors)),
                   _ =>
@@ -436,7 +436,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
                       )
                     )
                 )
-            }
+              }
           }
       }
     }

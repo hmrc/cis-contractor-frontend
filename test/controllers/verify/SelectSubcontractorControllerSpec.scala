@@ -448,6 +448,71 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       status(result) mustBe BAD_REQUEST
     }
 
+    "must allow gotoPage navigation even when more than 100 subcontractors are selected" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      val manySubcontractors = generateSubcontractors(201)
+
+      val manySubs =
+        SubcontractorViewModel.fromSubcontractors(manySubcontractors)
+
+      val allItems =
+        SubcontractorViewModel.checkboxItems(manySubs)
+
+      val firstPage =
+        paginationService.paginateCheckboxItems(allItems, 1)
+
+      val currentPageIds: Set[String] =
+        firstPage.paginatedData.map(_.value).toSet
+
+      val priorSelections: Set[SubcontractorViewModel] =
+        manySubs
+          .filterNot(sub => currentPageIds.contains(sub.id))
+          .take(100)
+          .toSet
+
+      val responseWithManySubcontractors =
+        getNewestVerificationBatchResponse.copy(
+          subcontractors = manySubcontractors
+        )
+
+      val userAnswers =
+        userAnswersWithCisId
+          .set(NewestVerificationBatchResponsePage, responseWithManySubcontractors)
+          .success
+          .value
+          .set(UnverifiedSubcontractorsPage, manySubcontractors)
+          .success
+          .value
+          .set(SelectSubcontractorPage, priorSelections)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val newlySelectedId = firstPage.paginatedData.head.value
+
+        val request =
+          FakeRequest(POST, url())
+            .withFormUrlEncodedBody(
+              "value[0]" -> newlySelectedId,
+              "gotoPage" -> "2"
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual url(2)
+      }
+    }
+
     "must initialise verification data and render the page for a GET if no existing data is found" in {
 
       val mockVerificationService = mock[VerificationService]
