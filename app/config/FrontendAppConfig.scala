@@ -37,7 +37,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val contactFormServiceIdentifier: String = configuration.get[String]("contact-frontend.serviceId")
 
   def feedbackUrl(implicit request: RequestHeader): String =
-    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
+    s"$contactHost/contact/beta-feedback?service=construction-industry-scheme&backUrl=${host + request.uri}"
 
   lazy val keepAliveUrl = s"$host/subcontractor/refresh-session"
 
