@@ -18,7 +18,6 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.requests.DataRequest
 import models.verify.SubmissionStatus
 import models.verify.SubmissionStatus.*
 import models.response.{ChrisPollResponse, ChrisSubmissionResponse}
@@ -26,7 +25,7 @@ import models.verify.GovTalkErrorStatus.{DepartmentalError, FatalError}
 import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -144,7 +143,7 @@ class SubmissionSendingController @Inject() (
 
   private def redirectForInitialSubmissionResponse(
     response: ChrisSubmissionResponse
-  )(implicit request: DataRequest[_]): Future[Result] =
+  ): Future[Result] =
     SubmissionStatus.fromString(response.status) match {
 
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
@@ -153,11 +152,9 @@ class SubmissionSendingController @Inject() (
         )
 
       case SUBMITTED_NO_RECEIPT =>
-        verificationService
-          .resetUserAnswers(request.userAnswers)
-          .map { _ =>
-            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-          }
+        Future.successful(
+          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+        )
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
@@ -169,7 +166,7 @@ class SubmissionSendingController @Inject() (
   private def redirectForPollSubmissionResponse(
     response: ChrisPollResponse,
     refreshInterval: Int
-  )(implicit request: DataRequest[_]): Future[Result] =
+  )(implicit request: Request[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
         Future.successful(
@@ -178,18 +175,14 @@ class SubmissionSendingController @Inject() (
         )
 
       case SUBMITTED =>
-        verificationService
-          .resetUserAnswers(request.userAnswers)
-          .map { _ =>
-            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-          }
+        Future.successful(
+          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+        )
 
       case SUBMITTED_NO_RECEIPT =>
-        verificationService
-          .resetUserAnswers(request.userAnswers)
-          .map { _ =>
-            Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-          }
+        Future.successful(
+          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+        )
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
