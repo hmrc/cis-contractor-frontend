@@ -152,4 +152,26 @@ class UpdateSubcontractorDetailsController @Inject() (
       }
     }
 
+  def onCancel(subcontractorId: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      request.userAnswers.get(FinalValidationDraftIdPage) match {
+
+        case Some(draftId) =>
+          finalValidationDraftService
+            .resetSubcontractor(
+              request.cisId,
+              draftId,
+              subcontractorId
+            )
+            .map { _ =>
+              Redirect(routes.ReviewSubcontractorDetailsController.onPageLoad())
+            }
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
+    }
+
 }
