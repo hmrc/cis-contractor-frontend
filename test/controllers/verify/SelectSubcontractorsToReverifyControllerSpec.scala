@@ -762,6 +762,86 @@ class SelectSubcontractorsToReverifyControllerSpec extends SpecBase with Mockito
         }
       }
 
+      "must return BadRequest and show an error when more than 100 subcontractors are selected" in {
+        val mockRepo = mock[SessionRepository]
+        when(mockRepo.set(any())) thenReturn Future.successful(true)
+
+        val rows: Seq[SubcontractorReverifyRow] =
+          (1 to 101).map { i =>
+            SubcontractorReverifyRow(
+              id = i.toString,
+              name = f"Subcontractor $i%03d Ltd",
+              utr = "",
+              verified = "Yes",
+              verificationNumber = "Unknown",
+              taxTreatment = "Unknown",
+              dateAdded = "1 Jan 2024"
+            )
+          }
+
+        val priorSelections: Set[SelectedSubcontractors] =
+          rows
+            .drop(6)
+            .map(row => SelectedSubcontractors(row.id, row.name))
+            .toSet
+
+        priorSelections.size mustBe 95
+
+        val ua =
+          userAnswersWithCisId
+            .set(SubcontractorReverifyRowsPage, rows)
+            .success
+            .value
+            .set(UnverifiedSubcontractorsPage, Seq.empty)
+            .success
+            .value
+            .set(
+              SelectSubcontractorPage,
+              Set.empty[SubcontractorViewModel]
+            )
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage,
+              priorSelections
+            )
+            .success
+            .value
+
+        val app =
+          applicationBuilder(userAnswers = Some(ua))
+            .overrides(
+              bind[SessionRepository].toInstance(mockRepo),
+              bind[Clock].toInstance(fixedClock)
+            )
+            .build()
+
+        running(app) {
+          val formData =
+            (0 until 6).map { index =>
+              s"value[$index]" -> rows(index).id
+            }
+
+          val request =
+            FakeRequest(
+              POST,
+              url(page = 1)
+            ).withFormUrlEncodedBody(formData*)
+
+          val result = route(app, request).value
+
+          status(result) mustBe BAD_REQUEST
+
+          val body = contentAsString(result)
+
+          body must include(
+            messages("verify.selectSubcontractorsToReverify.error.maxSelected")
+          )
+
+          verify(mockRepo, never()).set(any())
+        }
+      }
+
       "must allow submission when only SelectSubcontractorsToReverifyPage contains selections" in {
         val mockRepo = mock[SessionRepository]
         when(mockRepo.set(any())) thenReturn Future.successful(true)

@@ -371,49 +371,59 @@ class SelectSubcontractorsToReverifyController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(redirectTo(updatedAnswers))
 
-          gotoPage match {
-            case Some(targetPage) =>
-              saveSelectionsAndRedirect { _ =>
-                routes.SelectSubcontractorsToReverifyController
-                  .onPageLoad(mode, targetPage)
-              }
-
-            case None =>
-              boundForm.fold(
-                formWithErrors => Future.successful(renderForm(formWithErrors)),
-                _ =>
-                  for {
-                    withSelections <- Future.fromTry(
-                                        request.userAnswers.set(
-                                          SelectSubcontractorsToReverifyPage,
-                                          updatedSelections
-                                        )
-                                      )
-
-                    withContext <- Future.fromTry(
-                                     withSelections.set(
-                                       FinalValidationContextPage,
-                                       FinalValidationContext.VerifySubcontractor
-                                     )
-                                   )
-
-                    withSource <- Future.fromTry(
-                                    withContext.set(
-                                      VerifyFinalValidationSourcePage,
-                                      VerifyFinalValidationSource.SelectSubcontractorsToReverify
-                                    )
-                                  )
-
-                    _ <- sessionRepository.set(withSource)
-
-                  } yield Redirect(
-                    navigator.nextPage(
-                      SelectSubcontractorsToReverifyPage,
-                      mode,
-                      withSource
-                    )
-                  )
+          if (updatedSelections.size > 100) {
+            val formWithErrors =
+              boundForm.withError(
+                "value",
+                "verify.selectSubcontractorsToReverify.error.maxSelected"
               )
+
+            Future.successful(renderForm(formWithErrors))
+          } else {
+            gotoPage match {
+              case Some(targetPage) =>
+                saveSelectionsAndRedirect { _ =>
+                  routes.SelectSubcontractorsToReverifyController
+                    .onPageLoad(mode, targetPage)
+                }
+
+              case None =>
+                boundForm.fold(
+                  formWithErrors => Future.successful(renderForm(formWithErrors)),
+                  _ =>
+                    for {
+                      withSelections <- Future.fromTry(
+                                          request.userAnswers.set(
+                                            SelectSubcontractorsToReverifyPage,
+                                            updatedSelections
+                                          )
+                                        )
+
+                      withContext <- Future.fromTry(
+                                       withSelections.set(
+                                         FinalValidationContextPage,
+                                         FinalValidationContext.VerifySubcontractor
+                                       )
+                                     )
+
+                      withSource <- Future.fromTry(
+                                      withContext.set(
+                                        VerifyFinalValidationSourcePage,
+                                        VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                      )
+                                    )
+
+                      _ <- sessionRepository.set(withSource)
+
+                    } yield Redirect(
+                      navigator.nextPage(
+                        SelectSubcontractorsToReverifyPage,
+                        mode,
+                        withSource
+                      )
+                    )
+                )
+            }
           }
       }
     }

@@ -302,6 +302,81 @@ class SelectSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return BadRequest when more than 100 subcontractors are selected" in {
+
+      val manySubcontractors = generateSubcontractors(201)
+
+      val manySubs =
+        SubcontractorViewModel.fromSubcontractors(manySubcontractors)
+
+      val allItems =
+        SubcontractorViewModel.checkboxItems(manySubs)
+
+      val firstPage =
+        paginationService.paginateCheckboxItems(allItems, 1)
+
+      val currentPageIds: Set[String] =
+        firstPage.paginatedData.map(_.value).toSet
+
+      val priorSelections: Set[SubcontractorViewModel] =
+        manySubs
+          .filterNot(sub => currentPageIds.contains(sub.id))
+          .take(100)
+          .toSet
+
+      priorSelections.size mustBe 100
+
+      val newlySelectedId =
+        firstPage.paginatedData.head.value
+
+      val responseWithManySubcontractors =
+        getNewestVerificationBatchResponse.copy(
+          subcontractors = manySubcontractors
+        )
+
+      val userAnswers =
+        userAnswersWithCisId
+          .set(
+            NewestVerificationBatchResponsePage,
+            responseWithManySubcontractors
+          )
+          .success
+          .value
+          .set(
+            UnverifiedSubcontractorsPage,
+            manySubcontractors
+          )
+          .success
+          .value
+          .set(
+            SelectSubcontractorPage,
+            priorSelections
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, url())
+            .withFormUrlEncodedBody(
+              "value[0]" -> newlySelectedId
+            )
+
+        val result = route(application, request).value
+
+        status(result) mustBe BAD_REQUEST
+
+        val body = contentAsString(result)
+
+        body must include(
+          "You can only include up to 100 subcontractors in a verification request"
+        )
+      }
+    }
+
     "must support pagination (page 2)" in {
 
       val mockSessionRepository = mock[SessionRepository]

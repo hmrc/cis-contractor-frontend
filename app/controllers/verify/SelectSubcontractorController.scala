@@ -211,67 +211,80 @@ class SelectSubcontractorController @Inject() (
                   .flatMap(_.headOption)
                   .flatMap(_.toIntOption)
 
-              gotoPage match {
-                case Some(targetPage) =>
-                  for {
-                    updatedAnswers <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(routes.SelectSubcontractorController.onPageLoad(mode, targetPage))
+              if (mergedValues.size > 100) {
+                val formWithErrors =
+                  form
+                    .fill(currentSelectedValues.map(_.id))
+                    .withError(
+                      "value",
+                      "verify.selectSubcontractor.error.maxSelected"
+                    )
 
-                case None =>
-                  if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(ua)) {
+                Future.successful(
+                  renderPageWithError(formWithErrors, mode, result)
+                )
+              } else {
+                gotoPage match {
+                  case Some(targetPage) =>
                     for {
-                      answersWithSelections <- Future.fromTry(ua.set(SelectSubcontractorPage, mergedValues))
-
-                      cleanedAnswers <-
-                        if (
-                          mode == CheckMode &&
-                          answersWithSelections
-                            .get(RebuildVerificationFromWarningPage)
-                            .contains(true)
-                        ) {
-                          Future.fromTry(
-                            answersWithSelections.remove(RebuildVerificationFromWarningPage)
-                          )
-                        } else {
-                          Future.successful(answersWithSelections)
-                        }
-
-                      withContext <- Future.fromTry(
-                                       cleanedAnswers.set(
-                                         FinalValidationContextPage,
-                                         FinalValidationContext.VerifySubcontractor
-                                       )
-                                     )
-
-                      withSource <- Future.fromTry(
-                                      withContext.set(
-                                        VerifyFinalValidationSourcePage,
-                                        VerifyFinalValidationSource.SelectSubcontractor
-                                      )
-                                    )
-
-                      _ <- sessionRepository.set(withSource)
+                      updatedAnswers <- Future.fromTry(
+                                          ua.set(SelectSubcontractorPage, mergedValues)
+                                        )
+                      _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
-                      navigator.nextPage(SelectSubcontractorPage, mode, withSource)
+                      routes.SelectSubcontractorController.onPageLoad(mode, targetPage)
                     )
-                  } else {
-                    val formWithErrors =
-                      form
-                        .fill(currentSelectedValues.map(_.id))
-                        .withError(
-                          "value",
-                          "verify.selectSubcontractor.error.required"
-                        )
 
-                    Future.successful(
-                      renderPageWithError(
-                        formWithErrors,
-                        mode,
-                        result
+                  case None =>
+                    if (mergedValues.nonEmpty || hasAnyVerifiedSubcontractor(ua)) {
+                      for {
+                        answersWithSelections <- Future.fromTry(
+                                                   ua.set(SelectSubcontractorPage, mergedValues)
+                                                 )
+                        cleanedAnswers        <-
+                          if (
+                            mode == CheckMode &&
+                            answersWithSelections
+                              .get(RebuildVerificationFromWarningPage)
+                              .contains(true)
+                          ) {
+                            Future.fromTry(
+                              answersWithSelections.remove(RebuildVerificationFromWarningPage)
+                            )
+                          } else {
+                            Future.successful(answersWithSelections)
+                          }
+
+                        withContext <- Future.fromTry(
+                                         cleanedAnswers.set(
+                                           FinalValidationContextPage,
+                                           FinalValidationContext.VerifySubcontractor
+                                         )
+                                       )
+
+                        withSource <- Future.fromTry(
+                                        withContext.set(
+                                          VerifyFinalValidationSourcePage,
+                                          VerifyFinalValidationSource.SelectSubcontractor
+                                        )
+                                      )
+                        _          <- sessionRepository.set(withSource)
+                      } yield Redirect(
+                        navigator.nextPage(
+                          SelectSubcontractorPage,
+                          mode,
+                          withSource
+                        )
                       )
-                    )
-                  }
+                    } else {
+                      val formWithErrors =
+                        form
+                          .fill(currentSelectedValues.map(_.id))
+                          .withError("value", "verify.selectSubcontractor.error.required")
+
+                      Future.successful(renderPageWithError(formWithErrors, mode, result))
+                    }
+                }
               }
           }
       }
