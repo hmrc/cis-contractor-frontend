@@ -132,8 +132,11 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case _ =>
-        logger.error("[SubmissionSendingController][redirectForErrorStatus] - unexpected submission status")
+      case unexpectedStatus =>
+        logger.error(
+          "[SubmissionSendingController][redirectForErrorStatus] - " +
+            s"unexpected submission status=${unexpectedStatus.value}"
+        )
         recovery
     }
 
@@ -157,9 +160,10 @@ class SubmissionSendingController @Inject() (
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
 
-      case _ =>
+      case unexpectedStatus =>
         logger.error(
-          "[SubmissionSendingController][redirectForInitialSubmissionResponse] - unexpected submission status"
+          "[SubmissionSendingController][redirectForInitialSubmissionResponse] - " +
+            s"unexpected submission status=${unexpectedStatus.value}"
         )
         Future.successful(recovery)
     }
@@ -201,8 +205,11 @@ class SubmissionSendingController @Inject() (
 
       case TIMED_OUT => Future.successful(Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad()))
 
-      case _ =>
-        logger.error("[SubmissionSendingController][redirectForPollSubmissionResponse] - unexpected poll status")
+      case unexpectedStatus =>
+        logger.error(
+          "[SubmissionSendingController][redirectForPollSubmissionResponse] - " +
+            s"unexpected poll status=${unexpectedStatus.value}"
+        )
         Future.successful(recovery)
     }
 
