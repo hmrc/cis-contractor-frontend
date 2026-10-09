@@ -76,6 +76,9 @@ class SubmissionSendingController @Inject() (
 
       request.userAnswers.get(VerificationSubmissionDetailsPage) match {
         case None =>
+          logger.error(
+            "[SubmissionSendingController][onPollAndRedirect] - VerificationSubmissionDetailsPage missing from userAnswers"
+          )
           Future.successful(recovery)
 
         case Some(submissionDetails) =>
@@ -137,7 +140,11 @@ class SubmissionSendingController @Inject() (
             .onPageLoad()
         )
 
-      case _ =>
+      case unexpectedStatus =>
+        logger.error(
+          "[SubmissionSendingController][redirectForErrorStatus] - " +
+            s"unexpected submission status=${unexpectedStatus.value}"
+        )
         recovery
     }
 
@@ -159,7 +166,11 @@ class SubmissionSendingController @Inject() (
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         Future.successful(redirectForErrorStatus(status, response.govTalkErrorStatus))
 
-      case _ =>
+      case unexpectedStatus =>
+        logger.error(
+          "[SubmissionSendingController][redirectForInitialSubmissionResponse] - " +
+            s"unexpected submission status=${unexpectedStatus.value}"
+        )
         Future.successful(recovery)
     }
 
@@ -196,7 +207,11 @@ class SubmissionSendingController @Inject() (
 
       case TIMED_OUT => Future.successful(Redirect(controllers.verify.routes.VerifySendErrorController.onPageLoad()))
 
-      case _ =>
+      case unexpectedStatus =>
+        logger.error(
+          "[SubmissionSendingController][redirectForPollSubmissionResponse] - " +
+            s"unexpected poll status=${unexpectedStatus.value}"
+        )
         Future.successful(recovery)
     }
 

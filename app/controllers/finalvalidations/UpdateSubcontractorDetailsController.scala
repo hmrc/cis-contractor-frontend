@@ -23,6 +23,7 @@ import services.VerifyFinalValidationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.finalvalidation.FinalValidationDraftService
@@ -46,7 +47,8 @@ class UpdateSubcontractorDetailsController @Inject() (
   view: UpdateSubcontractorDetailsView
 )(using ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(subcontractorId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -89,6 +91,7 @@ class UpdateSubcontractorDetailsController @Inject() (
                 )
 
               case None =>
+                logger.error("[UpdateSubcontractorDetailsController][onPageLoad] - subcontractor missing from draft")
                 Redirect(
                   controllers.routes.JourneyRecoveryController.onPageLoad()
                 )
@@ -96,6 +99,7 @@ class UpdateSubcontractorDetailsController @Inject() (
           }
 
         case None =>
+          logger.error("[UpdateSubcontractorDetailsController][onPageLoad] - FinalValidationDraftIdPage missing")
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
@@ -139,6 +143,7 @@ class UpdateSubcontractorDetailsController @Inject() (
                 )
 
               case None =>
+                logger.error("[UpdateSubcontractorDetailsController][onSubmit] - subcontractor missing from draft")
                 Future.successful(
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                 )
@@ -146,6 +151,7 @@ class UpdateSubcontractorDetailsController @Inject() (
           }
 
         case None =>
+          logger.error("[UpdateSubcontractorDetailsController][onSubmit] - FinalValidationDraftIdPage missing")
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
