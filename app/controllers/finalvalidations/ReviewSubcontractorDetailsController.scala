@@ -257,7 +257,7 @@ class ReviewSubcontractorDetailsController @Inject() (
     answers.data.setObject(path, Json.toJson(value)) match {
       case JsSuccess(updatedData, _) =>
         Success(answers.copy(data = updatedData))
-      case JsError(errors) =>
+      case JsError(errors)           =>
         Failure(JsResultException(errors))
     }
 

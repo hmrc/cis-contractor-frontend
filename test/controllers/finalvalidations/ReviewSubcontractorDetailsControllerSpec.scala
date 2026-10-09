@@ -1020,22 +1020,22 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
           .obj(
             "subcontractors" -> Json.arr(
               Json.obj(
-                "subcontractorId" -> 1L,
+                "subcontractorId"   -> 1L,
                 "subbieResourceRef" -> 10L,
-                "baseVersion" -> 1,
+                "baseVersion"       -> 1,
                 "subcontractorType" -> "soletrader",
-                "displayName" -> "Old Subcontractor Name",
-                "base" -> Json.obj(
+                "displayName"       -> "Old Subcontractor Name",
+                "base"              -> Json.obj(
                   "firstName" -> "Old",
-                  "surname" -> "Subcontractor Name"
+                  "surname"   -> "Subcontractor Name"
                 ),
-                "proposed" -> Json.obj(
+                "proposed"          -> Json.obj(
                   "firstName" -> "Corrected",
-                  "surname" -> "Subcontractor Name"
+                  "surname"   -> "Subcontractor Name"
                 ),
-                "changedTargets" -> Json.arr(),
-                "issues" -> Json.arr(),
-                "readiness" -> "Complete"
+                "changedTargets"    -> Json.arr(),
+                "issues"            -> Json.arr(),
+                "readiness"         -> "Complete"
               )
             )
           )
@@ -1154,22 +1154,22 @@ class ReviewSubcontractorDetailsControllerSpec extends SpecBase {
           .obj(
             "subcontractors" -> Json.arr(
               Json.obj(
-                "subcontractorId" -> 1L,
+                "subcontractorId"   -> 1L,
                 "subbieResourceRef" -> 10L,
-                "baseVersion" -> 1,
+                "baseVersion"       -> 1,
                 "subcontractorType" -> "soletrader",
-                "displayName" -> "Old Subcontractor Name",
-                "base" -> Json.obj(
+                "displayName"       -> "Old Subcontractor Name",
+                "base"              -> Json.obj(
                   "firstName" -> "Old",
-                  "surname" -> "Subcontractor Name"
+                  "surname"   -> "Subcontractor Name"
                 ),
-                "proposed" -> Json.obj(
+                "proposed"          -> Json.obj(
                   "firstName" -> "Corrected",
-                  "surname" -> "Subcontractor Name"
+                  "surname"   -> "Subcontractor Name"
                 ),
-                "changedTargets" -> Json.arr(),
-                "issues" -> Json.arr(),
-                "readiness" -> "Complete"
+                "changedTargets"    -> Json.arr(),
+                "issues"            -> Json.arr(),
+                "readiness"         -> "Complete"
               )
             )
           )
