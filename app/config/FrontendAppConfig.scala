@@ -37,7 +37,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val contactFormServiceIdentifier: String = configuration.get[String]("contact-frontend.serviceId")
 
   def feedbackUrl(implicit request: RequestHeader): String =
-    s"$contactHost/contact/beta-feedback?service=construction-industry-scheme&backUrl=${host + request.uri}"
+    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
   lazy val keepAliveUrl = s"$host/subcontractor/refresh-session"
 
@@ -108,7 +108,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val manageSubcontractorsLandingBaseUrl: String = configuration.get[String]("urls.manageSubcontractorsLanding")
   private val exitSurveyBaseUrl: String               = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  lazy val exitSurveyUrl: String                      = s"$exitSurveyBaseUrl/feedback/cis-contractor-frontend"
+  lazy val exitSurveyUrl: String                      = s"$exitSurveyBaseUrl/feedback/construction-industry-scheme"
   lazy val cisFeedbackSurveyUrl: String               = s"$exitSurveyBaseUrl/feedback/construction-industry-scheme"
 
   lazy val userResearchUrl: String                = configuration.get[String]("urls.userResearchUrl")
