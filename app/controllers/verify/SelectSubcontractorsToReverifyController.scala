@@ -33,7 +33,7 @@ import viewmodels.verify.SubcontractorReverifyRow
 import models.verify.SelectedSubcontractors
 import pages.verify.UnverifiedSubcontractorsPage
 import pages.verify.SelectSubcontractorPage
-import services.PaginationToReverifyService
+import services.{PaginationToReverifyService, VerificationPreSelectionService}
 import models.requests.DataRequest
 import models.verify.*
 import pages.verify.*
@@ -55,6 +55,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SelectSubcontractorsToReverifyFormProvider,
   paginationToReverifyService: PaginationToReverifyService,
+  verificationPreSelectionService: VerificationPreSelectionService,
   clock: Clock,
   val controllerComponents: MessagesControllerComponents,
   view: SelectSubcontractorsToReverifyView
@@ -227,10 +228,22 @@ class SelectSubcontractorsToReverifyController @Inject() (
                     .url
                 )
 
+              val displayedSubcontractors =
+                sortedRowsWithSubcontractors.map(_._1)
+
               val selectedSubcontractors =
-                request.userAnswers
-                  .get(SelectSubcontractorsToReverifyPage)
-                  .getOrElse(Set.empty[SelectedSubcontractors])
+                request.userAnswers.get(SelectSubcontractorsToReverifyPage).getOrElse {
+                  val selectedIds =
+                    verificationPreSelectionService.preSelectedSubcontractorIds(
+                      displayedSubcontractors,
+                      request.userAnswers
+                    )
+
+                  sortedRows
+                    .filter(row => selectedIds.contains(row.id))
+                    .map(row => SelectedSubcontractors(row.id, row.name))
+                    .toSet
+                }
 
               val preparedForm =
                 formProvider(requireSelection = false)
@@ -377,6 +390,12 @@ class SelectSubcontractorsToReverifyController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(redirectTo(updatedAnswers))
 
+          val previouslySelectedUnverifiedCount: Int =
+            request.userAnswers
+              .get(SelectSubcontractorPage)
+              .map(_.size)
+              .getOrElse(0)
+
           gotoPage match {
             case Some(targetPage) =>
               saveSelectionsAndRedirect { _ =>
@@ -385,41 +404,51 @@ class SelectSubcontractorsToReverifyController @Inject() (
               }
 
             case None =>
-              boundForm.fold(
-                formWithErrors => Future.successful(renderForm(formWithErrors)),
-                _ =>
-                  for {
-                    withSelections <- Future.fromTry(
-                                        request.userAnswers.set(
-                                          SelectSubcontractorsToReverifyPage,
-                                          updatedSelections
-                                        )
-                                      )
-
-                    withContext <- Future.fromTry(
-                                     withSelections.set(
-                                       FinalValidationContextPage,
-                                       FinalValidationContext.VerifySubcontractor
-                                     )
-                                   )
-
-                    withSource <- Future.fromTry(
-                                    withContext.set(
-                                      VerifyFinalValidationSourcePage,
-                                      VerifyFinalValidationSource.SelectSubcontractorsToReverify
-                                    )
-                                  )
-
-                    _ <- sessionRepository.set(withSource)
-
-                  } yield Redirect(
-                    navigator.nextPage(
-                      SelectSubcontractorsToReverifyPage,
-                      mode,
-                      withSource
-                    )
+              if (updatedSelections.size + previouslySelectedUnverifiedCount > 100) {
+                val formWithErrors =
+                  boundForm.withError(
+                    "value",
+                    "verify.selectSubcontractorsToReverify.error.maxSelected"
                   )
-              )
+
+                Future.successful(renderForm(formWithErrors))
+              } else {
+                boundForm.fold(
+                  formWithErrors => Future.successful(renderForm(formWithErrors)),
+                  _ =>
+                    for {
+                      withSelections <- Future.fromTry(
+                                          request.userAnswers.set(
+                                            SelectSubcontractorsToReverifyPage,
+                                            updatedSelections
+                                          )
+                                        )
+
+                      withContext <- Future.fromTry(
+                                       withSelections.set(
+                                         FinalValidationContextPage,
+                                         FinalValidationContext.VerifySubcontractor
+                                       )
+                                     )
+
+                      withSource <- Future.fromTry(
+                                      withContext.set(
+                                        VerifyFinalValidationSourcePage,
+                                        VerifyFinalValidationSource.SelectSubcontractorsToReverify
+                                      )
+                                    )
+
+                      _ <- sessionRepository.set(withSource)
+
+                    } yield Redirect(
+                      navigator.nextPage(
+                        SelectSubcontractorsToReverifyPage,
+                        mode,
+                        withSource
+                      )
+                    )
+                )
+              }
           }
       }
     }
