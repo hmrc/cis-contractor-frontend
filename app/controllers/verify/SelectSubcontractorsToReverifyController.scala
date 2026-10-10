@@ -390,6 +390,12 @@ class SelectSubcontractorsToReverifyController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(redirectTo(updatedAnswers))
 
+          val previouslySelectedUnverifiedCount: Int =
+            request.userAnswers
+              .get(SelectSubcontractorPage)
+              .map(_.size)
+              .getOrElse(0)
+
           gotoPage match {
             case Some(targetPage) =>
               saveSelectionsAndRedirect { _ =>
@@ -398,7 +404,7 @@ class SelectSubcontractorsToReverifyController @Inject() (
               }
 
             case None =>
-              if (updatedSelections.size > 100) {
+              if (updatedSelections.size + previouslySelectedUnverifiedCount > 100) {
                 val formWithErrors =
                   boundForm.withError(
                     "value",
