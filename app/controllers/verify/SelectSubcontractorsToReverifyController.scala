@@ -22,6 +22,7 @@ import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSour
 import models.{Mode, Subcontractor, TypeOfSubcontractor, UserAnswers}
 import navigation.Navigator
 import pages.verify.SelectSubcontractorsToReverifyPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import utils.DateTimeFormats
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
@@ -61,7 +62,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
-    with PendingVerificationRequestGuard {
+    with PendingVerificationRequestGuard
+    with Logging {
 
   private def dateFmt(implicit messages: Messages) =
     DateTimeFormats.shortDateFormat()(messages.lang)
@@ -177,6 +179,10 @@ class SelectSubcontractorsToReverifyController @Inject() (
 
     request.userAnswers.get(NewestVerificationBatchResponsePage) match {
       case None =>
+        logger.error(
+          "[SelectSubcontractorsToReverifyController][buildRowsFromSession] - " +
+            "NewestVerificationBatchResponsePage missing from userAnswers"
+        )
         Left(recovery)
 
       case Some(resp) =>
