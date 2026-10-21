@@ -16,7 +16,6 @@
 
 package repositories
 
-import com.google.inject.Inject
 import models.response.CisTaxpayerResponse
 import org.mongodb.scala.model.*
 import play.api.Configuration
@@ -27,8 +26,10 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class CisTaxpayerCache @Inject() (
   clock: Clock,
   config: Configuration,
