@@ -37,20 +37,22 @@ class CisTaxpayerService @Inject() (
     with FrontendHeaderCarrierProvider {
 
   def findForOrganisation(using req: IdentifierRequest[?]): Future[CisTaxpayerResponse] =
-    val EmployerReference(ton, tor) = req.employerReference.get
-
-    cache
-      .findBy(ton, tor)
-      .flatMap {
-        case Some(cisTaxpayer) => Future.successful(cisTaxpayer)
-        case None              =>
-          logger.info(s"Cache miss for scheme <$ton/$tor>; fetching from backend.")
-          fetchFromBackend
-      }
-      .recoverWith { case ex =>
-        logger.warn(s"Falling back to connector; failed to fetch scheme <$ton/$tor> from cache.", ex)
-        fetchFromBackend
-      }
+    req.employerReference match
+      case None                              =>
+        Future.failed(new IllegalStateException("Organisation user has no employer reference"))
+      case Some(EmployerReference(ton, tor)) =>
+        cache
+          .findBy(ton, tor)
+          .flatMap {
+            case Some(cisTaxpayer) => Future.successful(cisTaxpayer)
+            case None              =>
+              logger.info(s"Cache miss for scheme <$ton/$tor>; fetching from backend.")
+              fetchFromBackend
+          }
+          .recoverWith { case ex =>
+            logger.warn(s"Falling back to connector; failed to fetch scheme <$ton/$tor> from cache.", ex)
+            fetchFromBackend
+          }
 
   def findForAgent(cisId: String)(using IdentifierRequest[?]): Future[Option[CisTaxpayerResponse]] =
     cache
