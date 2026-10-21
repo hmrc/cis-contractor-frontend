@@ -19,7 +19,6 @@ package repositories
 import models.response.CisTaxpayerResponse
 import org.mongodb.scala.model.*
 import play.api.Configuration
-import repositories.CisTaxpayerCache.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -35,14 +34,14 @@ class CisTaxpayerCache @Inject() (
   config: Configuration,
   mongoComponent: MongoComponent
 )(using ExecutionContext)
-    extends PlayMongoRepository[Entity](
+    extends PlayMongoRepository[CisTaxpayerCache.Entity](
       collectionName = "cisTaxpayers",
       mongoComponent = mongoComponent,
-      domainFormat = entityFormat,
+      domainFormat = CisTaxpayerCache.entityFormat,
       indexes = Seq(
-        IndexModel(Indexes.ascending(EMP_REF)),
+        IndexModel(Indexes.ascending(CisTaxpayerCache.EMP_REF)),
         IndexModel(
-          Indexes.ascending(LAST_USED),
+          Indexes.ascending(CisTaxpayerCache.LAST_USED),
           IndexOptions().expireAfter(config.get[Long]("mongodb.timeToLiveInSeconds"), TimeUnit.SECONDS)
         )
       ),
@@ -53,11 +52,11 @@ class CisTaxpayerCache @Inject() (
     Future
       .traverse(cisTaxpayers) { cisTaxpayer =>
         val employerRef = s"${cisTaxpayer.taxOfficeNumber}/${cisTaxpayer.taxOfficeRef}"
-        val entity      = Entity(cisTaxpayer.uniqueId, employerRef, clock.instant(), cisTaxpayer)
+        val entity      = CisTaxpayerCache.Entity(cisTaxpayer.uniqueId, employerRef, clock.instant(), cisTaxpayer)
 
         collection
           .replaceOne(
-            Filters.eq(ID, entity.cisId),
+            Filters.eq(CisTaxpayerCache.ID, entity.cisId),
             entity,
             ReplaceOptions().upsert(true)
           )
@@ -70,8 +69,8 @@ class CisTaxpayerCache @Inject() (
 
     collection
       .findOneAndUpdate(
-        Filters.eq(ID, cisId),
-        Updates.set(LAST_USED, now)
+        Filters.eq(CisTaxpayerCache.ID, cisId),
+        Updates.set(CisTaxpayerCache.LAST_USED, now)
       )
       .toFutureOption()
       .map(_.map(_.data))
@@ -81,8 +80,8 @@ class CisTaxpayerCache @Inject() (
 
     collection
       .findOneAndUpdate(
-        Filters.eq(EMP_REF, s"$ton/$tor"),
-        Updates.set(LAST_USED, now)
+        Filters.eq(CisTaxpayerCache.EMP_REF, s"$ton/$tor"),
+        Updates.set(CisTaxpayerCache.LAST_USED, now)
       )
       .toFutureOption()
       .map(_.map(_.data))
