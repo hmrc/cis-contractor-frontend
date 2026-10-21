@@ -78,6 +78,10 @@ final class SchemeActionImpl @Inject() (
 
       private def resolveSchemeForOrganisation[B](using request: IdentifierRequest[B]) =
         cisPath match
+          case CisOrg if request.employerReference.isEmpty =>
+            logger.warn(s"${request.user} has no employer reference.")
+            Future.successful(Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
           case CisOrg =>
             cisTaxpayerService.findForOrganisation
               .map(cisTaxpayer => Right(new SchemeRequest(request, cisTaxpayer)))

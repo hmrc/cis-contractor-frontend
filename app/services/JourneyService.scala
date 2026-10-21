@@ -41,7 +41,11 @@ class JourneyService @Inject() (
 
     Future.fromTry(initialise(UserAnswers(journeyId.asString))).flatMap { ua =>
       if ua.id != journeyId.asString then Future.failed(new IllegalArgumentException("Incorrect journey ID"))
-      else sessionRepository.set(ua).map(_ => journeyId)
+      else
+        sessionRepository.set(ua).flatMap { saved =>
+          if saved then Future.successful(journeyId)
+          else Future.failed(new IllegalStateException("Journey was not saved"))
+        }
     }
   }
 }
