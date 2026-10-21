@@ -386,7 +386,7 @@ individualContactMethodOptions.error.required                                   
 individualContactMethodOptions.change.hidden                                          =  dulliau o gysylltu
 
 amendCompanyRemoveDetailYesNo.title                                                   =  Ydych chi’n siŵr eich bod chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn?
-amendCompanyRemoveDetailYesNo.heading                                                 =  A ydych yn siŵr eich bod am dynnu'r {1} ar gyfer {0}?
+amendCompanyRemoveDetailYesNo.heading                                                 =  A ydych yn siŵr eich bod am dynnu’r {1} ar gyfer {0}?
 amendCompanyRemoveDetailYesNo.error.required                                          =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
 amendCompanyRemoveDetailYesNo.detail.address                                          =  cyfeiriad
 amendCompanyRemoveDetailYesNo.detail.contactDetails                                   =  manylion cysylltu
@@ -418,7 +418,7 @@ amendConfirmation.table.content.none                                            
 amendConfirmation.table.selectContent.none                                            =  Heb ddewis un
 
 amendTrustRemoveDetailYesNo.title                                                     =  Ydych chi’n siŵr eich bod chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn?
-amendTrustRemoveDetailYesNo.heading                                                   =  A ydych yn siŵr eich bod am dynnu'r {1} ar gyfer {0}?
+amendTrustRemoveDetailYesNo.heading                                                   =  A ydych yn siŵr eich bod am dynnu’r {1} ar gyfer {0}?
 amendTrustRemoveDetailYesNo.error.required                                            =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
 amendTrustRemoveDetailYesNo.detail.address                                            =  cyfeiriad
 amendTrustRemoveDetailYesNo.detail.contactDetails                                     =  manylion cysylltu
@@ -437,7 +437,7 @@ amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerNino                   
 amendPartnershipRemoveDetailYesNo.detail.nominatedPartnerCompanyRegistrationNumber    =  rhif cofrestru’r cwmni y partner enwebedig
 
 amendIndividualRemoveDetailYesNo.title                                                =  Ydych chi’n siŵr eich bod chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn?
-amendIndividualRemoveDetailYesNo.heading                                              =  A ydych yn siŵr eich bod am dynnu'r {1} ar gyfer {0}?
+amendIndividualRemoveDetailYesNo.heading                                              =  A ydych yn siŵr eich bod am dynnu’r {1} ar gyfer {0}?
 amendIndividualRemoveDetailYesNo.error.required                                       =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
 amendIndividualRemoveDetailYesNo.detail.tradingName                                   =  enw masnachu
 amendIndividualRemoveDetailYesNo.detail.subcontractorName                             =  enw’r is-gontractwr
