@@ -342,7 +342,7 @@ addressLookup.partnershipQuestionsAddress.confirmPage.heading                   
 addressLookup.partnershipQuestionsAddress.confirmPage.changeLinkText                  =  Golygwch y cyfeiriad hwn
 addressLookup.partnershipQuestionsAddress.confirmPage.submitLabel                     =  Parhau
 addressLookup.partnershipQuestionsAddress.countryPicker.title                         =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
-addressLookup.partnershipQuestionsAddress.countryPicker.heading                       = Pa wlad neu diriogaeth sy’n ymddangos yn y cyfeiriad ar gyfer {0}?
+addressLookup.partnershipQuestionsAddress.countryPicker.heading                       =  Pa wlad neu diriogaeth sy’n ymddangos yn y cyfeiriad ar gyfer {0}?
 addressLookup.partnershipQuestionsAddress.countryPicker.countryLabel                  =  Dewiswch y wlad neu’r diriogaeth
 addressLookup.trustQuestionsAddress.lookupPage.title                                  =  Dod o hyd i gyfeiriad ar gyfer yr is-gontractwr hwn
 addressLookup.trustQuestionsAddress.lookupPage.heading                                =  Chwiliwch am y cyfeiriad ar gyfer {0}
