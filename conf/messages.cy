@@ -140,7 +140,7 @@ tradingNameOfSubcontractor.error.invalidCharacters                              
 subAddressYesNo.title                                                                 =  Ydych chi am ychwanegu cyfeiriad ar gyfer yr is-gontractwr hwn?
 subAddressYesNo.heading                                                               =  Ydych chi am ychwanegu cyfeiriad ar gyfer {0}?
 subAddressYesNo.hint                                                                  =  Gallwch ychwanegu’r wybodaeth hon nes ymlaen os yw’n well gennych
-subAddressYesNo.checkYourAnswersLabel                                                 =  Ychwanegu manylion cysylltu?
+subAddressYesNo.checkYourAnswersLabel                                                 =  Ychwanegu cyfeiriad yr is-gontractwr?
 subAddressYesNo.error.required                                                        =  Dewiswch p’un a ydych chi am ychwanegu cyfeiriad ar gyfer yr is-gontractwr hwn
 subAddressYesNo.change.hidden                                                         =  ychwanegu cyfeiriad yr is-gontractwr?
 
