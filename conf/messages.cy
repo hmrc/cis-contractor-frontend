@@ -243,7 +243,7 @@ subcontractorsUniqueTaxpayerReference.error.length                              
 subcontractorsUniqueTaxpayerReference.error.duplicate                                 =  Rydych chi eisoes wedi defnyddio Cyfeirnod Unigryw y Trethdalwr (UTR) hwn ar gyfer is-gontractwr presennol
 subcontractorsUniqueTaxpayerReference.change.hidden                                   =  UTR
 
-subcontractorAdded.title                                                              =  {0} is-gontractwr wedi'i ychwanegu
+subcontractorAdded.title                                                              =  {0} is-gontractwr wedi’i ychwanegu
 subcontractorAdded.heading                                                            =  Wedi ychwanegu’r is-gontractwr
 subcontractorAdded.p1                                                                 =  Erbyn hyn, mae {0} i’w weld ar eich rhestr o is-gontractwyr.
 subcontractorAdded.nextSteps.h2                                                       =  Camau nesaf
@@ -342,7 +342,7 @@ addressLookup.partnershipQuestionsAddress.confirmPage.heading                   
 addressLookup.partnershipQuestionsAddress.confirmPage.changeLinkText                  =  Golygwch y cyfeiriad hwn
 addressLookup.partnershipQuestionsAddress.confirmPage.submitLabel                     =  Parhau
 addressLookup.partnershipQuestionsAddress.countryPicker.title                         =  Pa wlad neu diriogaeth sy’n ymddangos yng nghyfeiriad yr is-gontractwr hwn?
-addressLookup.partnershipQuestionsAddress.countryPicker.heading                       = Pa wlad neu diriogaeth sy’n ymddangos yn y cyfeiriad ar gyfer {0}?
+addressLookup.partnershipQuestionsAddress.countryPicker.heading                       =  Pa wlad neu diriogaeth sy’n ymddangos yn y cyfeiriad ar gyfer {0}?
 addressLookup.partnershipQuestionsAddress.countryPicker.countryLabel                  =  Dewiswch y wlad neu’r diriogaeth
 addressLookup.trustQuestionsAddress.lookupPage.title                                  =  Dod o hyd i gyfeiriad ar gyfer yr is-gontractwr hwn
 addressLookup.trustQuestionsAddress.lookupPage.heading                                =  Chwiliwch am y cyfeiriad ar gyfer {0}
@@ -472,7 +472,7 @@ insufficientSubcontractorDetailsUpdated.table.hdr.previous                      
 insufficientSubcontractorDetailsUpdated.table.hdr.updated                             =  Wedi’i ddiweddaru
 insufficientSubcontractorDetailsUpdated.noneProvided                                  =  Heb roi un
 insufficientSubcontractorDetailsUpdated.noneSelected                                  =  Heb ddewis un
-insufficientSubcontractorDetailsUpdated.noName                                        =  Dim enw wedi'i roi
+insufficientSubcontractorDetailsUpdated.noName                                        =  Dim enw wedi’i roi
 insufficientSubcontractorDetailsUpdated.beforeYouGo.h2                                =  Cyn i chi fynd
 insufficientSubcontractorDetailsUpdated.beforeYouGo.p1                                =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
 insufficientSubcontractorDetailsUpdated.beforeYouGo.takeAShortSurvey                  =  Llenwch arolwg byr
@@ -518,7 +518,7 @@ agent.agentLostAccess.bullet.item.1.prefix                                      
 agent.agentLostAccess.bullet.item.1.link                                              =  gyfrif ar-lein CThEF
 agent.agentLostAccess.bullet.item.2.prefix                                            =  lawrlwytho a chwblhau
 agent.agentLostAccess.bullet.item.2.link                                              =  ffurflen 648
-agent.agentLostAccess.bullet.item.2.suffix                                            =  eich awdurdodi drwy'r post
+agent.agentLostAccess.bullet.item.2.suffix                                            =  eich awdurdodi drwy’r post
 agent.agentLostAccess.p2                                                              =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
 agent.agentLostAccess.return.link                                                     =  Dychwelyd i’r rhestr o gleientiaid
 
@@ -562,7 +562,7 @@ finalvalidations.updateSubcontractorDetails.phoneNumber                         
 finalvalidations.updateSubcontractorDetails.mobilePhoneNumber                         =  Rhif ffôn symudol
 finalvalidations.updateSubcontractorDetails.addWorksReferenceNumber                   =  Ychwanegu cyfeirnod y gwaith?
 finalvalidations.updateSubcontractorDetails.worksReferenceNumber                      =  Cyfeirnod y gwaith
-finalvalidations.updateSubcontractorDetails.noNameProvided                            =  Dim enw wedi'i roi
+finalvalidations.updateSubcontractorDetails.noNameProvided                            =  Dim enw wedi’i roi
 finalvalidations.updateSubcontractorDetails.soleTrader.subcontractorName              =  Enw’r is-gontractwr
 finalvalidations.updateSubcontractorDetails.soleTrader.tradingName                    =  Enw masnachu
 finalvalidations.updateSubcontractorDetails.soleTrader.names                          =  Enwau
@@ -599,7 +599,7 @@ individualNamesOptions.heading                                                  
 individualNamesOptions.subcontractorName                                              =  Enw’r is-gontractwr
 individualNamesOptions.tradingName                                                    =  Enw masnachu
 individualNamesOptions.noSelection                                                    =  Heb ddewis un
-individualNamesOptions.hint                                                           =  Gallwch ychwanegu enw person, enw masnachu neu'r ddau
+individualNamesOptions.hint                                                           =  Gallwch ychwanegu enw person, enw masnachu neu’r ddau
 individualNamesOptions.error.required                                                 =  Dewiswch pa enwau rydych am eu hychwanegu ar gyfer yr is-gontractwr hwn.
 individualNamesOptions.checkYourAnswersLabel                                          =  Enwau
 individualNamesOptions.change.hidden                                                  =  Enwau
@@ -885,7 +885,7 @@ companyCheckYourAnswers.trailHeading                 =  Nawr ychwanegwch yr is-g
 companyCheckYourAnswers.trailText                    =  Drwy ychwanegu’r is-gontractwr hwn, rydych chi’n cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion a roddir gennych yn gywir.
 companyCheckYourAnswers.continue                     =  Derbyn a chyflwyno
 
-companyAdded.title                                   =  Is-gontractwr cwmni wedi'i ychwanegu
+companyAdded.title                                   =  Is-gontractwr cwmni wedi’i ychwanegu
 companyAdded.heading                                 =  Wedi ychwanegu’r is-gontractwr
 companyAdded.p1                                      =  Erbyn hyn, mae {0} i’w weld ar eich rhestr o is-gontractwyr.
 companyAdded.nextSteps.h2                            =  Camau nesaf
@@ -1197,7 +1197,7 @@ verify.verifyDepartmentalErrorSubmitAgainController.p1                          
 verify.verifyDepartmentalErrorSubmitAgainController.p2                             =  I ddilysu’r is-gontractwyr hyn, mae angen i chi ddechrau eto gyda chais dilysu newydd.
 verify.verifyDepartmentalErrorSubmitAgainController.manageYourSubcontractors.link  =  Rheoli’ch is-gontractwyr
 
-verify.noName                                                                      =  Dim enw wedi'i roi
+verify.noName                                                                      =  Dim enw wedi’i roi
 
 verify.reviewInsufficientInfo.title                                                =  Ni ellir dilysu pob is-gontractwr
 verify.reviewInsufficientInfo.heading                                              =  Ni ellir dilysu pob is-gontractwr
