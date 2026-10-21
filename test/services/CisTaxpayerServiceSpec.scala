@@ -25,7 +25,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import repositories.CisTaxpayerCache
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -69,74 +68,44 @@ class CisTaxpayerServiceSpec extends SpecBase with MockitoSugar {
 
   "CisTaxpayerService.findForOrganisation" - {
 
-    "returns the cached client" in {
-      val cache     = mock[CisTaxpayerCache]
+    "returns the client from the backend" in {
       val connector = mock[ConstructionIndustrySchemeConnector]
-      when(cache.findBy("123", "AB456")).thenReturn(Future.successful(Some(taxpayer)))
-
-      val result = new CisTaxpayerService(connector, cache).findForOrganisation(using organisation).futureValue
-
-      result mustBe taxpayer
-      verify(connector, never).getCisTaxpayer()(any[HeaderCarrier])
-    }
-
-    "fetches the client from the backend when the cache misses" in {
-      val cache     = mock[CisTaxpayerCache]
-      val connector = mock[ConstructionIndustrySchemeConnector]
-      when(cache.findBy("123", "AB456")).thenReturn(Future.successful(None))
-      when(cache.insert(any())).thenReturn(Future.successful(true))
       when(connector.getCisTaxpayer()(any[HeaderCarrier])).thenReturn(Future.successful(taxpayer))
 
-      val result = new CisTaxpayerService(connector, cache).findForOrganisation(using organisation).futureValue
+      val result = new CisTaxpayerService(connector).findForOrganisation(using organisation).futureValue
 
       result mustBe taxpayer
     }
 
     "fails when the organisation user has no employer reference" in {
-      val cache     = mock[CisTaxpayerCache]
       val connector = mock[ConstructionIndustrySchemeConnector]
       val request   = IdentifierRequest(FakeRequest(), "user-1", None, None)
 
-      val failure = new CisTaxpayerService(connector, cache).findForOrganisation(using request).failed.futureValue
+      val failure = new CisTaxpayerService(connector).findForOrganisation(using request).failed.futureValue
 
       failure mustBe a[IllegalStateException]
+      verify(connector, never).getCisTaxpayer()(any[HeaderCarrier])
     }
   }
 
   "CisTaxpayerService.findForAgent" - {
 
-    "returns the cached client when they are still a client" in {
-      val cache     = mock[CisTaxpayerCache]
+    "returns the client from the client list" in {
       val connector = mock[ConstructionIndustrySchemeConnector]
-      when(cache.findBy("AB12")).thenReturn(Future.successful(Some(taxpayer)))
-      when(connector.hasClient(any(), any())(any())).thenReturn(Future.successful(true))
-
-      val result = new CisTaxpayerService(connector, cache).findForAgent("AB12")(using agent).futureValue
-
-      result mustBe Some(taxpayer)
-    }
-
-    "returns nothing when the cached client is no longer a client" in {
-      val cache     = mock[CisTaxpayerCache]
-      val connector = mock[ConstructionIndustrySchemeConnector]
-      when(cache.findBy("AB12")).thenReturn(Future.successful(Some(taxpayer)))
-      when(connector.hasClient(any(), any())(any())).thenReturn(Future.successful(false))
-
-      val result = new CisTaxpayerService(connector, cache).findForAgent("AB12")(using agent).futureValue
-
-      result mustBe None
-    }
-
-    "reads the client list when the cache misses" in {
-      val cache     = mock[CisTaxpayerCache]
-      val connector = mock[ConstructionIndustrySchemeConnector]
-      when(cache.findBy("AB12")).thenReturn(Future.successful(None))
-      when(cache.insert(any())).thenReturn(Future.successful(true))
       when(connector.getAllClients(using any[HeaderCarrier]())).thenReturn(Future.successful(List(taxpayer)))
 
-      val result = new CisTaxpayerService(connector, cache).findForAgent("AB12")(using agent).futureValue
+      val result = new CisTaxpayerService(connector).findForAgent("AB12")(using agent).futureValue
 
       result mustBe Some(taxpayer)
+    }
+
+    "returns nothing when the client is not in the list" in {
+      val connector = mock[ConstructionIndustrySchemeConnector]
+      when(connector.getAllClients(using any[HeaderCarrier]())).thenReturn(Future.successful(List(taxpayer)))
+
+      val result = new CisTaxpayerService(connector).findForAgent("ZZ99")(using agent).futureValue
+
+      result mustBe None
     }
   }
 }
