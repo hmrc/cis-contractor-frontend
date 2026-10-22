@@ -426,7 +426,7 @@ amendTrustRemoveDetailYesNo.detail.utr                                          
 amendTrustRemoveDetailYesNo.detail.worksReferenceNumber                               =  cyfeirnod y gwaith
 
 amendPartnershipRemoveDetailYesNo.title                                               =  Ydych chi’n siŵr eich bod chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn?
-amendPartnershipRemoveDetailYesNo.heading                                             =  A ydych yn siŵr eich bod am dynnu’r {1} ar gyfer {0}?
+amendPartnershipRemoveDetailYesNo.heading                                             =  A ydych yn siŵr eich bod am dynnu’r {0} ar gyfer {1}?
 amendPartnershipRemoveDetailYesNo.error.required                                      =  Dewiswch p’un a ydych chi am dynnu’r wybodaeth hon o gofnod yr is-gontractwr hwn
 amendPartnershipRemoveDetailYesNo.detail.address                                      =  cyfeiriad
 amendPartnershipRemoveDetailYesNo.detail.contactDetails                               =  manylion cysylltu
