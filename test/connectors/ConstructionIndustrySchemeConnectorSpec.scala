@@ -153,6 +153,49 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec with Matchers 
     }
   }
 
+  "ConstructionIndustrySchemeConnector.getAllClients" should {
+
+    "GET the agent client list and read the clients" in {
+      val config = mock[ServicesConfig]
+      val http   = mock[HttpClientV2]
+      val rb     = mock[RequestBuilder]
+
+      when(config.baseUrl("construction-industry-scheme")).thenReturn("http://cis-host")
+      when(http.get(any())(any())).thenReturn(rb)
+
+      val client = CisTaxpayerResponse(
+        uniqueId = "AB12",
+        taxOfficeNumber = "123",
+        taxOfficeRef = "AB456",
+        aoDistrict = None,
+        aoPayType = None,
+        aoCheckCode = None,
+        aoReference = None,
+        validBusinessAddr = None,
+        correlation = None,
+        ggAgentId = None,
+        employerName1 = None,
+        employerName2 = None,
+        agentOwnRef = None,
+        schemeName = None,
+        utr = None,
+        enrolledSig = None
+      )
+
+      when(rb.execute[JsValue](any(), any())).thenReturn(
+        Future.successful(Json.obj("clients" -> Json.toJson(List(client))))
+      )
+
+      val connector = new ConstructionIndustrySchemeConnector(config, http)
+
+      connector.getAllClients.futureValue mustBe List(client)
+
+      val urlCaptor: ArgumentCaptor[URL] = ArgumentCaptor.forClass(classOf[URL])
+      verify(http).get(urlCaptor.capture())(any[HeaderCarrier])
+      urlCaptor.getValue.toString mustBe "http://cis-host/cis/agent/client-list"
+    }
+  }
+
   "ConstructionIndustrySchemeConnector.getNewestVerificationBatch" should {
 
     "return GetNewestVerificationBatchResponse when CIS returns a valid response" in {
