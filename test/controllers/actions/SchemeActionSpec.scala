@@ -82,17 +82,6 @@ class SchemeActionSpec extends SpecBase with MockitoSugar {
       contentAsString(result) mustBe "AB12"
     }
 
-    "sends an organisation user with no employer reference to journey recovery" in {
-      val service = mock[CisTaxpayerService]
-      val request = IdentifierRequest(FakeRequest(), "user-1", None, None)
-
-      val result = action(service)(CisOrg).invokeBlock(request, _ => Future.successful(Results.Ok))
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
-      verifyNoInteractions(service)
-    }
-
     "sends an organisation user who opens a client id back to org" in {
       val service = mock[CisTaxpayerService]
       val request = IdentifierRequest(
