@@ -1211,7 +1211,20 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
               verifBatchResourceRef = Some(7777L)
             )
           ),
-          verifications = Seq.empty
+          verifications = Seq(
+            VerificationCurrentVerification(
+              verificationId = 3001L,
+              verificationBatchId = Some(999L),
+              subcontractorId = Some(10L),
+              verificationResourceRef = Some(4001L),
+              subcontractorName = Some("Test Subcontractor"),
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = Some("Y"),
+              matched = None
+            )
+          )
         )
 
       val ua =
