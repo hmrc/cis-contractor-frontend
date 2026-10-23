@@ -91,7 +91,7 @@ class ContractorDetailsFinalValidationController @Inject() (
       request.userAnswers.get(ContractorDetailsValidationTargetPage) match {
         case Some(target) =>
           val validation = finalValidationService.validate(request.userAnswers)
-          Ok(view(viewModel(validation, target)))
+          Ok(view(viewModel(validation, target), appConfig.cisReturnDashboardUrl))
 
         case None =>
           logger.error("[ContractorDetailsFinalValidationController][onPageLoad] - validation target missing")
@@ -149,7 +149,9 @@ class ContractorDetailsFinalValidationController @Inject() (
           titleKey = "finalValidations.reviewContractorDetails.task.email",
           statusKey = statusKey(validation.emailComplete),
           href = Option.when(!validation.emailComplete)(
-            controllers.contractordetails.routes.EnterContractorEmailAddressController.onPageLoad(NormalMode).url
+            controllers.contractordetails.routes.EnterContractorEmailAddressController
+              .onPageLoad(NormalMode)
+              .url
           ),
           id = "contractor-email"
         )
@@ -157,13 +159,16 @@ class ContractorDetailsFinalValidationController @Inject() (
       finalTask = ContractorDetailsTaskViewModel(
         titleKey = finalTaskTitleKey(target),
         statusKey =
-          if (validation.allComplete) "finalValidations.reviewContractorDetails.status.incomplete"
-          else "finalValidations.reviewContractorDetails.status.cannotStart",
+          if (validation.allComplete)
+            "finalValidations.reviewContractorDetails.status.incomplete"
+          else
+            "finalValidations.reviewContractorDetails.status.cannotStart",
         href = Option.when(validation.allComplete)(
           routes.ContractorDetailsFinalValidationController.onContinue().url
         ),
         id = "final-action"
-      )
+      ),
+      paragraphKey = paragraphKey(target)
     )
 
   private def statusKey(complete: Boolean): String =
@@ -176,6 +181,15 @@ class ContractorDetailsFinalValidationController @Inject() (
         "finalValidations.reviewContractorDetails.task.fileReturn"
       case VerifySubcontractors | ReviewUnmatchedSubcontractors =>
         "finalValidations.reviewContractorDetails.task.verifySubcontractors"
+    }
+
+  private def paragraphKey(target: ContractorDetailsValidationTarget): String =
+    target match {
+      case FileMonthlyReturn | FileNilReturn =>
+        "finalValidations.reviewContractorDetails.paragraph.fileReturn"
+
+      case VerifySubcontractors | ReviewUnmatchedSubcontractors =>
+        "finalValidations.reviewContractorDetails.paragraph.verifySubcontractors"
     }
 
   private def redirectToTarget(target: ContractorDetailsValidationTarget): Result =

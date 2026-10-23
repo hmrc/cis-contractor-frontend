@@ -43,6 +43,9 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
   private val fileNilReturnUrl =
     "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
 
+  private val cisReturnDashboardUrl =
+    "http://localhost:6996/construction-industry-scheme/management/org/manage-construction-industry-scheme-account"
+
   private val scheme =
     Scheme(
       schemeId = 1,
@@ -64,7 +67,7 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
     when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
     applicationBuilder(userAnswers = Some(userAnswers))
-      .configure("urls.cisReturnDashboard" -> "http://localhost:9557/return-dashboard")
+      .configure("urls.cisReturnDashboard" -> cisReturnDashboardUrl)
       .configure("urls.fileStandardReturn" -> fileStandardReturnUrl)
       .configure("urls.fileNilReturn" -> fileNilReturnUrl)
       .overrides(
@@ -174,6 +177,42 @@ class ContractorDetailsFinalValidationControllerSpec extends SpecBase with Mocki
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe fileStandardReturnUrl
+      }
+    }
+
+    "must render the return to CIS account link with the configured URL" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            ContractorDetailsValidationTargetPage,
+            ContractorDetailsValidationTarget.VerifySubcontractors
+          )
+          .success
+          .value
+
+      val mockFinalValidationService =
+        mock[ContractorDetailsFinalValidationService]
+
+      when(mockFinalValidationService.validate(any[UserAnswers]))
+        .thenReturn(ContractorDetailsFinalValidation(true, true, true))
+
+      val application = app(userAnswers, mockFinalValidationService)
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(
+              GET,
+              routes.ContractorDetailsFinalValidationController.onPageLoad().url
+            )
+          ).value
+
+        val body = contentAsString(result)
+
+        status(result) mustBe OK
+        body must include("Return to CIS account")
+        body must include(cisReturnDashboardUrl)
       }
     }
 
