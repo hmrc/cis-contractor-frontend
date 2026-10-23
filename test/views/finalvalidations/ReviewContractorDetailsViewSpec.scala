@@ -22,6 +22,7 @@ import org.jsoup.nodes.Document
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import scala.jdk.CollectionConverters.*
 import viewmodels.contractordetails.{ContractorDetailsTaskViewModel, ReviewContractorDetailsViewModel}
 import views.html.finalvalidations.ReviewContractorDetailsView
 
@@ -33,8 +34,11 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
 
   private val view = app.injector.instanceOf[ReviewContractorDetailsView]
 
+  private val cisReturnDashboardUrl =
+    "http://localhost:6996/construction-industry-scheme/management/org/manage-construction-industry-scheme-account"
+
   private def doc(viewModel: ReviewContractorDetailsViewModel): Document =
-    Jsoup.parse(view(viewModel).body)
+    Jsoup.parse(view(viewModel, cisReturnDashboardUrl).body)
 
   "ReviewContractorDetailsView" - {
 
@@ -60,7 +64,8 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
             statusKey = "finalValidations.reviewContractorDetails.status.cannotStart",
             href = None,
             id = "final-action"
-          )
+          ),
+          paragraphKey = "finalValidations.reviewContractorDetails.paragraph.fileReturn"
         )
 
       val document = doc(viewModel)
@@ -73,6 +78,35 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
         "finalValidations.reviewContractorDetails.status.complete"
       )
       document.select("#final-action-status .govuk-tag").size() mustBe 0
+    }
+
+    "must render the return to CIS account link with the configured URL" in {
+      val viewModel =
+        ReviewContractorDetailsViewModel(
+          tasks = Seq(
+            ContractorDetailsTaskViewModel(
+              titleKey = "finalValidations.reviewContractorDetails.task.utr",
+              statusKey = "finalValidations.reviewContractorDetails.status.complete",
+              href = None,
+              id = "contractor-utr"
+            )
+          ),
+          finalTask = ContractorDetailsTaskViewModel(
+            titleKey = "finalValidations.reviewContractorDetails.task.fileReturn",
+            statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
+            href = None,
+            id = "final-action"
+          ),
+          paragraphKey = "finalValidations.reviewContractorDetails.paragraph.fileReturn"
+        )
+
+      val document = doc(viewModel)
+
+      document
+        .select("a")
+        .asScala
+        .find(_.text() == messagesImpl("finalValidations.reviewContractorDetails.returnToCisAccount"))
+        .map(_.attr("href")) mustBe Some(cisReturnDashboardUrl)
     }
 
     "must highlight final task when it has incomplete status" in {
@@ -91,7 +125,8 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
             statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
             href = Some("/construction-industry-scheme/final-validations/review-contractor-details/next"),
             id = "final-action"
-          )
+          ),
+          paragraphKey = "finalValidations.reviewContractorDetails.paragraph.fileReturn"
         )
 
       val document = doc(viewModel)

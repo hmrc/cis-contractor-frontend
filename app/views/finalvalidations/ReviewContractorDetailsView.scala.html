@@ -15,13 +15,16 @@
  *@
 
 @import viewmodels.contractordetails.{ContractorDetailsTaskViewModel, ReviewContractorDetailsViewModel}
+@import views.html.components._
 
 @this(
     layout: templates.Layout,
-    h1: components.H1
+    h1: components.H1,
+    link: Link,
+    paragraph: Paragraph,
 )
 
-@(viewModel: ReviewContractorDetailsViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: ReviewContractorDetailsViewModel, cisReturnDashboardUrl: String)(implicit request: Request[_], messages: Messages)
 
 @task(taskItem: ContractorDetailsTaskViewModel) = {
     <li class="govuk-task-list__item govuk-task-list__item--with-link">
@@ -46,7 +49,9 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("finalValidations.reviewContractorDetails.title"))) {
-    @h1("finalValidations.reviewContractorDetails.heading", classes = "govuk-heading-xl")
+    @h1("finalValidations.reviewContractorDetails.heading", classes = "govuk-heading-l")
+
+    @paragraph(messages(viewModel.paragraphKey))
 
     <ul class="govuk-task-list">
         @for(taskItem <- viewModel.tasks) {
@@ -54,4 +59,9 @@
         }
         @task(viewModel.finalTask)
     </ul>
+
+    @link(
+    linkTextKey = "finalValidations.reviewContractorDetails.returnToCisAccount",
+    linkUrl = cisReturnDashboardUrl
+    )
 }

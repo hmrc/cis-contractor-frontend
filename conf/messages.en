@@ -547,6 +547,9 @@ finalValidations.reviewContractorDetails.task.schemeName                        
 finalValidations.reviewContractorDetails.task.email                                   =  Email address
 finalValidations.reviewContractorDetails.task.fileReturn                              =  File a return
 finalValidations.reviewContractorDetails.task.verifySubcontractors                    =  Verify subcontractors
+finalValidations.reviewContractorDetails.paragraph.fileReturn                         =  You cannot file a return at the moment. You need to review the contractor details.
+finalValidations.reviewContractorDetails.paragraph.verifySubcontractors               =  You cannot verify your subcontractors at the moment. You need to review the contractor details.
+finalValidations.reviewContractorDetails.returnToCisAccount                           =  Return to CIS account
 finalValidations.reviewContractorDetails.status.complete                              =  Complete
 finalValidations.reviewContractorDetails.status.incomplete                            =  Incomplete
 finalValidations.reviewContractorDetails.status.cannotStart                           =  Cannot start yet

@@ -25,5 +25,6 @@ final case class ContractorDetailsTaskViewModel(
 
 final case class ReviewContractorDetailsViewModel(
   tasks: Seq[ContractorDetailsTaskViewModel],
-  finalTask: ContractorDetailsTaskViewModel
+  finalTask: ContractorDetailsTaskViewModel,
+  paragraphKey: String
 )

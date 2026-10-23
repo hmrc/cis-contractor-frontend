@@ -535,6 +535,9 @@ finalValidations.reviewContractorDetails.task.schemeName                        
 finalValidations.reviewContractorDetails.task.email                                   =  Cyfeiriad e-bost
 finalValidations.reviewContractorDetails.task.fileReturn                              =  Ffeilio ffurflen
 finalValidations.reviewContractorDetails.task.verifySubcontractors                    =  Gwirio is-gontractwyr
+finalValidations.reviewContractorDetails.paragraph.fileReturn                         =  Ni allwch gyflwyno datganiad ar hyn o bryd. Mae angen i chi adolygu manylion y contractwr.
+finalValidations.reviewContractorDetails.paragraph.verifySubcontractors               =  Ni allwch ddilysu eich is-gontractwyr ar hyn o bryd. Mae angen i chi adolygu manylion y contractwr.
+finalValidations.reviewContractorDetails.returnToCisAccount                           =  Dychwelyd i ‘Cyfrif CIS’
 finalValidations.reviewContractorDetails.status.complete                              =  Wedi cwblhau
 finalValidations.reviewContractorDetails.status.incomplete                            =  Anghyflawn
 finalValidations.reviewContractorDetails.status.cannotStart                           =  Methu dechrau eto
