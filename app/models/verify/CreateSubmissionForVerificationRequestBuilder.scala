@@ -17,6 +17,7 @@
 package models.verify
 
 import models.requests.{CreateSubmissionForVerificationRequest, VerificationToUpdate}
+import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.i18n.Messages
@@ -41,22 +42,9 @@ object CreateSubmissionForVerificationRequestBuilder {
       batchRef <-
         current.verificationBatch.flatMap(_.verifBatchResourceRef).toRight("verificationBatchResourceRef missing")
       agentId  <- resolveAgentId(isAgent, agentReference)
+      verifications <- buildVerifications(current)
     } yield {
       val email: Option[String] = VerifyEmailResolver.resolvedEmail(ua)
-
-      val subsById: Map[Long, SubcontractorCurrentVerification] =
-        current.subcontractors.map(s => s.subcontractorId -> s).toMap
-
-      val verifications: Seq[VerificationToUpdate] =
-        current.verifications.flatMap { verification =>
-          verification.verificationResourceRef.map { ref =>
-            VerificationToUpdate(
-              subcontractorName = resolveName(verification, verification.subcontractorId.flatMap(subsById.get)),
-              verificationResourceRef = ref,
-              proceedVerification = proceedFlag(verification)
-            )
-          }
-        }
 
       CreateSubmissionForVerificationRequest(
         instanceId = instanceId,
@@ -68,6 +56,33 @@ object CreateSubmissionForVerificationRequestBuilder {
         agentId = Some(agentId)
       )
     }
+
+  private def buildVerifications(
+    current: GetCurrentVerificationBatchResponse
+  )(implicit messages: Messages): Either[String, Seq[VerificationToUpdate]] = {
+
+    if (current.verifications.isEmpty) {
+      Left("No verifications found in current verification batch")
+    } else {
+      val subsById: Map[Long, SubcontractorCurrentVerification] =
+        current.subcontractors.map(s => s.subcontractorId -> s).toMap
+
+      current.verifications
+        .foldRight[Either[String, Seq[VerificationToUpdate]]](Right(Seq.empty)) {
+          case (verification, acc) =>
+            for {
+              ref <- verification.verificationResourceRef.toRight(
+                s"Missing verificationResourceRef for verificationId: ${verification.verificationId}"
+              )
+              verifications <- acc
+            } yield VerificationToUpdate(
+              subcontractorName = resolveName(verification, verification.subcontractorId.flatMap(subsById.get)),
+              verificationResourceRef = ref,
+              proceedVerification = proceedFlag(verification)
+            ) +: verifications
+        }
+    }
+  }
 
   private def resolveAgentId(isAgent: Boolean, agentReference: Option[String]): Either[String, String] =
     if (isAgent) {

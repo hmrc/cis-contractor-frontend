@@ -183,5 +183,88 @@ class CreateSubmissionForVerificationRequestBuilderSpec extends SpecBase {
           fail(s"Expected Left, but got Right($value)")
       }
     }
+
+    "must fail when current batch has no verifications" in {
+      val currentBatch =
+        verificationUserAnswers.get(CurrentVerificationBatchResponsePage).get
+
+      val updatedUa =
+        verificationUserAnswers
+          .set(
+            CurrentVerificationBatchResponsePage,
+            currentBatch.copy(verifications = Seq.empty)
+          )
+          .success
+          .value
+
+      val result =
+        CreateSubmissionForVerificationRequestBuilder.build(
+          updatedUa,
+          isAgent = false,
+          agentReference = None
+        )
+
+      result mustBe Left("No verifications found in current verification batch")
+    }
+
+    "must fail when verificationResourceRef is missing" in {
+      val currentBatch =
+        verificationUserAnswers.get(CurrentVerificationBatchResponsePage).get
+
+      val updatedVerifications =
+        currentBatch.verifications.map { verification =>
+          verification.copy(verificationResourceRef = None)
+        }
+
+      val updatedUa =
+        verificationUserAnswers
+          .set(
+            CurrentVerificationBatchResponsePage,
+            currentBatch.copy(verifications = updatedVerifications)
+          )
+          .success
+          .value
+
+      val result =
+        CreateSubmissionForVerificationRequestBuilder.build(
+          updatedUa,
+          isAgent = false,
+          agentReference = None
+        )
+
+      result mustBe Left("Missing verificationResourceRef for verificationId: 3001")
+    }
+
+    "must fail when one of multiple verifications has a missing resource reference" in {
+      val currentBatch =
+        verificationUserAnswers.get(CurrentVerificationBatchResponsePage).get
+
+      val validVerification =
+        currentBatch.verifications.head
+
+      val invalidVerification =
+        validVerification.copy(
+          verificationId = 3002L,
+          verificationResourceRef = None
+        )
+
+      val updatedUa =
+        verificationUserAnswers
+          .set(
+            CurrentVerificationBatchResponsePage,
+            currentBatch.copy(verifications = Seq(validVerification, invalidVerification))
+          )
+          .success
+          .value
+
+      val result =
+        CreateSubmissionForVerificationRequestBuilder.build(
+          updatedUa,
+          isAgent = false,
+          agentReference = None
+        )
+
+      result mustBe Left("Missing verificationResourceRef for verificationId: 3002")
+    }
   }
 }
