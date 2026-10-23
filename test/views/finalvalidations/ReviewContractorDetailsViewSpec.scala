@@ -109,6 +109,52 @@ class ReviewContractorDetailsViewSpec extends SpecBase {
         .map(_.attr("href")) mustBe Some(cisReturnDashboardUrl)
     }
 
+    "must render visually hidden text for contractor detail task links" in {
+      val viewModel =
+        ReviewContractorDetailsViewModel(
+          tasks = Seq(
+            ContractorDetailsTaskViewModel(
+              titleKey = "finalValidations.reviewContractorDetails.task.utr",
+              statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
+              href = Some("/utr"),
+              id = "contractor-utr"
+            ),
+            ContractorDetailsTaskViewModel(
+              titleKey = "finalValidations.reviewContractorDetails.task.schemeName",
+              statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
+              href = Some("/scheme-name"),
+              id = "scheme-name"
+            ),
+            ContractorDetailsTaskViewModel(
+              titleKey = "finalValidations.reviewContractorDetails.task.email",
+              statusKey = "finalValidations.reviewContractorDetails.status.incomplete",
+              href = Some("/email"),
+              id = "contractor-email"
+            )
+          ),
+          finalTask = ContractorDetailsTaskViewModel(
+            titleKey = "finalValidations.reviewContractorDetails.task.fileReturn",
+            statusKey = "finalValidations.reviewContractorDetails.status.cannotStart",
+            href = None,
+            id = "final-action"
+          ),
+          paragraphKey = "finalValidations.reviewContractorDetails.paragraph.fileReturn"
+        )
+
+      val document = doc(viewModel)
+
+      val hiddenTexts = document
+        .select(".govuk-visually-hidden")
+        .asScala
+        .map(_.text())
+
+      hiddenTexts must contain allOf (
+        "Review unique taxpayer reference",
+        "Review scheme name",
+        "Review email address"
+      )
+    }
+
     "must highlight final task when it has incomplete status" in {
       val viewModel =
         ReviewContractorDetailsViewModel(

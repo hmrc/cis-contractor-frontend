@@ -26,26 +26,31 @@
 
 @(viewModel: ReviewContractorDetailsViewModel, cisReturnDashboardUrl: String)(implicit request: Request[_], messages: Messages)
 
-@task(taskItem: ContractorDetailsTaskViewModel) = {
-    <li class="govuk-task-list__item govuk-task-list__item--with-link">
-        <div class="govuk-task-list__name-and-hint">
-            @taskItem.href match {
-                case Some(href) => {
-                    <a class="govuk-link govuk-task-list__link" href="@href" id="@taskItem.id">@messages(taskItem.titleKey)</a>
+@task(taskItem: ContractorDetailsTaskViewModel, showHidden: Boolean = false) = {
+<li class="govuk-task-list__item govuk-task-list__item--with-link">
+    <div class="govuk-task-list__name-and-hint">
+        @taskItem.href match {
+          case Some(href) => {
+                <a class="govuk-link govuk-task-list__link" href="@href" id="@taskItem.id">
+                    @messages(taskItem.titleKey)
+                    @if(showHidden) {
+                 <span class="govuk-visually-hidden">@messages(s"${taskItem.titleKey}.hidden")</span>
                 }
-                case None => {
-                    <span id="@taskItem.id">@messages(taskItem.titleKey)</span>
-                }
+            </a>
             }
-        </div>
-        <div class="govuk-task-list__status" id="@{taskItem.id}-status">
-            @if(taskItem.statusKey == "finalValidations.reviewContractorDetails.status.incomplete") {
-                <strong class="govuk-tag">@messages(taskItem.statusKey)</strong>
-            } else {
-                @messages(taskItem.statusKey)
-            }
-        </div>
-    </li>
+            case None => {
+                <span id="@taskItem.id">@messages(taskItem.titleKey)</span>
+             }
+         }
+    </div>
+    <div class="govuk-task-list__status" id="@{taskItem.id}-status">
+        @if(taskItem.statusKey == "finalValidations.reviewContractorDetails.status.incomplete") {
+             <strong class="govuk-tag">@messages(taskItem.statusKey)</strong>
+        } else {
+             @messages(taskItem.statusKey)
+        }
+    </div>
+</li>
 }
 
 @layout(pageTitle = titleNoForm(messages("finalValidations.reviewContractorDetails.title"))) {
@@ -55,7 +60,7 @@
 
     <ul class="govuk-task-list">
         @for(taskItem <- viewModel.tasks) {
-            @task(taskItem)
+        @task(taskItem, showHidden = true)
         }
         @task(viewModel.finalTask)
     </ul>

@@ -550,6 +550,9 @@ finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor 
 finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet  =  Methu parhau eto
 finalValidations.verify.reviewSubcontractorDetails.backLink                           =  Yn ôl i ddewis eich is-gontractwyr
 finalValidations.verify.reviewSubcontractorDetails.taskList.review                    =  Adolygu
+finalValidations.reviewContractorDetails.task.utr.hidden                              =  Adolygu Cyfeirnod Unigryw y Trethdalwr
+finalValidations.reviewContractorDetails.task.schemeName.hidden                       =  Adolygu enw’r cynllun
+finalValidations.reviewContractorDetails.task.email.hidden                            =  Adolygu cyfeiriad e-bost
 
 finalvalidations.updateSubcontractorDetails.title                                     =  {0}
 finalvalidations.updateSubcontractorDetails.heading                                   =  {0}

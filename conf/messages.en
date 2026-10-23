@@ -562,6 +562,10 @@ finalValidations.verify.reviewSubcontractorDetails.taskList.verifySubcontractor 
 finalValidations.verify.reviewSubcontractorDetails.taskList.status.cannotContinueYet  =  Cannot continue yet
 finalValidations.verify.reviewSubcontractorDetails.backLink                           =  select your subcontractors
 finalValidations.verify.reviewSubcontractorDetails.taskList.review                    =  Review
+finalValidations.reviewContractorDetails.task.utr.hidden                              = Review unique taxpayer reference
+finalValidations.reviewContractorDetails.task.schemeName.hidden                       = Review scheme name
+finalValidations.reviewContractorDetails.task.email.hidden                            = Review email address
+
 
 finalvalidations.updateSubcontractorDetails.title                                     =  {0}
 finalvalidations.updateSubcontractorDetails.heading                                   =  {0}
