@@ -1098,8 +1098,8 @@ verify.verifySendError.manageSubcontractors.p1.link                             
 verify.verifyDepartmentalError.title                                               =  Mae problem gyda’ch cais dilysu
 verify.verifyDepartmentalError.heading                                             =  Mae problem gyda’ch cais dilysu
 verify.verifyDepartmentalError.p1                                                  =  Nid yw’r is-gontractwyr a ddewisoch wedi cael eu dilysu ac nid yw’ch cais wedi’i gadw.
-verify.verifyDepartmentalError.contactHMRC.p1                                      =  rhagor o help.
-verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Cysylltwch â CThEF dros y ffôn i gael
+verify.verifyDepartmentalError.contactHMRC.p1                                      =  i gael rhagor o help gan ddyfynnu ‘gwall 7912’.
+verify.verifyDepartmentalError.contactHMRC.p1.link                                 =  Cysylltwch â CThEF dros y ffôn
 verify.verifyDepartmentalError.manageSubcontractors.p1.link                        =  Rheoli’ch is-gontractwyr
 
 verify.verificationNotSubmittedWarning.title                                       =  Nid oes modd cyflwyno’ch cais dilysu
