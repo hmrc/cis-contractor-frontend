@@ -314,8 +314,11 @@ class VerificationService @Inject() (
     for {
       latestUa      <- getCurrentVerificationBatch(request.userAnswers)
       createRequest <- buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
+      // Build the ChRIS request before creating the submission: a failure here must not leave a
+      // created-but-never-sent submission, which would make every retry fail on the unique key
+      chrisRequest  <- buildChrisVerificationRequest(latestUa)
       submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
-      response      <- submitVerificationToChris(submissionId, latestUa)
+      response      <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
       updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
     } yield response
 
@@ -373,15 +376,17 @@ class VerificationService @Inject() (
   )(implicit hc: HeaderCarrier): Future[CreateSubmissionForVerificationResponse] =
     cisConnector.createSubmissionForVerification(request)
 
-  private def submitVerificationToChris(
-    submissionId: Long,
+  private def buildChrisVerificationRequest(
     ua: UserAnswers
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier, messages: Messages): Future[ChrisSubmissionResponse] =
+  )(implicit
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    messages: Messages
+  ): Future[ChrisVerificationRequest] =
     for {
       employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
       chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
-      result            <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
-    } yield result
+    } yield chrisRequest
 
   private def buildCreateSubmissionRequest(
     ua: UserAnswers,

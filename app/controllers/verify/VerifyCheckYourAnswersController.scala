@@ -18,24 +18,28 @@ package controllers.verify
 
 import controllers.actions.*
 import models.verify.ValidatedVerify
+import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
 import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class VerifyCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  sessionRepository: SessionRepository,
   view: VerifyCheckYourAnswersView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging
     with PendingVerificationRequestGuard {
@@ -75,11 +79,12 @@ class VerifyCheckYourAnswersController @Inject() (
           ValidatedVerify.build(request.userAnswers) match {
 
             case Right(_) =>
-              Future.successful(
-                Redirect(
-                  controllers.verify.routes.SubmissionSendingController.onPageLoad()
-                )
-              )
+              // Clear details from any earlier submission so SubmissionSendingController can tell a refresh of
+              // this submission (details present) from the start of a new one
+              for {
+                cleared <- Future.fromTry(request.userAnswers.remove(VerificationSubmissionDetailsPage))
+                _       <- sessionRepository.set(cleared)
+              } yield Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
 
             case Left(error) =>
               logger.error(

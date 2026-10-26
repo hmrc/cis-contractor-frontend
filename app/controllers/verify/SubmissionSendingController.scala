@@ -59,15 +59,23 @@ class SubmissionSendingController @Inject() (
     (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      verificationService.createSubmitAndPersistVerificationSubmission
-        .flatMap(redirectForInitialSubmissionResponse)
-        .recover { case ex =>
-          logger.error(
-            "[SubmissionSendingController.onPageLoad] Failed to create submission",
-            ex
-          )
-          recovery
-        }
+      // A reload or back-navigation after the submission was sent must not create and send it again
+      if (request.userAnswers.get(VerificationSubmissionDetailsPage).isDefined) {
+        logger.warn(
+          "[SubmissionSendingController.onPageLoad] Submission already sent for this journey; redirecting to poll"
+        )
+        Future.successful(Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect))
+      } else {
+        verificationService.createSubmitAndPersistVerificationSubmission
+          .flatMap(redirectForInitialSubmissionResponse)
+          .recover { case ex =>
+            logger.error(
+              "[SubmissionSendingController.onPageLoad] Failed to create submission",
+              ex
+            )
+            recovery
+          }
+      }
     }
 
   def onPollAndRedirect: Action[AnyContent] =
