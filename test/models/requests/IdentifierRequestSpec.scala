@@ -35,7 +35,7 @@ class IdentifierRequestSpec extends SpecBase {
       request.user mustBe "Organisation <userId: user-1>"
     }
 
-    "names an agent by reference and code" in {
+    "names an agent by login" in {
       val request = IdentifierRequest(
         FakeRequest(),
         "agent-1",
@@ -45,7 +45,7 @@ class IdentifierRequestSpec extends SpecBase {
         agentCode = Some("C1")
       )
 
-      request.user mustBe "Agent <ref:A123;code:C1>"
+      request.user mustBe "Agent <userId: agent-1>"
     }
   }
 }
