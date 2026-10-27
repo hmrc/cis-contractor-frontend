@@ -25,18 +25,8 @@ import models.response.GetNewestVerificationBatchResponse
 import org.scalatestplus.mockito.MockitoSugar
 import org.jsoup.Jsoup
 import pages.verify._
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.{verify, when}
-import models.UserAnswers
-import models.verify.VerificationSubmissionDetails
-import play.api.inject.bind
-import repositories.SessionRepository
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
-import java.time.LocalDateTime
-import scala.concurrent.Future
 
 class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
 
@@ -443,57 +433,13 @@ class VerifyCheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
           .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
           .setOrException(VerificationBatchReadinessPage, true)
 
-        val repo        = mock[SessionRepository]
-        when(repo.set(any[UserAnswers])).thenReturn(Future.successful(true))
-        val application = applicationBuilder(userAnswers = Some(ua))
-          .overrides(bind[SessionRepository].toInstance(repo))
-          .build()
+        val application = applicationBuilder(userAnswers = Some(ua)).build()
 
         running(application) {
           val result = route(application, FakeRequest(POST, onSubmitRoute)).value
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustBe controllers.verify.routes.SubmissionSendingController.onPageLoad().url
-        }
-      }
-
-      "must clear details of an earlier submission before redirecting to Submission Sending" in {
-        val details = VerificationSubmissionDetails(
-          submissionId = "13602",
-          status = "ACCEPTED",
-          hmrcMarkGenerated = "hmrc-mark",
-          hmrcMarkGgis = None,
-          correlationId = None,
-          pollUrl = None,
-          pollIntervalSeconds = None,
-          submittedAt = LocalDateTime.parse("2026-06-15T03:30:52"),
-          lastMessageDate = None,
-          timedOut = false
-        )
-
-        val ua = emptyUserAnswers
-          .setOrException(SelectSubcontractorPage, Set(brodyMartin))
-          .setOrException(ReverifyExistingSubcontractorsYesNoPage, false)
-          .setOrException(ContractorEmailConfirmationStoredPage, DoNotSend)
-          .setOrException(VerificationBatchReadinessPage, true)
-          .setOrException(VerificationSubmissionDetailsPage, details)
-
-        val repo = mock[SessionRepository]
-        when(repo.set(any[UserAnswers])).thenReturn(Future.successful(true))
-
-        val application = applicationBuilder(userAnswers = Some(ua))
-          .overrides(bind[SessionRepository].toInstance(repo))
-          .build()
-
-        running(application) {
-          val result = route(application, FakeRequest(POST, onSubmitRoute)).value
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe controllers.verify.routes.SubmissionSendingController.onPageLoad().url
-
-          val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-          verify(repo).set(captor.capture())
-          captor.getValue.get(VerificationSubmissionDetailsPage) mustBe None
         }
       }
 

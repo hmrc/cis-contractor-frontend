@@ -22,34 +22,40 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.CisIdQuery
+import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.VerificationNotSubmittedWarningView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class VerificationNotSubmittedWarningController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  verificationService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationNotSubmittedWarningView,
   appConfig: FrontendAppConfig
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(CisIdQuery) match {
       case Some(cisId) =>
         val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
-        Ok(view(manageSubcontractorsUrl, appConfig.cisGeneralEnquiries))
+        verificationService
+          .resetUserAnswers(request.userAnswers)
+          .map(_ => Ok(view(manageSubcontractorsUrl, appConfig.cisGeneralEnquiries)))
 
       case None =>
         logger.error(
           "[VerificationNotSubmittedWarningController][onPageLoad] - CisIdQuery missing from userAnswers"
         )
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 }

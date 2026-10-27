@@ -18,28 +18,24 @@ package controllers.verify
 
 import controllers.actions.*
 import models.verify.ValidatedVerify
-import pages.verify.VerificationSubmissionDetailsPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
 import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class VerifyCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  sessionRepository: SessionRepository,
   view: VerifyCheckYourAnswersView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging
     with PendingVerificationRequestGuard {
@@ -78,14 +74,8 @@ class VerifyCheckYourAnswersController @Inject() (
           // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
           ValidatedVerify.build(request.userAnswers) match {
 
-            case Right(_) =>
-              // Clear details from any earlier submission so SubmissionSendingController can tell a refresh of
-              // this submission (details present) from the start of a new one
-              for {
-                cleared <- Future.fromTry(request.userAnswers.remove(VerificationSubmissionDetailsPage))
-                _       <- sessionRepository.set(cleared)
-              } yield Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad())
-
+            case Right(_)    =>
+              Future.successful(Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad()))
             case Left(error) =>
               logger.error(
                 s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
