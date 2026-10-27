@@ -65,6 +65,31 @@ class VerifySendErrorControllerSpec extends SpecBase with MockitoSugar {
       status(result) mustEqual OK
       contentAsString(result) mustEqual view(cisId)(request, messages(app)).toString
     }
+
+    "must reset the user answers when the page is rendered" in {
+      val ua = emptyUserAnswers.set(CisIdQuery, cisId).success.value
+      mockSession(ua)
+
+      val mockService = mock[services.VerificationService]
+      when(mockService.resetUserAnswers(any[UserAnswers])).thenReturn(Future.successful(()))
+
+      val resetApp = new GuiceApplicationBuilder()
+        .overrides(
+          bind[IdentifierAction] toInstance new FakeIdentifierAction(
+            isAgent = false,
+            hasAgentRef = false,
+            hasEmployeeRef = true
+          )(parsers),
+          bind[SessionRepository] toInstance mockRepo,
+          bind[services.VerificationService] toInstance mockService
+        )
+        .build()
+
+      val result = route(resetApp, FakeRequest(GET, routes.VerifySendErrorController.onPageLoad().url)).value
+
+      status(result) mustEqual OK
+      verify(mockService).resetUserAnswers(any[UserAnswers])
+    }
   }
 
   private def mockSession(userAnswers: UserAnswers) =

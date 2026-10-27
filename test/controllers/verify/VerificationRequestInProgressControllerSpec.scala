@@ -78,5 +78,28 @@ class VerificationRequestInProgressControllerSpec extends SpecBase {
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must reset the user answers when the page is rendered" in {
+      val ua = emptyUserAnswers.set(queries.CisIdQuery, "12345").success.value
+
+      val mockService = org.mockito.Mockito.mock(classOf[services.VerificationService])
+      org.mockito.Mockito
+        .when(mockService.resetUserAnswers(org.mockito.ArgumentMatchers.any[models.UserAnswers]))
+        .thenReturn(scala.concurrent.Future.successful(()))
+
+      val application = applicationBuilder(
+        userAnswers = Some(ua),
+        additionalBindings = Seq(play.api.inject.bind[services.VerificationService].toInstance(mockService))
+      ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.verify.routes.VerificationRequestInProgressController.onPageLoad().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        org.mockito.Mockito.verify(mockService).resetUserAnswers(ua)
+      }
+    }
   }
 }

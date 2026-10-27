@@ -1190,6 +1190,116 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockRepo, times(2)).set(any[UserAnswers])
     }
 
+    "must not create a submission when building the ChRIS request fails" in {
+      val mockConnector      = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo           = mock[SessionRepository]
+      val mockRequestBuilder = mock[ChrisVerificationRequestBuilder]
+      val service            = buildService(mockConnector, mockRepo, requestBuilder = mockRequestBuilder)
+
+      val currentBatch =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Seq.empty,
+          verificationBatch = Some(
+            VerificationBatchCurrentVerification(
+              verificationBatchId = 999L,
+              verifBatchResourceRef = Some(7777L)
+            )
+          ),
+          verifications = Seq(
+            VerificationCurrentVerification(
+              verificationId = 1L,
+              verificationBatchId = Some(999L),
+              subcontractorId = Some(10L),
+              verificationResourceRef = Some(1111L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
+            )
+          )
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "test@test.com")
+          .success
+          .value
+
+      implicit val request: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          userId = "user-id",
+          userAnswers = ua,
+          employerReference = Some(EmployerReference("123", "AB456"))
+        )
+
+      val chrisRequest =
+        ChrisVerificationRequest(
+          instanceId = instanceId,
+          isAgent = false,
+          clientTaxOfficeNumber = "123",
+          clientTaxOfficeRef = "AB456",
+          contractorUTR = "1234567890",
+          contractorAORef = "AO123",
+          verificationBatchId = "999",
+          verificationBatchResourceRef = "7777",
+          emailRecipient = Some("test@test.com"),
+          language = None,
+          subcontractors = Seq.empty,
+          verifications = Seq.empty
+        )
+
+      val chrisResponse =
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "ACCEPTED",
+          hmrcMarkGenerated = "hmrc-mark",
+          correlationId = Some("corr-id"),
+          responseEndPoint = Some(ResponseEndPointDto("http://localhost/poll", 5)),
+          gatewayTimestamp = Some("2026-06-15T03:30:52")
+        )
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentBatch))
+
+      when(
+        mockConnector.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
+
+      when(
+        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+          any[HeaderCarrier],
+          any[Messages]
+        )
+      ).thenReturn(Future.failed(new RuntimeException("build boom")))
+
+      when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(chrisResponse))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      service.createSubmitAndPersistVerificationSubmission.failed.futureValue.getMessage must include("build boom")
+
+      verify(mockConnector, never()).createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(
+        any[HeaderCarrier]
+      )
+      verify(mockConnector, never()).submitVerificationToChris(any[Long], any[ChrisVerificationRequest])(
+        any[HeaderCarrier]
+      )
+    }
+
     "must set agentId to the agent reference when the user is an agent" in {
       val mockConnector      = mock[ConstructionIndustrySchemeConnector]
       val mockRepo           = mock[SessionRepository]

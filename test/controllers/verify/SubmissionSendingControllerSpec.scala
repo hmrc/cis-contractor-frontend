@@ -121,6 +121,25 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
 
   "SubmissionSendingController.onPageLoad" - {
 
+    "must redirect to the poll page without creating or sending again when submission details already exist" in {
+      val mockService = mock[VerificationService]
+      val application = applicationWith(mockService, userAnswersWithSubmissionDetails)
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
+
+        verify(mockService, never).createSubmitAndPersistVerificationSubmission(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier],
+          any[Messages]
+        )
+      }
+    }
+
     "must redirect to poll page when initial submission returns ACCEPTED" in {
       val mockService = mock[VerificationService]
 

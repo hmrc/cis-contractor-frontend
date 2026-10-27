@@ -74,13 +74,8 @@ class VerifyCheckYourAnswersController @Inject() (
           // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
           ValidatedVerify.build(request.userAnswers) match {
 
-            case Right(_) =>
-              Future.successful(
-                Redirect(
-                  controllers.verify.routes.SubmissionSendingController.onPageLoad()
-                )
-              )
-
+            case Right(_)    =>
+              Future.successful(Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad()))
             case Left(error) =>
               logger.error(
                 s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
