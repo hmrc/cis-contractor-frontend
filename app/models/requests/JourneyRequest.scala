@@ -18,10 +18,8 @@ package models.requests
 
 import models.requests.CisPath.{CisId, CisOrg}
 import models.response.CisTaxpayerResponse
-import models.{JourneyId, UserAnswers}
+import models.UserAnswers
 import play.api.mvc.WrappedRequest
-
-import java.util.UUID
 
 class SchemeRequest[B](
   val identifier: IdentifierRequest[B],
@@ -37,9 +35,6 @@ class SchemeRequest[B](
 
 class JourneyRequest[B](
   scheme: SchemeRequest[B],
-  val journeyId: JourneyId,
+  val subJourneyId: String,
   val userAnswers: UserAnswers
-) extends SchemeRequest[B](scheme.identifier, scheme.cisTaxpayer) {
-
-  def journeyUuid: UUID = journeyId.uuid
-}
+) extends SchemeRequest[B](scheme.identifier, scheme.cisTaxpayer)

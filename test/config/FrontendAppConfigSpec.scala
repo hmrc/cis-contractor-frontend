@@ -38,6 +38,10 @@ class FrontendAppConfigSpec extends SpecBase {
       applicationConfig.cisStubUrl mustBe "http://localhost:6997"
     }
 
+    "multiTabEnabled must read the feature flag" in {
+      applicationConfig.multiTabEnabled mustBe true
+    }
+
     "cisFrontendBaseUrl must resolve from the cis-frontend config" in {
       applicationConfig.cisFrontendBaseUrl mustBe "http://localhost:6993"
     }

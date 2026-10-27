@@ -17,35 +17,46 @@
 package services
 
 import models.requests.SchemeRequest
-import models.{JourneyId, UserAnswers}
+import models.{JourneyScope, UserAnswers}
 import repositories.SessionRepository
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class JourneyService @Inject() (
   sessionRepository: SessionRepository
 )(using ec: ExecutionContext) {
 
-  def create[B](req: SchemeRequest[B]): Future[JourneyId] =
-    create(req, ua => Success(ua))
+  def create[B](req: SchemeRequest[B]): Future[UUID] =
+    create(req, (ua, _) => Success(ua))
 
   def create[B](
     req: SchemeRequest[B],
-    initialise: UserAnswers => Try[UserAnswers]
-  ): Future[JourneyId] = {
-    val journeyId = JourneyId(req.identifier.userId, req.cisPath, UUID.randomUUID())
+    initialise: (UserAnswers, String) => Try[UserAnswers]
+  ): Future[UUID] = {
+    val flowId     = UUID.randomUUID()
+    val documentId = req.identifier.userId
+    val id         = JourneyScope.subJourneyId(req.cisPath, flowId)
 
-    Future.fromTry(initialise(UserAnswers(journeyId.asString))).flatMap { ua =>
-      if ua.id != journeyId.asString then Future.failed(new IllegalArgumentException("Incorrect journey ID"))
-      else
-        sessionRepository.set(ua).flatMap { saved =>
-          if saved then Future.successful(journeyId)
-          else Future.failed(new IllegalStateException("Journey was not saved"))
-        }
+    sessionRepository.get(documentId).flatMap { existing =>
+      val userAnswers = existing.getOrElse(UserAnswers(documentId))
+
+      val initialisedAnswers = for {
+        started <- userAnswers.initialiseSubJourney(id)
+        updated <- initialise(started, id)
+        result  <-
+          if updated.id == documentId then Success(updated)
+          else Failure(new IllegalArgumentException("Incorrect session ID"))
+      } yield result
+
+      Future.fromTry(initialisedAnswers).flatMap { updatedAnswers =>
+        sessionRepository
+          .set(updatedAnswers)
+          .map(_ => flowId)
+      }
     }
   }
 }

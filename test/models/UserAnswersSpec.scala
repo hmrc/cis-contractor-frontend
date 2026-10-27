@@ -17,18 +17,28 @@
 package models
 
 import base.SpecBase
-import models.requests.CisPath.{CisId, CisOrg}
 
-import java.util.UUID
+class UserAnswersSpec extends SpecBase {
 
-class JourneyIdSpec extends SpecBase {
+  "UserAnswers.initialiseSubJourney" - {
 
-  "JourneyId" - {
-    "stores answers under the login, the client and the UUID" in {
-      val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+    "adds an empty folder for a new id" in {
+      val answers = UserAnswers("user-1").initialiseSubJourney("org_abc").success.value
 
-      JourneyId("user-1", CisOrg, uuid).asString mustBe s"user-1/org/$uuid"
-      JourneyId("user-1", CisId("AB12"), uuid).asString mustBe s"user-1/AB12/$uuid"
+      answers.hasSubJourney("org_abc") mustBe true
+    }
+
+    "fails when the folder already exists" in {
+      val answers = UserAnswers("user-1").initialiseSubJourney("org_abc").success.value
+
+      answers.initialiseSubJourney("org_abc").isFailure mustBe true
+    }
+  }
+
+  "UserAnswers.hasSubJourney" - {
+
+    "is false when the folder is missing" in {
+      UserAnswers("user-1").hasSubJourney("org_abc") mustBe false
     }
   }
 }

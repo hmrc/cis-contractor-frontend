@@ -17,10 +17,10 @@
 package controllers.actions
 
 import base.SpecBase
+import models.JourneyScope
 import models.requests.{IdentifierRequest, SchemeRequest}
 import models.response.CisTaxpayerResponse
-import models.{EmployerReference, JourneyId, UserAnswers}
-import models.requests.CisPath.CisOrg
+import models.{EmployerReference, UserAnswers}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results
@@ -34,8 +34,7 @@ import scala.concurrent.Future
 
 class JourneyActionSpec extends SpecBase with MockitoSugar {
 
-  private val uuid      = UUID.fromString("11111111-1111-1111-1111-111111111111")
-  private val journeyId = JourneyId("user-1", CisOrg, uuid)
+  private val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
 
   private val taxpayer = CisTaxpayerResponse(
     uniqueId = "AB12",
@@ -61,24 +60,27 @@ class JourneyActionSpec extends SpecBase with MockitoSugar {
     taxpayer
   )
 
+  private val subJourneyId = JourneyScope.subJourneyId(schemeRequest.cisPath, uuid)
+
   "JourneyAction" - {
 
-    "loads the saved answers for a known UUID" in {
+    "loads the login document when the folder exists" in {
+      val answers    = UserAnswers("user-1").initialiseSubJourney(subJourneyId).success.value
       val repository = mock[SessionRepository]
-      when(repository.get(journeyId.asString)).thenReturn(Future.successful(Some(UserAnswers(journeyId.asString))))
+      when(repository.get("user-1")).thenReturn(Future.successful(Some(answers)))
 
       val result = new JourneyActionImpl(repository)(uuid).invokeBlock(
         schemeRequest,
-        journey => Future.successful(Results.Ok(journey.userAnswers.id))
+        journey => Future.successful(Results.Ok(journey.subJourneyId))
       )
 
       status(result) mustBe OK
-      contentAsString(result) mustBe journeyId.asString
+      contentAsString(result) mustBe subJourneyId
     }
 
-    "sends the user to journey recovery when the UUID is missing" in {
+    "sends the user to journey recovery when the folder is missing" in {
       val repository = mock[SessionRepository]
-      when(repository.get(journeyId.asString)).thenReturn(Future.successful(None))
+      when(repository.get("user-1")).thenReturn(Future.successful(Some(UserAnswers("user-1"))))
 
       val result = new JourneyActionImpl(repository)(uuid).invokeBlock(
         schemeRequest,

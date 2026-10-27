@@ -19,17 +19,18 @@ package services
 import base.SpecBase
 import models.requests.SchemeRequest
 import models.response.CisTaxpayerResponse
-import models.{EmployerReference, UserAnswers}
+import models.{EmployerReference, JourneyScope, UserAnswers}
 import models.requests.IdentifierRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 class JourneyServiceSpec extends SpecBase with MockitoSugar {
 
@@ -59,26 +60,45 @@ class JourneyServiceSpec extends SpecBase with MockitoSugar {
 
   "JourneyService" - {
 
-    "saves a new journey under the login, the client and a UUID" in {
+    "creates a folder on the login document" in {
       val repository = mock[SessionRepository]
+      when(repository.get("user-1")).thenReturn(Future.successful(None))
       when(repository.set(any[UserAnswers]())).thenReturn(Future.successful(true))
 
-      val journeyId = new JourneyService(repository).create(schemeRequest).futureValue
-
-      journeyId.asString must startWith("user-1/org/")
+      val flowId = new JourneyService(repository).create(schemeRequest).futureValue
+      val id     = JourneyScope.subJourneyId(schemeRequest.cisPath, flowId)
 
       val saved: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-      org.mockito.Mockito.verify(repository).set(saved.capture())
-      saved.getValue.id mustBe journeyId.asString
+      verify(repository).set(saved.capture())
+      saved.getValue.id mustBe "user-1"
+      saved.getValue.hasSubJourney(id) mustBe true
     }
 
-    "does not return a journey id when the save fails" in {
+    "keeps answers already on the login document" in {
       val repository = mock[SessionRepository]
-      when(repository.set(any[UserAnswers]())).thenReturn(Future.successful(false))
+      val existing   = UserAnswers("user-1").initialiseSubJourney("existing").success.value
+      when(repository.get("user-1")).thenReturn(Future.successful(Some(existing)))
+      when(repository.set(any[UserAnswers]())).thenReturn(Future.successful(true))
+
+      val flowId = new JourneyService(repository)
+        .create(schemeRequest, (ua, _) => Success(ua))
+        .futureValue
+      val id     = JourneyScope.subJourneyId(schemeRequest.cisPath, flowId)
+
+      val saved: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(repository).set(saved.capture())
+      saved.getValue.hasSubJourney("existing") mustBe true
+      saved.getValue.hasSubJourney(id) mustBe true
+    }
+
+    "fails when the session cannot be saved" in {
+      val repository = mock[SessionRepository]
+      when(repository.get("user-1")).thenReturn(Future.successful(None))
+      when(repository.set(any[UserAnswers]())).thenReturn(Future.failed(new RuntimeException("Database error")))
 
       val failure = new JourneyService(repository).create(schemeRequest).failed.futureValue
 
-      failure mustBe a[IllegalStateException]
+      failure.getMessage mustBe "Database error"
     }
   }
 }

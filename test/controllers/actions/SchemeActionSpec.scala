@@ -60,7 +60,8 @@ class SchemeActionSpec extends SpecBase with MockitoSugar {
       messagesApi = app.injector.instanceOf[MessagesApi],
       config = applicationConfig,
       cisTaxpayerService = service,
-      notFoundView = app.injector.instanceOf[PageNotFoundView]
+      notFoundView = app.injector.instanceOf[PageNotFoundView],
+      multiTabAction = new MultiTabAction(applicationConfig)
     )
 
   "SchemeAction" - {

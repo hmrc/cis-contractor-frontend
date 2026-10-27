@@ -20,7 +20,7 @@ import models.requests.CisPath
 
 import java.util.UUID
 
-final case class JourneyId(userId: String, cisPath: CisPath, uuid: UUID) {
-
-  def asString: String = s"$userId/${cisPath.toUrl}/$uuid"
+object JourneyScope {
+  def subJourneyId(cisPath: CisPath, flowId: UUID): String =
+    s"${cisPath.toUrl}_$flowId"
 }

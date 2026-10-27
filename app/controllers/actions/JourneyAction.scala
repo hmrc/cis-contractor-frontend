@@ -17,7 +17,7 @@
 package controllers.actions
 
 import com.google.inject.{ImplementedBy, Inject, Singleton}
-import models.JourneyId
+import models.JourneyScope
 import models.requests.{JourneyRequest, SchemeRequest}
 import play.api.mvc.{ActionRefiner, Result, Results}
 import repositories.SessionRepository
@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[JourneyActionImpl])
 abstract class JourneyAction {
-  def apply(uuid: UUID): ActionRefiner[SchemeRequest, JourneyRequest]
+  def apply(flowId: UUID): ActionRefiner[SchemeRequest, JourneyRequest]
 }
 
 @Singleton
@@ -36,16 +36,18 @@ final class JourneyActionImpl @Inject() (
 )(using ec: ExecutionContext)
     extends JourneyAction {
 
-  def apply(uuid: UUID): ActionRefiner[SchemeRequest, JourneyRequest] =
+  def apply(flowId: UUID): ActionRefiner[SchemeRequest, JourneyRequest] =
     new ActionRefiner[SchemeRequest, JourneyRequest] with Results {
       val executionContext: ExecutionContext = ec
 
       def refine[B](req: SchemeRequest[B]): Future[Either[Result, JourneyRequest[B]]] = {
-        val journeyId = JourneyId(req.identifier.userId, req.cisPath, uuid)
+        val id = JourneyScope.subJourneyId(req.cisPath, flowId)
 
-        sessionRepository.get(journeyId.asString).map {
-          case Some(ua) => Right(new JourneyRequest(req, journeyId, ua))
-          case None     => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        sessionRepository.get(req.identifier.userId).map {
+          case Some(ua) if ua.hasSubJourney(id) =>
+            Right(new JourneyRequest(req, id, ua))
+          case _                                =>
+            Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
       }
     }
