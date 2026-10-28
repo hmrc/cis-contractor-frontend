@@ -30,27 +30,37 @@ import viewmodels.implicits.*
 
 object PartnershipContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipContactMethodOptionsPage).map { selectedMethods =>
-      val options =
-        ContactMethodOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$m")).toString)
-      SummaryListRowViewModel(
-        key = "partnershipContactMethodOptions.checkYourAnswersLabel",
-        value = ValueViewModelHelper
-          .makeGovukBulletList(options, false)
-          .getOrElse(ValueViewModel(HtmlContent(""))),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipContactMethodOptionsPage(id)))
+      .getOrElse(answers.get(PartnershipContactMethodOptionsPage))
+      .map { selectedMethods =>
+        val options =
+          ContactMethodOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"partnershipContactMethodOptions.$m")).toString)
+        SummaryListRowViewModel(
+          key = "partnershipContactMethodOptions.checkYourAnswersLabel",
+          value = ValueViewModelHelper
+            .makeGovukBulletList(options, false)
+            .getOrElse(ValueViewModel(HtmlContent(""))),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
+              .withAttribute("id" -> "partnership-methods-of-contact")
           )
-            .withVisuallyHiddenText(messages("partnershipContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "partnership-methods-of-contact")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

@@ -27,18 +27,29 @@ import viewmodels.implicits.*
 
 object PartnershipWorksReferenceNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipWorksReferenceNumberPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipWorksReferenceNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel("site.change", routes.PartnershipWorksReferenceNumberController.onPageLoad(mode).url)
-            .withVisuallyHiddenText(messages("partnershipWorksReferenceNumber.change.hidden"))
-            .withAttribute("id" -> "partnership-works-reference-number")
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipWorksReferenceNumberPage(id)))
+      .getOrElse(answers.get(PartnershipWorksReferenceNumberPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "partnershipWorksReferenceNumber.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(routes.PartnershipWorksReferenceNumberController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("partnershipWorksReferenceNumber.change.hidden"))
+              .withAttribute("id" -> "partnership-works-reference-number")
+          )
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

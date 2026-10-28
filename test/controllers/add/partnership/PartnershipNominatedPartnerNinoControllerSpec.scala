@@ -16,7 +16,7 @@
 
 package controllers.add.partnership
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerNinoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -33,7 +33,7 @@ import views.html.add.partnership.PartnershipNominatedPartnerNinoView
 
 import scala.concurrent.Future
 
-class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new PartnershipNominatedPartnerNinoFormProvider()
   private val form         = formProvider()
@@ -71,7 +71,12 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -147,7 +152,12 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("AA123456A"), NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form.fill("AA123456A"),
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -210,7 +220,12 @@ class PartnershipNominatedPartnerNinoControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

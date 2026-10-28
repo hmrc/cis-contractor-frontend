@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.LegendSize.Large
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -24,11 +25,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("addPartnershipContactMethodsYesNo.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

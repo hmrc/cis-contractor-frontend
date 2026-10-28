@@ -26,21 +26,31 @@ import viewmodels.implicits.*
 
 object PartnershipPhoneNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipPhoneNumberPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipPhoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipPhoneNumberPage(id)))
+      .getOrElse(answers.get(PartnershipPhoneNumberPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "partnershipPhoneNumber.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipPhoneNumber.change.hidden"))
+              .withAttribute("id" -> "partnership-phone-number")
           )
-            .withVisuallyHiddenText(messages("partnershipPhoneNumber.change.hidden"))
-            .withAttribute("id" -> "partnership-phone-number")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

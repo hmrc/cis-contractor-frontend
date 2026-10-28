@@ -26,6 +26,7 @@ import models.amend.AmendJourneyType
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
+import pages.QuestionPage
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
@@ -61,7 +62,7 @@ class SubcontractorService @Inject() (
             individualOrSoleTraderPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
 
           case Partnership =>
-            partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+            partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, subJourneyId)
 
           case Limitedcompany =>
             companyPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
@@ -111,28 +112,73 @@ class SubcontractorService @Inject() (
   private def partnershipPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
-    userAnswers: UserAnswers
-  ): PartnershipPayload =
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): PartnershipPayload = {
+    val address = subJourneyId
+      .flatMap(id => userAnswers.get(PartnershipAddressPage(id)))
+      .orElse(userAnswers.get(PartnershipAddressPage))
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
-      utr = userAnswers.get(PartnershipUniqueTaxpayerReferencePage),
-      partnerUtr = userAnswers.get(PartnershipNominatedPartnerUtrPage),
-      partnershipTradingName = userAnswers.get(PartnershipNamePage),
-      partnerTradingName = userAnswers.get(PartnershipNominatedPartnerNamePage),
-      partnerNino = userAnswers.get(PartnershipNominatedPartnerNinoPage),
-      partnerCrn = userAnswers.get(PartnershipNominatedPartnerCrnPage),
-      addressLine1 = userAnswers.get(PartnershipAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(PartnershipAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(PartnershipAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(PartnershipAddressPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = userAnswers.get(PartnershipEmailAddressPage),
-      phoneNumber = userAnswers.get(PartnershipPhoneNumberPage),
-      mobilePhoneNumber = userAnswers.get(PartnershipMobileNumberPage),
-      worksReferenceNumber = userAnswers.get(PartnershipWorksReferenceNumberPage)
+      utr = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipUniqueTaxpayerReferencePage.apply,
+        PartnershipUniqueTaxpayerReferencePage
+      ),
+      partnerUtr = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipNominatedPartnerUtrPage.apply,
+        PartnershipNominatedPartnerUtrPage
+      ),
+      partnershipTradingName = pageValue(userAnswers, subJourneyId, PartnershipNamePage.apply, PartnershipNamePage),
+      partnerTradingName = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipNominatedPartnerNamePage.apply,
+        PartnershipNominatedPartnerNamePage
+      ),
+      partnerNino = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipNominatedPartnerNinoPage.apply,
+        PartnershipNominatedPartnerNinoPage
+      ),
+      partnerCrn = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipNominatedPartnerCrnPage.apply,
+        PartnershipNominatedPartnerCrnPage
+      ),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      city = address.flatMap(_.addressLine3),
+      county = address.flatMap(_.addressLine4),
+      postcode = address.flatMap(_.postcode),
+      country = address.flatMap(_.country).flatMap(_.name),
+      emailAddress =
+        pageValue(userAnswers, subJourneyId, PartnershipEmailAddressPage.apply, PartnershipEmailAddressPage),
+      phoneNumber = pageValue(userAnswers, subJourneyId, PartnershipPhoneNumberPage.apply, PartnershipPhoneNumberPage),
+      mobilePhoneNumber =
+        pageValue(userAnswers, subJourneyId, PartnershipMobileNumberPage.apply, PartnershipMobileNumberPage),
+      worksReferenceNumber = pageValue(
+        userAnswers,
+        subJourneyId,
+        PartnershipWorksReferenceNumberPage.apply,
+        PartnershipWorksReferenceNumberPage
+      )
     )
+  }
+
+  private def pageValue[A](
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String],
+    nestedPage: String => QuestionPage[A],
+    rootPage: QuestionPage[A]
+  )(implicit reads: play.api.libs.json.Reads[A]): Option[A] =
+    subJourneyId.flatMap(id => userAnswers.get(nestedPage(id))).orElse(userAnswers.get(rootPage))
 
   private def individualOrSoleTraderPayloadFromUserAnswers(
     cisId: String,

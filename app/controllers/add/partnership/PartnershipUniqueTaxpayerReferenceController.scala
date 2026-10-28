@@ -32,6 +32,7 @@ import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipUniqueTaxpayerReferenceView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +43,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: PartnershipUtrFormProvider,
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -68,6 +70,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       val yesOrNoPage       = PartnershipHasUtrYesNoPage
       val yesOrNoPageOption = request.userAnswers.get(PartnershipHasUtrYesNoPage)
+      val submitAction      = routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode)
 
       SubcontractorNameDisplayHelper
         .getPartnershipDisplayName(request.userAnswers, mode)
@@ -76,7 +79,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          val result       = Ok(view(preparedForm, mode, partnershipName))
+          val result       = Ok(view(preparedForm, mode, partnershipName, submitAction))
           yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
         .getOrElse {
@@ -89,13 +92,14 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+      val submitAction = routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(mode)
       SubcontractorNameDisplayHelper
         .getPartnershipDisplayName(request.userAnswers, mode)
         .map { name =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
               value =>
                 val prevValue = request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage)
                 val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
@@ -116,7 +120,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
                             message = "partnershipUniqueTaxpayerReference.error.duplicate"
                           )
                         Future.successful(
-                          BadRequest(view(errorForm, mode, name))
+                          BadRequest(view(errorForm, mode, name, submitAction))
                         )
                       case false =>
                         saveAndContinue(mode, value)
@@ -130,5 +134,82 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
           )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      if (!request.userAnswers.get(PartnershipHasUtrYesNoPage(id)).contains(true)) {
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      } else {
+        SubcontractorNameDisplayHelper
+          .getPartnershipDisplayName(request.userAnswers, mode, id)
+          .map { partnershipName =>
+            val page         = PartnershipUniqueTaxpayerReferencePage(id)
+            val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+            Ok(
+              view(
+                preparedForm,
+                mode,
+                partnershipName,
+                routes.PartnershipUniqueTaxpayerReferenceController.onSubmitWithId(flowId, mode)
+              )
+            )
+          }
+          .getOrElse {
+            logger.error(
+              s"[PartnershipUniqueTaxpayerReferenceController][onPageLoadWithId] - PartnershipNamePage missing from userAnswers"
+            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.PartnershipUniqueTaxpayerReferenceController.onSubmitWithId(flowId, mode)
+      if (!request.userAnswers.get(PartnershipHasUtrYesNoPage(id)).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        SubcontractorNameDisplayHelper
+          .getPartnershipDisplayName(request.userAnswers, mode, id)
+          .map { name =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
+                value =>
+                  subcontractorService.isDuplicateUTR(request.userAnswers, value, Some(id)).flatMap {
+                    case true  =>
+                      val errorForm = form
+                        .fill(value)
+                        .withError(
+                          key = "value",
+                          message = "partnershipUniqueTaxpayerReference.error.duplicate"
+                        )
+                      Future.successful(BadRequest(view(errorForm, mode, name, submitAction)))
+                    case false =>
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            request.userAnswers
+                              .set(PartnershipUniqueTaxpayerReferencePage(id), value)
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Redirect(
+                        navigator
+                          .nextPage(PartnershipUniqueTaxpayerReferencePage(id), mode, updatedAnswers)
+                      )
+                  }
+              )
+          }
+          .getOrElse {
+            logger.error(
+              s"[PartnershipUniqueTaxpayerReferenceController][onSubmitWithId] - PartnershipNamePage missing from userAnswers"
+            )
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+      }
     }
 }

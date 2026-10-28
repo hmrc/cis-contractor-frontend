@@ -592,14 +592,16 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode).url
 
         val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository).set(captor.capture())
 
         val saved = captor.getValue
         val id    = saved.data.value.keys.find(key => scala.util.Try(UUID.fromString(key)).isSuccess).value
+        redirectLocation(result).value mustBe
+          controllers.add.partnership.routes.PartnershipNameController
+            .onPageLoadWithId(UUID.fromString(id), NormalMode)
+            .url
         saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Partnership)
         saved.get(CisIdQuery(id)) mustBe Some(startCisId)
         saved.get(CisIdQuery) mustBe Some("1")
@@ -942,7 +944,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode).url
+          controllers.add.partnership.routes.PartnershipNameController.onPageLoadWithId(flowId, NormalMode).url
 
         val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository).set(captor.capture())

@@ -16,7 +16,7 @@
 
 package controllers.add.partnership
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.partnership.PartnershipNominatedPartnerCrnYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -32,7 +32,7 @@ import views.html.add.partnership.PartnershipNominatedPartnerCrnYesNoView
 
 import scala.concurrent.Future
 
-class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val nominatedPartnershipName = "Test Nominated Partnership"
 
@@ -59,7 +59,12 @@ class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with Mo
         val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, nominatedPartnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          nominatedPartnershipName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -80,7 +85,12 @@ class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with Mo
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, nominatedPartnershipName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          nominatedPartnershipName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -161,7 +171,12 @@ class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with Mo
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          nominatedPartnershipName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -215,7 +230,12 @@ class PartnershipNominatedPartnerCrnYesNoControllerSpec extends SpecBase with Mo
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          nominatedPartnershipName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
