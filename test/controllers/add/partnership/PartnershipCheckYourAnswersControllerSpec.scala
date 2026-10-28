@@ -904,4 +904,109 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase {
     verify(mockSessionRepository, never()).set(any[UserAnswers])
   }
 
+  "PartnershipCheckYourAnswers Controller with id" - {
+
+    val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+    val cisPath = models.requests.CisPath.CisOrg
+    val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+
+    val minUaWithId = emptyUserAnswers
+      .initialiseSubJourney(id)
+      .success
+      .value
+      .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+      .success
+      .value
+      .set(PartnershipNamePage(id), "Test Partnership")
+      .success
+      .value
+      .set(PartnershipAddressYesNoPage(id), false)
+      .success
+      .value
+      .set(AddPartnershipContactMethodsYesNoPage(id), false)
+      .success
+      .value
+      .set(PartnershipHasUtrYesNoPage(id), false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerNamePage(id), "Test Nominated Partner")
+      .success
+      .value
+      .set(PartnershipNominatedPartnerNinoYesNoPage(id), false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerCrnYesNoPage(id), false)
+      .success
+      .value
+      .set(PartnershipNominatedPartnerUtrYesNoPage(id), false)
+      .success
+      .value
+      .set(PartnershipWorksReferenceNumberYesNoPage(id), false)
+      .success
+      .value
+
+    "must return OK for a GET when the journey folder has the minimum answers" in {
+      val repo        = mockSessionRepository(Some(minUaWithId))
+      val application =
+        applicationBuilder(userAnswers = Some(minUaWithId))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoadWithId(cisPath, uuid).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("Test Partnership")
+        contentAsString(result) must include(s"/check-your-answers/${cisPath.toUrl}/$uuid")
+      }
+    }
+
+    "must submit folder answers and redirect to the added page with id" in {
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(()))
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(minUaWithId)))
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUaWithId))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmitWithId(cisPath, uuid).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAddedWithId(cisPath, uuid).url
+      }
+
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
+        any[HeaderCarrier]
+      )
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+    }
+  }
+
 }

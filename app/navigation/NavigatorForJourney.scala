@@ -16,13 +16,21 @@
 
 package navigation
 
+import models.requests.CisPath
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import pages.Page
 import play.api.Logging
 import play.api.mvc.Call
-import pages.Page
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+
+import java.util.UUID
 
 trait NavigatorForJourney extends Logging {
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
+
+  def nextPage(cisPath: CisPath, uuid: UUID, page: Page, mode: Mode, userAnswers: UserAnswers): Call = {
+    logger.error(s"[NavigatorForJourney] No UUID-scoped route for page: $page, mode: $mode")
+    controllers.routes.JourneyRecoveryController.onPageLoad()
+  }
 
   /** Shared routing for an "add an address?" Yes/No page that feeds into the Address Lookup Frontend journey. Identical
     * across subcontractor types; only the target calls differ.

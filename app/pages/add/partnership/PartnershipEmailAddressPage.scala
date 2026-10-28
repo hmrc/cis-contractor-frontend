@@ -19,6 +19,13 @@ package pages.add.partnership
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class PartnershipEmailAddressPage(id: String) extends QuestionPage[String] with PartnershipJourney {
+
+  override def path: JsPath = JsPath \ id \ toString
+
+  override def toString: String = "partnershipEmailAddress"
+}
+
 case object PartnershipEmailAddressPage extends QuestionPage[String] with PartnershipJourney {
 
   override def path: JsPath = JsPath \ toString

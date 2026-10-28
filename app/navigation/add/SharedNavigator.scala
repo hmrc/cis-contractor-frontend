@@ -22,12 +22,14 @@ import models.add.ValidatedSubcontractor
 import models.add.company.ValidatedCompany
 import models.add.partnership.ValidatedPartnership
 import models.add.trust.ValidatedTrust
-import models.{AmendMode, CheckMode, Mode, NormalMode, TypeOfSubcontractor, UserAnswers}
+import models.requests.CisPath
+import models.{AmendMode, CheckMode, JourneyScope, Mode, NormalMode, TypeOfSubcontractor, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
 import play.api.mvc.Call
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -75,6 +77,12 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         }
     }
 
+  override def nextPage(cisPath: CisPath, uuid: UUID, page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    page match {
+      case TypeOfSubcontractorPage => navigatorFromTypeOfSubcontractorPage(cisPath, uuid, mode)(userAnswers)
+      case _                       => super.nextPage(cisPath, uuid, page, mode, userAnswers)
+    }
+
   private def firstJourneyPageFor(subcontractorType: TypeOfSubcontractor): Call =
     subcontractorType match {
       case Individualorsoletrader => controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
@@ -82,6 +90,37 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case Partnership            => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case Trust                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
+
+  private def firstJourneyPageFor(cisPath: CisPath, uuid: UUID, subcontractorType: TypeOfSubcontractor): Call =
+    subcontractorType match {
+      case Individualorsoletrader => controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
+      case Limitedcompany         => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      case Partnership            =>
+        controllers.add.partnership.routes.PartnershipNameController.onPageLoadWithId(cisPath, uuid, NormalMode)
+      case Trust                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
+    }
+
+  private def navigatorFromTypeOfSubcontractorPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call = {
+    val id = JourneyScope.subJourneyId(cisPath, uuid)
+    userAnswers.get(TypeOfSubcontractorPage(id)).orElse(userAnswers.get(TypeOfSubcontractorPage)) match {
+      case None                    =>
+        logger.error(
+          "[SharedNavigator][navigatorFromTypeOfSubcontractorPage] - TypeOfSubcontractorPage missing"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+      case Some(subcontractorType) =>
+        mode match {
+          case NormalMode => firstJourneyPageFor(cisPath, uuid, subcontractorType)
+          case _          =>
+            if journeyComplete(subcontractorType, userAnswers) then checkYourAnswersFor(subcontractorType)
+            else firstJourneyPageFor(cisPath, uuid, subcontractorType)
+        }
+    }
+  }
 
   private def checkYourAnswersFor(subcontractorType: TypeOfSubcontractor): Call =
     subcontractorType match {

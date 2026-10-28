@@ -45,6 +45,112 @@ class PartnershipNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from PartnershipNamePage to the address yes no page with id" in {
+        val uuid = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        navigator.nextPage(
+          models.requests.CisPath.CisOrg,
+          uuid,
+          PartnershipNamePage,
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
+          .onPageLoadWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+      }
+
+      "must go from PartnershipAddressYesNoPage with id to address lookup when yes" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+        val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), true)
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController
+          .redirectToAddressLookupWithId(cisPath, uuid, None)
+      }
+
+      "must go from PartnershipAddressYesNoPage with id to contact methods when no" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+        val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), false)
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          PartnershipAddressYesNoPage,
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      }
+
+      "must go from AddPartnershipContactMethodsYesNoPage with id to has UTR when no" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+        val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+        val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage(id), false)
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          AddPartnershipContactMethodsYesNoPage,
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      }
+
+      "must go from PartnershipHasUtrYesNoPage with id to nominated partner name when no" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+        val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+        val answers = emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage(id), false)
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          PartnershipHasUtrYesNoPage,
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      }
+
+      "must go from PartnershipWorksReferenceNumberYesNoPage with id to CYA when no" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+        val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+        val answers = emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage(id), false)
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          PartnershipWorksReferenceNumberYesNoPage,
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+          .onPageLoadWithId(cisPath, uuid)
+      }
+
+      "must go from PartnershipNamePage with id in CheckMode to CYA" in {
+        val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val cisPath = models.requests.CisPath.CisOrg
+
+        navigator.nextPage(
+          cisPath,
+          uuid,
+          PartnershipNamePage,
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+          .onPageLoadWithId(cisPath, uuid)
+      }
+
       "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReferencePage when true" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,

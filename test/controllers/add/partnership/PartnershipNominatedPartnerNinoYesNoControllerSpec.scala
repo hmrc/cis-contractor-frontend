@@ -66,7 +66,12 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val view = application.injector.instanceOf[PartnershipNominatedPartnerNinoYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipNominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipNominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -91,7 +96,12 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipNominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          partnershipNominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -142,7 +152,12 @@ class PartnershipNominatedPartnerNinoYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipNominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipNominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

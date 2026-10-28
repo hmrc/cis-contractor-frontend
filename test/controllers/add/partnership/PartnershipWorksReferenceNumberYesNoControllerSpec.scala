@@ -79,7 +79,12 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val view = application.injector.instanceOf[PartnershipWorksReferenceNumberYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -102,7 +107,12 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result  = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -197,7 +207,12 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -250,7 +265,12 @@ class PartnershipWorksReferenceNumberYesNoControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

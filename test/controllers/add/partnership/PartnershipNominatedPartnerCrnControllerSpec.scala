@@ -71,7 +71,12 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -146,7 +151,12 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         val view = application.injector.instanceOf[PartnershipNominatedPartnerCrnView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("AC012345"), NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          form.fill("AC012345"),
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -206,7 +216,12 @@ class PartnershipNominatedPartnerCrnControllerSpec extends SpecBase with Mockito
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, nominatedPartnerName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          nominatedPartnerName,
+          controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

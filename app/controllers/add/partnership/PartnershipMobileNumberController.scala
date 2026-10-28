@@ -21,6 +21,7 @@ import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipMobileNumberFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
+import models.requests.CisPath
 import navigation.Navigator
 import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipMobileNumberPage}
 import play.api.Logging
@@ -31,6 +32,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipMobileNumberView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,6 +43,8 @@ class PartnershipMobileNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  getJourney: JourneyAction,
   formProvider: PartnershipMobileNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipMobileNumberView
@@ -55,6 +59,7 @@ class PartnershipMobileNumberController @Inject() (
 
     val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
     val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+    val submitAction    = routes.PartnershipMobileNumberController.onSubmit(mode)
 
     val mobileIsAvailable =
       mode == FinalValidationMode ||
@@ -66,7 +71,7 @@ class PartnershipMobileNumberController @Inject() (
           case None        => form
           case Some(value) => form.fill(value)
         }
-        Ok(view(preparedForm, mode, partnershipName))
+        Ok(view(preparedForm, mode, partnershipName, submitAction))
 
       case (Some(_), false) =>
         Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
@@ -81,6 +86,7 @@ class PartnershipMobileNumberController @Inject() (
 
       val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
       val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+      val submitAction    = routes.PartnershipMobileNumberController.onSubmit(mode)
 
       val mobileIsAvailable =
         mode == FinalValidationMode ||
@@ -92,7 +98,7 @@ class PartnershipMobileNumberController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, submitAction))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage, value))
@@ -104,4 +110,61 @@ class PartnershipMobileNumberController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)) { implicit request =>
+      val contactOption     = request.userAnswers.get(PartnershipContactMethodOptionsPage(request.subJourneyId))
+      val partnershipName   =
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (partnershipName, mobileIsAvailable) match {
+        case (Some(partnershipName), true) =>
+          val page         = PartnershipMobileNumberPage(request.subJourneyId)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              partnershipName,
+              routes.PartnershipMobileNumberController.onSubmitWithId(cisPath, uuid, mode)
+            )
+          )
+        case _                             =>
+          logger.error(
+            s"[PartnershipMobileNumberController][onPageLoadWithId] - partnership name or mobile option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)).async { implicit request =>
+      val submitAction      = routes.PartnershipMobileNumberController.onSubmitWithId(cisPath, uuid, mode)
+      val contactOption     = request.userAnswers.get(PartnershipContactMethodOptionsPage(request.subJourneyId))
+      val partnershipName   =
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (for {
+        partnershipName <- partnershipName
+        if mobileIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(PartnershipMobileNumberPage(request.subJourneyId), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(cisPath, uuid, PartnershipMobileNumberPage, mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            s"[PartnershipMobileNumberController][onSubmitWithId] - partnership name or mobile option missing"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

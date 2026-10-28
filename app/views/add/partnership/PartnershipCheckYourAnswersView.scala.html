@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -26,11 +27,11 @@
     formHelper: FormWithCSRF
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("partnershipCheckYourAnswers.title"))) {
 
-    @formHelper(action = controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @h1("partnershipCheckYourAnswers.heading")
 

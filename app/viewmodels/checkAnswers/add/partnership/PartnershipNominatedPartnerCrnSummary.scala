@@ -28,20 +28,28 @@ import viewmodels.implicits._
 
 object PartnershipNominatedPartnerCrnSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNominatedPartnerCrnPage).map { crn =>
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerCrn.checkYourAnswersLabel",
-        value = ValueViewModel(Text(crn)),
-        actions = Seq(
-          ActionItemViewModel(
-            content = Text(messages("site.change")),
-            href = routes.PartnershipNominatedPartnerCrnController.onPageLoad(mode).url
-          ).withVisuallyHiddenText(messages("partnershipNominatedPartnerCrn.change.hidden"))
-            .withAttribute("id" -> "nominated-partner-crn")
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipNominatedPartnerCrnPage(id)))
+      .getOrElse(answers.get(PartnershipNominatedPartnerCrnPage))
+      .map { crn =>
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerCrn.checkYourAnswersLabel",
+          value = ValueViewModel(Text(crn)),
+          actions = Seq(
+            ActionItemViewModel(
+              content = Text(messages("site.change")),
+              href = changeUrl.getOrElse(routes.PartnershipNominatedPartnerCrnController.onPageLoad(mode).url)
+            ).withVisuallyHiddenText(messages("partnershipNominatedPartnerCrn.change.hidden"))
+              .withAttribute("id" -> "nominated-partner-crn")
+          )
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

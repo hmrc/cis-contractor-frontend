@@ -64,7 +64,12 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PartnershipAddressYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -85,7 +90,12 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -136,7 +146,12 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -220,7 +235,12 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+          view(
+            boundForm,
+            NormalMode,
+            partnershipName,
+            controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+          )(request, messages(application)).toString
       }
     }
 
@@ -240,7 +260,119 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode, partnershipName)(request, messages(application)).toString
+          view(
+            boundForm,
+            NormalMode,
+            partnershipName,
+            controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+          )(request, messages(application)).toString
+      }
+    }
+
+    "must return OK for a GET with id when the journey folder has a partnership name" in {
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id      = models.JourneyScope.subJourneyId(models.requests.CisPath.CisOrg, uuid)
+      val answers = emptyUserAnswers
+        .initialiseSubJourney(id)
+        .success
+        .value
+        .set(PartnershipNamePage(id), partnershipName)
+        .success
+        .value
+      val repo    = mockSessionRepository(Some(answers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.add.partnership.routes.PartnershipAddressYesNoController
+            .onPageLoadWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to address lookup with id when yes is submitted" in {
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id      = models.JourneyScope.subJourneyId(models.requests.CisPath.CisOrg, uuid)
+      val answers = emptyUserAnswers
+        .initialiseSubJourney(id)
+        .success
+        .value
+        .set(PartnershipNamePage(id), partnershipName)
+        .success
+        .value
+      val repo    = mockSessionRepository(Some(answers))
+
+      when(repo.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipAddressYesNoController
+              .onSubmitWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+              .url
+          ).withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.PartnershipAddressController
+            .redirectToAddressLookupWithId(models.requests.CisPath.CisOrg, uuid, None)
+            .url
+      }
+    }
+
+    "must redirect to contact methods with id when no is submitted" in {
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id      = models.JourneyScope.subJourneyId(models.requests.CisPath.CisOrg, uuid)
+      val answers = emptyUserAnswers
+        .initialiseSubJourney(id)
+        .success
+        .value
+        .set(PartnershipNamePage(id), partnershipName)
+        .success
+        .value
+      val repo    = mockSessionRepository(Some(answers))
+
+      when(repo.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipAddressYesNoController
+              .onSubmitWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+              .url
+          ).withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+            .onPageLoadWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+            .url
       }
     }
   }

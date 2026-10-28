@@ -16,9 +16,9 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import pages.*
+import models.requests.CisPath
 import models.*
+import pages.*
 import pages.add.IndividualJourney
 import pages.add.company.CompanyJourney
 import pages.add.partnership.PartnershipJourney
@@ -26,6 +26,9 @@ import pages.add.trust.TrustJourney
 import pages.contractordetails.ContractorDetailsJourney
 import pages.verify.VerifyJourney
 import play.api.mvc.Call
+
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() (
@@ -44,6 +47,9 @@ class Navigator @Inject() (
       case FinalValidationMode => finalValidationNavigator.nextPage(page, mode, userAnswers)
       case _                   => navigatorFor(page).nextPage(page, mode, userAnswers)
     }
+
+  def nextPage(cisPath: CisPath, uuid: UUID, page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    navigatorFor(page).nextPage(cisPath, uuid, page, mode, userAnswers)
 
   private def navigatorFor(page: Page): NavigatorForJourney =
     page match {

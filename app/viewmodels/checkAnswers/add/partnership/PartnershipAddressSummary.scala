@@ -25,21 +25,33 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object PartnershipAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipAddressPage).map { answer =>
-      AddressSummaryRow.row(
-        address = answer,
-        key = "partnershipAddress.checkYourAnswersLabel",
-        changeCall = if (mode == AmendMode) {
-          controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
-        } else {
-          controllers.add.partnership.routes.PartnershipAddressController
-            .redirectToAddressLookup(NormalMode, Some("change"))
-        },
-        hiddenTextKey = "partnershipAddress.change.hidden",
-        id = "address-of-partnership"
-      )
-    }
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipAddressPage(id)))
+      .getOrElse(answers.get(PartnershipAddressPage))
+      .map { answer =>
+        AddressSummaryRow.row(
+          address = answer,
+          key = "partnershipAddress.checkYourAnswersLabel",
+          changeCall = changeUrl
+            .map(url => play.api.mvc.Call("GET", url))
+            .getOrElse(
+              if (mode == AmendMode) {
+                controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookup()
+              } else {
+                controllers.add.partnership.routes.PartnershipAddressController
+                  .redirectToAddressLookup(NormalMode, Some("change"))
+              }
+            ),
+          hiddenTextKey = "partnershipAddress.change.hidden",
+          id = "address-of-partnership"
+        )
+      }
 
   def row(
     answers: PartnershipAnswers

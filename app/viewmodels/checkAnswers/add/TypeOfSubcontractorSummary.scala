@@ -29,36 +29,41 @@ object TypeOfSubcontractorSummary {
 
   def row(
     answers: UserAnswers,
-    showActions: Boolean = true
+    showActions: Boolean = true,
+    subJourneyId: Option[String] = None,
+    changeUrl: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TypeOfSubcontractorPage).map { answer =>
+    subJourneyId
+      .map(id => answers.get(TypeOfSubcontractorPage(id)))
+      .getOrElse(answers.get(TypeOfSubcontractorPage))
+      .map { answer =>
 
-      val value = ValueViewModel(
-        HtmlContent(
-          HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
-        )
-      )
-
-      val actions =
-        if (showActions) {
-          Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
-            )
-              .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
-              .withAttribute("id" -> "type-of-subcontractor")
+        val value = ValueViewModel(
+          HtmlContent(
+            HtmlFormat.escape(messages(s"typeOfSubcontractor.$answer"))
           )
-        } else {
-          Seq.empty
-        }
+        )
 
-      SummaryListRowViewModel(
-        key = "typeOfSubcontractor.checkYourAnswersLabel",
-        value = value,
-        actions = actions
-      )
-    }
+        val actions =
+          if (showActions) {
+            Seq(
+              ActionItemViewModel(
+                "site.change",
+                changeUrl.getOrElse(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
+              )
+                .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
+                .withAttribute("id" -> "type-of-subcontractor")
+            )
+          } else {
+            Seq.empty
+          }
+
+        SummaryListRowViewModel(
+          key = "typeOfSubcontractor.checkYourAnswersLabel",
+          value = value,
+          actions = actions
+        )
+      }
 
   def row(
     subcontractorType: TypeOfSubcontractor

@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
-import models.requests.DataRequest
+import models.requests.{CisPath, DataRequest}
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.company.CompanyNamePage
 import pages.add.partnership.PartnershipNamePage
@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorAddedView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -41,6 +42,8 @@ class SubcontractorAddedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  getJourney: JourneyAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorAddedView,
@@ -67,6 +70,36 @@ class SubcontractorAddedController @Inject() (
   def trustSubcontractorAdded: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Trust)
+    }
+
+  def partnershipSubcontractorAddedWithId(cisPath: CisPath, uuid: UUID): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)) { implicit request =>
+      def recoveryRedirect =
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(request.subJourneyId)).contains(true)) {
+        val name  = request.userAnswers.get(PartnershipNamePage(request.subJourneyId))
+        val cisId = request.userAnswers.get(CisIdQuery)
+
+        (name, cisId) match {
+          case (Some(name), Some(cisId)) =>
+            val manageSubcontractorsUrl =
+              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+
+            Ok(view(name, Messages("subcontractorAdded.partnership"), manageSubcontractorsUrl))
+
+          case _ =>
+            logger.error(
+              "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+            )
+            recoveryRedirect
+        }
+      } else {
+        logger.error(
+          "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+        )
+        recoveryRedirect
+      }
     }
 
   private def subcontractorAdded(
