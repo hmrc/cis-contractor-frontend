@@ -84,6 +84,14 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             proceed = Some("Y"),
             matched = Some("Y")
           )
+        ),
+        submission = Some(
+          Submission(
+            submissionId = 13602L,
+            activeObjectId = Some(99L),
+            submissionRequestDate = Some(LocalDateTime.parse("2026-07-23T10:20:30")),
+            status = Some("STARTED")
+          )
         )
       )
 
@@ -127,16 +135,49 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (v0 \ "actionIndicator").as[String] mustBe "A"
       (v0 \ "proceed").as[String] mustBe "Y"
       (v0 \ "matched").as[String] mustBe "Y"
+
+      val submission = json \ "submission"
+
+      (submission \ "submissionId").as[Long] mustBe 13602L
+      (submission \ "activeObjectId").as[Long] mustBe 99L
+      (submission \ "submissionRequestDate").as[String] mustBe "2026-07-23T10:20:30"
+      (submission \ "status").as[String] mustBe "STARTED"
     }
 
     "round-trip (model -> json -> model) without losing data" in {
       val model = GetCurrentVerificationBatchResponse(
         subcontractors = Seq.empty,
         verificationBatch = None,
-        verifications = Seq.empty
+        verifications = Seq.empty,
+        submission = None
       )
 
       val json = Json.toJson(model)
+      json.validate[GetCurrentVerificationBatchResponse] mustBe JsSuccess(model)
+    }
+
+    "round-trip (model -> json -> model) with an existing submission" in {
+      val model = GetCurrentVerificationBatchResponse(
+        subcontractors = Seq.empty,
+        verificationBatch = Some(
+          VerificationBatchCurrentVerification(
+            verificationBatchId = 99L,
+            verifBatchResourceRef = Some(999L)
+          )
+        ),
+        verifications = Seq.empty,
+        submission = Some(
+          Submission(
+            submissionId = 13602L,
+            activeObjectId = Some(99L),
+            submissionRequestDate = None,
+            status = Some("STARTED")
+          )
+        )
+      )
+
+      val json = Json.toJson(model)
+
       json.validate[GetCurrentVerificationBatchResponse] mustBe JsSuccess(model)
     }
   }

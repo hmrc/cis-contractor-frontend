@@ -312,14 +312,23 @@ class VerificationService @Inject() (
     messages: Messages
   ): Future[ChrisSubmissionResponse] =
     for {
-      latestUa      <- getCurrentVerificationBatch(request.userAnswers)
-      createRequest <- buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
-      // Build the ChRIS request before creating the submission: a failure here must not leave a
-      // created-but-never-sent submission, which would make every retry fail on the unique key
-      chrisRequest  <- buildChrisVerificationRequest(latestUa)
-      submissionId  <- createSubmissionForVerification(createRequest).map(_.submissionId)
-      response      <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
-      updatedUa     <- saveVerificationSubmissionDetailsToSession(latestUa, response)
+      latestUa     <- getCurrentVerificationBatch(request.userAnswers)
+      chrisRequest <- buildChrisVerificationRequest(latestUa)
+      submissionId <- latestUa.get(CurrentVerificationBatchResponsePage).flatMap(_.submission) match {
+                        case Some(existingSubmission) =>
+                          logger.info(
+                            s"[VerificationService] Reusing existing verification submissionId=${existingSubmission.submissionId}"
+                          )
+                          Future.successful(existingSubmission.submissionId)
+                        case None                     =>
+                          for {
+                            createRequest  <-
+                              buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
+                            createResponse <- createSubmissionForVerification(createRequest)
+                          } yield createResponse.submissionId
+                      }
+      response     <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
+      updatedUa    <- saveVerificationSubmissionDetailsToSession(latestUa, response)
     } yield response
 
   def pollStatusAndPersist(
