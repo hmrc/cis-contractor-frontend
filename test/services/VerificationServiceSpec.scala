@@ -1144,7 +1144,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           emailRecipient = Some("test@test.com"),
           language = None,
           subcontractors = Seq.empty,
-          verifications = Seq.empty
+          verifications = Seq.empty,
+          isResubmission = false
         )
 
       val chrisResponse =
@@ -1269,6 +1270,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           verifications = Seq.empty
         )
 
+      val resubmissionRequest = chrisRequest.copy(isResubmission = true)
+
       val chrisResponse =
         ChrisSubmissionResponse(
           submissionId = "13602",
@@ -1289,7 +1292,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         )
       ).thenReturn(Future.successful(chrisRequest))
 
-      when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier]))
+      when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(resubmissionRequest))(any[HeaderCarrier]))
         .thenReturn(Future.successful(chrisResponse))
 
       when(mockRepo.set(any[UserAnswers]))
@@ -1303,7 +1306,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockConnector, never()).createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(
         any[HeaderCarrier]
       )
-      verify(mockConnector).submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier])
+      verify(mockConnector).submitVerificationToChris(eqTo(13602L), eqTo(resubmissionRequest))(any[HeaderCarrier])
       verify(mockRepo, times(2)).set(any[UserAnswers])
     }
 
@@ -1454,7 +1457,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           emailRecipient = None,
           language = None,
           subcontractors = Seq.empty,
-          verifications = Seq.empty
+          verifications = Seq.empty,
+          isResubmission = false
         )
 
       val chrisResponse =

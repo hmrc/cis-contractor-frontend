@@ -312,23 +312,27 @@ class VerificationService @Inject() (
     messages: Messages
   ): Future[ChrisSubmissionResponse] =
     for {
-      latestUa     <- getCurrentVerificationBatch(request.userAnswers)
-      chrisRequest <- buildChrisVerificationRequest(latestUa)
-      submissionId <- latestUa.get(CurrentVerificationBatchResponsePage).flatMap(_.submission) match {
-                        case Some(existingSubmission) =>
-                          logger.info(
-                            s"[VerificationService] Reusing existing verification submissionId=${existingSubmission.submissionId}"
-                          )
-                          Future.successful(existingSubmission.submissionId)
-                        case None                     =>
-                          for {
-                            createRequest  <-
-                              buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
-                            createResponse <- createSubmissionForVerification(createRequest)
-                          } yield createResponse.submissionId
-                      }
-      response     <- cisConnector.submitVerificationToChris(submissionId, chrisRequest)
-      updatedUa    <- saveVerificationSubmissionDetailsToSession(latestUa, response)
+      latestUa          <- getCurrentVerificationBatch(request.userAnswers)
+      chrisRequest      <- buildChrisVerificationRequest(latestUa)
+      existingSubmission = latestUa.get(CurrentVerificationBatchResponsePage).flatMap(_.submission)
+      isResubmission     = existingSubmission.isDefined
+      submissionId      <- existingSubmission match {
+                             case Some(existingSubmission) =>
+                               logger.info(
+                                 s"[VerificationService] Reusing existing verification " +
+                                   s"submissionId=${existingSubmission.submissionId}"
+                               )
+                               Future.successful(existingSubmission.submissionId)
+                             case None                     =>
+                               for {
+                                 createRequest  <-
+                                   buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
+                                 createResponse <- createSubmissionForVerification(createRequest)
+                               } yield createResponse.submissionId
+                           }
+      verificationReq    = chrisRequest.copy(isResubmission = isResubmission)
+      response          <- cisConnector.submitVerificationToChris(submissionId, verificationReq)
+      updatedUa         <- saveVerificationSubmissionDetailsToSession(latestUa, response)
     } yield response
 
   def pollStatusAndPersist(
