@@ -34,6 +34,7 @@ class ChrisVerificationRequestSpec extends SpecBase {
         "verificationBatchId"          -> "1001",
         "verificationBatchResourceRef" -> "2001",
         "emailRecipient"               -> "test@test.com",
+        "isResubmission"               -> true,
         "subcontractors"               -> Json.arr(),
         "verifications"                -> Json.arr(
           Json.obj(
@@ -49,6 +50,7 @@ class ChrisVerificationRequestSpec extends SpecBase {
       result.instanceId mustBe "1"
       result.verificationBatchId mustBe "1001"
       result.verifications.head.subcontractorName mustBe "Test Subcontractor"
+      result.isResubmission mustBe true
     }
 
     "must write to JSON" in {
@@ -78,6 +80,7 @@ class ChrisVerificationRequestSpec extends SpecBase {
       (json \ "instanceId").as[String] mustBe "1"
       (json \ "verificationBatchId").as[String] mustBe "1001"
       (json \ "verifications" \ 0 \ "proceedVerification").as[Boolean] mustBe true
+      (json \ "isResubmission").as[Boolean] mustBe false
     }
   }
 }

@@ -1104,7 +1104,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
               proceed = None,
               matched = None
             )
-          )
+          ),
+          submission = None
         )
 
       val ua =
@@ -1143,7 +1144,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           emailRecipient = Some("test@test.com"),
           language = None,
           subcontractors = Seq.empty,
-          verifications = Seq.empty
+          verifications = Seq.empty,
+          isResubmission = false
         )
 
       val chrisResponse =
@@ -1190,7 +1192,7 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockRepo, times(2)).set(any[UserAnswers])
     }
 
-    "must not create a submission when building the ChRIS request fails" in {
+    "must reuse an existing submission without creating another" in {
       val mockConnector      = mock[ConstructionIndustrySchemeConnector]
       val mockRepo           = mock[SessionRepository]
       val mockRequestBuilder = mock[ChrisVerificationRequestBuilder]
@@ -1217,6 +1219,14 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
               actionIndicator = None,
               proceed = None,
               matched = None
+            )
+          ),
+          submission = Some(
+            Submission(
+              submissionId = 13602L,
+              activeObjectId = Some(999L),
+              submissionRequestDate = None,
+              status = Some("STARTED")
             )
           )
         )
@@ -1260,6 +1270,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           verifications = Seq.empty
         )
 
+      val resubmissionRequest = chrisRequest.copy(isResubmission = true)
+
       val chrisResponse =
         ChrisSubmissionResponse(
           submissionId = "13602",
@@ -1274,8 +1286,87 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .thenReturn(Future.successful(currentBatch))
 
       when(
-        mockConnector.createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(any[HeaderCarrier])
-      ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
+        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+          any[HeaderCarrier],
+          any[Messages]
+        )
+      ).thenReturn(Future.successful(chrisRequest))
+
+      when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(resubmissionRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(chrisResponse))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result =
+        service.createSubmitAndPersistVerificationSubmission.futureValue
+
+      result mustBe chrisResponse
+
+      verify(mockConnector, never()).createSubmissionForVerification(any[CreateSubmissionForVerificationRequest])(
+        any[HeaderCarrier]
+      )
+      verify(mockConnector).submitVerificationToChris(eqTo(13602L), eqTo(resubmissionRequest))(any[HeaderCarrier])
+      verify(mockRepo, times(2)).set(any[UserAnswers])
+    }
+
+    "must not create a submission when building the ChRIS request fails" in {
+      val mockConnector      = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo           = mock[SessionRepository]
+      val mockRequestBuilder = mock[ChrisVerificationRequestBuilder]
+      val service            = buildService(mockConnector, mockRepo, requestBuilder = mockRequestBuilder)
+
+      val currentBatch =
+        GetCurrentVerificationBatchResponse(
+          subcontractors = Seq.empty,
+          verificationBatch = Some(
+            VerificationBatchCurrentVerification(
+              verificationBatchId = 999L,
+              verifBatchResourceRef = Some(7777L)
+            )
+          ),
+          verifications = Seq(
+            VerificationCurrentVerification(
+              verificationId = 1L,
+              verificationBatchId = Some(999L),
+              subcontractorId = Some(10L),
+              verificationResourceRef = Some(1111L),
+              subcontractorName = None,
+              verificationNumber = None,
+              taxTreatment = None,
+              actionIndicator = None,
+              proceed = None,
+              matched = None
+            )
+          ),
+          submission = None
+        )
+
+      val ua =
+        emptyUserAnswers
+          .set(CisIdQuery, instanceId)
+          .success
+          .value
+          .set(CurrentVerificationBatchResponsePage, currentBatch)
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "test@test.com")
+          .success
+          .value
+
+      implicit val request: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          userId = "user-id",
+          userAnswers = ua,
+          employerReference = Some(EmployerReference("123", "AB456"))
+        )
+
+      when(mockConnector.getCurrentVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(currentBatch))
 
       when(
         mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
@@ -1283,9 +1374,6 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           any[Messages]
         )
       ).thenReturn(Future.failed(new RuntimeException("build boom")))
-
-      when(mockConnector.submitVerificationToChris(eqTo(13602L), eqTo(chrisRequest))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(chrisResponse))
 
       when(mockRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
@@ -1334,7 +1422,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
               proceed = Some("Y"),
               matched = None
             )
-          )
+          ),
+          submission = None
         )
 
       val ua =
@@ -1368,7 +1457,8 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
           emailRecipient = None,
           language = None,
           subcontractors = Seq.empty,
-          verifications = Seq.empty
+          verifications = Seq.empty,
+          isResubmission = false
         )
 
       val chrisResponse =
