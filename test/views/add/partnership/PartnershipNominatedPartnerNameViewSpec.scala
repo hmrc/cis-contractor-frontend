@@ -36,7 +36,12 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipNominatedPartnerName.title"))
@@ -65,7 +70,12 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipNominatedPartnerName.title"))
@@ -97,7 +107,12 @@ class PartnershipNominatedPartnerNameViewSpec extends AnyWordSpec with Matchers 
       val errorForm: Form[String] =
         form.withError("value", "partnershipNominatedPartnerName.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onSubmit(NormalMode)
+      )
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

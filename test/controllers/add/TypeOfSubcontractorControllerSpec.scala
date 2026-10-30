@@ -19,6 +19,7 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
+import models.requests.CisPath.CisOrg
 import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -29,9 +30,12 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.JourneyService
 import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
+import java.util.UUID
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
@@ -67,7 +71,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           form,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -104,7 +109,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           form.fill(TypeOfSubcontractor.values.head),
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -159,6 +165,44 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockSessionRepository, times(1))
           .set(any())
+      }
+    }
+
+    "must create a UUID and continue to the partnership name page when Partnership is submitted" in {
+
+      val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+
+      val mockSessionRepository = mock[SessionRepository]
+      val journeyService        = new JourneyService(mockSessionRepository) {
+        override def create[B](
+          req: models.requests.SchemeRequest[B],
+          initialise: (UserAnswers, String) => scala.util.Try[UserAnswers]
+        ): Future[UUID] =
+          Future.successful(uuid)
+      }
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[JourneyService].toInstance(journeyService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitWithCisPath(CisOrg, NormalMode).url
+          ).withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.add.partnership.routes.PartnershipNameController
+            .onPageLoadWithId(CisOrg, uuid, NormalMode)
+            .url
       }
     }
 
@@ -458,7 +502,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           boundForm,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -505,7 +550,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           boundForm,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)

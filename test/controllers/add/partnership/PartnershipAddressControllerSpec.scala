@@ -544,5 +544,104 @@ class PartnershipAddressControllerSpec extends SpecBase with MockitoSugar {
         }
       }
     }
+
+    "with id" - {
+
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val cisPath = models.requests.CisPath.CisOrg
+      val id      = models.JourneyScope.subJourneyId(cisPath, uuid)
+      val answers = emptyUserAnswers
+        .initialiseSubJourney(id)
+        .success
+        .value
+        .set(PartnershipNamePage(id), partnershipName)
+        .success
+        .value
+
+      "must redirect to the address lookup on-ramp using the WithId callback" in {
+        val mockSessionRepository    = mock[SessionRepository]
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+        when(
+          mockAddressLookupService
+            .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+        ) thenReturn Future.successful(Call("GET", lookupUrl))
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[AddressLookupService].toInstance(mockAddressLookupService)
+            )
+            .build()
+
+        running(application) {
+          val request = FakeRequest(
+            GET,
+            controllers.add.partnership.routes.PartnershipAddressController
+              .redirectToAddressLookupWithId(cisPath, uuid, None)
+              .url
+          )
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe lookupUrl
+
+          val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
+
+          verify(mockAddressLookupService)
+            .getJourneyUrl(
+              any(),
+              callbackCaptor.capture(),
+              any(),
+              any(),
+              any(),
+              any(),
+              any(),
+              any(),
+              any()
+            )(any(), any(), any())
+
+          callbackCaptor.getValue.url mustBe
+            controllers.add.partnership.routes.PartnershipAddressController
+              .addressLookupCallbackWithId(cisPath, uuid, id = "")
+              .url
+        }
+      }
+
+      "must persist the folder address then redirect to contact methods with id" in {
+        val mockSessionRepository    = mock[SessionRepository]
+        val mockAddressLookupService = mock[AddressLookupService]
+
+        when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+        when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
+        when(mockAddressLookupService.saveAddressDetails(any(), any(), any())(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[AddressLookupService].toInstance(mockAddressLookupService)
+            )
+            .build()
+
+        running(application) {
+          val request = FakeRequest(
+            GET,
+            controllers.add.partnership.routes.PartnershipAddressController
+              .addressLookupCallbackWithId(cisPath, uuid, "addr-id")
+              .url
+          )
+          val result  = route(application, request).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+              .onPageLoadWithId(cisPath, uuid, NormalMode)
+              .url
+        }
+      }
+    }
   }
 }

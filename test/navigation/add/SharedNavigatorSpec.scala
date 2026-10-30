@@ -128,6 +128,22 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe journeyRecovery
       }
 
+      "must go from a TypeOfSubcontractorPage to the partnership name page with id when Partnership is selected" in {
+        val uuid = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id   = models.JourneyScope.subJourneyId(models.requests.CisPath.CisOrg, uuid)
+        navigator.nextPage(
+          models.requests.CisPath.CisOrg,
+          uuid,
+          TypeOfSubcontractorPage,
+          NormalMode,
+          emptyUserAnswers
+            .initialiseSubJourney(id)
+            .get
+            .setOrException(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController
+          .onPageLoadWithId(models.requests.CisPath.CisOrg, uuid, NormalMode)
+      }
+
     }
 
     "in Check mode" - {

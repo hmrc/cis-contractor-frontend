@@ -20,6 +20,13 @@ import models.address.Address
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class PartnershipAddressPage(id: String) extends QuestionPage[Address] with PartnershipJourney {
+
+  override def path: JsPath = JsPath \ id \ toString
+
+  override def toString: String = "partnershipAddress"
+}
+
 case object PartnershipAddressPage extends QuestionPage[Address] with PartnershipJourney {
 
   override def path: JsPath = JsPath \ toString

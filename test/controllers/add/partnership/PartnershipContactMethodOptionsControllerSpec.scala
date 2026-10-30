@@ -68,7 +68,12 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -133,7 +138,8 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
         contentAsString(result) mustEqual view(
           form.fill(PartnershipContactMethodOptions.values.toSet),
           NormalMode,
-          partnershipName
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onSubmit(NormalMode)
         )(request, messages(application)).toString
       }
     }
@@ -181,7 +187,12 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -351,7 +362,12 @@ class PartnershipContactMethodOptionsControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipContactMethodOptionsController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

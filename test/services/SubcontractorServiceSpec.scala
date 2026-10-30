@@ -678,6 +678,72 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should create and update a partnership from folder answers" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "org_11111111-1111-1111-1111-111111111111"
+        val folderAddress =
+          Address(
+            addressLine1 = "p1",
+            addressLine2 = Some("p2"),
+            addressLine3 = Some("London"),
+            addressLine4 = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .success
+            .value
+            .initialiseSubJourney(id)
+            .success
+            .value
+            .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+            .success
+            .value
+            .set(PartnershipNamePage(id), "Folder Partnership")
+            .success
+            .value
+            .set(PartnershipNominatedPartnerNamePage(id), "Folder Partner")
+            .success
+            .value
+            .set(PartnershipAddressPage(id), folderAddress)
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          PartnershipPayload(
+            cisId = cisId,
+            subcontractorType = TypeOfSubcontractor.Partnership,
+            utr = None,
+            partnerUtr = None,
+            partnershipTradingName = Some("Folder Partnership"),
+            partnerTradingName = Some("Folder Partner"),
+            partnerNino = None,
+            partnerCrn = None,
+            addressLine1 = Some("p1"),
+            addressLine2 = Some("p2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should fail when cisId not found in session data" in {
         val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
         val service                                            = new SubcontractorService(mockConnector)

@@ -22,6 +22,7 @@ import models.UserAnswers
 import models.add.IndividualNamesOptions
 import models.audit.*
 import models.contact.ContactMethodOptions
+import pages.QuestionPage
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
@@ -65,12 +66,21 @@ class AuditService @Inject() (
     }
 
   def addSubcontractorEvent(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Unit =
-    userAnswers.get(TypeOfSubcontractorPage) match {
+    addSubcontractorEvent(userAnswers, None)
+
+  def addSubcontractorEvent(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Unit = {
+    val subcontractorType = subJourneyId
+      .flatMap(id => userAnswers.get(TypeOfSubcontractorPage(id)))
+      .orElse(userAnswers.get(TypeOfSubcontractorPage))
+    subcontractorType match {
       case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers))
-      case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers))
+      case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers, subJourneyId))
       case Some(TypeOfSubcontractor.Trust)          => send(buildTrustModel(userAnswers))
       case _                                        => send(buildIndividualModel(userAnswers))
     }
+  }
 
   private def send[A <: AuditEvent](event: A)(implicit writes: OWrites[A], hc: HeaderCarrier): Unit =
     auditConnector.sendExplicitAudit(event.auditType, Json.toJson(event))
@@ -129,32 +139,50 @@ class AuditService @Inject() (
     )
   }
 
-  private def buildPartnershipModel(ua: UserAnswers): AddPartnershipSubcontractorAuditEventModel = {
-    val contactOpts = ua.get(PartnershipContactMethodOptionsPage)
+  private def buildPartnershipModel(
+    ua: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): AddPartnershipSubcontractorAuditEventModel = {
+    def value[A](folder: String => QuestionPage[A], root: QuestionPage[A])(implicit
+      reads: play.api.libs.json.Reads[A]
+    ): Option[A] =
+      subJourneyId.flatMap(id => ua.get(folder(id))).orElse(ua.get(root))
+
+    val contactOpts = value(PartnershipContactMethodOptionsPage.apply, PartnershipContactMethodOptionsPage)
     AddPartnershipSubcontractorAuditEventModel(
       cisId = ua.get(CisIdQuery),
-      typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      partnershipName = ua.get(PartnershipNamePage),
-      partnershipAddressYesNo = ua.get(PartnershipAddressYesNoPage),
-      partnershipAddress = ua.get(PartnershipAddressPage),
-      addPartnershipContactMethodsYesNo = ua.get(AddPartnershipContactMethodsYesNoPage),
+      typeOfSubcontractor = value(TypeOfSubcontractorPage.apply, TypeOfSubcontractorPage).fold("")(_.toString),
+      partnershipName = value(PartnershipNamePage.apply, PartnershipNamePage),
+      partnershipAddressYesNo = value(PartnershipAddressYesNoPage.apply, PartnershipAddressYesNoPage),
+      partnershipAddress = value(PartnershipAddressPage.apply, PartnershipAddressPage),
+      addPartnershipContactMethodsYesNo =
+        value(AddPartnershipContactMethodsYesNoPage.apply, AddPartnershipContactMethodsYesNoPage),
       partnershipEmailContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Email)),
       partnershipPhoneContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Phone)),
       partnershipMobileContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Mobile)),
-      partnershipEmailAddress = ua.get(PartnershipEmailAddressPage),
-      partnershipPhoneNumber = ua.get(PartnershipPhoneNumberPage),
-      partnershipMobileNumber = ua.get(PartnershipMobileNumberPage),
-      partnershipHasUtrYesNo = ua.get(PartnershipHasUtrYesNoPage),
-      partnershipUniqueTaxpayerReference = ua.get(PartnershipUniqueTaxpayerReferencePage),
-      partnershipNominatedPartnerName = ua.get(PartnershipNominatedPartnerNamePage),
-      partnershipNominatedPartnerUtrYesNo = ua.get(PartnershipNominatedPartnerUtrYesNoPage),
-      partnershipNominatedPartnerUtr = ua.get(PartnershipNominatedPartnerUtrPage),
-      partnershipNominatedPartnerNinoYesNo = ua.get(PartnershipNominatedPartnerNinoYesNoPage),
-      nominatedPartnerNationalInsuranceNumber = ua.get(PartnershipNominatedPartnerNinoPage),
-      partnershipNominatedPartnerCrnYesNo = ua.get(PartnershipNominatedPartnerCrnYesNoPage),
-      nominatedPartnerCompanyRegistrationNumber = ua.get(PartnershipNominatedPartnerCrnPage),
-      partnershipWorksReferenceNumberYesNo = ua.get(PartnershipWorksReferenceNumberYesNoPage),
-      partnershipWorksReference = ua.get(PartnershipWorksReferenceNumberPage)
+      partnershipEmailAddress = value(PartnershipEmailAddressPage.apply, PartnershipEmailAddressPage),
+      partnershipPhoneNumber = value(PartnershipPhoneNumberPage.apply, PartnershipPhoneNumberPage),
+      partnershipMobileNumber = value(PartnershipMobileNumberPage.apply, PartnershipMobileNumberPage),
+      partnershipHasUtrYesNo = value(PartnershipHasUtrYesNoPage.apply, PartnershipHasUtrYesNoPage),
+      partnershipUniqueTaxpayerReference =
+        value(PartnershipUniqueTaxpayerReferencePage.apply, PartnershipUniqueTaxpayerReferencePage),
+      partnershipNominatedPartnerName =
+        value(PartnershipNominatedPartnerNamePage.apply, PartnershipNominatedPartnerNamePage),
+      partnershipNominatedPartnerUtrYesNo =
+        value(PartnershipNominatedPartnerUtrYesNoPage.apply, PartnershipNominatedPartnerUtrYesNoPage),
+      partnershipNominatedPartnerUtr =
+        value(PartnershipNominatedPartnerUtrPage.apply, PartnershipNominatedPartnerUtrPage),
+      partnershipNominatedPartnerNinoYesNo =
+        value(PartnershipNominatedPartnerNinoYesNoPage.apply, PartnershipNominatedPartnerNinoYesNoPage),
+      nominatedPartnerNationalInsuranceNumber =
+        value(PartnershipNominatedPartnerNinoPage.apply, PartnershipNominatedPartnerNinoPage),
+      partnershipNominatedPartnerCrnYesNo =
+        value(PartnershipNominatedPartnerCrnYesNoPage.apply, PartnershipNominatedPartnerCrnYesNoPage),
+      nominatedPartnerCompanyRegistrationNumber =
+        value(PartnershipNominatedPartnerCrnPage.apply, PartnershipNominatedPartnerCrnPage),
+      partnershipWorksReferenceNumberYesNo =
+        value(PartnershipWorksReferenceNumberYesNoPage.apply, PartnershipWorksReferenceNumberYesNoPage),
+      partnershipWorksReference = value(PartnershipWorksReferenceNumberPage.apply, PartnershipWorksReferenceNumberPage)
     )
   }
 

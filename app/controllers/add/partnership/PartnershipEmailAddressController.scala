@@ -21,6 +21,7 @@ import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipEmailAddressFormProvider
 import models.{FinalValidationMode, Mode}
 import models.contact.ContactMethodOptions
+import models.requests.CisPath
 import navigation.Navigator
 import pages.add.partnership.{PartnershipContactMethodOptionsPage, PartnershipEmailAddressPage}
 import play.api.Logging
@@ -30,6 +31,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipEmailAddressView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +42,8 @@ class PartnershipEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  getJourney: JourneyAction,
   formProvider: PartnershipEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipEmailAddressView
@@ -55,6 +59,7 @@ class PartnershipEmailAddressController @Inject() (
 
       val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
       val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+      val submitAction    = routes.PartnershipEmailAddressController.onSubmit(mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -66,7 +71,7 @@ class PartnershipEmailAddressController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, partnershipName))
+          Ok(view(preparedForm, mode, partnershipName, submitAction))
 
         case (Some(_), false) =>
           Redirect(controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode))
@@ -83,6 +88,7 @@ class PartnershipEmailAddressController @Inject() (
 
       val contactOption   = request.userAnswers.get(PartnershipContactMethodOptionsPage)
       val partnershipName = SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode)
+      val submitAction    = routes.PartnershipEmailAddressController.onSubmit(mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -94,7 +100,7 @@ class PartnershipEmailAddressController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, submitAction))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage, value))
@@ -106,4 +112,61 @@ class PartnershipEmailAddressController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)) { implicit request =>
+      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(request.subJourneyId))
+      val partnershipName  =
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (partnershipName, emailIsAvailable) match {
+        case (Some(partnershipName), true) =>
+          val page         = PartnershipEmailAddressPage(request.subJourneyId)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              partnershipName,
+              routes.PartnershipEmailAddressController.onSubmitWithId(cisPath, uuid, mode)
+            )
+          )
+        case _                             =>
+          logger.error(
+            s"[PartnershipEmailAddressController][onPageLoadWithId] - partnership name or email option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)).async { implicit request =>
+      val submitAction     = routes.PartnershipEmailAddressController.onSubmitWithId(cisPath, uuid, mode)
+      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(request.subJourneyId))
+      val partnershipName  =
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (for {
+        partnershipName <- partnershipName
+        if emailIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, partnershipName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage(request.subJourneyId), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(cisPath, uuid, PartnershipEmailAddressPage, mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            s"[PartnershipEmailAddressController][onSubmitWithId] - partnership name or email option missing"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

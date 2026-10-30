@@ -18,16 +18,453 @@ package navigation.add
 
 import controllers.routes
 import models.contact.ContactMethodOptions
-import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
+import models.requests.CisPath
+import models.{AmendMode, CheckMode, JourneyScope, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
 import pages.{Page, QuestionPage}
 import pages.add.partnership.*
 import play.api.mvc.Call
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class PartnershipNavigator @Inject() () extends NavigatorForJourney {
+
+  override def nextPage(cisPath: CisPath, uuid: UUID, page: Page, mode: Mode, userAnswers: UserAnswers): Call = {
+    val id = JourneyScope.subJourneyId(cisPath, uuid)
+    mode match {
+      case NormalMode => normalRoutesWithId(cisPath, uuid, id)(page)(userAnswers)
+      case CheckMode  => checkRouteMapWithId(cisPath, uuid, id)(page)(userAnswers)
+      case _          => super.nextPage(cisPath, uuid, page, mode, userAnswers)
+    }
+  }
+
+  private def cyaRouteWithId(cisPath: CisPath, uuid: UUID): Call =
+    controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoadWithId(cisPath, uuid)
+
+  private def normalRoutesWithId(cisPath: CisPath, uuid: UUID, id: String): Page => UserAnswers => Call = {
+    case PartnershipNamePage                      =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoadWithId(cisPath, uuid, NormalMode)
+    case PartnershipAddressYesNoPage              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage      =>
+      userAnswers => nextSelectedContactMethodPageAfter(cisPath, uuid, id, current = None)(userAnswers)
+    case PartnershipEmailAddressPage              =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(cisPath, uuid, id, current = Some(ContactMethodOptions.Email))(userAnswers)
+    case PartnershipPhoneNumberPage               =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(cisPath, uuid, id, current = Some(ContactMethodOptions.Phone))(userAnswers)
+    case PartnershipMobileNumberPage              =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(cisPath, uuid, id, current = Some(ContactMethodOptions.Mobile))(userAnswers)
+    case PartnershipHasUtrYesNoPage               =>
+      userAnswers => navigatorFromPartnershipHasUtrYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipUniqueTaxpayerReferencePage   =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+    case PartnershipNominatedPartnerNamePage      =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+    case PartnershipWorksReferenceNumberYesNoPage =>
+      userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage      =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipWorksReferenceNumberPage      =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case PartnershipNominatedPartnerCrnPage       =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerCrnYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage       =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(cisPath, uuid, id, NormalMode)(userAnswers)
+    case _                                        => _ => routes.IndexController.onPageLoad()
+  }
+
+  private def checkRouteMapWithId(cisPath: CisPath, uuid: UUID, id: String): Page => UserAnswers => Call = {
+    case PartnershipHasUtrYesNoPage               =>
+      navigatorFromPartnershipHasUtrYesNoPage(cisPath, uuid, id, CheckMode)(_)
+    case PartnershipWorksReferenceNumberYesNoPage =>
+      navigatorFromPartnershipWorksReferenceNumberYesNoPage(cisPath, uuid, id, CheckMode)(_)
+    case PartnershipNominatedPartnerCrnYesNoPage  =>
+      navigatorFromPartnershipNominatedPartnerCrnYesNoPage(cisPath, uuid, id, CheckMode)(_)
+    case PartnershipNamePage                      =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case PartnershipAddressYesNoPage              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(cisPath, uuid, id, CheckMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(cisPath, uuid, id, CheckMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage      =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(cisPath, uuid, id, current = None, CheckMode)(userAnswers)
+    case PartnershipEmailAddressPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          cisPath,
+          uuid,
+          id,
+          current = Some(ContactMethodOptions.Email),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipPhoneNumberPage               =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          cisPath,
+          uuid,
+          id,
+          current = Some(ContactMethodOptions.Phone),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipMobileNumberPage              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          cisPath,
+          uuid,
+          id,
+          current = Some(ContactMethodOptions.Mobile),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipNominatedPartnerNinoYesNoPage =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(cisPath, uuid, id, CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage      =>
+      navigatorFromPartnershipNominatedPartnerNinoPage(cisPath, uuid, id, CheckMode)(_)
+    case PartnershipNominatedPartnerNamePage      =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case PartnershipNominatedPartnerUtrYesNoPage  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(cisPath, uuid, id, CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage       =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case PartnershipNominatedPartnerCrnPage       =>
+      navigatorFromPartnershipNominatedPartnerCrnPage(cisPath, uuid, id, CheckMode)(_)
+    case PartnershipWorksReferenceNumberPage      =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case PartnershipUniqueTaxpayerReferencePage   =>
+      _ => cyaRouteWithId(cisPath, uuid)
+    case _                                        => _ => cyaRouteWithId(cisPath, uuid)
+  }
+
+  private def navigatorFromPartnershipNominatedPartnerNinoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipNominatedPartnerNinoPage(id)), mode) match {
+      case (Some(_), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(_), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                     =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerNinoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerCrnPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipNominatedPartnerCrnPage(id)), mode) match {
+      case (Some(_), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(_), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                     =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerCrnPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipHasUtrYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipHasUtrYesNoPage(id)), mode) match {
+      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage(id)).isDefined =>
+        cyaRouteWithId(cisPath, uuid)
+      case (Some(true), CheckMode)                                                                 =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoadWithId(cisPath, uuid, mode)
+      case (Some(false), CheckMode)                                                                => cyaRouteWithId(cisPath, uuid)
+      case (Some(true), NormalMode)                                                                =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode)                                                               =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case _                                                                                       =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipHasUtrYesNoPage] - unexpected state, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipWorksReferenceNumberYesNoPage(id)), mode) match {
+      case (Some(true), CheckMode)   =>
+        ua.get(PartnershipWorksReferenceNumberPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+              .onPageLoadWithId(cisPath, uuid, mode)
+          )(_ => cyaRouteWithId(cisPath, uuid))
+      case (Some(false), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode) => cyaRouteWithId(cisPath, uuid)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipWorksReferenceNumberYesNoPage] - unexpected, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerUtrPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+              .onPageLoadWithId(cisPath, uuid, mode)
+          )(_ => cyaRouteWithId(cisPath, uuid))
+      case (Some(false), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerUtrYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerCrnYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerCrnPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+              .onPageLoadWithId(cisPath, uuid, mode)
+          )(_ => cyaRouteWithId(cisPath, uuid))
+      case (Some(false), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerCrnYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipAddressYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    addressLookupYesNoRoute(
+      mode,
+      userAnswers.get(PartnershipAddressYesNoPage(id)),
+      userAnswers.get(PartnershipAddressPage(id)).isDefined,
+      onYes = controllers.add.partnership.routes.PartnershipAddressController
+        .redirectToAddressLookupWithId(cisPath, uuid, None),
+      onYesChange = controllers.add.partnership.routes.PartnershipAddressController
+        .redirectToAddressLookupWithId(cisPath, uuid, Some(CheckMode.toString)),
+      onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+        .onPageLoadWithId(cisPath, uuid, NormalMode),
+      checkYourAnswers = cyaRouteWithId(cisPath, uuid)
+    )
+
+  private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerNinoPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+              .onPageLoadWithId(cisPath, uuid, mode)
+          )(_ => cyaRouteWithId(cisPath, uuid))
+      case (Some(false), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerNinoYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddPartnershipContactMethodsYesNoPage(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddPartnershipContactMethodsYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipContactMethodOptionsController
+          .onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(cisPath, uuid, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipContactMethodOptionsPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController
+              .onPageLoadWithId(cisPath, uuid, mode)
+          )(_ => cyaRouteWithId(cisPath, uuid))
+      case (Some(false), CheckMode)  => cyaRouteWithId(cisPath, uuid)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromAddPartnershipContactMethodsYesNoPage] - unexpected state, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def nextSelectedContactMethodPageAfter(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    current: Option[ContactMethodOptions]
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining.headOption.fold {
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(cisPath, uuid, NormalMode)
+      }(contactMethodPageCall(cisPath, uuid, _, NormalMode))
+    }
+
+  private def nextMissingSelectedContactMethodPageAfter(
+    cisPath: CisPath,
+    uuid: UUID,
+    id: String,
+    current: Option[ContactMethodOptions],
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining
+        .find(isMissingAnswer(id, _)(userAnswers))
+        .map(contactMethodPageCall(cisPath, uuid, _, mode))
+        .getOrElse(cyaRouteWithId(cisPath, uuid))
+    }
+
+  private def navigateFromContactMethodPage(
+    id: String,
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
+    selectedContactMethodsInOrder(id, userAnswers)
+      .filter(_.nonEmpty)
+      .fold {
+        logger.error(
+          "[PartnershipNavigator][navigateFromContactMethodPage] - ContactMethodOptions missing or empty"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+      } { selectedContactMethods =>
+        current match {
+          case Some(currentContactMethod) if !selectedContactMethods.contains(currentContactMethod) =>
+            logger.error(
+              "[PartnershipNavigator][navigateFromContactMethodPage] - current contact method not selected"
+            )
+            routes.JourneyRecoveryController.onPageLoad()
+          case _                                                                                    =>
+            val remaining =
+              current match {
+                case None                       => selectedContactMethods
+                case Some(currentContactMethod) =>
+                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
+                  selectedContactMethods.drop(currentIndex + 1)
+              }
+            terminalStep(remaining)
+        }
+      }
+
+  private def selectedContactMethodsInOrder(
+    id: String,
+    userAnswers: UserAnswers
+  ): Option[Seq[ContactMethodOptions]] =
+    userAnswers.get(PartnershipContactMethodOptionsPage(id)).map(ContactMethodOptions.ordered)
+
+  private def contactMethodPageCall(
+    cisPath: CisPath,
+    uuid: UUID,
+    contactMethod: ContactMethodOptions,
+    mode: Mode
+  ): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  =>
+        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoadWithId(cisPath, uuid, mode)
+      case ContactMethodOptions.Phone  =>
+        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoadWithId(cisPath, uuid, mode)
+      case ContactMethodOptions.Mobile =>
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoadWithId(cisPath, uuid, mode)
+    }
+
+  private def isMissingAnswer(id: String, contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(contactMethodPage(id, contactMethod)).isEmpty
+
+  private def contactMethodPage(id: String, contactMethod: ContactMethodOptions): QuestionPage[String] =
+    contactMethod match {
+      case ContactMethodOptions.Email  => PartnershipEmailAddressPage(id)
+      case ContactMethodOptions.Phone  => PartnershipPhoneNumberPage(id)
+      case ContactMethodOptions.Mobile => PartnershipMobileNumberPage(id)
+    }
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>

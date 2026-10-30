@@ -27,21 +27,29 @@ import viewmodels.implicits.*
 
 object PartnershipNameSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    SubcontractorNameDisplayHelper.getPartnershipDisplayName(answers, mode).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipName.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.PartnershipNameController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => SubcontractorNameDisplayHelper.getPartnershipDisplayName(answers, mode, id))
+      .getOrElse(SubcontractorNameDisplayHelper.getPartnershipDisplayName(answers, mode))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "partnershipName.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(routes.PartnershipNameController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("partnershipName.change.hidden"))
+              .withAttribute("id" -> "partnership-name")
           )
-            .withVisuallyHiddenText(messages("partnershipName.change.hidden"))
-            .withAttribute("id" -> "partnership-name")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

@@ -83,7 +83,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -111,7 +116,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form.fill("answer"),
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -225,7 +235,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          formWithDuplicateError,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -251,7 +266,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -357,7 +377,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(formWithDuplicateError, AmendMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          formWithDuplicateError,
+          AmendMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(AmendMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -383,7 +408,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, AmendMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          AmendMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(AmendMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -485,7 +515,12 @@ class PartnershipUniqueTaxpayerReferenceControllerSpec extends SpecBase with Moc
         val view = application.injector.instanceOf[PartnershipUniqueTaxpayerReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          partnershipName,
+          controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(AmendMode)
+        )(
           request,
           messages(application)
         ).toString

@@ -19,6 +19,7 @@ package controllers.add.partnership
 import controllers.actions.*
 import forms.add.partnership.PartnershipNameFormProvider
 import models.Mode
+import models.requests.CisPath
 import navigation.Navigator
 import pages.add.partnership.PartnershipNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,6 +28,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNameView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +39,8 @@ class PartnershipNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  getJourney: JourneyAction,
   formProvider: PartnershipNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -50,7 +54,7 @@ class PartnershipNameController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       val preparedForm = request.userAnswers.get(PartnershipNamePage).fold(form)(form.fill)
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmit(mode)))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
@@ -58,12 +62,36 @@ class PartnershipNameController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, routes.PartnershipNameController.onSubmit(mode)))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipNamePage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(PartnershipNamePage, mode, updatedAnswers))
+        )
+    }
+
+  def onPageLoadWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)) { implicit request =>
+      val page         = PartnershipNamePage(request.subJourneyId)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmitWithId(cisPath, uuid, mode)))
+    }
+
+  def onSubmitWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)).async { implicit request =>
+      val submitAction = routes.PartnershipNameController.onSubmitWithId(cisPath, uuid, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(PartnershipNamePage(request.subJourneyId), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(cisPath, uuid, PartnershipNamePage, mode, updatedAnswers))
         )
     }
 }

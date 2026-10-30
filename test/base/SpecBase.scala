@@ -36,6 +36,7 @@ import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
+import services.{CisTaxpayerService, FakeCisTaxpayerService}
 
 import scala.concurrent.Future
 
@@ -92,7 +93,8 @@ trait SpecBase
             .to(new FakeIdentifierAction(false, false, true)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
           bind[CisIdRequiredAction].to[CisIdRequiredActionImpl],
-          bind[FormpRdsReconcileAction].toInstance(formpRdsReconcileAction)
+          bind[FormpRdsReconcileAction].toInstance(formpRdsReconcileAction),
+          bind[CisTaxpayerService].toInstance(new FakeCisTaxpayerService)
         ) ++ additionalBindings
       )
 }

@@ -17,6 +17,7 @@
 package controllers.helpers
 
 import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
+import pages.QuestionPage
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
@@ -42,7 +43,19 @@ object SubcontractorNameDisplayHelper {
       }
 
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    userAnswers.get(PartnershipNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+    getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage)
+
+  def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage(id))
+
+  private def getPartnershipDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: QuestionPage[String]
+  )(implicit messages: Messages): Option[String] =
+    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
@@ -51,13 +64,12 @@ object SubcontractorNameDisplayHelper {
     }
 
   def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode || mode == FinalValidationMode) {
-        Some(messages("verify.noName"))
-      } else {
-        None
-      }
-    }
+    getPartnershipDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage)
+
+  def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    getPartnershipDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage(id))
 
   def partnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
     userAnswers

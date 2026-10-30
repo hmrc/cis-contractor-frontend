@@ -36,7 +36,12 @@ class PartnershipAddressYesNoViewSpec extends AnyWordSpec with Matchers with Gui
 
       val partnershipName = "Test Partnership"
 
-      val html = view(form, NormalMode, partnershipName)
+      val html = view(
+        form,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -69,7 +74,12 @@ class PartnershipAddressYesNoViewSpec extends AnyWordSpec with Matchers with Gui
 
       val partnershipName = "Test Partnership"
 
-      val html = view(form, AmendMode, partnershipName)
+      val html = view(
+        form,
+        AmendMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(AmendMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -104,7 +114,12 @@ class PartnershipAddressYesNoViewSpec extends AnyWordSpec with Matchers with Gui
 
       val errorForm = form.withError("value", "partnershipAddressYesNo.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipAddressYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

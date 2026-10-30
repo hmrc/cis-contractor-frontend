@@ -77,6 +77,46 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
       ValidatedPartnership.build(minRequired) mustBe a[Right[?, ?]]
     }
 
+    "build successfully from a journey folder" in {
+      val id            = "org_11111111-1111-1111-1111-111111111111"
+      val folderAnswers = emptyUserAnswers
+        .initialiseSubJourney(id)
+        .success
+        .value
+        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+        .success
+        .value
+        .set(PartnershipNamePage(id), "Folder Partnership")
+        .success
+        .value
+        .set(PartnershipAddressYesNoPage(id), false)
+        .success
+        .value
+        .set(AddPartnershipContactMethodsYesNoPage(id), false)
+        .success
+        .value
+        .set(PartnershipHasUtrYesNoPage(id), false)
+        .success
+        .value
+        .set(PartnershipNominatedPartnerNamePage(id), "Folder Partner")
+        .success
+        .value
+        .set(PartnershipNominatedPartnerUtrYesNoPage(id), false)
+        .success
+        .value
+        .set(PartnershipNominatedPartnerNinoYesNoPage(id), false)
+        .success
+        .value
+        .set(PartnershipNominatedPartnerCrnYesNoPage(id), false)
+        .success
+        .value
+        .set(PartnershipWorksReferenceNumberYesNoPage(id), false)
+        .success
+        .value
+
+      ValidatedPartnership.build(folderAnswers, id) mustBe a[Right[?, ?]]
+    }
+
     "fail when TypeOfSubcontractor is not Partnership" in {
       val ua =
         minRequired

@@ -20,6 +20,7 @@ import controllers.actions.*
 import controllers.helpers.SubcontractorNameDisplayHelper
 import forms.add.partnership.PartnershipHasUtrYesNoFormProvider
 import models.Mode
+import models.requests.CisPath
 import navigation.Navigator
 import pages.add.partnership.PartnershipHasUtrYesNoPage
 import play.api.Logging
@@ -29,6 +30,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipHasUtrYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +41,8 @@ class PartnershipHasUtrYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  getJourney: JourneyAction,
   formProvider: PartnershipHasUtrYesNoFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -59,7 +63,7 @@ class PartnershipHasUtrYesNoController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, partnershipName))
+          Ok(view(preparedForm, mode, partnershipName, routes.PartnershipHasUtrYesNoController.onSubmit(mode)))
         }
         .getOrElse {
           logger.error(s"[PartnershipHasUtrYesNoController][onPageLoad] - PartnershipNamePage missing from userAnswers")
@@ -75,7 +79,10 @@ class PartnershipHasUtrYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, name, routes.PartnershipHasUtrYesNoController.onSubmit(mode)))
+                ),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage, value))
@@ -85,6 +92,56 @@ class PartnershipHasUtrYesNoController @Inject() (
         }
         .getOrElse {
           logger.error(s"[PartnershipHasUtrYesNoController][onSubmit] - PartnershipNamePage missing from userAnswers")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
+
+  def onPageLoadWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)) { implicit request =>
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+        .map { partnershipName =>
+          val page         = PartnershipHasUtrYesNoPage(request.subJourneyId)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              partnershipName,
+              routes.PartnershipHasUtrYesNoController.onSubmitWithId(cisPath, uuid, mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            s"[PartnershipHasUtrYesNoController][onPageLoadWithId] - PartnershipNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(cisPath: CisPath, uuid: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath) andThen getJourney(uuid)).async { implicit request =>
+      val submitAction = routes.PartnershipHasUtrYesNoController.onSubmitWithId(cisPath, uuid, mode)
+      SubcontractorNameDisplayHelper
+        .getPartnershipDisplayName(request.userAnswers, mode, request.subJourneyId)
+        .map { name =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage(request.subJourneyId), value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(cisPath, uuid, PartnershipHasUtrYesNoPage, mode, updatedAnswers))
+            )
+        }
+        .getOrElse {
+          logger.error(
+            s"[PartnershipHasUtrYesNoController][onSubmitWithId] - PartnershipNamePage missing from userAnswers"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }

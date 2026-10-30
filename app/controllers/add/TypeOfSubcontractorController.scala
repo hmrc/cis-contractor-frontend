@@ -18,20 +18,24 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
-import models.Mode
+import models.requests.CisPath
+import models.{JourneyScope, Mode, UserAnswers}
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
-import utils.DefaultSubcontractorCleanupService
-import scala.util.{Failure, Success}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import repositories.SessionRepository
+import services.JourneyService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 class TypeOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,6 +44,8 @@ class TypeOfSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  resolveScheme: SchemeAction,
+  journeyService: JourneyService,
   cleanupService: DefaultSubcontractorCleanupService,
   formProvider: TypeOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -58,7 +64,7 @@ class TypeOfSubcontractorController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmit(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
@@ -68,7 +74,7 @@ class TypeOfSubcontractorController @Inject() (
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, mode))
+              BadRequest(view(formWithErrors, mode, routes.TypeOfSubcontractorController.onSubmit(mode)))
             ),
           value =>
             cleanupService.clean(request.userAnswers) match {
@@ -103,6 +109,42 @@ class TypeOfSubcontractorController @Inject() (
                   )
                 )
             }
+        )
+    }
+
+  def onPageLoadWithCisPath(cisPath: CisPath, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath)) { implicit request =>
+      Ok(view(form, mode, routes.TypeOfSubcontractorController.onSubmitWithCisPath(cisPath, mode)))
+    }
+
+  def onSubmitWithCisPath(cisPath: CisPath, mode: Mode): Action[AnyContent] =
+    (identify andThen resolveScheme(cisPath)).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithCisPath(cisPath, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            journeyService
+              .create(
+                request,
+                (ua, id) =>
+                  ua.set(TypeOfSubcontractorPage(id), value)
+                    .flatMap(_.set(CisIdQuery, request.cisId))
+              )
+              .map { flowId =>
+                val id             = JourneyScope.subJourneyId(cisPath, flowId)
+                val updatedAnswers = UserAnswers(request.identifier.userId)
+                  .initialiseSubJourney(id)
+                  .flatMap(_.set(TypeOfSubcontractorPage(id), value))
+                  .flatMap(_.set(CisIdQuery, request.cisId))
+                  .get
+                Redirect(navigator.nextPage(cisPath, flowId, TypeOfSubcontractorPage, mode, updatedAnswers))
+              }
+              .recover { case NonFatal(exception) =>
+                logger.error("[TypeOfSubcontractorController] Failed to create journey", exception)
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
         )
     }
 }
