@@ -44,6 +44,21 @@ class ValidationSpec extends AnyFreeSpec with Matchers {
       "must match a short address" in {
         matches("a@b.co") mustBe true
       }
+      "must match a domain without a dot" in {
+        matches("test@example") mustBe true
+      }
+      "must match an underscore in the local part" in {
+        matches("test_name@example.com") mustBe true
+      }
+      "must match an apostrophe in the local part" in {
+        matches("o'connor@example.com") mustBe true
+      }
+      "must match a curly apostrophe in the local part" in {
+        matches("o’connor@example.com") mustBe true
+      }
+      "must match consecutive dots in the local part" in {
+        matches("test..name@example.com") mustBe true
+      }
     }
 
     "missing structure" - {
@@ -59,10 +74,61 @@ class ValidationSpec extends AnyFreeSpec with Matchers {
       "must not match an empty string" in {
         matches("") mustBe false
       }
+      "must not match multiple at signs" in {
+        matches("test@@example.com") mustBe false
+      }
+    }
+
+    "invalid domain characters" - {
+      "must not match an underscore in the domain" in {
+        matches("test@example_domain.com") mustBe false
+      }
+      "must not match a comma in the domain" in {
+        matches("test@example,com") mustBe false
+      }
+      "must not match a forward slash in the domain" in {
+        matches("test@example/com") mustBe false
+      }
+      "must not match a plus sign in the domain" in {
+        matches("test@example+test.com") mustBe false
+      }
+      "must not match an exclamation mark in the domain" in {
+        matches("test@example!.com") mustBe false
+      }
+    }
+
+    "invalid domain structure" - {
+      "must not match consecutive dots in the domain" in {
+        matches("test@example..com") mustBe false
+      }
+      "must not match a leading dot in the domain" in {
+        matches("test@.example.com") mustBe false
+      }
+      "must not match a trailing dot in the domain" in {
+        matches("test@example.com.") mustBe false
+      }
+    }
+
+    "whitespace" - {
+      "must not match leading whitespace" in {
+        matches(" test@example.com") mustBe false
+      }
+      "must not match trailing whitespace" in {
+        matches("test@example.com ") mustBe false
+      }
+      "must not match whitespace in the local part" in {
+        matches("test name@example.com") mustBe false
+      }
+      "must not match whitespace in the domain" in {
+        matches("test@example .com") mustBe false
+      }
     }
 
     "non-ASCII and non-English characters" - {
-      "must not match a non-ASCII character in the local part" in {
+      "must not match a non-ASCII letter in the local part" in {
+        matches("tëst@example.com") mustBe false
+      }
+      "must not match a non-ASCII letter in the domain" in {
         matches("test@ëxample.com") mustBe false
       }
     }
