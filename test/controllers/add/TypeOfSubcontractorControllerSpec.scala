@@ -25,6 +25,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
+import queries.CisIdQuery
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -67,7 +68,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           form,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -104,7 +106,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           form.fill(TypeOfSubcontractor.values.head),
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -458,7 +461,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           boundForm,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -505,7 +509,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         contentAsString(result) mustEqual view(
           boundForm,
-          NormalMode
+          NormalMode,
+          controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode)
         )(
           request,
           messages(application)
@@ -518,6 +523,60 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         )
 
         verifyNoInteractions(mockCleanupService)
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must store the type and cisId under a new UUID when Partnership is submitted on start" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+            .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode).url
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+
+        val saved = captor.getValue
+        val ids   = saved.data.value.keys.filterNot(_ == "cisId")
+        ids.size mustBe 1
+        val id    = ids.head
+        saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Partnership)
+        saved.get(CisIdQuery(id)) mustBe Some("1")
+        saved.get(CisIdQuery) mustBe Some("1")
+      }
+    }
+
+    "must redirect to Journey Recovery on start when cisId is missing" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val application           =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+            .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         verifyNoInteractions(mockSessionRepository)
       }
     }

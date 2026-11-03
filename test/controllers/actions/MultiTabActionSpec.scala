@@ -18,10 +18,11 @@ package controllers.actions
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.requests.SchemeRequest
+import models.requests.DataRequest
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,15 +30,17 @@ import scala.concurrent.Future
 
 class MultiTabActionSpec extends SpecBase with MockitoSugar {
 
+  private def dataRequest =
+    DataRequest(FakeRequest(), userAnswersId, userAnswersWithCisId)
+
   "MultiTabAction" - {
 
     "allows the request when multi-tab is enabled" in {
       val appConfig = mock[FrontendAppConfig]
-      val request   = mock[SchemeRequest[?]]
       when(appConfig.multiTabEnabled).thenReturn(true)
 
       val result = new MultiTabAction(appConfig).invokeBlock(
-        request,
+        dataRequest,
         _ => Future.successful(Results.Ok)
       )
 
@@ -46,14 +49,12 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
 
     "sends the user to manage subcontractors when multi-tab is disabled" in {
       val appConfig  = mock[FrontendAppConfig]
-      val request    = mock[SchemeRequest[?]]
-      val landingUrl = "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/AB12"
+      val landingUrl = "http://localhost:6996/construction-industry-scheme/management/manage-subcontractors/1"
       when(appConfig.multiTabEnabled).thenReturn(false)
-      when(request.cisId).thenReturn("AB12")
-      when(appConfig.manageSubcontractorsLandingUrl("AB12")).thenReturn(landingUrl)
+      when(appConfig.manageSubcontractorsLandingUrl("1")).thenReturn(landingUrl)
 
       val result = new MultiTabAction(appConfig).invokeBlock(
-        request,
+        dataRequest,
         _ => Future.successful(Results.Ok)
       )
 

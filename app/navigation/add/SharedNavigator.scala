@@ -44,17 +44,25 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
-    case _                       => _ => routes.IndexController.onPageLoad()
+    case TypeOfSubcontractorPage(id) =>
+      userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode, Some(id))(userAnswers)
+    case TypeOfSubcontractorPage     => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
+    case _                           => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
-    case _                       => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case TypeOfSubcontractorPage(id) => navigatorFromTypeOfSubcontractorPage(CheckMode, Some(id))(_)
+    case TypeOfSubcontractorPage     => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
+    case _                           => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
-  private def navigatorFromTypeOfSubcontractorPage(mode: Mode)(userAnswers: UserAnswers): Call =
-    userAnswers.get(TypeOfSubcontractorPage) match {
+  private def navigatorFromTypeOfSubcontractorPage(mode: Mode, id: Option[String] = None)(
+    userAnswers: UserAnswers
+  ): Call = {
+    val selectedType =
+      id.flatMap(value => userAnswers.get(TypeOfSubcontractorPage(value)))
+        .orElse(userAnswers.get(TypeOfSubcontractorPage))
+    selectedType match {
       case None                    =>
         logger.error(
           "[SharedNavigator][navigatorFromTypeOfSubcontractorPage] - TypeOfSubcontractorPage missing"
@@ -64,9 +72,6 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         mode match {
           case NormalMode => firstJourneyPageFor(subcontractorType)
           case _          =>
-            // Only skip straight to CYA when the selected type's journey is already complete
-            // (i.e. the type was not changed). If the type changed its answers are cleaned up,
-            // leaving the journey incomplete, so the user is taken through the relevant pages.
             if (journeyComplete(subcontractorType, userAnswers)) {
               checkYourAnswersFor(subcontractorType)
             } else {
@@ -74,6 +79,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
             }
         }
     }
+  }
 
   private def firstJourneyPageFor(subcontractorType: TypeOfSubcontractor): Call =
     subcontractorType match {

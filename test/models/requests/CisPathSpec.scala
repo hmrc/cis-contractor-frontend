@@ -17,19 +17,27 @@
 package models.requests
 
 import base.SpecBase
-import models.requests.CisPath.{CisId, CisOrg}
+import play.api.mvc.PathBindable
+
+import java.util.UUID
 
 class CisPathSpec extends SpecBase {
 
+  private val bindable = summon[PathBindable[CisPath]]
+  private val uuid     = UUID.fromString("11111111-1111-1111-1111-111111111111")
+
   "CisPath" - {
-    "reads org and a client id" in {
-      CisPath.from("org") mustBe Some(CisOrg)
-      CisPath.from("AB12") mustBe Some(CisId("AB12"))
+
+    "binds a UUID" in {
+      bindable.bind("id", uuid.toString) mustBe Right(CisPath(uuid))
     }
 
-    "rejects an empty or punctuated value" in {
-      CisPath.from("") mustBe None
-      CisPath.from("AB-12") mustBe None
+    "unbinds to the UUID string" in {
+      bindable.unbind("id", CisPath(uuid)) mustBe uuid.toString
+    }
+
+    "rejects a value that is not a UUID" in {
+      bindable.bind("id", "org") mustBe a[Left[?, ?]]
     }
   }
 }

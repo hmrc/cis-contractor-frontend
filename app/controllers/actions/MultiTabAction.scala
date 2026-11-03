@@ -17,21 +17,26 @@
 package controllers.actions
 
 import config.FrontendAppConfig
-import models.requests.SchemeRequest
+import models.requests.DataRequest
 import play.api.mvc.{ActionFilter, Result, Results}
+import queries.CisIdQuery
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MultiTabAction @Inject() (appConfig: FrontendAppConfig)(using ec: ExecutionContext)
-    extends ActionFilter[SchemeRequest] {
+    extends ActionFilter[DataRequest] {
 
   override protected def executionContext: ExecutionContext = ec
 
-  override protected def filter[A](request: SchemeRequest[A]): Future[Option[Result]] =
+  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
     Future.successful {
       if appConfig.multiTabEnabled then None
-      else Some(Results.Redirect(appConfig.manageSubcontractorsLandingUrl(request.cisId)))
+      else
+        request.userAnswers.get(CisIdQuery) match {
+          case Some(cisId) => Some(Results.Redirect(appConfig.manageSubcontractorsLandingUrl(cisId)))
+          case None        => Some(Results.Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
     }
 }

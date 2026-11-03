@@ -24,6 +24,13 @@ import utils.SubcontractorCleanup.*
 
 import scala.util.Try
 
+case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
+
+  override def path: JsPath = JsPath \ id \ toString
+
+  override def toString: String = "typeOfSubcontractor"
+}
+
 case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
   override def path: JsPath = JsPath \ toString

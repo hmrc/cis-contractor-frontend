@@ -18,20 +18,22 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
-import utils.DefaultSubcontractorCleanupService
-import scala.util.{Failure, Success}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class TypeOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
@@ -58,18 +60,16 @@ class TypeOfSubcontractorController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmit(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmit(mode)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(view(formWithErrors, mode))
-            ),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
           value =>
             cleanupService.clean(request.userAnswers) match {
               case Success(cleanedAnswers) =>
@@ -103,6 +103,66 @@ class TypeOfSubcontractorController @Inject() (
                   )
                 )
             }
+        )
+    }
+
+  def onPageLoadStart(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    Ok(view(form, mode, routes.TypeOfSubcontractorController.onSubmitStart(mode)))
+  }
+
+  def onSubmitStart(mode: Mode): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitStart(mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value => {
+            val answers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+            answers.get(CisIdQuery) match {
+              case None        =>
+                logger.error("[TypeOfSubcontractorController][onSubmitStart] CisIdQuery missing from session data")
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Some(cisId) =>
+                val id = UUID.randomUUID().toString
+                Future
+                  .fromTry(
+                    answers
+                      .set(TypeOfSubcontractorPage(id), value)
+                      .flatMap(_.set(CisIdQuery(id), cisId))
+                  )
+                  .flatMap { updatedAnswers =>
+                    sessionRepository.set(updatedAnswers).map { _ =>
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                    }
+                  }
+            }
+          }
+        )
+    }
+
+  def onPageLoadWithId(id: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val page         = TypeOfSubcontractorPage(id.toString)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)))
+    }
+
+  def onSubmitWithId(id: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            Future
+              .fromTry(request.userAnswers.set(TypeOfSubcontractorPage(id.toString), value))
+              .flatMap { updatedAnswers =>
+                sessionRepository.set(updatedAnswers).map { _ =>
+                  Redirect(navigator.nextPage(TypeOfSubcontractorPage(id.toString), mode, updatedAnswers))
+                }
+              }
         )
     }
 }

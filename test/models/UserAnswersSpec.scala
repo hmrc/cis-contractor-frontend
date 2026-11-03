@@ -17,28 +17,37 @@
 package models
 
 import base.SpecBase
+import pages.add.TypeOfSubcontractorPage
+import queries.CisIdQuery
 
 class UserAnswersSpec extends SpecBase {
 
-  "UserAnswers.initialiseSubJourney" - {
+  "UserAnswers with a subjourney id" - {
 
-    "adds an empty folder for a new id" in {
-      val answers = UserAnswers("user-1").initialiseSubJourney("org_abc").success.value
+    "keep two subjourneys in one login document" in {
+      val answers = UserAnswers("user-1")
+        .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership)
+        .flatMap(_.set(CisIdQuery("uuid-1"), "1045"))
+        .flatMap(_.set(TypeOfSubcontractorPage("uuid-2"), TypeOfSubcontractor.Partnership))
+        .flatMap(_.set(CisIdQuery("uuid-2"), "800"))
+        .success
+        .value
 
-      answers.hasSubJourney("org_abc") mustBe true
+      answers.get(TypeOfSubcontractorPage("uuid-1")) mustBe Some(TypeOfSubcontractor.Partnership)
+      answers.get(CisIdQuery("uuid-1")) mustBe Some("1045")
+      answers.get(TypeOfSubcontractorPage("uuid-2")) mustBe Some(TypeOfSubcontractor.Partnership)
+      answers.get(CisIdQuery("uuid-2")) mustBe Some("800")
     }
 
-    "fails when the folder already exists" in {
-      val answers = UserAnswers("user-1").initialiseSubJourney("org_abc").success.value
+    "do not overwrite root cisId when a subjourney cisId is set" in {
+      val answers = UserAnswers("user-1")
+        .set(CisIdQuery, "1")
+        .flatMap(_.set(CisIdQuery("uuid-1"), "1045"))
+        .success
+        .value
 
-      answers.initialiseSubJourney("org_abc").isFailure mustBe true
-    }
-  }
-
-  "UserAnswers.hasSubJourney" - {
-
-    "is false when the folder is missing" in {
-      UserAnswers("user-1").hasSubJourney("org_abc") mustBe false
+      answers.get(CisIdQuery) mustBe Some("1")
+      answers.get(CisIdQuery("uuid-1")) mustBe Some("1045")
     }
   }
 }

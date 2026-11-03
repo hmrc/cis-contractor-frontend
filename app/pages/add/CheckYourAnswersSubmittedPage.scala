@@ -19,6 +19,11 @@ package pages.add
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class CheckYourAnswersSubmittedPage(id: String) extends QuestionPage[Boolean] {
+  override def path: JsPath     = JsPath \ id \ toString
+  override def toString: String = "checkYourAnswersSubmitted"
+}
+
 case object CheckYourAnswersSubmittedPage extends QuestionPage[Boolean] {
   override def path: JsPath     = JsPath \ toString
   override def toString: String = "checkYourAnswersSubmitted"

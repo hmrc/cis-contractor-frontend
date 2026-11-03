@@ -18,21 +18,18 @@ package models.requests
 
 import play.api.mvc.PathBindable
 
-enum CisPath(val toUrl: String) {
-  case CisOrg extends CisPath("org")
-  case CisId(value: String) extends CisPath(value)
+import java.util.UUID
+
+final case class CisPath(id: UUID) {
+  def toUrl: String = id.toString
 }
 
 object CisPath {
 
-  def from(urlPath: String): Option[CisPath] =
-    if urlPath == CisOrg.toUrl then Some(CisOrg)
-    else if urlPath.nonEmpty && urlPath.forall(_.isLetterOrDigit) then Some(CisId(urlPath))
-    else None
-
   given PathBindable[CisPath] = new PathBindable[CisPath] {
     def bind(key: String, value: String): Either[String, CisPath] =
-      CisPath.from(value).toRight(s"Could not resolve CIS path from: $value")
+      try Right(CisPath(UUID.fromString(value)))
+      catch case _: IllegalArgumentException => Left(s"Could not resolve CIS path from: $value")
 
     def unbind(key: String, value: CisPath): String = value.toUrl
   }
