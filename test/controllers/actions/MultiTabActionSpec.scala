@@ -61,5 +61,18 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(landingUrl)
     }
+
+    "sends the user to Journey Recovery when multi-tab is disabled and cisId is missing" in {
+      val appConfig = mock[FrontendAppConfig]
+      when(appConfig.multiTabEnabled).thenReturn(false)
+
+      val result = new MultiTabAction(appConfig).invokeBlock(
+        DataRequest(FakeRequest(), userAnswersId, emptyUserAnswers),
+        _ => Future.successful(Results.Ok)
+      )
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
+    }
   }
 }

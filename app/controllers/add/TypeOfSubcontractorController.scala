@@ -124,18 +124,27 @@ class TypeOfSubcontractorController @Inject() (
                 logger.error("[TypeOfSubcontractorController][onSubmitStart] CisIdQuery missing from session data")
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               case Some(cisId) =>
-                val id = UUID.randomUUID().toString
-                Future
-                  .fromTry(
-                    answers
-                      .set(TypeOfSubcontractorPage(id), value)
-                      .flatMap(_.set(CisIdQuery(id), cisId))
-                  )
-                  .flatMap { updatedAnswers =>
-                    sessionRepository.set(updatedAnswers).map { _ =>
-                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
-                    }
-                  }
+                cleanupService.clean(answers) match {
+                  case Failure(exception)      =>
+                    logger.error(
+                      "[TypeOfSubcontractorController][onSubmitStart] Failed to clean previous subcontractor answers",
+                      exception
+                    )
+                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                  case Success(cleanedAnswers) =>
+                    val id = UUID.randomUUID().toString
+                    Future
+                      .fromTry(
+                        cleanedAnswers
+                          .set(TypeOfSubcontractorPage(id), value)
+                          .flatMap(_.set(CisIdQuery(id), cisId))
+                      )
+                      .flatMap { updatedAnswers =>
+                        sessionRepository.set(updatedAnswers).map { _ =>
+                          Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                        }
+                      }
+                }
             }
           }
         )
@@ -156,13 +165,22 @@ class TypeOfSubcontractorController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
           value =>
-            Future
-              .fromTry(request.userAnswers.set(TypeOfSubcontractorPage(id.toString), value))
-              .flatMap { updatedAnswers =>
-                sessionRepository.set(updatedAnswers).map { _ =>
-                  Redirect(navigator.nextPage(TypeOfSubcontractorPage(id.toString), mode, updatedAnswers))
-                }
-              }
+            cleanupService.clean(request.userAnswers) match {
+              case Failure(exception)      =>
+                logger.error(
+                  "[TypeOfSubcontractorController][onSubmitWithId] Failed to clean previous subcontractor answers",
+                  exception
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Success(cleanedAnswers) =>
+                Future
+                  .fromTry(cleanedAnswers.set(TypeOfSubcontractorPage(id.toString), value))
+                  .flatMap { updatedAnswers =>
+                    sessionRepository.set(updatedAnswers).map { _ =>
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id.toString), mode, updatedAnswers))
+                    }
+                  }
+            }
         )
     }
 }
