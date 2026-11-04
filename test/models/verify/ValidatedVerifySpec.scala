@@ -176,6 +176,19 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua).map(_.emailToUse) mustBe Right(Some("scheme@example.com"))
     }
 
+    "resolve emailToUse from scheme address with an apostrophe when ContractorEmailConfirmationStored is CurrentEmail" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("o'connor@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+
+      ValidatedVerify.build(ua).map(_.emailToUse) mustBe Right(Some("o'connor@example.com"))
+    }
+
     "resolve emailToUse from EmailAddressPage when ContractorEmailConfirmationStored is DifferentEmail" in {
       val ua =
         minRequired
@@ -333,6 +346,60 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
     }
 
+    "fail when CurrentEmail is selected but the scheme email address is invalid" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example_domain.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
+    "fail when CurrentEmail is selected but the scheme email address contains consecutive domain dots" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example..com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
+    "fail when CurrentEmail is selected but the scheme email address contains trailing whitespace" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com "))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
+    "fail when CurrentEmail is selected but the scheme email address exceeds 254 characters" in {
+      val email = ("a" * 243) + "@example.com"
+
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail(email))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, CurrentEmail)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(ContractorEmailConfirmationStoredPage))
+    }
+
     "fail when DifferentEmail is selected but EmailAddressPage is absent" in {
       val ua =
         minRequired
@@ -346,6 +413,56 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(EmailAddressPage))
     }
 
+    "fail when DifferentEmail is selected but EmailAddressPage contains an invalid email address" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "override@example_domain.com")
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(EmailAddressPage))
+    }
+
+    "fail when DifferentEmail is selected but EmailAddressPage contains trailing whitespace" in {
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, "override@example.com ")
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(EmailAddressPage))
+    }
+
+    "fail when DifferentEmail is selected but EmailAddressPage exceeds 254 characters" in {
+      val email = ("a" * 243) + "@example.com"
+
+      val ua =
+        minRequired
+          .set(NewestVerificationBatchResponsePage, batchResponseWithEmail("scheme@example.com"))
+          .success
+          .value
+          .set(ContractorEmailConfirmationStoredPage, DifferentEmail)
+          .success
+          .value
+          .set(EmailAddressPage, email)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(EmailAddressPage))
+    }
+
     "fail when ContractorEmailConfirmationNotStored is true but EmailAddressPage is absent" in {
       val ua =
         minRequiredLessEmail
@@ -356,12 +473,41 @@ class ValidatedVerifySpec extends SpecBase with Matchers {
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(EmailAddressPage))
     }
 
+    "fail when ContractorEmailConfirmationNotStored is true but EmailAddressPage contains an invalid email address" in {
+      val ua =
+        minRequiredLessEmail
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+          .set(EmailAddressPage, "new@example..com")
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(EmailAddressPage))
+    }
+
+    "fail when ContractorEmailConfirmationNotStored is true but EmailAddressPage exceeds 254 characters" in {
+      val email = ("a" * 243) + "@example.com"
+
+      val ua =
+        minRequiredLessEmail
+          .set(ContractorEmailConfirmationNotStoredPage, true)
+          .success
+          .value
+          .set(EmailAddressPage, email)
+          .success
+          .value
+
+      ValidatedVerify.build(ua) mustBe Left(InvalidAnswer(EmailAddressPage))
+    }
+
     "fail when neither email confirmation page is present" in {
       ValidatedVerify.build(minRequiredLessEmail) mustBe Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
     }
 
     "fail when VerificationBatchReadinessPage is absent" in {
       val ua = minRequired.remove(VerificationBatchReadinessPage).success.value
+
       ValidatedVerify.build(ua) mustBe Left(MissingAnswer(VerificationBatchReadinessPage))
     }
 

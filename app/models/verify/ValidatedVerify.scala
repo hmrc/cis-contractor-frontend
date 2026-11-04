@@ -16,6 +16,7 @@
 
 package models.verify
 
+import forms.mappings.Constants.MaxLength254
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import models.{InvalidAnswer, MissingAnswer, SubcontractorViewModel, UserAnswers, Validation, ValidationError}
 import pages.verify.*
@@ -66,19 +67,37 @@ object ValidatedVerify extends Validation {
           .flatMap(_.scheme)
           .flatMap(_.emailAddress)
           .toRight(MissingAnswer(ContractorEmailConfirmationStoredPage))
-          .map(Some(_))
+          .flatMap { email =>
+            Either.cond(
+              isValidEmail(email),
+              Some(email),
+              InvalidAnswer(ContractorEmailConfirmationStoredPage)
+            )
+          }
       case Some(DifferentEmail) =>
-        answers
-          .get(EmailAddressPage)
-          .toRight(MissingAnswer(EmailAddressPage))
-          .map(Some(_))
+        validateEnteredEmail(answers)
       case Some(DoNotSend)      =>
         Right(None)
       case None                 =>
         answers.get(ContractorEmailConfirmationNotStoredPage) match {
-          case Some(true)  => answers.get(EmailAddressPage).toRight(MissingAnswer(EmailAddressPage)).map(Some(_))
+          case Some(true)  => validateEnteredEmail(answers)
           case Some(false) => Right(None)
           case None        => Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
         }
     }
+
+  private def validateEnteredEmail(answers: UserAnswers): Either[ValidationError, Option[String]] =
+    answers
+      .get(EmailAddressPage)
+      .toRight(MissingAnswer(EmailAddressPage))
+      .flatMap { email =>
+        Either.cond(
+          isValidEmail(email),
+          Some(email),
+          InvalidAnswer(EmailAddressPage)
+        )
+      }
+
+  private def isValidEmail(email: String): Boolean =
+    email.length <= MaxLength254 && email.matches(forms.Validation.emailRegex)
 }

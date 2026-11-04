@@ -35,7 +35,7 @@ object EmailAddressSummary {
     Option.when(emailRowRequired(answers))(answers.get(EmailAddressPage)).flatten.map { answer =>
       SummaryListRowViewModel(
         key = "verify.emailAddress.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(answer),
         actions = Seq(
           ActionItemViewModel("site.change", controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("verify.emailAddress.change.hidden"))
