@@ -74,7 +74,10 @@ class SubcontractorService @Inject() (
       _ <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
 
-  def isDuplicateUTR(userAnswers: UserAnswers, utr: String, subJourneyId: Option[String] = None)(implicit
+  def isDuplicateUTR(userAnswers: UserAnswers, utr: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+    isDuplicateUTR(userAnswers, utr, None)
+
+  def isDuplicateUTR(userAnswers: UserAnswers, utr: String, subJourneyId: Option[String])(implicit
     hc: HeaderCarrier
   ): Future[Boolean] =
     for {
