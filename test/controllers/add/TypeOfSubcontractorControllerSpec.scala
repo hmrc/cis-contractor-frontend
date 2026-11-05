@@ -51,6 +51,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new TypeOfSubcontractorFormProvider()
   private val form         = formProvider()
   private val startCisId   = "1045"
+  private val flowId       = UUID.fromString("11111111-1111-1111-1111-111111111111")
 
   private def taxpayer(cisId: String = startCisId) =
     CisTaxpayerResponse(
@@ -835,12 +836,11 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return OK and the correct view for a GET with id" in {
+    "must return OK and the correct view for a GET with flowId" in {
 
-      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(id.toString), startCisId)
+          .set(CisIdQuery(flowId.toString), startCisId)
           .success
           .value
       val application =
@@ -850,7 +850,10 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(id, NormalMode).url)
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, NormalMode).url
+          )
 
         val result =
           route(application, request).value
@@ -863,7 +866,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           form,
           NormalMode,
-          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode)
+          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode)
         )(
           request,
           messages(application)
@@ -871,13 +874,12 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must populate the view correctly on a GET with id when the question has previously been answered" in {
+    "must populate the view correctly on a GET with flowId when the question has previously been answered" in {
 
-      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(id.toString), startCisId)
-          .flatMap(_.set(TypeOfSubcontractorPage(id.toString), TypeOfSubcontractor.Partnership))
+          .set(CisIdQuery(flowId.toString), startCisId)
+          .flatMap(_.set(TypeOfSubcontractorPage(flowId.toString), TypeOfSubcontractor.Partnership))
           .success
           .value
 
@@ -888,7 +890,10 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(id, NormalMode).url)
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, NormalMode).url
+          )
 
         val view =
           application.injector.instanceOf[TypeOfSubcontractorView]
@@ -901,7 +906,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           form.fill(TypeOfSubcontractor.Partnership),
           NormalMode,
-          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode)
+          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode)
         )(
           request,
           messages(application)
@@ -909,15 +914,14 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must save the selected type under the id when Partnership is submitted" in {
+    "must save the selected type under the flowId when Partnership is submitted" in {
 
-      val id                    = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val userAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(id.toString), startCisId)
+          .set(CisIdQuery(flowId.toString), startCisId)
           .success
           .value
 
@@ -931,7 +935,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode).url)
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode).url)
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -944,19 +948,18 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         val saved = captor.getValue
-        saved.get(TypeOfSubcontractorPage(id.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
+        saved.get(TypeOfSubcontractorPage(flowId.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
         saved.get(TypeOfSubcontractorPage) mustBe None
         saved.get(CisIdQuery) mustBe Some("1")
-        saved.get(CisIdQuery(id.toString)) mustBe Some(startCisId)
+        saved.get(CisIdQuery(flowId.toString)) mustBe Some(startCisId)
       }
     }
 
-    "must clean previous answers before saving the type under the id" in {
+    "must clean previous answers before saving the type under the flowId" in {
 
-      val id              = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val leftoverAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(id.toString), startCisId)
+          .set(CisIdQuery(flowId.toString), startCisId)
           .flatMap(_.set(PartnershipNamePage, "Old name"))
           .success
           .value
@@ -974,7 +977,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode).url)
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode).url)
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -985,20 +988,19 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         captor.getValue.get(PartnershipNamePage) mustBe None
-        captor.getValue.get(TypeOfSubcontractorPage(id.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
+        captor.getValue.get(TypeOfSubcontractorPage(flowId.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
       }
     }
 
-    "must redirect to Journey Recovery on submit with id when cleanup fails" in {
+    "must redirect to Journey Recovery on submit with flowId when cleanup fails" in {
 
-      val id                    = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val mockSessionRepository = mock[SessionRepository]
       val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
       when(mockCleanupService.clean(any())).thenReturn(Failure(new RuntimeException("Unable to clean user answers")))
 
       val userAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(id.toString), startCisId)
+          .set(CisIdQuery(flowId.toString), startCisId)
           .success
           .value
 
@@ -1013,7 +1015,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode).url)
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode).url)
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -1024,12 +1026,11 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return a Bad Request and errors when invalid data is submitted with id" in {
+    "must return a Bad Request and errors when invalid data is submitted with flowId" in {
 
-      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(id.toString), startCisId)
+          .set(CisIdQuery(flowId.toString), startCisId)
           .success
           .value
       val application =
@@ -1039,7 +1040,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode).url)
+          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode).url)
             .withFormUrlEncodedBody("value" -> "invalid value")
 
         val boundForm =
@@ -1056,7 +1057,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           boundForm,
           NormalMode,
-          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(id, NormalMode)
+          controllers.add.routes.TypeOfSubcontractorController.onSubmitWithId(flowId, NormalMode)
         )(
           request,
           messages(application)
@@ -1064,16 +1065,18 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery on a GET with id when there is no session data" in {
+    "must redirect to Journey Recovery on a GET with flowId when there is no session data" in {
 
-      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val application =
         applicationBuilder(userAnswers = None)
           .build()
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(id, NormalMode).url)
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, NormalMode).url
+          )
 
         val result = route(application, request).value
 
@@ -1082,9 +1085,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery on a GET with id when cisId is missing under the id" in {
+    "must redirect to Journey Recovery on a GET with flowId when cisId is missing under the flowId" in {
 
-      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
@@ -1092,7 +1094,10 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(id, NormalMode).url)
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, NormalMode).url
+          )
 
         val result = route(application, request).value
 

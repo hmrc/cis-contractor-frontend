@@ -35,8 +35,8 @@ import scala.concurrent.Future
 
 class MultiTabActionSpec extends SpecBase with MockitoSugar {
 
-  private val cisId = "1045"
-  private val id    = UUID.fromString("11111111-1111-1111-1111-111111111111")
+  private val cisId  = "1045"
+  private val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
 
   private val taxpayer = CisTaxpayerResponse(
     uniqueId = cisId,
@@ -133,15 +133,15 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
 
   "MultiTabAction.forJourney" - {
 
-    "allows the request when cisId under the id is authorised" in {
+    "allows the request when cisId under the flowId is authorised" in {
       val service = mock[CisTaxpayerService]
       when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
         .thenReturn(Future.successful(taxpayer))
 
-      val answers = emptyUserAnswers.set(CisIdQuery(id.toString), cisId).success.value
+      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString), cisId).success.value
 
       val result = new MultiTabAction(service)
-        .forJourney(id)
+        .forJourney(flowId)
         .invokeBlock(
           journeyRequest(answers),
           _ => Future.successful(Results.Ok)
@@ -150,11 +150,11 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       status(result) mustBe OK
     }
 
-    "sends the user to Journey Recovery when cisId is missing under the id" in {
+    "sends the user to Journey Recovery when cisId is missing under the flowId" in {
       val service = mock[CisTaxpayerService]
 
       val result = new MultiTabAction(service)
-        .forJourney(id)
+        .forJourney(flowId)
         .invokeBlock(
           journeyRequest(emptyUserAnswers),
           _ => Future.successful(Results.Ok)
@@ -164,15 +164,15 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
     }
 
-    "sends the user to Journey Recovery when cisId under the id is not authorised" in {
+    "sends the user to Journey Recovery when cisId under the flowId is not authorised" in {
       val service = mock[CisTaxpayerService]
       when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
         .thenReturn(Future.successful(taxpayer.copy(uniqueId = "other")))
 
-      val answers = emptyUserAnswers.set(CisIdQuery(id.toString), cisId).success.value
+      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString), cisId).success.value
 
       val result = new MultiTabAction(service)
-        .forJourney(id)
+        .forJourney(flowId)
         .invokeBlock(
           journeyRequest(answers),
           _ => Future.successful(Results.Ok)

@@ -41,12 +41,12 @@ class MultiTabAction @Inject() (cisTaxpayerService: CisTaxpayerService)(using ec
         }
     }
 
-  def forJourney(id: UUID): ActionFilter[DataRequest] =
+  def forJourney(flowId: UUID): ActionFilter[DataRequest] =
     new ActionFilter[DataRequest] {
       override protected def executionContext: ExecutionContext = ec
 
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        request.userAnswers.get(CisIdQuery(id.toString)) match {
+        request.userAnswers.get(CisIdQuery(flowId.toString)) match {
           case None        =>
             Future.successful(Some(Results.Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           case Some(cisId) =>

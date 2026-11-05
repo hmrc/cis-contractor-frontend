@@ -129,7 +129,8 @@ class TypeOfSubcontractorController @Inject() (
                 )
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               case Success(cleanedAnswers) =>
-                val id = UUID.randomUUID().toString
+                val flowId = UUID.randomUUID()
+                val id     = flowId.toString
                 Future
                   .fromTry(
                     cleanedAnswers
@@ -146,16 +147,18 @@ class TypeOfSubcontractorController @Inject() (
         )
     }
 
-  def onPageLoadWithId(id: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(id)) { implicit request =>
-      val page         = TypeOfSubcontractorPage(id.toString)
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = TypeOfSubcontractorPage(id)
       val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
-      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)))
+      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
     }
 
-  def onSubmitWithId(id: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(id)).async { implicit request =>
-      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)
       form
         .bindFromRequest()
         .fold(
@@ -170,10 +173,10 @@ class TypeOfSubcontractorController @Inject() (
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               case Success(cleanedAnswers) =>
                 Future
-                  .fromTry(cleanedAnswers.set(TypeOfSubcontractorPage(id.toString), value))
+                  .fromTry(cleanedAnswers.set(TypeOfSubcontractorPage(id), value))
                   .flatMap { updatedAnswers =>
                     sessionRepository.set(updatedAnswers).map { _ =>
-                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id.toString), mode, updatedAnswers))
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
                     }
                   }
             }
