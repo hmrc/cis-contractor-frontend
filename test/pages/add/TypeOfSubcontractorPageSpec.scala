@@ -32,6 +32,41 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
 
     beRemovable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
+    "must store the answer under the subjourney id" in {
+      val answers = emptyUserAnswers
+        .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership)
+        .success
+        .value
+
+      answers.get(TypeOfSubcontractorPage("uuid-1")) mustBe Some(TypeOfSubcontractor.Partnership)
+      answers.get(TypeOfSubcontractorPage) mustBe None
+    }
+
+    "cleanup: must remove other type answers when Partnership is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership).success.value
+
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
+      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+    }
+
     "cleanup: must remove all LimitedCompany, Partnership and Trust subcontractor answers when IndividualSoleTraderSubcontractor is selected" in {
       val userAnswers =
         emptyUserAnswers

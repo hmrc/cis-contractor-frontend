@@ -46,9 +46,14 @@ class SubcontractorService @Inject() (
     extends Logging {
 
   def createAndUpdateSubcontractor(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    createAndUpdateSubcontractor(userAnswers, None)
+
+  def createAndUpdateSubcontractor(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
     for {
-      cisId             <- getCisId(userAnswers)
-      subcontractorType <- getSubcontractorType(userAnswers)
+      cisId             <- getCisId(userAnswers, subJourneyId)
+      subcontractorType <- getSubcontractorType(userAnswers, subJourneyId)
 
       payload = {
         subcontractorType match {
@@ -70,22 +75,38 @@ class SubcontractorService @Inject() (
     } yield ()
 
   def isDuplicateUTR(userAnswers: UserAnswers, utr: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+    isDuplicateUTR(userAnswers, utr, None)
+
+  def isDuplicateUTR(userAnswers: UserAnswers, utr: String, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[Boolean] =
     for {
-      cisId   <- getCisId(userAnswers)
+      cisId   <- getCisId(userAnswers, subJourneyId)
       utrList <- cisConnector.getSubcontractorUTRs(cisId.toString)
     } yield utrList.subcontractorUTRs.contains(utr)
 
-  private def getCisId(userAnswers: UserAnswers): Future[String] =
-    userAnswers.get(CisIdQuery) match {
+  private def getCisId(userAnswers: UserAnswers, subJourneyId: Option[String] = None): Future[String] = {
+    val answer =
+      subJourneyId.flatMap(id => userAnswers.get(CisIdQuery(id))).orElse(userAnswers.get(CisIdQuery))
+    answer match {
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
     }
+  }
 
-  private def getSubcontractorType(userAnswers: UserAnswers): Future[TypeOfSubcontractor] =
-    userAnswers.get(TypeOfSubcontractorPage) match {
+  private def getSubcontractorType(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Future[TypeOfSubcontractor] = {
+    val answer =
+      subJourneyId
+        .flatMap(id => userAnswers.get(TypeOfSubcontractorPage(id)))
+        .orElse(userAnswers.get(TypeOfSubcontractorPage))
+    answer match {
       case Some(t) => Future.successful(t)
       case None    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
+  }
 
   private def partnershipPayloadFromUserAnswers(
     cisId: String,

@@ -1197,6 +1197,67 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should read cisId and type from the subjourney id when provided" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "11111111-1111-1111-1111-111111111111"
+        val nestedCisId   = "1045"
+
+        val partnershipAddress =
+          Address(
+            addressLine1 = "p1",
+            addressLine2 = Some("p2"),
+            addressLine3 = Some("London"),
+            addressLine4 = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery(id), nestedCisId)
+            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership))
+            .flatMap(_.set(PartnershipUniqueTaxpayerReferencePage, "1234567890"))
+            .flatMap(_.set(PartnershipNamePage, "Test Partnership"))
+            .flatMap(_.set(PartnershipNominatedPartnerNamePage, "Nominated Partner"))
+            .flatMap(_.set(PartnershipNominatedPartnerNinoPage, "AA123456A"))
+            .flatMap(_.set(PartnershipNominatedPartnerCrnPage, "AC012345"))
+            .flatMap(_.set(PartnershipWorksReferenceNumberPage, "WRN-PTN"))
+            .flatMap(_.set(PartnershipAddressPage, partnershipAddress))
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          PartnershipPayload(
+            cisId = nestedCisId,
+            subcontractorType = TypeOfSubcontractor.Partnership,
+            utr = Some("1234567890"),
+            partnerUtr = None,
+            partnershipTradingName = Some("Test Partnership"),
+            partnerTradingName = Some("Nominated Partner"),
+            partnerNino = Some("AA123456A"),
+            partnerCrn = Some("AC012345"),
+            addressLine1 = Some("p1"),
+            addressLine2 = Some("p2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-PTN")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
     }
 
     "isDuplicateUTR(" - {
@@ -1217,6 +1278,23 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         service.isDuplicateUTR(userAnswers, utr).futureValue mustBe true
 
         verify(mockConnector).getSubcontractorUTRs(eqTo(cisId.toString))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should use cisId from the subjourney id when provided" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "11111111-1111-1111-1111-111111111111"
+        val nestedCisId   = "1045"
+
+        val userAnswers = emptyUserAnswers.set(CisIdQuery(id), nestedCisId).success.value
+
+        when(mockConnector.getSubcontractorUTRs(eqTo(nestedCisId))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(GetSubcontractorUTRsResponse(subcontractorUTRs = subcontractorUTRs)))
+
+        service.isDuplicateUTR(userAnswers, utr, Some(id)).futureValue mustBe true
+
+        verify(mockConnector).getSubcontractorUTRs(eqTo(nestedCisId))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
       }
 

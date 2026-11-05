@@ -33,7 +33,8 @@ class TypeOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOn
   "TypeOfSubcontractorView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable =
+        view(form, NormalMode, controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("typeOfSubcontractor.title"))
 
@@ -63,7 +64,8 @@ class TypeOfSubcontractorViewSpec extends AnyWordSpec with Matchers with GuiceOn
       val errorForm: Form[TypeOfSubcontractor] =
         form.withError("value", "typeOfSubcontractor.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html =
+        view(errorForm, NormalMode, controllers.add.routes.TypeOfSubcontractorController.onSubmit(NormalMode))
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

@@ -18,20 +18,22 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
-import models.Mode
+import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
-import utils.DefaultSubcontractorCleanupService
-import scala.util.{Failure, Success}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class TypeOfSubcontractorController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,6 +42,7 @@ class TypeOfSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   cleanupService: DefaultSubcontractorCleanupService,
   formProvider: TypeOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -58,18 +61,16 @@ class TypeOfSubcontractorController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmit(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmit(mode)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(view(formWithErrors, mode))
-            ),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
           value =>
             cleanupService.clean(request.userAnswers) match {
               case Success(cleanedAnswers) =>
@@ -102,6 +103,82 @@ class TypeOfSubcontractorController @Inject() (
                     controllers.routes.JourneyRecoveryController.onPageLoad()
                   )
                 )
+            }
+        )
+    }
+
+  def onPageLoadStart(cisId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen multiTabAction.forStart(cisId) andThen getData) { implicit request =>
+      Ok(view(form, mode, routes.TypeOfSubcontractorController.onSubmitStart(cisId, mode)))
+    }
+
+  def onSubmitStart(cisId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen multiTabAction.forStart(cisId) andThen getData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitStart(cisId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value => {
+            val answers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+            cleanupService.clean(answers) match {
+              case Failure(exception)      =>
+                logger.error(
+                  "[TypeOfSubcontractorController][onSubmitStart] Failed to clean previous subcontractor answers",
+                  exception
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Success(cleanedAnswers) =>
+                val flowId = UUID.randomUUID()
+                val id     = flowId.toString
+                Future
+                  .fromTry(
+                    cleanedAnswers
+                      .set(TypeOfSubcontractorPage(id), value)
+                      .flatMap(_.set(CisIdQuery(id), cisId))
+                  )
+                  .flatMap { updatedAnswers =>
+                    sessionRepository.set(updatedAnswers).map { _ =>
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                    }
+                  }
+            }
+          }
+        )
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = TypeOfSubcontractorPage(id)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            cleanupService.clean(request.userAnswers) match {
+              case Failure(exception)      =>
+                logger.error(
+                  "[TypeOfSubcontractorController][onSubmitWithId] Failed to clean previous subcontractor answers",
+                  exception
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              case Success(cleanedAnswers) =>
+                Future
+                  .fromTry(cleanedAnswers.set(TypeOfSubcontractorPage(id), value))
+                  .flatMap { updatedAnswers =>
+                    sessionRepository.set(updatedAnswers).map { _ =>
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                    }
+                  }
             }
         )
     }
