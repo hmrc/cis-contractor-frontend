@@ -19,9 +19,11 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
+import models.requests.IdentifierRequest
+import models.response.CisTaxpayerResponse
 import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.add.TypeOfSubcontractorPage
@@ -31,6 +33,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.CisTaxpayerService
 import utils.DefaultSubcontractorCleanupService
 import views.html.add.TypeOfSubcontractorView
 
@@ -47,6 +50,41 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new TypeOfSubcontractorFormProvider()
   private val form         = formProvider()
+  private val startCisId   = "1045"
+
+  private def taxpayer(cisId: String = startCisId) =
+    CisTaxpayerResponse(
+      uniqueId = cisId,
+      taxOfficeNumber = "123",
+      taxOfficeRef = "AB456",
+      aoDistrict = None,
+      aoPayType = None,
+      aoCheckCode = None,
+      aoReference = None,
+      validBusinessAddr = None,
+      correlation = None,
+      ggAgentId = None,
+      employerName1 = None,
+      employerName2 = None,
+      agentOwnRef = None,
+      schemeName = None,
+      utr = None,
+      enrolledSig = None
+    )
+
+  private def authorisedOrgService(cisId: String = startCisId): CisTaxpayerService = {
+    val service = mock[CisTaxpayerService]
+    when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
+      .thenReturn(Future.successful(taxpayer(cisId)))
+    service
+  }
+
+  private def authorisedAgentService(cisId: String = startCisId): CisTaxpayerService = {
+    val service = mock[CisTaxpayerService]
+    when(service.findForAgent(eqTo(cisId))(using any[IdentifierRequest[?]]()))
+      .thenReturn(Future.successful(Some(taxpayer(cisId))))
+    service
+  }
 
   "TypeOfSubcontractorController" - {
 
@@ -529,19 +567,25 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must store the type and cisId under a new UUID when Partnership is submitted on start" in {
+    "must store the type and cisId from the URL under a new UUID when Partnership is submitted on start" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
+          )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -556,7 +600,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val saved = captor.getValue
         val id    = saved.data.value.keys.find(key => scala.util.Try(UUID.fromString(key)).isSuccess).value
         saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Partnership)
-        saved.get(CisIdQuery(id)) mustBe Some("1")
+        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
         saved.get(CisIdQuery) mustBe Some("1")
       }
     }
@@ -574,12 +618,18 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(leftoverAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
+          )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -604,13 +654,17 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService)
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
           )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -621,16 +675,99 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery on start when cisId is missing" in {
+    "must redirect to Journey Recovery on start when the organisation is not authorised for the cisId" in {
       val mockSessionRepository = mock[SessionRepository]
-      val application           =
+      val mockTaxpayerService   = mock[CisTaxpayerService]
+      when(mockTaxpayerService.findForOrganisation(using any[IdentifierRequest[?]]()))
+        .thenReturn(Future.successful(taxpayer("other")))
+
+      val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(mockTaxpayerService)
+          )
           .build()
 
       running(application) {
         val request =
-          FakeRequest(POST, controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode).url)
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
+            .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+        verifyNoInteractions(mockSessionRepository)
+      }
+    }
+
+    "must store the URL cisId for an agent when they are authorised for the client" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          isAgent = true,
+          hasEmployeeRef = false
+        )
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedAgentService())
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
+            .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+
+        val saved = captor.getValue
+        val id    = saved.data.value.keys.find(key => scala.util.Try(UUID.fromString(key)).isSuccess).value
+        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
+        saved.get(CisIdQuery) mustBe None
+      }
+    }
+
+    "must redirect to Journey Recovery on start when the agent is not authorised for the cisId" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val mockTaxpayerService   = mock[CisTaxpayerService]
+      when(mockTaxpayerService.findForAgent(eqTo(startCisId))(using any[IdentifierRequest[?]]()))
+        .thenReturn(Future.successful(None))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          isAgent = true,
+          hasEmployeeRef = false
+        )
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(mockTaxpayerService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
             .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Partnership.toString)
 
         val result = route(application, request).value
@@ -645,11 +782,15 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadStart(NormalMode).url)
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadStart(startCisId, NormalMode).url
+          )
 
         val result =
           route(application, request).value
@@ -662,7 +803,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           form,
           NormalMode,
-          controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(NormalMode)
+          controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode)
         )(
           request,
           messages(application)
@@ -670,11 +811,41 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery on a GET on start when the organisation is not authorised for the cisId" in {
+      val mockTaxpayerService = mock[CisTaxpayerService]
+      when(mockTaxpayerService.findForOrganisation(using any[IdentifierRequest[?]]()))
+        .thenReturn(Future.successful(taxpayer("other")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[CisTaxpayerService].toInstance(mockTaxpayerService))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.add.routes.TypeOfSubcontractorController.onPageLoadStart(startCisId, NormalMode).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET with id" in {
 
       val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery(id.toString), startCisId)
+          .success
+          .value
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
           .build()
 
       running(application) {
@@ -705,12 +876,14 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val userAnswers =
         emptyUserAnswers
-          .set(TypeOfSubcontractorPage(id.toString), TypeOfSubcontractor.Partnership)
+          .set(CisIdQuery(id.toString), startCisId)
+          .flatMap(_.set(TypeOfSubcontractorPage(id.toString), TypeOfSubcontractor.Partnership))
           .success
           .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
           .build()
 
       running(application) {
@@ -742,9 +915,18 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
+      val userAnswers =
+        userAnswersWithCisId
+          .set(CisIdQuery(id.toString), startCisId)
+          .success
+          .value
+
       val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
+          )
           .build()
 
       running(application) {
@@ -765,6 +947,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         saved.get(TypeOfSubcontractorPage(id.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
         saved.get(TypeOfSubcontractorPage) mustBe None
         saved.get(CisIdQuery) mustBe Some("1")
+        saved.get(CisIdQuery(id.toString)) mustBe Some(startCisId)
       }
     }
 
@@ -773,7 +956,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val id              = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val leftoverAnswers =
         userAnswersWithCisId
-          .set(PartnershipNamePage, "Old name")
+          .set(CisIdQuery(id.toString), startCisId)
+          .flatMap(_.set(PartnershipNamePage, "Old name"))
           .success
           .value
 
@@ -782,7 +966,10 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(leftoverAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
+          )
           .build()
 
       running(application) {
@@ -809,11 +996,18 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val mockCleanupService    = mock[DefaultSubcontractorCleanupService]
       when(mockCleanupService.clean(any())).thenReturn(Failure(new RuntimeException("Unable to clean user answers")))
 
+      val userAnswers =
+        userAnswersWithCisId
+          .set(CisIdQuery(id.toString), startCisId)
+          .success
+          .value
+
       val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService)
+            bind[DefaultSubcontractorCleanupService].toInstance(mockCleanupService),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
           )
           .build()
 
@@ -833,8 +1027,14 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
     "must return a Bad Request and errors when invalid data is submitted with id" in {
 
       val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery(id.toString), startCisId)
+          .success
+          .value
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
           .build()
 
       running(application) {
@@ -869,6 +1069,25 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
       val application =
         applicationBuilder(userAnswers = None)
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(id, NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery on a GET with id when cisId is missing under the id" in {
+
+      val id          = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[CisTaxpayerService].toInstance(authorisedOrgService()))
           .build()
 
       running(application) {

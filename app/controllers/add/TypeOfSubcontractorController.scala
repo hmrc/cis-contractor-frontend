@@ -42,6 +42,7 @@ class TypeOfSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   cleanupService: DefaultSubcontractorCleanupService,
   formProvider: TypeOfSubcontractorFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -106,59 +107,54 @@ class TypeOfSubcontractorController @Inject() (
         )
     }
 
-  def onPageLoadStart(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    Ok(view(form, mode, routes.TypeOfSubcontractorController.onSubmitStart(mode)))
-  }
+  def onPageLoadStart(cisId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen multiTabAction.forStart(cisId) andThen getData) { implicit request =>
+      Ok(view(form, mode, routes.TypeOfSubcontractorController.onSubmitStart(cisId, mode)))
+    }
 
-  def onSubmitStart(mode: Mode): Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
-      val submitAction = routes.TypeOfSubcontractorController.onSubmitStart(mode)
+  def onSubmitStart(cisId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen multiTabAction.forStart(cisId) andThen getData).async { implicit request =>
+      val submitAction = routes.TypeOfSubcontractorController.onSubmitStart(cisId, mode)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
           value => {
             val answers = request.userAnswers.getOrElse(UserAnswers(request.userId))
-            answers.get(CisIdQuery) match {
-              case None        =>
-                logger.error("[TypeOfSubcontractorController][onSubmitStart] CisIdQuery missing from session data")
+            cleanupService.clean(answers) match {
+              case Failure(exception)      =>
+                logger.error(
+                  "[TypeOfSubcontractorController][onSubmitStart] Failed to clean previous subcontractor answers",
+                  exception
+                )
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-              case Some(cisId) =>
-                cleanupService.clean(answers) match {
-                  case Failure(exception)      =>
-                    logger.error(
-                      "[TypeOfSubcontractorController][onSubmitStart] Failed to clean previous subcontractor answers",
-                      exception
-                    )
-                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                  case Success(cleanedAnswers) =>
-                    val id = UUID.randomUUID().toString
-                    Future
-                      .fromTry(
-                        cleanedAnswers
-                          .set(TypeOfSubcontractorPage(id), value)
-                          .flatMap(_.set(CisIdQuery(id), cisId))
-                      )
-                      .flatMap { updatedAnswers =>
-                        sessionRepository.set(updatedAnswers).map { _ =>
-                          Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
-                        }
-                      }
-                }
+              case Success(cleanedAnswers) =>
+                val id = UUID.randomUUID().toString
+                Future
+                  .fromTry(
+                    cleanedAnswers
+                      .set(TypeOfSubcontractorPage(id), value)
+                      .flatMap(_.set(CisIdQuery(id), cisId))
+                  )
+                  .flatMap { updatedAnswers =>
+                    sessionRepository.set(updatedAnswers).map { _ =>
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                    }
+                  }
             }
           }
         )
     }
 
   def onPageLoadWithId(id: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(id)) { implicit request =>
       val page         = TypeOfSubcontractorPage(id.toString)
       val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
       Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)))
     }
 
   def onSubmitWithId(id: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(id)).async { implicit request =>
       val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(id, mode)
       form
         .bindFromRequest()
