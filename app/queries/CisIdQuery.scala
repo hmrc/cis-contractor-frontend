@@ -19,7 +19,7 @@ package queries
 import play.api.libs.json.JsPath
 
 case class CisIdQuery(id: String) extends Gettable[String] with Settable[String] {
-  override def path: JsPath = JsPath \ id \ "cisId"
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ "cisId"
 }
 
 case object CisIdQuery extends Gettable[String] with Settable[String] {

@@ -24,7 +24,7 @@ import scala.util.Try
 
 case class PartnershipNominatedPartnerCrnYesNoPage(id: String) extends QuestionPage[Boolean] with PartnershipJourney {
 
-  override def path: JsPath = JsPath \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "partnershipNominatedPartnerCrnYesNo"
 

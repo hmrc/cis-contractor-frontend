@@ -30,7 +30,7 @@ case class PartnershipContactMethodOptionsPage(id: String)
     with PartnershipJourney
     with ContactMethodOptionsCleanup {
 
-  override def path: JsPath = JsPath \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "partnershipContactMethodOptions"
 

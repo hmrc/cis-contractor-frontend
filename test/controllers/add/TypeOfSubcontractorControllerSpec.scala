@@ -597,7 +597,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         val saved = captor.getValue
-        val id    = saved.data.value.keys.find(key => scala.util.Try(UUID.fromString(key)).isSuccess).value
+        val id    = (saved.data \ "addSubcontractor").as[play.api.libs.json.JsObject].value.keys.head
         redirectLocation(result).value mustBe
           controllers.add.partnership.routes.PartnershipNameController
             .onPageLoadWithId(UUID.fromString(id), NormalMode)
@@ -741,7 +741,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         val saved = captor.getValue
-        val id    = saved.data.value.keys.find(key => scala.util.Try(UUID.fromString(key)).isSuccess).value
+        val id    = (saved.data \ "addSubcontractor").as[play.api.libs.json.JsObject].value.keys.head
         saved.get(CisIdQuery(id)) mustBe Some(startCisId)
         saved.get(CisIdQuery) mustBe None
       }
