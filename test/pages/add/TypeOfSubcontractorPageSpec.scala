@@ -21,6 +21,7 @@ import pages.add.company.CompanyAddressYesNoPage
 import pages.add.partnership.PartnershipAddressYesNoPage
 import pages.add.trust.TrustAddressYesNoPage
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
 class TypeOfSubcontractorPageSpec extends PageBehaviours {
 
@@ -31,6 +32,11 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
     beSettable[TypeOfSubcontractor](TypeOfSubcontractorPage)
 
     beRemovable[TypeOfSubcontractor](TypeOfSubcontractorPage)
+
+    "must nest the WithId path under addSubcontractor" in {
+      TypeOfSubcontractorPage("uuid-1").path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "typeOfSubcontractor")
+      TypeOfSubcontractorPage.path mustBe (JsPath \ "typeOfSubcontractor")
+    }
 
     "must store the answer under the subjourney id" in {
       val answers = emptyUserAnswers

@@ -17,6 +17,7 @@
 package pages.add
 
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
 class CheckYourAnswersSubmittedPageSpec extends PageBehaviours {
 
@@ -27,5 +28,11 @@ class CheckYourAnswersSubmittedPageSpec extends PageBehaviours {
     beSettable[Boolean](CheckYourAnswersSubmittedPage)
 
     beRemovable[Boolean](CheckYourAnswersSubmittedPage)
+
+    "must nest the WithId path under addSubcontractor" in {
+      CheckYourAnswersSubmittedPage("uuid-1").path mustBe
+        (JsPath \ "addSubcontractor" \ "uuid-1" \ "checkYourAnswersSubmitted")
+      CheckYourAnswersSubmittedPage.path mustBe (JsPath \ "checkYourAnswersSubmitted")
+    }
   }
 }

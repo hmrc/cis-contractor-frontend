@@ -28,34 +28,43 @@ import viewmodels.checkAnswers.UtrViewModel
 
 object PartnershipUniqueTaxpayerReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    showActions: Boolean = true,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit
     messages: Messages
   ): Option[SummaryListRow] =
-    answers.get(PartnershipUniqueTaxpayerReferencePage).map { answer =>
-      val value = UtrViewModel(answer)
-      if (showActions) {
-        val actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url
+    subJourneyId
+      .map(id => answers.get(PartnershipUniqueTaxpayerReferencePage(id)))
+      .getOrElse(answers.get(PartnershipUniqueTaxpayerReferencePage))
+      .map { answer =>
+        val value = UtrViewModel(answer)
+        if (showActions) {
+          val actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(routes.PartnershipUniqueTaxpayerReferenceController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
+              .withAttribute("id" -> "partnership-unique-taxpayer-reference")
           )
-            .withVisuallyHiddenText(messages("partnershipUniqueTaxpayerReference.change.hidden"))
-            .withAttribute("id" -> "partnership-unique-taxpayer-reference")
-        )
-        SummaryListRowViewModel(
-          key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
-          value = value,
-          actions = actions
-        )
-      } else {
-        SummaryListRowViewModel(
-          key = "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel",
-          value = value,
-          actions = Seq.empty
-        )
-      }
+          SummaryListRowViewModel(
+            key = "partnershipUniqueTaxpayerReference.checkYourAnswersLabel",
+            value = value,
+            actions = actions
+          )
+        } else {
+          SummaryListRowViewModel(
+            key = "partnershipUniqueTaxpayerReference.verified.checkYourAnswersLabel",
+            value = value,
+            actions = Seq.empty
+          )
+        }
 
-    }
+      }
 
   def row(
     answers: PartnershipAnswers,

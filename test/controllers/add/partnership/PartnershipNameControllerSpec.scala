@@ -16,7 +16,7 @@
 
 package controllers.add.partnership
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.partnership.PartnershipNameFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
@@ -34,7 +34,7 @@ import views.html.add.partnership.PartnershipNameView
 import scala.concurrent.Future
 import scala.util.Random
 
-class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
+class PartnershipNameControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new PartnershipNameFormProvider()
   private val form         = formProvider()
@@ -57,7 +57,11 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PartnershipNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -74,7 +78,11 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("My Partnership"), NormalMode)(
+        contentAsString(result) mustEqual view(
+          form.fill("My Partnership"),
+          NormalMode,
+          controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -123,7 +131,11 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -143,7 +155,11 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -234,7 +250,11 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PartnershipNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          controllers.add.partnership.routes.PartnershipNameController.onSubmit(AmendMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -266,6 +286,63 @@ class PartnershipNameControllerSpec extends SpecBase with MockitoSugar {
         ).value mustEqual controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
           .onPageLoad()
           .url
+      }
+    }
+
+    "must return OK for a GET with id when the subjourney exists" in {
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id      = uuid.toString
+      val answers = emptyUserAnswers.set(queries.CisIdQuery(id), "AB12").success.value
+      val repo    = mockSessionRepository(Some(answers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.add.partnership.routes.PartnershipNameController
+            .onPageLoadWithId(uuid, NormalMode)
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to the address yes no page with id when valid data is submitted" in {
+      val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id      = uuid.toString
+      val answers = emptyUserAnswers.set(queries.CisIdQuery(id), "AB12").success.value
+      val repo    = mockSessionRepository(Some(answers))
+
+      when(repo.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.partnership.routes.PartnershipNameController
+              .onSubmitWithId(uuid, NormalMode)
+              .url
+          ).withFormUrlEncodedBody(("value", "My Partnership"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.partnership.routes.PartnershipAddressYesNoController
+            .onPageLoadWithId(uuid, NormalMode)
+            .url
       }
     }
   }

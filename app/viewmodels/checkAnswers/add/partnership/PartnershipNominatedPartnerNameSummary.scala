@@ -26,21 +26,31 @@ import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerNameSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerName.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode, id))
+      .getOrElse(SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerName.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.partnership.routes.PartnershipNominatedPartnerNameController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipNominatedPartnerName.change.hidden"))
+              .withAttribute("id" -> "nominated-partner-name")
           )
-            .withVisuallyHiddenText(messages("partnershipNominatedPartnerName.change.hidden"))
-            .withAttribute("id" -> "nominated-partner-name")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

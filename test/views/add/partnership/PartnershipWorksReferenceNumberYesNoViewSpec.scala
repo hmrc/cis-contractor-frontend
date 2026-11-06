@@ -37,7 +37,12 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
     "render the page with title, heading, radios and submit button" in new Setup {
       private val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("partnershipWorksReferenceNumberYesNo.title"))
 
@@ -70,7 +75,12 @@ class PartnershipWorksReferenceNumberYesNoViewSpec extends AnyWordSpec with Matc
 
       private val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

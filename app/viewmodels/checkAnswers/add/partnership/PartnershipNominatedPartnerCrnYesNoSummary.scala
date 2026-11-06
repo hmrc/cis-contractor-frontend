@@ -27,28 +27,39 @@ import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerCrnYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNominatedPartnerCrnYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipNominatedPartnerCrnYesNoPage(id)))
+      .getOrElse(answers.get(PartnershipNominatedPartnerCrnYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key)
-                .url
-            else controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                    .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key)
+                    .url
+                else
+                  controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipNominatedPartnerCrnYesNo.change.hidden"))
+              .withAttribute("id" -> "add-nominated-partner-crn")
           )
-            .withVisuallyHiddenText(messages("partnershipNominatedPartnerCrnYesNo.change.hidden"))
-            .withAttribute("id" -> "add-nominated-partner-crn")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

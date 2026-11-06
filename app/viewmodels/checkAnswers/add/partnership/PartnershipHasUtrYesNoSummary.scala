@@ -28,42 +28,53 @@ import viewmodels.implicits.*
 
 object PartnershipHasUtrYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipHasUtrYesNoPage).map { answer =>
-      val partnershipName =
-        answers.get(PartnershipNamePage) match {
-          case Some(name)                => name.trim
-          case None if mode == AmendMode =>
-            messages("verify.noName")
-          case None                      =>
-            throw MissingRequiredAnswer("PartnershipNamePage")
-        }
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipHasUtrYesNoPage(id)))
+      .getOrElse(answers.get(PartnershipHasUtrYesNoPage))
+      .map { answer =>
+        val partnershipName =
+          subJourneyId
+            .map(id => answers.get(PartnershipNamePage(id)))
+            .getOrElse(answers.get(PartnershipNamePage)) match {
+            case Some(name)                => name.trim
+            case None if mode == AmendMode =>
+              messages("verify.noName")
+            case None                      =>
+              throw MissingRequiredAnswer("PartnershipNamePage")
+          }
 
-      val yesNoText = if (answer) messages("site.yes") else messages("site.no")
+        val yesNoText = if (answer) messages("site.yes") else messages("site.no")
 
-      SummaryListRowViewModel(
-        key = KeyViewModel(
-          Text(messages("partnershipHasUtrYesNo.checkYourAnswersLabel", partnershipName))
-        ),
-        value = ValueViewModel(yesNoText),
-        actions = Seq(
-          ActionItemViewModel(
-            content = messages("site.change"),
-            href =
-              if answer && mode == AmendMode then
-                controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                  .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
-                  .url
-              else
-                controllers.add.partnership.routes.PartnershipHasUtrYesNoController
-                  .onPageLoad(mode)
-                  .url
-          ).withVisuallyHiddenText(
-            messages("partnershipHasUtrYesNo.change.hidden")
-          ).withAttribute("id" -> "add-partnership-utr")
+        SummaryListRowViewModel(
+          key = KeyViewModel(
+            Text(messages("partnershipHasUtrYesNo.checkYourAnswersLabel", partnershipName))
+          ),
+          value = ValueViewModel(yesNoText),
+          actions = Seq(
+            ActionItemViewModel(
+              content = messages("site.change"),
+              href = changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                    .onPageLoad(AmendPartnershipRemoveDetail.Utr.key)
+                    .url
+                else
+                  controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+                    .onPageLoad(mode)
+                    .url
+              )
+            ).withVisuallyHiddenText(
+              messages("partnershipHasUtrYesNo.change.hidden")
+            ).withAttribute("id" -> "add-partnership-utr")
+          )
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

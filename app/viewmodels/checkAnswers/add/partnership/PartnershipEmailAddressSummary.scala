@@ -26,21 +26,31 @@ import viewmodels.implicits.*
 
 object PartnershipEmailAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipEmailAddressPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "partnershipEmailAddress.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipEmailAddressPage(id)))
+      .getOrElse(answers.get(PartnershipEmailAddressPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "partnershipEmailAddress.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipEmailAddress.change.hidden"))
+              .withAttribute("id" -> "partnership-email-address")
           )
-            .withVisuallyHiddenText(messages("partnershipEmailAddress.change.hidden"))
-            .withAttribute("id" -> "partnership-email-address")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

@@ -16,10 +16,10 @@
 
 package navigation
 
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import pages.Page
 import play.api.Logging
 import play.api.mvc.Call
-import pages.Page
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
 
 trait NavigatorForJourney extends Logging {
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
