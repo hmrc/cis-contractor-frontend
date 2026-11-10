@@ -61,8 +61,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     userAnswers: UserAnswers
   ): Call = {
     val selectedType =
-      id.flatMap(value => userAnswers.get(TypeOfSubcontractorPage(value)))
-        .orElse(userAnswers.get(TypeOfSubcontractorPage))
+      id.map(value => userAnswers.get(TypeOfSubcontractorPage(value)))
+        .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
     selectedType match {
       case None                    =>
         logger.error(

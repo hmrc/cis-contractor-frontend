@@ -18,7 +18,7 @@ package pages.add
 
 import models.TypeOfSubcontractor
 import pages.add.company.CompanyAddressYesNoPage
-import pages.add.partnership.PartnershipAddressYesNoPage
+import pages.add.partnership.{PartnershipAddressYesNoPage, PartnershipNamePage}
 import pages.add.trust.TrustAddressYesNoPage
 import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
@@ -48,7 +48,7 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       answers.get(TypeOfSubcontractorPage) mustBe None
     }
 
-    "cleanup: must remove other type answers when Partnership is selected under the subjourney id" in {
+    "cleanup: must not remove root answers when Partnership is selected under the subjourney id" in {
       val userAnswers =
         emptyUserAnswers
           .set(NationalInsuranceNumberYesNoPage, true)
@@ -60,6 +60,9 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
           .set(PartnershipAddressYesNoPage, true)
           .success
           .value
+          .set(PartnershipAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
           .set(TrustAddressYesNoPage, true)
           .success
           .value
@@ -67,10 +70,32 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       val updatedUserAnswers =
         userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership).success.value
 
-      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
-      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
-      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe Some(true)
+    }
+
+    "cleanup: must remove nested partnership answers when another type is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(PartnershipNamePage("uuid-1"), "Nested Partnership")
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Limitedcompany).success.value
+
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipNamePage("uuid-1")) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe None
     }
 
     "cleanup: must remove all LimitedCompany, Partnership and Trust subcontractor answers when IndividualSoleTraderSubcontractor is selected" in {

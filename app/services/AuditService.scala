@@ -72,8 +72,8 @@ class AuditService @Inject() (
     hc: HeaderCarrier
   ): Unit = {
     val subcontractorType = subJourneyId
-      .flatMap(id => userAnswers.get(TypeOfSubcontractorPage(id)))
-      .orElse(userAnswers.get(TypeOfSubcontractorPage))
+      .map(id => userAnswers.get(TypeOfSubcontractorPage(id)))
+      .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
     subcontractorType match {
       case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers))
       case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers, subJourneyId))
@@ -146,11 +146,11 @@ class AuditService @Inject() (
     def value[A](nested: String => QuestionPage[A], root: QuestionPage[A])(implicit
       reads: play.api.libs.json.Reads[A]
     ): Option[A] =
-      subJourneyId.flatMap(id => ua.get(nested(id))).orElse(ua.get(root))
+      subJourneyId.map(id => ua.get(nested(id))).getOrElse(ua.get(root))
 
     val contactOpts = value(PartnershipContactMethodOptionsPage.apply, PartnershipContactMethodOptionsPage)
     AddPartnershipSubcontractorAuditEventModel(
-      cisId = subJourneyId.flatMap(id => ua.get(CisIdQuery(id))).orElse(ua.get(CisIdQuery)),
+      cisId = subJourneyId.map(id => ua.get(CisIdQuery(id))).getOrElse(ua.get(CisIdQuery)),
       typeOfSubcontractor = value(TypeOfSubcontractorPage.apply, TypeOfSubcontractorPage).fold("")(_.toString),
       partnershipName = value(PartnershipNamePage.apply, PartnershipNamePage),
       partnershipAddressYesNo = value(PartnershipAddressYesNoPage.apply, PartnershipAddressYesNoPage),

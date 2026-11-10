@@ -299,6 +299,31 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(PartnershipWorksReferenceNumberPage) mustBe None
       result.get(PartnershipWorksReferenceNumberYesNoPage) mustBe None
     }
+
+    "remove nested PartnershipSubcontractor answers for the subjourney id and leave root answers" in {
+      val id = "11111111-1111-1111-1111-111111111111"
+      val userAnswers =
+        emptyUserAnswers
+          .set(PartnershipNamePage, name)
+          .success
+          .value
+          .set(PartnershipNamePage(id), "Nested Partnership")
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage(id), true)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage(id), true)
+          .success
+          .value
+
+      val result = removePartnershipSubcontractor(userAnswers, id).success.value
+
+      result.get(PartnershipNamePage) mustBe Some(name)
+      result.get(PartnershipNamePage(id)) mustBe None
+      result.get(PartnershipAddressYesNoPage(id)) mustBe None
+      result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
+    }
   }
 
   ".removeTrustSubcontractor" - {

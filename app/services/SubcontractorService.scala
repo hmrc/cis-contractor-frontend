@@ -88,7 +88,7 @@ class SubcontractorService @Inject() (
 
   private def getCisId(userAnswers: UserAnswers, subJourneyId: Option[String] = None): Future[String] = {
     val answer =
-      subJourneyId.flatMap(id => userAnswers.get(CisIdQuery(id))).orElse(userAnswers.get(CisIdQuery))
+      subJourneyId.map(id => userAnswers.get(CisIdQuery(id))).getOrElse(userAnswers.get(CisIdQuery))
     answer match {
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
@@ -101,8 +101,8 @@ class SubcontractorService @Inject() (
   ): Future[TypeOfSubcontractor] = {
     val answer =
       subJourneyId
-        .flatMap(id => userAnswers.get(TypeOfSubcontractorPage(id)))
-        .orElse(userAnswers.get(TypeOfSubcontractorPage))
+        .map(id => userAnswers.get(TypeOfSubcontractorPage(id)))
+        .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
     answer match {
       case Some(t) => Future.successful(t)
       case None    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
@@ -116,8 +116,8 @@ class SubcontractorService @Inject() (
     subJourneyId: Option[String] = None
   ): PartnershipPayload = {
     val address = subJourneyId
-      .flatMap(id => userAnswers.get(PartnershipAddressPage(id)))
-      .orElse(userAnswers.get(PartnershipAddressPage))
+      .map(id => userAnswers.get(PartnershipAddressPage(id)))
+      .getOrElse(userAnswers.get(PartnershipAddressPage))
     PartnershipPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
@@ -178,7 +178,7 @@ class SubcontractorService @Inject() (
     nestedPage: String => QuestionPage[A],
     rootPage: QuestionPage[A]
   )(implicit reads: play.api.libs.json.Reads[A]): Option[A] =
-    subJourneyId.flatMap(id => userAnswers.get(nestedPage(id))).orElse(userAnswers.get(rootPage))
+    subJourneyId.map(id => userAnswers.get(nestedPage(id))).getOrElse(userAnswers.get(rootPage))
 
   private def individualOrSoleTraderPayloadFromUserAnswers(
     cisId: String,
