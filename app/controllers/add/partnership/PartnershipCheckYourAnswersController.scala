@@ -20,6 +20,7 @@ import controllers.actions.*
 import models.CheckMode
 import models.add.partnership.ValidatedPartnership
 import pages.add.CheckYourAnswersSubmittedPage
+import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -277,23 +278,43 @@ class PartnershipCheckYourAnswersController @Inject() (
       } else {
         ValidatedPartnership.build(request.userAnswers, id) match {
           case Right(_) =>
-            subcontractorService
-              .createAndUpdateSubcontractor(request.userAnswers, Some(id))
-              .flatMap { _ =>
-                auditService.addSubcontractorEvent(request.userAnswers, Some(id))
-                Future
-                  .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
-                  .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                  .map { _ =>
-                    Redirect(
-                      controllers.add.routes.SubcontractorAddedController
-                        .partnershipSubcontractorAddedWithId(flowId)
-                    )
-                  }
+            val duplicateUtr =
+              request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage(id)) match {
+                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, Some(id))
+                case None      => Future.successful(false)
+              }
+
+            duplicateUtr
+              .flatMap {
+                case true  =>
+                  logger.error("[PartnershipCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                case false =>
+                  subcontractorService
+                    .createAndUpdateSubcontractor(request.userAnswers, Some(id))
+                    .flatMap { _ =>
+                      auditService.addSubcontractorEvent(request.userAnswers, Some(id))
+                      Future
+                        .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
+                        .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                        .map { _ =>
+                          Redirect(
+                            controllers.add.routes.SubcontractorAddedController
+                              .partnershipSubcontractorAddedWithId(flowId)
+                          )
+                        }
+                    }
+                    .recover { case t =>
+                      logger.error(
+                        "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
+                        t
+                      )
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    }
               }
               .recover { case t =>
                 logger.error(
-                  "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
+                  "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
                   t
                 )
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -1006,6 +1006,113 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
       verify(mockSessionRepository).set(any[UserAnswers])
       verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
     }
+
+    "must redirect to Journey Recovery when the UTR is already used and not create the subcontractor" in {
+      val uaWithUtr = minUaWithId
+        .set(PartnershipHasUtrYesNoPage(id), true)
+        .success
+        .value
+        .set(PartnershipUniqueTaxpayerReferencePage(id), "1111111111")
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(uaWithUtr)))
+      when(
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithUtr))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmitWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
+        any[HeaderCarrier]
+      )
+      verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
+        any[HeaderCarrier]
+      )
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
+      verify(mockAuditService, never()).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+    }
+
+    "must submit nested answers when the UTR is not a duplicate" in {
+      val uaWithUtr = minUaWithId
+        .set(PartnershipHasUtrYesNoPage(id), true)
+        .success
+        .value
+        .set(PartnershipUniqueTaxpayerReferencePage(id), "1111111111")
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(uaWithUtr)))
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+      when(
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(false))
+      when(
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithUtr))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onSubmitWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAddedWithId(flowId).url
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
+        any[HeaderCarrier]
+      )
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
+        any[HeaderCarrier]
+      )
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+    }
   }
 
 }
