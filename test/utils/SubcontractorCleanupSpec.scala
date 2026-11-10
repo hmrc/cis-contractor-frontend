@@ -301,7 +301,7 @@ class SubcontractorCleanupSpec extends SpecBase {
     }
 
     "remove nested PartnershipSubcontractor answers for the subjourney id and leave root answers" in {
-      val id = "11111111-1111-1111-1111-111111111111"
+      val id          = "11111111-1111-1111-1111-111111111111"
       val userAnswers =
         emptyUserAnswers
           .set(PartnershipNamePage, name)
