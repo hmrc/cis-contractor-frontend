@@ -91,6 +91,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
       case (Limitedcompany, _)         => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
       case (Partnership, _)            => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case (Trust, Some(value))        =>
+        controllers.add.trust.routes.TrustNameController.onPageLoadWithId(UUID.fromString(value), NormalMode)
       case (Trust, _)                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
@@ -103,6 +105,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Limitedcompany, _)         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       case (Partnership, _)            =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
+      case (Trust, Some(value))        =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoadWithId(UUID.fromString(value))
       case (Trust, _)                  => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     }
 
@@ -116,7 +120,8 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case Limitedcompany         => ValidatedCompany.build(userAnswers).isRight
       case Partnership            =>
         id.map(ValidatedPartnership.build(userAnswers, _)).getOrElse(ValidatedPartnership.build(userAnswers)).isRight
-      case Trust                  => ValidatedTrust.build(userAnswers).isRight
+      case Trust                  =>
+        id.map(ValidatedTrust.build(userAnswers, _)).getOrElse(ValidatedTrust.build(userAnswers)).isRight
     }
 
 }
