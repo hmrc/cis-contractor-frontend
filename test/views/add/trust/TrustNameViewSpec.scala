@@ -33,7 +33,8 @@ class TrustNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSui
   "TrustNameView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable =
+        view(form, NormalMode, controllers.add.trust.routes.TrustNameController.onSubmit(NormalMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustName.title"))
@@ -51,7 +52,8 @@ class TrustNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSui
     }
 
     "render the page with title, heading, input and submit button for amend journey" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, AmendMode)
+      val html: HtmlFormat.Appendable =
+        view(form, AmendMode, controllers.add.trust.routes.TrustNameController.onSubmit(AmendMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustName.title"))
@@ -72,7 +74,7 @@ class TrustNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSui
       val errorForm: Form[String] =
         form.withError("value", "trustName.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html = view(errorForm, NormalMode, controllers.add.trust.routes.TrustNameController.onSubmit(NormalMode))
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

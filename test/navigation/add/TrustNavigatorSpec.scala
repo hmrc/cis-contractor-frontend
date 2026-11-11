@@ -48,6 +48,13 @@ class TrustNavigatorSpec extends SpecBase {
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(NormalMode)
       }
 
+      "must go from TrustNamePage with id to TrustAddressYesNoPage with id" in {
+        val flowId = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+        navigator.nextPage(TrustNamePage(id), NormalMode, UserAnswers("id")) mustBe
+          controllers.add.trust.routes.TrustAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
+      }
+
       "must go from a TrustAddressYesNoPage to the address lookup on-ramp when true" in {
         navigator.nextPage(
           TrustAddressYesNoPage,

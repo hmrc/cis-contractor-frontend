@@ -40,7 +40,12 @@ class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with G
 
       val subcontractorName = "Test Subcontractor"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, subcontractorName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        subcontractorName,
+        controllers.add.trust.routes.TrustContactMethodOptionsController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("trustContactMethodOptions.title"))
 
@@ -74,7 +79,12 @@ class TrustContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with G
       val errorForm: Form[Set[TrustContactMethodOptions]] =
         form.withError("value", "trustContactMethodOptions.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, subcontractorName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        subcontractorName,
+        controllers.add.trust.routes.TrustContactMethodOptionsController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.TrustUtrYesNoFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
@@ -33,7 +33,7 @@ import views.html.add.trust.TrustUtrYesNoView
 
 import scala.concurrent.Future
 
-class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
+class TrustUtrYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new TrustUtrYesNoFormProvider()
   private val form         = formProvider()
@@ -60,7 +60,12 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view    = application.injector.instanceOf[TrustUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -79,7 +84,12 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -161,7 +171,12 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result    = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -274,7 +289,12 @@ class TrustUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view   = application.injector.instanceOf[TrustUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          trustName,
+          controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(AmendMode)
+        )(request, messages(application)).toString
       }
     }
 

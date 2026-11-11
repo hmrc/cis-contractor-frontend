@@ -39,6 +39,56 @@ object ValidatedTrust extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
     buildTrust(answers, getPageValue(answers, TrustNamePage))
 
+  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedTrust] =
+    for {
+      _                         <- validateType(answers, id)
+      trustName                 <- getPageValue(answers, TrustNamePage(id))
+      trustAddress              <- getOptionalPageValue(answers, TrustAddressPage(id), TrustAddressYesNoPage(id))
+      trustContactMethodOptions <-
+        getOptionalPageValue(
+          answers,
+          TrustContactMethodOptionsPage(id),
+          AddTrustContactMethodsYesNoPage(id)
+        ).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+          case Some(_)                           =>
+            Left(InvalidAnswer(TrustContactMethodOptionsPage(id)))
+          case None                              =>
+            Right(None)
+        }
+      trustEmail                <- getContactPageValue(
+                                     answers,
+                                     trustContactMethodOptions,
+                                     TrustEmailAddressPage(id),
+                                     ContactMethodOptions.Email
+                                   )
+      trustPhone                <- getContactPageValue(
+                                     answers,
+                                     trustContactMethodOptions,
+                                     TrustPhoneNumberPage(id),
+                                     ContactMethodOptions.Phone
+                                   )
+      trustMobile               <- getContactPageValue(
+                                     answers,
+                                     trustContactMethodOptions,
+                                     TrustMobileNumberPage(id),
+                                     ContactMethodOptions.Mobile
+                                   )
+      trustUtr                  <- getOptionalPageValue(answers, TrustUtrPage(id), TrustUtrYesNoPage(id))
+      trustWorkRefNumber        <-
+        getOptionalPageValue(answers, TrustWorksReferencePage(id), TrustWorksReferenceYesNoPage(id))
+    } yield ValidatedTrust(
+      trustName = trustName,
+      trustAddress = trustAddress,
+      trustContactMethodOptions = trustContactMethodOptions,
+      trustEmail = trustEmail,
+      trustPhone = trustPhone,
+      trustMobile = trustMobile,
+      trustUtr = trustUtr,
+      trustWorkRefNumber = trustWorkRefNumber
+    )
+
   def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
     buildTrust(answers, getAmendPageValue(answers, TrustNamePage))
 
@@ -91,5 +141,11 @@ object ValidatedTrust extends Validation {
     getPageValue(answers, TypeOfSubcontractorPage).flatMap {
       case TypeOfSubcontractor.Trust => Right(())
       case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+
+  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+      case TypeOfSubcontractor.Trust => Right(())
+      case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
     }
 }

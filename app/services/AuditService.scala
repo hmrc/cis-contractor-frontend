@@ -77,7 +77,7 @@ class AuditService @Inject() (
     subcontractorType match {
       case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers))
       case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers, subJourneyId))
-      case Some(TypeOfSubcontractor.Trust)          => send(buildTrustModel(userAnswers))
+      case Some(TypeOfSubcontractor.Trust)          => send(buildTrustModel(userAnswers, subJourneyId))
       case _                                        => send(buildIndividualModel(userAnswers))
     }
   }
@@ -186,25 +186,33 @@ class AuditService @Inject() (
     )
   }
 
-  private def buildTrustModel(ua: UserAnswers): AddTrustSubcontractorAuditEventModel = {
-    val contactOpts = ua.get(TrustContactMethodOptionsPage)
+  private def buildTrustModel(
+    ua: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): AddTrustSubcontractorAuditEventModel = {
+    def value[A](nested: String => QuestionPage[A], root: QuestionPage[A])(implicit
+      reads: play.api.libs.json.Reads[A]
+    ): Option[A] =
+      subJourneyId.map(id => ua.get(nested(id))).getOrElse(ua.get(root))
+
+    val contactOpts = value(TrustContactMethodOptionsPage.apply, TrustContactMethodOptionsPage)
     AddTrustSubcontractorAuditEventModel(
-      cisId = ua.get(CisIdQuery),
-      typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      trustName = ua.get(TrustNamePage),
-      trustAddressYesNo = ua.get(TrustAddressYesNoPage),
-      trustAddress = ua.get(TrustAddressPage),
-      addTrustContactMethodsYesNo = ua.get(AddTrustContactMethodsYesNoPage),
+      cisId = subJourneyId.map(id => ua.get(CisIdQuery(id))).getOrElse(ua.get(CisIdQuery)),
+      typeOfSubcontractor = value(TypeOfSubcontractorPage.apply, TypeOfSubcontractorPage).fold("")(_.toString),
+      trustName = value(TrustNamePage.apply, TrustNamePage),
+      trustAddressYesNo = value(TrustAddressYesNoPage.apply, TrustAddressYesNoPage),
+      trustAddress = value(TrustAddressPage.apply, TrustAddressPage),
+      addTrustContactMethodsYesNo = value(AddTrustContactMethodsYesNoPage.apply, AddTrustContactMethodsYesNoPage),
       trustEmailContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Email)),
       trustPhoneContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Phone)),
       trustMobileContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Mobile)),
-      trustEmailAddress = ua.get(TrustEmailAddressPage),
-      trustPhoneNumber = ua.get(TrustPhoneNumberPage),
-      trustMobileNumber = ua.get(TrustMobileNumberPage),
-      trustUtrYesNo = ua.get(TrustUtrYesNoPage),
-      trustUtr = ua.get(TrustUtrPage),
-      trustWorksReferenceYesNo = ua.get(TrustWorksReferenceYesNoPage),
-      trustWorksReference = ua.get(TrustWorksReferencePage)
+      trustEmailAddress = value(TrustEmailAddressPage.apply, TrustEmailAddressPage),
+      trustPhoneNumber = value(TrustPhoneNumberPage.apply, TrustPhoneNumberPage),
+      trustMobileNumber = value(TrustMobileNumberPage.apply, TrustMobileNumberPage),
+      trustUtrYesNo = value(TrustUtrYesNoPage.apply, TrustUtrYesNoPage),
+      trustUtr = value(TrustUtrPage.apply, TrustUtrPage),
+      trustWorksReferenceYesNo = value(TrustWorksReferenceYesNoPage.apply, TrustWorksReferenceYesNoPage),
+      trustWorksReference = value(TrustWorksReferencePage.apply, TrustWorksReferencePage)
     )
   }
 

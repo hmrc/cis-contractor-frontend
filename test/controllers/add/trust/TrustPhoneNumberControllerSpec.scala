@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.TrustPhoneNumberFormProvider
 import models.contact.ContactMethodOptions
@@ -35,7 +35,7 @@ import views.html.add.trust.TrustPhoneNumberView
 
 import scala.concurrent.Future
 
-class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
+class TrustPhoneNumberControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   val formProvider = new TrustPhoneNumberFormProvider()
   val form         = formProvider()
@@ -80,7 +80,12 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -105,7 +110,12 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("0123456723"), NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form.fill("0123456723"),
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -155,7 +165,12 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -330,7 +345,12 @@ class TrustPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, FinalValidationMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form,
+          FinalValidationMode,
+          trustName,
+          controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(FinalValidationMode)
+        )(
           request,
           messages(application)
         ).toString

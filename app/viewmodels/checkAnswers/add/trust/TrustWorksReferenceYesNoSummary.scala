@@ -26,28 +26,38 @@ import viewmodels.implicits.*
 
 object TrustWorksReferenceYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustWorksReferenceYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustWorksReferenceYesNoPage(id)))
+      .getOrElse(answers.get(TrustWorksReferenceYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "trustWorksReferenceYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
-                .onPageLoad("works-reference-number")
-                .url
-            else controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "trustWorksReferenceYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+                    .onPageLoad("works-reference-number")
+                    .url
+                else controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("trustWorksReferenceYesNo.change.hidden"))
+              .withAttribute("id" -> "add-trust-works-reference")
           )
-            .withVisuallyHiddenText(messages("trustWorksReferenceYesNo.change.hidden"))
-            .withAttribute("id" -> "add-trust-works-reference")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

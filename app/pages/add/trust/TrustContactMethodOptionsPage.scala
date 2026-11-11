@@ -25,6 +25,26 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class TrustContactMethodOptionsPage(id: String)
+    extends QuestionPage[Set[TrustContactMethodOptions]]
+    with TrustJourney
+    with ContactMethodOptionsCleanup {
+
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "trustContactMethodOptions"
+
+  override def cleanup(value: Option[Set[TrustContactMethodOptions]], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(selectedAnswers) =>
+        removeIfNotSelected(selectedAnswers, Email, TrustEmailAddressPage(id), userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, Phone, TrustPhoneNumberPage(id), _))
+          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, TrustMobileNumberPage(id), _))
+      case _                     =>
+        super.cleanup(value, userAnswers)
+    }
+}
+
 case object TrustContactMethodOptionsPage
     extends QuestionPage[Set[TrustContactMethodOptions]]
     with TrustJourney

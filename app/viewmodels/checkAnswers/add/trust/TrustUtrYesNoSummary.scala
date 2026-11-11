@@ -26,26 +26,36 @@ import viewmodels.implicits.*
 
 object TrustUtrYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustUtrYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustUtrYesNoPage(id)))
+      .getOrElse(answers.get(TrustUtrYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "trustUtrYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
-            else controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "trustUtrYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("utr").url
+                else controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
+              .withAttribute("id" -> "add-trust-utr")
           )
-            .withVisuallyHiddenText(messages("trustUtrYesNo.change.hidden"))
-            .withAttribute("id" -> "add-trust-utr")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

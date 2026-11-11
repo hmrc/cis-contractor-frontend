@@ -26,21 +26,29 @@ import viewmodels.implicits.*
 
 object TrustPhoneNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustPhoneNumberPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "trustPhoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustPhoneNumberPage(id)))
+      .getOrElse(answers.get(TrustPhoneNumberPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "trustPhoneNumber.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(controllers.add.trust.routes.TrustPhoneNumberController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("trustPhoneNumber.change.hidden"))
+              .withAttribute("id" -> "trust-phone-number")
           )
-            .withVisuallyHiddenText(messages("trustPhoneNumber.change.hidden"))
-            .withAttribute("id" -> "trust-phone-number")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

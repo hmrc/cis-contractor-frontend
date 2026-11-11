@@ -22,7 +22,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.SubcontractorCleanup.*
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
@@ -32,8 +32,10 @@ case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcon
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(Partnership) => Success(ua)
-      case Some(_)           => removePartnershipSubcontractor(ua, id)
+      case Some(Partnership) => removeTrustSubcontractor(ua, id)
+      case Some(Trust)       => removePartnershipSubcontractor(ua, id)
+      case Some(_)           =>
+        removePartnershipSubcontractor(ua, id).flatMap(removeTrustSubcontractor(_, id))
       case _                 => super.cleanup(value, ua)
     }
 }

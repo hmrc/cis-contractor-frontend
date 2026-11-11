@@ -32,6 +32,7 @@ import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustUtrView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +43,7 @@ class TrustUtrController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: TrustUtrFormProvider,
   subcontractorService: SubcontractorService,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
@@ -76,7 +78,7 @@ class TrustUtrController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          val result       = Ok(view(preparedForm, mode, trustName))
+          val result       = Ok(view(preparedForm, mode, trustName, routes.TrustUtrController.onSubmit(mode)))
           yesOrNoPageGuardService.yesOrNoPageRoute(result, yesOrNoPageOption, yesOrNoPage, mode)
         }
         .getOrElse {
@@ -93,7 +95,10 @@ class TrustUtrController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, trustName, routes.TrustUtrController.onSubmit(mode)))
+                ),
               value =>
                 val prevValue = request.userAnswers.get(TrustUtrPage)
                 val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage)
@@ -112,7 +117,9 @@ class TrustUtrController @Inject() (
                             key = "value",
                             message = "trustUtr.error.duplicate"
                           )
-                        Future.successful(BadRequest(view(errorForm, mode, trustName)))
+                        Future.successful(
+                          BadRequest(view(errorForm, mode, trustName, routes.TrustUtrController.onSubmit(mode)))
+                        )
                       case false =>
                         saveAndContinue(mode, value)
                     }
@@ -123,5 +130,82 @@ class TrustUtrController @Inject() (
           logger.error(s"[TrustUtrController][onSubmit] - TrustNamePage missing from userAnswers")
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      if (!request.userAnswers.get(TrustUtrYesNoPage(id)).contains(true)) {
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      } else {
+        SubcontractorNameDisplayHelper
+          .getTrustDisplayName(request.userAnswers, mode, id)
+          .map { trustName =>
+            val page         = TrustUtrPage(id)
+            val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+            Ok(
+              view(
+                preparedForm,
+                mode,
+                trustName,
+                routes.TrustUtrController.onSubmitWithId(flowId, mode)
+              )
+            )
+          }
+          .getOrElse {
+            logger.error(
+              s"[TrustUtrController][onPageLoadWithId] - TrustNamePage missing from userAnswers"
+            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.TrustUtrController.onSubmitWithId(flowId, mode)
+      if (!request.userAnswers.get(TrustUtrYesNoPage(id)).contains(true)) {
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+        SubcontractorNameDisplayHelper
+          .getTrustDisplayName(request.userAnswers, mode, id)
+          .map { name =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
+                value =>
+                  subcontractorService.isDuplicateUTR(request.userAnswers, value, Some(id)).flatMap {
+                    case true  =>
+                      val errorForm = form
+                        .fill(value)
+                        .withError(
+                          key = "value",
+                          message = "trustUtr.error.duplicate"
+                        )
+                      Future.successful(BadRequest(view(errorForm, mode, name, submitAction)))
+                    case false =>
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            request.userAnswers
+                              .set(TrustUtrPage(id), value)
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Redirect(
+                        navigator
+                          .nextPage(TrustUtrPage(id), mode, updatedAnswers)
+                      )
+                  }
+              )
+          }
+          .getOrElse {
+            logger.error(
+              s"[TrustUtrController][onSubmitWithId] - TrustNamePage missing from userAnswers"
+            )
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+      }
     }
 }

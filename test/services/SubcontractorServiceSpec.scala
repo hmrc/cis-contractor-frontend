@@ -1263,6 +1263,65 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should create and update a trust from nested answers" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "11111111-1111-1111-1111-111111111111"
+        val nestedAddress =
+          Address(
+            addressLine1 = "t1",
+            addressLine2 = Some("t2"),
+            addressLine3 = Some("London"),
+            addressLine4 = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery(id), "AB12")
+            .success
+            .value
+            .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+            .success
+            .value
+            .set(TrustNamePage(id), "Nested Trust")
+            .success
+            .value
+            .set(TrustAddressPage(id), nestedAddress)
+            .success
+            .value
+            .set(TrustNamePage, "Root Trust")
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          TrustPayload(
+            cisId = "AB12",
+            subcontractorType = TypeOfSubcontractor.Trust,
+            trustTradingName = Some("Nested Trust"),
+            utr = None,
+            addressLine1 = Some("t1"),
+            addressLine2 = Some("t2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            postcode = Some("N1 5AP"),
+            country = Some("United Kingdom"),
+            emailAddress = None,
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = None
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should read cisId and type from the subjourney id when provided" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)

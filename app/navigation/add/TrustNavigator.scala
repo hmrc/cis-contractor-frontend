@@ -24,12 +24,45 @@ import pages.{Page, QuestionPage}
 import pages.add.trust.*
 import play.api.mvc.Call
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class TrustNavigator @Inject() () extends NavigatorForJourney {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    extractId(page) match {
+      case Some(id) =>
+        val flowId = UUID.fromString(id)
+        mode match {
+          case NormalMode => normalRoutesWithId(flowId, id)(page)(userAnswers)
+          case CheckMode  => checkRouteMapWithId(flowId, id)(page)(userAnswers)
+          case _          => nextPageWithoutId(page, mode, userAnswers)
+        }
+      case None     => nextPageWithoutId(page, mode, userAnswers)
+    }
+
+  private def extractId(page: Page): Option[String] =
+    page match {
+      case TrustNamePage(id)                   => Some(id)
+      case TrustAddressYesNoPage(id)           => Some(id)
+      case TrustAddressPage(id)                => Some(id)
+      case AddTrustContactMethodsYesNoPage(id) => Some(id)
+      case TrustContactMethodOptionsPage(id)   => Some(id)
+      case TrustEmailAddressPage(id)           => Some(id)
+      case TrustPhoneNumberPage(id)            => Some(id)
+      case TrustMobileNumberPage(id)           => Some(id)
+      case TrustUtrYesNoPage(id)               => Some(id)
+      case TrustUtrPage(id)                    => Some(id)
+      case TrustWorksReferenceYesNoPage(id)    => Some(id)
+      case TrustWorksReferencePage(id)         => Some(id)
+      case _                                   => None
+    }
+
+  private def cyaRouteWithId(flowId: UUID): Call =
+    controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoadWithId(flowId)
+
+  private def nextPageWithoutId(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
@@ -37,6 +70,233 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case AmendMode  =>
       amendRouteMap(page)(userAnswers)
   }
+
+  private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
+    case TrustNamePage(_)                   =>
+      _ => controllers.add.trust.routes.TrustAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
+    case TrustAddressYesNoPage(_)           =>
+      userAnswers => navigatorFromTrustAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case AddTrustContactMethodsYesNoPage(_) =>
+      userAnswers => navigatorFromAddTrustContactMethodsYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case TrustContactMethodOptionsPage(_)   =>
+      userAnswers => nextSelectedContactMethodPageAfter(flowId, id, current = None)(userAnswers)
+    case TrustEmailAddressPage(_)           =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Email))(userAnswers)
+    case TrustPhoneNumberPage(_)            =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Phone))(userAnswers)
+    case TrustMobileNumberPage(_)           =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Mobile))(userAnswers)
+    case TrustUtrYesNoPage(_)               =>
+      userAnswers => navigatorFromTrustUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case TrustUtrPage(_)                    =>
+      _ => controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, NormalMode)
+    case TrustWorksReferenceYesNoPage(_)    =>
+      userAnswers => navigatorFromTrustWorksReferenceYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case TrustWorksReferencePage(_)         =>
+      _ => cyaRouteWithId(flowId)
+    case _                                  => _ => routes.IndexController.onPageLoad()
+  }
+
+  private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
+    case TrustNamePage(_)                   => _ => cyaRouteWithId(flowId)
+    case TrustAddressYesNoPage(_)           =>
+      userAnswers => navigatorFromTrustAddressYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case AddTrustContactMethodsYesNoPage(_) =>
+      userAnswers => navigatorFromAddTrustContactMethodsYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case TrustContactMethodOptionsPage(_)   =>
+      userAnswers => nextMissingSelectedContactMethodPageAfter(flowId, id, current = None, CheckMode)(userAnswers)
+    case TrustEmailAddressPage(_)           =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Email),
+          CheckMode
+        )(userAnswers)
+    case TrustPhoneNumberPage(_)            =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Phone),
+          CheckMode
+        )(userAnswers)
+    case TrustMobileNumberPage(_)           =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Mobile),
+          CheckMode
+        )(userAnswers)
+    case TrustUtrYesNoPage(_)               =>
+      navigatorFromTrustUtrYesNoPage(flowId, id, CheckMode)(_)
+    case TrustUtrPage(_)                    => _ => cyaRouteWithId(flowId)
+    case TrustWorksReferenceYesNoPage(_)    =>
+      navigatorFromTrustWorksReferenceYesNoPage(flowId, id, CheckMode)(_)
+    case TrustWorksReferencePage(_)         => _ => cyaRouteWithId(flowId)
+    case _                                  => _ => cyaRouteWithId(flowId)
+  }
+
+  private def navigatorFromTrustUtrYesNoPage(flowId: UUID, id: String, mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(TrustUtrYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.trust.routes.TrustUtrController.onPageLoadWithId(flowId, mode)
+      case (Some(false), NormalMode) =>
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        ua.get(TrustUtrPage(id))
+          .fold(controllers.add.trust.routes.TrustUtrController.onPageLoadWithId(flowId, mode))(_ =>
+            cyaRouteWithId(flowId)
+          )
+      case (Some(false), CheckMode)  =>
+        cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(s"[TrustNavigator][navigatorFromTrustUtrYesNoPage] - unexpected state, mode=$mode")
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromTrustAddressYesNoPage(flowId: UUID, id: String, mode: Mode)(ua: UserAnswers): Call =
+    addressLookupYesNoRoute(
+      mode,
+      ua.get(TrustAddressYesNoPage(id)),
+      ua.get(TrustAddressPage(id)).isDefined,
+      onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookupWithId(flowId, None),
+      onYesChange = controllers.add.trust.routes.TrustAddressController
+        .redirectToAddressLookupWithId(flowId, Some(CheckMode.toString)),
+      onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, NormalMode),
+      checkYourAnswers = cyaRouteWithId(flowId)
+    )
+
+  private def navigatorFromTrustWorksReferenceYesNoPage(flowId: UUID, id: String, mode: Mode)(ua: UserAnswers): Call =
+    (ua.get(TrustWorksReferenceYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.trust.routes.TrustWorksReferenceController.onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        cyaRouteWithId(flowId)
+      case (Some(true), CheckMode)   =>
+        ua.get(TrustWorksReferencePage(id))
+          .fold(controllers.add.trust.routes.TrustWorksReferenceController.onPageLoadWithId(flowId, mode))(_ =>
+            cyaRouteWithId(flowId)
+          )
+      case (Some(false), CheckMode)  =>
+        cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(s"[TrustNavigator][navigatorFromTrustWorksReferenceYesNoPage] - unexpected state, mode=$mode")
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddTrustContactMethodsYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(AddTrustContactMethodsYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        ua.get(TrustContactMethodOptionsPage(id))
+          .fold(
+            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  =>
+        cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[TrustNavigator][navigatorFromAddTrustContactMethodsYesNoPage] - unexpected state, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def nextSelectedContactMethodPageAfter(
+    flowId: UUID,
+    id: String,
+    current: Option[ContactMethodOptions]
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining.headOption.fold {
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoadWithId(flowId, NormalMode)
+      }(contactMethodPageCall(flowId, _, NormalMode))
+    }
+
+  private def nextMissingSelectedContactMethodPageAfter(
+    flowId: UUID,
+    id: String,
+    current: Option[ContactMethodOptions],
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining
+        .find(isMissingAnswer(id, _)(userAnswers))
+        .map(contactMethodPageCall(flowId, _, mode))
+        .getOrElse(cyaRouteWithId(flowId))
+    }
+
+  private def navigateFromContactMethodPage(
+    id: String,
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
+    selectedContactMethodsInOrder(id, userAnswers)
+      .filter(_.nonEmpty)
+      .fold {
+        logger.error(
+          "[TrustNavigator][navigateFromContactMethodPage] - ContactMethodOptions missing or empty"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+      } { selectedContactMethods =>
+        current match {
+          case Some(currentContactMethod) if !selectedContactMethods.contains(currentContactMethod) =>
+            logger.error(
+              "[TrustNavigator][navigateFromContactMethodPage] - current contact method not selected"
+            )
+            routes.JourneyRecoveryController.onPageLoad()
+          case _                                                                                    =>
+            val remaining =
+              current match {
+                case None                       => selectedContactMethods
+                case Some(currentContactMethod) =>
+                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
+                  selectedContactMethods.drop(currentIndex + 1)
+              }
+            terminalStep(remaining)
+        }
+      }
+
+  private def selectedContactMethodsInOrder(
+    id: String,
+    userAnswers: UserAnswers
+  ): Option[Seq[ContactMethodOptions]] =
+    userAnswers.get(TrustContactMethodOptionsPage(id)).map(ContactMethodOptions.ordered)
+
+  private def contactMethodPageCall(
+    flowId: UUID,
+    contactMethod: ContactMethodOptions,
+    mode: Mode
+  ): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  =>
+        controllers.add.trust.routes.TrustEmailAddressController.onPageLoadWithId(flowId, mode)
+      case ContactMethodOptions.Phone  =>
+        controllers.add.trust.routes.TrustPhoneNumberController.onPageLoadWithId(flowId, mode)
+      case ContactMethodOptions.Mobile =>
+        controllers.add.trust.routes.TrustMobileNumberController.onPageLoadWithId(flowId, mode)
+    }
+
+  private def isMissingAnswer(id: String, contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(contactMethodPage(id, contactMethod)).isEmpty
+
+  private def contactMethodPage(id: String, contactMethod: ContactMethodOptions): QuestionPage[String] =
+    contactMethod match {
+      case ContactMethodOptions.Email  => TrustEmailAddressPage(id)
+      case ContactMethodOptions.Phone  => TrustPhoneNumberPage(id)
+      case ContactMethodOptions.Mobile => TrustMobileNumberPage(id)
+    }
 
   private def cyaRoute(mode: Mode): Call = mode match {
     case AmendMode =>
