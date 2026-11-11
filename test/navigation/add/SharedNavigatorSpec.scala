@@ -130,6 +130,16 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
       }
 
+      "must go from a TypeOfSubcontractorPage with id to TrustNameController when Trust is selected" in {
+        val id = "11111111-1111-1111-1111-111111111111"
+        navigator.nextPage(
+          TypeOfSubcontractorPage(id),
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+        ) mustBe controllers.add.trust.routes.TrustNameController
+          .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
+      }
+
       "must go from a TypeOfSubcontractorPage to journey recovery page when incomplete info provided" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,

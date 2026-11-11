@@ -36,7 +36,8 @@ class TrustUtrYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPe
 
       val trustName = "Test Trust"
 
-      val html = view(form, NormalMode, trustName)
+      val html =
+        view(form, NormalMode, trustName, controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode))
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -72,7 +73,12 @@ class TrustUtrYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPe
 
       val errorForm = form.withError("value", "error.required")
 
-      val html = view(errorForm, NormalMode, trustName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustUtrYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

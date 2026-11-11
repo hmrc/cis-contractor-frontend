@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.TrustWorksReferenceYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -35,7 +35,7 @@ import views.html.add.trust.TrustWorksReferenceYesNoView
 
 import scala.concurrent.Future
 
-class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
+class TrustWorksReferenceYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val trustName = "Test Trust"
 
@@ -67,7 +67,12 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
         val view = application.injector.instanceOf[TrustWorksReferenceYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -85,7 +90,12 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -162,7 +172,12 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -216,7 +231,12 @@ class TrustWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

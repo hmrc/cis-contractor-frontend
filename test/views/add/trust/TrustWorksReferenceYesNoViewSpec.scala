@@ -38,7 +38,12 @@ class TrustWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with Gu
 
       private val trustName = "Test Trust"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, trustName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -78,7 +83,12 @@ class TrustWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with Gu
 
       private val trustName = "Test Trust"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, trustName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

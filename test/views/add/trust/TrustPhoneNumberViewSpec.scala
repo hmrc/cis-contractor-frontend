@@ -36,7 +36,8 @@ class TrustPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val trustName = "Test Trust"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, trustName)
+      val html: HtmlFormat.Appendable =
+        view(form, NormalMode, trustName, controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(NormalMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustPhoneNumber.title"))
@@ -62,7 +63,8 @@ class TrustPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val trustName = "Test Trust"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, trustName)
+      val html: HtmlFormat.Appendable =
+        view(form, AmendMode, trustName, controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(AmendMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustPhoneNumber.title"))
@@ -77,7 +79,12 @@ class TrustPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOneAp
       val errorForm: Form[String] =
         form.withError("value", "trustPhoneNumber.error.required")
 
-      val html = view(errorForm, NormalMode, trustName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustPhoneNumberController.onSubmit(NormalMode)
+      )
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

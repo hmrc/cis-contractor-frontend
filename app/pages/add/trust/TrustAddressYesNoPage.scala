@@ -22,6 +22,17 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class TrustAddressYesNoPage(id: String) extends QuestionPage[Boolean] with TrustJourney {
+
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "trustAddressYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then userAnswers.remove(TrustAddressPage(id))
+    else super.cleanup(value, userAnswers)
+}
+
 case object TrustAddressYesNoPage extends QuestionPage[Boolean] with TrustJourney {
 
   override def path: JsPath = JsPath \ toString
@@ -34,5 +45,4 @@ case object TrustAddressYesNoPage extends QuestionPage[Boolean] with TrustJourne
     } else {
       super.cleanup(value, userAnswers)
     }
-
 }

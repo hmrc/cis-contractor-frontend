@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.AddTrustContactMethodsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -32,7 +32,7 @@ import views.html.add.trust.AddTrustContactMethodsYesNoView
 
 import scala.concurrent.Future
 
-class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSugar {
+class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new AddTrustContactMethodsYesNoFormProvider()
   private val form         = formProvider()
@@ -59,7 +59,12 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
         val view = application.injector.instanceOf[AddTrustContactMethodsYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -77,7 +82,12 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -154,7 +164,12 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -208,7 +223,12 @@ class AddTrustContactMethodsYesNoControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

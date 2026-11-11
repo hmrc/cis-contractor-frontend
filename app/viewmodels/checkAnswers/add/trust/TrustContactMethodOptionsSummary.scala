@@ -30,27 +30,35 @@ import viewmodels.implicits.*
 
 object TrustContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustContactMethodOptionsPage).map { selectedMethods =>
-      val options =
-        ContactMethodOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"trustContactMethodOptions.$m")).toString)
-      SummaryListRowViewModel(
-        key = "trustContactMethodOptions.checkYourAnswersLabel",
-        value = ValueViewModelHelper
-          .makeGovukBulletList(options, false)
-          .getOrElse(ValueViewModel(HtmlContent(""))),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustContactMethodOptionsPage(id)))
+      .getOrElse(answers.get(TrustContactMethodOptionsPage))
+      .map { selectedMethods =>
+        val options =
+          ContactMethodOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"trustContactMethodOptions.$m")).toString)
+        SummaryListRowViewModel(
+          key = "trustContactMethodOptions.checkYourAnswersLabel",
+          value = ValueViewModelHelper
+            .makeGovukBulletList(options, false)
+            .getOrElse(ValueViewModel(HtmlContent(""))),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(controllers.add.trust.routes.TrustContactMethodOptionsController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
+              .withAttribute("id" -> "trust-methods-of-contact")
           )
-            .withVisuallyHiddenText(messages("trustContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "trust-methods-of-contact")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

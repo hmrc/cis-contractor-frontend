@@ -25,20 +25,32 @@ import viewmodels.checkAnswers.add.AddressSummaryRow
 
 object TrustAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustAddressPage).map { answer =>
-      AddressSummaryRow.row(
-        address = answer,
-        key = "trustAddress.checkYourAnswersLabel",
-        changeCall = if (mode == AmendMode) {
-          controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
-        } else {
-          controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(NormalMode, Some("change"))
-        },
-        hiddenTextKey = "trustAddress.change.hidden",
-        id = "address-of-trust"
-      )
-    }
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustAddressPage(id)))
+      .getOrElse(answers.get(TrustAddressPage))
+      .map { answer =>
+        AddressSummaryRow.row(
+          address = answer,
+          key = "trustAddress.checkYourAnswersLabel",
+          changeCall = changeUrl
+            .map(url => play.api.mvc.Call("GET", url))
+            .getOrElse(
+              if (mode == AmendMode) {
+                controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookup()
+              } else {
+                controllers.add.trust.routes.TrustAddressController.redirectToAddressLookup(NormalMode, Some("change"))
+              }
+            ),
+          hiddenTextKey = "trustAddress.change.hidden",
+          id = "address-of-trust"
+        )
+      }
 
   def row(
     answers: TrustAnswers

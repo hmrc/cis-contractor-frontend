@@ -30,6 +30,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustEmailAddressView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class TrustEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: TrustEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustEmailAddressView
@@ -66,7 +68,7 @@ class TrustEmailAddressController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, trustName))
+          Ok(view(preparedForm, mode, trustName, routes.TrustEmailAddressController.onSubmit(mode)))
 
         case (Some(_), false) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
@@ -92,7 +94,10 @@ class TrustEmailAddressController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, mode, trustName, routes.TrustEmailAddressController.onSubmit(mode)))
+            ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustEmailAddressPage, value))
@@ -104,4 +109,63 @@ class TrustEmailAddressController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id               = flowId.toString
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val trustName        =
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (trustName, emailIsAvailable) match {
+        case (Some(trustName), true) =>
+          val page         = TrustEmailAddressPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              trustName,
+              routes.TrustEmailAddressController.onSubmitWithId(flowId, mode)
+            )
+          )
+        case _                       =>
+          logger.error(
+            s"[TrustEmailAddressController][onPageLoadWithId] - trust name or email option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id               = flowId.toString
+      val submitAction     = routes.TrustEmailAddressController.onSubmitWithId(flowId, mode)
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val trustName        =
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (for {
+        trustName <- trustName
+        if emailIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(TrustEmailAddressPage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TrustEmailAddressPage(id), mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            s"[TrustEmailAddressController][onSubmitWithId] - trust name or email option missing"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

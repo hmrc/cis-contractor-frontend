@@ -25,7 +25,19 @@ import play.api.i18n.Messages
 object SubcontractorNameDisplayHelper {
 
   def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    userAnswers.get(TrustNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+    getTrustDisplayName(userAnswers, mode, TrustNamePage)
+
+  def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    getTrustDisplayName(userAnswers, mode, TrustNamePage(id))
+
+  private def getTrustDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: QuestionPage[String]
+  )(implicit messages: Messages): Option[String] =
+    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
