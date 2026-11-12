@@ -70,7 +70,9 @@ class SchemeRequestFormatsSpec extends AnyFreeSpec with Matchers {
       (Json.toJson(model).as[JsObject] - "version").validate[UpdateSchemeRequest].isError mustBe true
     }
     "fail when a field has the wrong type" in {
-      (Json.toJson(model).as[JsObject] + ("prePopCount" -> JsString("x"))).validate[UpdateSchemeRequest].isError mustBe true
+      (Json.toJson(model).as[JsObject] + ("prePopCount" -> JsString("x")))
+        .validate[UpdateSchemeRequest]
+        .isError mustBe true
     }
   }
 }

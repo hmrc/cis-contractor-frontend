@@ -37,7 +37,8 @@ class SubcontractorListAndSubmissionResponseSpec extends AnyFreeSpec with Matche
 
   "GetSubcontractorListResponse" - {
     "round-trip with items" in {
-      val model = GetSubcontractorListResponse(Seq(SubcontractorListItem(1L, Some(2L)), SubcontractorListItem(3L, None)))
+      val model =
+        GetSubcontractorListResponse(Seq(SubcontractorListItem(1L, Some(2L)), SubcontractorListItem(3L, None)))
       Json.toJson(model).validate[GetSubcontractorListResponse] mustBe JsSuccess(model)
     }
     "round-trip empty" in {
