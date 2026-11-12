@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.Aliases.{ServiceNavigation, ServiceNavigationItem}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import models.requests.RequestUserType
 @import views.html.helper.CSPNonce
@@ -81,6 +82,15 @@
     else (messages("site.hmrcAccount.org"), appConfig.hmrcServicesOrgUrl)
 }
 
+@serviceNavigation = @{
+    val nav = ServiceNavigation(
+        serviceName = Some(messages("service.name")),
+        serviceUrl  = Some(routes.ServiceHomeController.onPageLoad().url),
+        navigation  = Seq(ServiceNavigationItem(content = Text(hmrcAccountLink._1), href = hmrcAccountLink._2))
+    )
+    if (appConfig.languageTranslationEnabled) nav.withLanguageToggle() else nav
+}
+
 @content = {
   @contentBlock
   @hmrcReportTechnicalIssueHelper()
@@ -103,14 +113,8 @@
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
         userResearchBanner = if(appConfig.showUserResearchBannerEnabled && showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
     ),
-    serviceNavigation = Some(
-        ServiceNavigation(
-            serviceName = Some(messages("service.name")),
-            serviceUrl  = Some(routes.ServiceHomeController.onPageLoad().url),
-            navigation  = Seq(ServiceNavigationItem(content = Text(hmrcAccountLink._1), href = hmrcAccountLink._2))
-        )
-    ),
-      isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
+    serviceNavigation = Some(serviceNavigation),
+    isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
       backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
      )
     )(content)
