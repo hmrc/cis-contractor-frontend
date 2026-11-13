@@ -35,7 +35,12 @@ class PartnershipWorksReferenceNumberViewSpec extends AnyWordSpec with Matchers 
 
     "render the page with title, heading, input and submit button" in new Setup {
       val partnershipName             = "Test Partnership"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipWorksReferenceNumber.title"))
@@ -56,7 +61,12 @@ class PartnershipWorksReferenceNumberViewSpec extends AnyWordSpec with Matchers 
 
     "render the page with title, heading, input and update button in Amend journey" in new Setup {
       val partnershipName             = "Test Partnership"
-      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipWorksReferenceNumber.title"))
@@ -80,7 +90,12 @@ class PartnershipWorksReferenceNumberViewSpec extends AnyWordSpec with Matchers 
         form.withError("value", "partnershipWorksReferenceNumber.error.required")
 
       val partnershipName = "Test Partnership"
-      val html            = view(errorForm, NormalMode, partnershipName)
+      val html            = view(
+        errorForm,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController.onSubmit(NormalMode)
+      )
       val doc             = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

@@ -45,6 +45,94 @@ class PartnershipNavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
       }
 
+      "must go from PartnershipNamePage to the address yes no page with id" in {
+        val uuid = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id   = uuid.toString
+        navigator.nextPage(
+          PartnershipNamePage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
+          .onPageLoadWithId(uuid, NormalMode)
+      }
+
+      "must go from PartnershipAddressYesNoPage with id to address lookup when yes" in {
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), true)
+
+        navigator.nextPage(
+          PartnershipAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipAddressController
+          .redirectToAddressLookupWithId(flowId, None)
+      }
+
+      "must go from PartnershipAddressYesNoPage with id to contact methods when no" in {
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), false)
+
+        navigator.nextPage(
+          PartnershipAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddPartnershipContactMethodsYesNoPage with id to has UTR when no" in {
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage(id), false)
+
+        navigator.nextPage(
+          AddPartnershipContactMethodsYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from PartnershipHasUtrYesNoPage with id to nominated partner name when no" in {
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage(id), false)
+
+        navigator.nextPage(
+          PartnershipHasUtrYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from PartnershipWorksReferenceNumberYesNoPage with id to CYA when no" in {
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage(id), false)
+
+        navigator.nextPage(
+          PartnershipWorksReferenceNumberYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from PartnershipNamePage with id in CheckMode to CYA" in {
+        val flowId = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          PartnershipNamePage(id),
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
       "must go from a PartnershipHasUtrYesNo to PartnershipUniqueTaxpayerReferencePage when true" in {
         navigator.nextPage(
           PartnershipHasUtrYesNoPage,

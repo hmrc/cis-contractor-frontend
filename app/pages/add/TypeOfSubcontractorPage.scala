@@ -22,16 +22,20 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.SubcontractorCleanup.*
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
-  override def path: JsPath = JsPath \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "typeOfSubcontractor"
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
-    TypeOfSubcontractorPage.cleanup(value, ua)
+    value match {
+      case Some(Partnership) => Success(ua)
+      case Some(_)           => removePartnershipSubcontractor(ua, id)
+      case _                 => super.cleanup(value, ua)
+    }
 }
 
 case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney {

@@ -17,6 +17,7 @@
 package pages.add.partnership
 
 import pages.behaviours.PageBehaviours
+import play.api.libs.json.JsPath
 
 class PartnershipNamePageSpec extends PageBehaviours {
 
@@ -27,5 +28,10 @@ class PartnershipNamePageSpec extends PageBehaviours {
     beSettable[String](PartnershipNamePage)
 
     beRemovable[String](PartnershipNamePage)
+
+    "must nest the WithId path under addSubcontractor" in {
+      PartnershipNamePage("uuid-1").path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "partnershipName")
+      PartnershipNamePage.path mustBe (JsPath \ "partnershipName")
+    }
   }
 }
