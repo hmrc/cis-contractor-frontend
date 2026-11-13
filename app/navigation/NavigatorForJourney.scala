@@ -22,7 +22,11 @@ import pages.Page
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 
 trait NavigatorForJourney extends Logging {
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call
+
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = {
+    logger.error(s"[NavigatorForJourney] No UUID-scoped route for page: $page, mode: $mode")
+    controllers.routes.JourneyRecoveryController.onPageLoad()
+  }
 
   /** Shared routing for an "add an address?" Yes/No page that feeds into the Address Lookup Frontend journey. Identical
     * across subcontractor types; only the target calls differ.

@@ -26,6 +26,7 @@ import models.amend.AmendJourneyType
 import models.contact.ContactMethodOptions
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
 import models.response.*
+import pages.QuestionPage
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
@@ -45,49 +46,85 @@ class SubcontractorService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def createAndUpdateSubcontractor(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
-    createAndUpdateSubcontractor(userAnswers, None)
+  def createAndUpdateSubcontractor(
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    createAndUpdateSubcontractor(
+      userAnswers = userAnswers,
+      subJourneyId = None
+    )
 
-  def createAndUpdateSubcontractor(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
-    hc: HeaderCarrier
-  ): Future[Unit] =
+  def createAndUpdateSubcontractor(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[Unit] =
     for {
       cisId             <- getCisId(userAnswers, subJourneyId)
-      subcontractorType <- getSubcontractorType(userAnswers, subJourneyId)
+      subcontractorType <- getSubcontractorType(
+                             userAnswers = userAnswers,
+                             subJourneyId = subJourneyId
+                           )
 
-      payload = {
-        subcontractorType match {
-          case Individualorsoletrader =>
-            individualOrSoleTraderPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+      payload = subcontractorType match {
+                  case Individualorsoletrader =>
+                    individualOrSoleTraderPayloadFromUserAnswers(
+                      cisId = cisId,
+                      subcontractorType = subcontractorType,
+                      userAnswers = userAnswers
+                    )
 
-          case Partnership =>
-            partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+                  case Partnership =>
+                    partnershipPayloadFromUserAnswers(
+                      cisId = cisId,
+                      subcontractorType = subcontractorType,
+                      userAnswers = userAnswers
+                    )
 
-          case Limitedcompany =>
-            companyPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+                  case Limitedcompany =>
+                    companyPayloadFromUserAnswers(
+                      cisId = cisId,
+                      subcontractorType = subcontractorType,
+                      userAnswers = userAnswers,
+                      subJourneyId = subJourneyId
+                    )
 
-          case Trust =>
-            trustPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
-        }
-      }
+                  case Trust =>
+                    trustPayloadFromUserAnswers(
+                      cisId = cisId,
+                      subcontractorType = subcontractorType,
+                      userAnswers = userAnswers
+                    )
+                }
 
       _ <- cisConnector.createAndUpdateSubcontractor(payload)
     } yield ()
 
-  def isDuplicateUTR(userAnswers: UserAnswers, utr: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def isDuplicateUTR(
+    userAnswers: UserAnswers,
+    utr: String
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
     isDuplicateUTR(userAnswers, utr, None)
 
-  def isDuplicateUTR(userAnswers: UserAnswers, utr: String, subJourneyId: Option[String])(implicit
-    hc: HeaderCarrier
-  ): Future[Boolean] =
+  def isDuplicateUTR(
+    userAnswers: UserAnswers,
+    utr: String,
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       cisId   <- getCisId(userAnswers, subJourneyId)
       utrList <- cisConnector.getSubcontractorUTRs(cisId.toString)
     } yield utrList.subcontractorUTRs.contains(utr)
 
-  private def getCisId(userAnswers: UserAnswers, subJourneyId: Option[String] = None): Future[String] = {
+  private def getCisId(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Future[String] = {
     val answer =
-      subJourneyId.flatMap(id => userAnswers.get(CisIdQuery(id))).orElse(userAnswers.get(CisIdQuery))
+      subJourneyId match {
+        case Some(id) => userAnswers.get(CisIdQuery(id))
+        case None     => userAnswers.get(CisIdQuery)
+      }
+
     answer match {
       case Some(cisId) => Future.successful(cisId)
       case None        => Future.failed(new RuntimeException("CisIdQuery not found in session data"))
@@ -98,13 +135,22 @@ class SubcontractorService @Inject() (
     userAnswers: UserAnswers,
     subJourneyId: Option[String] = None
   ): Future[TypeOfSubcontractor] = {
-    val answer =
-      subJourneyId
-        .flatMap(id => userAnswers.get(TypeOfSubcontractorPage(id)))
-        .orElse(userAnswers.get(TypeOfSubcontractorPage))
-    answer match {
-      case Some(t) => Future.successful(t)
-      case None    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
+    val subcontractorType =
+      subJourneyId match {
+        case Some(id) => userAnswers.get(TypeOfSubcontractorPage(id))
+        case None     => userAnswers.get(TypeOfSubcontractorPage)
+      }
+
+    subcontractorType match {
+      case Some(value) =>
+        Future.successful(value)
+
+      case None =>
+        Future.failed(
+          new RuntimeException(
+            "TypeOfSubcontractorPage not found in session data"
+          )
+        )
     }
   }
 
@@ -163,25 +209,81 @@ class SubcontractorService @Inject() (
   private def companyPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
-    userAnswers: UserAnswers
-  ): CompanyPayload =
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): CompanyPayload = {
+    val address =
+      subJourneyId match {
+        case Some(id) => userAnswers.get(CompanyAddressPage(id))
+        case None     => userAnswers.get(CompanyAddressPage)
+      }
+
     CompanyPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
-      utr = userAnswers.get(CompanyUtrPage),
-      crn = userAnswers.get(CompanyCrnPage),
-      tradingName = userAnswers.get(CompanyNamePage),
-      addressLine1 = userAnswers.get(CompanyAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(CompanyAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(CompanyAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(CompanyAddressPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = userAnswers.get(CompanyEmailAddressPage),
-      phoneNumber = userAnswers.get(CompanyPhoneNumberPage),
-      mobilePhoneNumber = userAnswers.get(CompanyMobileNumberPage),
-      worksReferenceNumber = userAnswers.get(CompanyWorksReferencePage)
+      utr = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyUtrPage.apply,
+        CompanyUtrPage
+      ),
+      crn = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyCrnPage.apply,
+        CompanyCrnPage
+      ),
+      tradingName = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyNamePage.apply,
+        CompanyNamePage
+      ),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      city = address.flatMap(_.addressLine3),
+      county = address.flatMap(_.addressLine4),
+      postcode = address.flatMap(_.postcode),
+      country = address
+        .flatMap(_.country)
+        .flatMap(_.name),
+      emailAddress = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyEmailAddressPage.apply,
+        CompanyEmailAddressPage
+      ),
+      phoneNumber = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyPhoneNumberPage.apply,
+        CompanyPhoneNumberPage
+      ),
+      mobilePhoneNumber = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyMobileNumberPage.apply,
+        CompanyMobileNumberPage
+      ),
+      worksReferenceNumber = pageValue(
+        userAnswers,
+        subJourneyId,
+        CompanyWorksReferencePage.apply,
+        CompanyWorksReferencePage
+      )
     )
+  }
+
+  private def pageValue[A](
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String],
+    nestedPage: String => QuestionPage[A],
+    rootPage: QuestionPage[A]
+  )(implicit reads: play.api.libs.json.Reads[A]): Option[A] =
+    subJourneyId match {
+      case Some(id) => userAnswers.get(nestedPage(id))
+      case None     => userAnswers.get(rootPage)
+    }
 
   private def trustPayloadFromUserAnswers(
     cisId: String,

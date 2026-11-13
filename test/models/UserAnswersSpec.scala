@@ -18,6 +18,7 @@ package models
 
 import base.SpecBase
 import pages.add.TypeOfSubcontractorPage
+import play.api.libs.json.{JsDefined, JsString}
 import queries.CisIdQuery
 
 class UserAnswersSpec extends SpecBase {
@@ -37,6 +38,8 @@ class UserAnswersSpec extends SpecBase {
       answers.get(CisIdQuery("uuid-1")) mustBe Some("1045")
       answers.get(TypeOfSubcontractorPage("uuid-2")) mustBe Some(TypeOfSubcontractor.Partnership)
       answers.get(CisIdQuery("uuid-2")) mustBe Some("800")
+      (answers.data \ "addSubcontractor" \ "uuid-1" \ "cisId") mustBe JsDefined(JsString("1045"))
+      (answers.data \ "addSubcontractor" \ "uuid-2" \ "cisId") mustBe JsDefined(JsString("800"))
     }
 
     "do not overwrite root cisId when a subjourney cisId is set" in {

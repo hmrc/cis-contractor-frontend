@@ -96,12 +96,18 @@ class SharedNavigatorSpec extends SpecBase {
         ) mustBe controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
       }
 
-      "must go from a TypeOfSubcontractorPage to CompanyNameController when Limitedcompany is selected" in {
+      "must go from a TypeOfSubcontractorPage with id to CompanyNameController when Limitedcompany is selected" in {
+        val id = "11111111-1111-1111-1111-111111111111"
+
         navigator.nextPage(
-          TypeOfSubcontractorPage,
+          TypeOfSubcontractorPage(id),
           NormalMode,
-          emptyUserAnswers.setOrException(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
-        ) mustBe controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+          emptyUserAnswers.setOrException(
+            TypeOfSubcontractorPage(id),
+            TypeOfSubcontractor.Limitedcompany
+          )
+        ) mustBe controllers.add.company.routes.CompanyNameController
+          .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to PartnershipNameController when Partnership is selected" in {

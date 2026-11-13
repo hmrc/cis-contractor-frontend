@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyMobileNumberFormProvider
 import models.contact.ContactMethodOptions
@@ -36,7 +36,7 @@ import views.html.add.company.CompanyMobileNumberView
 
 import scala.concurrent.Future
 
-class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
+class CompanyMobileNumberControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   val formProvider       = new CompanyMobileNumberFormProvider()
   val form: Form[String] = formProvider()
@@ -80,7 +80,12 @@ class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyMobileNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -105,7 +110,12 @@ class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("+44 7700 900 999"), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill("+44 7700 900 999"),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyMobileNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -153,7 +163,12 @@ class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyMobileNumberController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -328,7 +343,12 @@ class CompanyMobileNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyMobileNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, FinalValidationMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form,
+          FinalValidationMode,
+          companyName,
+          controllers.add.company.routes.CompanyMobileNumberController.onSubmit(FinalValidationMode)
+        )(
           request,
           messages(application)
         ).toString

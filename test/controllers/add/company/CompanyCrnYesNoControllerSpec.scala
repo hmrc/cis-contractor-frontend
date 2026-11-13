@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyCrnYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -32,7 +32,7 @@ import views.html.add.company.CompanyCrnYesNoView
 
 import scala.concurrent.Future
 
-class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
+class CompanyCrnYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val companyName = "Test CompanyName"
 
@@ -40,7 +40,14 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
   private val form         = formProvider()
 
   private lazy val companyCrnYesNoRoute =
-    controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(NormalMode).url
+    controllers.add.company.routes.CompanyCrnYesNoController
+      .onPageLoad(NormalMode)
+      .url
+
+  private lazy val postUrl =
+    controllers.add.company.routes.CompanyCrnYesNoController
+      .onSubmit(NormalMode)
+      .url
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
@@ -59,7 +66,12 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyCrnYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -80,7 +92,12 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -102,7 +119,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyCrnYesNoRoute)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -131,7 +148,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyCrnYesNoRoute)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
@@ -151,7 +168,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyCrnYesNoRoute)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -161,7 +178,12 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -188,7 +210,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyCrnYesNoRoute)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -204,7 +226,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, companyCrnYesNoRoute)
+          FakeRequest(POST, postUrl)
             .withFormUrlEncodedBody()
 
         val form      = new CompanyCrnYesNoFormProvider()()
@@ -215,7 +237,12 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -246,7 +273,7 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, companyCrnYesNoRoute)
+        val request = FakeRequest(POST, postUrl)
           .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -257,6 +284,5 @@ class CompanyCrnYesNoControllerSpec extends SpecBase with MockitoSugar {
           .url
       }
     }
-
   }
 }

@@ -37,8 +37,14 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+
       doc.select("title").text() must include(messages("addCompanyContactMethodsYesNo.title"))
 
       val legend: Elements = doc.select("fieldset legend")
@@ -50,11 +56,10 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
       radioButtons.get(0).text mustBe "Yes"
       radioButtons.get(1).text mustBe "No"
 
-      doc
-        .select("form")
-        .attr("action") mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
-        .onSubmit(NormalMode)
-        .url
+      doc.select("form").attr("action") mustBe
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+          .onSubmit(NormalMode)
+          .url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 
@@ -68,7 +73,12 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
       val errorForm: Form[Boolean] =
         form.withError("value", "addCompanyContactMethodsYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
@@ -94,7 +104,7 @@ class AddCompanyContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers wi
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: AddCompanyContactMethodsYesNoView = app.injector.instanceOf[AddCompanyContactMethodsYesNoView]
+    val view: AddCompanyContactMethodsYesNoView =
+      app.injector.instanceOf[AddCompanyContactMethodsYesNoView]
   }
-
 }

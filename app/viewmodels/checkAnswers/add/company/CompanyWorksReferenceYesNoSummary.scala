@@ -27,28 +27,38 @@ import models.info.company.CompanyAnswers
 
 object CompanyWorksReferenceYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyWorksReferenceYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyWorksReferenceYesNoPage(id)))
+      .getOrElse(answers.get(CompanyWorksReferenceYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "companyWorksReferenceYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-                .onPageLoad(AmendCompanyRemoveDetail.WorksReferenceNumber.key)
-                .url
-            else controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "companyWorksReferenceYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                    .onPageLoad(AmendCompanyRemoveDetail.WorksReferenceNumber.key)
+                    .url
+                else controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyWorksReferenceYesNo.change.hidden"))
+              .withAttribute("id" -> "add-company-works-reference")
           )
-            .withVisuallyHiddenText(messages("companyWorksReferenceYesNo.change.hidden"))
-            .withAttribute("id" -> "add-company-works-reference")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

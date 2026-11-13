@@ -17,7 +17,7 @@
 package pages.add
 
 import models.{TypeOfSubcontractor, UserAnswers}
-import models.TypeOfSubcontractor.*
+import models.TypeOfSubcontractor._
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.SubcontractorCleanup.*
@@ -26,7 +26,7 @@ import scala.util.Try
 
 case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
-  override def path: JsPath = JsPath \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "typeOfSubcontractor"
 

@@ -22,16 +22,19 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.company.CompanyAnswers
-import utils.SubcontractorNameExtractor
+import controllers.helpers.SubcontractorNameDisplayHelper
 
 object CompanyNameSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] = {
-
-    val subcontractorNameExtractor = new SubcontractorNameExtractor()
-
-    subcontractorNameExtractor
-      .getCompanyName(answers, mode)
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => SubcontractorNameDisplayHelper.getCompanyDisplayName(answers, mode, id))
+      .getOrElse(SubcontractorNameDisplayHelper.getCompanyDisplayName(answers, mode))
       .map { answer =>
         SummaryListRowViewModel(
           key = "companyName.checkYourAnswersLabel",
@@ -39,14 +42,15 @@ object CompanyNameSummary {
           actions = Seq(
             ActionItemViewModel(
               "site.change",
-              controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyNameController.onPageLoad(mode).url
+              )
             )
               .withVisuallyHiddenText(messages("companyName.change.hidden"))
               .withAttribute("id" -> "company-name")
           )
         )
       }
-  }
 
   def row(
     answers: CompanyAnswers

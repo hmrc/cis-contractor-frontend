@@ -16,7 +16,6 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
 import pages.*
 import models.*
 import pages.add.IndividualJourney
@@ -26,6 +25,8 @@ import pages.add.trust.TrustJourney
 import pages.contractordetails.ContractorDetailsJourney
 import pages.verify.VerifyJourney
 import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() (

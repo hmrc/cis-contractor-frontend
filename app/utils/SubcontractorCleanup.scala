@@ -63,6 +63,24 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CompanyWorksReferencePage))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage))
 
+  def removeLimitedCompanySubcontractor(userAnswers: UserAnswers, id: String): Try[UserAnswers] =
+    userAnswers
+      .remove(CompanyAddressPage(id))
+      .flatMap(_.remove(CompanyAddressYesNoPage(id)))
+      .flatMap(_.remove(AddCompanyContactMethodsYesNoPage(id)))
+      .flatMap(_.remove(CompanyContactMethodOptionsPage(id)))
+      .flatMap(_.remove(CompanyCrnPage(id)))
+      .flatMap(_.remove(CompanyCrnYesNoPage(id)))
+      .flatMap(_.remove(CompanyEmailAddressPage(id)))
+      .flatMap(_.remove(CompanyMobileNumberPage(id)))
+      .flatMap(_.remove(CompanyNamePage(id)))
+      .flatMap(_.remove(CompanyPhoneNumberPage(id)))
+      .flatMap(_.remove(CompanyUtrPage(id)))
+      .flatMap(_.remove(CompanyUtrYesNoPage(id)))
+      .flatMap(_.remove(CompanyWorksReferencePage(id)))
+      .flatMap(_.remove(CompanyWorksReferenceYesNoPage(id)))
+      .flatMap(_.remove(CheckYourAnswersSubmittedPage(id)))
+
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(PartnershipAddressPage)

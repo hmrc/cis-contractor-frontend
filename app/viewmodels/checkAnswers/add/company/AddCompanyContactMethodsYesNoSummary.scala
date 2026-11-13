@@ -27,28 +27,49 @@ import viewmodels.implicits.*
 
 object AddCompanyContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddCompanyContactMethodsYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(AddCompanyContactMethodsYesNoPage(id)))
+      .getOrElse(answers.get(AddCompanyContactMethodsYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "addCompanyContactMethodsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-                .onPageLoad(AmendCompanyRemoveDetail.ContactDetails.key)
-                .url
-            else controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "addCompanyContactMethodsYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                    .onPageLoad(AmendCompanyRemoveDetail.ContactDetails.key)
+                    .url
+                else
+                  subJourneyId match {
+                    case Some(_) =>
+                      controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                        .onPageLoad(mode)
+                        .url
+
+                    case None =>
+                      controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                        .onPageLoad(mode)
+                        .url
+                  }
+              )
+            )
+              .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
+              .withAttribute("id" -> "add-company-contact-details")
           )
-            .withVisuallyHiddenText(messages("addCompanyContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "add-company-contact-details")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

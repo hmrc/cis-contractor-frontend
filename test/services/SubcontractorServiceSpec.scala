@@ -805,6 +805,88 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
+      "should create and update subcontractor (Company) using values from the subjourney id when provided" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "11111111-1111-1111-1111-111111111111"
+        val nestedCisId   = "1045"
+
+        val companyAddress =
+          Address(
+            addressLine1 = "c1",
+            addressLine2 = Some("c2"),
+            addressLine3 = Some("London"),
+            addressLine4 = Some("Hackney"),
+            postcode = Some("E1 6AN"),
+            country = Some(Country(Some("GB"), Some("United Kingdom")))
+          )
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery(id), nestedCisId)
+            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany))
+            .flatMap(_.set(CompanyNamePage(id), "Test Company Ltd"))
+            .flatMap(_.set(CompanyAddressYesNoPage(id), true))
+            .flatMap(_.set(CompanyAddressPage(id), companyAddress))
+            .flatMap(_.set(CompanyUtrYesNoPage(id), true))
+            .flatMap(_.set(CompanyUtrPage(id), "1234567890"))
+            .flatMap(_.set(CompanyCrnYesNoPage(id), true))
+            .flatMap(_.set(CompanyCrnPage(id), "AC012345"))
+            .flatMap(_.set(CompanyWorksReferenceYesNoPage(id), true))
+            .flatMap(_.set(CompanyWorksReferencePage(id), "WRN-CMP"))
+            .flatMap(_.set(AddCompanyContactMethodsYesNoPage(id), true))
+            .flatMap(_.set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Email)))
+            .flatMap(_.set(CompanyEmailAddressPage(id), "c@example.com"))
+            .success
+            .value
+
+        val expectedPayload: CreateAndUpdateSubcontractorPayload =
+          CompanyPayload(
+            cisId = nestedCisId,
+            subcontractorType = TypeOfSubcontractor.Limitedcompany,
+            utr = Some("1234567890"),
+            crn = Some("AC012345"),
+            tradingName = Some("Test Company Ltd"),
+            addressLine1 = Some("c1"),
+            addressLine2 = Some("c2"),
+            city = Some("London"),
+            county = Some("Hackney"),
+            country = Some("United Kingdom"),
+            postcode = Some("E1 6AN"),
+            emailAddress = Some("c@example.com"),
+            phoneNumber = None,
+            mobilePhoneNumber = None,
+            worksReferenceNumber = Some("WRN-CMP")
+          )
+
+        when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(()))
+
+        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+
+        verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
+        verifyNoMoreInteractions(mockConnector)
+      }
+
+      "should fail when nested cisId is missing even if root cisId exists" in {
+        val mockConnector = mock[ConstructionIndustrySchemeConnector]
+        val service       = new SubcontractorService(mockConnector)
+        val id            = "11111111-1111-1111-1111-111111111111"
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(CisIdQuery, cisId)
+            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany))
+            .success
+            .value
+
+        val exception =
+          service.createAndUpdateSubcontractor(userAnswers, Some(id)).failed.futureValue
+
+        exception.getMessage must include("CisIdQuery not found in session data")
+        verifyNoMoreInteractions(mockConnector)
+      }
+
       "should create and update subcontractor (Company) with PHONE contact details" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)

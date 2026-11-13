@@ -27,9 +27,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
+import controllers.helpers.SubcontractorNameDisplayHelper
 import views.html.add.company.CompanyPhoneNumberView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,8 +41,8 @@ class CompanyPhoneNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: CompanyPhoneNumberFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyPhoneNumberView
 )(implicit ec: ExecutionContext)
@@ -55,8 +56,8 @@ class CompanyPhoneNumberController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = subcontractorNameExtractor
-        .getCompanyName(request.userAnswers, mode)
+      val companyName   = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode)
+      val submitAction  = routes.CompanyPhoneNumberController.onSubmit(mode)
 
       val phoneIsAvailable =
         mode == FinalValidationMode ||
@@ -68,21 +69,28 @@ class CompanyPhoneNumberController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, companyName))
+
+          Ok(view(preparedForm, mode, companyName, submitAction))
 
         case (Some(_), false) =>
-          Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
-        case _                =>
-          logger.error("[CompanyPhoneNumberController][onPageLoad] - CompanyNamePage missing from userAnswers")
+          Redirect(
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode)
+          )
+
+        case _ =>
+          logger.error(
+            "[CompanyPhoneNumberController][onPageLoad] - CompanyNamePage missing from userAnswers"
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
+      val companyName   = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode)
+      val submitAction  = routes.CompanyPhoneNumberController.onSubmit(mode)
 
       val phoneIsAvailable =
         mode == FinalValidationMode ||
@@ -94,18 +102,101 @@ class CompanyPhoneNumberController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  companyName,
+                  submitAction
+                )
+              )
+            ),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyPhoneNumberPage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
+                    CompanyPhoneNumberPage,
+                    value
+                  )
+                )
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyPhoneNumberPage, mode, updatedAnswers))
+            } yield Redirect(
+              navigator.nextPage(
+                CompanyPhoneNumberPage,
+                mode,
+                updatedAnswers
+              )
+            )
         ))
         .getOrElse {
           logger.error(
             "[CompanyPhoneNumberController][onSubmit] - CompanyNamePage missing or phone contact method not selected"
           )
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id               = flowId.toString
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val companyName      =
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
+      val phoneIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (companyName, phoneIsAvailable) match {
+        case (Some(companyName), true) =>
+          val page         = CompanyPhoneNumberPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyPhoneNumberController.onSubmitWithId(flowId, mode)
+            )
+          )
+        case _                         =>
+          logger.error(
+            "[CompanyPhoneNumberController][onPageLoadWithId] - company name or phone option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id               = flowId.toString
+      val submitAction     = routes.CompanyPhoneNumberController.onSubmitWithId(flowId, mode)
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val companyName      =
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
+      val phoneIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (for {
+        companyName <- companyName
+        if phoneIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(CompanyPhoneNumberPage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyPhoneNumberPage(id), mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            "[CompanyPhoneNumberController][onSubmitWithId] - company name or phone option missing"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-  }
+    }
 }

@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyUtrYesNoFormProvider
 import models.{AmendMode, NormalMode, UserAnswers}
@@ -33,7 +33,7 @@ import views.html.add.company.CompanyUtrYesNoView
 
 import scala.concurrent.Future
 
-class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
+class CompanyUtrYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val companyName = "Test Company"
 
@@ -63,7 +63,15 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyUtrYesNoController.onSubmit(NormalMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -81,7 +89,12 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyUtrYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -158,7 +171,12 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyUtrYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -212,7 +230,12 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyUtrYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -313,7 +336,15 @@ class CompanyUtrYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view   = application.injector.instanceOf[CompanyUtrYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          companyName,
+          controllers.add.company.routes.CompanyUtrYesNoController.onSubmit(AmendMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

@@ -2,6 +2,7 @@
 
 # Infrastructure
 ->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
+->    /                             addCompany.Routes
 
 GET   /subcontractor  controllers.IndexController.onPageLoad()
 
@@ -229,10 +230,12 @@ GET   /subcontractor/add/type-of-subcontractor/start/:cisId         controllers.
 POST  /subcontractor/add/type-of-subcontractor/start/:cisId         controllers.add.TypeOfSubcontractorController.onSubmitStart(cisId: String, mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor/start/:cisId  controllers.add.TypeOfSubcontractorController.onPageLoadStart(cisId: String, mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor/start/:cisId  controllers.add.TypeOfSubcontractorController.onSubmitStart(cisId: String, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/type-of-subcontractor/:flowId         controllers.add.TypeOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 POST  /subcontractor/add/type-of-subcontractor/:flowId         controllers.add.TypeOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor/:flowId  controllers.add.TypeOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor/:flowId  controllers.add.TypeOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
@@ -320,152 +323,8 @@ GET   /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsCon
 POST  /subcontractor/add/change-names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = CheckMode)
 
 # Company
-GET   /subcontractor/add/company/subcontractor-added  controllers.add.SubcontractorAddedController.companySubcontractorAdded()
-
-GET   /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-name         controllers.add.company.CompanyNameController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-name  controllers.add.company.CompanyNameController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-name       controllers.add.company.CompanyNameController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/check-address         controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-check-address  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/check-address       controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/address                  controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
-GET   /subcontractor/add/company/address-return           controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
-GET   /subcontractor/add/company/address-return/change    controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
-GET   /subcontractor/amend/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
-GET   /subcontractor/amend/company/address-change         controllers.add.company.CompanyAddressController.redirectToAmendAddressLookup()
-GET   /subcontractor/amend/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
-GET   /subcontractor/amend/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/email-address         controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-email-address  controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-email-address  controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/email-address       controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/email-address       controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/phone-number         controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/phone-number         controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-phone-number  controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/phone-number       controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/mobile-number         controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-mobile-number  controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-mobile-number  controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/mobile-number       controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/mobile-number       controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-has-utr         controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-has-utr         controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-has-utr  controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-has-utr  controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-has-utr       controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-has-utr       controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-utr         controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-utr         controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-utr  controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-utr  controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-utr       controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-utr       controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-has-registration-number         controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-has-registration-number         controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-has-registration-number  controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-has-registration-number  controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-has-registration-number       controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-has-registration-number       controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-registration-number         controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-registration-number         controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-registration-number  controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-registration-number  controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-registration-number       controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-registration-number       controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-has-works-reference         controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-has-works-reference         controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-has-works-reference       controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-has-works-reference       controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/company-works-reference         controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/company-works-reference       controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/company-works-reference       controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onPageLoad()
-POST  /subcontractor/add/company/check-your-answers  controllers.add.company.CompanyCheckYourAnswersController.onSubmit()
-
-GET   /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/add-contact-details         controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/add-contact-details       controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/add-contact-details       controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/add/company/select-contact-details         controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractor/add/company/select-contact-details         controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
-GET   /subcontractor/add/company/change-select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
-POST  /subcontractor/add/company/change-select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/amend/company/select-contact-details       controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = AmendMode)
-POST  /subcontractor/amend/company/select-contact-details       controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = AmendMode)
-
-GET   /subcontractor/final-validation/company/company-name  controllers.add.company.CompanyNameController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-name  controllers.add.company.CompanyNameController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/check-address  controllers.add.company.CompanyAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/check-address  controllers.add.company.CompanyAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/address                controllers.add.company.CompanyAddressController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
-GET   /subcontractor/final-validation/company/address-return         controllers.add.company.CompanyAddressController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
-GET   /subcontractor/final-validation/company/address-return/change  controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/add-contact-details  controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/select-contact-details  controllers.add.company.CompanyContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/email-address  controllers.add.company.CompanyEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/email-address  controllers.add.company.CompanyEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/phone-number  controllers.add.company.CompanyPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/phone-number  controllers.add.company.CompanyPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/mobile-number  controllers.add.company.CompanyMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/mobile-number  controllers.add.company.CompanyMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-has-utr  controllers.add.company.CompanyUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-has-utr  controllers.add.company.CompanyUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-utr  controllers.add.company.CompanyUtrController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-utr  controllers.add.company.CompanyUtrController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-has-registration-number  controllers.add.company.CompanyCrnYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-has-registration-number  controllers.add.company.CompanyCrnYesNoController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-registration-number  controllers.add.company.CompanyCrnController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-registration-number  controllers.add.company.CompanyCrnController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-has-works-reference  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
-
-GET   /subcontractor/final-validation/company/company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
-POST  /subcontractor/final-validation/company/company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+GET   /subcontractor/add/company/subcontractor-added           controllers.add.SubcontractorAddedController.companySubcontractorAdded()
+GET   /subcontractor/add/company/subcontractor-added/:flowId   controllers.add.SubcontractorAddedController.companySubcontractorAddedWithId(flowId: java.util.UUID)
 
 # Partnership
 GET   /subcontractor/add/partnership/subcontractor-added  controllers.add.SubcontractorAddedController.partnershipSubcontractorAdded()

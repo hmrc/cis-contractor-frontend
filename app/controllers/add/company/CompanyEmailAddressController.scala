@@ -28,9 +28,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
+import controllers.helpers.SubcontractorNameDisplayHelper
 import views.html.add.company.CompanyEmailAddressView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,8 +42,8 @@ class CompanyEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: CompanyEmailAddressFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyEmailAddressView
 )(implicit ec: ExecutionContext)
@@ -56,8 +57,10 @@ class CompanyEmailAddressController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = subcontractorNameExtractor
-        .getCompanyName(request.userAnswers, mode)
+      val companyName   =
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode)
+      val submitAction  =
+        routes.CompanyEmailAddressController.onSubmit(mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -69,21 +72,38 @@ class CompanyEmailAddressController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, companyName))
+
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              submitAction
+            )
+          )
 
         case (Some(_), false) =>
-          Redirect(controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoad(mode))
-        case _                =>
-          logger.error("[CompanyEmailAddressController][onPageLoad] - CompanyNamePage missing from userAnswers")
+          Redirect(
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+              .onPageLoad(mode)
+          )
+
+        case _ =>
+          logger.error(
+            "[CompanyEmailAddressController][onPageLoad] - CompanyNamePage missing from userAnswers"
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val contactOption = request.userAnswers.get(CompanyContactMethodOptionsPage)
-      val companyName   = subcontractorNameExtractor.getCompanyName(request.userAnswers, mode)
+      val companyName   =
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode)
+      val submitAction  =
+        routes.CompanyEmailAddressController.onSubmit(mode)
 
       val emailIsAvailable =
         mode == FinalValidationMode ||
@@ -95,18 +115,99 @@ class CompanyEmailAddressController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  companyName,
+                  submitAction
+                )
+              )
+            ),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
+                    CompanyEmailAddressPage,
+                    value
+                  )
+                )
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage, mode, updatedAnswers))
+            } yield Redirect(
+              navigator.nextPage(
+                CompanyEmailAddressPage,
+                mode,
+                updatedAnswers
+              )
+            )
         ))
         .getOrElse {
           logger.error(
             "[CompanyEmailAddressController][onSubmit] - CompanyNamePage missing or email contact method not selected"
           )
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id               = flowId.toString
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (companyName, emailIsAvailable) match {
+        case (Some(companyName), true) =>
+          val page         = CompanyEmailAddressPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyEmailAddressController.onSubmitWithId(flowId, mode)
+            )
+          )
+        case _                         =>
+          logger.error(
+            "[CompanyEmailAddressController][onPageLoadWithId] - company name or email option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id               = flowId.toString
+      val submitAction     = routes.CompanyEmailAddressController.onSubmitWithId(flowId, mode)
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
+      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+
+      (for {
+        companyName <- companyName
+        if emailIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage(id), mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            "[CompanyEmailAddressController][onSubmitWithId] - company name or email option missing"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-  }
+    }
 }

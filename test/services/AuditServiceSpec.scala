@@ -217,6 +217,37 @@ class AuditServiceSpec
       (detail \ "companyName").as[String] mustBe "Test Co Ltd"
     }
 
+    "must use nested company answers and not root answers when a subjourney id is provided" in {
+      val id = "11111111-1111-1111-1111-111111111111"
+
+      val ua = emptyUserAnswers
+        .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Limitedcompany)
+        .success
+        .value
+        .set(CompanyNamePage, "Root Company")
+        .success
+        .value
+        .set(CisIdQuery, "ROOT")
+        .success
+        .value
+        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany)
+        .success
+        .value
+        .set(CompanyNamePage(id), "Nested Company")
+        .success
+        .value
+        .set(CisIdQuery(id), "AB12")
+        .success
+        .value
+
+      service.addSubcontractorEvent(ua, Some(id))
+
+      val detail = captureDetail()
+      (detail \ "typeOfSubcontractor").as[String] mustBe "company"
+      (detail \ "companyName").as[String] mustBe "Nested Company"
+      (detail \ "cisId").as[String] mustBe "AB12"
+    }
+
     "must build a partnership audit event for a partnership" in {
       val ua = emptyUserAnswers
         .set(TypeOfSubcontractorPage, TypeOfSubcontractor.Partnership)

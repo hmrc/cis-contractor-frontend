@@ -36,6 +36,7 @@ import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
+import services.{CisTaxpayerService, FakeCisTaxpayerServiceSpec}
 
 import scala.concurrent.Future
 
@@ -98,4 +99,25 @@ trait SpecBase
           bind[FormpRdsReconcileAction].toInstance(formpRdsReconcileAction)
         ) ++ additionalBindings
       )
+}
+
+trait WithFakeCisTaxpayer extends SpecBase {
+  override protected def applicationBuilder(
+    userAnswers: Option[UserAnswers] = None,
+    additionalBindings: Seq[Binding[_]] = Nil,
+    isAgent: Boolean = false,
+    hasAgentRef: Boolean = true,
+    hasEmployeeRef: Boolean = true,
+    formpRdsReconcileAction: FormpRdsReconcileAction = new FakeFormpRdsReconcileAction,
+    agentCode: Option[String] = Some("agentCode")
+  ): GuiceApplicationBuilder =
+    super.applicationBuilder(
+      userAnswers,
+      additionalBindings :+ bind[CisTaxpayerService].toInstance(new FakeCisTaxpayerServiceSpec),
+      isAgent,
+      hasAgentRef,
+      hasEmployeeRef,
+      formpRdsReconcileAction,
+      agentCode
+    )
 }

@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package views.add.company
 
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.{AmendMode, NormalMode}
-import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -28,7 +42,6 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import views.html.add.company.CompanyAddressYesNoView
 
 class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
@@ -39,7 +52,12 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val companyName = "Test Company"
 
-      val html = view(form, NormalMode, companyName)
+      val html = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -63,17 +81,22 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
         controllers.add.company.routes.CompanyAddressYesNoController
           .onSubmit(NormalMode)
           .url
-      doc.select("form").attr("autocomplete") mustBe "off"
 
+      doc.select("form").attr("autocomplete") mustBe "off"
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, hint, yes/no radios and submit button for amend journey" in new Setup {
+    "render the page with title, heading, no hint, yes/no radios and submit button for amend journey" in new Setup {
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
-      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+      val html = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(AmendMode)
+      )
+      val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
         messages("companyAddressYesNo.title")
@@ -83,8 +106,7 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
       legend.text() mustBe messages("companyAddressYesNo.heading", companyName)
       legend.hasClass("govuk-fieldset__legend--l") mustBe true
 
-      val hint: Elements = doc.select("fieldset .govuk-hint")
-      hint.text() mustBe empty
+      doc.select(".govuk-hint").text() mustBe empty
 
       val radios = doc.select(".govuk-radios__input")
       radios.size() mustBe 2
@@ -97,8 +119,8 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
         controllers.add.company.routes.CompanyAddressYesNoController
           .onSubmit(AmendMode)
           .url
-      doc.select("form").attr("autocomplete") mustBe "off"
 
+      doc.select("form").attr("autocomplete") mustBe "off"
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
@@ -106,16 +128,24 @@ class CompanyAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
       val companyName = "Test Company"
 
-      val errorForm = form.withError("value", "companyAddressYesNo.error.required")
+      val errorForm =
+        form.withError("value", "companyAddressYesNo.error.required")
 
-      val html = view(errorForm, NormalMode, companyName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyAddressYesNo.error.required"))
       summary.select("a").attr("href") mustBe "#value_0"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyAddressYesNo.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("companyAddressYesNo.error.required")
+      )
     }
   }
 
