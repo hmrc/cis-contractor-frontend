@@ -18,6 +18,7 @@ package views.add.company
 
 import forms.add.company.CompanyCrnFormProvider
 import models.{AmendMode, NormalMode}
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
@@ -31,77 +32,93 @@ import play.twirl.api.HtmlFormat
 import views.html.add.company.CompanyCrnView
 
 class CompanyCrnViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+
   "CompanyCrnView" should {
 
-    "render the page with title, heading, input and submit button" in new Setup {
+    "render the page with title, heading, hint, input and submit button" in new Setup {
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
-      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyCrnController.onSubmit(NormalMode)
+      )
+      val doc: Document               = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("companyCrn.title"))
+      doc.select("title").text() must include(
+        messages("companyCrn.title", companyName)
+      )
 
-      val heading: Elements = doc.select("h1")
-      heading.text() mustBe messages("companyCrn.heading", companyName)
+      val label: Elements = doc.select("label.govuk-label")
+      label.text() mustBe messages("companyCrn.heading", companyName)
 
-      val hint: Elements = doc.select(".govuk-hint")
-      hint.text() mustBe messages("companyCrn.hint")
+      doc.select(".govuk-hint").text() mustBe messages("companyCrn.hint")
 
-      doc
-        .select("form")
-        .attr("action") mustBe controllers.add.company.routes.CompanyCrnController
-        .onSubmit(NormalMode)
-        .url
+      doc.select("form").attr("action") mustBe
+        controllers.add.company.routes.CompanyCrnController
+          .onSubmit(NormalMode)
+          .url
 
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, input and update button for Amend journey" in new Setup {
+    "render the page with title, heading, hint, input and update button for Amend journey" in new Setup {
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
-      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyCrnController.onSubmit(AmendMode)
+      )
+      val doc: Document               = Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("companyCrn.title"))
+      doc.select("title").text() must include(
+        messages("companyCrn.title", companyName)
+      )
 
-      val heading: Elements = doc.select("h1")
-      heading.text() mustBe messages("companyCrn.heading", companyName)
+      val label: Elements = doc.select("label.govuk-label")
+      label.text() mustBe messages("companyCrn.heading", companyName)
 
-      val hint: Elements = doc.select(".govuk-hint")
-      hint.text() mustBe messages("companyCrn.hint")
+      doc.select(".govuk-hint").text() mustBe messages("companyCrn.hint")
 
-      doc
-        .select("form")
-        .attr("action") mustBe controllers.add.company.routes.CompanyCrnController
-        .onSubmit(AmendMode)
-        .url
+      doc.select("form").attr("action") mustBe
+        controllers.add.company.routes.CompanyCrnController
+          .onSubmit(AmendMode)
+          .url
 
       doc.select("input[name=value]").size() mustBe 1
 
       doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
-    "display error summary and inline error when no utr is entered" in new Setup {
+    "display error summary and inline error when no CRN is entered" in new Setup {
 
       val companyName = "Test Company"
 
       val errorForm: Form[String] =
         form.withError("value", "companyCrn.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
-      val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyCrnController.onSubmit(NormalMode)
+      )
+      val doc: Document               = Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyCrn.error.required"))
+      summary.select("a").attr("href") mustBe "#value"
 
-      val linkHref: String = summary.select("a").attr("href")
-      linkHref mustBe "#value"
-
-      doc.select(".govuk-error-message").text() must include(messages("companyCrn.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("companyCrn.error.required")
+      )
     }
   }
 
@@ -116,6 +133,7 @@ class CompanyCrnViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: CompanyCrnView = app.injector.instanceOf[CompanyCrnView]
+    val view: CompanyCrnView =
+      app.injector.instanceOf[CompanyCrnView]
   }
 }

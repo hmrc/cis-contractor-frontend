@@ -27,33 +27,44 @@ import viewmodels.checkAnswers.UtrViewModel
 
 object CompanyUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    showActions: Boolean = true,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit
     messages: Messages
   ): Option[SummaryListRow] =
-    answers.get(CompanyUtrPage).map { answer =>
-      val value = UtrViewModel(answer)
-      if (showActions) {
-        val actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyUtrController.onPageLoad(mode).url
+    subJourneyId
+      .map(id => answers.get(CompanyUtrPage(id)))
+      .getOrElse(answers.get(CompanyUtrPage))
+      .map { answer =>
+        val value = UtrViewModel(answer)
+        if (showActions) {
+          val actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyUtrController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyUtr.change.hidden"))
+              .withAttribute("id" -> "company-utr")
           )
-            .withVisuallyHiddenText(messages("companyUtr.change.hidden"))
-            .withAttribute("id" -> "company-utr")
-        )
-        SummaryListRowViewModel(
-          key = "companyUtr.checkYourAnswersLabel",
-          value = value,
-          actions = actions
-        )
-      } else {
-        SummaryListRowViewModel(
-          key = "companyUtr.verified.checkYourAnswersLabel",
-          value = value,
-          actions = Seq.empty
-        )
+          SummaryListRowViewModel(
+            key = "companyUtr.checkYourAnswersLabel",
+            value = value,
+            actions = actions
+          )
+        } else {
+          SummaryListRowViewModel(
+            key = "companyUtr.verified.checkYourAnswersLabel",
+            value = value,
+            actions = Seq.empty
+          )
+        }
       }
-    }
 
   def row(
     answers: CompanyAnswers,

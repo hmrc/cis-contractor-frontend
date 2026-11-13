@@ -24,6 +24,7 @@ import models.RichJsObject
 import pages.QuestionPage
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
+import queries.CisIdQuery
 import play.api.libs.json.{JsError, JsSuccess, Json, Writes}
 import org.scalatest.matchers.must.Matchers
 
@@ -67,6 +68,37 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
 
     "build successfully with minimum required answers (all optionals No)" in {
       ValidatedCompany.build(minRequired) mustBe a[Right[?, ?]]
+    }
+
+    "build successfully from a subjourney" in {
+      val id      = "11111111-1111-1111-1111-111111111111"
+      val answers = emptyUserAnswers
+        .set(CisIdQuery(id), "AB12")
+        .success
+        .value
+        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany)
+        .success
+        .value
+        .set(CompanyNamePage(id), "Folder Company Ltd")
+        .success
+        .value
+        .set(CompanyAddressYesNoPage(id), false)
+        .success
+        .value
+        .set(AddCompanyContactMethodsYesNoPage(id), false)
+        .success
+        .value
+        .set(CompanyUtrYesNoPage(id), false)
+        .success
+        .value
+        .set(CompanyCrnYesNoPage(id), false)
+        .success
+        .value
+        .set(CompanyWorksReferenceYesNoPage(id), false)
+        .success
+        .value
+
+      ValidatedCompany.build(answers, id) mustBe a[Right[?, ?]]
     }
 
     "fail when TypeOfSubcontractor is not Limitedcompany" in {

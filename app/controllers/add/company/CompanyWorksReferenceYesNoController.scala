@@ -26,9 +26,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
+import controllers.helpers.SubcontractorNameDisplayHelper
 import views.html.add.company.CompanyWorksReferenceYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,8 +40,8 @@ class CompanyWorksReferenceYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: CompanyWorksReferenceYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyWorksReferenceYesNoView
 )(implicit ec: ExecutionContext)
@@ -50,42 +51,130 @@ class CompanyWorksReferenceYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    subcontractorNameExtractor
-      .getCompanyName(request.userAnswers, mode)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyWorksReferenceYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode)
+        .map { companyName =>
+          val preparedForm = request.userAnswers.get(CompanyWorksReferenceYesNoPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyWorksReferenceYesNoController.onSubmit(mode)
+            )
+          )
         }
+        .getOrElse {
+          logger.error(
+            "[CompanyWorksReferenceYesNoController][onPageLoad] - CompanyNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 
-        Ok(view(preparedForm, mode, companyName))
-      }
-      .getOrElse {
-        logger.error("[CompanyWorksReferenceYesNoController][onPageLoad] - CompanyNamePage missing from userAnswers")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val submitAction = routes.CompanyWorksReferenceYesNoController.onSubmit(mode)
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      subcontractorNameExtractor
-        .getCompanyName(request.userAnswers, mode)
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      companyName,
+                      submitAction
+                    )
+                  )
+                ),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyWorksReferenceYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(
+                                      request.userAnswers.set(CompanyWorksReferenceYesNoPage, value)
+                                    )
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(CompanyWorksReferenceYesNoPage, mode, updatedAnswers))
+                } yield Redirect(
+                  navigator.nextPage(
+                    CompanyWorksReferenceYesNoPage,
+                    mode,
+                    updatedAnswers
+                  )
+                )
             )
         }
         .getOrElse {
-          logger.error("[CompanyWorksReferenceYesNoController][onSubmit] - CompanyNamePage missing from userAnswers")
+          logger.error(
+            "[CompanyWorksReferenceYesNoController][onSubmit] - CompanyNamePage missing from userAnswers"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-  }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .map { companyName =>
+          val page         = CompanyWorksReferenceYesNoPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyWorksReferenceYesNoController.onSubmitWithId(flowId, mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            s"[CompanyWorksReferenceYesNoController][onPageLoadWithId] - CompanyNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.CompanyWorksReferenceYesNoController.onSubmitWithId(flowId, mode)
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(
+                      request.userAnswers.set(CompanyWorksReferenceYesNoPage(id), value)
+                    )
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(CompanyWorksReferenceYesNoPage(id), mode, updatedAnswers)
+                )
+            )
+        }
+        .getOrElse {
+          logger.error(
+            s"[CompanyWorksReferenceYesNoController][onSubmitWithId] - CompanyNamePage missing from userAnswers"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

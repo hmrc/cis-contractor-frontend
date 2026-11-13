@@ -16,31 +16,41 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.info.company.CompanyAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyEmailAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.info.company.CompanyAnswers
 
 object CompanyEmailAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyEmailAddressPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyEmailAddress.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyEmailAddressPage(id)))
+      .getOrElse(answers.get(CompanyEmailAddressPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "companyEmailAddress.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyEmailAddressController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
+              .withAttribute("id" -> "company-email-address")
           )
-            .withVisuallyHiddenText(messages("companyEmailAddress.change.hidden"))
-            .withAttribute("id" -> "company-email-address")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

@@ -22,6 +22,7 @@ import models.UserAnswers
 import models.add.IndividualNamesOptions
 import models.audit.*
 import models.contact.ContactMethodOptions
+import pages.QuestionPage
 import pages.add.*
 import pages.add.company.*
 import pages.add.partnership.*
@@ -65,12 +66,22 @@ class AuditService @Inject() (
     }
 
   def addSubcontractorEvent(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Unit =
-    userAnswers.get(TypeOfSubcontractorPage) match {
-      case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers))
+    addSubcontractorEvent(userAnswers, None)
+
+  def addSubcontractorEvent(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Unit = {
+    val subcontractorType = subJourneyId
+      .map(id => userAnswers.get(TypeOfSubcontractorPage(id)))
+      .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
+
+    subcontractorType match {
+      case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers, subJourneyId))
       case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers))
       case Some(TypeOfSubcontractor.Trust)          => send(buildTrustModel(userAnswers))
       case _                                        => send(buildIndividualModel(userAnswers))
     }
+  }
 
   private def send[A <: AuditEvent](event: A)(implicit writes: OWrites[A], hc: HeaderCarrier): Unit =
     auditConnector.sendExplicitAudit(event.auditType, Json.toJson(event))
@@ -105,27 +116,37 @@ class AuditService @Inject() (
     )
   }
 
-  private def buildCompanyModel(ua: UserAnswers): AddCompanySubcontractorAuditEventModel = {
-    val contactOpts = ua.get(CompanyContactMethodOptionsPage)
+  private def buildCompanyModel(
+    ua: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): AddCompanySubcontractorAuditEventModel = {
+
+    def value[A](folder: String => QuestionPage[A], root: QuestionPage[A])(implicit
+      reads: play.api.libs.json.Reads[A]
+    ): Option[A] =
+      subJourneyId.flatMap(id => ua.get(folder(id))).orElse(ua.get(root))
+
+    val contactOpts = value(CompanyContactMethodOptionsPage.apply, CompanyContactMethodOptionsPage)
+
     AddCompanySubcontractorAuditEventModel(
-      cisId = ua.get(CisIdQuery),
-      typeOfSubcontractor = ua.get(TypeOfSubcontractorPage).fold("")(_.toString),
-      companyName = ua.get(CompanyNamePage),
-      companyAddressYesNo = ua.get(CompanyAddressYesNoPage),
-      companyAddress = ua.get(CompanyAddressPage),
-      addCompanyContactMethodsYesNo = ua.get(AddCompanyContactMethodsYesNoPage),
+      cisId = subJourneyId.flatMap(id => ua.get(CisIdQuery(id))).orElse(ua.get(CisIdQuery)),
+      typeOfSubcontractor = value(TypeOfSubcontractorPage.apply, TypeOfSubcontractorPage).fold("")(_.toString),
+      companyName = value(CompanyNamePage.apply, CompanyNamePage),
+      companyAddressYesNo = value(CompanyAddressYesNoPage.apply, CompanyAddressYesNoPage),
+      companyAddress = value(CompanyAddressPage.apply, CompanyAddressPage),
+      addCompanyContactMethodsYesNo = value(AddCompanyContactMethodsYesNoPage.apply, AddCompanyContactMethodsYesNoPage),
       companyEmailContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Email)),
       companyPhoneContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Phone)),
       companyMobileContactMethod = contactOpts.map(_.contains(ContactMethodOptions.Mobile)),
-      companyEmailAddress = ua.get(CompanyEmailAddressPage),
-      companyPhoneNumber = ua.get(CompanyPhoneNumberPage),
-      companyMobileNumber = ua.get(CompanyMobileNumberPage),
-      companyUtrYesNo = ua.get(CompanyUtrYesNoPage),
-      companyUtr = ua.get(CompanyUtrPage),
-      companyCrnYesNo = ua.get(CompanyCrnYesNoPage),
-      companyCrn = ua.get(CompanyCrnPage),
-      companyWorksReferenceYesNo = ua.get(CompanyWorksReferenceYesNoPage),
-      companyWorksReference = ua.get(CompanyWorksReferencePage)
+      companyEmailAddress = value(CompanyEmailAddressPage.apply, CompanyEmailAddressPage),
+      companyPhoneNumber = value(CompanyPhoneNumberPage.apply, CompanyPhoneNumberPage),
+      companyMobileNumber = value(CompanyMobileNumberPage.apply, CompanyMobileNumberPage),
+      companyUtrYesNo = value(CompanyUtrYesNoPage.apply, CompanyUtrYesNoPage),
+      companyUtr = value(CompanyUtrPage.apply, CompanyUtrPage),
+      companyCrnYesNo = value(CompanyCrnYesNoPage.apply, CompanyCrnYesNoPage),
+      companyCrn = value(CompanyCrnPage.apply, CompanyCrnPage),
+      companyWorksReferenceYesNo = value(CompanyWorksReferenceYesNoPage.apply, CompanyWorksReferenceYesNoPage),
+      companyWorksReference = value(CompanyWorksReferencePage.apply, CompanyWorksReferencePage)
     )
   }
 

@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import models.contact.ContactMethodOptions
+import models.info.company.CompanyAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.Messages
@@ -26,31 +27,41 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.info.company.CompanyAnswers
 
 object CompanyContactMethodOptionsSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyContactMethodOptionsPage).map { selectedMethods =>
-      val options =
-        ContactMethodOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"companyContactMethodOptions.$m")).toString)
-      SummaryListRowViewModel(
-        key = "companyContactMethodOptions.checkYourAnswersLabel",
-        value = ValueViewModelHelper
-          .makeGovukBulletList(options, false)
-          .getOrElse(ValueViewModel(HtmlContent(""))),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyContactMethodOptionsPage(id)))
+      .getOrElse(answers.get(CompanyContactMethodOptionsPage))
+      .map { selectedMethods =>
+        val options =
+          ContactMethodOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"companyContactMethodOptions.$m")).toString)
+
+        SummaryListRowViewModel(
+          key = "companyContactMethodOptions.checkYourAnswersLabel",
+          value = ValueViewModelHelper
+            .makeGovukBulletList(options, false)
+            .getOrElse(ValueViewModel(HtmlContent(""))),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyContactMethodOptionsController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
+              .withAttribute("id" -> "company-methods-of-contact")
           )
-            .withVisuallyHiddenText(messages("companyContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "company-methods-of-contact")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.contact.ContactMethodOptions
@@ -36,7 +36,7 @@ import views.html.add.company.CompanyEmailAddressView
 
 import scala.concurrent.Future
 
-class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
+class CompanyEmailAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   val formProvider       = new CompanyEmailAddressFormProvider()
   val form: Form[String] = formProvider()
@@ -81,7 +81,12 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyEmailAddressController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -106,7 +111,12 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("abc@test.com"), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill("abc@test.com"),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyEmailAddressController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -154,7 +164,12 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyEmailAddressController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -329,7 +344,12 @@ class CompanyEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, FinalValidationMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form,
+          FinalValidationMode,
+          companyName,
+          controllers.add.company.routes.CompanyEmailAddressController.onSubmit(FinalValidationMode)
+        )(
           request,
           messages(application)
         ).toString

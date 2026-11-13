@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyWorksReferenceFormProvider
 import models.{NormalMode, UserAnswers}
@@ -26,6 +26,8 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.add.company.{CompanyNamePage, CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage}
 import play.api.data.Form
 import play.api.inject.bind
+import navigation.Navigator
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -33,7 +35,9 @@ import views.html.add.company.CompanyWorksReferenceView
 
 import scala.concurrent.Future
 
-class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
+class CompanyWorksReferenceControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
+
+  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider       = new CompanyWorksReferenceFormProvider()
   val form: Form[String] = formProvider()
@@ -66,7 +70,15 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyWorksReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(NormalMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -122,22 +134,30 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("WR-001"), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill("WR-001"),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the company CYA page when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockNavigator         = mock[Navigator]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockNavigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(userAnswers = Some(uaWithName))
           .overrides(
+            bind[Navigator].toInstance(mockNavigator),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -150,9 +170,7 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.add.company.routes.CompanyCheckYourAnswersController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -172,7 +190,12 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -220,6 +243,28 @@ class CompanyWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST when company name is missing (userAnswers present)" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, companyWorksReferenceRoute)
+            .withFormUrlEncodedBody("value" -> "WR-001")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

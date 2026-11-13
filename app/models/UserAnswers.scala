@@ -54,6 +54,61 @@ final case class UserAnswers(
       }
     }
 
+  def initialiseSubJourney(id: String): Try[UserAnswers] =
+    if data.value.contains(id) then Failure(new IllegalArgumentException(s"Subjourney already exists for id: $id"))
+    else Success(copy(data = data + (id -> Json.obj())))
+
+  def hasSubJourney(id: String): Boolean =
+    data.value.get(id).exists {
+      case _: JsObject => true
+      case _           => false
+    }
+
+  private def subJourneyPath(
+    subJourneyId: String,
+    pagePath: JsPath
+  ): JsPath =
+    JsPath((JsPath \ subJourneyId).path ++ pagePath.path)
+
+  def getFromSubJourney[A](
+    subJourneyId: String,
+    page: QuestionPage[A]
+  )(using reads: Reads[A]): Option[A] =
+    data
+      .validate(subJourneyPath(subJourneyId, page.path).readNullable[A])
+      .asOpt
+      .flatten
+
+  def setInSubJourney[A](
+    subJourneyId: String,
+    page: Settable[A],
+    value: A
+  )(using writes: Writes[A]): Try[UserAnswers] =
+    data.setObject(
+      subJourneyPath(subJourneyId, page.path),
+      Json.toJson(value)
+    ) match {
+      case JsSuccess(updatedData, _) =>
+        Success(copy(data = updatedData))
+
+      case JsError(errors) =>
+        Failure(JsResultException(errors))
+    }
+
+  def removeFromSubJourney[A](
+    subJourneyId: String,
+    page: Settable[A]
+  ): Try[UserAnswers] =
+    data.removeObject(
+      subJourneyPath(subJourneyId, page.path)
+    ) match {
+      case JsSuccess(updatedData, _) =>
+        Success(copy(data = updatedData))
+
+      case JsError(errors) =>
+        Failure(JsResultException(errors))
+    }
+
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {

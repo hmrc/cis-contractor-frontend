@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
@@ -31,11 +31,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AddressLookupService
-import queries.AddressLookupAmendReturnQuery
+import queries.{AddressLookupAmendReturnQuery, CisIdQuery}
 
 import scala.concurrent.Future
 
-class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
+class CompanyAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val lookupUrl   = "/address-lookup-on-ramp"
   private val companyName = "Test Company"
@@ -541,6 +541,106 @@ class CompanyAddressControllerSpec extends SpecBase with MockitoSugar {
 
           redirectLocation(result).value mustBe
             controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "with id" - {
+
+        val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers
+          .set(CisIdQuery(id), "AB12")
+          .success
+          .value
+          .set(CompanyNamePage(id), companyName)
+          .success
+          .value
+
+        "must redirect to the address lookup on-ramp using the WithId callback" in {
+          val mockSessionRepository    = mock[SessionRepository]
+          val mockAddressLookupService = mock[AddressLookupService]
+
+          when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+          when(
+            mockAddressLookupService
+              .getJourneyUrl(any(), any(), any(), any(), any(), any(), any(), any(), any())(any(), any(), any())
+          ) thenReturn Future.successful(Call("GET", lookupUrl))
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository),
+                bind[AddressLookupService].toInstance(mockAddressLookupService)
+              )
+              .build()
+
+          running(application) {
+            val request = FakeRequest(
+              GET,
+              controllers.add.company.routes.CompanyAddressController
+                .redirectToAddressLookupWithId(flowId, None)
+                .url
+            )
+            val result  = route(application, request).value
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result).value mustBe lookupUrl
+
+            val callbackCaptor = ArgumentCaptor.forClass(classOf[Call])
+
+            verify(mockAddressLookupService)
+              .getJourneyUrl(
+                any(),
+                callbackCaptor.capture(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+              )(any(), any(), any())
+
+            callbackCaptor.getValue.url mustBe
+              controllers.add.company.routes.CompanyAddressController
+                .addressLookupCallbackWithId(flowId, id = "")
+                .url
+          }
+        }
+
+        "must persist the nested address then redirect to contact methods with id" in {
+          val mockSessionRepository    = mock[SessionRepository]
+          val mockAddressLookupService = mock[AddressLookupService]
+
+          when(mockSessionRepository.get(any())) thenReturn Future.successful(Some(answers))
+          when(mockAddressLookupService.getAddressById(any())(any(), any())) thenReturn Future.successful(testAddress)
+          when(mockAddressLookupService.saveAddressDetails(any(), any(), any())(any())) thenReturn Future.successful(
+            true
+          )
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository),
+                bind[AddressLookupService].toInstance(mockAddressLookupService)
+              )
+              .build()
+
+          running(application) {
+            val request = FakeRequest(
+              GET,
+              controllers.add.company.routes.CompanyAddressController
+                .addressLookupCallbackWithId(flowId, "addr-id")
+                .url
+            )
+            val result  = route(application, request).value
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result).value mustBe
+              controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                .onPageLoadWithId(flowId, NormalMode)
+                .url
+          }
         }
       }
     }

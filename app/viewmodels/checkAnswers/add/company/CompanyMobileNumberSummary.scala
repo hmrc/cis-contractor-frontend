@@ -26,21 +26,31 @@ import models.info.company.CompanyAnswers
 
 object CompanyMobileNumberSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyMobileNumberPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyMobileNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyMobileNumberPage(id)))
+      .getOrElse(answers.get(CompanyMobileNumberPage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "companyMobileNumber.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyMobileNumberController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyMobileNumber.change.hidden"))
+              .withAttribute("id" -> "company-mobile-number")
           )
-            .withVisuallyHiddenText(messages("companyMobileNumber.change.hidden"))
-            .withAttribute("id" -> "company-mobile-number")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

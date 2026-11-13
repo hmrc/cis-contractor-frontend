@@ -17,38 +17,51 @@
 package viewmodels.checkAnswers.add.company
 
 import models.amend.company.AmendCompanyRemoveDetail
+import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyAddressYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.info.company.CompanyAnswers
 
 object CompanyAddressYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyAddressYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyAddressYesNoPage(id)))
+      .getOrElse(answers.get(CompanyAddressYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "companyAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-                .onPageLoad(AmendCompanyRemoveDetail.Address.key)
-                .url
-            else controllers.add.company.routes.CompanyAddressYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "companyAddressYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                    .onPageLoad(AmendCompanyRemoveDetail.Address.key)
+                    .url
+                else
+                  controllers.add.company.routes.CompanyAddressYesNoController
+                    .onPageLoad(mode)
+                    .url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyAddressYesNo.change.hidden"))
+              .withAttribute("id" -> "add-company-address")
           )
-            .withVisuallyHiddenText(messages("companyAddressYesNo.change.hidden"))
-            .withAttribute("id" -> "add-company-address")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers
@@ -58,9 +71,9 @@ object CompanyAddressYesNoSummary {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "companyAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq.empty
+        "companyAddressYesNo.checkYourAnswersLabel",
+        ValueViewModel(value),
+        Seq.empty
       )
     }
 }
