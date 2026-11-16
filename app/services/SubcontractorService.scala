@@ -77,7 +77,8 @@ class SubcontractorService @Inject() (
                     partnershipPayloadFromUserAnswers(
                       cisId = cisId,
                       subcontractorType = subcontractorType,
-                      userAnswers = userAnswers
+                      userAnswers = userAnswers,
+                      subJourneyId = subJourneyId
                     )
 
                   case Limitedcompany =>

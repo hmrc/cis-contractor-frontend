@@ -934,7 +934,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should fail when nested cisId is missing even if root cisId exists" in {
+      "should fail when nested cisId is missing for a company even if root cisId exists" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
         val id            = "11111111-1111-1111-1111-111111111111"
@@ -1406,7 +1406,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         verifyNoMoreInteractions(mockConnector)
       }
 
-      "should fail when nested cisId is missing even if root cisId exists" in {
+      "should fail when nested cisId is missing for a partnership even if root cisId exists" in {
         val mockConnector = mock[ConstructionIndustrySchemeConnector]
         val service       = new SubcontractorService(mockConnector)
         val id            = "11111111-1111-1111-1111-111111111111"
