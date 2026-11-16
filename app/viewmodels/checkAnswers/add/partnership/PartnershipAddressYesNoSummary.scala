@@ -27,28 +27,38 @@ import viewmodels.implicits.*
 
 object PartnershipAddressYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipAddressYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipAddressYesNoPage(id)))
+      .getOrElse(answers.get(PartnershipAddressYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "partnershipAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad(AmendPartnershipRemoveDetail.Address.key)
-                .url
-            else controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "partnershipAddressYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                    .onPageLoad(AmendPartnershipRemoveDetail.Address.key)
+                    .url
+                else controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
+              .withAttribute("id" -> "add-partnership-address")
           )
-            .withVisuallyHiddenText(messages("partnershipAddressYesNo.change.hidden"))
-            .withAttribute("id" -> "add-partnership-address")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

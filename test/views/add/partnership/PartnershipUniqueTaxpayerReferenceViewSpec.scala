@@ -34,7 +34,9 @@ class PartnershipUniqueTaxpayerReferenceViewSpec extends SpecBase {
         val html = view(
           form = new forms.add.partnership.PartnershipUtrFormProvider()(),
           mode = models.NormalMode,
-          name = "Test Partnership"
+          name = "Test Partnership",
+          submitAction =
+            controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(models.NormalMode)
         )(
           FakeRequest(),
           messages(application)
@@ -54,7 +56,9 @@ class PartnershipUniqueTaxpayerReferenceViewSpec extends SpecBase {
         val html = view(
           form = new forms.add.partnership.PartnershipUtrFormProvider()(),
           mode = models.AmendMode,
-          name = "Test Partnership"
+          name = "Test Partnership",
+          submitAction =
+            controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController.onSubmit(models.AmendMode)
         )(
           FakeRequest(),
           messages(application)

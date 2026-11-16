@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorAddedView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -41,6 +42,7 @@ class SubcontractorAddedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorAddedView,
@@ -67,6 +69,37 @@ class SubcontractorAddedController @Inject() (
   def trustSubcontractorAdded: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Trust)
+    }
+
+  def partnershipSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id               = flowId.toString
+      def recoveryRedirect =
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+        val name  = request.userAnswers.get(PartnershipNamePage(id))
+        val cisId = request.userAnswers.get(CisIdQuery(id))
+
+        (name, cisId) match {
+          case (Some(name), Some(cisId)) =>
+            val manageSubcontractorsUrl =
+              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+
+            Ok(view(name, Messages("subcontractorAdded.partnership"), manageSubcontractorsUrl))
+
+          case _ =>
+            logger.error(
+              "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+            )
+            recoveryRedirect
+        }
+      } else {
+        logger.error(
+          "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+        )
+        recoveryRedirect
+      }
     }
 
   private def subcontractorAdded(

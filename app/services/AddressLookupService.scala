@@ -18,6 +18,7 @@ package services
 
 import config.AddressLookupConfiguration
 import connectors.AddressLookupConnector
+import models.UserAnswers
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
 import play.api.mvc.{Call, Request}
@@ -68,8 +69,13 @@ class AddressLookupService @Inject() (
     request: DataRequest[_],
     ec: ExecutionContext
   ): Future[Boolean] =
+    saveAddressDetails(address, page, request.userAnswers)
+
+  def saveAddressDetails(address: Address, page: Settable[Address], userAnswers: UserAnswers)(implicit
+    ec: ExecutionContext
+  ): Future[Boolean] =
     for {
-      updatedAnswers <- Future.fromTry(request.userAnswers.set(page, address))
+      updatedAnswers <- Future.fromTry(userAnswers.set(page, address))
       cleanedAnswers <- Future.fromTry(updatedAnswers.remove(AddressLookupAmendReturnQuery))
       result         <- sessionRepository.set(cleanedAnswers)
     } yield result

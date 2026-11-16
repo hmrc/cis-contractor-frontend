@@ -27,28 +27,39 @@ import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerNinoYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNominatedPartnerNinoYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipNominatedPartnerNinoYesNoPage(id)))
+      .getOrElse(answers.get(PartnershipNominatedPartnerNinoYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerNino.key)
-                .url
-            else controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                    .onPageLoad(AmendPartnershipRemoveDetail.NominatedPartnerNino.key)
+                    .url
+                else
+                  controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("partnershipNominatedPartnerNinoYesNo.change.hidden"))
+              .withAttribute("id" -> "add-nominated-partner-nino")
           )
-            .withVisuallyHiddenText(messages("partnershipNominatedPartnerNinoYesNo.change.hidden"))
-            .withAttribute("id" -> "add-nominated-partner-nino")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

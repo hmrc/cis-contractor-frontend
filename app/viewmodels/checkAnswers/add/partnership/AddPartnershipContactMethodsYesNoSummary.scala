@@ -27,28 +27,38 @@ import viewmodels.implicits.*
 
 object AddPartnershipContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddPartnershipContactMethodsYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(AddPartnershipContactMethodsYesNoPage(id)))
+      .getOrElse(answers.get(AddPartnershipContactMethodsYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "addPartnershipContactMethodsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-                .onPageLoad(AmendPartnershipRemoveDetail.ContactDetails.key)
-                .url
-            else controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "addPartnershipContactMethodsYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                    .onPageLoad(AmendPartnershipRemoveDetail.ContactDetails.key)
+                    .url
+                else controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("addPartnershipContactMethodsYesNo.change.hidden"))
+              .withAttribute("id" -> "add-partnership-contact-details")
           )
-            .withVisuallyHiddenText(messages("addPartnershipContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "add-partnership-contact-details")
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

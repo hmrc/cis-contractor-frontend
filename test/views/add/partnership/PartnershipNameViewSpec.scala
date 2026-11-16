@@ -36,7 +36,8 @@ class PartnershipNameViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable =
+        view(form, NormalMode, controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipName.title"))
@@ -62,7 +63,8 @@ class PartnershipNameViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
 
       val partnershipName = "Test Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode)
+      val html: HtmlFormat.Appendable =
+        view(form, AmendMode, controllers.add.partnership.routes.PartnershipNameController.onSubmit(AmendMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipName.title"))
@@ -91,7 +93,8 @@ class PartnershipNameViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
       val errorForm: Form[String] =
         form.withError("value", "partnershipName.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html =
+        view(errorForm, NormalMode, controllers.add.partnership.routes.PartnershipNameController.onSubmit(NormalMode))
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

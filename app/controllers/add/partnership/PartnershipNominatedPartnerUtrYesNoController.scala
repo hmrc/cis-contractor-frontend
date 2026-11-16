@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.partnership.PartnershipNominatedPartnerUtrYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +40,7 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: PartnershipNominatedPartnerUtrYesNoFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -60,7 +62,14 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
             case Some(value) => form.fill(value)
           }
 
-          Ok(view(preparedForm, mode, nominatedPartnershipName))
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              nominatedPartnershipName,
+              routes.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode)
+            )
+          )
         }
         .getOrElse {
           logger.error(
@@ -72,13 +81,15 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+      val submitAction = routes.PartnershipNominatedPartnerUtrYesNoController.onSubmit(mode)
       SubcontractorNameDisplayHelper
         .getPartnerDisplayName(request.userAnswers, mode)
         .map { nominatedPartnershipName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnershipName))),
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnershipName, submitAction))),
               value =>
                 for {
                   updatedAnswers <-
@@ -90,6 +101,63 @@ class PartnershipNominatedPartnerUtrYesNoController @Inject() (
         .getOrElse {
           logger.error(
             s"[PartnershipNominatedPartnerUtrYesNoController][onSubmit] - partner name missing from userAnswers"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      SubcontractorNameDisplayHelper
+        .getPartnerDisplayName(request.userAnswers, mode, id)
+        .map { nominatedPartnershipName =>
+          val page         = PartnershipNominatedPartnerUtrYesNoPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              nominatedPartnershipName,
+              routes.PartnershipNominatedPartnerUtrYesNoController.onSubmitWithId(flowId, mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            s"[PartnershipNominatedPartnerUtrYesNoController][onPageLoadWithId] - partner name missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.PartnershipNominatedPartnerUtrYesNoController.onSubmitWithId(flowId, mode)
+      SubcontractorNameDisplayHelper
+        .getPartnerDisplayName(request.userAnswers, mode, id)
+        .map { nominatedPartnershipName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, nominatedPartnershipName, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(
+                      request.userAnswers.set(PartnershipNominatedPartnerUtrYesNoPage(id), value)
+                    )
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(PartnershipNominatedPartnerUtrYesNoPage(id), mode, updatedAnswers)
+                )
+            )
+        }
+        .getOrElse {
+          logger.error(
+            s"[PartnershipNominatedPartnerUtrYesNoController][onSubmitWithId] - partner name missing from userAnswers"
           )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }

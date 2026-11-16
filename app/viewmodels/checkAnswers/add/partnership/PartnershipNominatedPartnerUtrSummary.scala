@@ -28,33 +28,42 @@ import viewmodels.implicits.*
 
 object PartnershipNominatedPartnerUtrSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    showActions: Boolean = true,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit
     messages: Messages
   ): Option[SummaryListRow] =
-    answers.get(PartnershipNominatedPartnerUtrPage).map { answer =>
-      val value = UtrViewModel(answer)
-      if (showActions) {
-        val actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode).url
+    subJourneyId
+      .map(id => answers.get(PartnershipNominatedPartnerUtrPage(id)))
+      .getOrElse(answers.get(PartnershipNominatedPartnerUtrPage))
+      .map { answer =>
+        val value = UtrViewModel(answer)
+        if (showActions) {
+          val actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(routes.PartnershipNominatedPartnerUtrController.onPageLoad(mode).url)
+            )
+              .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtr.change.hidden"))
+              .withAttribute("id" -> "nominated-partner-utr")
           )
-            .withVisuallyHiddenText(messages("partnershipNominatedPartnerUtr.change.hidden"))
-            .withAttribute("id" -> "nominated-partner-utr")
-        )
-        SummaryListRowViewModel(
-          key = "partnershipNominatedPartnerUtr.checkYourAnswersLabel",
-          value = value,
-          actions = actions
-        )
-      } else {
-        SummaryListRowViewModel(
-          key = "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel",
-          value = value,
-          actions = Seq.empty
-        )
+          SummaryListRowViewModel(
+            key = "partnershipNominatedPartnerUtr.checkYourAnswersLabel",
+            value = value,
+            actions = actions
+          )
+        } else {
+          SummaryListRowViewModel(
+            key = "partnershipNominatedPartnerUtr.verified.checkYourAnswersLabel",
+            value = value,
+            actions = Seq.empty
+          )
+        }
       }
-    }
 
   def row(
     answers: PartnershipAnswers,
