@@ -77,7 +77,8 @@ class AuditService @Inject() (
 
     subcontractorType match {
       case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers, subJourneyId))
-      case Some(TypeOfSubcontractor.Partnership)    => send(buildPartnershipModel(userAnswers))
+      case Some(TypeOfSubcontractor.Partnership) =>
+        send(buildPartnershipModel(userAnswers, subJourneyId))
       case Some(TypeOfSubcontractor.Trust)          => send(buildTrustModel(userAnswers))
       case _                                        => send(buildIndividualModel(userAnswers))
     }
