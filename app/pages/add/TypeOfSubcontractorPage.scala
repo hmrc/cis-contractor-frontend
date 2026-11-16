@@ -34,25 +34,27 @@ case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcon
     value match {
       case Some(Individualorsoletrader) =>
         removePartnershipSubcontractor(ua)
-          .flatMap(removeLimitedCompanySubcontractor(_, id))
+          .flatMap(removeLimitedCompanySubcontractor)
           .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
 
       case Some(Limitedcompany) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removePartnershipSubcontractor)
           .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removePartnershipSubcontractor(ua, id))
 
       case Some(Partnership) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
-          .flatMap(removeLimitedCompanySubcontractor(_, id))
           .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
 
       case Some(Trust) =>
         removeIndividualSoleTraderSubcontractor(ua)
           .flatMap(removeLimitedCompanySubcontractor)
-          .flatMap(removeLimitedCompanySubcontractor(_, id))
           .flatMap(removePartnershipSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
 
       case _ =>
         super.cleanup(value, ua)

@@ -319,17 +319,6 @@ class SubcontractorService @Inject() (
     )
   }
 
-  private def pageValue[A](
-    userAnswers: UserAnswers,
-    subJourneyId: Option[String],
-    nestedPage: String => QuestionPage[A],
-    rootPage: QuestionPage[A]
-  )(implicit reads: play.api.libs.json.Reads[A]): Option[A] =
-    subJourneyId match {
-      case Some(id) => userAnswers.get(nestedPage(id))
-      case None     => userAnswers.get(rootPage)
-    }
-
   private def trustPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,

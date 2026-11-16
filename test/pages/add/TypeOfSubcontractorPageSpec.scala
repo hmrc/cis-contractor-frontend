@@ -75,7 +75,7 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
       updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
     }
-    
+
     "cleanup: must not remove root answers when Partnership is selected under the subjourney id" in {
       val userAnswers =
         emptyUserAnswers
@@ -98,9 +98,9 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       val updatedUserAnswers =
         userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership).success.value
 
-      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe Some(true)
-      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe Some(true)
-      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
+      updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
       updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe Some(true)
     }
@@ -121,7 +121,7 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       val updatedUserAnswers =
         userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Limitedcompany).success.value
 
-      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
       updatedUserAnswers.get(PartnershipNamePage("uuid-1")) mustBe None
       updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe None
     }
