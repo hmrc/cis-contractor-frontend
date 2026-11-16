@@ -17,7 +17,7 @@
 package pages.add
 
 import models.TypeOfSubcontractor
-import pages.add.company.CompanyAddressYesNoPage
+import pages.add.company.*
 import pages.add.partnership.PartnershipAddressYesNoPage
 import pages.add.trust.TrustAddressYesNoPage
 import pages.behaviours.PageBehaviours
@@ -118,6 +118,122 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(CompanyAddressYesNoPage) mustBe None
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
       updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+    }
+
+    "cleanup: must remove nested company answers when IndividualSoleTrader is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Individualorsoletrader)
+          .success
+          .value
+
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-1")) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+    }
+
+    "cleanup: must preserve nested company answers when Limitedcompany is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Limitedcompany)
+          .success
+          .value
+
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-1")) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
+    }
+
+    "cleanup: must remove nested company answers when Partnership is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage("uuid-2"), true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership)
+          .success
+          .value
+
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-1")) mustBe None
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-2")) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
+    }
+
+    "cleanup: must remove nested company answers when Trust is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyAddressYesNoPage("uuid-1"), true)
+          .success
+          .value
+          .set(CompanyAddressYesNoPage("uuid-2"), true)
+          .success
+          .value
+          .set(PartnershipAddressYesNoPage, true)
+          .success
+          .value
+          .set(TrustAddressYesNoPage, true)
+          .success
+          .value
+          .set(NationalInsuranceNumberYesNoPage, true)
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Trust)
+          .success
+          .value
+
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-1")) mustBe None
+      updatedUserAnswers.get(CompanyAddressYesNoPage("uuid-2")) mustBe Some(true)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe None
+      updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
+      updatedUserAnswers.get(NationalInsuranceNumberYesNoPage) mustBe None
     }
 
     "cleanup: must remove all IndividualSoleTrader, LimitedCompany and Trust subcontractor answers when PartnershipSubcontractor is selected" in {

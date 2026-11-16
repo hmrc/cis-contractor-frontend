@@ -20,7 +20,7 @@ import models.{TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor._
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.SubcontractorCleanup.*
+import utils.SubcontractorCleanup._
 
 import scala.util.Try
 
@@ -31,7 +31,32 @@ case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcon
   override def toString: String = "typeOfSubcontractor"
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
-    TypeOfSubcontractorPage.cleanup(value, ua)
+    value match {
+      case Some(Individualorsoletrader) =>
+        removePartnershipSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor(_, id))
+          .flatMap(removeTrustSubcontractor)
+
+      case Some(Limitedcompany) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removePartnershipSubcontractor)
+          .flatMap(removeTrustSubcontractor)
+
+      case Some(Partnership) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeLimitedCompanySubcontractor(_, id))
+          .flatMap(removeTrustSubcontractor)
+
+      case Some(Trust) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeLimitedCompanySubcontractor(_, id))
+          .flatMap(removePartnershipSubcontractor)
+
+      case _ =>
+        super.cleanup(value, ua)
+    }
 }
 
 case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
