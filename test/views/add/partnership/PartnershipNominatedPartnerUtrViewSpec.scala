@@ -34,7 +34,9 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
         val html = view(
           form = new forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider()(),
           mode = models.NormalMode,
-          name = "Test Partnership"
+          name = "Test Partnership",
+          submitAction =
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onSubmit(models.NormalMode)
         )(
           FakeRequest(),
           messages(application)
@@ -54,7 +56,9 @@ class PartnershipNominatedPartnerUtrViewSpec extends SpecBase {
         val html = view(
           form = new forms.add.partnership.PartnershipNominatedPartnerUtrFormProvider()(),
           mode = models.AmendMode,
-          name = "Test Partnership"
+          name = "Test Partnership",
+          submitAction =
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onSubmit(models.AmendMode)
         )(
           FakeRequest(),
           messages(application)

@@ -27,20 +27,28 @@ import viewmodels.implicits._
 
 object PartnershipNominatedPartnerNinoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(PartnershipNominatedPartnerNinoPage).map { value =>
-      SummaryListRowViewModel(
-        key = "partnershipNominatedPartnerNino.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            content = "site.change",
-            href = routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode).url
-          ).withVisuallyHiddenText(messages("partnershipNominatedPartnerNino.change.hidden"))
-            .withAttribute("id" -> "nominated-partner-nino")
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(PartnershipNominatedPartnerNinoPage(id)))
+      .getOrElse(answers.get(PartnershipNominatedPartnerNinoPage))
+      .map { value =>
+        SummaryListRowViewModel(
+          key = "partnershipNominatedPartnerNino.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              content = "site.change",
+              href = changeUrl.getOrElse(routes.PartnershipNominatedPartnerNinoController.onPageLoad(mode).url)
+            ).withVisuallyHiddenText(messages("partnershipNominatedPartnerNino.change.hidden"))
+              .withAttribute("id" -> "nominated-partner-nino")
+          )
         )
-      )
-    }
+      }
 
   def row(
     answers: PartnershipAnswers

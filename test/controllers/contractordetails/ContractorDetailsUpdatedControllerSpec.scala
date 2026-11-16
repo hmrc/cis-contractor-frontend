@@ -124,7 +124,7 @@ class ContractorDetailsUpdatedControllerSpec extends SpecBase with MockitoSugar 
 
             contentAsString(result) mustEqual
               view(expectedCisAccountUrl)(
-                request,
+                viewRequest(request, isAgent),
                 messages(application)
               ).toString
 

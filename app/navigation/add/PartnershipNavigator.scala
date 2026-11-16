@@ -24,12 +24,458 @@ import pages.{Page, QuestionPage}
 import pages.add.partnership.*
 import play.api.mvc.Call
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
+    extractId(page) match {
+      case Some(id) =>
+        val flowId = UUID.fromString(id)
+        mode match {
+          case NormalMode => normalRoutesWithId(flowId, id)(page)(userAnswers)
+          case CheckMode  => checkRouteMapWithId(flowId, id)(page)(userAnswers)
+          case _          => nextPageWithoutId(page, mode, userAnswers)
+        }
+      case None     => nextPageWithoutId(page, mode, userAnswers)
+    }
+
+  private def extractId(page: Page): Option[String] =
+    page match {
+      case PartnershipNamePage(id)                      => Some(id)
+      case PartnershipAddressYesNoPage(id)              => Some(id)
+      case PartnershipAddressPage(id)                   => Some(id)
+      case AddPartnershipContactMethodsYesNoPage(id)    => Some(id)
+      case PartnershipContactMethodOptionsPage(id)      => Some(id)
+      case PartnershipEmailAddressPage(id)              => Some(id)
+      case PartnershipPhoneNumberPage(id)               => Some(id)
+      case PartnershipMobileNumberPage(id)              => Some(id)
+      case PartnershipHasUtrYesNoPage(id)               => Some(id)
+      case PartnershipUniqueTaxpayerReferencePage(id)   => Some(id)
+      case PartnershipNominatedPartnerNamePage(id)      => Some(id)
+      case PartnershipNominatedPartnerUtrYesNoPage(id)  => Some(id)
+      case PartnershipNominatedPartnerUtrPage(id)       => Some(id)
+      case PartnershipNominatedPartnerNinoYesNoPage(id) => Some(id)
+      case PartnershipNominatedPartnerNinoPage(id)      => Some(id)
+      case PartnershipNominatedPartnerCrnYesNoPage(id)  => Some(id)
+      case PartnershipNominatedPartnerCrnPage(id)       => Some(id)
+      case PartnershipWorksReferenceNumberYesNoPage(id) => Some(id)
+      case PartnershipWorksReferenceNumberPage(id)      => Some(id)
+      case _                                            => None
+    }
+
+  private def cyaRouteWithId(flowId: UUID): Call =
+    controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoadWithId(flowId)
+
+  private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
+    case PartnershipNamePage(_)                      =>
+      _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
+    case PartnershipAddressYesNoPage(_)              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage(_)    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage(_)      =>
+      userAnswers => nextSelectedContactMethodPageAfter(flowId, id, current = None)(userAnswers)
+    case PartnershipEmailAddressPage(_)              =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Email))(userAnswers)
+    case PartnershipPhoneNumberPage(_)               =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Phone))(userAnswers)
+    case PartnershipMobileNumberPage(_)              =>
+      userAnswers =>
+        nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Mobile))(userAnswers)
+    case PartnershipHasUtrYesNoPage(_)               =>
+      userAnswers => navigatorFromPartnershipHasUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipUniqueTaxpayerReferencePage(_)   =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(flowId, NormalMode)
+    case PartnershipNominatedPartnerNamePage(_)      =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+    case PartnershipWorksReferenceNumberYesNoPage(_) =>
+      userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage(_)      =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipWorksReferenceNumberPage(_)      =>
+      _ => cyaRouteWithId(flowId)
+    case PartnershipNominatedPartnerCrnPage(_)       =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoYesNoPage(_) =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerCrnYesNoPage(_)  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage(_)       =>
+      _ =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+    case PartnershipNominatedPartnerUtrYesNoPage(_)  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
+    case _                                           => _ => routes.IndexController.onPageLoad()
+  }
+
+  private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
+    case PartnershipHasUtrYesNoPage(_)               =>
+      navigatorFromPartnershipHasUtrYesNoPage(flowId, id, CheckMode)(_)
+    case PartnershipWorksReferenceNumberYesNoPage(_) =>
+      navigatorFromPartnershipWorksReferenceNumberYesNoPage(flowId, id, CheckMode)(_)
+    case PartnershipNominatedPartnerCrnYesNoPage(_)  =>
+      navigatorFromPartnershipNominatedPartnerCrnYesNoPage(flowId, id, CheckMode)(_)
+    case PartnershipNamePage(_)                      =>
+      _ => cyaRouteWithId(flowId)
+    case PartnershipAddressYesNoPage(_)              =>
+      userAnswers => navigatorFromPartnershipAddressYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case AddPartnershipContactMethodsYesNoPage(_)    =>
+      userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case PartnershipContactMethodOptionsPage(_)      =>
+      userAnswers => nextMissingSelectedContactMethodPageAfter(flowId, id, current = None, CheckMode)(userAnswers)
+    case PartnershipEmailAddressPage(_)              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Email),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipPhoneNumberPage(_)               =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Phone),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipMobileNumberPage(_)              =>
+      userAnswers =>
+        nextMissingSelectedContactMethodPageAfter(
+          flowId,
+          id,
+          current = Some(ContactMethodOptions.Mobile),
+          CheckMode
+        )(
+          userAnswers
+        )
+    case PartnershipNominatedPartnerNinoYesNoPage(_) =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerNinoPage(_)      =>
+      navigatorFromPartnershipNominatedPartnerNinoPage(flowId, id, CheckMode)(_)
+    case PartnershipNominatedPartnerNamePage(_)      =>
+      _ => cyaRouteWithId(flowId)
+    case PartnershipNominatedPartnerUtrYesNoPage(_)  =>
+      userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(flowId, id, CheckMode)(userAnswers)
+    case PartnershipNominatedPartnerUtrPage(_)       =>
+      _ => cyaRouteWithId(flowId)
+    case PartnershipNominatedPartnerCrnPage(_)       =>
+      navigatorFromPartnershipNominatedPartnerCrnPage(flowId, id, CheckMode)(_)
+    case PartnershipWorksReferenceNumberPage(_)      =>
+      _ => cyaRouteWithId(flowId)
+    case PartnershipUniqueTaxpayerReferencePage(_)   =>
+      _ => cyaRouteWithId(flowId)
+    case _                                           => _ => cyaRouteWithId(flowId)
+  }
+
+  private def navigatorFromPartnershipNominatedPartnerNinoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipNominatedPartnerNinoPage(id)), mode) match {
+      case (Some(_), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(_), CheckMode)  => cyaRouteWithId(flowId)
+      case _                     =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerNinoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerCrnPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipNominatedPartnerCrnPage(id)), mode) match {
+      case (Some(_), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(_), CheckMode)  => cyaRouteWithId(flowId)
+      case _                     =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerCrnPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipHasUtrYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipHasUtrYesNoPage(id)), mode) match {
+      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage(id)).isDefined =>
+        cyaRouteWithId(flowId)
+      case (Some(true), CheckMode)                                                                 =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoadWithId(flowId, mode)
+      case (Some(false), CheckMode)                                                                => cyaRouteWithId(flowId)
+      case (Some(true), NormalMode)                                                                =>
+        controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode)                                                               =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
+          .onPageLoadWithId(flowId, NormalMode)
+      case _                                                                                       =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipHasUtrYesNoPage] - unexpected state, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipWorksReferenceNumberYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(ua: UserAnswers): Call =
+    (ua.get(PartnershipWorksReferenceNumberYesNoPage(id)), mode) match {
+      case (Some(true), CheckMode)   =>
+        ua.get(PartnershipWorksReferenceNumberPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+              .onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  => cyaRouteWithId(flowId)
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) => cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipWorksReferenceNumberYesNoPage] - unexpected, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerUtrYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerUtrPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+              .onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  => cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerUtrYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipNominatedPartnerCrnYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerCrnPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+              .onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  => cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerCrnYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromPartnershipAddressYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    addressLookupYesNoRoute(
+      mode,
+      userAnswers.get(PartnershipAddressYesNoPage(id)),
+      userAnswers.get(PartnershipAddressPage(id)).isDefined,
+      onYes = controllers.add.partnership.routes.PartnershipAddressController
+        .redirectToAddressLookupWithId(flowId, None),
+      onYesChange = controllers.add.partnership.routes.PartnershipAddressController
+        .redirectToAddressLookupWithId(flowId, Some(CheckMode.toString)),
+      onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
+        .onPageLoadWithId(flowId, NormalMode),
+      checkYourAnswers = cyaRouteWithId(flowId)
+    )
+
+  private def navigatorFromPartnershipNominatedPartnerNinoYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipNominatedPartnerNinoPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+              .onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  => cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromPartnershipNominatedPartnerNinoYesNoPage] - answer missing, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def navigatorFromAddPartnershipContactMethodsYesNoPage(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    (userAnswers.get(AddPartnershipContactMethodsYesNoPage(id)), mode) match {
+      case (Some(true), NormalMode)  =>
+        controllers.add.partnership.routes.PartnershipContactMethodOptionsController
+          .onPageLoadWithId(flowId, NormalMode)
+      case (Some(false), NormalMode) =>
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, NormalMode)
+      case (Some(true), CheckMode)   =>
+        userAnswers
+          .get(PartnershipContactMethodOptionsPage(id))
+          .fold(
+            controllers.add.partnership.routes.PartnershipContactMethodOptionsController
+              .onPageLoadWithId(flowId, mode)
+          )(_ => cyaRouteWithId(flowId))
+      case (Some(false), CheckMode)  => cyaRouteWithId(flowId)
+      case _                         =>
+        logger.error(
+          s"[PartnershipNavigator][navigatorFromAddPartnershipContactMethodsYesNoPage] - unexpected state, mode=$mode"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  private def nextSelectedContactMethodPageAfter(
+    flowId: UUID,
+    id: String,
+    current: Option[ContactMethodOptions]
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining.headOption.fold {
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, NormalMode)
+      }(contactMethodPageCall(flowId, _, NormalMode))
+    }
+
+  private def nextMissingSelectedContactMethodPageAfter(
+    flowId: UUID,
+    id: String,
+    current: Option[ContactMethodOptions],
+    mode: Mode
+  )(userAnswers: UserAnswers): Call =
+    navigateFromContactMethodPage(id, current, userAnswers) { remaining =>
+      remaining
+        .find(isMissingAnswer(id, _)(userAnswers))
+        .map(contactMethodPageCall(flowId, _, mode))
+        .getOrElse(cyaRouteWithId(flowId))
+    }
+
+  private def navigateFromContactMethodPage(
+    id: String,
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers
+  )(terminalStep: Seq[ContactMethodOptions] => Call): Call =
+    selectedContactMethodsInOrder(id, userAnswers)
+      .filter(_.nonEmpty)
+      .fold {
+        logger.error(
+          "[PartnershipNavigator][navigateFromContactMethodPage] - ContactMethodOptions missing or empty"
+        )
+        routes.JourneyRecoveryController.onPageLoad()
+      } { selectedContactMethods =>
+        current match {
+          case Some(currentContactMethod) if !selectedContactMethods.contains(currentContactMethod) =>
+            logger.error(
+              "[PartnershipNavigator][navigateFromContactMethodPage] - current contact method not selected"
+            )
+            routes.JourneyRecoveryController.onPageLoad()
+          case _                                                                                    =>
+            val remaining =
+              current match {
+                case None                       => selectedContactMethods
+                case Some(currentContactMethod) =>
+                  val currentIndex = selectedContactMethods.indexWhere(_ == currentContactMethod)
+                  selectedContactMethods.drop(currentIndex + 1)
+              }
+            terminalStep(remaining)
+        }
+      }
+
+  private def selectedContactMethodsInOrder(
+    id: String,
+    userAnswers: UserAnswers
+  ): Option[Seq[ContactMethodOptions]] =
+    userAnswers.get(PartnershipContactMethodOptionsPage(id)).map(ContactMethodOptions.ordered)
+
+  private def contactMethodPageCall(
+    flowId: UUID,
+    contactMethod: ContactMethodOptions,
+    mode: Mode
+  ): Call =
+    contactMethod match {
+      case ContactMethodOptions.Email  =>
+        controllers.add.partnership.routes.PartnershipEmailAddressController.onPageLoadWithId(flowId, mode)
+      case ContactMethodOptions.Phone  =>
+        controllers.add.partnership.routes.PartnershipPhoneNumberController.onPageLoadWithId(flowId, mode)
+      case ContactMethodOptions.Mobile =>
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onPageLoadWithId(flowId, mode)
+    }
+
+  private def isMissingAnswer(id: String, contactMethod: ContactMethodOptions)(userAnswers: UserAnswers): Boolean =
+    userAnswers.get(contactMethodPage(id, contactMethod)).isEmpty
+
+  private def contactMethodPage(id: String, contactMethod: ContactMethodOptions): QuestionPage[String] =
+    contactMethod match {
+      case ContactMethodOptions.Email  => PartnershipEmailAddressPage(id)
+      case ContactMethodOptions.Phone  => PartnershipPhoneNumberPage(id)
+      case ContactMethodOptions.Mobile => PartnershipMobileNumberPage(id)
+    }
+
+  private def nextPageWithoutId(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode  =>

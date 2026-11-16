@@ -16,8 +16,8 @@
 
 package navigation
 
-import pages.*
 import models.*
+import pages.*
 import pages.add.IndividualJourney
 import pages.add.company.CompanyJourney
 import pages.add.partnership.PartnershipJourney

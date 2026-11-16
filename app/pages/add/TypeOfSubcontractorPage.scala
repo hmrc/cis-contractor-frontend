@@ -22,7 +22,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.SubcontractorCleanup._
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 

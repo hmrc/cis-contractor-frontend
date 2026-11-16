@@ -16,7 +16,7 @@
 
 package controllers.add.partnership
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.partnership.AddPartnershipContactMethodsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -32,7 +32,7 @@ import views.html.add.partnership.AddPartnershipContactMethodsYesNoView
 
 import scala.concurrent.Future
 
-class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with MockitoSugar {
+class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new AddPartnershipContactMethodsYesNoFormProvider()
   private val form         = formProvider()
@@ -59,7 +59,12 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
         val view = application.injector.instanceOf[AddPartnershipContactMethodsYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -80,7 +85,12 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -159,7 +169,12 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -213,7 +228,12 @@ class AddPartnershipContactMethodsYesNoControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, partnershipName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          partnershipName,
+          controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

@@ -38,7 +38,12 @@ class PartnershipNominatedPartnerNinoViewSpec extends AnyWordSpec with Matchers 
     "render the page with title, heading, hint, input and submit button" in new Setup {
       private val nominatedPartnerName = "Jane Doe"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, nominatedPartnerName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        nominatedPartnerName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(NormalMode)
+      )
       val doc: Document               = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -63,7 +68,12 @@ class PartnershipNominatedPartnerNinoViewSpec extends AnyWordSpec with Matchers 
     "render the page with title, heading, hint, input and update button for Amend journey" in new Setup {
       private val nominatedPartnerName = "Jane Doe"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, nominatedPartnerName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        nominatedPartnerName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(AmendMode)
+      )
       val doc: Document               = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -91,7 +101,12 @@ class PartnershipNominatedPartnerNinoViewSpec extends AnyWordSpec with Matchers 
       val errorForm: Form[String] =
         form.withError("value", "partnershipNominatedPartnerNino.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, nominatedPartnerName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        nominatedPartnerName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController.onSubmit(NormalMode)
+      )
       val doc: Document               = Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

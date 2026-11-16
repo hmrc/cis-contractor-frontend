@@ -81,8 +81,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
 
       case Some(subcontractorType) =>
         mode match {
-          case NormalMode =>
-            firstJourneyPageFor(subcontractorType, id)
+          case NormalMode => firstJourneyPageFor(subcontractorType, id)
           case _          =>
             if (journeyComplete(subcontractorType, userAnswers, id)) {
               checkYourAnswersFor(subcontractorType, id)
