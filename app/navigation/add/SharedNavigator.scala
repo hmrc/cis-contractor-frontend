@@ -104,10 +104,10 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
       case (Limitedcompany, _)           =>
         controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, Some(value)) =>
+      case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Partnership, _) =>
+      case (Partnership, _)              =>
         controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
       case (Trust, _)                    =>
         controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
@@ -125,10 +125,10 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (Limitedcompany, _)           =>
         controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-      case (Partnership, Some(value)) =>
+      case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
-      case (Partnership, _) =>
+      case (Partnership, _)              =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       case (Trust, _)                    =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
