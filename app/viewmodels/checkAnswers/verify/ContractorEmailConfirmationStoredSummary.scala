@@ -29,14 +29,18 @@ import viewmodels.implicits.*
 
 object ContractorEmailConfirmationStoredSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ContractorEmailConfirmationStoredPage).map { answer =>
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val page =
+      subJourneyId.map(ContractorEmailConfirmationStoredPage.apply).getOrElse(ContractorEmailConfirmationStoredPage)
+    answers.get(page).map { answer =>
 
       val label = messages(s"verify.contractorEmailConfirmationStored.$answer")
 
       val displayText = answer match {
         case CurrentEmail =>
-          VerifyEmailResolver.resolvedEmail(answers).fold(label) { email =>
+          VerifyEmailResolver.resolvedEmail(answers, subJourneyId).fold(label) { email =>
             s"$label: <strong>${HtmlFormat.escape(email)}</strong>"
           }
         case _            => HtmlFormat.escape(label).toString
@@ -50,11 +54,20 @@ object ContractorEmailConfirmationStoredSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode).url
+            subJourneyId
+              .map(id =>
+                controllers.verify.routes.ContractorEmailConfirmationStoredController
+                  .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                  .url
+              )
+              .getOrElse(
+                controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(CheckMode).url
+              )
           )
             .withVisuallyHiddenText(messages("verify.contractorEmailConfirmationStored.change.hidden"))
             .withAttribute("id" -> "contractor-email-confirmation-stored")
         )
       )
     }
+  }
 }

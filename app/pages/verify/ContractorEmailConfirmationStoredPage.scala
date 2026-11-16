@@ -24,6 +24,25 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class ContractorEmailConfirmationStoredPage(id: String)
+    extends QuestionPage[ContractorEmailConfirmationStored]
+    with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "contractorEmailConfirmationStored"
+
+  override def cleanup(
+    value: Option[ContractorEmailConfirmationStored],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
+    value match {
+      case Some(DifferentEmail) => super.cleanup(value, userAnswers)
+      case Some(_)              => userAnswers.remove(EmailAddressPage(id))
+      case None                 => super.cleanup(value, userAnswers)
+    }
+}
+
 case object ContractorEmailConfirmationStoredPage
     extends QuestionPage[ContractorEmailConfirmationStored]
     with VerifyJourney {
@@ -37,8 +56,8 @@ case object ContractorEmailConfirmationStoredPage
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
     value match {
-      case Some(DifferentEmail) => super.cleanup(value, userAnswers) // keep EmailAddressPage
-      case Some(_)              => userAnswers.remove(EmailAddressPage) // CurrentEmail / DoNotSend
+      case Some(DifferentEmail) => super.cleanup(value, userAnswers)
+      case Some(_)              => userAnswers.remove(EmailAddressPage)
       case None                 => super.cleanup(value, userAnswers)
     }
 }

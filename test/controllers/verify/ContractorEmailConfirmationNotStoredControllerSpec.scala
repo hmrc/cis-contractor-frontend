@@ -66,7 +66,9 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
   private val formProvider = new ContractorEmailConfirmationNotStoredFormProvider()
   private val form         = formProvider()
 
-  private val cisId = "123"
+  private val cisId        = "123"
+  private val submitAction =
+    controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onSubmit(NormalMode)
 
   private lazy val routeUrl =
     controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(NormalMode).url
@@ -205,7 +207,7 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         val view = application.injector.instanceOf[ContractorEmailConfirmationNotStoredView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, submitAction)(request, messages(application)).toString
       }
     }
 
@@ -240,7 +242,10 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -278,7 +283,7 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         val view = application.injector.instanceOf[ContractorEmailConfirmationNotStoredView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, submitAction)(request, messages(application)).toString
 
         val savedAnswers = captor.getValue
         savedAnswers.get(VerifyFinalValidationContinuationPage) mustEqual None
@@ -321,7 +326,10 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -454,7 +462,10 @@ class ContractorEmailConfirmationNotStoredControllerSpec extends SpecBase with M
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

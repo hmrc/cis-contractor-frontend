@@ -32,7 +32,7 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
   "VerifyCheckYourAnswersView" should {
 
     "render the page title, heading, confirm button and form action" in new Setup {
-      val doc = Jsoup.parse(view(SummaryList()).toString())
+      val doc = Jsoup.parse(view(SummaryList(), submitAction).toString())
 
       doc.select("title").text() must include(messages("verify.verifyCheckYourAnswers.title"))
       doc.select("h1").text() mustBe messages("verify.verifyCheckYourAnswers.heading")
@@ -44,7 +44,7 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "render the declaration heading" in new Setup {
-      val doc = Jsoup.parse(view(SummaryList()).toString())
+      val doc = Jsoup.parse(view(SummaryList(), submitAction).toString())
 
       doc.select("main h2").text() mustBe
         messages("verify.verificationDeclaration.heading")
@@ -64,7 +64,7 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
         )
       )
 
-      val doc = Jsoup.parse(view(list).toString())
+      val doc = Jsoup.parse(view(list, submitAction).toString())
 
       val rows = doc.select(".govuk-summary-list__row")
       rows.size() mustBe 2
@@ -91,7 +91,7 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
         )
       )
 
-      val doc = Jsoup.parse(view(list).toString())
+      val doc = Jsoup.parse(view(list, submitAction).toString())
 
       val subRow  = doc.select(".govuk-summary-list__row").first()
       val bullets = subRow.select(".govuk-list--bullet li")
@@ -102,13 +102,13 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "render no rows for an empty summary list" in new Setup {
-      val doc = Jsoup.parse(view(SummaryList()).toString())
+      val doc = Jsoup.parse(view(SummaryList(), submitAction).toString())
       doc.select(".govuk-summary-list__row").size() mustBe 0
     }
 
     "render the declaration before the confirm button" in new Setup {
 
-      val doc = Jsoup.parse(view(SummaryList()).toString())
+      val doc = Jsoup.parse(view(SummaryList(), submitAction).toString())
 
       val mainContent = doc.select("main").text()
 
@@ -131,5 +131,7 @@ class VerifyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Guic
 
     val view: VerifyCheckYourAnswersView =
       app.injector.instanceOf[VerifyCheckYourAnswersView]
+
+    val submitAction = controllers.verify.routes.VerifyCheckYourAnswersController.onSubmit()
   }
 }

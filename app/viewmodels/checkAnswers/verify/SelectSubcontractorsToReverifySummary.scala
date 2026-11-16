@@ -27,8 +27,11 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorsToReverifySummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorsToReverifyPage) match {
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val page = subJourneyId.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
+    answers.get(page) match {
 
       case Some(subcontractorsToReverify) =>
         val names = if (subcontractorsToReverify.isEmpty) {
@@ -43,7 +46,15 @@ object SelectSubcontractorsToReverifySummary {
             actions = Seq(
               ActionItemViewModel(
                 content = Text(messages("site.change")),
-                href = controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode).url
+                href = subJourneyId
+                  .map(id =>
+                    controllers.verify.routes.SelectSubcontractorsToReverifyController
+                      .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                      .url
+                  )
+                  .getOrElse(
+                    controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoad(CheckMode).url
+                  )
               ).withVisuallyHiddenText(messages("verify.selectSubcontractorsToReverify.change.hidden"))
                 .withAttribute("id", "select-subcontractors-to-reverify")
             )
@@ -51,4 +62,5 @@ object SelectSubcontractorsToReverifySummary {
         }
       case None                           => None
     }
+  }
 }

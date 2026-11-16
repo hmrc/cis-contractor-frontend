@@ -20,6 +20,13 @@ import models.verify.VerificationSubmissionDetails
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class VerificationSubmissionDetailsPage(id: String) extends QuestionPage[VerificationSubmissionDetails] {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "verificationSubmissionDetails"
+}
+
 case object VerificationSubmissionDetailsPage extends QuestionPage[VerificationSubmissionDetails] {
 
   override def path: JsPath = JsPath \ toString

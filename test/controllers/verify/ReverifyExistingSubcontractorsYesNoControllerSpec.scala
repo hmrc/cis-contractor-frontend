@@ -71,6 +71,9 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       .onPageLoad(NormalMode)
       .url
 
+  private val submitAction =
+    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(NormalMode)
+
   "ReverifyExistingSubcontractorsYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
@@ -91,7 +94,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(application)).toString
+          view(form, NormalMode, submitAction)(request, messages(application)).toString
       }
     }
 
@@ -119,7 +122,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(true), NormalMode)(
+          view(form.fill(true), NormalMode, submitAction)(
             request,
             messages(application)
           ).toString
@@ -307,7 +310,7 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode)(
+          view(boundForm, NormalMode, submitAction)(
             request,
             messages(application)
           ).toString

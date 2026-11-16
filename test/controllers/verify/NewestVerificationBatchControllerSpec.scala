@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import models.response.GetNewestVerificationBatchResponse
 import models.{MonthlyReturn, MonthlyReturnSubmission, NormalMode, Subcontractor, Submission, UserAnswers, Verification}
@@ -40,7 +40,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import java.time.{Clock, LocalDateTime, ZoneOffset}
 import scala.concurrent.Future
 
-class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar with ModelGenerators {
+class NewestVerificationBatchControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with ModelGenerators
+    with WithFakeCisTaxpayer {
 
   private val endpointUrl = "/subcontractor/verify/newest"
 
@@ -1608,6 +1612,68 @@ class NewestVerificationBatchControllerSpec extends SpecBase with MockitoSugar w
           .refreshNewestVerificationBatch(any[UserAnswers])(
             any[HeaderCarrier]
           )
+      }
+    }
+
+    "on start" - {
+
+      val startCisId = "AB12"
+      val startUrl   =
+        controllers.verify.routes.NewestVerificationBatchController.onPageLoadStart(startCisId).url
+
+      "must create a uuid nest and redirect to select subcontractors when unverified subcontractors exist" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any[UserAnswers], any[Option[String]])(any[HeaderCarrier]))
+          .thenAnswer { invocation =>
+            val answers = invocation.getArgument[UserAnswers](0)
+            val id      = invocation.getArgument[Option[String]](1).get
+            Future.successful(
+              answers
+                .set(
+                  NewestVerificationBatchResponsePage(id),
+                  newestBatchResponse(
+                    subcontractors = Seq(unverifiedSubcontractor),
+                    monthlyReturn = Some(activeMonthlyReturn)
+                  )
+                )
+                .flatMap(_.set(UnverifiedSubcontractorsPage(id), Seq(unverifiedSubcontractor)))
+                .success
+                .value
+            )
+          }
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, startUrl)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include(
+            "/subcontractor/verify/select-subcontractors-to-verify/"
+          )
+          redirectLocation(result).value must not be
+            controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+        }
+      }
+
+      "must redirect to Journey Recovery when the organisation is not authorised for the cisId" in {
+        val mockService = mock[VerificationService]
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(
+                GET,
+                controllers.verify.routes.NewestVerificationBatchController.onPageLoadStart("other").url
+              )
+            ).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
     }
   }

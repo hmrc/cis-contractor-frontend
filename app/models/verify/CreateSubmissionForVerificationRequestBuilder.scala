@@ -21,7 +21,7 @@ import models.response.GetCurrentVerificationBatchResponse
 import models.{SubcontractorCurrentVerification, VerificationCurrentVerification}
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.i18n.Messages
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import utils.VerifyEmailResolver
 import viewmodels.verify.SubcontractorDisplay
 
@@ -34,9 +34,21 @@ object CreateSubmissionForVerificationRequestBuilder {
     isAgent: Boolean,
     agentReference: Option[String]
   )(implicit messages: Messages): Either[String, CreateSubmissionForVerificationRequest] =
+    build(ua, isAgent, agentReference, None)
+
+  def build(
+    ua: models.UserAnswers,
+    isAgent: Boolean,
+    agentReference: Option[String],
+    subJourneyId: Option[String]
+  )(implicit messages: Messages): Either[String, CreateSubmissionForVerificationRequest] = {
+    val cisId       = subJourneyId.map(id => ua.get(VerifyCisIdQuery(id))).getOrElse(ua.get(CisIdQuery))
+    val currentPage =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
+
     for {
-      instanceId <- ua.get(CisIdQuery).toRight("CisIdQuery not found")
-      current    <- ua.get(CurrentVerificationBatchResponsePage).toRight("CurrentVerificationBatchResponsePage not found")
+      instanceId <- cisId.toRight("CisIdQuery not found")
+      current    <- ua.get(currentPage).toRight("CurrentVerificationBatchResponsePage not found")
 
       batchId       <- current.verificationBatch.map(_.verificationBatchId).toRight("verificationBatchId missing")
       batchRef      <-
@@ -44,7 +56,7 @@ object CreateSubmissionForVerificationRequestBuilder {
       agentId       <- resolveAgentId(isAgent, agentReference)
       verifications <- buildVerifications(current)
     } yield {
-      val email: Option[String] = VerifyEmailResolver.resolvedEmail(ua)
+      val email: Option[String] = VerifyEmailResolver.resolvedEmail(ua, subJourneyId)
 
       CreateSubmissionForVerificationRequest(
         instanceId = instanceId,
@@ -56,6 +68,7 @@ object CreateSubmissionForVerificationRequestBuilder {
         agentId = Some(agentId)
       )
     }
+  }
 
   private def buildVerifications(
     current: GetCurrentVerificationBatchResponse

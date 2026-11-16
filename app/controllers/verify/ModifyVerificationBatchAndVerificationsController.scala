@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import models.Mode
 import models.requests.{CreateVerifications, DeleteVerifications, ModifyVerificationsRequest}
 import models.response.GetCurrentVerificationBatchResponse
@@ -24,10 +24,11 @@ import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPa
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +37,7 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService
 )(implicit ec: ExecutionContext)
@@ -48,21 +50,36 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       redirectIfVerificationRequestInProgress(request.userAnswers) match {
         case Some(redirectResult) => Future.successful(redirectResult)
-        case None                 => runModifyLogic(mode)
+        case None                 => runModifyLogic(mode, None)
       }
     }
 
-  private def runModifyLogic(mode: Mode)(implicit request: models.requests.DataRequest[?]): Future[Result] = {
+  def modifyVerificationBatchWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id = flowId.toString
+        redirectIfVerificationRequestInProgress(request.userAnswers, Some(id)) match {
+          case Some(redirectResult) => Future.successful(redirectResult)
+          case None                 => runModifyLogic(mode, Some(flowId))
+        }
+    }
+
+  private def runModifyLogic(mode: Mode, flowId: Option[UUID])(implicit
+    request: models.requests.DataRequest[?]
+  ): Future[Result] = {
+    val id           = flowId.map(_.toString)
+    val selectPage   = id.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+    val reverifyPage = id.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
 
     val verifyIdsRaw: Seq[String] =
       request.userAnswers
-        .get(SelectSubcontractorPage)
+        .get(selectPage)
         .map(_.toSeq.map(_.id))
         .getOrElse(Seq.empty)
 
     val reverifyIdsRaw: Seq[String] =
       request.userAnswers
-        .get(SelectSubcontractorsToReverifyPage)
+        .get(reverifyPage)
         .map(_.toSeq.map(_.id))
         .getOrElse(Seq.empty)
 
@@ -80,8 +97,8 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
 
       case Right(selectedSubcontractorIds) =>
         (for {
-          instanceId <- instanceIdFromSession(request.userAnswers)
-          current    <- currentBatchFromSession(request.userAnswers)
+          instanceId <- instanceIdFromSession(request.userAnswers, id)
+          current    <- currentBatchFromSession(request.userAnswers, id)
 
           idToRef = current.subcontractors.flatMap(s => s.subbieResourceRef.map(ref => s.subcontractorId -> ref)).toMap
 
@@ -97,10 +114,27 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
               Future.successful(())
             } else {
               val modifyReq = buildModifyRequest(instanceId, current, createRefs, deleteRefs)
-              verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq).map(_ => ())
+              id
+                .fold(
+                  verificationService.modifyVerificationBatchAndVerifications(request.userAnswers, modifyReq)
+                )(nestedId =>
+                  verificationService.modifyVerificationBatchAndVerifications(
+                    request.userAnswers,
+                    modifyReq,
+                    Some(nestedId)
+                  )
+                )
+                .map(_ => ())
             }
         } yield Redirect(
-          controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode)
+          flowId
+            .map(fid =>
+              controllers.verify.routes.CheckVerificationBatchReadinessController
+                .checkVerificationBatchReadinessWithId(fid, mode)
+            )
+            .getOrElse(
+              controllers.verify.routes.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode)
+            )
         ))
           .recover { case t =>
             logger.error(
@@ -112,17 +146,24 @@ class ModifyVerificationBatchAndVerificationsController @Inject() (
     }
   }
 
-  private def instanceIdFromSession(userAnswers: models.UserAnswers): Future[String] =
-    userAnswers
-      .get(CisIdQuery)
+  private def instanceIdFromSession(userAnswers: models.UserAnswers, subJourneyId: Option[String]): Future[String] =
+    subJourneyId
+      .map(id => userAnswers.get(VerifyCisIdQuery(id)))
+      .getOrElse(userAnswers.get(CisIdQuery))
       .map(Future.successful)
       .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
-  private def currentBatchFromSession(userAnswers: models.UserAnswers): Future[GetCurrentVerificationBatchResponse] =
+  private def currentBatchFromSession(
+    userAnswers: models.UserAnswers,
+    subJourneyId: Option[String]
+  ): Future[GetCurrentVerificationBatchResponse] = {
+    val page =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
     userAnswers
-      .get(CurrentVerificationBatchResponsePage)
+      .get(page)
       .map(Future.successful)
       .getOrElse(Future.failed(new RuntimeException("CurrentVerificationBatchResponsePage not found in session data")))
+  }
 
   private def parseIds(label: String, ids: Iterable[String]): Either[String, Seq[Long]] = {
     val parsed = ids.toSeq.distinct.map(_.trim).map(_.toLongOption)
