@@ -29,7 +29,7 @@ case object UnverifiedSubcontractorsPage extends QuestionPage[Seq[Subcontractor]
     "unverifiedSubcontractors"
 }
 
-case class UnverifiedSubcontractorsPage(id:String) extends QuestionPage[Seq[Subcontractor]] {
+case class UnverifiedSubcontractorsPage(id: String) extends QuestionPage[Seq[Subcontractor]] {
 
   override def path: JsPath =
     JsPath \ "verify" \ id \ toString

@@ -161,10 +161,10 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
   // DTR-9569 MultiTab onPageLoad
   def onPageLoadWithId(
-                  flowId: UUID,
-                  verificationResourceRef: Long = -1L,
-                  mode: Mode = NormalMode
-                ): Action[AnyContent] =
+    flowId: UUID,
+    verificationResourceRef: Long = -1L,
+    mode: Mode = NormalMode
+  ): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val id         = flowId.toString
       val formAction =
@@ -185,13 +185,14 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     }
 
   def onSubmitWithId(
-                flowId: UUID,
-                verificationResourceRef: Long = -1L,
-                mode: Mode = NormalMode
-              ): Action[AnyContent] =
+    flowId: UUID,
+    verificationResourceRef: Long = -1L,
+    mode: Mode = NormalMode
+  ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val id = flowId.toString
-      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+      val id         = flowId.toString
+      val formAction =
+        routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
 
       val subcontractorName =
         getSubcontractorNameWithId(id, request, verificationResourceRef)
@@ -213,9 +214,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
             ),
           value =>
             val subcontractorIdOpt = for {
-              batch <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+              batch        <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
               verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
-              subId <- verification.subcontractorId
+              subId        <- verification.subcontractorId
             } yield subId.toString
 
             for {
@@ -230,9 +231,15 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
               cleanedAnswers <-
                 Future.fromTry(
                   if (value) {
-                    removeSubcontractorFromSelectionWithId(id, updatedAnswers, verificationResourceRef, subcontractorIdOpt)
+                    removeSubcontractorFromSelectionWithId(
+                      id,
+                      updatedAnswers,
+                      verificationResourceRef,
+                      subcontractorIdOpt
+                    )
                   } else {
-                    updatedAnswers.remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
+                    updatedAnswers
+                      .remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
                   }
                 )
 
@@ -243,8 +250,10 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                   deleteAndRedirect(cleanedAnswers, verificationResourceRef)
                 } else {
                   Future.successful(
-                    Redirect(routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId,
-                      verificationResourceRef))
+                    Redirect(
+                      routes.RemoveInsufficientSubcontractorNameYesNoController
+                        .onPageLoadWithId(flowId, verificationResourceRef)
+                    )
 //                    TODO: uncomment below and replace above redirect
 //                    Redirect(
 //                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
@@ -282,26 +291,27 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     )
   }
 
-  //DTR-9569 removeSubcontractorFromSelection UUID scoped
+  // DTR-9569 removeSubcontractorFromSelection UUID scoped
   private def removeSubcontractorFromSelectionWithId(
-                                                flowId: String,
-                                                userAnswers: UserAnswers,
-                                                verificationResourceRef: Long,
-                                                subcontractorId: Option[String]
-                                              ): Try[UserAnswers] = {
+    flowId: String,
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long,
+    subcontractorId: Option[String]
+  ): Try[UserAnswers] = {
     val withSelectionsRemoved =
       subcontractorId.fold[Try[UserAnswers]](Success(userAnswers)) { id =>
         for {
-          afterSelect <- userAnswers
-            .get(SelectSubcontractorPage(flowId))
-            .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
-              userAnswers.set(SelectSubcontractorPage(flowId), selected.filterNot(_.id == id))
-            )
-          afterReverify <- afterSelect
-            .get(SelectSubcontractorsToReverifyPage(flowId))
-            .fold[Try[UserAnswers]](Success(afterSelect))(selected =>
-              afterSelect.set(SelectSubcontractorsToReverifyPage(flowId), selected.filterNot(_.id == id))
-            )
+          afterSelect   <- userAnswers
+                             .get(SelectSubcontractorPage(flowId))
+                             .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
+                               userAnswers.set(SelectSubcontractorPage(flowId), selected.filterNot(_.id == id))
+                             )
+          afterReverify <-
+            afterSelect
+              .get(SelectSubcontractorsToReverifyPage(flowId))
+              .fold[Try[UserAnswers]](Success(afterSelect))(selected =>
+                afterSelect.set(SelectSubcontractorsToReverifyPage(flowId), selected.filterNot(_.id == id))
+              )
         } yield afterReverify
       }
 
@@ -310,7 +320,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     )
   }
 
-  //TODO make ID overload of deleteAndRedirect
+  // TODO make ID overload of deleteAndRedirect
   private def deleteAndRedirect(
     userAnswers: models.UserAnswers,
     verificationResourceRef: Long
@@ -446,16 +456,20 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     }
 
   // DTR-9569 nameFromCurrentBatch ID overload
-  private def nameFromCurrentBatchWithId(id: String, request: DataRequest[?], verificationResourceRef: Long): Option[String] =
+  private def nameFromCurrentBatchWithId(
+    id: String,
+    request: DataRequest[?],
+    verificationResourceRef: Long
+  ): Option[String] =
     if (verificationResourceRef < 0) {
       None
     } else {
       for {
-        batch <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
-        verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
-        subId <- verification.subcontractorId
+        batch         <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+        verification  <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
+        subId         <- verification.subcontractorId
         subcontractor <- batch.subcontractors.find(_.subcontractorId == subId)
-        name <- displayName(subcontractor)
+        name          <- displayName(subcontractor)
       } yield name
     }
 
