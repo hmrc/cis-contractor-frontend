@@ -133,6 +133,10 @@ POST  /subcontractor/amend/partnership/remove/information/:subcontractorDetail  
 GET   /subcontractor/proceed-verifying-subcontractor/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoad(subcontractorId: Long, mode: Mode = NormalMode)
 POST  /subcontractor/proceed-verifying-subcontractor/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId: Long, mode: Mode = NormalMode)
 
+# DTR-9569
+GET   /subcontractor/proceed-verifying-subcontractor/:flowId/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId: UUID, subcontractorId: Long, mode: Mode = NormalMode)
+POST  /subcontractor/proceed-verifying-subcontractor/:flowId/:subcontractorId  controllers.insufficient.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId: UUID, subcontractorId: Long, mode: Mode = NormalMode)
+
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 
