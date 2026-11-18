@@ -24,3 +24,9 @@ case class RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef:
   override def path: JsPath =
     JsPath \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
 }
+
+case class RemoveInsufficientSubcontractorNameYesNoForFlowPage(id: String, verificationResourceRef: Long) extends QuestionPage[Boolean] {
+
+  override def path: JsPath =
+    JsPath \ "verify" \ id \ "removeInsufficientSubcontractorNameYesNo" \ verificationResourceRef.toString \ "removed"
+}

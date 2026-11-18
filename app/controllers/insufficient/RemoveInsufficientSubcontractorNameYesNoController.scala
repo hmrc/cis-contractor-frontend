@@ -22,7 +22,7 @@ import forms.insufficient.RemoveInsufficientSubcontractorNameYesNoFormProvider
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
 import models.{Mode, NormalMode, SubcontractorCurrentVerification, TypeOfSubcontractor, UserAnswers}
-import pages.insufficient.RemoveInsufficientSubcontractorNameYesNoPage
+import pages.insufficient.{RemoveInsufficientSubcontractorNameYesNoForFlowPage, RemoveInsufficientSubcontractorNameYesNoPage}
 import pages.verify.{CurrentVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.data.Form
@@ -33,6 +33,7 @@ import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.insufficient.RemoveInsufficientSubcontractorNameYesNoView
 
+import java.util.UUID
 import scala.util.{Success, Try}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,6 +47,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: RemoveInsufficientSubcontractorNameYesNoFormProvider,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: RemoveInsufficientSubcontractorNameYesNoView
 )(implicit ec: ExecutionContext)
@@ -63,11 +65,18 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       .get(RemoveInsufficientSubcontractorNameYesNoPage(verificationResourceRef))
       .fold(form)(form.fill)
 
+  // DTR-9569 Multitab preparedForm
+  private def preparedFormWithId(id: String, verificationResourceRef: Long)(implicit request: DataRequest[?]) =
+    request.userAnswers
+      .get(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
+      .fold(form)(form.fill)
+
   def onPageLoad(
     verificationResourceRef: Long = -1L,
     mode: Mode = NormalMode
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)
 
       val subcontractorName =
         getSubcontractorName(request, verificationResourceRef)
@@ -77,7 +86,8 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
           preparedForm(verificationResourceRef),
           mode,
           subcontractorName,
-          verificationResourceRef
+          verificationResourceRef,
+          formAction
         )
       )
     }
@@ -87,6 +97,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     mode: Mode = NormalMode
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)
 
       val subcontractorName =
         getSubcontractorName(request, verificationResourceRef)
@@ -101,7 +112,8 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                   formWithErrors,
                   mode,
                   subcontractorName,
-                  verificationResourceRef
+                  verificationResourceRef,
+                  formAction
                 )
               )
             ),
@@ -147,6 +159,103 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         )
     }
 
+  // DTR-9569 MultiTab onPageLoad
+  def onPageLoadWithId(
+                  flowId: UUID,
+                  verificationResourceRef: Long = -1L,
+                  mode: Mode = NormalMode
+                ): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id         = flowId.toString
+      val formAction =
+        routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+
+      val subcontractorName =
+        getSubcontractorName(request, verificationResourceRef)
+
+      Ok(
+        view(
+          preparedFormWithId(id, verificationResourceRef),
+          mode,
+          subcontractorName,
+          verificationResourceRef,
+          formAction
+        )
+      )
+    }
+
+  def onSubmitWithId(
+                flowId: UUID,
+                verificationResourceRef: Long = -1L,
+                mode: Mode = NormalMode
+              ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val id = flowId.toString
+      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+
+      val subcontractorName =
+        getSubcontractorNameWithId(id, request, verificationResourceRef)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  subcontractorName,
+                  verificationResourceRef,
+                  formAction
+                )
+              )
+            ),
+          value =>
+            val subcontractorIdOpt = for {
+              batch <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+              verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
+              subId <- verification.subcontractorId
+            } yield subId.toString
+
+            for {
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
+                    RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef),
+                    value
+                  )
+                )
+
+              cleanedAnswers <-
+                Future.fromTry(
+                  if (value) {
+                    removeSubcontractorFromSelectionWithId(id, updatedAnswers, verificationResourceRef, subcontractorIdOpt)
+                  } else {
+                    updatedAnswers.remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
+                  }
+                )
+
+              _ <- sessionRepository.set(cleanedAnswers)
+
+              redirect <-
+                if (value) {
+                  deleteAndRedirect(cleanedAnswers, verificationResourceRef)
+                } else {
+                  Future.successful(
+                    Redirect(routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId,
+                      verificationResourceRef))
+//                    TODO: uncomment below and replace above redirect
+//                    Redirect(
+//                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+//                        .onPageLoadWithId(flowId)
+//                    )
+                  )
+                }
+            } yield redirect
+        )
+    }
+
   private def removeSubcontractorFromSelection(
     userAnswers: UserAnswers,
     verificationResourceRef: Long,
@@ -173,6 +282,35 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     )
   }
 
+  //DTR-9569 removeSubcontractorFromSelection UUID scoped
+  private def removeSubcontractorFromSelectionWithId(
+                                                flowId: String,
+                                                userAnswers: UserAnswers,
+                                                verificationResourceRef: Long,
+                                                subcontractorId: Option[String]
+                                              ): Try[UserAnswers] = {
+    val withSelectionsRemoved =
+      subcontractorId.fold[Try[UserAnswers]](Success(userAnswers)) { id =>
+        for {
+          afterSelect <- userAnswers
+            .get(SelectSubcontractorPage(flowId))
+            .fold[Try[UserAnswers]](Success(userAnswers))(selected =>
+              userAnswers.set(SelectSubcontractorPage(flowId), selected.filterNot(_.id == id))
+            )
+          afterReverify <- afterSelect
+            .get(SelectSubcontractorsToReverifyPage(flowId))
+            .fold[Try[UserAnswers]](Success(afterSelect))(selected =>
+              afterSelect.set(SelectSubcontractorsToReverifyPage(flowId), selected.filterNot(_.id == id))
+            )
+        } yield afterReverify
+      }
+
+    withSelectionsRemoved.flatMap(
+      _.remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(flowId, verificationResourceRef))
+    )
+  }
+
+  //TODO make ID overload of deleteAndRedirect
   private def deleteAndRedirect(
     userAnswers: models.UserAnswers,
     verificationResourceRef: Long
@@ -224,6 +362,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         }
     }
 
+  // TODO ID overload
   private def checkVerificationBatchReadiness()(implicit request: DataRequest[?]): Future[Option[models.UserAnswers]] =
     sessionRepository
       .get(request.userId)
@@ -252,11 +391,45 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         Redirect(redirect)
       }
 
+  // DTR-9569 refreshNewestBatchAndRedirectToVerificationSelection ID overload
+  // TODO to be used in deleteAndRedirect ID overload method
+  private def refreshNewestBatchAndRedirectToVerificationSelectionWithId(
+    flowId: UUID,
+    userAnswers: models.UserAnswers
+  )(implicit request: DataRequest[?]): Future[play.api.mvc.Result] = {
+    val id = flowId.toString
+    verificationService
+      .refreshNewestVerificationBatch(userAnswers)
+      .map { updatedAnswers =>
+        val redirect =
+          if (updatedAnswers.get(UnverifiedSubcontractorsPage(id)).exists(_.nonEmpty)) {
+            routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
+            // TODO remove above replace with below
+//            controllers.verify.routes.SelectSubcontractorController.onPageLoadWithId(flowId, NormalMode)
+          } else {
+            routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
+            // TODO remove above replace with below
+//            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoadWithId(id, NormalMode)
+          }
+
+        Redirect(redirect)
+      }
+  }
+
   private def getSubcontractorName(
     request: DataRequest[?],
     verificationResourceRef: Long
   )(implicit messages: Messages): String =
     nameFromCurrentBatch(request, verificationResourceRef)
+      .getOrElse(messages("verify.noName"))
+
+  // DTR-9569 getSubcontractorName ID overload
+  private def getSubcontractorNameWithId(
+    id: String,
+    request: DataRequest[?],
+    verificationResourceRef: Long
+  )(implicit messages: Messages): String =
+    nameFromCurrentBatchWithId(id, request, verificationResourceRef)
       .getOrElse(messages("verify.noName"))
 
   private def nameFromCurrentBatch(request: DataRequest[?], verificationResourceRef: Long): Option[String] =
@@ -269,6 +442,20 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         subId         <- verification.subcontractorId
         subcontractor <- batch.subcontractors.find(_.subcontractorId == subId)
         name          <- displayName(subcontractor)
+      } yield name
+    }
+
+  // DTR-9569 nameFromCurrentBatch ID overload
+  private def nameFromCurrentBatchWithId(id: String, request: DataRequest[?], verificationResourceRef: Long): Option[String] =
+    if (verificationResourceRef < 0) {
+      None
+    } else {
+      for {
+        batch <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+        verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
+        subId <- verification.subcontractorId
+        subcontractor <- batch.subcontractors.find(_.subcontractorId == subId)
+        name <- displayName(subcontractor)
       } yield name
     }
 

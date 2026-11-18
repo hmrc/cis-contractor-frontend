@@ -140,6 +140,10 @@ POST  /subcontractor/proceed-verifying-subcontractor/:flowId/:subcontractorId  c
 GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoad(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 
+# DTR-9569
+GET   /subcontractor/remove-subcontractor-from-request/:flowId  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId:UUID, verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
+POST  /subcontractor/remove-subcontractor-from-request/:flowId  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId:UUID, verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
+
 GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
