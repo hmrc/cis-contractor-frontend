@@ -18,9 +18,11 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import models.UserAnswers
 import pages.CisIdPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
+import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
@@ -38,7 +40,7 @@ class ServiceHomeController @Inject() (
     (identify andThen getData) { implicit request =>
       if (request.isAgent) {
         request.userAnswers
-          .flatMap(_.get(CisIdPage))
+          .flatMap(cisIdFromAnswers)
           .map { cisId =>
             Redirect(s"${appConfig.constructionIndustryAgentAccountUrl}$cisId")
           }
@@ -49,5 +51,15 @@ class ServiceHomeController @Inject() (
       } else {
         Redirect(appConfig.constructionIndustryOrgAccountUrl)
       }
+    }
+
+  private def cisIdFromAnswers(answers: UserAnswers): Option[String] =
+    answers.get(CisIdPage).orElse {
+      (answers.data \ "addSubcontractor")
+        .asOpt[JsObject]
+        .toSeq
+        .flatMap(_.values)
+        .collectFirst { case obj: JsObject => (obj \ "cisId").asOpt[String] }
+        .flatten
     }
 }
