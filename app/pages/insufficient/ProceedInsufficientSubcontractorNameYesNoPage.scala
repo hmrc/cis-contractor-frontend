@@ -23,6 +23,8 @@ case class ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId: String
   override def path: JsPath = JsPath \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
 }
 
-case class ProceedInsufficientSubcontractorNameYesNoForFlowPage(id: String, subcontractorId: String) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ "verify" \ id \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
+case class ProceedInsufficientSubcontractorNameYesNoForFlowPage(id: String, subcontractorId: String)
+    extends QuestionPage[Boolean] {
+  override def path: JsPath =
+    JsPath \ "verify" \ id \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded"
 }

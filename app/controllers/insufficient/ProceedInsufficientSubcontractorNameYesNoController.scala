@@ -61,7 +61,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
   def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
-      val page =
+      val page       =
         ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString)
 
       request.userAnswers
@@ -111,7 +111,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
         }
     }
 
-  def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] = {
+  def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
 
@@ -201,14 +201,14 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
         recoveryRedirect
       }
     }
-  }
 
   //  DTR-9569: MultiTab
   def onPageLoadWithId(flowId: UUID, subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
-      val id = flowId.toString
-      val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
-      val page =
+      val id         = flowId.toString
+      val formAction =
+        routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
+      val page       =
         ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString)
 
       request.userAnswers
@@ -224,7 +224,10 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                 )
 
               if (verification.exists(_.proceed.exists(_.trim.equalsIgnoreCase("Y")))) {
-                Redirect(controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId, subcontractorId))
+                Redirect(
+                  controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+                    .onPageLoadWithId(flowId, subcontractorId)
+                )
 // TODO: uncomment & Remove prior redirect call when flow is complete
 //                Redirect(
 //                  navigator.nextPage(
@@ -258,14 +261,18 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
           )
           recoveryRedirect
         }
-  }
+    }
 
-  def onSubmitWithId(flowId:UUID, subcontractorId: Long, mode: Mode): Action[AnyContent] = {
+  def onSubmitWithId(flowId: UUID, subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id = flowId.toString
-      val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
-      val result =
-        (request.userAnswers.get(CisIdQuery(id)), request.userAnswers.get(CurrentVerificationBatchResponsePage(id))) match {
+      val id         = flowId.toString
+      val formAction =
+        routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
+      val result     =
+        (
+          request.userAnswers.get(CisIdQuery(id)),
+          request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+        ) match {
           case (Some(cisId), Some(batch)) =>
             batch.subcontractors
               .find(_.subcontractorId == subcontractorId)
@@ -288,18 +295,21 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                     value =>
                       if (value) {
                         for {
-                          _ <-
+                          _                         <-
                             verificationBatchService.proceedInsufficientVerification(cisId, subcontractorId, batch)
-                          updatedAnswers <-
+                          updatedAnswers            <-
                             Future.fromTry(
                               request.userAnswers
-                                .set(ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString), value)
+                                .set(
+                                  ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                                  value
+                                )
                             )
                           uaWithUpdatedCurrentBatch <-
                             verificationBatchService.getCurrentVerificationBatch(updatedAnswers)
-                          uaWithNewestBatch <-
+                          uaWithNewestBatch         <-
                             verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch)
-                          _ <- sessionRepository.set(uaWithNewestBatch)
+                          _                         <- sessionRepository.set(uaWithNewestBatch)
                         } yield Redirect(
                           navigator.nextPage(
                             ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
@@ -312,10 +322,16 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                           updatedAnswers <-
                             Future.fromTry(
                               request.userAnswers
-                                .set(ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString), value)
+                                .set(
+                                  ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                                  value
+                                )
                             )
-                          _ <- sessionRepository.set(updatedAnswers)
-                        } yield Redirect(controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId, subcontractorId))
+                          _              <- sessionRepository.set(updatedAnswers)
+                        } yield Redirect(
+                          controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
+                            .onPageLoadWithId(flowId, subcontractorId)
+                        )
 // TODO: uncomment & Remove prior redirect call when flow is complete
 //                          Redirect(
 //                          navigator.nextPage(
@@ -352,6 +368,5 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
         recoveryRedirect
       }
     }
-  }
 
 }
