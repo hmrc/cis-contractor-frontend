@@ -127,7 +127,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
   "AddIndividualContactMethodsYesNoSummary.row with id" - {
     val flowId = UUID.randomUUID()
-    val id = flowId.toString
+    val id     = flowId.toString
 
     "must return a SummaryListRow with 'Yes' when the answer is true" in {
       val answers = UserAnswers("test-id")
@@ -151,15 +151,16 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.AddIndividualContactMethodsYesNoController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHref       =
+        routes.AddIndividualContactMethodsYesNoController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "add-individual-contact-details")
+      changeAction.attributes                 should contain("id" -> "add-individual-contact-details")
     }
 
     "must return a SummaryListRow with 'Yes' when the answer is true in AmendMode" in {
@@ -184,18 +185,18 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
           .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
           .url
       val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
 
-      changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
-      changeAction.attributes should contain("id" -> "add-individual-contact-details")
+      changeAction.attributes                 should contain("id" -> "add-individual-contact-details")
     }
 
     "must return a SummaryListRow with 'No' when the answer is false" in {
@@ -207,7 +208,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
       val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(flowId, answers)
       maybeRow shouldBe defined
 
-      val row = maybeRow.value
+      val row           = maybeRow.value
       val expectedValue = messages("site.no")
       row.value.content.asHtml.toString should include(expectedValue)
     }

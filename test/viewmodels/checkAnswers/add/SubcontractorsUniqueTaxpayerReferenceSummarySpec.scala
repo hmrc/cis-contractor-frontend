@@ -156,9 +156,9 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
   }
 
   "SubcontractorsUniqueTaxpayerReferenceSummary.row with id" - {
-    
+
     val flowId = UUID.randomUUID()
-    val id = id.toString
+    val id     = id.toString
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =
@@ -181,14 +181,16 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
-        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url // TODO DTR-4963: Update to use id
+      val expectedHref       =
+        routes.SubcontractorsUniqueTaxpayerReferenceController
+          .onPageLoad(CheckMode)
+          .url // TODO DTR-4963: Update to use id
       val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
@@ -214,14 +216,16 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
-        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url // TODO DTR-9463: Update to use id
+      val expectedHref       =
+        routes.SubcontractorsUniqueTaxpayerReferenceController
+          .onPageLoad(AmendMode)
+          .url // TODO DTR-9463: Update to use id
       val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
@@ -275,7 +279,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
 
       row.value.content.asHtml.toString should include(utr)
 
-      row.actions shouldBe defined
+      row.actions             shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

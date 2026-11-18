@@ -30,7 +30,7 @@ class WorksReferenceNumberYesNoPageSpec extends PageBehaviours {
 
   "WorksReferenceNumberYesNoPage with id" - {
     val id = "testId"
-    
+
     beRetrievable[Boolean](WorksReferenceNumberYesNoPage(id))
 
     beSettable[Boolean](WorksReferenceNumberYesNoPage(id))

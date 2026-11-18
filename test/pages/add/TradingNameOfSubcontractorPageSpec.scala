@@ -31,7 +31,7 @@ class TradingNameOfSubcontractorPageSpec extends PageBehaviours {
 
   "TradingNameOfSubcontractorPage with id" - {
     val id = "testId"
-    
+
     beRetrievable[String](TradingNameOfSubcontractorPage(id))
 
     beSettable[String](TradingNameOfSubcontractorPage(id))

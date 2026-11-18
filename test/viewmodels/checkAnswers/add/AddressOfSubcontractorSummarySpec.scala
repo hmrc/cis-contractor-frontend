@@ -226,7 +226,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
   "AddressOfSubcontractorSummary.row with id" should {
     val flowId = UUID.randomUUID()
-    val id = flowId.toString
+    val id     = flowId.toString
 
     "return a SummaryListRow when AddressOfSubcontractorPage has an answer" in {
 

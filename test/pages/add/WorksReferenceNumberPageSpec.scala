@@ -38,5 +38,5 @@ class WorksReferenceNumberPageSpec extends PageBehaviours {
 
     beRemovable[String](WorksReferenceNumberPage(id))
   }
-  
+
 }

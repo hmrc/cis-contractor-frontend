@@ -151,7 +151,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
   "SubcontractorNameSummary.row with id" - {
     val flowId = UUID.randomUUID()
-    val id = "testId"
+    val id     = "testId"
 
     "must return a SummaryListRow when the answer exists" in {
 

@@ -110,7 +110,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
 
   "WorksReferenceNumberSummary.row with id" - {
     val flowId = UUID.randowmUUID()
-    val id = flowID.toString
+    val id     = flowID.toString
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =
@@ -133,14 +133,14 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.WorksReferenceNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
       val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
@@ -166,14 +166,14 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref =
+      val expectedHref       =
         routes.WorksReferenceNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
       val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }

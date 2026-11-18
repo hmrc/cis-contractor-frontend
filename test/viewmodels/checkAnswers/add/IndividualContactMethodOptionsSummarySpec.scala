@@ -176,7 +176,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
 
   "IndividualContactMethodOptionsSummary.row with id" - {
     val flowId = UUID.randomUUID()
-    val id = flowId.toString
+    val id     = flowId.toString
 
     "must return a row with multiple selected options" in {
 

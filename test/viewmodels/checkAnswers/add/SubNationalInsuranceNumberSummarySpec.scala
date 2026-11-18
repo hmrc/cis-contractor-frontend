@@ -126,7 +126,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
 
   "SubNationalInsuranceNumberSummary.row with id" - {
     val flowId = UUID.randomUUID()
-    val id = flowId.toString
+    val id     = flowId.toString
 
     "must return a SummaryListRow when the answer exists" in {
       val answers =
@@ -149,13 +149,14 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHref       =
+        routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
       val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
@@ -181,13 +182,14 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
       val actions = row.actions.value.items
       actions should have size 1
 
-      val changeAction = actions.head
+      val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref = routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
+      val expectedHref       =
+        routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
       val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
 
       changeAction.content.asHtml.toString should include(expectedChangeText)
-      changeAction.href shouldBe expectedHref
+      changeAction.href                  shouldBe expectedHref
 
       changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
     }
