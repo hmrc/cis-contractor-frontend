@@ -24,6 +24,7 @@ import org.scalatest.matchers.must.Matchers
 import pages.add.IndividualNamesOptionsPage
 import play.api.test.Helpers.stubMessages
 import play.api.i18n.Messages
+import java.util.UUID
 
 class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
 
@@ -151,6 +152,141 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
           .value
 
       val result = IndividualNamesOptionsSummary.row(answers, AmendMode)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+    }
+  }
+
+  "IndividualNamesOptionsSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id = flowId.toString
+
+    "must return a row with multiple selected options" in {
+
+      val answers: UserAnswers =
+        UserAnswers("test-id")
+          .set(
+            IndividualNamesOptionsPage(id),
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+
+      val result = IndividualNamesOptionsSummary.row(flowId, answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(messages("individualNamesOptions.checkYourAnswersLabel"))
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+
+      val actions = row.actions.value.items
+      actions must have size 1
+
+      val action = actions.head
+
+      action.href mustBe controllers.add.routes.IndividualNamesOptionsController // TODO DTR-9463: Update with id
+        .onPageLoad(CheckMode)
+        .url
+
+      action.content.asHtml.toString must include(messages("site.change"))
+
+      action.visuallyHiddenText mustBe Some(
+        messages("individualNamesOptions.change.hidden")
+      )
+
+      action.attributes must contain("id" -> "individual-names-options")
+    }
+
+    "must return a row with multiple selected options in amend journey" in {
+
+      val answers: UserAnswers =
+        UserAnswers("test-id")
+          .set(
+            IndividualNamesOptionsPage(id),
+            Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+          )
+          .success
+          .value
+
+      val result = IndividualNamesOptionsSummary.row(flowId, answers, AmendMode)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(messages("individualNamesOptions.checkYourAnswersLabel"))
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must include(messages("individualNamesOptions.tradingName"))
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+
+      val actions = row.actions.value.items
+      actions must have size 1
+
+      val action = actions.head
+
+      action.href mustBe controllers.add.routes.IndividualNamesOptionsController // TODO DTR-9463: Update with id
+        .onPageLoad(AmendMode)
+        .url
+
+      action.content.asHtml.toString must include(messages("site.change"))
+
+      action.visuallyHiddenText mustBe Some(
+        messages("individualNamesOptions.change.hidden")
+      )
+
+      action.attributes must contain("id" -> "individual-names-options")
+    }
+
+    "must return a row with a single selected option" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(IndividualNamesOptionsPage(id), Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+
+      val result = IndividualNamesOptionsSummary.row(flowId, answers)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include(messages("individualNamesOptions.subcontractorName"))
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+    }
+
+    "must return a row with a single selected option in amend journey" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(IndividualNamesOptionsPage(id), Set(IndividualNamesOptions.SubcontractorName))
+          .success
+          .value
+
+      val result = IndividualNamesOptionsSummary.row(flowId, answers, AmendMode)
 
       result mustBe defined
 

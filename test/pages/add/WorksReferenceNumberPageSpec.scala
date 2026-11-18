@@ -28,4 +28,15 @@ class WorksReferenceNumberPageSpec extends PageBehaviours {
 
     beRemovable[String](WorksReferenceNumberPage)
   }
+
+  "worksReferenceNumber with id" - {
+    val id = "testId"
+
+    beRetrievable[String](WorksReferenceNumberPage(id))
+
+    beSettable[String](WorksReferenceNumberPage(id))
+
+    beRemovable[String](WorksReferenceNumberPage(id))
+  }
+  
 }

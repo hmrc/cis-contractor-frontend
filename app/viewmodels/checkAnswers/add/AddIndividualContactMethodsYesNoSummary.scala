@@ -24,6 +24,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import java.util.UUID
 
 object AddIndividualContactMethodsYesNoSummary {
 
@@ -49,6 +50,37 @@ object AddIndividualContactMethodsYesNoSummary {
         )
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+
+    answers.get(AddIndividualContactMethodsYesNoPage(subJourneyId)).map { answer =>
+
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "addIndividualContactMethodsYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
+                .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+                .url
+            else
+              controllers.add.routes.AddIndividualContactMethodsYesNoController
+                .onPageLoad(mode)
+                .url // TODO DTR-9463: Update with id
+          )
+            .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
+            .withAttribute("id" -> "add-individual-contact-details")
+        )
+      )
+    }
+  }
 
   def row(
     answers: IndividualAnswers

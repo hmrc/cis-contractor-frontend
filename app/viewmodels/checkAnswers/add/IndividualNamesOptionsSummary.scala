@@ -27,6 +27,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import java.util.UUID
 
 object IndividualNamesOptionsSummary {
 
@@ -57,6 +58,41 @@ object IndividualNamesOptionsSummary {
         )
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+
+    answers.get(IndividualNamesOptionsPage(subJourneyId)).map { selectedMethods =>
+
+      val options =
+        if (selectedMethods.isEmpty) {
+          Seq(HtmlFormat.escape(messages("individualNamesOptions.noSelection")).toString)
+        } else {
+          IndividualNamesOptions
+            .ordered(selectedMethods)
+            .map(m => HtmlFormat.escape(messages(s"individualNamesOptions.$m")).toString)
+        }
+
+      SummaryListRowViewModel(
+        key = "individualNamesOptions.checkYourAnswersLabel",
+        value = ValueViewModelHelper
+          .makeGovukBulletList(options, false)
+          .getOrElse(ValueViewModel(HtmlContent(""))),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.IndividualNamesOptionsController
+              .onPageLoad(mode)
+              .url // TODO DTR-9463: Update with id
+          )
+            .withVisuallyHiddenText(messages("individualNamesOptions.change.hidden"))
+            .withAttribute("id" -> "individual-names-options")
+        )
+      )
+    }
+  }
 
   def row(answers: IndividualAnswers)(implicit messages: Messages): Option[SummaryListRow] =
 

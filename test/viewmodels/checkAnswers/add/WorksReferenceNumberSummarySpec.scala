@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -104,6 +105,82 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       WorksReferenceNumberSummary.row(answers) shouldBe None
+    }
+  }
+
+  "WorksReferenceNumberSummary.row with id" - {
+    val flowId = UUID.randowmUUID()
+    val id = flowID.toString
+
+    "must return a SummaryListRow when the answer exists" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(WorksReferenceNumberPage(id), "1234567890")
+          .success
+          .value
+
+      val maybeRow = WorksReferenceNumberSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("worksReferenceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref =
+        routes.WorksReferenceNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(WorksReferenceNumberPage(id), "1234567890")
+          .success
+          .value
+
+      val maybeRow = WorksReferenceNumberSummary.row(flowId, answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("worksReferenceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref =
+        routes.WorksReferenceNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("worksReferenceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      WorksReferenceNumberSummary.row(flowId, answers) shouldBe None
     }
   }
 

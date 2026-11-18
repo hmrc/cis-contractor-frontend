@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -150,6 +151,131 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
       row.value.content.asHtml.toString should include(utr)
 
       row.actions             shouldBe defined
+      row.actions.value.items shouldBe empty
+    }
+  }
+
+  "SubcontractorsUniqueTaxpayerReferenceSummary.row with id" - {
+    
+    val flowId = UUID.randomUUID()
+    val id = id.toString
+
+    "must return a SummaryListRow when the answer exists" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage(id), "1234567890")
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref =
+        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(CheckMode).url // TODO DTR-4963: Update to use id
+      val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists for amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage(id), "1234567890")
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("1234567890")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref =
+        routes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(AmendMode).url // TODO DTR-9463: Update to use id
+      val expectedHiddenText = messages("subcontractorsUniqueTaxpayerReference.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val utr = "1234567890 & Ref'01"
+
+      val answers =
+        UserAnswers("id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage(id), utr)
+          .success
+          .value
+
+      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "1234567890 &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+    }
+
+    "must not include actions when showActions is false" in {
+      val utr = "1234567890"
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorsUniqueTaxpayerReferencePage(id), utr)
+          .success
+          .value
+
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(
+        flowId,
+        answers,
+        mode = CheckMode,
+        showActions = false
+      )
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel")
+      )
+
+      row.value.content.asHtml.toString should include(utr)
+
+      row.actions shouldBe defined
       row.actions.value.items shouldBe empty
     }
   }

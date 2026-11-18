@@ -40,4 +40,14 @@ class SubcontractorNamePageSpec extends PageBehaviours with Matchers {
 
     beRemovable[SubcontractorName](SubcontractorNamePage)
   }
+
+  "SubcontractorNamePage with id" - {
+    val id = "testId"
+
+    beRetrievable[SubcontractorName](SubcontractorNamePage(id))
+
+    beSettable[SubcontractorName](SubcontractorNamePage(id))
+
+    beRemovable[SubcontractorName](SubcontractorNamePage(id))
+  }
 }

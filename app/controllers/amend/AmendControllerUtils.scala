@@ -64,4 +64,23 @@ object AmendControllerUtils {
       case None =>
         userAnswers.get(ShowVerificationDetailsPage).contains(true)
     }
+
+  def isVerifiedForAmendJourney(
+    userAnswers: UserAnswers,
+    subJourneyId: String
+  ): Boolean =
+    userAnswers.get(AmendJourneyTypePage(subJourneyId)) match {
+
+      case Some(AmendJourneyType.Standard) =>
+        userAnswers.get(ShowVerificationDetailsPage(subJourneyId)).contains(true)
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        false
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        false
+
+      case None =>
+        userAnswers.get(ShowVerificationDetailsPage(subJourneyId)).contains(true)
+    }
 }

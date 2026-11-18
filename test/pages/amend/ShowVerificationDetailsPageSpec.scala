@@ -41,7 +41,7 @@ class ShowVerificationDetailsPageSpec extends SpecBase {
 
     "must use the expected JSON path" in {
       ShowVerificationDetailsPage.path mustBe
-        JsPath \ "ShowVerificationDetailsPage"
+        JsPath \ "ShowVerificationDetails"
     }
 
     "must save and retrieve true from UserAnswers" in {
@@ -92,6 +92,65 @@ class ShowVerificationDetailsPageSpec extends SpecBase {
 
       updatedAnswers
         .get(ShowVerificationDetailsPage) mustBe None
+    }
+  }
+
+  "ShowVerificationDetailsPage with id" - {
+    val id = "testId"
+
+    "must use the expected JSON path" in {
+      ShowVerificationDetailsPage(id).path mustBe
+        JsPath \ "amendSubcontractor" \ id \ "ShowVerificationDetails"
+    }
+
+    "must save and retrieve true from UserAnswers" in {
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            ShowVerificationDetailsPage(id),
+            true
+          )
+          .success
+          .value
+
+      updatedAnswers
+        .get(ShowVerificationDetailsPage(id))
+        .value mustBe true
+    }
+
+    "must save and retrieve false from UserAnswers" in {
+      val updatedAnswers =
+        emptyUserAnswers
+          .set(
+            ShowVerificationDetailsPage(id),
+            false
+          )
+          .success
+          .value
+
+      updatedAnswers
+        .get(ShowVerificationDetailsPage(id))
+        .value mustBe false
+    }
+
+    "must remove the answer from UserAnswers" in {
+      val answersWithValue =
+        emptyUserAnswers
+          .set(
+            ShowVerificationDetailsPage(id),
+            true
+          )
+          .success
+          .value
+
+      val updatedAnswers =
+        answersWithValue
+          .remove(ShowVerificationDetailsPage(id))
+          .success
+          .value
+
+      updatedAnswers
+        .get(ShowVerificationDetailsPage(id)) mustBe None
     }
   }
 }

@@ -47,4 +47,33 @@ class AddIndividualContactMethodsYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(IndividualMobileNumberPage) mustBe None
     }
   }
+
+  "AddIndividualContactMethodsYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](AddIndividualContactMethodsYesNoPage(id))
+
+    beSettable[Boolean](AddIndividualContactMethodsYesNoPage(id))
+
+    beRemovable[Boolean](AddIndividualContactMethodsYesNoPage(id))
+
+    "cleanup: must remove all methods of contact userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers
+        .set(IndividualEmailAddressPage(id), "old@email.com")
+        .success
+        .value
+        .set(IndividualPhoneNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(IndividualMobileNumberPage(id), "01234567890")
+        .success
+        .value
+
+      val updatedUserAnswers = userAnswers.set(AddIndividualContactMethodsYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe None
+      updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe None
+      updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe None
+    }
+  }
 }

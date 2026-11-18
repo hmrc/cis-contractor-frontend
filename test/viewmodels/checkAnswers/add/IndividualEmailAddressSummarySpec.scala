@@ -28,6 +28,7 @@ import pages.add.IndividualEmailAddressPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import java.util.UUID
 
 class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -123,6 +124,106 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
           .value
 
       val row = IndividualEmailAddressSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "user+o&#x27;reilly&amp;co@test.com")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "IndividualEmailAddressSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id = flowId.toString
+
+    "must return a SummaryListRow when the answer exists" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(IndividualEmailAddressPage(id), "test@example.com")
+          .success
+          .value
+
+      val maybeRow = IndividualEmailAddressSummary.row(flowId, answers)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("individualEmailAddress.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("test@example.com")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.IndividualEmailAddressController // TODO DTR-9463: Update with id
+        .onPageLoad(CheckMode)
+        .url
+      val expectedHiddenText = messages("individualEmailAddress.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists for amend journey" in {
+
+      val answers =
+        UserAnswers("test-id")
+          .set(IndividualEmailAddressPage(id), "test@example.com")
+          .success
+          .value
+
+      val maybeRow = IndividualEmailAddressSummary.row(flowId, answers, AmendMode)
+
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("individualEmailAddress.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("test@example.com")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.IndividualEmailAddressController // TODO DTR-9463: Update with id
+        .onPageLoad(AmendMode)
+        .url
+      val expectedHiddenText = messages("individualEmailAddress.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+
+      val answers = UserAnswers("test-id")
+
+      IndividualEmailAddressSummary.row(flowId, answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val email = "user+o'reilly&co@test.com"
+
+      val answers =
+        UserAnswers("id")
+          .set(IndividualEmailAddressPage(id), email)
+          .success
+          .value
+
+      val row = IndividualEmailAddressSummary.row(flowId, answers).value
 
       val html = extractHtml(row)
 

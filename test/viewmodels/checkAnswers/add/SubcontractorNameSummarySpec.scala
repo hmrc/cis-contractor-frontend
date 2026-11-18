@@ -149,6 +149,124 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
     }
   }
 
+  "SubcontractorNameSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id = "testId"
+
+    "must return a SummaryListRow when the answer exists" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("F."),
+        lastName = "Doe"
+      )
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorNamePage(id), subcontractorName)
+          .success
+          .value
+
+      val row = SubcontractorNameSummary.row(flowId, answers).value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorName.checkYourAnswersLabel")
+      )
+
+      val expectedFullName =
+        Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
+
+      row.value.content.asHtml.toString should include(expectedFullName)
+
+      row.actions.value.items should have size 1
+
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        routes.SubcontractorNameController // TODO DTR-9463: Update with id
+          .onPageLoad(CheckMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("subcontractorName.change.hidden")
+
+      action.attributes should contain("id" -> "subcontractor-name")
+    }
+
+    "must return a SummaryListRow when the answer exists in AmendMode" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("F."),
+        lastName = "Doe"
+      )
+
+      val answers =
+        UserAnswers("test-id")
+          .set(SubcontractorNamePage(id), subcontractorName)
+          .success
+          .value
+
+      val row = SubcontractorNameSummary.row(flowId, answers, AmendMode).value
+
+      row.key.content.asHtml.toString should include(
+        messages("subcontractorName.checkYourAnswersLabel")
+      )
+
+      val expectedFullName =
+        Seq(Some("John"), Some("F."), Some("Doe")).flatten.mkString(" ")
+
+      row.value.content.asHtml.toString should include(expectedFullName)
+
+      row.actions.value.items should have size 1
+
+      val action = row.actions.value.items.head
+
+      action.href shouldBe
+        routes.SubcontractorNameController // TODO DTR-9463: Update with id
+          .onPageLoad(AmendMode)
+          .url
+
+      action.content.asHtml.toString should include(messages("site.change"))
+
+      action.visuallyHiddenText.value shouldBe
+        messages("subcontractorName.change.hidden")
+
+      action.attributes should contain("id" -> "subcontractor-name")
+    }
+
+    "must return None when the answer does not exist" in {
+
+      val answers = UserAnswers("test-id")
+
+      SubcontractorNameSummary.row(flowId, answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "O'Reilly",
+        middleName = Some("A&B"),
+        lastName = "Smith & Co"
+      )
+
+      val answers =
+        UserAnswers("id")
+          .set(SubcontractorNamePage(id), subcontractorName)
+          .success
+          .value
+
+      val row = SubcontractorNameSummary.row(flowId, answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "O&#x27;Reilly A&amp;B Smith &amp; Co")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
   "ViewOnly - SubcontractorNameSummary.row" - {
 
     "must return a SummaryListRow when subcontractor name exists" in {

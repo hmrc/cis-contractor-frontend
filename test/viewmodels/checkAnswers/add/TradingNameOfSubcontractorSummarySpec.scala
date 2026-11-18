@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -102,6 +103,80 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       TradingNameOfSubcontractorSummary.row(answers) shouldBe None
+    }
+  }
+
+  "TradingNNameOfSubcontractorSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id = flowId.toString
+
+    "must return a SummaryListRow when the answer exists" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TradingNameOfSubcontractorPage(id), "O'Reilly & Co <UK>")
+          .success
+          .value
+
+      val maybeRow = TradingNameOfSubcontractorSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("O&#x27;Reilly &amp; Co &lt;UK&gt;")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.TradingNameOfSubcontractorController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(TradingNameOfSubcontractorPage(id), "O'Reilly & Co <UK>")
+          .success
+          .value
+
+      val maybeRow = TradingNameOfSubcontractorSummary.row(flowId, answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("tradingNameOfSubcontractor.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("O&#x27;Reilly &amp; Co &lt;UK&gt;")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref = routes.TradingNameOfSubcontractorController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("tradingNameOfSubcontractor.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      TradingNameOfSubcontractorSummary.row(flowId, answers) shouldBe None
     }
   }
 

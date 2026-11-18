@@ -20,8 +20,16 @@ import pages.QuestionPage
 
 import play.api.libs.json.JsPath
 
+case class ShowVerificationDetailsPage(id: String) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+
+  override def toString: String = "ShowVerificationDetails"
+}
+
 case object ShowVerificationDetailsPage extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    JsPath \ toString
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "ShowVerificationDetails"
 }

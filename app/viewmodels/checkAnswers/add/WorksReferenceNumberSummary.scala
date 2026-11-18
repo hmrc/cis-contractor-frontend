@@ -23,6 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 object WorksReferenceNumberSummary {
 
@@ -41,6 +42,26 @@ object WorksReferenceNumberSummary {
         )
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+    answers.get(WorksReferenceNumberPage(subJourneyId)).map { answer =>
+      SummaryListRowViewModel(
+        key = "worksReferenceNumber.checkYourAnswersLabel",
+        value = ValueViewModel(answer),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.add.routes.WorksReferenceNumberController.onPageLoad(mode).url // TODO DTR-9463: Update with id
+          )
+            .withVisuallyHiddenText(messages("worksReferenceNumber.change.hidden"))
+            .withAttribute("id" -> "works-reference-number")
+        )
+      )
+    }
+  }
 
   def row(
     answers: IndividualAnswers

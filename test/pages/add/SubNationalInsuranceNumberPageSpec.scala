@@ -28,4 +28,14 @@ class SubNationalInsuranceNumberPageSpec extends PageBehaviours {
 
     beRemovable[String](SubNationalInsuranceNumberPage)
   }
+
+  "SubNationalInsuranceNumberPartial with id" - {
+    val id = "testId"
+
+    beRetrievable[String](SubNationalInsuranceNumberPage(id))
+
+    beSettable[String](SubNationalInsuranceNumberPage(id))
+
+    beRemovable[String](SubNationalInsuranceNumberPage(id))
+  }
 }
