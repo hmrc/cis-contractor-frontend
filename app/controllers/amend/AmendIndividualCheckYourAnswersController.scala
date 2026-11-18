@@ -539,7 +539,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   private def handleNoChangesWithId(flowId: UUID)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] = {
-    val cisId = request.userAnswers.get(CisIdQuery(flowId.toString))
+    val cisId        = request.userAnswers.get(CisIdQuery(flowId.toString))
     val redirectCall =
       amendJourneyExitRedirectWithId(
         flowId,
