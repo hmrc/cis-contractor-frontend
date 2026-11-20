@@ -102,7 +102,8 @@ object ValidatedSubcontractor extends Validation {
                                           TradingNameOfSubcontractorPage(id),
                                           IndividualNamesOptions.TradingName
                                         )
-      subcontractorName              <- getNamesPageValue(answers, SubcontractorNamePage(id), IndividualNamesOptions.SubcontractorName)
+      subcontractorName              <-
+        getNamesPageValue(answers, SubcontractorNamePage(id), IndividualNamesOptions.SubcontractorName)
       address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage(id), SubAddressYesNoPage(id))
       individualContactMethodOptions <-
         getOptionalPageValue(answers, IndividualContactMethodOptionsPage(id), AddIndividualContactMethodsYesNoPage(id))
@@ -135,7 +136,11 @@ object ValidatedSubcontractor extends Validation {
                             IndividualMobileNumberPage(id),
                             ContactMethodOptions.Mobile
                           )
-      utr              <- getOptionalPageValue(answers, SubcontractorsUniqueTaxpayerReferencePage(id), UniqueTaxpayerReferenceYesNoPage(id))
+      utr              <- getOptionalPageValue(
+                            answers,
+                            SubcontractorsUniqueTaxpayerReferencePage(id),
+                            UniqueTaxpayerReferenceYesNoPage(id)
+                          )
       nino             <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage(id), NationalInsuranceNumberYesNoPage(id))
       workReference    <- getOptionalPageValue(answers, WorksReferenceNumberPage(id), WorksReferenceNumberYesNoPage(id))
     } yield ValidatedSubcontractor(
@@ -160,7 +165,7 @@ object ValidatedSubcontractor extends Validation {
   private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
     getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
       case TypeOfSubcontractor.Individualorsoletrader => Right(())
-      case _ => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
+      case _                                          => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
     }
 
   private def getNamesPageValue[A](
