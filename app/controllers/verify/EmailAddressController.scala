@@ -23,12 +23,13 @@ import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import navigation.Navigator
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.EmailAddressView
 import models.UserAnswers
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +40,7 @@ class EmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: EmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: EmailAddressView
@@ -48,11 +50,13 @@ class EmailAddressController @Inject() (
 
   val form = formProvider()
 
-  private def hintKey(answers: UserAnswers): String = {
+  private def hintKey(answers: UserAnswers, subJourneyId: Option[String] = None): String = {
+    val newestPage =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
 
     val hasStoredEmail =
       answers
-        .get(NewestVerificationBatchResponsePage)
+        .get(newestPage)
         .exists { response =>
           response.scheme.exists(_.emailAddress.exists(_.nonEmpty))
         }
@@ -61,35 +65,71 @@ class EmailAddressController @Inject() (
     else "verify.emailAddress.hint.notStored"
   }
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  private def submitAction(mode: Mode, flowId: Option[UUID]): Call =
+    flowId
+      .map(id => routes.EmailAddressController.onSubmitWithId(id, mode))
+      .getOrElse(routes.EmailAddressController.onSubmit(mode))
 
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    renderEmailPage(mode, None)
+  }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      renderEmailPage(mode, Some(flowId))
+    }
+
+  private def renderEmailPage(mode: Mode, flowId: Option[UUID])(implicit
+    request: models.requests.DataRequest[?]
+  ) = {
+    val id                = flowId.map(_.toString)
+    val storedPage        =
+      id.map(ContractorEmailConfirmationStoredPage.apply).getOrElse(ContractorEmailConfirmationStoredPage)
+    val notStoredPage     =
+      id.map(ContractorEmailConfirmationNotStoredPage.apply).getOrElse(ContractorEmailConfirmationNotStoredPage)
+    val emailPage         = id.map(EmailAddressPage.apply).getOrElse(EmailAddressPage)
     val emailPageRequired =
-      request.userAnswers.get(ContractorEmailConfirmationStoredPage).contains(DifferentEmail) ||
-        request.userAnswers.get(ContractorEmailConfirmationNotStoredPage).contains(true)
+      request.userAnswers.get(storedPage).contains(DifferentEmail) ||
+        request.userAnswers.get(notStoredPage).contains(true)
 
     if (!emailPageRequired) {
-      Redirect(controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad())
+      Redirect(
+        flowId
+          .map(fid => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoadWithId(fid))
+          .getOrElse(controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad())
+      )
     } else {
-      val preparedForm = request.userAnswers.get(EmailAddressPage) match {
-        case None        => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode, hintKey(request.userAnswers)))
+      val preparedForm = request.userAnswers.get(emailPage).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, hintKey(request.userAnswers, id), submitAction(mode, flowId)))
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, hintKey(request.userAnswers)))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(EmailAddressPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(EmailAddressPage, mode, updatedAnswers))
-        )
+      submitEmail(mode, None)
+  }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        submitEmail(mode, Some(flowId))
+    }
+
+  private def submitEmail(mode: Mode, flowId: Option[UUID])(implicit request: models.requests.DataRequest[?]) = {
+    val id        = flowId.map(_.toString)
+    val emailPage = id.map(EmailAddressPage.apply).getOrElse(EmailAddressPage)
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors =>
+          Future.successful(
+            BadRequest(view(formWithErrors, mode, hintKey(request.userAnswers, id), submitAction(mode, flowId)))
+          ),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(emailPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(emailPage, mode, updatedAnswers))
+      )
   }
 }

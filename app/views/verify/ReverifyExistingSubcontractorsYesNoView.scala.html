@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import play.api.mvc.Call
 @import viewmodels.LegendSize.Medium
 @import views.html.components._
 
@@ -28,11 +29,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("verify.reverifyExistingSubcontractorsYesNo.title"))) {
 
-    @formHelper(action = controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

@@ -21,6 +21,19 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import scala.util.Try
 
+case class ContractorEmailConfirmationNotStoredPage(id: String) extends QuestionPage[Boolean] with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "contractorEmailConfirmationNotStored"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(false) => userAnswers.remove(EmailAddressPage(id))
+      case _           => super.cleanup(value, userAnswers)
+    }
+}
+
 case object ContractorEmailConfirmationNotStoredPage extends QuestionPage[Boolean] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString

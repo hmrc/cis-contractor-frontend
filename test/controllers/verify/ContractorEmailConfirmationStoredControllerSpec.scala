@@ -50,13 +50,11 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
   private val testEmail = "test@example.com"
   private val cisId     = "123"
 
-  private lazy val contractorEmailConfirmationStoredRoute =
-    controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
-
-  private lazy val contractorEmailConfirmationStoredAfterFinalValidationRoute =
-    controllers.verify.routes.ContractorEmailConfirmationStoredController
-      .onPageLoadAfterFinalValidation(NormalMode)
-      .url
+  private val contractorEmailConfirmationStoredRoute                     =
+    "/subcontractor/verify/confirmation-email-stored"
+  private val contractorEmailConfirmationStoredAfterFinalValidationRoute =
+    "/subcontractor/verify/confirmation-email-stored/final-validation-complete"
+  private val submitAction: Call                                         = Call("POST", contractorEmailConfirmationStoredRoute)
 
   private val testScheme = ContractorScheme(
     accountsOfficeReference = Some("123PA12345678"),
@@ -121,7 +119,10 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         val view    = application.injector.instanceOf[ContractorEmailConfirmationStoredView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testEmail)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testEmail, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -150,7 +151,8 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         contentAsString(result) mustEqual view(
           form.fill(ContractorEmailConfirmationStored.CurrentEmail),
           NormalMode,
-          testEmail
+          testEmail,
+          submitAction
         )(request, messages(application)).toString
       }
     }
@@ -240,7 +242,10 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         val view    = application.injector.instanceOf[ContractorEmailConfirmationStoredView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testEmail)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testEmail, submitAction)(
+          request,
+          messages(application)
+        ).toString
 
         val savedAnswers = captor.getValue
         savedAnswers.get(VerifyFinalValidationContinuationPage) mustEqual None
@@ -281,7 +286,8 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         contentAsString(result) mustEqual view(
           form.fill(ContractorEmailConfirmationStored.CurrentEmail),
           NormalMode,
-          testEmail
+          testEmail,
+          submitAction
         )(request, messages(application)).toString
       }
     }
@@ -389,7 +395,7 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
         val result    = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testEmail)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testEmail, submitAction)(
           request,
           messages(application)
         ).toString

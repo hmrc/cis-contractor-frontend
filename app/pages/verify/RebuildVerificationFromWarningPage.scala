@@ -19,6 +19,13 @@ package pages.verify
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class RebuildVerificationFromWarningPage(id: String) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "rebuildVerificationFromWarning"
+}
+
 case object RebuildVerificationFromWarningPage extends QuestionPage[Boolean] {
 
   override def path: JsPath =

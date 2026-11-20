@@ -1166,7 +1166,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1286,7 +1291,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .thenReturn(Future.successful(currentBatch))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1369,7 +1379,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .thenReturn(Future.successful(currentBatch))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1482,7 +1497,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(true), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(true),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )

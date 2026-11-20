@@ -479,65 +479,100 @@ GET   /subcontractor/add/trust/subcontractor-added/:flowId  controllers.add.Subc
 
 
 # Verify
+GET   /subcontractor/verify/confirmation-email-not-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-not-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-not-stored/:flowId                                   controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/verify/confirmation-email-not-stored/:flowId                                   controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-not-stored/:flowId                            controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/verify/change-confirmation-email-not-stored/:flowId                            controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/confirmation-email-not-stored                                   controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/confirmation-email-not-stored                                   controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-not-stored                            controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-not-stored                            controllers.verify.ContractorEmailConfirmationNotStoredController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/verify/confirmation-email-not-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
-GET   /subcontractor/verify/change-confirmation-email-not-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationNotStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/verification-declaration  controllers.verify.VerificationDeclarationController.onSubmit(mode: Mode = NormalMode)
 
+GET   /subcontractor/verify/submitting-verification-request/:flowId  controllers.verify.SubmissionSendingController.onPageLoadWithId(flowId: java.util.UUID)
+GET   /subcontractor/verify/polling/:flowId                          controllers.verify.SubmissionSendingController.onPollAndRedirectWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/submitting-verification-request  controllers.verify.SubmissionSendingController.onPageLoad()
 GET   /subcontractor/verify/polling                          controllers.verify.SubmissionSendingController.onPollAndRedirect
 
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
+GET   /subcontractor/verify/check-verification-batch-readiness/:flowId         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/check-verification-batch-readiness/change/:flowId  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/check-verification-batch-readiness         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/change  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
 
+GET   /subcontractor/verify/newest/start/:cisId  controllers.verify.NewestVerificationBatchController.onPageLoadStart(cisId: String)
 GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
 GET   /subcontractor/verify/check-results  controllers.verify.CheckVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
 
+GET   /subcontractor/verify/current/:flowId         controllers.verify.CurrentVerificationBatchController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-current/:flowId  controllers.verify.CurrentVerificationBatchController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/current         controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-current  controllers.verify.CurrentVerificationBatchController.onPageLoad(mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/verification-request-in-progress  controllers.verify.VerificationRequestInProgressController.onPageLoad()
 
+GET   /subcontractor/verify/confirmation-email-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
+GET   /subcontractor/verify/confirmation-email-stored/:flowId                                   controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/verify/confirmation-email-stored/:flowId                                   controllers.verify.ContractorEmailConfirmationStoredController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-confirmation-email-stored/:flowId                            controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/verify/change-confirmation-email-stored/:flowId                            controllers.verify.ContractorEmailConfirmationStoredController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/confirmation-email-stored                                   controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/confirmation-email-stored                                   controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-confirmation-email-stored                            controllers.verify.ContractorEmailConfirmationStoredController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-confirmation-email-stored                            controllers.verify.ContractorEmailConfirmationStoredController.onSubmit(mode: Mode = CheckMode)
-GET   /subcontractor/verify/confirmation-email-stored/final-validation-complete         controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = NormalMode)
-GET   /subcontractor/verify/change-confirmation-email-stored/final-validation-complete  controllers.verify.ContractorEmailConfirmationStoredController.onPageLoadAfterFinalValidation(mode: Mode = CheckMode)
 
+GET   /subcontractor/verify/select-subcontractors-to-reverify/:flowId         controllers.verify.SelectSubcontractorsToReverifyController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode, page: Int ?= 1)
+POST  /subcontractor/verify/select-subcontractors-to-reverify/:flowId         controllers.verify.SelectSubcontractorsToReverifyController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode, page: Int ?= 1)
+GET   /subcontractor/verify/change-select-subcontractors-to-reverify/:flowId  controllers.verify.SelectSubcontractorsToReverifyController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode, page: Int ?= 1)
+POST  /subcontractor/verify/change-select-subcontractors-to-reverify/:flowId  controllers.verify.SelectSubcontractorsToReverifyController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode, page: Int ?= 1)
 GET   /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-reverify         controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractor/verify/change-select-subcontractors-to-reverify  controllers.verify.SelectSubcontractorsToReverifyController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
+GET   /subcontractor/verify/verification-batch/modify/:flowId         controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatchWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/verification-batch/change-modify/:flowId  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatchWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/verification-batch/modify         controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = NormalMode)
 GET   /subcontractor/verify/verification-batch/change-modify  controllers.verify.ModifyVerificationBatchAndVerificationsController.modifyVerificationBatch(mode: Mode = CheckMode)
 
+GET   /subcontractor/verify/select-subcontractors-to-verify/:flowId         controllers.verify.SelectSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode, page: Int ?= 1)
+POST  /subcontractor/verify/select-subcontractors-to-verify/:flowId         controllers.verify.SelectSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode, page: Int ?= 1)
+GET   /subcontractor/verify/change-select-subcontractors-to-verify/:flowId  controllers.verify.SelectSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode, page: Int ?= 1)
+POST  /subcontractor/verify/change-select-subcontractors-to-verify/:flowId  controllers.verify.SelectSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode, page: Int ?= 1)
 GET   /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractor/verify/select-subcontractors-to-verify         controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractor/verify/change-select-subcontractors-to-verify  controllers.verify.SelectSubcontractorController.onPageLoad(mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractor/verify/change-select-subcontractors-to-verify  controllers.verify.SelectSubcontractorController.onSubmit(mode: Mode = CheckMode, page: Int ?= 1)
 
+GET   /subcontractor/verify/enter-confirmation-email/:flowId         controllers.verify.EmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/verify/enter-confirmation-email/:flowId         controllers.verify.EmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-enter-confirmation-email/:flowId  controllers.verify.EmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/verify/change-enter-confirmation-email/:flowId  controllers.verify.EmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/enter-confirmation-email         controllers.verify.EmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/enter-confirmation-email         controllers.verify.EmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-enter-confirmation-email  controllers.verify.EmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-enter-confirmation-email  controllers.verify.EmailAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/verify/reverify-existing-subcontractors/:flowId         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/verify/reverify-existing-subcontractors/:flowId         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/change-reverify-existing-subcontractors/:flowId  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/verify/change-reverify-existing-subcontractors/:flowId  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/verify/reverify-existing-subcontractors         controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/verify/change-reverify-existing-subcontractors  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/verify/change-reverify-existing-subcontractors  controllers.verify.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/verify/no-new-subcontractors-to-verify/:flowId  controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoadWithId(flowId: java.util.UUID)
+POST  /subcontractor/verify/no-new-subcontractors-to-verify/:flowId  controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmitWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/no-new-subcontractors-to-verify  controllers.verify.VerifyYourSubcontractorsYesNoController.onPageLoad
 POST  /subcontractor/verify/no-new-subcontractors-to-verify  controllers.verify.VerifyYourSubcontractorsYesNoController.onSubmit
 
@@ -557,9 +592,12 @@ GET   /subcontractor/verify/verification-request-submitted  controllers.verify.V
 
 GET   /subcontractor/verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
 
+GET   /subcontractor/verify/check-your-answers/:flowId  controllers.verify.VerifyCheckYourAnswersController.onPageLoadWithId(flowId: java.util.UUID)
+POST  /subcontractor/verify/check-your-answers/:flowId  controllers.verify.VerifyCheckYourAnswersController.onSubmitWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onPageLoad()
 POST  /subcontractor/verify/check-your-answers  controllers.verify.VerifyCheckYourAnswersController.onSubmit()
 
+GET   /subcontractor/verify/submission/create/:flowId  controllers.verify.SubmissionSendingController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/submission/create  controllers.verify.SubmissionSendingController.onPageLoad()
 
 GET   /subcontractor/verify/verification-status/reverification-decision  controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
