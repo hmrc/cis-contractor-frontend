@@ -20,7 +20,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case class CheckYourAnswersSubmittedPage(id: String) extends QuestionPage[Boolean] {
-  override def path: JsPath     = JsPath \ id \ toString
+  override def path: JsPath     = JsPath \ "addSubcontractor" \ id \ toString
   override def toString: String = "checkYourAnswersSubmitted"
 }
 

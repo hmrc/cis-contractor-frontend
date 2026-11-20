@@ -36,7 +36,12 @@ class PartnershipMobileNumberViewSpec extends AnyWordSpec with Matchers with Gui
 
       val partnershipName = "Test Name"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipMobileNumber.title"))
@@ -62,7 +67,12 @@ class PartnershipMobileNumberViewSpec extends AnyWordSpec with Matchers with Gui
 
       val partnershipName = "Test Name"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, partnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("partnershipMobileNumber.title"))
@@ -91,7 +101,12 @@ class PartnershipMobileNumberViewSpec extends AnyWordSpec with Matchers with Gui
       val errorForm: Form[String] =
         form.withError("value", "partnershipMobileNumber.error.required")
 
-      val html = view(errorForm, NormalMode, partnershipName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        partnershipName,
+        controllers.add.partnership.routes.PartnershipMobileNumberController.onSubmit(NormalMode)
+      )
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

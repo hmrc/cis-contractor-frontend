@@ -29,6 +29,10 @@ class CisIdQuerySpec extends AnyFreeSpec with Matchers with SpecBase {
       CisIdQuery.path mustEqual (JsPath \ "cisId")
     }
 
+    "must nest the WithId path under addSubcontractor" in {
+      CisIdQuery("uuid-1").path mustEqual (JsPath \ "addSubcontractor" \ "uuid-1" \ "cisId")
+    }
+
     "must set a CIS ID value" in {
       val ua = emptyUserAnswers
         .set(CisIdQuery, "CIS-12345")

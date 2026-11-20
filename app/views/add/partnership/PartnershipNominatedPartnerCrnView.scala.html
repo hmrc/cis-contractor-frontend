@@ -16,6 +16,7 @@
 
 @import viewmodels.InputWidth._
 @import play.api.data.Form
+@import play.api.mvc.Call
 @import models.Mode
 
 @this(
@@ -26,11 +27,11 @@
   govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, nominatedPartnerName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, nominatedPartnerName: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("partnershipNominatedPartnerCrn.title", nominatedPartnerName))) {
 
-  @formHelper(action = controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController.onSubmit(mode)) {
+  @formHelper(action = submitAction) {
 
     @if(form.errors.nonEmpty) {
       @govukErrorSummary(ErrorSummaryViewModel(form))

@@ -85,6 +85,29 @@ object SubcontractorCleanup {
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage))
 
+  def removePartnershipSubcontractor(userAnswers: UserAnswers, id: String): Try[UserAnswers] =
+    userAnswers
+      .remove(PartnershipAddressPage(id))
+      .flatMap(_.remove(PartnershipAddressYesNoPage(id)))
+      .flatMap(_.remove(AddPartnershipContactMethodsYesNoPage(id)))
+      .flatMap(_.remove(PartnershipContactMethodOptionsPage(id)))
+      .flatMap(_.remove(PartnershipEmailAddressPage(id)))
+      .flatMap(_.remove(PartnershipHasUtrYesNoPage(id)))
+      .flatMap(_.remove(PartnershipMobileNumberPage(id)))
+      .flatMap(_.remove(PartnershipNamePage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerCrnPage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerCrnYesNoPage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNamePage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNinoPage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNinoYesNoPage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerUtrPage(id)))
+      .flatMap(_.remove(PartnershipNominatedPartnerUtrYesNoPage(id)))
+      .flatMap(_.remove(PartnershipPhoneNumberPage(id)))
+      .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage(id)))
+      .flatMap(_.remove(PartnershipWorksReferenceNumberPage(id)))
+      .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage(id)))
+      .flatMap(_.remove(CheckYourAnswersSubmittedPage(id)))
+
   def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(TrustAddressPage)

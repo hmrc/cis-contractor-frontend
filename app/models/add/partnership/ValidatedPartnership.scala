@@ -47,6 +47,93 @@ object ValidatedPartnership extends Validation {
       getPageValue(answers, PartnershipNominatedPartnerNamePage)
     )
 
+  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedPartnership] =
+    for {
+      _                               <- validateType(answers, id)
+      partnershipName                 <- getPageValue(answers, PartnershipNamePage(id))
+      partnershipAddress              <- getOptionalPageValue(
+                                           answers,
+                                           PartnershipAddressPage(id),
+                                           PartnershipAddressYesNoPage(id)
+                                         )
+      partnershipContactMethodOptions <-
+        getOptionalPageValue(
+          answers,
+          PartnershipContactMethodOptionsPage(id),
+          AddPartnershipContactMethodsYesNoPage(id)
+        ).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+          case Some(_)                           =>
+            Left(InvalidAnswer(PartnershipContactMethodOptionsPage(id)))
+          case None                              =>
+            Right(None)
+        }
+      partnershipEmail                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipEmailAddressPage(id),
+                                           ContactMethodOptions.Email
+                                         )
+      partnershipPhone                <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipPhoneNumberPage(id),
+                                           ContactMethodOptions.Phone
+                                         )
+      partnershipMobile               <- getContactPageValue(
+                                           answers,
+                                           partnershipContactMethodOptions,
+                                           PartnershipMobileNumberPage(id),
+                                           ContactMethodOptions.Mobile
+                                         )
+      partnershipUtr                  <-
+        getOptionalPageValue(
+          answers,
+          PartnershipUniqueTaxpayerReferencePage(id),
+          PartnershipHasUtrYesNoPage(id)
+        )
+      partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage(id))
+      partnershipNominatedPartnerUtr  <-
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerUtrPage(id),
+          PartnershipNominatedPartnerUtrYesNoPage(id)
+        )
+      partnershipNominatedPartnerNino <-
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerNinoPage(id),
+          PartnershipNominatedPartnerNinoYesNoPage(id)
+        )
+      partnershipNominatedPartnerCrn  <-
+        getOptionalPageValue(
+          answers,
+          PartnershipNominatedPartnerCrnPage(id),
+          PartnershipNominatedPartnerCrnYesNoPage(id)
+        )
+      partnershipWorkRefNumber        <-
+        getOptionalPageValue(
+          answers,
+          PartnershipWorksReferenceNumberPage(id),
+          PartnershipWorksReferenceNumberYesNoPage(id)
+        )
+
+    } yield ValidatedPartnership(
+      partnershipName,
+      partnershipAddress,
+      partnershipContactMethodOptions,
+      partnershipEmail,
+      partnershipPhone,
+      partnershipMobile,
+      partnershipUtr,
+      partnershipNominatedPartnerName,
+      partnershipNominatedPartnerUtr,
+      partnershipNominatedPartnerNino,
+      partnershipNominatedPartnerCrn,
+      partnershipWorkRefNumber
+    )
+
   def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedPartnership] =
     buildPartnership(
       answers,
@@ -149,5 +236,11 @@ object ValidatedPartnership extends Validation {
     getPageValue(answers, TypeOfSubcontractorPage).flatMap {
       case TypeOfSubcontractor.Partnership => Right(())
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+
+  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+      case TypeOfSubcontractor.Partnership => Right(())
+      case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
     }
 }

@@ -118,7 +118,8 @@ class SharedNavigatorSpec extends SpecBase {
           TypeOfSubcontractorPage(id),
           NormalMode,
           emptyUserAnswers.setOrException(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
-        ) mustBe controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+        ) mustBe controllers.add.partnership.routes.PartnershipNameController
+          .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
       }
 
       "must go from a TypeOfSubcontractorPage to TrustNameController when Trust is selected" in {

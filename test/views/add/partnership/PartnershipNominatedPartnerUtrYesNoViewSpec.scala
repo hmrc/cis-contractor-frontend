@@ -38,7 +38,12 @@ class PartnershipNominatedPartnerUtrYesNoViewSpec extends AnyWordSpec with Match
 
       private val nominatedPartnershipName = "Test Nominated Partnership"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, nominatedPartnershipName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        nominatedPartnershipName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("partnershipNominatedPartnerUtrYesNo.title"))
 
@@ -71,7 +76,12 @@ class PartnershipNominatedPartnerUtrYesNoViewSpec extends AnyWordSpec with Match
 
       private val nominatedPartnershipName = "Test Nominated Partnership"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, nominatedPartnershipName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        nominatedPartnershipName,
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
