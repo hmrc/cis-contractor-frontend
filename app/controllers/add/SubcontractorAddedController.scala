@@ -46,7 +46,6 @@ class SubcontractorAddedController @Inject() (
   multiTabAction: MultiTabAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
-  multiTabAction: MultiTabAction,
   view: SubcontractorAddedView,
   appConfig: FrontendAppConfig
 ) extends FrontendBaseController

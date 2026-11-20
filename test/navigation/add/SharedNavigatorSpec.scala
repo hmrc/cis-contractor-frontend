@@ -122,6 +122,16 @@ class SharedNavigatorSpec extends SpecBase {
           .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
       }
 
+      "must go from a TypeOfSubcontractorPage with id to IndividualNamesOptions when Individualorsoletrader is selected" in {
+        val id = "11111111-1111-1111-1111-111111111111"
+        navigator.nextPage(
+          TypeOfSubcontractorPage(id),
+          NormalMode,
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Individualorsoletrader)
+        ) mustBe controllers.add.routes.IndividualNamesOptionsController
+          .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
+      }
+
       "must go from a TypeOfSubcontractorPage to TrustNameController when Trust is selected" in {
         navigator.nextPage(
           TypeOfSubcontractorPage,

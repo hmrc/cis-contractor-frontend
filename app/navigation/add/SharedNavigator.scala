@@ -84,14 +84,17 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
 
   private def firstJourneyPageFor(subcontractorType: TypeOfSubcontractor, id: Option[String] = None): Call =
     (subcontractorType, id) match {
-      case (Partnership, Some(value))  =>
+      case (Partnership, Some(value))            =>
         controllers.add.partnership.routes.PartnershipNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Individualorsoletrader, _) =>
+      case (Individualorsoletrader, Some(value)) =>
+        controllers.add.routes.IndividualNamesOptionsController
+          .onPageLoadWithId(UUID.fromString(value), NormalMode)
+      case (Individualorsoletrader, _)           =>
         controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Limitedcompany, _)         => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, _)            => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Trust, _)                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
+      case (Limitedcompany, _)                   => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      case (Partnership, _)                      => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case (Trust, _)                            => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
   private def checkYourAnswersFor(subcontractorType: TypeOfSubcontractor, id: Option[String] = None): Call =
