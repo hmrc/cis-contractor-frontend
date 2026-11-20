@@ -47,6 +47,10 @@ class CheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
+  // TODO: THIS IS THE FILE THAT I CAN USE FOR SharedNavigator AND IndividualNavigator
+  // Instead of updating the IndividualCheckYourAnswersController can update
+  // this controller and use it inside SharedNavigator and IndividualNavigator(cyaRouteWithId) and rest
+  // of the methods or code needed
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val ua = request.userAnswers
     ValidatedSubcontractor.build(ua) match {

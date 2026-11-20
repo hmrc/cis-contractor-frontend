@@ -24,6 +24,37 @@ import play.api.libs.json.JsPath
 
 import scala.util.{Success, Try}
 
+case class IndividualNamesOptionsPage(id: String)
+    extends QuestionPage[Set[IndividualNamesOptions]]
+    with IndividualJourney {
+
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "individualNamesOptions"
+
+  override def cleanup(
+    value: Option[Set[IndividualNamesOptions]],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
+    value match {
+
+      case Some(selectedAnswers) =>
+        removeIfNotSelected(selectedAnswers, SubcontractorName, SubcontractorNamePage(id), userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, TradingName, TradingNameOfSubcontractorPage(id), _))
+
+      case _ => super.cleanup(value, userAnswers)
+    }
+
+  private def removeIfNotSelected[A](
+    selectedAnswers: Set[IndividualNamesOptions],
+    answer: IndividualNamesOptions,
+    page: QuestionPage[A],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
+    if (selectedAnswers.contains(answer)) { Success(userAnswers) }
+    else { userAnswers.remove(page) }
+}
+
 case object IndividualNamesOptionsPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString

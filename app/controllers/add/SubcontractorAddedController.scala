@@ -20,8 +20,9 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
+import models.add.IndividualNamesOptions
 import models.requests.DataRequest
-import pages.add.CheckYourAnswersSubmittedPage
+import pages.add.{CheckYourAnswersSubmittedPage, IndividualNamesOptionsPage}
 import pages.add.company.CompanyNamePage
 import pages.add.partnership.PartnershipNamePage
 import pages.add.trust.TrustNamePage
@@ -33,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorAddedView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -43,6 +45,7 @@ class SubcontractorAddedController @Inject() (
   requireData: DataRequiredAction,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
+  multiTabAction: MultiTabAction,
   view: SubcontractorAddedView,
   appConfig: FrontendAppConfig
 ) extends FrontendBaseController
@@ -52,6 +55,44 @@ class SubcontractorAddedController @Inject() (
   def individualSubcontractorAdded: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       subcontractorAdded(TypeOfSubcontractor.Individualorsoletrader)
+    }
+
+  // TODO: NEED TO FINISH THIS METHOD.
+  def individualSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+
+      def recoveryRedirect =
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+        val namesOptions = request.userAnswers.get(IndividualNamesOptionsPage(id))
+        val cisId        = request.userAnswers.get(CisIdQuery(id))
+
+        (namesOptions, cisId) match {
+          case (Some(selectedOptions), Some(cisId)) =>
+            val manageSubcontractorsUrl =
+              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+
+            val selectedName = IndividualNamesOptions
+              .ordered(selectedOptions)
+              .map(option => Messages(s"individualNamesOptions.${option.toString}"))
+              .mkString(", ")
+
+            Ok(view(selectedName, Messages("subcontractorAdded.individual"), manageSubcontractorsUrl))
+
+          case _ =>
+            logger.error(
+              "[SubcontractorAddedController][individualSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+            )
+            recoveryRedirect
+        }
+      } else {
+        logger.error(
+          "[SubcontractorAddedController][individualSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+        )
+        recoveryRedirect
+      }
     }
 
   def companySubcontractorAdded: Action[AnyContent] =
