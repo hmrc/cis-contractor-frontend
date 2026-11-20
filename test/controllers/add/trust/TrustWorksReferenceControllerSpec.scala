@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.TrustWorksReferenceFormProvider
 import models.{NormalMode, UserAnswers}
@@ -34,7 +34,7 @@ import views.html.add.trust.TrustWorksReferenceView
 
 import scala.concurrent.Future
 
-class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
+class TrustWorksReferenceControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
@@ -69,7 +69,12 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[TrustWorksReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, trustName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -124,7 +129,12 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          form.fill("answer"),
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -173,7 +183,12 @@ class TrustWorksReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, trustName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          trustName,
+          controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
