@@ -45,20 +45,16 @@ class ContractorEmailConfirmationStoredControllerSpec extends SpecBase with Mock
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider         = new ContractorEmailConfirmationStoredFormProvider()
-  private val form         = formProvider()
-  private val testEmail    = "test@example.com"
-  private val cisId        = "123"
-  private val submitAction =
-    controllers.verify.routes.ContractorEmailConfirmationStoredController.onSubmit(NormalMode)
+  val formProvider      = new ContractorEmailConfirmationStoredFormProvider()
+  private val form      = formProvider()
+  private val testEmail = "test@example.com"
+  private val cisId     = "123"
 
-  private lazy val contractorEmailConfirmationStoredRoute =
-    controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(NormalMode).url
-
-  private lazy val contractorEmailConfirmationStoredAfterFinalValidationRoute =
-    controllers.verify.routes.ContractorEmailConfirmationStoredController
-      .onPageLoadAfterFinalValidation(NormalMode)
-      .url
+  private val contractorEmailConfirmationStoredRoute                     =
+    "/subcontractor/verify/confirmation-email-stored"
+  private val contractorEmailConfirmationStoredAfterFinalValidationRoute =
+    "/subcontractor/verify/confirmation-email-stored/final-validation-complete"
+  private val submitAction: Call                                         = Call("POST", contractorEmailConfirmationStoredRoute)
 
   private val testScheme = ContractorScheme(
     accountsOfficeReference = Some("123PA12345678"),

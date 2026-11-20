@@ -1618,13 +1618,12 @@ class NewestVerificationBatchControllerSpec
     "on start" - {
 
       val startCisId = "AB12"
-      val startUrl   =
-        controllers.verify.routes.NewestVerificationBatchController.onPageLoadStart(startCisId).url
+      val startUrl   = s"/subcontractor/verify/newest/start/$startCisId"
 
       "must create a uuid nest and redirect to select subcontractors when unverified subcontractors exist" in {
         val mockService = mock[VerificationService]
 
-        when(mockService.refreshNewestVerificationBatch(any[UserAnswers], any[Option[String]])(any[HeaderCarrier]))
+        when(mockService.refreshNewestVerificationBatch(any(), any())(any()))
           .thenAnswer { invocation =>
             val answers = invocation.getArgument[UserAnswers](0)
             val id      = invocation.getArgument[Option[String]](1).get
@@ -1652,8 +1651,7 @@ class NewestVerificationBatchControllerSpec
           redirectLocation(result).value must include(
             "/subcontractor/verify/select-subcontractors-to-verify/"
           )
-          redirectLocation(result).value must not be
-            controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode).url
+          redirectLocation(result).value must not include "/subcontractor/verify/select-subcontractors-to-verify?"
         }
       }
 
@@ -1665,10 +1663,7 @@ class NewestVerificationBatchControllerSpec
           val result =
             route(
               application,
-              FakeRequest(
-                GET,
-                controllers.verify.routes.NewestVerificationBatchController.onPageLoadStart("other").url
-              )
+              FakeRequest(GET, "/subcontractor/verify/newest/start/other")
             ).value
 
           status(result) mustEqual SEE_OTHER

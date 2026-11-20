@@ -66,13 +66,9 @@ class ReverifyExistingSubcontractorsYesNoControllerSpec extends SpecBase with Mo
       .success
       .value
 
-  lazy val reverifyExistingSubcontractorsYesNoRoute =
-    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController
-      .onPageLoad(NormalMode)
-      .url
-
-  private val submitAction =
-    controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(NormalMode)
+  private val reverifyExistingSubcontractorsYesNoRoute =
+    "/subcontractor/verify/reverify-existing-subcontractors"
+  private val submitAction: Call                       = Call("POST", reverifyExistingSubcontractorsYesNoRoute)
 
   "ReverifyExistingSubcontractorsYesNo Controller" - {
 
