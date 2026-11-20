@@ -97,6 +97,145 @@ class ContractorDetailsNavigatorSpec extends SpecBase {
         navigator.nextPage(ContractorUtrPage, NormalMode, userAnswers) mustBe
           controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
       }
+
+      "must go from ContractorUtrPage with id to AddSchemeNameYesNo" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          ContractorUtrPage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.AddSchemeNameYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddSchemeNameYesNoPage with id to SchemeName when Yes" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddSchemeNameYesNoPage(id),
+            true
+          )
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe contractorDetailsRoutes.SchemeNameController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddSchemeNameYesNoPage with id to AddEmailAddressYesNo when No" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddSchemeNameYesNoPage(id),
+            false
+          )
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe contractorDetailsRoutes.AddEmailAddressYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go to JourneyRecovery from AddSchemeNameYesNoPage with id when unanswered" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from SchemeNamePage with id to AddEmailAddressYesNo" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          SchemeNamePage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.AddEmailAddressYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddEmailAddressYesNoPage with id to EnterContractorEmailAddress when Yes" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddEmailAddressYesNoPage(id),
+            true
+          )
+
+        navigator.nextPage(
+          AddEmailAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe contractorDetailsRoutes.EnterContractorEmailAddressController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddEmailAddressYesNoPage with id to check answers when No" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddEmailAddressYesNoPage(id),
+            false
+          )
+
+        navigator.nextPage(
+          AddEmailAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go to JourneyRecovery from AddEmailAddressYesNoPage with id when unanswered" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          AddEmailAddressYesNoPage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go from EnterContractorEmailAddressPage with id to check answers" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          EnterContractorEmailAddressPage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
     }
 
     "in CheckMode" - {
@@ -145,6 +284,121 @@ class ContractorDetailsNavigatorSpec extends SpecBase {
         navigator.nextPage(EnterContractorEmailAddressPage, CheckMode, emptyUserAnswers) mustEqual
           contractorDetailsRoutes.ContractorDetailsCheckAnswersController.onPageLoad()
       }
+
+      "must go from ContractorUtrPage with id to check answers" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          ContractorUtrPage(id),
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from AddSchemeNameYesNoPage with id to SchemeName when Yes" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddSchemeNameYesNoPage(id),
+            true
+          )
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          CheckMode,
+          answers
+        ) mustBe contractorDetailsRoutes.SchemeNameController
+          .onPageLoadWithId(flowId, CheckMode)
+      }
+
+      "must go from AddSchemeNameYesNoPage with id to check answers when No" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddSchemeNameYesNoPage(id),
+            false
+          )
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          CheckMode,
+          answers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from SchemeNamePage with id to check answers" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          SchemeNamePage(id),
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from AddEmailAddressYesNoPage with id to EnterContractorEmailAddress when Yes" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddEmailAddressYesNoPage(id),
+            true
+          )
+
+        navigator.nextPage(
+          AddEmailAddressYesNoPage(id),
+          CheckMode,
+          answers
+        ) mustBe contractorDetailsRoutes.EnterContractorEmailAddressController
+          .onPageLoadWithId(flowId, CheckMode)
+      }
+
+      "must go from AddEmailAddressYesNoPage with id to check answers when No" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddEmailAddressYesNoPage(id),
+            false
+          )
+
+        navigator.nextPage(
+          AddEmailAddressYesNoPage(id),
+          CheckMode,
+          answers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from EnterContractorEmailAddressPage with id to check answers" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          EnterContractorEmailAddressPage(id),
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
     }
 
     "in AmendMode" - {
@@ -158,6 +412,38 @@ class ContractorDetailsNavigatorSpec extends SpecBase {
         val answers = emptyUserAnswers.set(AddSchemeNameYesNoPage, true).success.value
         navigator.nextPage(AddSchemeNameYesNoPage, AmendMode, answers) mustEqual
           contractorDetailsRoutes.SchemeNameController.onPageLoad(CheckMode)
+      }
+
+      "must go from ContractorUtrPage with id to check answers" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          ContractorUtrPage(id),
+          AmendMode,
+          emptyUserAnswers
+        ) mustBe contractorDetailsRoutes.ContractorDetailsCheckAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from AddSchemeNameYesNoPage with id to SchemeName in CheckMode when Yes" in {
+        val flowId =
+          java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val answers =
+          emptyUserAnswers.setOrException(
+            AddSchemeNameYesNoPage(id),
+            true
+          )
+
+        navigator.nextPage(
+          AddSchemeNameYesNoPage(id),
+          AmendMode,
+          answers
+        ) mustBe contractorDetailsRoutes.SchemeNameController
+          .onPageLoadWithId(flowId, CheckMode)
       }
     }
 

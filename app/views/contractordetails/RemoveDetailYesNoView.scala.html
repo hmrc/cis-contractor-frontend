@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.LegendSize.Large
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -24,7 +25,7 @@
     govukButton: GovukButton
 )
 
-@(contractorDetail:String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(contractorDetail:String, form: Form[_], submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @defining(contractorDetail match {
     case "email-address"       => messages("contractordetails.removeDetailYesNo.detail.email")
@@ -33,7 +34,7 @@
 
     @layout(pageTitle = title(form, messages("contractordetails.removeDetailYesNo.title", selectedContractorDetail))) {
 
-        @formHelper(action = controllers.contractordetails.routes.RemoveDetailYesNoController.onSubmit(contractorDetail), Symbol("autoComplete") -> "off") {
+        @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
             @if(form.errors.nonEmpty) {
                 @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

@@ -20,23 +20,46 @@ import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class RemoveDetailYesNoPage(contractorDetail: String) extends QuestionPage[Boolean] {
+case class RemoveDetailYesNoPage(contractorDetail: String, id: Option[String] = None)
+    extends QuestionPage[Boolean]
+    with ContractorDetailsJourney {
 
-  override def path: JsPath = JsPath \ "contractordetails" \ toString
+  override def path: JsPath =
+    id match {
+      case Some(value) => JsPath \ "contractordetails" \ value \ toString
+      case None        => JsPath \ "contractordetails" \ toString
+    }
 
-  override def toString: String = s"removeDetailYesNo-$contractorDetail"
+  override def toString: String =
+    s"removeDetailYesNo-$contractorDetail"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
     contractorDetail match {
       case "email-address" if value.contains(true) =>
-        userAnswers
-          .remove(EnterContractorEmailAddressPage)
-          .flatMap(_.set(AddEmailAddressYesNoPage, false))
+        id match {
+          case Some(value) =>
+            userAnswers
+              .remove(EnterContractorEmailAddressPage(value))
+              .flatMap(_.set(AddEmailAddressYesNoPage(value), false))
+
+          case None =>
+            userAnswers
+              .remove(EnterContractorEmailAddressPage)
+              .flatMap(_.set(AddEmailAddressYesNoPage, false))
+        }
 
       case "scheme-name" if value.contains(true) =>
-        userAnswers
-          .remove(SchemeNamePage)
-          .flatMap(_.set(AddSchemeNameYesNoPage, false))
+        id match {
+          case Some(value) =>
+            userAnswers
+              .remove(SchemeNamePage(value))
+              .flatMap(_.set(AddSchemeNameYesNoPage(value), false))
+
+          case None =>
+            userAnswers
+              .remove(SchemeNamePage)
+              .flatMap(_.set(AddSchemeNameYesNoPage, false))
+        }
 
       case _ =>
         super.cleanup(value, userAnswers)

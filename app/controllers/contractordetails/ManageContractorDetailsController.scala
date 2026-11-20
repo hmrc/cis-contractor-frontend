@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import services.{CisManageService, ContractorDetailsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -37,6 +38,8 @@ class ManageContractorDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   contractorDetailsService: ContractorDetailsService,
   override protected val cisManageService: CisManageService,
   override protected val sessionRepository: SessionRepository,
@@ -119,10 +122,87 @@ class ManageContractorDetailsController @Inject() (
       }
     }
 
+  def onPageLoadWithId(flowId: UUID, target: Option[String] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+
+      val userAnswers = request.userAnswers
+
+      withAgentClientChecks(
+        request.userId,
+        request.isAgent,
+        userAnswers
+      ).flatMap {
+
+        case Left(redirect) =>
+          Future.successful(redirect)
+
+        case Right(checkedAnswers) =>
+          Future
+            .fromTry(checkedAnswers.remove(ContractorDetailsValidationTargetPage))
+            .flatMap { cleanedAnswers =>
+              getCisId(cleanedAnswers, Some(flowId)).flatMap { cisId =>
+                contractorDetailsService
+                  .getScheme(cisId)
+                  .flatMap { scheme =>
+                    cleanedAnswers
+                      .set(ContractorSchemePage, scheme) match {
+
+                      case Failure(error) =>
+                        Future.failed(error)
+
+                      case Success(answersWithScheme) =>
+                        if (shouldRedirectToCheckAnswers(scheme)) {
+
+                          ContractorDetailsPopulator
+                            .populate(
+                              answersWithScheme,
+                              scheme
+                            )
+                            .fold(
+                              Future.failed,
+                              updatedAnswers =>
+                                sessionRepository
+                                  .set(updatedAnswers)
+                                  .map(_ =>
+                                    Redirect(
+                                      routes.ContractorDetailsCheckAnswersController.onPageLoadWithId(flowId, target)
+                                    )
+                                  )
+                            )
+                        } else {
+                          sessionRepository
+                            .set(answersWithScheme)
+                            .map(_ =>
+                              Redirect(
+                                routes.ContractorDetailsController.onPageLoadWithId(flowId)
+                              )
+                            )
+                        }
+                    }
+                  }
+              }
+            }
+      }.recover { case error =>
+        logger.error(
+          "[ManageContractorDetailsController][onPageLoadWithId] Failed to retrieve contractor details",
+          error
+        )
+
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
   private def getCisId(
-    userAnswers: UserAnswers
-  ): Future[String] =
-    userAnswers.get(CisIdQuery) match {
+    userAnswers: UserAnswers,
+    flowId: Option[UUID] = None
+  ): Future[String] = {
+
+    val cisIdQuery = flowId match {
+      case Some(id) => CisIdQuery(id.toString)
+      case None     => CisIdQuery
+    }
+
+    userAnswers.get(cisIdQuery) match {
       case Some(cisId) =>
         Future.successful(cisId)
 
@@ -133,6 +213,7 @@ class ManageContractorDetailsController @Inject() (
           )
         )
     }
+  }
 
   private def shouldRedirectToCheckAnswers(
     scheme: Scheme

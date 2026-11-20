@@ -22,32 +22,63 @@ import models.NormalMode
 import org.jsoup.Jsoup
 import play.api.Application
 import play.api.data.Form
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.contractordetails.SchemeNameView
 
 class SchemeNameViewSpec extends SpecBase {
+
   "SchemeNameView" - {
 
     "must return the correct html" in new Setup {
       val doc = Jsoup.parse(html.body)
-      doc.select("title").text must include(messages("contractordetails.schemeName.title"))
-      doc.select("h1").text    must include(messages("contractordetails.schemeName.heading"))
+
+      doc.select("title").text must include(
+        messages("contractordetails.schemeName.title")
+      )
+
+      doc.select("h1").text must include(
+        messages("contractordetails.schemeName.heading")
+      )
+
       doc.select("input[type=text]").size() mustBe 1
+
+      doc.select("form").attr("action") mustBe submitAction.url
     }
   }
 
   trait Setup {
-    val app: Application                          = applicationBuilder().build()
-    val view: SchemeNameView                      = app.injector.instanceOf[SchemeNameView]
-    val formProvider                              = new SchemeNameFormProvider()
-    val form: Form[String]                        = formProvider()
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
-    val html: HtmlFormat.Appendable               = view(form, NormalMode)
+    val app: Application =
+      applicationBuilder().build()
+
+    val view: SchemeNameView =
+      app.injector.instanceOf[SchemeNameView]
+
+    val formProvider =
+      new SchemeNameFormProvider()
+
+    val form: Form[String] =
+      formProvider()
+
+    implicit val request: play.api.mvc.Request[_] =
+      FakeRequest()
+
+    implicit val messages: Messages =
+      play.api.i18n.MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[play.api.i18n.MessagesApi]
+      )
+
+    val submitAction =
+      controllers.contractordetails.routes.SchemeNameController
+        .onSubmit(NormalMode)
+
+    val html: HtmlFormat.Appendable =
+      view(
+        form,
+        NormalMode,
+        submitAction
+      )
   }
 }

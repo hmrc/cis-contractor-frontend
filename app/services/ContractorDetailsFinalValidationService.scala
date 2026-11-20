@@ -26,6 +26,7 @@ import queries.CisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,38 +51,111 @@ class ContractorDetailsFinalValidationService @Inject() (
     } yield (updated, validate(updated))
 
   def validate(userAnswers: UserAnswers): ContractorDetailsFinalValidation =
-    ContractorDetailsFinalValidation(
-      utrComplete = userAnswers.get(ContractorUtrPage).exists(isValidContractorUtr),
-      schemeNameComplete = userAnswers.get(SchemeNamePage).forall(isValidSchemeName),
-      emailComplete = userAnswers.get(EnterContractorEmailAddressPage).forall(isValidEmail)
+    validateAnswers(
+      userAnswers,
+      ContractorUtrPage,
+      SchemeNamePage,
+      EnterContractorEmailAddressPage
     )
 
   def updateSchemeFromAnswers(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    updateScheme(
+      userAnswers,
+      ContractorSchemePage,
+      ContractorUtrPage,
+      SchemeNamePage,
+      EnterContractorEmailAddressPage
+    )
+
+  def refreshAndValidateWithId(
+    userAnswers: UserAnswers,
+    target: ContractorDetailsValidationTarget,
+    flowId: UUID
+  )(implicit hc: HeaderCarrier): Future[(UserAnswers, ContractorDetailsFinalValidation)] =
     for {
-      scheme          <- required(userAnswers.get(ContractorSchemePage), "ContractorSchemePage not found in session data")
-      _               <- if (validate(userAnswers).allComplete) Future.successful(())
-                         else Future.failed(new RuntimeException("Contractor details final validations are incomplete"))
+      instanceId <- required(
+                      userAnswers.get(CisIdQuery(flowId.toString)),
+                      "CisIdQuery not found in contractor details tab"
+                    )
+      scheme     <- contractorDetailsService.getScheme(instanceId)
+      updated    <- Future.fromTry(populateWithId(userAnswers, target, scheme, flowId))
+      _          <- sessionRepository.set(updated)
+    } yield (updated, validateWithId(updated, flowId))
+
+  def validateWithId(
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): ContractorDetailsFinalValidation =
+    validateAnswers(
+      userAnswers,
+      ContractorUtrPage(flowId.toString),
+      SchemeNamePage(flowId.toString),
+      EnterContractorEmailAddressPage(flowId.toString)
+    )
+
+  def updateSchemeFromAnswersWithId(
+    userAnswers: UserAnswers,
+    flowId: UUID
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    updateScheme(
+      userAnswers,
+      ContractorSchemePage(flowId.toString),
+      ContractorUtrPage(flowId.toString),
+      SchemeNamePage(flowId.toString),
+      EnterContractorEmailAddressPage(flowId.toString)
+    )
+
+  private def validateAnswers(
+    userAnswers: UserAnswers,
+    utrPage: QuestionPage[String],
+    schemeNamePage: QuestionPage[String],
+    emailPage: QuestionPage[String]
+  ): ContractorDetailsFinalValidation =
+    ContractorDetailsFinalValidation(
+      utrComplete = userAnswers.get(utrPage).exists(isValidContractorUtr),
+      schemeNameComplete = userAnswers.get(schemeNamePage).forall(isValidSchemeName),
+      emailComplete = userAnswers.get(emailPage).forall(isValidEmail)
+    )
+
+  private def updateScheme(
+    userAnswers: UserAnswers,
+    contractorSchemePage: QuestionPage[models.Scheme],
+    utrPage: QuestionPage[String],
+    schemeNamePage: QuestionPage[String],
+    emailPage: QuestionPage[String]
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    for {
+      scheme <- required(
+                  userAnswers.get(contractorSchemePage),
+                  "ContractorSchemePage not found in session data"
+                )
+      _      <- if (validateAnswers(userAnswers, utrPage, schemeNamePage, emailPage).allComplete)
+                  Future.successful(())
+                else
+                  Future.failed(new RuntimeException("Contractor details final validations are incomplete"))
+
       versionResponse <- contractorDetailsService.updateSchemeVersion(
                            UpdateSchemeVersionRequest(
                              currentVersion = scheme.version.getOrElse(0),
                              instanceId = scheme.instanceId
                            )
                          )
-      _               <- contractorDetailsService.updateScheme(
-                           UpdateSchemeRequest(
-                             schemeId = scheme.schemeId,
-                             instanceId = scheme.instanceId,
-                             taxOfficeNumber = scheme.taxOfficeNumber,
-                             taxOfficeReference = scheme.taxOfficeReference,
-                             accountsOfficeReference = scheme.accountsOfficeReference,
-                             prePopCount = scheme.prePopCount.getOrElse(0),
-                             prePopSuccessful = scheme.prePopSuccessful.getOrElse(""),
-                             utr = userAnswers.get(ContractorUtrPage).getOrElse(""),
-                             name = userAnswers.get(SchemeNamePage).getOrElse(""),
-                             emailAddress = userAnswers.get(EnterContractorEmailAddressPage).getOrElse(""),
-                             version = versionResponse.newVersion
-                           )
-                         )
+
+      _ <- contractorDetailsService.updateScheme(
+             UpdateSchemeRequest(
+               schemeId = scheme.schemeId,
+               instanceId = scheme.instanceId,
+               taxOfficeNumber = scheme.taxOfficeNumber,
+               taxOfficeReference = scheme.taxOfficeReference,
+               accountsOfficeReference = scheme.accountsOfficeReference,
+               prePopCount = scheme.prePopCount.getOrElse(0),
+               prePopSuccessful = scheme.prePopSuccessful.getOrElse(""),
+               utr = userAnswers.get(utrPage).getOrElse(""),
+               name = userAnswers.get(schemeNamePage).getOrElse(""),
+               emailAddress = userAnswers.get(emailPage).getOrElse(""),
+               version = versionResponse.newVersion
+             )
+           )
     } yield ()
 
   private def populate(
@@ -97,6 +171,22 @@ class ContractorDetailsFinalValidationService @Inject() (
       ua5 <- ua4.set(AddSchemeNameYesNoPage, hasValue(scheme.name))
       ua6 <- setOptionalString(ua5, EnterContractorEmailAddressPage, scheme.emailAddress)
       ua7 <- ua6.set(AddEmailAddressYesNoPage, hasValue(scheme.emailAddress))
+    } yield ua7
+
+  private def populateWithId(
+    userAnswers: UserAnswers,
+    target: ContractorDetailsValidationTarget,
+    scheme: models.Scheme,
+    flowId: UUID
+  ) =
+    for {
+      ua1 <- userAnswers.set(ContractorSchemePage(flowId.toString), scheme)
+      ua2 <- ua1.set(ContractorDetailsValidationTargetPage, target)
+      ua3 <- setOptionalString(ua2, ContractorUtrPage(flowId.toString), scheme.utr)
+      ua4 <- setOptionalString(ua3, SchemeNamePage(flowId.toString), scheme.name)
+      ua5 <- ua4.set(AddSchemeNameYesNoPage(flowId.toString), hasValue(scheme.name))
+      ua6 <- setOptionalString(ua5, EnterContractorEmailAddressPage(flowId.toString), scheme.emailAddress)
+      ua7 <- ua6.set(AddEmailAddressYesNoPage(flowId.toString), hasValue(scheme.emailAddress))
     } yield ua7
 
   private def setOptionalString(

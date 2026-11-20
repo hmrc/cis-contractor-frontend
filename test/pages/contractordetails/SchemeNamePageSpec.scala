@@ -30,5 +30,13 @@ class SchemeNamePageSpec extends SpecBase {
     "have the correct toString" in {
       SchemeNamePage.toString mustBe "schemeName"
     }
+
+    "must nest the WithId path under contractordetails" in {
+      SchemeNamePage("uuid-1").path mustBe
+        (JsPath \ "contractordetails" \ "uuid-1" \ "schemeName")
+
+      SchemeNamePage.path mustBe
+        (JsPath \ "contractordetails" \ "schemeName")
+    }
   }
 }

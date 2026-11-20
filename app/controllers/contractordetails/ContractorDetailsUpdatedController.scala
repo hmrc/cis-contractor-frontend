@@ -28,6 +28,7 @@ import services.ContractorDetailsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.ContractorDetailsUpdatedView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +37,7 @@ class ContractorDetailsUpdatedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   contractorDetailsService: ContractorDetailsService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
@@ -79,12 +81,72 @@ class ContractorDetailsUpdatedController @Inject() (
               sessionRepository
                 .set(updatedAnswers)
                 .map { _ =>
-                  Ok(view(cisAccountUrl))
+                  Ok(
+                    view(
+                      cisAccountUrl,
+                      controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+                    )
+                  )
                 }
             }
             .recover { case error =>
               logger.error(
                 "[ContractorDetailsUpdatedController] Failed to refresh contractor details",
+                error
+              )
+
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+      }
+    }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+
+        case None =>
+          logger.error(
+            "[ContractorDetailsUpdatedController][onPageLoadWithId] - CisIdPage missing from userAnswers"
+          )
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Some(cisId) =>
+          val cisAccountUrl =
+            if (request.isAgent) {
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            } else {
+              appConfig.constructionIndustryOrgAccountUrl
+            }
+
+          contractorDetailsService
+            .getScheme(cisId)
+            .flatMap { latestScheme =>
+              Future.fromTry(
+                request.userAnswers.set(
+                  ContractorSchemePage,
+                  latestScheme
+                )
+              )
+            }
+            .flatMap { updatedAnswers =>
+              sessionRepository
+                .set(updatedAnswers)
+                .map { _ =>
+                  Ok(
+                    view(
+                      cisAccountUrl,
+                      controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+                        .onPageLoadWithId(flowId)
+                        .url
+                    )
+                  )
+                }
+            }
+            .recover { case error =>
+              logger.error(
+                "[ContractorDetailsUpdatedController][onPageLoadWithId] Failed to refresh contractor details",
                 error
               )
 

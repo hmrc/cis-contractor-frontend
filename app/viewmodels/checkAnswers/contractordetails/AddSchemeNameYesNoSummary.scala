@@ -25,29 +25,52 @@ import viewmodels.implicits.*
 
 object AddSchemeNameYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddSchemeNameYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] = {
 
-      val value = if (answer) "site.yes" else "site.no"
+    val answer =
+      subJourneyId
+        .map(id => answers.get(AddSchemeNameYesNoPage(id)))
+        .getOrElse(answers.get(AddSchemeNameYesNoPage))
+
+    val contractorScheme =
+      subJourneyId
+        .map(id => answers.get(ContractorSchemePage(id)))
+        .getOrElse(answers.get(ContractorSchemePage))
+
+    answer.map { value =>
+
+      val yesNoText = if (value) messages("site.yes") else messages("site.no")
+
+      val hasExistingUtr = contractorScheme.flatMap(_.utr).exists(_.trim.nonEmpty)
 
       val changeUrl =
-        if (answer && ContractorSchemePage.hasExistingUtr(answers)) {
-          controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("scheme-name").url
+        if (value && hasExistingUtr) {
+          controllers.contractordetails.routes.RemoveDetailYesNoController
+            .onPageLoad("scheme-name")
+            .url
         } else {
-          controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(CheckMode).url
+          controllers.contractordetails.routes.AddSchemeNameYesNoController
+            .onPageLoad(CheckMode)
+            .url
         }
 
       SummaryListRowViewModel(
         key = "contractordetails.addSchemeNameYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        value = ValueViewModel(yesNoText),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             changeUrl
           )
-            .withVisuallyHiddenText(messages("contractordetails.addSchemeNameYesNo.change.hidden"))
+            .withVisuallyHiddenText(
+              messages("contractordetails.addSchemeNameYesNo.change.hidden")
+            )
             .withAttribute("id" -> "add-scheme-name-yes-no")
         )
       )
     }
+  }
 }

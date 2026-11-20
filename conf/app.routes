@@ -2,6 +2,7 @@
 
 # Infrastructure
 ->    /subcontractor/hmrc-frontend  hmrcfrontend.Routes
+->    /                             contractorDetails.Routes
 
 GET   /subcontractor  controllers.IndexController.onPageLoad()
 
@@ -229,10 +230,12 @@ GET   /subcontractor/add/type-of-subcontractor/start/:cisId         controllers.
 POST  /subcontractor/add/type-of-subcontractor/start/:cisId         controllers.add.TypeOfSubcontractorController.onSubmitStart(cisId: String, mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor/start/:cisId  controllers.add.TypeOfSubcontractorController.onPageLoadStart(cisId: String, mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor/start/:cisId  controllers.add.TypeOfSubcontractorController.onSubmitStart(cisId: String, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/type-of-subcontractor/:flowId         controllers.add.TypeOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 POST  /subcontractor/add/type-of-subcontractor/:flowId         controllers.add.TypeOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor/:flowId  controllers.add.TypeOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor/:flowId  controllers.add.TypeOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
@@ -899,48 +902,3 @@ GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.Unmatche
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
 GET   /subcontractor/verify/continue-verification-submission  controllers.verify.ContinueVerificationSubmissionController.onSubmit()
-
-# Contractor Details
-GET   /contractor-details/manage  controllers.contractordetails.ManageContractorDetailsController.onPageLoad(target: Option[String] ?= None)
-
-GET   /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onPageLoad()
-POST  /contractor-details/introduction  controllers.contractordetails.ContractorDetailsController.onSubmit()
-
-GET   /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractor-scheme-name   controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractors-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-contractor-scheme-name  controllers.contractordetails.SchemeNameController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractor-email-address   controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractors-email          controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-contractor-email-address  controllers.contractordetails.EnterContractorEmailAddressController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/contractor-details-updated  controllers.contractordetails.ContractorDetailsUpdatedController.onPageLoad()
-
-GET   /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onPageLoad(target: Option[String] ?= None)
-POST  /contractor-details/contractor-details-added  controllers.contractordetails.ContractorDetailsCheckAnswersController.onSubmit(target: Option[String] ?= None)
-
-GET   /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractor-utr   controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/enter-contractors-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-contractor-utr  controllers.contractordetails.ContractorUtrController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/add-contractor-email-address         controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-add-contractor-email-address  controllers.contractordetails.AddEmailAddressYesNoController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /contractor-details/add-contractor-scheme-name         controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /contractor-details/change-add-contractor-scheme-name  controllers.contractordetails.AddSchemeNameYesNoController.onSubmit(mode: Mode = CheckMode)
-
-GET   /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onPageLoad(contractorDetail: String)
-POST  /contractor-details/remove-contractor-detail/:contractorDetail  controllers.contractordetails.RemoveDetailYesNoController.onSubmit(contractorDetail: String)

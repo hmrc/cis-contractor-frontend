@@ -38,45 +38,81 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
       s"when accountType is '$accountTypeSTR'" - {
 
         "must render the page with correct heading, paragraphs, and other contents" in new Setup {
-          val html: HtmlFormat.Appendable = view(cisAccountUrl)
-          val doc: Document               = Jsoup.parse(html.body)
 
-          doc.title must include(messages("contractordetails.contractorDetailsUpdated.title"))
+          val checkAnswersUrl =
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+              .onPageLoad()
+              .url
 
-          doc.select("h1").text must include(messages("contractordetails.contractorDetailsUpdated.heading"))
+          val html: HtmlFormat.Appendable =
+            view(cisAccountUrl, checkAnswersUrl)
+
+          val doc: Document =
+            Jsoup.parse(html.body)
+
+          doc.title must include(
+            messages("contractordetails.contractorDetailsUpdated.title")
+          )
+
+          doc.select("h1").text must include(
+            messages("contractordetails.contractorDetailsUpdated.heading")
+          )
 
           doc.select("p").text must include(
-            messages("contractordetails.contractorDetailsUpdated.p1.details.prefix")
+            messages(
+              "contractordetails.contractorDetailsUpdated.p1.details.prefix"
+            )
           )
 
           doc
-            .select(
-              s"a[href=${controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url}]"
-            )
+            .select(s"a[href='$checkAnswersUrl']")
             .size mustBe 1
 
-          doc.select("a").text must include(messages("contractordetails.contractorDetailsUpdated.p1.details.link"))
+          doc.select("a").text must include(
+            messages(
+              "contractordetails.contractorDetailsUpdated.p1.details.link"
+            )
+          )
 
           doc.select("a").text must include(
-            messages("contractordetails.contractorDetailsUpdated.returnToDashboard.link")
+            messages(
+              "contractordetails.contractorDetailsUpdated.returnToDashboard.link"
+            )
           )
 
           doc
             .select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
-            .text must include(messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"))
+            .text must include(
+            messages(
+              "contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"
+            )
+          )
 
           doc.select("a").text must include(
-            messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link")
+            messages(
+              "contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.link"
+            )
           )
 
           doc.select("p").text must include(
-            messages("contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix")
+            messages(
+              "contractordetails.contractorDetailsUpdated.p2.whatDidYouThink.suffix"
+            )
           )
         }
 
         "must not show back link" in new Setup {
-          val html: HtmlFormat.Appendable = view(cisAccountUrl)
-          val doc: Document               = Jsoup.parse(html.body)
+
+          val checkAnswersUrl =
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+              .onPageLoad()
+              .url
+
+          val html: HtmlFormat.Appendable =
+            view(cisAccountUrl, checkAnswersUrl)
+
+          val doc: Document =
+            Jsoup.parse(html.body)
 
           doc.getElementsByClass("govuk-back-link").size mustBe 0
         }
@@ -84,14 +120,23 @@ class ContractorDetailsUpdatedViewSpec extends SpecBase with Matchers {
     }
 
     trait Setup {
-      val app: Application                          = applicationBuilder().build()
-      val view: ContractorDetailsUpdatedView        = app.injector.instanceOf[ContractorDetailsUpdatedView]
-      val appConfig: FrontendAppConfig              = app.injector.instanceOf[FrontendAppConfig]
-      implicit val request: play.api.mvc.Request[_] = FakeRequest()
-      implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-        play.api.i18n.Lang.defaultLang,
-        app.injector.instanceOf[play.api.i18n.MessagesApi]
-      )
+      val app: Application =
+        applicationBuilder().build()
+
+      val view: ContractorDetailsUpdatedView =
+        app.injector.instanceOf[ContractorDetailsUpdatedView]
+
+      val appConfig: FrontendAppConfig =
+        app.injector.instanceOf[FrontendAppConfig]
+
+      implicit val request: play.api.mvc.Request[_] =
+        FakeRequest()
+
+      implicit val messages: Messages =
+        play.api.i18n.MessagesImpl(
+          play.api.i18n.Lang.defaultLang,
+          app.injector.instanceOf[play.api.i18n.MessagesApi]
+        )
     }
   }
 }

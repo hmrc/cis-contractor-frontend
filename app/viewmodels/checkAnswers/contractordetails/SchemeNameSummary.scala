@@ -16,7 +16,8 @@
 
 package viewmodels.checkAnswers.contractordetails
 
-import models.{CheckMode, UserAnswers}
+import controllers.contractordetails.routes
+import models.{CheckMode, Mode, UserAnswers}
 import pages.contractordetails.SchemeNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -24,21 +25,37 @@ import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object SchemeNameSummary {
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SchemeNamePage).map { answer =>
-      val isEmpty = answer.trim.isEmpty
-      SummaryListRowViewModel(
-        key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
-        value = ValueViewModel(if (isEmpty) "" else answer),
-        actions = Seq(
-          ActionItemViewModel(
-            messages(
-              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
-            ),
-            controllers.contractordetails.routes.SchemeNameController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("contractordetails.schemeName.change.hidden"))
-            .withAttribute("id" -> "scheme-name")
+
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(SchemeNamePage(id)))
+      .getOrElse(answers.get(SchemeNamePage))
+      .map { answer =>
+        val isEmpty = answer.trim.isEmpty
+
+        SummaryListRowViewModel(
+          key = messages("contractordetails.schemeName.checkYourAnswersLabel"),
+          value = ValueViewModel(if (isEmpty) "" else answer),
+          actions = Seq(
+            ActionItemViewModel(
+              if (isEmpty)
+                "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"
+              else
+                "site.change",
+              changeUrl.getOrElse(
+                routes.SchemeNameController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(
+                messages("contractordetails.schemeName.change.hidden")
+              )
+              .withAttribute("id" -> "scheme-name")
+          )
         )
-      )
-    }
+      }
 }

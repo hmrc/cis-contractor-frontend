@@ -34,12 +34,12 @@ class ContractorSchemePageSpec extends PageBehaviours {
 
     "have the correct path" in {
       ContractorSchemePage.path mustBe (
-        JsPath \ "contractordetails" \ "ContractorSchemePage"
+        JsPath \ "contractordetails" \ "contractorScheme"
       )
     }
 
     "have the correct toString" in {
-      ContractorSchemePage.toString mustBe "ContractorSchemePage"
+      ContractorSchemePage.toString mustBe "contractorScheme"
     }
 
     "hasExistingUtr" - {

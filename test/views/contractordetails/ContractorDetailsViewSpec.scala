@@ -31,31 +31,59 @@ class ContractorDetailsViewSpec extends SpecBase with Matchers {
   "ContractorDetailsView" - {
 
     "must display the correct title" in new Setup {
-      doc.title must include(messages("contractordetails.contractorDetailsIndex.title"))
+      doc.title must include(
+        messages("contractordetails.contractorDetailsIndex.title")
+      )
     }
 
     "must display the correct heading" in new Setup {
-      doc.select("h1").text must include(messages("contractordetails.contractorDetailsIndex.heading"))
+      doc.select("h1").text must include(
+        messages("contractordetails.contractorDetailsIndex.heading")
+      )
     }
 
     "must display paragraph 1" in new Setup {
-      doc.select("p").text must include(messages("contractordetails.contractorDetailsIndex.p1"))
+      doc.select("p").text must include(
+        messages("contractordetails.contractorDetailsIndex.p1")
+      )
     }
 
     "must display the Continue button" in new Setup {
-      doc.select("button").text must include(messages("site.continue"))
+      doc.select("button").text must include(
+        messages("site.continue")
+      )
+    }
+
+    "must submit to the correct action" in new Setup {
+      doc.select("form").attr("action") mustBe submitAction.url
+      doc.select("form").attr("autocomplete") mustBe "off"
     }
   }
 
   trait Setup {
-    val app: Application                          = applicationBuilder().build()
-    val view: ContractorDetailsView               = app.injector.instanceOf[ContractorDetailsView]
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
-    val html: HtmlFormat.Appendable               = view()
-    val doc: Document                             = Jsoup.parse(html.body)
+    val app: Application =
+      applicationBuilder().build()
+
+    val view: ContractorDetailsView =
+      app.injector.instanceOf[ContractorDetailsView]
+
+    implicit val request: play.api.mvc.Request[_] =
+      FakeRequest()
+
+    implicit val messages: Messages =
+      play.api.i18n.MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[play.api.i18n.MessagesApi]
+      )
+
+    val submitAction =
+      controllers.contractordetails.routes.ContractorDetailsController
+        .onSubmit()
+
+    val html: HtmlFormat.Appendable =
+      view(submitAction)
+
+    val doc: Document =
+      Jsoup.parse(html.body)
   }
 }

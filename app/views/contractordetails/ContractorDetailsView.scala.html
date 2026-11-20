@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -24,10 +25,10 @@
     paragraph: Paragraph
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsIndex.title")), showSignOut = true) {
-    @formHelper(action = controllers.contractordetails.routes.ContractorDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @h1(messages("contractordetails.contractorDetailsIndex.heading"))
         @paragraph(messages("contractordetails.contractorDetailsIndex.p1"))

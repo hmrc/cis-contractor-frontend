@@ -22,16 +22,31 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case object AddEmailAddressYesNoPage extends QuestionPage[Boolean] with ContractorDetailsJourney {
+case class AddEmailAddressYesNoPage(id: String) extends QuestionPage[Boolean] with ContractorDetailsJourney {
 
-  override def path: JsPath = JsPath \ "contractordetails" \ toString
+  override def path: JsPath =
+    JsPath \ "contractordetails" \ id \ toString
 
   override def toString: String = "addEmailAddressYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
-      userAnswers
-        .remove(EnterContractorEmailAddressPage)
+      userAnswers.remove(EnterContractorEmailAddressPage(id))
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+}
+
+case object AddEmailAddressYesNoPage extends QuestionPage[Boolean] with ContractorDetailsJourney {
+
+  override def path: JsPath =
+    JsPath \ "contractordetails" \ toString
+
+  override def toString: String = "addEmailAddressYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers.remove(EnterContractorEmailAddressPage)
     } else {
       super.cleanup(value, userAnswers)
     }

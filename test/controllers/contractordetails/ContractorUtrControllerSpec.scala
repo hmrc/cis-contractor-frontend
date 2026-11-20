@@ -16,7 +16,7 @@
 
 package controllers.contractordetails
 
-import base.SpecBase
+import base.WithFakeCisTaxpayer
 import controllers.routes
 import forms.contractordetails.ContractorUtrFormProvider
 import models.{CheckMode, NormalMode}
@@ -25,7 +25,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.contractordetails.ContractorUtrView
 
-class ContractorUtrControllerSpec extends SpecBase {
+import java.util.UUID
+
+class ContractorUtrControllerSpec extends WithFakeCisTaxpayer {
 
   private val formProvider = new ContractorUtrFormProvider()
   private val form         = formProvider()
@@ -33,8 +35,35 @@ class ContractorUtrControllerSpec extends SpecBase {
   private val validUtr   = "5860920998"
   private val invalidUtr = "1234567890"
 
+  private val flowId =
+    UUID.fromString("0f1af513-154f-4548-a24c-2d297f7b57be")
+
   private lazy val contractorUtrRoute =
-    controllers.contractordetails.routes.ContractorUtrController.onPageLoad(NormalMode).url
+    controllers.contractordetails.routes.ContractorUtrController
+      .onPageLoad(NormalMode)
+      .url
+
+  private lazy val contractorUtrSubmitRoute =
+    controllers.contractordetails.routes.ContractorUtrController
+      .onSubmit(NormalMode)
+      .url
+
+  private lazy val contractorUtrWithIdRoute =
+    controllers.contractordetails.routes.ContractorUtrController
+      .onPageLoadWithId(flowId, NormalMode)
+      .url
+
+  private lazy val contractorUtrWithIdSubmitRoute =
+    controllers.contractordetails.routes.ContractorUtrController
+      .onSubmitWithId(flowId, NormalMode)
+      .url
+
+  // The CIS ID must be stored against the same flow ID used in the route.
+  private def answersWithCisIdForFlow =
+    emptyUserAnswers
+      .set(queries.CisIdQuery(flowId.toString), "AB12")
+      .success
+      .value
 
   "ContractorUtrController" - {
 
@@ -42,7 +71,8 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must return OK and the correct view for a GET with no existing answer" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, contractorUtrRoute)
@@ -50,7 +80,13 @@ class ContractorUtrControllerSpec extends SpecBase {
           val view    = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            form,
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -60,16 +96,28 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must populate the view correctly on a GET when the question has previously been answered" in {
 
-        val userAnswers = emptyUserAnswers.set(ContractorUtrPage, validUtr).success.value
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val userAnswers =
+          emptyUserAnswers
+            .set(ContractorUtrPage, validUtr)
+            .success
+            .value
+
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, contractorUtrRoute)
-          val view    = application.injector.instanceOf[ContractorUtrView]
           val result  = route(application, request).value
+          val view    = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(validUtr), NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            form.fill(validUtr),
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -79,14 +127,17 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application =
+          applicationBuilder(userAnswers = None).build()
 
         running(application) {
           val request = FakeRequest(GET, contractorUtrRoute)
           val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }
@@ -95,12 +146,13 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must save the answer and redirect on a valid POST" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", validUtr))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> validUtr)
 
           val result = route(application, request).value
 
@@ -110,19 +162,26 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must return Bad Request and errors for an empty submission" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", ""))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> "")
 
           val boundForm = form.bind(Map("value" -> ""))
-          val view      = application.injector.instanceOf[ContractorUtrView]
           val result    = route(application, request).value
+          val view      = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            boundForm,
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -132,19 +191,26 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must return Bad Request and errors when UTR fails the check digit algorithm" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", invalidUtr))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> invalidUtr)
 
           val boundForm = form.bind(Map("value" -> invalidUtr))
-          val view      = application.injector.instanceOf[ContractorUtrView]
           val result    = route(application, request).value
+          val view      = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            boundForm,
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -154,19 +220,28 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must return Bad Request and errors when UTR is too short" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val shortUtr = "12345"
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", "12345"))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> shortUtr)
 
-          val boundForm = form.bind(Map("value" -> "12345"))
-          val view      = application.injector.instanceOf[ContractorUtrView]
+          val boundForm = form.bind(Map("value" -> shortUtr))
           val result    = route(application, request).value
+          val view      = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            boundForm,
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -176,19 +251,28 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must return Bad Request and errors when UTR contains non-numeric characters" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val nonNumericUtr = "12345abcde"
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", "12345abcde"))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> nonNumericUtr)
 
-          val boundForm = form.bind(Map("value" -> "12345abcde"))
-          val view      = application.injector.instanceOf[ContractorUtrView]
+          val boundForm = form.bind(Map("value" -> nonNumericUtr))
           val result    = route(application, request).value
+          val view      = application.injector.instanceOf[ContractorUtrView]
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode)(
+
+          contentAsString(result) mustEqual view(
+            boundForm,
+            NormalMode,
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmit(NormalMode)
+          )(
             request,
             applicationConfig,
             messages(application)
@@ -198,36 +282,304 @@ class ContractorUtrControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application =
+          applicationBuilder(userAnswers = None).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, contractorUtrRoute)
-              .withFormUrlEncodedBody(("value", validUtr))
+            FakeRequest(POST, contractorUtrSubmitRoute)
+              .withFormUrlEncodedBody("value" -> validUtr)
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
       "must redirect to Journey Recovery for a POST in CheckMode if no existing data is found" in {
 
-        val checkRoute =
-          controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
+        val checkSubmitRoute =
+          controllers.contractordetails.routes.ContractorUtrController
+            .onSubmit(CheckMode)
+            .url
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application =
+          applicationBuilder(userAnswers = None).build()
 
         running(application) {
           val request =
-            FakeRequest(POST, checkRoute)
-              .withFormUrlEncodedBody(("value", validUtr))
+            FakeRequest(POST, checkSubmitRoute)
+              .withFormUrlEncodedBody("value" -> validUtr)
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    }
+
+    "multitab journey" - {
+
+      "onPageLoadWithId" - {
+
+        "must return OK and the correct view for a GET with no existing answer" in {
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, contractorUtrWithIdRoute)
+            val result  = route(application, request).value
+            val view    = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual view(
+              form,
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must populate the view correctly when the question has previously been answered for the flow id" in {
+
+          val userAnswers =
+            answersWithCisIdForFlow
+              .set(ContractorUtrPage(flowId.toString), validUtr)
+              .success
+              .value
+
+          val application =
+            applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, contractorUtrWithIdRoute)
+            val result  = route(application, request).value
+            val view    = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual view(
+              form.fill(validUtr),
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+          val application =
+            applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val request = FakeRequest(GET, contractorUtrWithIdRoute)
+            val result  = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+      }
+
+      "onSubmitWithId" - {
+
+        "must save the answer and redirect on a valid POST" in {
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> validUtr)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+          }
+        }
+
+        "must return Bad Request and errors for an empty submission" in {
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> "")
+
+            val boundForm = form.bind(Map("value" -> ""))
+            val result    = route(application, request).value
+            val view      = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual BAD_REQUEST
+
+            contentAsString(result) mustEqual view(
+              boundForm,
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must return Bad Request and errors when UTR fails the check digit algorithm" in {
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> invalidUtr)
+
+            val boundForm = form.bind(Map("value" -> invalidUtr))
+            val result    = route(application, request).value
+            val view      = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual BAD_REQUEST
+
+            contentAsString(result) mustEqual view(
+              boundForm,
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must return Bad Request and errors when UTR is too short" in {
+
+          val shortUtr = "12345"
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> shortUtr)
+
+            val boundForm = form.bind(Map("value" -> shortUtr))
+            val result    = route(application, request).value
+            val view      = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual BAD_REQUEST
+
+            contentAsString(result) mustEqual view(
+              boundForm,
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must return Bad Request and errors when UTR contains non-numeric characters" in {
+
+          val nonNumericUtr = "12345abcde"
+
+          val application =
+            applicationBuilder(userAnswers = Some(answersWithCisIdForFlow)).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> nonNumericUtr)
+
+            val boundForm = form.bind(Map("value" -> nonNumericUtr))
+            val result    = route(application, request).value
+            val view      = application.injector.instanceOf[ContractorUtrView]
+
+            status(result) mustEqual BAD_REQUEST
+
+            contentAsString(result) mustEqual view(
+              boundForm,
+              NormalMode,
+              controllers.contractordetails.routes.ContractorUtrController
+                .onSubmitWithId(flowId, NormalMode)
+            )(
+              request,
+              applicationConfig,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
+          val application =
+            applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, contractorUtrWithIdSubmitRoute)
+                .withFormUrlEncodedBody("value" -> validUtr)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must redirect to Journey Recovery for a POST in CheckMode if no existing data is found" in {
+
+          val checkModeSubmitRoute =
+            controllers.contractordetails.routes.ContractorUtrController
+              .onSubmitWithId(flowId, CheckMode)
+              .url
+
+          val application =
+            applicationBuilder(userAnswers = None).build()
+
+          running(application) {
+            val request =
+              FakeRequest(POST, checkModeSubmitRoute)
+                .withFormUrlEncodedBody("value" -> validUtr)
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              routes.JourneyRecoveryController.onPageLoad().url
+          }
         }
       }
     }

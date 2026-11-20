@@ -16,7 +16,7 @@
 
 package controllers.contractordetails
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import forms.contractordetails.RemoveDetailYesNoFormProvider
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
@@ -33,10 +33,11 @@ import views.html.contractordetails.RemoveDetailYesNoView
 
 import scala.concurrent.Future
 
-class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
+class RemoveDetailYesNoControllerSpec extends WithFakeCisTaxpayer with MockitoSugar {
 
   def onwardRoute  = Call("GET", "/contractor-details/contractor-details-added")
   val formProvider = new RemoveDetailYesNoFormProvider()
+
   "removeDetailYesNo Controller" - {
 
     "when contractorDetail is neither 'email-address' or 'scheme-name'" - {
@@ -101,7 +102,11 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val view = application.injector.instanceOf[RemoveDetailYesNoView]
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(selectedDetail, form)(
+            contentAsString(result) mustEqual view(
+              selectedDetail,
+              form,
+              routes.RemoveDetailYesNoController.onSubmit(selectedDetail)
+            )(
               request,
               messages(application)
             ).toString
@@ -122,7 +127,11 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, request).value
 
             status(result) mustEqual OK
-            contentAsString(result) mustEqual view(selectedDetail, form.fill(true))(
+            contentAsString(result) mustEqual view(
+              selectedDetail,
+              form.fill(true),
+              routes.RemoveDetailYesNoController.onSubmit(selectedDetail)
+            )(
               request,
               messages(application)
             ).toString
@@ -138,20 +147,27 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
           val application =
             applicationBuilder(userAnswers = Some(emptyUserAnswers))
               .overrides(
-                bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               )
               .build()
 
           running(application) {
             val request =
-              FakeRequest(POST, removeDetailYesNoRoute)
-                .withFormUrlEncodedBody(("value", "true"))
+              FakeRequest(
+                POST,
+                routes.RemoveDetailYesNoController
+                  .onSubmit(selectedDetail)
+                  .url
+              ).withFormUrlEncodedBody(("value", "true"))
 
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual onwardRoute.url
+
+            redirectLocation(result).value mustEqual
+              routes.ContractorDetailsCheckAnswersController
+                .onPageLoad()
+                .url
           }
         }
 
@@ -171,7 +187,11 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(selectedDetail, boundForm)(
+            contentAsString(result) mustEqual view(
+              selectedDetail,
+              boundForm,
+              routes.RemoveDetailYesNoController.onSubmit(selectedDetail)
+            )(
               request,
               messages(application)
             ).toString
@@ -205,6 +225,182 @@ class RemoveDetailYesNoControllerSpec extends SpecBase with MockitoSugar {
 
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          }
+        }
+
+        "must return OK for a GET with id when the subjourney exists" in {
+
+          val uuid =
+            java.util.UUID.fromString(
+              "11111111-1111-1111-1111-111111111111"
+            )
+
+          val id =
+            uuid.toString
+
+          val answers =
+            emptyUserAnswers
+              .set(queries.CisIdQuery(id), "AB12")
+              .success
+              .value
+
+          val repo =
+            mockSessionRepository(Some(answers))
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(
+                bind[SessionRepository].toInstance(repo)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                GET,
+                routes.RemoveDetailYesNoController
+                  .onPageLoadWithId(uuid, selectedDetail)
+                  .url
+              )
+
+            val result =
+              route(application, request).value
+
+            val view =
+              application.injector
+                .instanceOf[RemoveDetailYesNoView]
+
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual view(
+              selectedDetail,
+              form,
+              routes.RemoveDetailYesNoController
+                .onSubmitWithId(uuid, selectedDetail)
+            )(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must populate the view correctly for a GET with id when previously answered" in {
+
+          val uuid =
+            java.util.UUID.fromString(
+              "11111111-1111-1111-1111-111111111111"
+            )
+
+          val id =
+            uuid.toString
+
+          val answers =
+            emptyUserAnswers
+              .set(queries.CisIdQuery(id), "AB12")
+              .flatMap(
+                _.set(
+                  RemoveDetailYesNoPage(
+                    selectedDetail,
+                    Some(id)
+                  ),
+                  true
+                )
+              )
+              .success
+              .value
+
+          val repo =
+            mockSessionRepository(Some(answers))
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(
+                bind[SessionRepository].toInstance(repo)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                GET,
+                routes.RemoveDetailYesNoController
+                  .onPageLoadWithId(uuid, selectedDetail)
+                  .url
+              )
+
+            val result =
+              route(application, request).value
+
+            val view =
+              application.injector
+                .instanceOf[RemoveDetailYesNoView]
+
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual view(
+              selectedDetail,
+              form.fill(true),
+              routes.RemoveDetailYesNoController
+                .onSubmitWithId(uuid, selectedDetail)
+            )(
+              request,
+              messages(application)
+            ).toString
+          }
+        }
+
+        "must redirect to ContractorDetailsCheckAnswers with id when valid data is submitted" in {
+
+          val uuid =
+            java.util.UUID.fromString(
+              "11111111-1111-1111-1111-111111111111"
+            )
+
+          val id =
+            uuid.toString
+
+          val answers =
+            emptyUserAnswers
+              .set(queries.CisIdQuery(id), "AB12")
+              .success
+              .value
+
+          val repo =
+            mockSessionRepository(Some(answers))
+
+          when(repo.set(any()))
+            .thenReturn(Future.successful(true))
+
+          val application =
+            applicationBuilder(userAnswers = Some(answers))
+              .overrides(
+                bind[SessionRepository].toInstance(repo)
+              )
+              .build()
+
+          running(application) {
+
+            val request =
+              FakeRequest(
+                POST,
+                routes.RemoveDetailYesNoController
+                  .onSubmitWithId(uuid, selectedDetail)
+                  .url
+              ).withFormUrlEncodedBody(
+                "value" -> "true"
+              )
+
+            val result =
+              route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              routes.ContractorDetailsCheckAnswersController
+                .onPageLoadWithId(uuid)
+                .url
           }
         }
 

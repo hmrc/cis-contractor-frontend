@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.contractordetails.*
 import views.html.contractordetails.ContractorDetailsCheckAnswersView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +39,7 @@ class ContractorDetailsCheckAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   service: ContractorDetailsService,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorDetailsCheckAnswersView
@@ -76,21 +78,18 @@ class ContractorDetailsCheckAnswersController @Inject() (
                 scheme.accountsOfficeReference,
                 summaryRows,
                 cisAccountUrl,
-                validTarget(target)
+                validTarget(target),
+                routes.ContractorDetailsCheckAnswersController.onSubmit(target)
               )
             )
           } else {
             logger.error("[ContractorDetailsCheckAnswersController][onPageLoad] - required details invalid")
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
 
         case None =>
           logger.error("[ContractorDetailsCheckAnswersController][onPageLoad] - scheme missing from userAnswers")
-          Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 
@@ -104,6 +103,76 @@ class ContractorDetailsCheckAnswersController @Inject() (
 
         case _ =>
           logger.error("[ContractorDetailsCheckAnswersController][onSubmit] - scheme or required details invalid")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
+
+  def onPageLoadWithId(flowId: UUID, target: Option[String] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+
+      val id = flowId.toString
+      val ua = request.userAnswers
+
+      val cisAccountUrl =
+        if (!request.isAgent) {
+          appConfig.constructionIndustryOrgAccountUrl
+        } else {
+          ua.get(CisIdPage)
+            .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            )
+        }
+
+      ua.get(ContractorSchemePage(id)) match {
+        case Some(scheme) =>
+          if (hasRequiredDetails(request, id)) {
+
+            val summaryRows = Seq(
+              ContractorUtrSummary.row(ua, subJourneyId = Some(id)),
+              AddSchemeNameYesNoSummary.row(ua, subJourneyId = Some(id)),
+              SchemeNameSummary.row(ua, subJourneyId = Some(id)),
+              AddEmailAddressYesNoSummary.row(ua, id = Some(id)),
+              EnterContractorEmailAddressSummary.row(ua, subJourneyId = Some(id))
+            ).flatten
+
+            Ok(
+              view(
+                scheme.accountsOfficeReference,
+                summaryRows,
+                cisAccountUrl,
+                validTarget(target),
+                routes.ContractorDetailsCheckAnswersController.onSubmitWithId(flowId, target)
+              )
+            )
+          } else {
+            logger.error(
+              "[ContractorDetailsCheckAnswersController][onPageLoadWithId] - required details invalid"
+            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+
+        case None =>
+          logger.error(
+            "[ContractorDetailsCheckAnswersController][onPageLoadWithId] - scheme missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, target: Option[String] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id = flowId.toString
+
+      request.userAnswers.get(ContractorSchemePage(id)) match {
+        case Some(scheme) if hasRequiredDetails(request, id) =>
+          validTarget(target)
+            .map(target => Future.successful(Redirect(targetUrl(target, scheme.instanceId))))
+            .getOrElse(updateContractorDetailsWithId(scheme, id, flowId))
+
+        case _ =>
+          logger.error(
+            "[ContractorDetailsCheckAnswersController][onSubmitWithId] - scheme or required details invalid"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
@@ -138,6 +207,38 @@ class ContractorDetailsCheckAnswersController @Inject() (
       }
   }
 
+  private def updateContractorDetailsWithId(
+    scheme: Scheme,
+    id: String,
+    flowId: UUID
+  )(implicit request: DataRequest[AnyContent]): Future[Result] = {
+    val updateRequest = UpdateContractorSchemeParams(
+      schemeId = scheme.schemeId,
+      instanceId = scheme.instanceId,
+      accountsOfficeReference = scheme.accountsOfficeReference,
+      taxOfficeNumber = scheme.taxOfficeNumber,
+      taxOfficeReference = scheme.taxOfficeReference,
+      utr = request.userAnswers.get(ContractorUtrPage(id)),
+      name = request.userAnswers.get(SchemeNamePage(id)),
+      emailAddress = request.userAnswers.get(EnterContractorEmailAddressPage(id)),
+      version = scheme.version,
+      displayWelcomePage = scheme.displayWelcomePage,
+      prePopCount = scheme.prePopCount,
+      prePopSuccessful = scheme.prePopSuccessful
+    )
+
+    service
+      .updateContractorDetails(updateRequest)
+      .map(_ => Redirect(routes.ContractorDetailsUpdatedController.onPageLoadWithId(flowId)))
+      .recover { case t =>
+        logger.error(
+          "[ContractorDetailsCheckAnswersController.onSubmitWithId] Failed to update contractor details",
+          t
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+  }
+
   private def hasRequiredDetails(request: DataRequest[AnyContent]): Boolean = {
     val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage) match {
       case Some(true)  => request.userAnswers.get(SchemeNamePage).isDefined
@@ -148,6 +249,22 @@ class ContractorDetailsCheckAnswersController @Inject() (
     val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage) match {
       case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage).isDefined
       case Some(false) => request.userAnswers.get(EnterContractorEmailAddressPage).isEmpty
+      case None        => false
+    }
+
+    schemeNameValid && emailAddressValid
+  }
+
+  private def hasRequiredDetails(request: DataRequest[AnyContent], id: String): Boolean = {
+    val schemeNameValid = request.userAnswers.get(AddSchemeNameYesNoPage(id)) match {
+      case Some(true)  => request.userAnswers.get(SchemeNamePage(id)).isDefined
+      case Some(false) => true
+      case None        => false
+    }
+
+    val emailAddressValid = request.userAnswers.get(AddEmailAddressYesNoPage(id)) match {
+      case Some(true)  => request.userAnswers.get(EnterContractorEmailAddressPage(id)).isDefined
+      case Some(false) => request.userAnswers.get(EnterContractorEmailAddressPage(id)).isEmpty
       case None        => false
     }
 

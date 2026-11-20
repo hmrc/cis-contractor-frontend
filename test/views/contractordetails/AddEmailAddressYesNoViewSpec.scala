@@ -28,10 +28,33 @@ import views.html.contractordetails.AddEmailAddressYesNoView
 class AddEmailAddressYesNoViewSpec extends SpecBase {
 
   "AddEmailAddressYesNoView" - {
+
     "must render the page with the correct html elements" in new Setup {
-      val doc: Document = Jsoup.parse(html.toString)
-      doc.title             must include(messages("contractordetails.addEmailAddressYesNo.title"))
-      doc.select("h1").text must include(messages("contractordetails.addEmailAddressYesNo.heading"))
+      val html =
+        view(
+          form,
+          NormalMode,
+          controllers.contractordetails.routes.AddEmailAddressYesNoController
+            .onSubmit(NormalMode)
+        )
+
+      val doc: Document =
+        Jsoup.parse(html.toString)
+
+      doc.title must include(
+        messages("contractordetails.addEmailAddressYesNo.title")
+      )
+
+      doc.select("h1").text must include(
+        messages("contractordetails.addEmailAddressYesNo.heading")
+      )
+
+      doc.select("form").attr("action") mustBe
+        controllers.contractordetails.routes.AddEmailAddressYesNoController
+          .onSubmit(NormalMode)
+          .url
+
+      doc.select("form").attr("autocomplete") mustBe "off"
 
       doc.getElementsByClass("govuk-button").text must include(
         messages("site.continue")
@@ -39,26 +62,54 @@ class AddEmailAddressYesNoViewSpec extends SpecBase {
     }
 
     "must render radio buttons with correct values" in new Setup {
-      val doc: Document = Jsoup.parse(html.toString)
+      val html =
+        view(
+          form,
+          NormalMode,
+          controllers.contractordetails.routes.AddEmailAddressYesNoController
+            .onSubmit(NormalMode)
+        )
+
+      val doc: Document =
+        Jsoup.parse(html.toString)
 
       doc.select("input[type=radio][value=true]").size() mustBe 1
       doc.select("input[type=radio][value=false]").size() mustBe 1
-
     }
 
     "must pre-populate the form when user has previously answered 'true'" in new Setup {
-      val filledForm    = form.fill(true)
-      val filledHtml    = view(filledForm, NormalMode)
-      val doc: Document = Jsoup.parse(filledHtml.toString)
+      val filledForm =
+        form.fill(true)
+
+      val filledHtml =
+        view(
+          filledForm,
+          NormalMode,
+          controllers.contractordetails.routes.AddEmailAddressYesNoController
+            .onSubmit(NormalMode)
+        )
+
+      val doc: Document =
+        Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe true
       doc.select("input[value=false]").hasAttr("checked") mustBe false
     }
 
     "must pre-populate the form when user has previously answered 'false'" in new Setup {
-      val filledForm    = form.fill(false)
-      val filledHtml    = view(filledForm, NormalMode)
-      val doc: Document = Jsoup.parse(filledHtml.toString)
+      val filledForm =
+        form.fill(false)
+
+      val filledHtml =
+        view(
+          filledForm,
+          NormalMode,
+          controllers.contractordetails.routes.AddEmailAddressYesNoController
+            .onSubmit(NormalMode)
+        )
+
+      val doc: Document =
+        Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe false
       doc.select("input[value=false]").hasAttr("checked") mustBe true
@@ -66,16 +117,25 @@ class AddEmailAddressYesNoViewSpec extends SpecBase {
   }
 
   trait Setup {
-    val app                                       = applicationBuilder().build()
-    val view                                      = app.injector.instanceOf[AddEmailAddressYesNoView]
-    val formProvider                              = new AddEmailAddressYesNoFormProvider()
-    val form                                      = formProvider()
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
+    val app =
+      applicationBuilder().build()
 
-    val html = view(form, NormalMode)
+    val view =
+      app.injector.instanceOf[AddEmailAddressYesNoView]
+
+    val formProvider =
+      new AddEmailAddressYesNoFormProvider()
+
+    val form =
+      formProvider()
+
+    implicit val request: play.api.mvc.Request[_] =
+      FakeRequest()
+
+    implicit val messages: Messages =
+      play.api.i18n.MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[play.api.i18n.MessagesApi]
+      )
   }
 }

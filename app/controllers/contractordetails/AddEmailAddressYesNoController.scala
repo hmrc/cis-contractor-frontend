@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.AddEmailAddressYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class AddEmailAddressYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: AddEmailAddressYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddEmailAddressYesNoView
@@ -46,27 +48,84 @@ class AddEmailAddressYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = request.userAnswers.get(AddEmailAddressYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    val preparedForm = request.userAnswers.get(AddEmailAddressYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          routes.AddEmailAddressYesNoController.onSubmit(mode)
+        )
+      )
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  routes.AddEmailAddressYesNoController.onSubmit(mode)
+                )
+              )
+            ),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AddEmailAddressYesNoPage, value))
+              updatedAnswers <- Future.fromTry(
+                                  request.userAnswers.set(AddEmailAddressYesNoPage, value)
+                                )
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AddEmailAddressYesNoPage, mode, updatedAnswers))
+            } yield Redirect(
+              navigator.nextPage(AddEmailAddressYesNoPage, mode, updatedAnswers)
+            )
         )
-  }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id   = flowId.toString
+      val page = AddEmailAddressYesNoPage(id)
+
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          routes.AddEmailAddressYesNoController.onSubmitWithId(flowId, mode)
+        )
+      )
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id   = flowId.toString
+      val page = AddEmailAddressYesNoPage(id)
+
+      val submitAction =
+        routes.AddEmailAddressYesNoController.onSubmitWithId(flowId, mode)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(
+              navigator.nextPage(page, mode, updatedAnswers)
+            )
+        )
+    }
 }

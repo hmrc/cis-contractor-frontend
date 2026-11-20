@@ -20,12 +20,11 @@ import base.SpecBase
 import forms.contractordetails.AddSchemeNameYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
-import pages.contractordetails.{AddSchemeNameYesNoPage, SchemeNamePage}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.contractordetails.AddSchemeNameYesNoPage
+import pages.contractordetails.{AddSchemeNameYesNoPage, SchemeNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -37,52 +36,67 @@ import scala.concurrent.Future
 
 class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new AddSchemeNameYesNoFormProvider()
-  val form         = formProvider()
+  private val formProvider = new AddSchemeNameYesNoFormProvider()
+  private val form         = formProvider()
 
-  lazy val addSchemeNameYesNoRoute =
+  private lazy val routeLoad =
     controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoad(NormalMode).url
+
+  private lazy val routeSubmit =
+    controllers.contractordetails.routes.AddSchemeNameYesNoController.onSubmit(NormalMode).url
 
   "AddSchemeNameYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addSchemeNameYesNoRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AddSchemeNameYesNoView]
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[AddSchemeNameYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(
+            form,
+            NormalMode,
+            controllers.contractordetails.routes.AddSchemeNameYesNoController
+              .onSubmit(NormalMode)
+          )(
+            request,
+            messages(application)
+          ).toString
+
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(AddSchemeNameYesNoPage, true).success.value
+      val userAnswers =
+        UserAnswers(userAnswersId).set(AddSchemeNameYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, addSchemeNameYesNoRoute)
-
-        val view = application.injector.instanceOf[AddSchemeNameYesNoView]
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[AddSchemeNameYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          controllers.contractordetails.routes.AddSchemeNameYesNoController
+            .onSubmit(NormalMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -97,7 +111,7 @@ class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addSchemeNameYesNoRoute)
+          FakeRequest(POST, routeSubmit)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -108,27 +122,31 @@ class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, addSchemeNameYesNoRoute)
+          FakeRequest(POST, routeSubmit)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[AddSchemeNameYesNoView]
-
-        val result = route(application, request).value
+        val view      = application.injector.instanceOf[AddSchemeNameYesNoView]
+        val result    = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.contractordetails.routes.AddSchemeNameYesNoController
+            .onSubmit(NormalMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must remove SchemeNamePage from UserAnswers when false is submitted" in {
-
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -152,46 +170,48 @@ class AddSchemeNameYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, addSchemeNameYesNoRoute)
+          FakeRequest(POST, routeSubmit)
             .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val captor: ArgumentCaptor[UserAnswers] =
+          ArgumentCaptor.forClass(classOf[UserAnswers])
+
         verify(mockSessionRepository).set(captor.capture())
+
         captor.getValue.get(SchemeNamePage) mustBe None
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, addSchemeNameYesNoRoute)
-
-        val result = route(application, request).value
+        val request = FakeRequest(GET, routeLoad)
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
-          FakeRequest(POST, addSchemeNameYesNoRoute)
+          FakeRequest(POST, routeSubmit)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

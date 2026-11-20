@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.AddSchemeNameYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class AddSchemeNameYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: AddSchemeNameYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddSchemeNameYesNoView
@@ -44,24 +46,35 @@ class AddSchemeNameYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
-    val preparedForm = request.userAnswers.get(AddSchemeNameYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = request.userAnswers.get(AddSchemeNameYesNoPage).fold(form)(form.fill)
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          routes.AddSchemeNameYesNoController.onSubmit(mode)
+        )
+      )
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  routes.AddSchemeNameYesNoController.onSubmit(mode)
+                )
+              )
+            ),
           value =>
             for {
               withYesNo      <- Future.fromTry(request.userAnswers.set(AddSchemeNameYesNoPage, value))
@@ -70,5 +83,40 @@ class AddSchemeNameYesNoController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(AddSchemeNameYesNoPage, mode, updatedAnswers))
         )
-  }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = AddSchemeNameYesNoPage(id)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          routes.AddSchemeNameYesNoController.onSubmitWithId(flowId, mode)
+        )
+      )
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val page         = AddSchemeNameYesNoPage(id)
+      val submitAction = routes.AddSchemeNameYesNoController.onSubmitWithId(flowId, mode)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              withYesNo      <- Future.fromTry(request.userAnswers.set(page, value))
+              updatedAnswers <- if (!value) Future.fromTry(withYesNo.remove(SchemeNamePage(id)))
+                                else Future.successful(withYesNo)
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        )
+    }
 }

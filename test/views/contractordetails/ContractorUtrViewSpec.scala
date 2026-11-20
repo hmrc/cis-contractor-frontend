@@ -57,14 +57,17 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
     }
 
     "must display the form with the correct action URL" in new Setup {
-      doc.select("form").attr("action") mustBe
-        controllers.contractordetails.routes.ContractorUtrController.onSubmit(NormalMode).url
+      doc.select("form").attr("action") mustBe submitAction.url
     }
 
     "must display error summary and inline error when form has errors" in new ErrorSetup {
       doc.select(".govuk-error-summary").size mustBe 1
-      doc.select(".govuk-error-summary").text must include(messages("contractordetails.contractorUtr.error.required"))
-      doc.select(".govuk-error-message").text must include(messages("contractordetails.contractorUtr.error.required"))
+      doc.select(".govuk-error-summary").text must include(
+        messages("contractordetails.contractorUtr.error.required")
+      )
+      doc.select(".govuk-error-message").text must include(
+        messages("contractordetails.contractorUtr.error.required")
+      )
     }
 
     "must display title with error prefix when form has errors" in new ErrorSetup {
@@ -73,22 +76,57 @@ class ContractorUtrViewSpec extends SpecBase with Matchers {
   }
 
   trait Setup {
-    val app                                       = applicationBuilder().build()
-    val formProvider: ContractorUtrFormProvider   = new ContractorUtrFormProvider()
-    val form: Form[String]                        = formProvider()
-    val view: ContractorUtrView                   = app.injector.instanceOf[ContractorUtrView]
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
-    lazy val html: HtmlFormat.Appendable          = view(form, NormalMode)
-    lazy val doc: Document                        = Jsoup.parse(html.body)
+    val app =
+      applicationBuilder().build()
+
+    val formProvider: ContractorUtrFormProvider =
+      new ContractorUtrFormProvider()
+
+    val form: Form[String] =
+      formProvider()
+
+    val view: ContractorUtrView =
+      app.injector.instanceOf[ContractorUtrView]
+
+    implicit val request: play.api.mvc.Request[_] =
+      FakeRequest()
+
+    implicit val messages: Messages =
+      play.api.i18n.MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[play.api.i18n.MessagesApi]
+      )
+
+    val submitAction =
+      controllers.contractordetails.routes.ContractorUtrController
+        .onSubmit(NormalMode)
+
+    lazy val html: HtmlFormat.Appendable =
+      view(
+        form,
+        NormalMode,
+        submitAction
+      )
+
+    lazy val doc: Document =
+      Jsoup.parse(html.body)
   }
 
   trait ErrorSetup extends Setup {
-    val errorForm: Form[String]                   = form.withError("value", "contractordetails.contractorUtr.error.required")
-    override lazy val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
-    override lazy val doc: Document               = Jsoup.parse(html.body)
+    val errorForm: Form[String] =
+      form.withError(
+        "value",
+        "contractordetails.contractorUtr.error.required"
+      )
+
+    override lazy val html: HtmlFormat.Appendable =
+      view(
+        errorForm,
+        NormalMode,
+        submitAction
+      )
+
+    override lazy val doc: Document =
+      Jsoup.parse(html.body)
   }
 }

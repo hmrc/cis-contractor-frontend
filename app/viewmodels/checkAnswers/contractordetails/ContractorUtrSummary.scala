@@ -26,25 +26,56 @@ import viewmodels.implicits.*
 
 object ContractorUtrSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ContractorUtrPage).map { answer =>
-      val isEmpty = answer.trim.isEmpty
-      SummaryListRowViewModel(
-        key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
-        value = if (isEmpty) {
-          ValueViewModel("")
+  def row(
+    answers: UserAnswers,
+    showActions: Boolean = true,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(ContractorUtrPage(id)))
+      .getOrElse(answers.get(ContractorUtrPage))
+      .map { answer =>
+
+        val isEmpty = answer.trim.isEmpty
+
+        val value =
+          if (isEmpty) ValueViewModel("")
+          else UtrViewModel(answer)
+
+        if (showActions) {
+          val actions = Seq(
+            ActionItemViewModel(
+              messages(
+                if (isEmpty) {
+                  "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"
+                } else {
+                  "site.change"
+                }
+              ),
+              changeUrl.getOrElse(
+                controllers.contractordetails.routes.ContractorUtrController
+                  .onPageLoad(CheckMode)
+                  .url
+              )
+            )
+              .withVisuallyHiddenText(
+                messages("contractordetails.contractorUtr.change.hidden")
+              )
+              .withAttribute("id" -> "contractor-utr")
+          )
+
+          SummaryListRowViewModel(
+            key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
+            value = value,
+            actions = actions
+          )
         } else {
-          UtrViewModel(answer)
-        },
-        actions = Seq(
-          ActionItemViewModel(
-            messages(
-              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
-            ),
-            controllers.contractordetails.routes.ContractorUtrController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("contractordetails.contractorUtr.change.hidden"))
-            .withAttribute("id" -> "contractor-utr")
-        )
-      )
-    }
+          SummaryListRowViewModel(
+            key = messages("contractordetails.contractorUtr.checkYourAnswersLabel"),
+            value = value,
+            actions = Seq.empty
+          )
+        }
+      }
 }

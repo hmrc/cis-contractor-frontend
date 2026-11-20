@@ -16,7 +16,7 @@
 
 package controllers.contractordetails
 
-import base.SpecBase
+import base.WithFakeCisTaxpayer
 import controllers.routes
 import forms.contractordetails.SchemeNameFormProvider
 import models.{NormalMode, UserAnswers}
@@ -34,13 +34,14 @@ import repositories.SessionRepository
 import views.html.contractordetails.SchemeNameView
 
 import scala.concurrent.Future
+import java.util.UUID
 
-class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
+class SchemeNameControllerSpec extends WithFakeCisTaxpayer with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider       = new SchemeNameFormProvider()
-  val form: Form[String] = formProvider()
+  val formProvider: SchemeNameFormProvider = new SchemeNameFormProvider()
+  val form: Form[String]                   = formProvider()
 
   lazy val schemeNameRoute: String =
     controllers.contractordetails.routes.SchemeNameController
@@ -70,7 +71,15 @@ class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(application)).toString
+          view(
+            form,
+            NormalMode,
+            controllers.contractordetails.routes.SchemeNameController
+              .onSubmit(NormalMode)
+          )(
+            request,
+            messages(application)
+          ).toString
       }
     }
 
@@ -95,7 +104,12 @@ class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill("answer"), NormalMode)(
+          view(
+            form.fill("answer"),
+            NormalMode,
+            controllers.contractordetails.routes.SchemeNameController
+              .onSubmit(NormalMode)
+          )(
             request,
             messages(application)
           ).toString
@@ -189,7 +203,15 @@ class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode)(request, messages(application)).toString
+          view(
+            boundForm,
+            NormalMode,
+            controllers.contractordetails.routes.SchemeNameController
+              .onSubmit(NormalMode)
+          )(
+            request,
+            messages(application)
+          ).toString
       }
     }
 
@@ -224,6 +246,85 @@ class SchemeNameControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET with id when the subjourney exists" in {
+
+      val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id   = uuid.toString
+
+      val answers =
+        emptyUserAnswers
+          .set(queries.CisIdQuery(id), "AB12")
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage(id), true)
+          .success
+          .value
+
+      val repo = mockSessionRepository(Some(answers))
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[SessionRepository].toInstance(repo)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.contractordetails.routes.SchemeNameController
+            .onPageLoadWithId(uuid, NormalMode)
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to the next page with id when valid data is submitted" in {
+
+      val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id   = uuid.toString
+
+      val answers =
+        emptyUserAnswers
+          .set(queries.CisIdQuery(id), "AB12")
+          .success
+          .value
+          .set(AddSchemeNameYesNoPage(id), true)
+          .success
+          .value
+
+      val repo = mockSessionRepository(Some(answers))
+
+      when(repo.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(repo)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.contractordetails.routes.SchemeNameController
+              .onSubmitWithId(uuid, NormalMode)
+              .url
+          ).withFormUrlEncodedBody(("value", "My Scheme"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
   }

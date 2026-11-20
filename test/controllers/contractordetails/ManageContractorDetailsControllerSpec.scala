@@ -77,7 +77,7 @@ class ManageContractorDetailsControllerSpec extends SpecBase with MockitoSugar {
       Future.successful(userAnswers)
     )
 
-    applicationBuilder(Some(emptyUserAnswers))
+    applicationBuilder(Some(userAnswers))
       .overrides(
         bind[ContractorDetailsService]
           .toInstance(mockContractorDetailsService),

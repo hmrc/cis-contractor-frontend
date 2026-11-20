@@ -34,6 +34,7 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
       ("ORGANISATION", applicationConfig.constructionIndustryOrgAccountUrl)
     ).foreach { case (accountTypeSTR, cisAccountUrl) =>
       s"when accountType is '$accountTypeSTR'" - {
+
         "must render the page with headings, summary list, save button and dashboard link" in new Setup {
 
           val summaryRows = Seq(
@@ -41,9 +42,13 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
               key = Key(Text("Unique Taxpayer Reference")),
               value = Value(Text("1234567890")),
               actions = Some(
-                Actions(items =
-                  Seq(
-                    ActionItem("#", Text("Change"), Some("Unique Taxpayer Reference"))
+                Actions(
+                  items = Seq(
+                    ActionItem(
+                      "#",
+                      Text("Change"),
+                      Some("Unique Taxpayer Reference")
+                    )
                   )
                 )
               )
@@ -52,19 +57,39 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
               key = Key(Text("Scheme name")),
               value = Value(Text("Scheme ABC")),
               actions = Some(
-                Actions(items =
-                  Seq(
-                    ActionItem("#", Text("Change"), Some("Scheme name"))
+                Actions(
+                  items = Seq(
+                    ActionItem(
+                      "#",
+                      Text("Change"),
+                      Some("Scheme name")
+                    )
                   )
                 )
               )
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
-          val doc  = Jsoup.parse(html.body)
+          val submitAction =
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+              .onSubmit(None)
 
-          doc.select("h1").text must include(messages("contractordetails.contractorDetailsCheckAnswers.heading"))
+          val html =
+            view(
+              accountsOfficeReference,
+              summaryRows,
+              cisAccountUrl,
+              None,
+              submitAction
+            )
+
+          val doc = Jsoup.parse(html.body)
+
+          doc.select("h1").text must include(
+            messages(
+              "contractordetails.contractorDetailsCheckAnswers.heading"
+            )
+          )
 
           doc.select("h2").text must include(
             messages(
@@ -83,12 +108,28 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
             "Scheme ABC"
           )
 
-          doc.select(".govuk-summary-list__actions .govuk-link").text must include(messages("site.change"))
-          doc.select("button.govuk-button").text mustBe messages("site.saveAndContinue")
-          doc.select(".govuk-link").text                              must include(
-            messages("contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link")
+          doc
+            .select(".govuk-summary-list__actions .govuk-link")
+            .text must include(
+            messages("site.change")
           )
 
+          doc
+            .select("form")
+            .attr("action") mustBe submitAction.url
+
+          doc
+            .select("form")
+            .attr("autocomplete") mustBe "off"
+
+          doc.select("button.govuk-button").text mustBe
+            messages("site.saveAndContinue")
+
+          doc.select(".govuk-link").text must include(
+            messages(
+              "contractordetails.contractorDetailsCheckAnswers.returnToCisDashboard.link"
+            )
+          )
         }
 
         "must render empty values and Add details links when summary rows contain empty values" in new Setup {
@@ -98,21 +139,40 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
               key = Key(Text("Unique Taxpayer Reference")),
               value = Value(Text("")),
               actions = Some(
-                Actions(items =
-                  Seq(
-                    ActionItem("#", Text("Add details"), Some("Unique Taxpayer Reference"))
+                Actions(
+                  items = Seq(
+                    ActionItem(
+                      "#",
+                      Text("Add details"),
+                      Some("Unique Taxpayer Reference")
+                    )
                   )
                 )
               )
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
-          val doc  = Jsoup.parse(html.body)
+          val submitAction =
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+              .onSubmit(None)
+
+          val html =
+            view(
+              accountsOfficeReference,
+              summaryRows,
+              cisAccountUrl,
+              None,
+              submitAction
+            )
+
+          val doc = Jsoup.parse(html.body)
 
           doc.select(".govuk-summary-list__value").text mustBe ""
+
           doc.select(".govuk-link").text must include(
-            messages("contractordetails.contractorDetailsCheckAnswers.table.link.addDetails")
+            messages(
+              "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"
+            )
           )
         }
 
@@ -123,34 +183,58 @@ class ContractorDetailsCheckAnswersViewSpec extends SpecBase {
               key = Key(Text("Unique Taxpayer Reference")),
               value = Value(Text("1234567890")),
               actions = Some(
-                Actions(items =
-                  Seq(
-                    ActionItem("#", Text("Change"), Some("Change Unique Taxpayer Reference"))
+                Actions(
+                  items = Seq(
+                    ActionItem(
+                      "#",
+                      Text("Change"),
+                      Some("Change Unique Taxpayer Reference")
+                    )
                   )
                 )
               )
             )
           )
 
-          val html = view(accountsOfficeReference, summaryRows, cisAccountUrl, None)
-          val doc  = Jsoup.parse(html.body)
+          val submitAction =
+            controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+              .onSubmit(None)
 
-          val hidden = doc.select(".govuk-visually-hidden").eachText()
+          val html =
+            view(
+              accountsOfficeReference,
+              summaryRows,
+              cisAccountUrl,
+              None,
+              submitAction
+            )
 
-          hidden must contain("Change Unique Taxpayer Reference")
+          val doc = Jsoup.parse(html.body)
+
+          val hidden =
+            doc.select(".govuk-visually-hidden").eachText()
+
+          hidden must contain(
+            "Change Unique Taxpayer Reference"
+          )
         }
       }
     }
 
     trait Setup {
-      implicit val request: Request[_] = FakeRequest()
-      implicit val messages: Messages  =
+
+      implicit val request: Request[_] =
+        FakeRequest()
+
+      implicit val messages: Messages =
         play.api.i18n.MessagesImpl(
           play.api.i18n.Lang.defaultLang,
           app.injector.instanceOf[play.api.i18n.MessagesApi]
         )
 
-      val accountsOfficeReference                 = "123 PA 87654321"
+      val accountsOfficeReference =
+        "123 PA 87654321"
+
       val view: ContractorDetailsCheckAnswersView =
         app.injector.instanceOf[ContractorDetailsCheckAnswersView]
     }

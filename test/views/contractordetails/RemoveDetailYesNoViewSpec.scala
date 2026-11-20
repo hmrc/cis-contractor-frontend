@@ -33,11 +33,22 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
     s"when contractorDetail is '$contractorDetail'" - {
 
       "RemoveDetailYesNoView" - {
+
         "must render the page with the correct html elements" in new Setup {
           val doc: Document = Jsoup.parse(html.toString)
-          doc.title             must include(messages("contractordetails.removeDetailYesNo.title", messages(detailKey)))
+
+          doc.title must include(
+            messages(
+              "contractordetails.removeDetailYesNo.title",
+              messages(detailKey)
+            )
+          )
+
           doc.select("h1").text must include(
-            messages("contractordetails.removeDetailYesNo.heading", messages(detailKey))
+            messages(
+              "contractordetails.removeDetailYesNo.heading",
+              messages(detailKey)
+            )
           )
 
           doc.getElementsByClass("govuk-button").text must include(
@@ -50,22 +61,37 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
 
           doc.select("input[type=radio][value=true]").size() mustBe 1
           doc.select("input[type=radio][value=false]").size() mustBe 1
-
         }
 
         "must pre-populate the form when user has previously answered 'true'" in new Setup {
-          val filledForm    = form.fill(true)
-          val filledHtml    = view(contractorDetail, filledForm)
-          val doc: Document = Jsoup.parse(filledHtml.toString)
+          val filledForm = form.fill(true)
+
+          val filledHtml =
+            view(
+              contractorDetail,
+              filledForm,
+              submitAction
+            )
+
+          val doc: Document =
+            Jsoup.parse(filledHtml.toString)
 
           doc.select("input[value=true]").hasAttr("checked") mustBe true
           doc.select("input[value=false]").hasAttr("checked") mustBe false
         }
 
         "must pre-populate the form when user has previously answered 'false'" in new Setup {
-          val filledForm    = form.fill(false)
-          val filledHtml    = view(contractorDetail, filledForm)
-          val doc: Document = Jsoup.parse(filledHtml.toString)
+          val filledForm = form.fill(false)
+
+          val filledHtml =
+            view(
+              contractorDetail,
+              filledForm,
+              submitAction
+            )
+
+          val doc: Document =
+            Jsoup.parse(filledHtml.toString)
 
           doc.select("input[value=true]").hasAttr("checked") mustBe false
           doc.select("input[value=false]").hasAttr("checked") mustBe true
@@ -73,19 +99,38 @@ class RemoveDetailYesNoViewSpec extends SpecBase {
       }
 
       trait Setup {
-        val app                                       = applicationBuilder().build()
-        val view                                      = app.injector.instanceOf[RemoveDetailYesNoView]
-        val formProvider                              = new RemoveDetailYesNoFormProvider()
-        val form                                      = formProvider(contractorDetail)
-        implicit val request: play.api.mvc.Request[_] = FakeRequest()
-        implicit val messages: Messages               = play.api.i18n.MessagesImpl(
-          play.api.i18n.Lang.defaultLang,
-          app.injector.instanceOf[play.api.i18n.MessagesApi]
-        )
+        val app =
+          applicationBuilder().build()
 
-        val html = view(contractorDetail, form)
+        val view =
+          app.injector.instanceOf[RemoveDetailYesNoView]
+
+        val formProvider =
+          new RemoveDetailYesNoFormProvider()
+
+        val form =
+          formProvider(contractorDetail)
+
+        implicit val request: play.api.mvc.Request[_] =
+          FakeRequest()
+
+        implicit val messages: Messages =
+          play.api.i18n.MessagesImpl(
+            play.api.i18n.Lang.defaultLang,
+            app.injector.instanceOf[play.api.i18n.MessagesApi]
+          )
+
+        val submitAction =
+          controllers.contractordetails.routes.RemoveDetailYesNoController
+            .onSubmit(contractorDetail)
+
+        val html =
+          view(
+            contractorDetail,
+            form,
+            submitAction
+          )
       }
     }
-
   }
 }

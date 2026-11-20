@@ -15,6 +15,7 @@
  *@
 
 @import config.FrontendAppConfig
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -30,12 +31,13 @@
     accountsOfficeReference: String,
     summaryRows: Seq[SummaryListRow],
     cisAccountUrl: String,
-    target: Option[String]
+    target: Option[String],
+    submitAction: Call
 )(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("contractordetails.contractorDetailsCheckAnswers.title"))) {
 
-    @formHelper(action = controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onSubmit(target), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @h1("contractordetails.contractorDetailsCheckAnswers.heading", classes = "govuk-heading-xl")
         @h2(messages("contractordetails.contractorDetailsCheckAnswers.accountsOfficeReference", accountsOfficeReference))

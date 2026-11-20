@@ -25,29 +25,48 @@ import viewmodels.implicits.*
 
 object AddEmailAddressYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddEmailAddressYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    id: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] = {
 
-      val value = if (answer) "site.yes" else "site.no"
+    val answer =
+      id.map(tabId => answers.get(AddEmailAddressYesNoPage(tabId)))
+        .getOrElse(answers.get(AddEmailAddressYesNoPage))
+
+    val contractorScheme =
+      id.map(tabId => answers.get(ContractorSchemePage(tabId)))
+        .getOrElse(answers.get(ContractorSchemePage))
+
+    answer.map { value =>
+
+      val yesNoText = if (value) messages("site.yes") else messages("site.no")
 
       val changeUrl =
-        if (answer && ContractorSchemePage.hasExistingUtr(answers)) {
-          controllers.contractordetails.routes.RemoveDetailYesNoController.onPageLoad("email-address").url
+        if (value && contractorScheme.exists(_.utr.exists(_.trim.nonEmpty))) {
+          controllers.contractordetails.routes.RemoveDetailYesNoController
+            .onPageLoad("email-address")
+            .url
         } else {
-          controllers.contractordetails.routes.AddEmailAddressYesNoController.onPageLoad(CheckMode).url
+          controllers.contractordetails.routes.AddEmailAddressYesNoController
+            .onPageLoad(CheckMode)
+            .url
         }
 
       SummaryListRowViewModel(
         key = "contractordetails.addEmailAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        value = ValueViewModel(yesNoText),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             changeUrl
           )
-            .withVisuallyHiddenText(messages("contractordetails.addEmailAddressYesNo.change.hidden"))
+            .withVisuallyHiddenText(
+              messages("contractordetails.addEmailAddressYesNo.change.hidden")
+            )
             .withAttribute("id" -> "add-email-address-yes-no")
         )
       )
     }
+  }
 }

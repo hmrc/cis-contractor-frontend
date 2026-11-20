@@ -20,10 +20,23 @@ import models.{Scheme, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ContractorSchemePage extends QuestionPage[Scheme] {
+case class ContractorSchemePage(id: String) extends QuestionPage[Scheme] with ContractorDetailsJourney {
+
+  override def path: JsPath =
+    JsPath \ "contractordetails" \ id \ toString
+
+  override def toString: String = "contractorScheme"
+
+  def hasExistingUtr(answers: UserAnswers): Boolean =
+    answers.get(this).flatMap(_.utr).exists(_.trim.nonEmpty)
+}
+
+case object ContractorSchemePage extends QuestionPage[Scheme] with ContractorDetailsJourney {
 
   override def path: JsPath =
     JsPath \ "contractordetails" \ toString
+
+  override def toString: String = "contractorScheme"
 
   def hasExistingUtr(answers: UserAnswers): Boolean =
     answers.get(this).flatMap(_.utr).exists(_.trim.nonEmpty)

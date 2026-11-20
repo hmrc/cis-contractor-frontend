@@ -26,11 +26,7 @@ object ContractorDetailsPopulator {
   private def nonBlank(value: Option[String]): Option[String] =
     value.map(_.trim).filter(_.nonEmpty)
 
-  def populate(
-    userAnswers: UserAnswers,
-    scheme: Scheme
-  ): Try[UserAnswers] = {
-
+  def populate(userAnswers: UserAnswers, scheme: Scheme): Try[UserAnswers] = {
     val utr   = nonBlank(scheme.utr)
     val name  = nonBlank(scheme.name)
     val email = nonBlank(scheme.emailAddress)
@@ -38,38 +34,45 @@ object ContractorDetailsPopulator {
     for {
       contractorUtr <- Try(
                          utr.getOrElse(
-                           throw new IllegalArgumentException(
-                             "Cannot populate contractor details without UTR"
-                           )
+                           throw new IllegalArgumentException("Cannot populate contractor details without UTR")
                          )
                        )
+      ua1           <- userAnswers.set(ContractorUtrPage, contractorUtr)
+      ua2           <- ua1.set(AddSchemeNameYesNoPage, name.isDefined)
+      ua3           <- name match {
+                         case Some(value) => ua2.set(SchemeNamePage, value)
+                         case None        => Success(ua2)
+                       }
+      ua4           <- ua3.set(AddEmailAddressYesNoPage, email.isDefined)
+      ua5           <- email match {
+                         case Some(value) => ua4.set(EnterContractorEmailAddressPage, value)
+                         case None        => Success(ua4)
+                       }
+    } yield ua5
+  }
 
-      ua1 <- userAnswers.set(ContractorUtrPage, contractorUtr)
+  def populate(userAnswers: UserAnswers, scheme: Scheme, id: String): Try[UserAnswers] = {
+    val utr   = nonBlank(scheme.utr)
+    val name  = nonBlank(scheme.name)
+    val email = nonBlank(scheme.emailAddress)
 
-      ua2 <- ua1.set(AddSchemeNameYesNoPage, name.isDefined)
-
-      ua3 <-
-        name match {
-          case Some(value) =>
-            ua2.set(SchemeNamePage, value)
-
-          case None =>
-            Success(ua2)
-        }
-
-      ua4 <- ua3.set(AddEmailAddressYesNoPage, email.isDefined)
-
-      ua5 <-
-        email match {
-          case Some(value) =>
-            ua4.set(
-              EnterContractorEmailAddressPage,
-              value
-            )
-
-          case None => Success(ua4)
-        }
-
+    for {
+      contractorUtr <- Try(
+                         utr.getOrElse(
+                           throw new IllegalArgumentException("Cannot populate contractor details without UTR")
+                         )
+                       )
+      ua1           <- userAnswers.set(ContractorUtrPage(id), contractorUtr)
+      ua2           <- ua1.set(AddSchemeNameYesNoPage(id), name.isDefined)
+      ua3           <- name match {
+                         case Some(value) => ua2.set(SchemeNamePage(id), value)
+                         case None        => Success(ua2)
+                       }
+      ua4           <- ua3.set(AddEmailAddressYesNoPage(id), email.isDefined)
+      ua5           <- email match {
+                         case Some(value) => ua4.set(EnterContractorEmailAddressPage(id), value)
+                         case None        => Success(ua4)
+                       }
     } yield ua5
   }
 }

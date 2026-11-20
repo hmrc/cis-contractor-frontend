@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.SchemeNameView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class SchemeNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: SchemeNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: SchemeNameView
@@ -58,7 +60,13 @@ class SchemeNameController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode))
+        Ok(
+          view(
+            preparedForm,
+            mode,
+            controllers.contractordetails.routes.SchemeNameController.onSubmit(mode)
+          )
+        )
       }
     }
 
@@ -67,7 +75,16 @@ class SchemeNameController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  controllers.contractordetails.routes.SchemeNameController.onSubmit(mode)
+                )
+              )
+            ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeNamePage, value))
@@ -75,4 +92,51 @@ class SchemeNameController @Inject() (
             } yield Redirect(navigator.nextPage(SchemeNamePage, mode, updatedAnswers))
         )
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+
+      if (!request.userAnswers.get(AddSchemeNameYesNoPage(id)).contains(true)) {
+        Redirect(
+          controllers.contractordetails.routes.AddSchemeNameYesNoController.onPageLoadWithId(flowId, mode)
+        )
+      } else {
+        val page         = SchemeNamePage(id)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+        Ok(
+          view(
+            preparedForm,
+            mode,
+            controllers.contractordetails.routes.SchemeNameController.onSubmitWithId(flowId, mode)
+          )
+        )
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id   = flowId.toString
+      val page = SchemeNamePage(id)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  controllers.contractordetails.routes.SchemeNameController.onSubmitWithId(flowId, mode)
+                )
+              )
+            ),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        )
+    }
 }

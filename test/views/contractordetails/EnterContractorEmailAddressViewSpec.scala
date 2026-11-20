@@ -19,7 +19,6 @@ package views.contractordetails
 import forms.contractordetails.EnterContractorEmailAddressFormProvider
 import models.NormalMode
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -34,38 +33,69 @@ class EnterContractorEmailAddressViewSpec extends AnyWordSpec with Matchers with
   "EnterContractorEmailAddressView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
-      val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("title").text() must include(messages("contractordetails.enterContractorEmailAddress.title"))
+      val html: HtmlFormat.Appendable =
+        view(
+          form,
+          NormalMode,
+          controllers.contractordetails.routes.EnterContractorEmailAddressController
+            .onSubmit(NormalMode)
+        )
+
+      val doc =
+        org.jsoup.Jsoup.parse(html.toString())
+
+      doc.select("title").text() must include(
+        messages("contractordetails.enterContractorEmailAddress.title")
+      )
 
       val heading = doc.select("h1")
-      heading.text() mustBe messages("contractordetails.enterContractorEmailAddress.heading")
+
+      heading.text() mustBe
+        messages("contractordetails.enterContractorEmailAddress.heading")
 
       doc
         .select("form")
-        .attr("action") mustBe controllers.contractordetails.routes.EnterContractorEmailAddressController
-        .onSubmit(NormalMode)
-        .url
+        .attr("action") mustBe
+        controllers.contractordetails.routes.EnterContractorEmailAddressController
+          .onSubmit(NormalMode)
+          .url
 
       doc.select("input[name=value]").size() mustBe 1
 
-      doc.select(".govuk-button").text() mustBe messages("site.continue")
+      doc.select(".govuk-button").text() mustBe
+        messages("site.continue")
     }
 
     "display error summary and inline error when no email is entered" in new Setup {
+
       val errorForm: Form[String] =
-        form.withError("value", "contractordetails.enterContractorEmailAddress.error.required")
+        form.withError(
+          "value",
+          "contractordetails.enterContractorEmailAddress.error.required"
+        )
 
-      val html = view(errorForm, NormalMode)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html =
+        view(
+          errorForm,
+          NormalMode,
+          controllers.contractordetails.routes.EnterContractorEmailAddressController
+            .onSubmit(NormalMode)
+        )
 
-      val summary = doc.select(".govuk-error-summary")
+      val doc =
+        org.jsoup.Jsoup.parse(html.toString())
+
+      val summary =
+        doc.select(".govuk-error-summary")
+
       summary.text() must include(
         messages("contractordetails.enterContractorEmailAddress.error.required")
       )
 
-      val linkHref = summary.select("a").attr("href")
+      val linkHref =
+        summary.select("a").attr("href")
+
       linkHref mustBe "#value"
 
       doc.select(".govuk-error-message").text() must include(
@@ -74,13 +104,27 @@ class EnterContractorEmailAddressViewSpec extends AnyWordSpec with Matchers with
     }
 
     "display error summary and inline error when an invalid email is entered" in new Setup {
+
       val errorForm: Form[String] =
-        form.withError("value", "contractordetails.enterContractorEmailAddress.error.invalid")
+        form.withError(
+          "value",
+          "contractordetails.enterContractorEmailAddress.error.invalid"
+        )
 
-      val html = view(errorForm, NormalMode)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
+      val html =
+        view(
+          errorForm,
+          NormalMode,
+          controllers.contractordetails.routes.EnterContractorEmailAddressController
+            .onSubmit(NormalMode)
+        )
 
-      val summary = doc.select(".govuk-error-summary")
+      val doc =
+        org.jsoup.Jsoup.parse(html.toString())
+
+      val summary =
+        doc.select(".govuk-error-summary")
+
       summary.text() must include(
         messages("contractordetails.enterContractorEmailAddress.error.invalid")
       )
@@ -92,16 +136,22 @@ class EnterContractorEmailAddressViewSpec extends AnyWordSpec with Matchers with
   }
 
   trait Setup {
-    val formProvider: EnterContractorEmailAddressFormProvider = new EnterContractorEmailAddressFormProvider()
-    val form: Form[String]                                    = formProvider()
+    val formProvider: EnterContractorEmailAddressFormProvider =
+      new EnterContractorEmailAddressFormProvider()
 
-    implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages  =
+    val form: Form[String] =
+      formProvider()
+
+    implicit val request: Request[_] =
+      FakeRequest()
+
+    implicit val messages: Messages =
       play.api.i18n.MessagesImpl(
         play.api.i18n.Lang.defaultLang,
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: EnterContractorEmailAddressView = app.injector.instanceOf[EnterContractorEmailAddressView]
+    val view: EnterContractorEmailAddressView =
+      app.injector.instanceOf[EnterContractorEmailAddressView]
   }
 }

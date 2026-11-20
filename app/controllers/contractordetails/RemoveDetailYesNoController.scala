@@ -26,6 +26,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.contractordetails.RemoveDetailYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,6 +36,7 @@ class RemoveDetailYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: RemoveDetailYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: RemoveDetailYesNoView
@@ -58,7 +60,16 @@ class RemoveDetailYesNoController @Inject() (
       withValidDetail(contractorDetail) {
         val form         = formProvider(contractorDetail)
         val preparedForm = request.userAnswers.get(RemoveDetailYesNoPage(contractorDetail)).fold(form)(form.fill)
-        Future.successful(Ok(view(contractorDetail, preparedForm)))
+        Future.successful(
+          Ok(
+            view(
+              contractorDetail,
+              preparedForm,
+              controllers.contractordetails.routes.RemoveDetailYesNoController
+                .onSubmit(contractorDetail)
+            )
+          )
+        )
       }
     }
 
@@ -68,7 +79,17 @@ class RemoveDetailYesNoController @Inject() (
         formProvider(contractorDetail)
           .bindFromRequest()
           .fold(
-            formWithErrors => Future.successful(BadRequest(view(contractorDetail, formWithErrors))),
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    contractorDetail,
+                    formWithErrors,
+                    controllers.contractordetails.routes.RemoveDetailYesNoController
+                      .onSubmit(contractorDetail)
+                  )
+                )
+              ),
             value =>
               for {
                 updatedAnswers <-
@@ -76,6 +97,60 @@ class RemoveDetailYesNoController @Inject() (
                 _              <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
                 controllers.contractordetails.routes.ContractorDetailsCheckAnswersController.onPageLoad().url
+              )
+          )
+      }
+    }
+
+  def onPageLoadWithId(flowId: UUID, contractorDetail: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      withValidDetail(contractorDetail) {
+        val id           = flowId.toString
+        val page         = RemoveDetailYesNoPage(contractorDetail, Some(id))
+        val form         = formProvider(contractorDetail)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+
+        Future.successful(
+          Ok(
+            view(
+              contractorDetail,
+              preparedForm,
+              controllers.contractordetails.routes.RemoveDetailYesNoController
+                .onSubmitWithId(flowId, contractorDetail)
+            )
+          )
+        )
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, contractorDetail: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      withValidDetail(contractorDetail) {
+        val id   = flowId.toString
+        val page = RemoveDetailYesNoPage(contractorDetail, Some(id))
+
+        formProvider(contractorDetail)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    contractorDetail,
+                    formWithErrors,
+                    controllers.contractordetails.routes.RemoveDetailYesNoController
+                      .onSubmitWithId(flowId, contractorDetail)
+                  )
+                )
+              ),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.contractordetails.routes.ContractorDetailsCheckAnswersController
+                  .onPageLoadWithId(flowId)
+                  .url
               )
           )
       }

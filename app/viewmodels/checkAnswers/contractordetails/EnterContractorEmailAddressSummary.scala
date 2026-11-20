@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.contractordetails
 
 import controllers.contractordetails.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, Mode, UserAnswers}
 import pages.contractordetails.EnterContractorEmailAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -25,21 +25,40 @@ import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object EnterContractorEmailAddressSummary {
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(EnterContractorEmailAddressPage).map { answer =>
-      val isEmpty = answer.trim.isEmpty
-      SummaryListRowViewModel(
-        key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
-        value = ValueViewModel(if (isEmpty) "" else answer),
-        actions = Seq(
-          ActionItemViewModel(
-            messages(
-              if (isEmpty) "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails" else "site.change"
-            ),
-            routes.EnterContractorEmailAddressController.onPageLoad(CheckMode).url
-          ).withVisuallyHiddenText(messages("contractordetails.enterContractorEmailAddress.change.hidden"))
-            .withAttribute("id" -> "contractor-email-address")
+
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(EnterContractorEmailAddressPage(id)))
+      .getOrElse(answers.get(EnterContractorEmailAddressPage))
+      .map { answer =>
+        val isEmpty = answer.trim.isEmpty
+
+        SummaryListRowViewModel(
+          key = messages("contractordetails.enterContractorEmailAddress.checkYourAnswersLabel"),
+          value = ValueViewModel(if (isEmpty) "" else answer),
+          actions = Seq(
+            ActionItemViewModel(
+              messages(
+                if (isEmpty) {
+                  "contractordetails.contractorDetailsCheckAnswers.table.link.addDetails"
+                } else {
+                  "site.change"
+                }
+              ),
+              changeUrl.getOrElse(
+                routes.EnterContractorEmailAddressController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(
+                messages("contractordetails.enterContractorEmailAddress.change.hidden")
+              )
+              .withAttribute("id" -> "contractor-email-address")
+          )
         )
-      )
-    }
+      }
 }
