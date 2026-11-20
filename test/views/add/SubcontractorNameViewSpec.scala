@@ -34,7 +34,7 @@ class SubcontractorNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
   "SubcontractorNameView" should {
 
     "render the page with title, heading, three input fields and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, submitAction)
       val doc                         = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subcontractorName.title"))
@@ -59,7 +59,7 @@ class SubcontractorNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
     }
 
     "render the page with title and update button in amend mode" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, AmendMode)
+      val html: HtmlFormat.Appendable = view(form, AmendMode, amendSubmitAction)
       val doc                         = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("subcontractorName.title"))
@@ -72,7 +72,7 @@ class SubcontractorNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
         .withError("firstName", "subcontractorName.firstName.error.required")
         .withError("lastName", "subcontractorName.lastName.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html = view(errorForm, NormalMode, submitAction)
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -99,5 +99,7 @@ class SubcontractorNameViewSpec extends AnyWordSpec with Matchers with GuiceOneA
       )
 
     val view: SubcontractorNameView = app.injector.instanceOf[SubcontractorNameView]
+    val submitAction                = controllers.add.routes.SubcontractorNameController.onSubmit(NormalMode)
+    val amendSubmitAction           = controllers.add.routes.SubcontractorNameController.onSubmit(AmendMode)
   }
 }
