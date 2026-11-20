@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustAddressYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +40,7 @@ class TrustAddressYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: TrustAddressYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustAddressYesNoView
@@ -58,7 +60,7 @@ class TrustAddressYesNoController @Inject() (
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, trustName))
+        Ok(view(preparedForm, mode, trustName, routes.TrustAddressYesNoController.onSubmit(mode)))
       }
       .getOrElse {
         logger.error(s"[TrustAddressYesNoController][onPageLoad] - TrustNamePage missing from userAnswers")
@@ -74,7 +76,10 @@ class TrustAddressYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, trustName, routes.TrustAddressYesNoController.onSubmit(mode)))
+                ),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage, value))
@@ -87,4 +92,56 @@ class TrustAddressYesNoController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode, id)
+        .map { trustName =>
+          val page         = TrustAddressYesNoPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              trustName,
+              routes.TrustAddressYesNoController.onSubmitWithId(flowId, mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            s"[TrustAddressYesNoController][onPageLoadWithId] - TrustNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.TrustAddressYesNoController.onSubmitWithId(flowId, mode)
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, mode, id)
+        .map { trustName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage(id), value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(TrustAddressYesNoPage(id), mode, updatedAnswers))
+            )
+        }
+        .getOrElse {
+          logger.error(
+            s"[TrustAddressYesNoController][onSubmitWithId] - TrustNamePage missing from userAnswers"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

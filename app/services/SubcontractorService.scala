@@ -68,7 +68,7 @@ class SubcontractorService @Inject() (
             companyPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
 
           case Trust =>
-            trustPayloadFromUserAnswers(cisId, subcontractorType, userAnswers)
+            trustPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, subJourneyId)
         }
       }
 
@@ -232,24 +232,30 @@ class SubcontractorService @Inject() (
   private def trustPayloadFromUserAnswers(
     cisId: String,
     subcontractorType: TypeOfSubcontractor,
-    userAnswers: UserAnswers
-  ): TrustPayload =
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): TrustPayload = {
+    val address = subJourneyId
+      .map(id => userAnswers.get(TrustAddressPage(id)))
+      .getOrElse(userAnswers.get(TrustAddressPage))
     TrustPayload(
       cisId = cisId,
       subcontractorType = subcontractorType,
-      trustTradingName = userAnswers.get(TrustNamePage),
-      utr = userAnswers.get(TrustUtrPage),
-      addressLine1 = userAnswers.get(TrustAddressPage).map(_.addressLine1),
-      addressLine2 = userAnswers.get(TrustAddressPage).flatMap(_.addressLine2),
-      city = userAnswers.get(TrustAddressPage).flatMap(_.addressLine3),
-      county = userAnswers.get(TrustAddressPage).flatMap(_.addressLine4),
-      postcode = userAnswers.get(TrustAddressPage).flatMap(_.postcode),
-      country = userAnswers.get(TrustAddressPage).flatMap(_.country).flatMap(_.name),
-      emailAddress = userAnswers.get(TrustEmailAddressPage),
-      phoneNumber = userAnswers.get(TrustPhoneNumberPage),
-      mobilePhoneNumber = userAnswers.get(TrustMobileNumberPage),
-      worksReferenceNumber = userAnswers.get(TrustWorksReferencePage)
+      trustTradingName = pageValue(userAnswers, subJourneyId, TrustNamePage.apply, TrustNamePage),
+      utr = pageValue(userAnswers, subJourneyId, TrustUtrPage.apply, TrustUtrPage),
+      addressLine1 = address.map(_.addressLine1),
+      addressLine2 = address.flatMap(_.addressLine2),
+      city = address.flatMap(_.addressLine3),
+      county = address.flatMap(_.addressLine4),
+      postcode = address.flatMap(_.postcode),
+      country = address.flatMap(_.country).flatMap(_.name),
+      emailAddress = pageValue(userAnswers, subJourneyId, TrustEmailAddressPage.apply, TrustEmailAddressPage),
+      phoneNumber = pageValue(userAnswers, subJourneyId, TrustPhoneNumberPage.apply, TrustPhoneNumberPage),
+      mobilePhoneNumber = pageValue(userAnswers, subJourneyId, TrustMobileNumberPage.apply, TrustMobileNumberPage),
+      worksReferenceNumber =
+        pageValue(userAnswers, subJourneyId, TrustWorksReferencePage.apply, TrustWorksReferencePage)
     )
+  }
 
   def getSubcontractor(
     cisId: String,

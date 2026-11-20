@@ -30,6 +30,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustPhoneNumberView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class TrustPhoneNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: TrustPhoneNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustPhoneNumberView
@@ -66,7 +68,7 @@ class TrustPhoneNumberController @Inject() (
             case None        => form
             case Some(value) => form.fill(value)
           }
-          Ok(view(preparedForm, mode, trustName))
+          Ok(view(preparedForm, mode, trustName, routes.TrustPhoneNumberController.onSubmit(mode)))
 
         case (Some(_), false) =>
           Redirect(controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode))
@@ -92,7 +94,10 @@ class TrustPhoneNumberController @Inject() (
       } yield form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, mode, trustName, routes.TrustPhoneNumberController.onSubmit(mode)))
+            ),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustPhoneNumberPage, value))
@@ -104,4 +109,63 @@ class TrustPhoneNumberController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id               = flowId.toString
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val trustName        =
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
+      val phoneIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (trustName, phoneIsAvailable) match {
+        case (Some(trustName), true) =>
+          val page         = TrustPhoneNumberPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              trustName,
+              routes.TrustPhoneNumberController.onSubmitWithId(flowId, mode)
+            )
+          )
+        case _                       =>
+          logger.error(
+            s"[TrustPhoneNumberController][onPageLoadWithId] - trust name or phone option missing"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id               = flowId.toString
+      val submitAction     = routes.TrustPhoneNumberController.onSubmitWithId(flowId, mode)
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val trustName        =
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
+      val phoneIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Phone))
+
+      (for {
+        trustName <- trustName
+        if phoneIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, trustName, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(TrustPhoneNumberPage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TrustPhoneNumberPage(id), mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            s"[TrustPhoneNumberController][onSubmitWithId] - trust name or phone option missing"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

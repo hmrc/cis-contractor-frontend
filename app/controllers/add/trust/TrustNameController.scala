@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.trust.TrustNameView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class TrustNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: TrustNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -55,7 +57,7 @@ class TrustNameController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, routes.TrustNameController.onSubmit(mode)))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
@@ -63,12 +65,38 @@ class TrustNameController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, routes.TrustNameController.onSubmit(mode)))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustNamePage, value))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(TrustNamePage, mode, updatedAnswers))
+        )
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = TrustNamePage(id)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.TrustNameController.onSubmitWithId(flowId, mode)))
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.TrustNameController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(TrustNamePage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(TrustNamePage(id), mode, updatedAnswers))
         )
     }
 }

@@ -608,6 +608,46 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must store the type and cisId from the URL under a new UUID when Trust is submitted on start" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[CisTaxpayerService].toInstance(authorisedOrgService())
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            POST,
+            controllers.add.routes.TypeOfSubcontractorController.onSubmitStart(startCisId, NormalMode).url
+          )
+            .withFormUrlEncodedBody("value" -> TypeOfSubcontractor.Trust.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(captor.capture())
+
+        val saved = captor.getValue
+        val id    = (saved.data \ "addSubcontractor").as[play.api.libs.json.JsObject].value.keys.head
+        redirectLocation(result).value mustBe
+          controllers.add.trust.routes.TrustNameController
+            .onPageLoadWithId(UUID.fromString(id), NormalMode)
+            .url
+        saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Trust)
+        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
+        saved.get(CisIdQuery) mustBe Some("1")
+      }
+    }
+
     "must clean previous answers before storing the type under a new UUID on start" in {
 
       val leftoverAnswers =

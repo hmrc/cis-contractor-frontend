@@ -65,6 +65,34 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
       ValidatedTrust.build(minRequired) mustBe a[Right[?, ?]]
     }
 
+    "build successfully from a subjourney" in {
+      val id      = "11111111-1111-1111-1111-111111111111"
+      val answers = emptyUserAnswers
+        .set(queries.CisIdQuery(id), "AB12")
+        .success
+        .value
+        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+        .success
+        .value
+        .set(TrustNamePage(id), "Folder Trust")
+        .success
+        .value
+        .set(TrustAddressYesNoPage(id), false)
+        .success
+        .value
+        .set(AddTrustContactMethodsYesNoPage(id), false)
+        .success
+        .value
+        .set(TrustUtrYesNoPage(id), false)
+        .success
+        .value
+        .set(TrustWorksReferenceYesNoPage(id), false)
+        .success
+        .value
+
+      ValidatedTrust.build(answers, id) mustBe a[Right[?, ?]]
+    }
+
     "fail when TypeOfSubcontractor is not Trust" in {
       val ua =
         minRequired

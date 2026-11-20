@@ -19,7 +19,7 @@ package pages.add
 import models.TypeOfSubcontractor
 import pages.add.company.CompanyAddressYesNoPage
 import pages.add.partnership.{PartnershipAddressYesNoPage, PartnershipNamePage}
-import pages.add.trust.TrustAddressYesNoPage
+import pages.add.trust.{TrustAddressYesNoPage, TrustNamePage}
 import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
@@ -66,6 +66,9 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
           .set(TrustAddressYesNoPage, true)
           .success
           .value
+          .set(TrustNamePage("uuid-1"), "Nested Trust")
+          .success
+          .value
 
       val updatedUserAnswers =
         userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership).success.value
@@ -75,6 +78,7 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(TrustAddressYesNoPage) mustBe Some(true)
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
       updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe Some(true)
+      updatedUserAnswers.get(TrustNamePage("uuid-1")) mustBe None
     }
 
     "cleanup: must remove nested partnership answers when another type is selected under the subjourney id" in {
@@ -89,6 +93,9 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
           .set(PartnershipAddressYesNoPage("uuid-1"), true)
           .success
           .value
+          .set(TrustNamePage("uuid-1"), "Nested Trust")
+          .success
+          .value
 
       val updatedUserAnswers =
         userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Limitedcompany).success.value
@@ -96,6 +103,24 @@ class TypeOfSubcontractorPageSpec extends PageBehaviours {
       updatedUserAnswers.get(PartnershipAddressYesNoPage) mustBe Some(true)
       updatedUserAnswers.get(PartnershipNamePage("uuid-1")) mustBe None
       updatedUserAnswers.get(PartnershipAddressYesNoPage("uuid-1")) mustBe None
+      updatedUserAnswers.get(TrustNamePage("uuid-1")) mustBe None
+    }
+
+    "cleanup: must remove nested partnership answers and keep nested trust when Trust is selected under the subjourney id" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(PartnershipNamePage("uuid-1"), "Nested Partnership")
+          .success
+          .value
+          .set(TrustNamePage("uuid-1"), "Nested Trust")
+          .success
+          .value
+
+      val updatedUserAnswers =
+        userAnswers.set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Trust).success.value
+
+      updatedUserAnswers.get(PartnershipNamePage("uuid-1")) mustBe None
+      updatedUserAnswers.get(TrustNamePage("uuid-1")) mustBe Some("Nested Trust")
     }
 
     "cleanup: must remove all LimitedCompany, Partnership and Trust subcontractor answers when IndividualSoleTraderSubcontractor is selected" in {
