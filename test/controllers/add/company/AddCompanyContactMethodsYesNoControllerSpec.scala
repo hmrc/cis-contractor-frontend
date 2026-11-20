@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.AddCompanyContactMethodsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -30,9 +30,10 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.add.company.AddCompanyContactMethodsYesNoView
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoSugar {
+class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val formProvider = new AddCompanyContactMethodsYesNoFormProvider()
   private val form         = formProvider()
@@ -44,6 +45,23 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
 
   private def uaWithName: UserAnswers =
     emptyUserAnswers.set(CompanyNamePage, companyName).success.value
+
+  private val flowId = UUID.randomUUID()
+  private val id     = flowId.toString
+
+  private lazy val addCompanyContactMethodsYesNoWithIdRoute =
+    controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+      .onPageLoadWithId(flowId, NormalMode)
+      .url
+
+  private def uaWithNameAndId(id: String): UserAnswers =
+    emptyUserAnswers
+      .set(queries.CisIdQuery(id), "AB12")
+      .success
+      .value
+      .set(CompanyNamePage(id), companyName)
+      .success
+      .value
 
   "AddCompanyContactMethodsYesNo Controller" - {
 
@@ -59,7 +77,12 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         val view = application.injector.instanceOf[AddCompanyContactMethodsYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -77,10 +100,12 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -154,10 +179,12 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -208,10 +235,12 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
 
         contentAsString(result) must include(messages(application)("addCompanyContactMethodsYesNo.error.required"))
       }
@@ -251,6 +280,158 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "when using multi-tab journey" - {
+
+      "must return OK and the correct view for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithNameAndId(id))).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addCompanyContactMethodsYesNoWithIdRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AddCompanyContactMethodsYesNoView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            form,
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must populate the view correctly on a GET when the question has previously been answered" in {
+
+        val userAnswers =
+          uaWithNameAndId(id).set(AddCompanyContactMethodsYesNoPage(id), true).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addCompanyContactMethodsYesNoWithIdRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AddCompanyContactMethodsYesNoView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            form.fill(true),
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must redirect to the next page with the same flowId when Yes is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithNameAndId(id)))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.add.company.routes.CompanyContactMethodOptionsController
+              .onPageLoadWithId(flowId, NormalMode)
+              .url
+        }
+      }
+
+      "must redirect to the next page with the same flowId when No is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(uaWithNameAndId(id)))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.add.company.routes.CompanyUtrYesNoController
+              .onPageLoadWithId(flowId, NormalMode)
+              .url
+        }
+      }
+
+      "must redirect to Journey Recovery when the company name is missing for the tab" in {
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, addCompanyContactMethodsYesNoWithIdRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must return a Bad Request when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(uaWithNameAndId(id))).build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", ""))
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AddCompanyContactMethodsYesNoView]
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(
+            form.bind(Map("value" -> "")),
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
       }
     }
   }

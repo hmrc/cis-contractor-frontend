@@ -43,6 +43,77 @@ object ValidatedCompany extends Validation {
       getPageValue(answers, CompanyNamePage)
     )
 
+  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedCompany] =
+    for {
+      _                           <- validateType(answers, id)
+      companyName                 <- getPageValue(answers, CompanyNamePage(id))
+      companyAddress              <- getOptionalPageValue(
+                                       answers,
+                                       CompanyAddressPage(id),
+                                       CompanyAddressYesNoPage(id)
+                                     )
+      companyContactMethodOptions <-
+        getOptionalPageValue(
+          answers,
+          CompanyContactMethodOptionsPage(id),
+          AddCompanyContactMethodsYesNoPage(id)
+        ).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+          case Some(_)                           =>
+            Left(InvalidAnswer(CompanyContactMethodOptionsPage(id)))
+          case None                              =>
+            Right(None)
+        }
+      companyEmail                <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyEmailAddressPage(id),
+                                       ContactMethodOptions.Email
+                                     )
+      companyPhone                <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyPhoneNumberPage(id),
+                                       ContactMethodOptions.Phone
+                                     )
+      companyMobile               <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyMobileNumberPage(id),
+                                       ContactMethodOptions.Mobile
+                                     )
+      companyUtr                  <-
+        getOptionalPageValue(
+          answers,
+          CompanyUtrPage(id),
+          CompanyUtrYesNoPage(id)
+        )
+      companyCrn                  <-
+        getOptionalPageValue(
+          answers,
+          CompanyCrnPage(id),
+          CompanyCrnYesNoPage(id)
+        )
+      companyWorksReferenceNumber <-
+        getOptionalPageValue(
+          answers,
+          CompanyWorksReferencePage(id),
+          CompanyWorksReferenceYesNoPage(id)
+        )
+
+    } yield ValidatedCompany(
+      companyName,
+      companyAddress,
+      companyContactMethodOptions,
+      companyEmail,
+      companyPhone,
+      companyMobile,
+      companyUtr,
+      companyCrn,
+      companyWorksReferenceNumber
+    )
+
   def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
     buildCompany(
       answers,
@@ -56,47 +127,82 @@ object ValidatedCompany extends Validation {
     for {
       _                           <- validateType(answers)
       companyName                 <- companyName
-      companyAddress              <- getOptionalPageValue(answers, CompanyAddressPage, CompanyAddressYesNoPage)
+      companyAddress              <- getOptionalPageValue(
+                                       answers,
+                                       CompanyAddressPage,
+                                       CompanyAddressYesNoPage
+                                     )
       companyContactMethodOptions <-
-        getOptionalPageValue(answers, CompanyContactMethodOptionsPage, AddCompanyContactMethodsYesNoPage).flatMap {
+        getOptionalPageValue(
+          answers,
+          CompanyContactMethodOptionsPage,
+          AddCompanyContactMethodsYesNoPage
+        ).flatMap {
           case Some(methods) if methods.nonEmpty =>
             Right(Some(methods))
-
-          case Some(_) =>
+          case Some(_)                           =>
             Left(InvalidAnswer(CompanyContactMethodOptionsPage))
-
-          case None =>
+          case None                              =>
             Right(None)
         }
-
-      companyEmail  <-
-        getContactPageValue(answers, companyContactMethodOptions, CompanyEmailAddressPage, ContactMethodOptions.Email)
-      companyPhone  <-
-        getContactPageValue(answers, companyContactMethodOptions, CompanyPhoneNumberPage, ContactMethodOptions.Phone)
-      companyMobile <-
-        getContactPageValue(answers, companyContactMethodOptions, CompanyMobileNumberPage, ContactMethodOptions.Mobile)
-
-      companyUtr <- getOptionalPageValue(answers, CompanyUtrPage, CompanyUtrYesNoPage)
-      companyCrn <- getOptionalPageValue(answers, CompanyCrnPage, CompanyCrnYesNoPage)
-
+      companyEmail                <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyEmailAddressPage,
+                                       ContactMethodOptions.Email
+                                     )
+      companyPhone                <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyPhoneNumberPage,
+                                       ContactMethodOptions.Phone
+                                     )
+      companyMobile               <- getContactPageValue(
+                                       answers,
+                                       companyContactMethodOptions,
+                                       CompanyMobileNumberPage,
+                                       ContactMethodOptions.Mobile
+                                     )
+      companyUtr                  <-
+        getOptionalPageValue(
+          answers,
+          CompanyUtrPage,
+          CompanyUtrYesNoPage
+        )
+      companyCrn                  <-
+        getOptionalPageValue(
+          answers,
+          CompanyCrnPage,
+          CompanyCrnYesNoPage
+        )
       companyWorksReferenceNumber <-
-        getOptionalPageValue(answers, CompanyWorksReferencePage, CompanyWorksReferenceYesNoPage)
+        getOptionalPageValue(
+          answers,
+          CompanyWorksReferencePage,
+          CompanyWorksReferenceYesNoPage
+        )
 
     } yield ValidatedCompany(
-      companyName = companyName,
-      companyAddress = companyAddress,
-      companyContactMethodOptions = companyContactMethodOptions,
-      companyEmail = companyEmail,
-      companyPhone = companyPhone,
-      companyMobile = companyMobile,
-      companyUtr = companyUtr,
-      companyCrn = companyCrn,
-      companyWorksReferenceNumber = companyWorksReferenceNumber
+      companyName,
+      companyAddress,
+      companyContactMethodOptions,
+      companyEmail,
+      companyPhone,
+      companyMobile,
+      companyUtr,
+      companyCrn,
+      companyWorksReferenceNumber
     )
 
   private def validateType(answers: UserAnswers): Either[ValidationError, Unit] =
     getPageValue(answers, TypeOfSubcontractorPage).flatMap {
       case TypeOfSubcontractor.Limitedcompany => Right(())
       case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+
+  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+      case TypeOfSubcontractor.Limitedcompany => Right(())
+      case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
     }
 }

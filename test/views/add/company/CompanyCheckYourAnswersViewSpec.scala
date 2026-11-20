@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package views.add.company
 
 import org.jsoup.nodes.Document
@@ -50,7 +34,10 @@ class CompanyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Gui
   "CompanyCheckYourAnswersView" should {
 
     "render the page with title, headings, summary list and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(list)
+      val submitAction =
+        controllers.add.company.routes.CompanyCheckYourAnswersController.onSubmit()
+
+      val html: HtmlFormat.Appendable = view(list, submitAction)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyCheckYourAnswers.title"))
@@ -67,9 +54,7 @@ class CompanyCheckYourAnswersViewSpec extends AnyWordSpec with Matchers with Gui
 
       doc
         .select("form")
-        .attr("action") mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
-        .onSubmit()
-        .url
+        .attr("action") mustBe submitAction.url
 
       doc.select("form").attr("autocomplete") mustBe "off"
 

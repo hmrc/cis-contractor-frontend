@@ -33,15 +33,22 @@ class CompanyNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
   "CompanyNameView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+
+      val html: HtmlFormat.Appendable =
+        view(form, NormalMode, controllers.add.company.routes.CompanyNameController.onSubmit(NormalMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyName.title"))
 
-      val heading = doc.select("label.govuk-label")
+      val heading = doc.select("h1")
       heading.text() mustBe messages("companyName.heading")
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyNameController
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyName.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyNameController
         .onSubmit(NormalMode)
         .url
 
@@ -50,16 +57,23 @@ class CompanyNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, input and submit button for amend journey" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, AmendMode)
+    "render the page with title, heading, input and update button for AmendMode journey" in new Setup {
+
+      val html: HtmlFormat.Appendable =
+        view(form, AmendMode, controllers.add.company.routes.CompanyNameController.onSubmit(AmendMode))
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyName.title"))
 
-      val heading = doc.select("label.govuk-label")
+      val heading = doc.select("h1")
       heading.text() mustBe messages("companyName.heading")
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyNameController
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyName.hint")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyNameController
         .onSubmit(AmendMode)
         .url
 
@@ -69,10 +83,12 @@ class CompanyNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
+
       val errorForm: Form[String] =
         form.withError("value", "companyName.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html =
+        view(errorForm, NormalMode, controllers.add.company.routes.CompanyNameController.onSubmit(NormalMode))
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -81,7 +97,9 @@ class CompanyNameViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyName.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("companyName.error.required")
+      )
     }
   }
 

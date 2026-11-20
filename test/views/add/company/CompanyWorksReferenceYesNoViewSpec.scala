@@ -38,7 +38,12 @@ class CompanyWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with 
 
       private val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -78,7 +83,12 @@ class CompanyWorksReferenceYesNoViewSpec extends AnyWordSpec with Matchers with 
 
       private val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
