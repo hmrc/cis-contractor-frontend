@@ -26,10 +26,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FakeCisTaxpayerService
-  extends CisTaxpayerService(
-    mock[ConstructionIndustrySchemeConnector],
-    mock[CisTaxpayerCache]
-  ) {
+    extends CisTaxpayerService(
+      mock[ConstructionIndustrySchemeConnector],
+      mock[CisTaxpayerCache]
+    ) {
 
   val taxpayer: CisTaxpayerResponse = CisTaxpayerResponse(
     uniqueId = "AB12",
