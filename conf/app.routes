@@ -303,6 +303,8 @@ POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAd
 GET   /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/individual/subcontractor-added/:flowId  controllers.add.SubcontractorAddedController.individualSubcontractorAddedWithId(flowId: java.util.UUID)
 GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
 
 GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
@@ -314,6 +316,12 @@ GET   /subcontractor/add/select-contact-details         controllers.add.Individu
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/names/:flowId         controllers.add.IndividualNamesOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/names/:flowId         controllers.add.IndividualNamesOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-names/:flowId  controllers.add.IndividualNamesOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-names/:flowId  controllers.add.IndividualNamesOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = NormalMode)

@@ -19,6 +19,13 @@ package pages.add
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class IndividualPhoneNumberPage(id: String) extends QuestionPage[String] with IndividualJourney {
+
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "individualPhoneNumber"
+}
+
 case object IndividualPhoneNumberPage extends QuestionPage[String] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString
