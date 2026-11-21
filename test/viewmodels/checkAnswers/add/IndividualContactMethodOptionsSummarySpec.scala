@@ -23,6 +23,7 @@ import models.{AmendMode, CheckMode, UserAnswers}
 import org.scalatest.matchers.must.Matchers
 import pages.add.IndividualContactMethodOptionsPage
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages}
+import java.util.UUID
 
 class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
   implicit val messages: Messages = new DefaultMessagesApi(
@@ -162,6 +163,143 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .value
 
       val result = IndividualContactMethodOptionsSummary.row(answers, AmendMode)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+    }
+  }
+
+  "IndividualContactMethodOptionsSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id     = flowId.toString
+
+    "must return a row with multiple selected options" in {
+
+      val answers: UserAnswers =
+        UserAnswers("test-id")
+          .set(
+            IndividualContactMethodOptionsPage(id),
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+
+      val result = IndividualContactMethodOptionsSummary.row(flowId, answers)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(messages("individualContactMethodOptions.checkYourAnswersLabel"))
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+
+      val actions = row.actions.value.items
+      actions must have size 1
+
+      val action = actions.head
+
+      action.href mustBe controllers.add.routes.IndividualContactMethodOptionsController // TODO DTR-9463: Update with id
+        .onPageLoad(CheckMode)
+        .url
+
+      action.content.asHtml.toString must include(messages("site.change"))
+
+      action.visuallyHiddenText mustBe Some(
+        messages("individualContactMethodOptions.change.hidden")
+      )
+
+      action.attributes must contain("id" -> "individual-methods-of-contact")
+    }
+
+    "must return a row with multiple selected options in amend journey" in {
+
+      val answers: UserAnswers =
+        UserAnswers("test-id")
+          .set(
+            IndividualContactMethodOptionsPage(id),
+            Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)
+          )
+          .success
+          .value
+
+      val result = IndividualContactMethodOptionsSummary.row(flowId, answers, AmendMode)
+
+      result mustBe defined
+
+      val row = result.value
+
+      row.key.content.asHtml.toString must include(messages("individualContactMethodOptions.checkYourAnswersLabel"))
+
+      val valueHtml = row.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must include("Phone number")
+      valueHtml must include("Mobile number")
+      valueHtml must not include "<br>"
+      valueHtml must include("govuk-list--bullet")
+
+      row.actions mustBe defined
+
+      val actions = row.actions.value.items
+      actions must have size 1
+
+      val action = actions.head
+
+      action.href mustBe controllers.add.routes.IndividualContactMethodOptionsController // TODO DTR-9463: Update with id
+        .onPageLoad(AmendMode)
+        .url
+
+      action.content.asHtml.toString must include(messages("site.change"))
+
+      action.visuallyHiddenText mustBe Some(
+        messages("individualContactMethodOptions.change.hidden")
+      )
+
+      action.attributes must contain("id" -> "individual-methods-of-contact")
+    }
+
+    "must return a row with a single selected option" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Email))
+          .success
+          .value
+
+      val result = IndividualContactMethodOptionsSummary.row(flowId, answers)
+
+      result mustBe defined
+
+      val valueHtml = result.value.value.content.asHtml.toString
+
+      valueHtml must include("Email address")
+      valueHtml must not include "<br>"
+      valueHtml must not include "govuk-list--bullet"
+    }
+
+    "must return a row with a single selected option in amend journey" in {
+
+      val answers: UserAnswers =
+        emptyUserAnswers
+          .set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Email))
+          .success
+          .value
+
+      val result = IndividualContactMethodOptionsSummary.row(flowId, answers, AmendMode)
 
       result mustBe defined
 

@@ -26,6 +26,7 @@ import models.info.IndividualAnswers
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import viewmodels.checkAnswers.UtrViewModel
+import java.util.UUID
 
 object SubcontractorsUniqueTaxpayerReferenceSummary {
 
@@ -53,6 +54,36 @@ object SubcontractorsUniqueTaxpayerReferenceSummary {
         actions = actions
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode, showActions: Boolean = true)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+
+    answers.get(SubcontractorsUniqueTaxpayerReferencePage(subJourneyId)).map { answer =>
+      val value   = UtrViewModel(answer)
+      val actions =
+        if (showActions) {
+          Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController
+                .onPageLoad(mode)
+                .url // TODO DTR-9463: Update with id
+            )
+              .withVisuallyHiddenText(messages("subcontractorsUniqueTaxpayerReference.change.hidden"))
+              .withAttribute("id" -> "subcontractors-unique-taxpayer-reference")
+          )
+        } else {
+          Seq.empty
+        }
+      SummaryListRowViewModel(
+        key = "subcontractorsUniqueTaxpayerReference.checkYourAnswersLabel",
+        value = value,
+        actions = actions
+      )
+    }
+  }
 
   def row(
     answers: IndividualAnswers

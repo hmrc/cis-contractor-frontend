@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 object SubAddressYesNoSummary {
 
@@ -49,6 +50,33 @@ object SubAddressYesNoSummary {
         )
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+
+    answers.get(SubAddressYesNoPage(subJourneyId)).map { answer =>
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "subAddressYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
+                .onPageLoad(AmendIndividualRemoveDetail.Address.key)
+                .url
+            else controllers.add.routes.SubAddressYesNoController.onPageLoad(mode).url // TODO DTR-9463: Update with id
+          )
+            .withVisuallyHiddenText(messages("subAddressYesNo.change.hidden"))
+            .withAttribute("id" -> "sub-address-yes-no")
+        )
+      )
+    }
+  }
 
   def row(
     answers: IndividualAnswers

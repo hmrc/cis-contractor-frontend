@@ -24,6 +24,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 object WorksReferenceNumberYesNoSummary {
 
@@ -49,6 +50,36 @@ object WorksReferenceNumberYesNoSummary {
         )
       )
     }
+
+  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val subJourneyId = flowId.toString
+
+    answers.get(WorksReferenceNumberYesNoPage(subJourneyId)).map { answer =>
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = "worksReferenceNumberYesNo.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            if answer && mode == AmendMode then
+              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
+                .onPageLoad(AmendIndividualRemoveDetail.WorksReferenceNumber.key)
+                .url
+            else
+              controllers.add.routes.WorksReferenceNumberYesNoController
+                .onPageLoad(mode)
+                .url // TODO DTR-9463: Update with id
+          )
+            .withVisuallyHiddenText(messages("worksReferenceNumberYesNo.change.hidden"))
+            .withAttribute("id" -> "works-reference-number-yes-no")
+        )
+      )
+    }
+  }
 
   def row(
     answers: IndividualAnswers

@@ -47,4 +47,32 @@ class SubAddressYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(AddressOfSubcontractorPage) mustBe None
     }
   }
+
+  "SubAddressYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](SubAddressYesNoPage(id))
+
+    beSettable[Boolean](SubAddressYesNoPage(id))
+
+    beRemovable[Boolean](SubAddressYesNoPage(id))
+
+    "cleanup: must remove AddressOfSubcontractor userAnswers when No is selected" in {
+
+      val testAddress = Address(
+        addressLine1 = "line 1",
+        addressLine2 = Some("line 2"),
+        addressLine3 = Some("line 3"),
+        addressLine4 = Some("line 4"),
+        postcode = Some("NX1 1AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val userAnswers = emptyUserAnswers.set(AddressOfSubcontractorPage(id), testAddress).success.value
+
+      val updatedUserAnswers = userAnswers.set(SubAddressYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(AddressOfSubcontractorPage(id)) mustBe None
+    }
+  }
 }

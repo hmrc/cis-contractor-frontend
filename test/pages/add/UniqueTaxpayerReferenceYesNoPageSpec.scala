@@ -28,13 +28,33 @@ class UniqueTaxpayerReferenceYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](UniqueTaxpayerReferenceYesNoPage)
 
-    // Need to update to correct page!
+    // TODO: Need to update to correct page!
     "cleanup: must remove SubcontractorsUniqueTaxpayerReferencePage userAnswers when No is selected" in {
       val userAnswers = emptyUserAnswers.set(SubcontractorsUniqueTaxpayerReferencePage, "1234567891").success.value
 
       val updatedUserAnswers = userAnswers.set(UniqueTaxpayerReferenceYesNoPage, false).success.value
 
       updatedUserAnswers.get(TradingNameOfSubcontractorPage) mustBe None
+    }
+
+  }
+
+  "UniqueTaxpayerReferenceYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](UniqueTaxpayerReferenceYesNoPage(id))
+
+    beSettable[Boolean](UniqueTaxpayerReferenceYesNoPage(id))
+
+    beRemovable[Boolean](UniqueTaxpayerReferenceYesNoPage(id))
+
+    // TODO: Need to update to correct page!
+    "cleanup: must remove SubcontractorsUniqueTaxpayerReferencePage userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(SubcontractorsUniqueTaxpayerReferencePage(id), "1234567891").success.value
+
+      val updatedUserAnswers = userAnswers.set(UniqueTaxpayerReferenceYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(TradingNameOfSubcontractorPage(id)) mustBe None
     }
 
   }

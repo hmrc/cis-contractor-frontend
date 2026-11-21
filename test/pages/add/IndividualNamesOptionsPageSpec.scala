@@ -77,4 +77,63 @@ class IndividualNamesOptionsPageSpec extends PageBehaviours {
       }
     }
   }
+
+  "IndividualNamesOptionsPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Set[IndividualNamesOptions]](IndividualNamesOptionsPage(id))
+
+    beSettable[Set[IndividualNamesOptions]](IndividualNamesOptionsPage(id))
+
+    beRemovable[Set[IndividualNamesOptions]](IndividualNamesOptionsPage(id))
+
+    "cleanup" - {
+
+      val subcontractorName = SubcontractorName(
+        firstName = "John",
+        middleName = Some("Paul"),
+        lastName = "Smith"
+      )
+
+      val tradingName = "Test Trading"
+
+      val userAnswers = emptyUserAnswers
+        .set(SubcontractorNamePage(id), subcontractorName)
+        .success
+        .value
+        .set(TradingNameOfSubcontractorPage(id), tradingName)
+        .success
+        .value
+
+      "must remove TradingNameOfSubcontractorPage when SubcontractorName is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(IndividualNamesOptionsPage(id), Set(IndividualNamesOptions.SubcontractorName)).success.value
+
+        updatedUserAnswers.get(SubcontractorNamePage(id)) mustBe Some(subcontractorName)
+        updatedUserAnswers.get(TradingNameOfSubcontractorPage(id)) mustBe None
+      }
+
+      "must remove SubcontractorNamePage when TradingName is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(IndividualNamesOptionsPage(id), Set(IndividualNamesOptions.TradingName)).success.value
+
+        updatedUserAnswers.get(TradingNameOfSubcontractorPage(id)) mustBe Some(tradingName)
+        updatedUserAnswers.get(SubcontractorNamePage(id)) mustBe None
+      }
+
+      "must not remove SubcontractorNamePage and TradingNameOfSubcontractorPage when SubcontractorName and TradingName are selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(
+              IndividualNamesOptionsPage(id),
+              Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+            )
+            .success
+            .value
+
+        updatedUserAnswers.get(SubcontractorNamePage(id)) mustBe Some(subcontractorName)
+        updatedUserAnswers.get(TradingNameOfSubcontractorPage(id)) mustBe Some(tradingName)
+      }
+    }
+  }
 }

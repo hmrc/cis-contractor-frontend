@@ -107,6 +107,9 @@ GET   /subcontractor/info/subcontractor-information-read-only/:journeyType  cont
 GET   /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
 POST  /subcontractor/amend/subcontractor-information  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 
+GET   /subcontractor/amend/subcontractor-information:flowId  controllers.amend.AmendIndividualCheckYourAnswersController.onPageLoadWithId(flowId: java.util.UUID, subbieResourceRef: Long ?= -1)
+POST  /subcontractor/amend/subcontractor-information:flowId  controllers.amend.AmendIndividualCheckYourAnswersController.onSubmitWithId(flowId: java.util.UUID, subbieResourceRef: Long ?= -1)
+
 GET   /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onPageLoad(subbieResourceRef: Long ?= -1)
 POST  /subcontractor/amend/partnership/partnership-information  controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onSubmit(subbieResourceRef: Long ?= -1)
 GET   /subcontractor/amend/partnership/cancel                   controllers.amend.partnership.AmendPartnershipCheckYourAnswersController.onCancel()
@@ -138,6 +141,7 @@ GET   /subcontractor/remove-subcontractor-from-request  controllers.insufficient
 POST  /subcontractor/remove-subcontractor-from-request  controllers.insufficient.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef: Long ?= -1, mode: Mode = NormalMode)
 
 GET   /subcontractor/amend/cancel  controllers.amend.AmendIndividualCheckYourAnswersController.onCancel()
+GET   /subcontractor/amend/cancel:flowId  controllers.amend.AmendIndividualCheckYourAnswersController.onCancelWithId(flowId: java.util.UUID)
 
 GET   /subcontractor/amend/individual/subcontractor-details-updated  controllers.amend.AmendIndividualConfirmationController.onPageLoad()
 

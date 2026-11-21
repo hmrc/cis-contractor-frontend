@@ -28,4 +28,14 @@ class SubcontractorsUniqueTaxpayerReferencePageSpec extends PageBehaviours {
 
     beRemovable[String](SubcontractorsUniqueTaxpayerReferencePage)
   }
+
+  "subcontractorsUniqueTaxpayerReference with id" - {
+    val id = "testId"
+
+    beRetrievable[String](SubcontractorsUniqueTaxpayerReferencePage(id))
+
+    beSettable[String](SubcontractorsUniqueTaxpayerReferencePage(id))
+
+    beRemovable[String](SubcontractorsUniqueTaxpayerReferencePage(id))
+  }
 }

@@ -20,6 +20,15 @@ import models.amend.AmendJourneyType
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class AmendJourneyTypePage(id: String) extends QuestionPage[AmendJourneyType] {
+
+  override def path: JsPath =
+    JsPath \ "amendSubcontractor" \ id \ toString
+
+  override def toString: String =
+    "amendJourneyType"
+}
+
 case object AmendJourneyTypePage extends QuestionPage[AmendJourneyType] {
 
   override def path: JsPath =

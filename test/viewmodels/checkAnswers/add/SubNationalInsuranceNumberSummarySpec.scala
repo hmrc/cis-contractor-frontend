@@ -28,6 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import models.info.IndividualAnswers
+import java.util.UUID
 
 class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
 
@@ -115,6 +116,100 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
           .value
 
       val row = SubNationalInsuranceNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "AB123456C &amp; Ref&#x27;01")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "SubNationalInsuranceNumberSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id     = flowId.toString
+
+    "must return a SummaryListRow when the answer exists" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubNationalInsuranceNumberPage(id), "AA123456A")
+          .success
+          .value
+
+      val maybeRow = SubNationalInsuranceNumberSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subNationalInsuranceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("AA123456A")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.SubNationalInsuranceNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow when the answer exists in amend journey" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(SubNationalInsuranceNumberPage(id), "AA123456A")
+          .success
+          .value
+
+      val maybeRow = SubNationalInsuranceNumberSummary.row(flowId, answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("subNationalInsuranceNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("AA123456A")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.SubNationalInsuranceNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("subNationalInsuranceNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      SubNationalInsuranceNumberSummary.row(flowId, answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val nino = "AB123456C & Ref'01"
+
+      val answers =
+        UserAnswers("id")
+          .set(SubNationalInsuranceNumberPage(id), nino)
+          .success
+          .value
+
+      val row = SubNationalInsuranceNumberSummary.row(flowId, answers).value
 
       val html = extractHtml(row)
 

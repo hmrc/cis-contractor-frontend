@@ -32,9 +32,15 @@ class AmendJourneyTypePageSpec extends PageBehaviours {
     )
 
   "AmendJourneyTypePage" - {
-
     beRetrievable[AmendJourneyType](AmendJourneyTypePage)
     beSettable[AmendJourneyType](AmendJourneyTypePage)
     beRemovable[AmendJourneyType](AmendJourneyTypePage)
+  }
+
+  "AmendJourneyTypePage with id" - {
+    val id = "testId"
+    beRetrievable[AmendJourneyType](AmendJourneyTypePage(id))
+    beSettable[AmendJourneyType](AmendJourneyTypePage(id))
+    beRemovable[AmendJourneyType](AmendJourneyTypePage(id))
   }
 }

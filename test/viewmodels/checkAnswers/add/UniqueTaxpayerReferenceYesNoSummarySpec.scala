@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import models.info.IndividualAnswers
+import java.util.UUID
 
 class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -119,6 +120,98 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
       UniqueTaxpayerReferenceYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "UniqueTaxpayerReferenceYesNoSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id     = flowId.toString
+
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+      val answers = UserAnswers("test-id")
+        .set(UniqueTaxpayerReferenceYesNoPage(id), true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.UniqueTaxpayerReferenceYesNoController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in amend journey" in {
+      val answers = UserAnswers("test-id")
+        .set(UniqueTaxpayerReferenceYesNoPage(id), true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("uniqueTaxpayerReferenceYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
+          .onPageLoad(AmendIndividualRemoveDetail.Utr.key)
+          .url
+      val expectedHiddenText = messages("uniqueTaxpayerReferenceYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+      val answers = UserAnswers("test-id")
+        .set(UniqueTaxpayerReferenceYesNoPage(id), false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers)
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers) shouldBe None
     }
   }
 
