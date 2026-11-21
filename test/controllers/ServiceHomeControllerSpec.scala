@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.CisIdQuery
 
 class ServiceHomeControllerSpec extends SpecBase {
 
@@ -63,6 +64,33 @@ class ServiceHomeControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           s"${applicationConfig.constructionIndustryAgentAccountUrl}1"
+      }
+    }
+
+    "must redirect an agent to the agent CIS account when the CIS id is only stored under a subjourney" in {
+
+      val nestedAnswers =
+        emptyUserAnswers
+          .set(CisIdQuery("468fc177-69f3-431e-8dc3-1b9f80bcab4a"), "100")
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(nestedAnswers),
+          isAgent = true
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.ServiceHomeController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          s"${applicationConfig.constructionIndustryAgentAccountUrl}100"
       }
     }
 
