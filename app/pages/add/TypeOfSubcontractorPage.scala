@@ -31,36 +31,39 @@ case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcon
   override def toString: String = "typeOfSubcontractor"
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
-  value match {
-    case Some(Individualorsoletrader) =>
-      removePartnershipSubcontractor(ua)
-        .flatMap(removeLimitedCompanySubcontractor)
-        .flatMap(removeTrustSubcontractor)
-        .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+    value match {
+      case Some(Individualorsoletrader) =>
+        removePartnershipSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removePartnershipSubcontractor(_, id))
+          .flatMap(removeTrustSubcontractor(_, id))
 
-    case Some(Limitedcompany) =>
-      removeIndividualSoleTraderSubcontractor(ua)
-        .flatMap(removePartnershipSubcontractor)
-        .flatMap(removeTrustSubcontractor)
-        .flatMap(ua => removePartnershipSubcontractor(ua, id))
+      case Some(Limitedcompany) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removePartnershipSubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removePartnershipSubcontractor(ua, id))
+          .flatMap(removeTrustSubcontractor(_, id))
 
-    case Some(Partnership) =>
-      removeIndividualSoleTraderSubcontractor(ua)
-        .flatMap(removeLimitedCompanySubcontractor)
-        .flatMap(removeTrustSubcontractor)
-        .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
-        .flatMap(removeTrustSubcontractor(_, id))
+      case Some(Partnership) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removeTrustSubcontractor(_, id))
 
-    case Some(Trust) =>
-      removeIndividualSoleTraderSubcontractor(ua)
-        .flatMap(removeLimitedCompanySubcontractor)
-        .flatMap(removePartnershipSubcontractor)
-        .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
-        .flatMap(removePartnershipSubcontractor(_, id))
+      case Some(Trust) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removePartnershipSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removePartnershipSubcontractor(_, id))
 
-    case _ =>
-      super.cleanup(value, ua)
-  }
+      case _ =>
+        super.cleanup(value, ua)
+    }
 }
 
 case object TypeOfSubcontractorPage extends QuestionPage[TypeOfSubcontractor] with SharedJourney {

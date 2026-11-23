@@ -100,19 +100,19 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Limitedcompany, Some(value)) =>
         controllers.add.company.routes.CompanyNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Individualorsoletrader, _) =>
+      case (Individualorsoletrader, _)   =>
         controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Limitedcompany, _) =>
+      case (Limitedcompany, _)           =>
         controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, Some(value)) =>
+      case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Partnership, _) =>
+      case (Partnership, _)              =>
         controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Trust, Some(value)) =>
+      case (Trust, Some(value))          =>
         controllers.add.trust.routes.TrustNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Trust, _) =>
+      case (Trust, _)                    =>
         controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
@@ -124,19 +124,19 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Limitedcompany, Some(value)) =>
         controllers.add.company.routes.CompanyCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
-      case (Individualorsoletrader, _) =>
+      case (Individualorsoletrader, _)   =>
         controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Limitedcompany, _) =>
+      case (Limitedcompany, _)           =>
         controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
-      case (Partnership, Some(value)) =>
+      case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
-      case (Partnership, _) =>
+      case (Partnership, _)              =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case (Trust, Some(value)) =>
+      case (Trust, Some(value))          =>
         controllers.add.trust.routes.TrustCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
-      case (Trust, _) =>
+      case (Trust, _)                    =>
         controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     }
 
@@ -148,15 +148,15 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     subcontractorType match {
       case Individualorsoletrader =>
         ValidatedSubcontractor.build(userAnswers).isRight
-      case Limitedcompany =>
+      case Limitedcompany         =>
         id.map(ValidatedCompany.build(userAnswers, _))
           .getOrElse(ValidatedCompany.build(userAnswers))
           .isRight
-      case Partnership =>
+      case Partnership            =>
         id.map(ValidatedPartnership.build(userAnswers, _))
           .getOrElse(ValidatedPartnership.build(userAnswers))
           .isRight
-      case Trust =>
+      case Trust                  =>
         id.map(ValidatedTrust.build(userAnswers, _))
           .getOrElse(ValidatedTrust.build(userAnswers))
           .isRight

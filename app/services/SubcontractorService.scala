@@ -93,7 +93,8 @@ class SubcontractorService @Inject() (
                     trustPayloadFromUserAnswers(
                       cisId = cisId,
                       subcontractorType = subcontractorType,
-                      userAnswers = userAnswers
+                      userAnswers = userAnswers,
+                      subJourneyId = subJourneyId
                     )
                 }
 
