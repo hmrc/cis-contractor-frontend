@@ -113,7 +113,6 @@ class VerificationPreSelectionServiceSpec extends SpecBase {
 
       service.preSelectedSubcontractorIds(displayedSubcontractors, ua) mustBe Set.empty[String]
     }
-    
 
     "must not preselect any displayed subcontractors when batch status is missing" in {
       val ua =
