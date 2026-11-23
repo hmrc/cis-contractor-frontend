@@ -539,33 +539,42 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   private def handleNoChangesWithId(flowId: UUID)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] = {
-    val cisId        = request.userAnswers.get(CisIdQuery(flowId.toString))
-    val redirectCall =
-      amendJourneyExitRedirectWithId(
-        flowId,
-        request.userAnswers,
-        cisId
-      )
+    val cisId            = request.userAnswers.get(CisIdQuery(flowId.toString))
+    def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-    Future
-      .fromTry(
-        cleanupService.cleanAmend(request.userAnswers)
-      )
-      .flatMap(sessionRepository.set)
-      .map { _ =>
-        Redirect(redirectCall)
-      }
-      .recover { case t =>
+    cisId match {
+      case Some(cisId) =>
+        val redirectCall =
+          amendJourneyExitRedirectWithId(
+            flowId,
+            request.userAnswers,
+            cisId
+          )
+
+        Future
+          .fromTry(
+            cleanupService.cleanAmend(request.userAnswers)
+          )
+          .flatMap(sessionRepository.set)
+          .map { _ =>
+            Redirect(redirectCall)
+          }
+          .recover { case t =>
+            logger.error(
+              s"[AmendIndividualCheckYourAnswersController.handleNoChangesWithId] " +
+                s"Failed to clean amend data for session ${request.userAnswers.id}",
+              t
+            )
+            recoveryRedirect
+          }
+
+      case None =>
         logger.error(
-          s"[AmendIndividualCheckYourAnswersController.handleNoChangesWithId] " +
-            s"Failed to clean amend data for session ${request.userAnswers.id}",
-          t
+          "[AmendIndividualCheckYourAnswersController][onCancelWithId] - cisId missing from userAnswers"
         )
+        Future.successful(recoveryRedirect)
+    }
 
-        Redirect(
-          routes.JourneyRecoveryController.onPageLoad()
-        )
-      }
   }
 
   private def amendJourneyExitRedirect(
@@ -669,32 +678,41 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onCancelWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val cisId = request.userAnswers.get(CisIdQuery(flowId.toString))
 
-      val redirectCall =
-        amendJourneyExitRedirectWithId(
-          flowId,
-          request.userAnswers,
-          request.cisId
-        )
+      def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-      Future
-        .fromTry(
-          cleanupService.cleanAmend(request.userAnswers) // TODO DTR-9463: Does this need id?
-        )
-        .flatMap(sessionRepository.set)
-        .map { _ =>
-          Redirect(redirectCall)
-        }
-        .recover { case t =>
+      cisId match {
+        case Some(cisId) =>
+          val redirectCall =
+            amendJourneyExitRedirectWithId(
+              flowId,
+              request.userAnswers,
+              cisId
+            )
+
+          Future
+            .fromTry(
+              cleanupService.cleanAmend(request.userAnswers) // TODO DTR-9463: Does this need id?
+            )
+            .flatMap(sessionRepository.set)
+            .map { _ =>
+              Redirect(redirectCall)
+            }
+            .recover { case t =>
+              logger.error(
+                s"[AmendIndividualCheckYourAnswersController.onCancelWithId] " +
+                  s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+                t
+              )
+              recoveryRedirect
+            }
+
+        case None =>
           logger.error(
-            s"[AmendIndividualCheckYourAnswersController.onCancelWithId] " +
-              s"Failed to clean amend user answers for session ${request.userAnswers.id}",
-            t
+            "[AmendIndividualCheckYourAnswersController][onCancelWithId] - cisId missing from userAnswers"
           )
-
-          Redirect(
-            routes.JourneyRecoveryController.onPageLoad()
-          )
-        }
+          Future.successful(recoveryRedirect)
+      }
     }
 }
