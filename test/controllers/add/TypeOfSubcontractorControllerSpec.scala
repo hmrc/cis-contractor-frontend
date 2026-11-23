@@ -604,7 +604,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             .url
         saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Partnership)
         saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe Some("1")
+        saved.get(CisIdQuery) mustBe Some(startCisId)
       }
     }
 
@@ -683,7 +683,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         captor.getValue.get(PartnershipNamePage) mustBe None
-        captor.getValue.get(CisIdQuery) mustBe Some("1")
+        captor.getValue.get(CisIdQuery) mustBe Some(startCisId)
       }
     }
 
@@ -783,7 +783,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         val saved = captor.getValue
         val id    = (saved.data \ "addSubcontractor").as[play.api.libs.json.JsObject].value.keys.head
         saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe None
+        saved.get(CisIdQuery) mustBe Some(startCisId)
       }
     }
 
