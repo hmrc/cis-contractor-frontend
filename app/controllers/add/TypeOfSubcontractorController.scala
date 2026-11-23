@@ -136,6 +136,7 @@ class TypeOfSubcontractorController @Inject() (
                     cleanedAnswers
                       .set(TypeOfSubcontractorPage(id), value)
                       .flatMap(_.set(CisIdQuery(id), cisId))
+                      .flatMap(_.set(CisIdQuery, cisId))
                   )
                   .flatMap { updatedAnswers =>
                     sessionRepository.set(updatedAnswers).map { _ =>

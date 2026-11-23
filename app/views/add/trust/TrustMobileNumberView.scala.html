@@ -16,6 +16,7 @@
 
 @import viewmodels.InputWidth._
 @import viewmodels.LabelSize.Large
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -25,11 +26,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, trustName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, trustName: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustMobileNumber.title"))) {
 
-    @formHelper(action = controllers.add.trust.routes.TrustMobileNumberController.onSubmit(mode)) {
+    @formHelper(action = submitAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

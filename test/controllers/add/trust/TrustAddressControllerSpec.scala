@@ -16,7 +16,7 @@
 
 package controllers.add.trust
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
@@ -35,7 +35,7 @@ import queries.AddressLookupAmendReturnQuery
 
 import scala.concurrent.Future
 
-class TrustAddressControllerSpec extends SpecBase with MockitoSugar {
+class TrustAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val lookupUrl = "/address-lookup-on-ramp"
   private val trustName = "Test Trust"

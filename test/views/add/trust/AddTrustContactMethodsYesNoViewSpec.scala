@@ -37,7 +37,12 @@ class AddTrustContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers with
 
       val trustName = "Test trustName"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, trustName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("addTrustContactMethodsYesNo.title"))
 
@@ -68,7 +73,12 @@ class AddTrustContactMethodsYesNoViewSpec extends AnyWordSpec with Matchers with
       val errorForm: Form[Boolean] =
         form.withError("value", "addTrustContactMethodsYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, trustName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
