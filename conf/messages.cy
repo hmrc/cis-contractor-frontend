@@ -3,7 +3,6 @@ service.name                                            =  Cynllun y Diwydiant A
 
 site.hmrcAccount.agent                                  =  Yn ôl i’r gwasanaethau asiant
 site.hmrcAccount.org                                    =  Yn ôl i’r cyfrif treth busnes
-
 site.back                                               =  Yn ôl
 site.backTo                                             =  Yn ôl i
 site.remove                                             =  Dileu
