@@ -36,7 +36,12 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "render the page with title, heading, input and submit button" in new Setup {
       val trustName                   = "Test Trust"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, trustName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustWorksReference.title"))
@@ -55,7 +60,8 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
     "render the page with title and update button in AmendMode" in new Setup {
       val trustName                   = "Test Trust"
-      val html: HtmlFormat.Appendable = view(form, AmendMode, trustName)
+      val html: HtmlFormat.Appendable =
+        view(form, AmendMode, trustName, controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(AmendMode))
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("trustWorksReference.title"))
@@ -68,7 +74,12 @@ class TrustWorksReferenceViewSpec extends AnyWordSpec with Matchers with GuiceOn
         form.withError("value", "trustWorksReference.error.required")
 
       val trustName = "Test Trust"
-      val html      = view(errorForm, NormalMode, trustName)
+      val html      = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustWorksReferenceController.onSubmit(NormalMode)
+      )
       val doc       = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

@@ -26,26 +26,36 @@ import viewmodels.implicits.*
 
 object AddTrustContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddTrustContactMethodsYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(AddTrustContactMethodsYesNoPage(id)))
+      .getOrElse(answers.get(AddTrustContactMethodsYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "addTrustContactMethodsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("contact-details").url
-            else controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "addTrustContactMethodsYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("contact-details").url
+                else controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
+              .withAttribute("id" -> "add-trust-contact-details")
           )
-            .withVisuallyHiddenText(messages("addTrustContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "add-trust-contact-details")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

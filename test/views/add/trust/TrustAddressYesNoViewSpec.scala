@@ -37,7 +37,8 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val trustName = "Test trustName"
 
-      val html = view(form, NormalMode, trustName)
+      val html =
+        view(form, NormalMode, trustName, controllers.add.trust.routes.TrustAddressYesNoController.onSubmit(NormalMode))
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -70,7 +71,8 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val trustName = "Test trustName"
 
-      val html = view(form, AmendMode, trustName)
+      val html =
+        view(form, AmendMode, trustName, controllers.add.trust.routes.TrustAddressYesNoController.onSubmit(AmendMode))
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -106,7 +108,12 @@ class TrustAddressYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneA
 
       val errorForm = form.withError("value", "trustAddressYesNo.error.required")
 
-      val html = view(errorForm, NormalMode, trustName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        trustName,
+        controllers.add.trust.routes.TrustAddressYesNoController.onSubmit(NormalMode)
+      )
       val doc  = Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
