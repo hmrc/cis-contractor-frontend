@@ -33,10 +33,3 @@ case object CurrentVerificationBatchResponsePage extends QuestionPage[GetCurrent
 
   override def toString: String = "currentVerificationBatchResponse"
 }
-
-case class CurrentVerificationBatchResponsePage(id: String) extends QuestionPage[GetCurrentVerificationBatchResponse] {
-
-  override def path: JsPath = JsPath \ "verify" \ id \ toString
-
-  override def toString: String = "currentVerificationBatchResponse"
-}

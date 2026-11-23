@@ -32,10 +32,3 @@ case object VerificationBatchReadinessPage extends QuestionPage[Boolean] with Ve
 
   override def toString: String = "verificationBatchReadiness"
 }
-
-case class VerificationBatchReadinessPage(id: String) extends QuestionPage[Boolean] with VerifyJourney {
-
-  override def path: JsPath = JsPath \ "verify" \ id \ toString
-
-  override def toString: String = "verificationBatchReadiness"
-}

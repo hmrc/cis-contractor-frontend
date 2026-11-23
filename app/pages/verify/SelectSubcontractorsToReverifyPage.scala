@@ -35,12 +35,3 @@ case object SelectSubcontractorsToReverifyPage extends QuestionPage[Set[Selected
 
   override def toString: String = "selectSubcontractorsToReverify"
 }
-
-case class SelectSubcontractorsToReverifyPage(id: String)
-    extends QuestionPage[Set[SelectedSubcontractors]]
-    with VerifyJourney {
-
-  override def path: JsPath = JsPath \ "verify" \ id \ toString
-
-  override def toString: String = "selectSubcontractorsToReverify"
-}
