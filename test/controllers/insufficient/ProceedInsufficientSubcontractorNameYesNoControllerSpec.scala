@@ -59,6 +59,9 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
   private val mode =
     NormalMode
 
+  private val formAction =
+    controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
+
   private lazy val proceedInsufficientSubcontractorNameYesNoRoute =
     insufficientRoutes.ProceedInsufficientSubcontractorNameYesNoController
       .onPageLoad(subcontractorId)
@@ -192,7 +195,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
               form,
               mode,
               subcontractorName,
-              subcontractorId
+              subcontractorId,
+              formAction
             )(
               request,
               messages(application)
@@ -239,7 +243,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
               form.fill(false),
               mode,
               subcontractorName,
-              subcontractorId
+              subcontractorId,
+              formAction
             )(
               request,
               messages(application)
@@ -289,7 +294,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
               form.fill(true),
               mode,
               subcontractorName,
-              subcontractorId
+              subcontractorId,
+              formAction
             )(
               request,
               messages(application)
@@ -331,7 +337,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
               form,
               mode,
               subcontractorName,
-              subcontractorId
+              subcontractorId,
+              formAction
             )(
               request,
               messages(application)
@@ -620,7 +627,8 @@ class ProceedInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase w
               boundForm,
               mode,
               subcontractorName,
-              subcontractorId
+              subcontractorId,
+              formAction
             )(
               request,
               messages(application)
