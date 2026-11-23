@@ -34,7 +34,7 @@ class ReverifyExistingSubcontractorsYesNoViewSpec extends AnyWordSpec with Match
 
     "render the page with title, heading, paragraphs, bullet list, radios and continue button" in new Setup {
 
-      val html = view(form, NormalMode)
+      val html = view(form, NormalMode, submitAction)
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -72,7 +72,7 @@ class ReverifyExistingSubcontractorsYesNoViewSpec extends AnyWordSpec with Match
       val errorForm =
         form.withError("value", "verify.reverifyExistingSubcontractorsYesNo.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html = view(errorForm, NormalMode, submitAction)
       val doc  = Jsoup.parse(html.toString())
 
       val errorSummary = doc.select(".govuk-error-summary")
@@ -102,5 +102,8 @@ class ReverifyExistingSubcontractorsYesNoViewSpec extends AnyWordSpec with Match
 
     val view: ReverifyExistingSubcontractorsYesNoView =
       app.injector.instanceOf[ReverifyExistingSubcontractorsYesNoView]
+
+    val submitAction =
+      controllers.verify.routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(NormalMode)
   }
 }

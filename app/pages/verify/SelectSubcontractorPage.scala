@@ -22,6 +22,16 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class SelectSubcontractorPage(id: String) extends QuestionPage[Set[SubcontractorViewModel]] with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "selectSubcontractor"
+
+  override def cleanup(value: Option[Set[SubcontractorViewModel]], userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(VerificationBatchReadinessPage(id))
+}
+
 case object SelectSubcontractorPage extends QuestionPage[Set[SubcontractorViewModel]] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString

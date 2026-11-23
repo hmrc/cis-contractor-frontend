@@ -20,6 +20,15 @@ import pages.QuestionPage
 import models.verify.SelectedSubcontractors
 import play.api.libs.json.JsPath
 
+case class SelectSubcontractorsToReverifyPage(id: String)
+    extends QuestionPage[Set[SelectedSubcontractors]]
+    with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "selectSubcontractorsToReverify"
+}
+
 case object SelectSubcontractorsToReverifyPage extends QuestionPage[Set[SelectedSubcontractors]] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString

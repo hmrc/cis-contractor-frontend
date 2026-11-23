@@ -24,13 +24,19 @@ import services.{CheckLatestSubmissionStatusService, SubmissionStatusCheckResult
 
 trait PendingVerificationRequestGuard extends Results {
 
-  protected def redirectIfVerificationRequestInProgress(userAnswers: UserAnswers): Option[Result] =
+  protected def redirectIfVerificationRequestInProgress(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Option[Result] = {
+    val page =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
     userAnswers
-      .get(NewestVerificationBatchResponsePage)
+      .get(page)
       .flatMap(_.verificationBatch.flatMap(_.status))
       .flatMap(VerificationBatchStatus.from)
       .map(status => CheckLatestSubmissionStatusService.check(Some(status)))
       .collect { case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
         Redirect(controllers.verify.routes.VerificationRequestInProgressController.onPageLoad())
       }
+  }
 }

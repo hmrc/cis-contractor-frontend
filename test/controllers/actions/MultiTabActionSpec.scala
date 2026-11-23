@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import services.CisTaxpayerService
 
 import java.util.UUID
@@ -173,6 +173,41 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
 
       val result = new MultiTabAction(service)
         .forJourney(flowId)
+        .invokeBlock(
+          journeyRequest(answers),
+          _ => Future.successful(Results.Ok)
+        )
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
+    }
+  }
+
+  "MultiTabAction.forVerifyJourney" - {
+
+    "allows the request when cisId under verify uuid is authorised" in {
+      val service = mock[CisTaxpayerService]
+      when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
+        .thenReturn(Future.successful(taxpayer))
+
+      val answers = emptyUserAnswers.set(VerifyCisIdQuery(flowId.toString), cisId).success.value
+
+      val result = new MultiTabAction(service)
+        .forVerifyJourney(flowId)
+        .invokeBlock(
+          journeyRequest(answers),
+          _ => Future.successful(Results.Ok)
+        )
+
+      status(result) mustBe OK
+    }
+
+    "sends the user to Journey Recovery when add cisId is present but verify cisId is missing" in {
+      val service = mock[CisTaxpayerService]
+      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString), cisId).success.value
+
+      val result = new MultiTabAction(service)
+        .forVerifyJourney(flowId)
         .invokeBlock(
           journeyRequest(answers),
           _ => Future.successful(Results.Ok)

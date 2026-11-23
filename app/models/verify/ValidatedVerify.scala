@@ -17,8 +17,10 @@
 package models.verify
 
 import forms.mappings.Constants.MaxLength254
+import models.response.GetNewestVerificationBatchResponse
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
 import models.{InvalidAnswer, MissingAnswer, SubcontractorViewModel, UserAnswers, Validation, ValidationError}
+import pages.QuestionPage
 import pages.verify.*
 
 final case class ValidatedVerify(
@@ -29,72 +31,117 @@ final case class ValidatedVerify(
 
 object ValidatedVerify extends Validation {
 
-  def build(answers: UserAnswers): Either[ValidationError, ValidatedVerify] = {
+  def build(answers: UserAnswers): Either[ValidationError, ValidatedVerify] =
+    build(
+      answers,
+      SelectSubcontractorPage,
+      SelectSubcontractorsToReverifyPage,
+      VerifyYourSubcontractorsYesNoPage,
+      ReverifyExistingSubcontractorsYesNoPage,
+      VerificationBatchReadinessPage,
+      ContractorEmailConfirmationStoredPage,
+      ContractorEmailConfirmationNotStoredPage,
+      NewestVerificationBatchResponsePage,
+      EmailAddressPage
+    )
+
+  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedVerify] =
+    build(
+      answers,
+      SelectSubcontractorPage(id),
+      SelectSubcontractorsToReverifyPage(id),
+      VerifyYourSubcontractorsYesNoPage(id),
+      ReverifyExistingSubcontractorsYesNoPage(id),
+      VerificationBatchReadinessPage(id),
+      ContractorEmailConfirmationStoredPage(id),
+      ContractorEmailConfirmationNotStoredPage(id),
+      NewestVerificationBatchResponsePage(id),
+      EmailAddressPage(id)
+    )
+
+  private def build(
+    answers: UserAnswers,
+    selectPage: QuestionPage[Set[SubcontractorViewModel]],
+    reverifyPage: QuestionPage[Set[SelectedSubcontractors]],
+    yesNoPage: QuestionPage[Boolean],
+    reverifyYesNoPage: QuestionPage[Boolean],
+    readinessPage: QuestionPage[Boolean],
+    storedPage: QuestionPage[ContractorEmailConfirmationStored],
+    notStoredPage: QuestionPage[Boolean],
+    newestPage: QuestionPage[GetNewestVerificationBatchResponse],
+    emailPage: QuestionPage[String]
+  ): Either[ValidationError, ValidatedVerify] = {
     val selectedSubcontractors: Set[SubcontractorViewModel] =
-      answers.get(SelectSubcontractorPage).getOrElse(Set.empty)
+      answers.get(selectPage).getOrElse(Set.empty)
 
     for {
       subcontractorsToReverify <- getOptionalPageAndQuestionValue(
                                     answers,
-                                    SelectSubcontractorsToReverifyPage,
-                                    answers
-                                      .get(VerifyYourSubcontractorsYesNoPage)
-                                      .map(_ => VerifyYourSubcontractorsYesNoPage)
-                                      .getOrElse(ReverifyExistingSubcontractorsYesNoPage)
+                                    reverifyPage,
+                                    answers.get(yesNoPage).map(_ => yesNoPage).getOrElse(reverifyYesNoPage)
                                   )
 
       _ <- Either.cond(
              selectedSubcontractors.nonEmpty || subcontractorsToReverify.exists(_.nonEmpty),
              (),
-             InvalidAnswer(SelectSubcontractorPage)
+             InvalidAnswer(selectPage)
            )
 
-      emailToUse <- resolveEmail(answers)
+      emailToUse <- resolveEmail(answers, storedPage, notStoredPage, newestPage, emailPage)
 
       _ <- Either.cond(
-             answers.get(VerificationBatchReadinessPage).contains(true),
+             answers.get(readinessPage).contains(true),
              (),
-             MissingAnswer(VerificationBatchReadinessPage)
+             MissingAnswer(readinessPage)
            )
     } yield ValidatedVerify(selectedSubcontractors, subcontractorsToReverify, emailToUse)
   }
 
-  private def resolveEmail(answers: UserAnswers): Either[ValidationError, Option[String]] =
-    answers.get(ContractorEmailConfirmationStoredPage) match {
+  private def resolveEmail(
+    answers: UserAnswers,
+    storedPage: QuestionPage[ContractorEmailConfirmationStored],
+    notStoredPage: QuestionPage[Boolean],
+    newestPage: QuestionPage[GetNewestVerificationBatchResponse],
+    emailPage: QuestionPage[String]
+  ): Either[ValidationError, Option[String]] =
+    answers.get(storedPage) match {
       case Some(CurrentEmail)   =>
         answers
-          .get(NewestVerificationBatchResponsePage)
+          .get(newestPage)
           .flatMap(_.scheme)
           .flatMap(_.emailAddress)
-          .toRight(MissingAnswer(ContractorEmailConfirmationStoredPage))
+          .toRight(MissingAnswer(storedPage))
           .flatMap { email =>
             Either.cond(
               isValidEmail(email),
               Some(email),
-              InvalidAnswer(ContractorEmailConfirmationStoredPage)
+              InvalidAnswer(storedPage)
             )
           }
       case Some(DifferentEmail) =>
-        validateEnteredEmail(answers)
+        validateEnteredEmail(answers, emailPage)
       case Some(DoNotSend)      =>
         Right(None)
       case None                 =>
-        answers.get(ContractorEmailConfirmationNotStoredPage) match {
-          case Some(true)  => validateEnteredEmail(answers)
+        answers.get(notStoredPage) match {
+          case Some(true)  => validateEnteredEmail(answers, emailPage)
           case Some(false) => Right(None)
-          case None        => Left(MissingAnswer(ContractorEmailConfirmationStoredPage))
+          case None        => Left(MissingAnswer(storedPage))
         }
     }
 
-  private def validateEnteredEmail(answers: UserAnswers): Either[ValidationError, Option[String]] =
+  private def validateEnteredEmail(
+    answers: UserAnswers,
+    emailPage: QuestionPage[String]
+  ): Either[ValidationError, Option[String]] =
     answers
-      .get(EmailAddressPage)
-      .toRight(MissingAnswer(EmailAddressPage))
+      .get(emailPage)
+      .toRight(MissingAnswer(emailPage))
       .flatMap { email =>
         Either.cond(
           isValidEmail(email),
           Some(email),
-          InvalidAnswer(EmailAddressPage)
+          InvalidAnswer(emailPage)
         )
       }
 

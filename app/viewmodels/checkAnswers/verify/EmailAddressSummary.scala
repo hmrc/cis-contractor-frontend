@@ -20,27 +20,45 @@ import models.{CheckMode, UserAnswers}
 import models.verify.ContractorEmailConfirmationStored.DifferentEmail
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, EmailAddressPage}
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object EmailAddressSummary {
 
-  private def emailRowRequired(answers: UserAnswers): Boolean =
-    answers.get(ContractorEmailConfirmationStoredPage).contains(DifferentEmail) ||
-      answers.get(ContractorEmailConfirmationNotStoredPage).contains(true)
+  private def emailRowRequired(answers: UserAnswers, subJourneyId: Option[String]): Boolean = {
+    val storedPage    =
+      subJourneyId.map(ContractorEmailConfirmationStoredPage.apply).getOrElse(ContractorEmailConfirmationStoredPage)
+    val notStoredPage = subJourneyId
+      .map(ContractorEmailConfirmationNotStoredPage.apply)
+      .getOrElse(ContractorEmailConfirmationNotStoredPage)
+    answers.get(storedPage).contains(DifferentEmail) ||
+    answers.get(notStoredPage).contains(true)
+  }
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    Option.when(emailRowRequired(answers))(answers.get(EmailAddressPage)).flatten.map { answer =>
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val emailPage = subJourneyId.map(EmailAddressPage.apply).getOrElse(EmailAddressPage)
+    Option.when(emailRowRequired(answers, subJourneyId))(answers.get(emailPage)).flatten.map { answer =>
       SummaryListRowViewModel(
         key = "verify.emailAddress.checkYourAnswersLabel",
         value = ValueViewModel(answer),
         actions = Seq(
-          ActionItemViewModel("site.change", controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            subJourneyId
+              .map(id =>
+                controllers.verify.routes.EmailAddressController
+                  .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                  .url
+              )
+              .getOrElse(controllers.verify.routes.EmailAddressController.onPageLoad(CheckMode).url)
+          )
             .withVisuallyHiddenText(messages("verify.emailAddress.change.hidden"))
             .withAttribute("id" -> "verify-email-address")
         )
       )
     }
+  }
 }

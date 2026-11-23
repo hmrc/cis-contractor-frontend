@@ -26,8 +26,14 @@ import viewmodels.implicits.*
 
 object ReverifyExistingSubcontractorsYesNoSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ReverifyExistingSubcontractorsYesNoPage).map { answer =>
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val page =
+      subJourneyId
+        .map(ReverifyExistingSubcontractorsYesNoPage.apply)
+        .getOrElse(ReverifyExistingSubcontractorsYesNoPage)
+    answers.get(page).map { answer =>
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
@@ -36,11 +42,18 @@ object ReverifyExistingSubcontractorsYesNoSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url
+            subJourneyId
+              .map(id =>
+                routes.ReverifyExistingSubcontractorsYesNoController
+                  .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                  .url
+              )
+              .getOrElse(routes.ReverifyExistingSubcontractorsYesNoController.onPageLoad(CheckMode).url)
           )
             .withVisuallyHiddenText(messages("verify.reverifyExistingSubcontractorsYesNo.change.hidden"))
             .withAttribute("id" -> "reverify-existing-subcontractors-yes-no")
         )
       )
     }
+  }
 }

@@ -20,6 +20,13 @@ import models.Subcontractor
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class UnverifiedSubcontractorsPage(id: String) extends QuestionPage[Seq[Subcontractor]] {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "unverifiedSubcontractors"
+}
+
 case object UnverifiedSubcontractorsPage extends QuestionPage[Seq[Subcontractor]] {
 
   override def path: JsPath =

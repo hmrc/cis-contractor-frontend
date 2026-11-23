@@ -26,8 +26,11 @@ import viewmodels.implicits.*
 
 object SelectSubcontractorSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SelectSubcontractorPage).flatMap { subcontractors =>
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val page = subJourneyId.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+    answers.get(page).flatMap { subcontractors =>
       val names =
         if (subcontractors.isEmpty) {
           List(messages("verify.selectSubcontractor.display.noneSelected"))
@@ -42,7 +45,13 @@ object SelectSubcontractorSummary {
           actions = Seq(
             ActionItemViewModel(
               "site.change",
-              controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url
+              subJourneyId
+                .map(id =>
+                  controllers.verify.routes.SelectSubcontractorController
+                    .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                    .url
+                )
+                .getOrElse(controllers.verify.routes.SelectSubcontractorController.onPageLoad(CheckMode).url)
             )
               .withVisuallyHiddenText(messages("verify.selectSubcontractor.change.hidden"))
               .withAttribute("id" -> "select-subcontractor")
@@ -50,4 +59,5 @@ object SelectSubcontractorSummary {
         )
       }
     }
+  }
 }

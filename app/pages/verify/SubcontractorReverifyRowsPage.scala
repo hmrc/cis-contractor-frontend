@@ -20,7 +20,18 @@ import viewmodels.verify.SubcontractorReverifyRow
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class SubcontractorReverifyRowsPage(id: String)
+    extends QuestionPage[Seq[SubcontractorReverifyRow]]
+    with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "subcontractorReverifyRows"
+}
+
 case object SubcontractorReverifyRowsPage extends QuestionPage[Seq[SubcontractorReverifyRow]] with VerifyJourney {
-  override def path: JsPath     = JsPath \ toString
+
+  override def path: JsPath = JsPath \ toString
+
   override def toString: String = "subcontractorReverifyRows"
 }

@@ -28,18 +28,31 @@ object VerifyEmailResolver {
     *   - No-email journey: Yes → user-entered email; No → None
     */
   def resolvedEmail(answers: UserAnswers): Option[String] =
-    answers.get(ContractorEmailConfirmationStoredPage) match {
+    resolvedEmail(answers, None)
+
+  def resolvedEmail(answers: UserAnswers, subJourneyId: Option[String]): Option[String] = {
+    val storedPage    =
+      subJourneyId.map(ContractorEmailConfirmationStoredPage.apply).getOrElse(ContractorEmailConfirmationStoredPage)
+    val notStoredPage = subJourneyId
+      .map(ContractorEmailConfirmationNotStoredPage.apply)
+      .getOrElse(ContractorEmailConfirmationNotStoredPage)
+    val newestPage    =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+    val emailPage     = subJourneyId.map(EmailAddressPage.apply).getOrElse(EmailAddressPage)
+
+    answers.get(storedPage) match {
       case Some(CurrentEmail)   =>
-        answers.get(NewestVerificationBatchResponsePage).flatMap(_.scheme).flatMap(_.emailAddress)
+        answers.get(newestPage).flatMap(_.scheme).flatMap(_.emailAddress)
       case Some(DifferentEmail) =>
-        answers.get(EmailAddressPage)
+        answers.get(emailPage)
       case Some(DoNotSend)      =>
         None
       case None                 =>
-        answers.get(ContractorEmailConfirmationNotStoredPage) match {
-          case Some(true)  => answers.get(EmailAddressPage)
+        answers.get(notStoredPage) match {
+          case Some(true)  => answers.get(emailPage)
           case Some(false) => None
           case None        => None
         }
     }
+  }
 }

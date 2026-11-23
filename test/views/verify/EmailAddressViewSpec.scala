@@ -34,7 +34,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
   "EmailAddressView" should {
 
     "render the page with title, heading, input and submit button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint")
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint", submitAction)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("verify.emailAddress.title"))
@@ -53,7 +53,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
     }
 
     "render the page with SM-01c hint when email is not stored" in new Setup {
-      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint.notStored")
+      val html: HtmlFormat.Appendable = view(form, NormalMode, "verify.emailAddress.hint.notStored", submitAction)
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select(".govuk-hint").text() must include(messages("verify.emailAddress.hint.notStored"))
@@ -63,7 +63,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       val errorForm: Form[String] =
         form.withError("value", "verify.emailAddress.error.required")
 
-      val html = view(errorForm, NormalMode, "verify.emailAddress.hint")
+      val html = view(errorForm, NormalMode, "verify.emailAddress.hint", submitAction)
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -88,5 +88,7 @@ class EmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPer
       )
 
     val view: EmailAddressView = app.injector.instanceOf[EmailAddressView]
+
+    val submitAction = controllers.verify.routes.EmailAddressController.onSubmit(NormalMode)
   }
 }
