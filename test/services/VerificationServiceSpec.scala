@@ -36,7 +36,7 @@ import play.api.i18n.Messages
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -465,6 +465,32 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
 
       ex.getMessage mustBe
         "Submitted verification request page cannot be accessed for submission status: missing"
+    }
+
+    "must return nested updated answers when the latest submission status is SUBMITTED" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+      val flowId        = "11111111-1111-1111-1111-111111111111"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(VerifyCisIdQuery(flowId), instanceId)
+          .success
+          .value
+
+      val response = responseWithSubmissionStatus(Some("SUBMITTED"))
+
+      when(mockConnector.getNewestVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.refreshSubmittedVerificationRequest(userAnswers, Some(flowId)).futureValue
+
+      result.get(NewestVerificationBatchResponsePage(flowId)) mustBe Some(response)
+      result.get(NewestVerificationBatchResponsePage) mustBe None
     }
   }
 
@@ -1166,7 +1192,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1286,7 +1317,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .thenReturn(Future.successful(currentBatch))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1369,7 +1405,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
         .thenReturn(Future.successful(currentBatch))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(false), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(false),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )
@@ -1482,7 +1523,12 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       ).thenReturn(Future.successful(CreateSubmissionForVerificationResponse(13602L)))
 
       when(
-        mockRequestBuilder.build(any[UserAnswers], eqTo(true), eqTo(EmployerReference("123", "AB456")))(
+        mockRequestBuilder.build(
+          any[UserAnswers],
+          eqTo(true),
+          eqTo(EmployerReference("123", "AB456")),
+          any[Option[String]]
+        )(
           any[HeaderCarrier],
           any[Messages]
         )

@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReverifyExistingSubcontractorsYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: ReverifyExistingSubcontractorsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ReverifyExistingSubcontractorsYesNoView
@@ -48,18 +50,20 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val submitAction = routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode)
     redirectIfVerificationRequestInProgress(request.userAnswers).getOrElse {
       val preparedForm = request.userAnswers.get(ReverifyExistingSubcontractorsYesNoPage) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, submitAction))
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
+      val submitAction = routes.ReverifyExistingSubcontractorsYesNoController.onSubmit(mode)
       redirectIfVerificationRequestInProgress(request.userAnswers) match {
         case Some(redirectResult) =>
           Future.successful(redirectResult)
@@ -68,7 +72,7 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
               value =>
                 for {
                   updatedAnswers <-
@@ -87,5 +91,44 @@ class ReverifyExistingSubcontractorsYesNoController @Inject() (
                 )
             )
       }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.ReverifyExistingSubcontractorsYesNoController.onSubmitWithId(flowId, mode)
+      redirectIfVerificationRequestInProgress(request.userAnswers, Some(id)).getOrElse {
+        val preparedForm = request.userAnswers.get(ReverifyExistingSubcontractorsYesNoPage(id)).fold(form)(form.fill)
+        Ok(view(preparedForm, mode, submitAction))
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id           = flowId.toString
+        val submitAction = routes.ReverifyExistingSubcontractorsYesNoController.onSubmitWithId(flowId, mode)
+        redirectIfVerificationRequestInProgress(request.userAnswers, Some(id)) match {
+          case Some(redirectResult) =>
+            Future.successful(redirectResult)
+          case None                 =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+                value =>
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(
+                        request.userAnswers
+                          .set(ReverifyExistingSubcontractorsYesNoPage(id), value)
+                          .flatMap(_.remove(SelectSubcontractorsToReverifyPage(id)))
+                      )
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield Redirect(
+                    navigator.nextPage(ReverifyExistingSubcontractorsYesNoPage(id), mode, updatedAnswers)
+                  )
+              )
+        }
     }
 }

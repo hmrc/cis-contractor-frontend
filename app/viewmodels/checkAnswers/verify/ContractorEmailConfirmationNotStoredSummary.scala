@@ -25,8 +25,13 @@ import viewmodels.implicits.*
 
 object ContractorEmailConfirmationNotStoredSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ContractorEmailConfirmationNotStoredPage).map { answer =>
+  def row(answers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val page = subJourneyId
+      .map(ContractorEmailConfirmationNotStoredPage.apply)
+      .getOrElse(ContractorEmailConfirmationNotStoredPage)
+    answers.get(page).map { answer =>
 
       val value = if (answer) "site.yes" else "verify.contractorEmailConfirmationStored.doNotSend"
 
@@ -36,11 +41,20 @@ object ContractorEmailConfirmationNotStoredSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
+            subJourneyId
+              .map(id =>
+                controllers.verify.routes.ContractorEmailConfirmationNotStoredController
+                  .onPageLoadWithId(java.util.UUID.fromString(id), CheckMode)
+                  .url
+              )
+              .getOrElse(
+                controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onPageLoad(CheckMode).url
+              )
           )
             .withVisuallyHiddenText(messages("verify.contractorEmailConfirmationNotStored.change.hidden"))
             .withAttribute("id" -> "contractor-email-confirmation-not-stored")
         )
       )
     }
+  }
 }

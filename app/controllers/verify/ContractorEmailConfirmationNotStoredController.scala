@@ -25,13 +25,15 @@ import navigation.Navigator
 import pages.finalvalidation.{FinalValidationDraftIdPage, VerifyFinalValidationContinuationPage, VerifyFinalValidationModePage}
 import pages.verify.{ContractorEmailConfirmationNotStoredPage, ContractorEmailConfirmationStoredPage, NewestVerificationBatchResponsePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 import services.VerifyFinalValidationService
 import services.finalvalidation.FinalValidationDraftService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ContractorEmailConfirmationNotStoredView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,6 +45,7 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  multiTabAction: MultiTabAction,
   verifyFinalValidationService: VerifyFinalValidationService,
   finalValidationDraftService: FinalValidationDraftService,
   finalValidationDraftRequestBuilder: FinalValidationDraftRequestBuilder,
@@ -55,12 +58,24 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
 
   val form = formProvider()
 
-  private def hasStoredEmail(ua: UserAnswers): Boolean =
-    ua.get(NewestVerificationBatchResponsePage)
+  private def hasStoredEmail(ua: UserAnswers, subJourneyId: Option[String] = None): Boolean = {
+    val page =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+    ua.get(page)
       .exists(_.scheme.exists(_.emailAddress.exists(_.nonEmpty)))
+  }
 
-  private def redirectToStored(mode: Mode): Result =
-    Redirect(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
+  private def notStoredSubmitAction(mode: Mode, flowId: Option[UUID]): Call =
+    flowId
+      .map(id => routes.ContractorEmailConfirmationNotStoredController.onSubmitWithId(id, mode))
+      .getOrElse(routes.ContractorEmailConfirmationNotStoredController.onSubmit(mode))
+
+  private def redirectToStored(mode: Mode, flowId: Option[UUID] = None): Result =
+    Redirect(
+      flowId
+        .map(id => controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoadWithId(id, mode))
+        .getOrElse(controllers.verify.routes.ContractorEmailConfirmationStoredController.onPageLoad(mode))
+    )
 
   private def redirectToStoredAfterFinalValidation(mode: Mode): Result =
     Redirect(
@@ -122,7 +137,7 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
                 case Some(value) => form.fill(value)
               }
 
-              Future.successful(Ok(view(preparedForm, mode)))
+              Future.successful(Ok(view(preparedForm, mode, notStoredSubmitAction(mode, None))))
             }
 
         } yield result
@@ -149,7 +164,7 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
             case Some(value) => form.fill(value)
           }
 
-          Ok(view(preparedForm, mode))
+          Ok(view(preparedForm, mode, notStoredSubmitAction(mode, None)))
         }
       }
     }
@@ -162,7 +177,8 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, notStoredSubmitAction(mode, None)))),
             value =>
               for {
                 cleanedAnswers <-
@@ -173,5 +189,75 @@ class ContractorEmailConfirmationNotStoredController @Inject() (
               } yield Redirect(navigator.nextPage(ContractorEmailConfirmationNotStoredPage, mode, updatedAnswers))
           )
       }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id = flowId.toString
+        if (hasStoredEmail(request.userAnswers, Some(id))) {
+          Future.successful(redirectToStored(mode, Some(flowId)))
+        } else {
+          request.userAnswers.get(VerifyCisIdQuery(id)) match {
+            case None        =>
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(cisId) =>
+              for {
+                validation <- verifyFinalValidationService.validate(cisId, request.userAnswers)
+                result     <-
+                  if (validation.hasErrors) {
+                    for {
+                      createRequest    <- Future.fromTry(finalValidationDraftRequestBuilder.build(cisId, validation))
+                      draftId          <- finalValidationDraftService.create(createRequest)
+                      withContinuation <- Future.fromTry(
+                                            request.userAnswers.set(
+                                              VerifyFinalValidationContinuationPage,
+                                              VerifyFinalValidationContinuation.ContractorEmailConfirmationNotStored
+                                            )
+                                          )
+                      withDraftId      <- Future.fromTry(withContinuation.set(FinalValidationDraftIdPage, draftId))
+                      withMode         <- Future.fromTry(withDraftId.set(VerifyFinalValidationModePage, mode.toString))
+                      _                <- sessionRepository.set(withMode)
+                    } yield Redirect(
+                      controllers.finalvalidations.routes.ReviewSubcontractorDetailsController.onPageLoad()
+                    )
+                  } else {
+                    val preparedForm =
+                      request.userAnswers.get(ContractorEmailConfirmationNotStoredPage(id)).fold(form)(form.fill)
+                    Future.successful(
+                      Ok(view(preparedForm, mode, notStoredSubmitAction(mode, Some(flowId))))
+                    )
+                  }
+              } yield result
+          }
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id = flowId.toString
+        if (hasStoredEmail(request.userAnswers, Some(id))) {
+          Future.successful(redirectToStored(mode, Some(flowId)))
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, notStoredSubmitAction(mode, Some(flowId))))
+                ),
+              value =>
+                for {
+                  cleanedAnswers <-
+                    Future.fromTry(request.userAnswers.remove(ContractorEmailConfirmationStoredPage(id)))
+                  updatedAnswers <-
+                    Future.fromTry(cleanedAnswers.set(ContractorEmailConfirmationNotStoredPage(id), value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(ContractorEmailConfirmationNotStoredPage(id), mode, updatedAnswers)
+                )
+            )
+        }
     }
 }

@@ -17,15 +17,13 @@
 package viewmodels.verify
 
 import base.SpecBase
-import models.UserAnswers
-import models.SubcontractorViewModel
+import models.{SubcontractorViewModel, Submission, UserAnswers, VerificationBatch}
+import models.response.GetNewestVerificationBatchResponse
+import models.verify.SelectedSubcontractors
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.matchers.should.Matchers._
-import pages.verify.SelectSubcontractorPage
-import models.{Submission, VerificationBatch}
-import models.response.GetNewestVerificationBatchResponse
-import pages.verify.NewestVerificationBatchResponsePage
-import queries.CisIdQuery
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
+import queries.{CisIdQuery, VerifyCisIdQuery}
 
 import java.time.LocalDateTime
 
@@ -206,6 +204,41 @@ class VerificationRequestSubmittedViewModelSpec extends SpecBase {
 
         vm.subcontractorsToVerify shouldBe Seq("Brody, Martin", "Hooper And Associates")
         vm.showVerify             shouldBe true
+      }
+
+      "must map nested subcontractors when a sub journey id is present" in {
+
+        val flowId = "11111111-1111-1111-1111-111111111111"
+
+        val userAnswers =
+          UserAnswers("id")
+            .set(VerifyCisIdQuery(flowId), cisId)
+            .success
+            .value
+            .set(NewestVerificationBatchResponsePage(flowId), newestBatchResponse)
+            .success
+            .value
+            .set(
+              SelectSubcontractorPage(flowId),
+              Set(SubcontractorViewModel("ID1", "ABC Company"))
+            )
+            .success
+            .value
+            .set(
+              SelectSubcontractorsToReverifyPage(flowId),
+              Set(SelectedSubcontractors("ID2", "Smith, John"))
+            )
+            .success
+            .value
+
+        val vm =
+          VerificationRequestSubmittedViewModel.fromUserAnswers(userAnswers, applicationConfig, Some(flowId))
+
+        vm.subcontractorsToVerify   shouldBe Seq("ABC Company")
+        vm.subcontractorsToReverify shouldBe Seq("Smith, John")
+        vm.showVerify               shouldBe true
+        vm.showReverify             shouldBe true
+        vm.referenceNumber          shouldBe Some("VB00000001")
       }
 
       "must preserve duplicate subcontractor names (different IDs, same name)" in {

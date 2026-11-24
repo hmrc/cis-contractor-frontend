@@ -15,6 +15,7 @@
  *@
 
 @import models.verify.ContractorEmailConfirmationStored
+@import play.api.mvc.Call
 @import viewmodels.LegendSize.Large
 
 @this(
@@ -25,11 +26,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, emailAddress: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, emailAddress: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("verify.contractorEmailConfirmationStored.title"))) {
 
-    @formHelper(action = controllers.verify.routes.ContractorEmailConfirmationStoredController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

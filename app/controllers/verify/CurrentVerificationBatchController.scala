@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import models.{Mode, UserAnswers}
 import models.response.GetCurrentVerificationBatchResponse
 import models.validation.SubcontractorValidationFailure
@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import services.{SubcontractorDetailsValidator, SubcontractorPartnershipValidator, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class CurrentVerificationBatchController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
   subcontractorDetailsValidator: SubcontractorDetailsValidator,
@@ -49,80 +51,113 @@ class CurrentVerificationBatchController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      verificationBatchService
-        .refreshNewestVerificationBatch(request.userAnswers)
-        .flatMap { updatedAnswers =>
-          if (verificationBatchService.latestBatchCanBeModified(updatedAnswers)) {
-            verificationBatchService
-              .getCurrentVerificationBatch(updatedAnswers)
-              .flatMap { currentAnswers =>
-                currentAnswers
-                  .get(CurrentVerificationBatchResponsePage)
-                  .map { response =>
-                    val validationFailures =
-                      SubcontractorValidationFailure.merge(
-                        subcontractorDetailsValidator.validate(
-                          response.subcontractors
-                        ),
-                        subcontractorPartnershipValidator.validate(
-                          response.subcontractors
-                        )
-                      )
-
-                    for {
-                      answersWithFailures <-
-                        Future.fromTry(
-                          currentAnswers.set(
-                            SubcontractorValidationFailuresPage,
-                            validationFailures
-                          )
-                        )
-
-                      _ <- sessionRepository.set(
-                             answersWithFailures
-                           )
-                    } yield redirectFor(response, mode)
-                  }
-                  .getOrElse {
-                    logger.error(
-                      "[CurrentVerificationBatchController][onPageLoad] - CurrentVerificationBatchResponsePage missing from userAnswers"
-                    )
-                    Future.successful(
-                      Redirect(
-                        controllers.routes.JourneyRecoveryController
-                          .onPageLoad()
-                      )
-                    )
-                  }
-              }
-          } else {
-            createVerificationBatch(updatedAnswers, mode)
-          }
-        }
-        .recover { case throwable =>
-          logger.error(
-            "[CurrentVerificationBatchController.onPageLoad] Failed to refresh, validate or persist the current verification batch",
-            throwable
-          )
-
-          Redirect(
-            controllers.routes.JourneyRecoveryController
-              .onPageLoad()
-          )
-        }
+      loadCurrentBatch(mode, None)
     }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        loadCurrentBatch(mode, Some(flowId))
+    }
+
+  private def loadCurrentBatch(mode: Mode, flowId: Option[UUID])(implicit
+    request: models.requests.DataRequest[?]
+  ): Future[Result] = {
+    val id        = flowId.map(_.toString)
+    val refreshed =
+      id.fold(verificationBatchService.refreshNewestVerificationBatch(request.userAnswers))(nestedId =>
+        verificationBatchService.refreshNewestVerificationBatch(request.userAnswers, Some(nestedId))
+      )
+    refreshed
+      .flatMap { updatedAnswers =>
+        val canModify =
+          id.fold(verificationBatchService.latestBatchCanBeModified(updatedAnswers))(nestedId =>
+            verificationBatchService.latestBatchCanBeModified(updatedAnswers, Some(nestedId))
+          )
+        if (canModify) {
+          val current =
+            id.fold(verificationBatchService.getCurrentVerificationBatch(updatedAnswers))(nestedId =>
+              verificationBatchService.getCurrentVerificationBatch(updatedAnswers, Some(nestedId))
+            )
+          current
+            .flatMap { currentAnswers =>
+              val currentPage =
+                id.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
+              currentAnswers
+                .get(currentPage)
+                .map { response =>
+                  val validationFailures =
+                    SubcontractorValidationFailure.merge(
+                      subcontractorDetailsValidator.validate(
+                        response.subcontractors
+                      ),
+                      subcontractorPartnershipValidator.validate(
+                        response.subcontractors
+                      )
+                    )
+
+                  for {
+                    answersWithFailures <-
+                      Future.fromTry(
+                        currentAnswers.set(
+                          SubcontractorValidationFailuresPage,
+                          validationFailures
+                        )
+                      )
+
+                    _ <- sessionRepository.set(
+                           answersWithFailures
+                         )
+                  } yield redirectFor(response, mode, flowId)
+                }
+                .getOrElse {
+                  logger.error(
+                    "[CurrentVerificationBatchController][onPageLoad] - CurrentVerificationBatchResponsePage missing from userAnswers"
+                  )
+                  Future.successful(
+                    Redirect(
+                      controllers.routes.JourneyRecoveryController
+                        .onPageLoad()
+                    )
+                  )
+                }
+            }
+        } else {
+          createVerificationBatch(updatedAnswers, mode, id)
+        }
+      }
+      .recover { case throwable =>
+        logger.error(
+          "[CurrentVerificationBatchController.onPageLoad] Failed to refresh, validate or persist the current verification batch",
+          throwable
+        )
+
+        Redirect(
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+        )
+      }
+  }
 
   private def redirectFor(
     response: GetCurrentVerificationBatchResponse,
-    mode: Mode
+    mode: Mode,
+    flowId: Option[UUID]
   ): Result =
     if (
       response.verificationBatch.nonEmpty ||
       response.verifications.nonEmpty
     ) {
       Redirect(
-        controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
-          .modifyVerificationBatch(mode)
+        flowId
+          .map(id =>
+            controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+              .modifyVerificationBatchWithId(id, mode)
+          )
+          .getOrElse(
+            controllers.verify.routes.ModifyVerificationBatchAndVerificationsController
+              .modifyVerificationBatch(mode)
+          )
       )
     } else {
       logger.error(
@@ -136,17 +171,22 @@ class CurrentVerificationBatchController @Inject() (
 
   private def createVerificationBatch(
     userAnswers: UserAnswers,
-    mode: Mode
+    mode: Mode,
+    subJourneyId: Option[String]
   )(implicit request: RequestHeader): Future[Result] = {
+    val selectPage   = subJourneyId.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+    val reverifyPage =
+      subJourneyId.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
+
     val verifyIdsRaw: Seq[String] =
       userAnswers
-        .get(SelectSubcontractorPage)
+        .get(selectPage)
         .map(_.toSeq.map(_.id))
         .getOrElse(Seq.empty)
 
     val reverifyIdsRaw: Seq[String] =
       userAnswers
-        .get(SelectSubcontractorsToReverifyPage)
+        .get(reverifyPage)
         .map(_.toSeq.map(_.id))
         .getOrElse(Seq.empty)
 
@@ -162,16 +202,33 @@ class CurrentVerificationBatchController @Inject() (
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
       case Right(selectedIds) =>
-        verificationBatchService
-          .createVerificationBatchAndVerifications(
-            userAnswers = userAnswers,
-            selectedSubcontractorIds = selectedIds,
-            actionIndicator = None
+        val created =
+          subJourneyId.fold(
+            verificationBatchService.createVerificationBatchAndVerifications(
+              userAnswers = userAnswers,
+              selectedSubcontractorIds = selectedIds,
+              actionIndicator = None
+            )
+          )(nestedId =>
+            verificationBatchService.createVerificationBatchAndVerifications(
+              userAnswers = userAnswers,
+              selectedSubcontractorIds = selectedIds,
+              actionIndicator = None,
+              subJourneyId = Some(nestedId)
+            )
           )
+        created
           .map(_ =>
             Redirect(
-              controllers.verify.routes.CheckVerificationBatchReadinessController
-                .checkVerificationBatchReadiness(mode)
+              subJourneyId
+                .map(id =>
+                  controllers.verify.routes.CheckVerificationBatchReadinessController
+                    .checkVerificationBatchReadinessWithId(UUID.fromString(id), mode)
+                )
+                .getOrElse(
+                  controllers.verify.routes.CheckVerificationBatchReadinessController
+                    .checkVerificationBatchReadiness(mode)
+                )
             )
           )
     }

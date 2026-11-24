@@ -19,6 +19,13 @@ package pages.verify
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class VerificationDeclarationPage(id: String) extends QuestionPage[Boolean] with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "verificationDeclaration"
+}
+
 case object VerificationDeclarationPage extends QuestionPage[Boolean] with VerifyJourney {
 
   override def path: JsPath = JsPath \ toString

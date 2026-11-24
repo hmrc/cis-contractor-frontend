@@ -20,6 +20,13 @@ import models.response.GetCurrentVerificationBatchResponse
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class CurrentVerificationBatchResponsePage(id: String) extends QuestionPage[GetCurrentVerificationBatchResponse] {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "currentVerificationBatchResponse"
+}
+
 case object CurrentVerificationBatchResponsePage extends QuestionPage[GetCurrentVerificationBatchResponse] {
 
   override def path: JsPath = JsPath \ toString

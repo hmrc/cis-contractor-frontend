@@ -44,7 +44,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
           pagination,
           page = 1,
           startIndex = 1,
-          totalCount = rows.size
+          totalCount = rows.size,
+          submitAction = submitAction
         )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -73,7 +74,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
         pagination,
         page = 1,
         startIndex = 1,
-        totalCount = rows.size
+        totalCount = rows.size,
+        submitAction = submitAction
       )
 
       val doc = Jsoup.parse(html.body)
@@ -92,7 +94,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
         PaginationViewModel(),
         page = 1,
         startIndex = 1,
-        totalCount = rows.size
+        totalCount = rows.size,
+        submitAction = submitAction
       )
 
       val doc = Jsoup.parse(html.body)
@@ -111,7 +114,7 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
           next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
         )
 
-      val html = view(form, mode, rows, paginationWithItems, 1, 1, rows.size)
+      val html = view(form, mode, rows, paginationWithItems, 1, 1, rows.size, submitAction = submitAction)
 
       val doc = Jsoup.parse(html.body)
 
@@ -131,7 +134,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
         pagination,
         1,
         1,
-        rows.size
+        rows.size,
+        submitAction = submitAction
       )
 
       val doc = Jsoup.parse(html.body)
@@ -150,7 +154,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
           page = 4,
           startIndex = 19,
           totalCount = 42,
-          totalPages = 7
+          totalPages = 7,
+          submitAction = submitAction
         )
 
       val doc = Jsoup.parse(html.body)
@@ -169,7 +174,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
         page = 1,
         startIndex = 1,
         totalCount = rows.size,
-        totalPages = 1
+        totalPages = 1,
+        submitAction = submitAction
       )
 
       val doc = Jsoup.parse(html.body)
@@ -208,5 +214,8 @@ class SelectSubcontractorsToReverifyViewSpec extends SpecBase with Matchers {
       )
 
     val mode: Mode = NormalMode
+
+    val submitAction =
+      controllers.verify.routes.SelectSubcontractorsToReverifyController.onSubmit(mode)
   }
 }

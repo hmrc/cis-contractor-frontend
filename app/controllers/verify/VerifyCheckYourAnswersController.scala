@@ -20,12 +20,13 @@ import controllers.actions.*
 import models.verify.ValidatedVerify
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.verify.*
 import viewmodels.govuk.summarylist.*
 import views.html.verify.VerifyCheckYourAnswersView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -33,6 +34,7 @@ class VerifyCheckYourAnswersController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: VerifyCheckYourAnswersView
 ) extends FrontendBaseController
@@ -41,22 +43,33 @@ class VerifyCheckYourAnswersController @Inject() (
     with PendingVerificationRequestGuard {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    redirectIfVerificationRequestInProgress(request.userAnswers).getOrElse {
-      val ua = request.userAnswers
-      // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
-      ValidatedVerify.build(ua) match {
+    renderCya(None)
+  }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      renderCya(Some(flowId))
+    }
+
+  private def renderCya(flowId: Option[UUID])(implicit request: models.requests.DataRequest[?]) = {
+    val id = flowId.map(_.toString)
+    redirectIfVerificationRequestInProgress(request.userAnswers, id).getOrElse {
+      val ua     = request.userAnswers
+      val built  = id.map(ValidatedVerify.build(ua, _)).getOrElse(ValidatedVerify.build(ua))
+      val submit = cyaSubmitAction(flowId)
+      built match {
         case Right(_)    =>
           val list = SummaryListViewModel(
             rows = Seq(
-              SelectSubcontractorSummary.row(ua),
-              ReverifyExistingSubcontractorsYesNoSummary.row(ua),
-              SelectSubcontractorsToReverifySummary.row(ua),
-              ContractorEmailConfirmationStoredSummary.row(ua),
-              ContractorEmailConfirmationNotStoredSummary.row(ua),
-              EmailAddressSummary.row(ua)
+              SelectSubcontractorSummary.row(ua, id),
+              ReverifyExistingSubcontractorsYesNoSummary.row(ua, id),
+              SelectSubcontractorsToReverifySummary.row(ua, id),
+              ContractorEmailConfirmationStoredSummary.row(ua, id),
+              ContractorEmailConfirmationNotStoredSummary.row(ua, id),
+              EmailAddressSummary.row(ua, id)
             ).flatten
           )
-          Ok(view(list))
+          Ok(view(list, submit))
         case Left(error) =>
           logger.error(s"[VerifyCheckYourAnswersController.onPageLoad] Validation failed: $error")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -66,27 +79,48 @@ class VerifyCheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      redirectIfVerificationRequestInProgress(request.userAnswers) match {
-        case Some(redirectResult) =>
-          Future.successful(redirectResult)
-
-        case None =>
-          // DTR-5294: validate Verify CYA answers; redirect to Journey Recovery if any required answer is missing
-          ValidatedVerify.build(request.userAnswers) match {
-
-            case Right(_)    =>
-              Future.successful(Redirect(controllers.verify.routes.SubmissionSendingController.onPageLoad()))
-            case Left(error) =>
-              logger.error(
-                s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
-              )
-              Future.successful(
-                Redirect(
-                  controllers.routes.JourneyRecoveryController.onPageLoad()
-                )
-              )
-          }
-      }
+      submitCya(None)
     }
 
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        submitCya(Some(flowId))
+    }
+
+  private def submitCya(flowId: Option[UUID])(implicit request: models.requests.DataRequest[?]) = {
+    val id = flowId.map(_.toString)
+    redirectIfVerificationRequestInProgress(request.userAnswers, id) match {
+      case Some(redirectResult) =>
+        Future.successful(redirectResult)
+
+      case None =>
+        val built =
+          id.map(ValidatedVerify.build(request.userAnswers, _)).getOrElse(ValidatedVerify.build(request.userAnswers))
+        built match {
+          case Right(_)    =>
+            Future.successful(
+              Redirect(
+                flowId
+                  .map(fid => controllers.verify.routes.SubmissionSendingController.onPageLoadWithId(fid))
+                  .getOrElse(controllers.verify.routes.SubmissionSendingController.onPageLoad())
+              )
+            )
+          case Left(error) =>
+            logger.error(
+              s"[VerifyCheckYourAnswersController.onSubmit] Validation failed: $error"
+            )
+            Future.successful(
+              Redirect(
+                controllers.routes.JourneyRecoveryController.onPageLoad()
+              )
+            )
+        }
+    }
+  }
+
+  private def cyaSubmitAction(flowId: Option[UUID]): Call =
+    flowId
+      .map(id => routes.VerifyCheckYourAnswersController.onSubmitWithId(id))
+      .getOrElse(routes.VerifyCheckYourAnswersController.onSubmit())
 }

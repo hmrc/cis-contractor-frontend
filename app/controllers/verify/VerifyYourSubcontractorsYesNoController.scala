@@ -25,11 +25,12 @@ import pages.verify.VerifyYourSubcontractorsYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.VerifyYourSubcontractorsYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: VerifyYourSubcontractorsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: VerifyYourSubcontractorsYesNoView
@@ -58,7 +60,7 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm))
+      Ok(view(preparedForm, routes.VerifyYourSubcontractorsYesNoController.onSubmit))
     }
   }
 
@@ -71,7 +73,10 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, routes.VerifyYourSubcontractorsYesNoController.onSubmit))
+              ),
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage, value))
@@ -94,4 +99,50 @@ class VerifyYourSubcontractorsYesNoController @Inject() (
           )
     }
   }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+      redirectIfVerificationRequestInProgress(request.userAnswers, Some(id)).getOrElse {
+        val page         = VerifyYourSubcontractorsYesNoPage(id)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+        Ok(view(preparedForm, routes.VerifyYourSubcontractorsYesNoController.onSubmitWithId(flowId)))
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id           = flowId.toString
+        val submitAction = routes.VerifyYourSubcontractorsYesNoController.onSubmitWithId(flowId)
+        redirectIfVerificationRequestInProgress(request.userAnswers, Some(id)) match {
+          case Some(redirectResult) =>
+            Future.successful(redirectResult)
+          case None                 =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, submitAction))),
+                value =>
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(request.userAnswers.set(VerifyYourSubcontractorsYesNoPage(id), value))
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield
+                    if (value) {
+                      Redirect(navigator.nextPage(VerifyYourSubcontractorsYesNoPage(id), NormalMode, updatedAnswers))
+                    } else {
+                      updatedAnswers.get(VerifyCisIdQuery(id)) match {
+                        case Some(cisId) =>
+                          Redirect(s"${appConfig.manageSubcontractorsUrl}/$cisId")
+                        case None        =>
+                          logger.error(
+                            "[VerifyYourSubcontractorsYesNoController][onSubmitWithId] - VerifyCisIdQuery missing from userAnswers"
+                          )
+                          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      }
+                    }
+              )
+        }
+    }
 }

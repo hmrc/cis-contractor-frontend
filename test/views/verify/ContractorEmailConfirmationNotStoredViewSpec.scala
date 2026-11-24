@@ -34,7 +34,7 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
 
     "render the page with title, heading, yes/no radios and continue button" in new Setup {
 
-      val html = view(form, NormalMode)
+      val html = view(form, NormalMode, submitAction)
       val doc  = Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(
@@ -67,7 +67,7 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
       val errorForm =
         form.withError("value", "verify.contractorEmailConfirmationNotStored.error.required")
 
-      val html = view(errorForm, NormalMode)
+      val html = view(errorForm, NormalMode, submitAction)
       val doc  = Jsoup.parse(html.toString())
 
       val errorSummary = doc.select(".govuk-error-summary")
@@ -102,5 +102,8 @@ class ContractorEmailConfirmationNotStoredViewSpec extends AnyWordSpec with Matc
 
     val view: ContractorEmailConfirmationNotStoredView =
       app.injector.instanceOf[ContractorEmailConfirmationNotStoredView]
+
+    val submitAction =
+      controllers.verify.routes.ContractorEmailConfirmationNotStoredController.onSubmit(NormalMode)
   }
 }

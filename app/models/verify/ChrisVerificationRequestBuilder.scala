@@ -21,7 +21,7 @@ import models.{EmployerReference, SubcontractorCurrentVerification, UserAnswers,
 import models.requests.{ChrisVerificationRequest, VerificationDetails}
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.i18n.Messages
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.VerifyEmailResolver
 import viewmodels.verify.SubcontractorDisplay
@@ -37,10 +37,21 @@ class ChrisVerificationRequestBuilder @Inject() (
     ua: UserAnswers,
     isAgent: Boolean,
     employerReference: EmployerReference
+  )(implicit hc: HeaderCarrier, messages: Messages): Future[ChrisVerificationRequest] =
+    build(ua, isAgent, employerReference, None)
+
+  def build(
+    ua: UserAnswers,
+    isAgent: Boolean,
+    employerReference: EmployerReference,
+    subJourneyId: Option[String]
   )(implicit hc: HeaderCarrier, messages: Messages): Future[ChrisVerificationRequest] = {
+    val cisId       = subJourneyId.map(id => ua.get(VerifyCisIdQuery(id))).getOrElse(ua.get(CisIdQuery))
+    val currentPage =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
 
     val cisIdFut = requireFromSession(
-      ua.get(CisIdQuery),
+      cisId,
       "CisIdQuery not found in session data"
     )
 
@@ -48,7 +59,7 @@ class ChrisVerificationRequestBuilder @Inject() (
       cisId                       <- cisIdFut
       scheme                      <- cisConnector.getScheme(cisId)
       currentVerificationBatch    <- requireFromSession(
-                                       ua.get(CurrentVerificationBatchResponsePage),
+                                       ua.get(currentPage),
                                        "CurrentVerificationBatchResponsePage not found in session data"
                                      )
       utr                          = requireValue(scheme.utr, "UTR not found in scheme data")
@@ -69,7 +80,7 @@ class ChrisVerificationRequestBuilder @Inject() (
       contractorAORef = aoRef,
       verificationBatchId = verificationBatch.verificationBatchId.toString,
       verificationBatchResourceRef = verificationBatchResourceRef.toString,
-      emailRecipient = VerifyEmailResolver.resolvedEmail(ua),
+      emailRecipient = VerifyEmailResolver.resolvedEmail(ua, subJourneyId),
       language = Some(messages.lang.code),
       subcontractors = currentBatchSubcontractors,
       verifications = currentVerificationBatch.verifications.map(v =>

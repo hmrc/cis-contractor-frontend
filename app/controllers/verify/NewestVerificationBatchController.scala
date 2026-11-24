@@ -17,17 +17,19 @@
 package controllers.verify
 
 import controllers.AgentClientChecks
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import models.{NormalMode, UserAnswers}
 import models.verify.VerificationBatchStatus
 import pages.verify.{NewestVerificationBatchResponsePage, ReverificationDecisionsPage, UnverifiedSubcontractorsPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 import services.{CheckLatestSubmissionStatusService, CheckUnmatchedSubcontractorsService, CisManageService, SubmissionStatusCheckResult, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import java.time.{Clock, LocalDateTime}
@@ -37,6 +39,7 @@ class NewestVerificationBatchController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   verificationBatchService: VerificationService,
   clock: Clock,
@@ -105,7 +108,8 @@ class NewestVerificationBatchController @Inject() (
   private def routeFromResponse(
     updatedAnswers: UserAnswers,
     response: models.response.GetNewestVerificationBatchResponse,
-    unverified: Seq[models.Subcontractor]
+    unverified: Seq[models.Subcontractor],
+    flowId: Option[UUID] = None
   ): Future[play.api.mvc.Result] =
     checkSchemeInactivity(response) match {
       case InactivityStatus.MissingData =>
@@ -128,14 +132,16 @@ class NewestVerificationBatchController @Inject() (
         routeFromSubmissionStatus(
           updatedAnswers,
           response,
-          unverified
+          unverified,
+          flowId
         )
     }
 
   private def routeFromSubmissionStatus(
     updatedAnswers: UserAnswers,
     response: models.response.GetNewestVerificationBatchResponse,
-    unverified: Seq[models.Subcontractor]
+    unverified: Seq[models.Subcontractor],
+    flowId: Option[UUID] = None
   ): Future[play.api.mvc.Result] =
     checkSubmissionStatus(response) match {
       case SubmissionStatusCheckResult.ShowPendingVerificationWarning =>
@@ -153,10 +159,12 @@ class NewestVerificationBatchController @Inject() (
             response.subcontractors
           )
 
+        val decisionsPage =
+          flowId.map(id => ReverificationDecisionsPage(id.toString)).getOrElse(ReverificationDecisionsPage)
         for {
           answersWithDecisions <- Future.fromTry(
                                     updatedAnswers.set(
-                                      ReverificationDecisionsPage,
+                                      decisionsPage,
                                       decisions
                                     )
                                   )
@@ -167,25 +175,66 @@ class NewestVerificationBatchController @Inject() (
               controllers.routes.UnmatchedSubcontractorsController.onPageLoad()
             )
           } else {
-            continueToF4(response, unverified)
+            continueToF4(response, unverified, flowId)
           }
 
       case SubmissionStatusCheckResult.Continue =>
         Future.successful(
-          continueToF4(response, unverified)
+          continueToF4(response, unverified, flowId)
         )
     }
 
   private def continueToF4(
     response: models.response.GetNewestVerificationBatchResponse,
-    unverified: Seq[models.Subcontractor]
+    unverified: Seq[models.Subcontractor],
+    flowId: Option[UUID] = None
   ): play.api.mvc.Result =
-    if (response.subcontractors.isEmpty) {
-      Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
-    } else if (unverified.isEmpty) {
-      Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
-    } else {
-      Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+    (response.subcontractors.isEmpty, unverified.isEmpty, flowId) match {
+      case (true, _, _)         =>
+        Redirect(controllers.verify.routes.NoSubcontractorsAddedController.onPageLoad())
+      case (_, true, Some(id))  =>
+        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoadWithId(id))
+      case (_, true, None)      =>
+        Redirect(controllers.verify.routes.VerifyYourSubcontractorsYesNoController.onPageLoad)
+      case (_, false, Some(id)) =>
+        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoadWithId(id, NormalMode))
+      case (_, false, None)     =>
+        Redirect(controllers.verify.routes.SelectSubcontractorController.onPageLoad(NormalMode))
+    }
+
+  def onPageLoadStart(cisId: String): Action[AnyContent] =
+    (identify andThen multiTabAction.forStart(cisId) andThen getData).async { implicit request =>
+      val answers = request.userAnswers.getOrElse(UserAnswers(request.userId))
+      val flowId  = UUID.randomUUID()
+      val id      = flowId.toString
+
+      Future
+        .fromTry(answers.set(VerifyCisIdQuery(id), cisId))
+        .flatMap { withCisId =>
+          verificationBatchService
+            .refreshNewestVerificationBatch(withCisId, Some(id))
+            .flatMap { updatedAnswers =>
+              val batch      = updatedAnswers.get(NewestVerificationBatchResponsePage(id))
+              val unverified = updatedAnswers.get(UnverifiedSubcontractorsPage(id)).getOrElse(Seq.empty)
+
+              batch match {
+                case None           =>
+                  logger.error(
+                    "[NewestVerificationBatchController][onPageLoadStart] - NewestVerificationBatchResponsePage missing from userAnswers"
+                  )
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                case Some(response) =>
+                  routeFromResponse(updatedAnswers, response, unverified, Some(flowId))
+              }
+            }
+        }
+        .recover { case t =>
+          logger.error(
+            "[NewestVerificationBatchController.onPageLoadStart] Failed to refresh newest verification batch",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onPageLoad(): Action[AnyContent] =

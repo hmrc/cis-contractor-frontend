@@ -32,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.verify.SubmissionSendingView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class SubmissionSendingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   reconcileFormpRds: FormpRdsReconcileAction,
   val controllerComponents: MessagesControllerComponents,
   appConfig: FrontendAppConfig,
@@ -57,66 +59,97 @@ class SubmissionSendingController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen reconcileFormpRds).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-      // A reload or back-navigation after the submission was sent must not create and send it again
-      if (request.userAnswers.get(VerificationSubmissionDetailsPage).isDefined) {
-        logger.warn(
-          "[SubmissionSendingController.onPageLoad] Submission already sent for this journey; redirecting to poll"
-        )
-        Future.successful(Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect))
-      } else {
-        verificationService.createSubmitAndPersistVerificationSubmission
-          .flatMap(redirectForInitialSubmissionResponse)
-          .recover { case ex =>
-            logger.error(
-              "[SubmissionSendingController.onPageLoad] Failed to create submission",
-              ex
-            )
-            recovery
-          }
-      }
+      startSubmission(None)
     }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(
+      flowId
+    ) andThen reconcileFormpRds.forVerifyJourney(flowId)).async { implicit request =>
+      startSubmission(Some(flowId))
+    }
+
+  private def startSubmission(flowId: Option[UUID])(implicit request: models.requests.DataRequest[AnyContent]) = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    val id                         = flowId.map(_.toString)
+    val detailsPage                =
+      id.map(VerificationSubmissionDetailsPage.apply).getOrElse(VerificationSubmissionDetailsPage)
+
+    if (request.userAnswers.get(detailsPage).isDefined) {
+      logger.warn(
+        "[SubmissionSendingController.onPageLoad] Submission already sent for this journey; redirecting to poll"
+      )
+      Future.successful(redirectToPoll(flowId))
+    } else {
+      id
+        .fold(verificationService.createSubmitAndPersistVerificationSubmission)(nestedId =>
+          verificationService.createSubmitAndPersistVerificationSubmission(Some(nestedId))
+        )
+        .flatMap(redirectForInitialSubmissionResponse(_, flowId))
+        .recover { case ex =>
+          logger.error(
+            "[SubmissionSendingController.onPageLoad] Failed to create submission",
+            ex
+          )
+          recovery
+        }
+    }
+  }
 
   def onPollAndRedirect: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-      request.userAnswers.get(VerificationSubmissionDetailsPage) match {
-        case None =>
-          logger.error(
-            "[SubmissionSendingController][onPollAndRedirect] - VerificationSubmissionDetailsPage missing from userAnswers"
-          )
-          Future.successful(recovery)
-
-        case Some(submissionDetails) =>
-          val gatePollInterval =
-            submissionDetails.pollIntervalSeconds
-              .getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
-          // Fixed page-refresh cadence, independent of the ChRIS poll interval used for the gate.
-          val refreshInterval  = appConfig.submissionPollDefaultIntervalSeconds
-
-          if (!verificationService.isPollDue(submissionDetails, gatePollInterval)) {
-            Future.successful(
-              Ok(view())
-                .withHeaders("Refresh" -> refreshInterval.toString)
-            )
-          } else {
-            verificationService
-              .pollStatusAndPersist(request.userAnswers, submissionDetails)
-              .flatMap { response =>
-                redirectForPollSubmissionResponse(response, refreshInterval)
-              }
-              .recover { case ex =>
-                logger.error(
-                  "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
-                  ex
-                )
-                recovery
-              }
-          }
-      }
+      pollAndRedirect(None)
     }
+
+  def onPollAndRedirectWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        pollAndRedirect(Some(flowId))
+    }
+
+  private def pollAndRedirect(flowId: Option[UUID])(implicit request: models.requests.DataRequest[AnyContent]) = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    val id                         = flowId.map(_.toString)
+    val detailsPage                =
+      id.map(VerificationSubmissionDetailsPage.apply).getOrElse(VerificationSubmissionDetailsPage)
+
+    request.userAnswers.get(detailsPage) match {
+      case None =>
+        logger.error(
+          "[SubmissionSendingController][onPollAndRedirect] - VerificationSubmissionDetailsPage missing from userAnswers"
+        )
+        Future.successful(recovery)
+
+      case Some(submissionDetails) =>
+        val gatePollInterval =
+          submissionDetails.pollIntervalSeconds
+            .getOrElse(appConfig.submissionPollDefaultIntervalSeconds)
+        // Fixed page-refresh cadence, independent of the ChRIS poll interval used for the gate.
+        val refreshInterval  = appConfig.submissionPollDefaultIntervalSeconds
+
+        if (!verificationService.isPollDue(submissionDetails, gatePollInterval)) {
+          Future.successful(
+            Ok(view())
+              .withHeaders("Refresh" -> refreshInterval.toString)
+          )
+        } else {
+          id
+            .fold(verificationService.pollStatusAndPersist(request.userAnswers, submissionDetails))(nestedId =>
+              verificationService.pollStatusAndPersist(request.userAnswers, submissionDetails, Some(nestedId))
+            )
+            .flatMap { response =>
+              redirectForPollSubmissionResponse(response, refreshInterval, flowId)
+            }
+            .recover { case ex =>
+              logger.error(
+                "[SubmissionSendingController.onPollAndRedirect] Verification poll failed",
+                ex
+              )
+              recovery
+            }
+        }
+    }
+  }
 
   private def redirectForErrorStatus(
     status: SubmissionStatus,
@@ -156,20 +189,31 @@ class SubmissionSendingController @Inject() (
         recovery
     }
 
+  private def redirectToPoll(flowId: Option[UUID]): Result =
+    Redirect(
+      flowId
+        .map(fid => controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(fid))
+        .getOrElse(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
+    )
+
+  private def redirectToConfirmation(flowId: Option[UUID]): Result =
+    Redirect(
+      flowId
+        .map(fid => controllers.verify.routes.VerificationRequestSubmittedController.onPageLoadWithId(fid))
+        .getOrElse(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+    )
+
   private def redirectForInitialSubmissionResponse(
-    response: ChrisSubmissionResponse
+    response: ChrisSubmissionResponse,
+    flowId: Option[UUID]
   ): Future[Result] =
     SubmissionStatus.fromString(response.status) match {
 
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Future.successful(
-          Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
-        )
+        Future.successful(redirectToPoll(flowId))
 
       case SUBMITTED_NO_RECEIPT =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         logger.error(
@@ -188,7 +232,8 @@ class SubmissionSendingController @Inject() (
 
   private def redirectForPollSubmissionResponse(
     response: ChrisPollResponse,
-    refreshInterval: Int
+    refreshInterval: Int,
+    flowId: Option[UUID]
   )(implicit request: Request[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
@@ -198,14 +243,10 @@ class SubmissionSendingController @Inject() (
         )
 
       case SUBMITTED =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case SUBMITTED_NO_RECEIPT =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         logger.error(

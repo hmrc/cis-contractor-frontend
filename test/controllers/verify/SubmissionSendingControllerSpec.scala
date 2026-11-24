@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.actions.FormpRdsReconcileAction
 import models.UserAnswers
 import models.requests.DataRequest
@@ -33,20 +33,30 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.VerifyCisIdQuery
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
+class SubmissionSendingControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private lazy val onPageLoadRoute =
     controllers.verify.routes.SubmissionSendingController.onPageLoad().url
 
   private lazy val onPollRoute =
     controllers.verify.routes.SubmissionSendingController.onPollAndRedirect.url
+
+  private val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+
+  private lazy val onPageLoadWithIdRoute =
+    controllers.verify.routes.SubmissionSendingController.onPageLoadWithId(flowId).url
+
+  private lazy val onPollWithIdRoute =
+    controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(flowId).url
 
   private val submissionDetails =
     VerificationSubmissionDetails(
@@ -68,12 +78,39 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private def userAnswersWithNestedSubmissionDetails: UserAnswers =
+    emptyUserAnswers
+      .set(VerifyCisIdQuery(flowId.toString), "AB12")
+      .success
+      .value
+      .set(VerificationSubmissionDetailsPage(flowId.toString), submissionDetails)
+      .success
+      .value
+
+  private def userAnswersWithVerifyCisId: UserAnswers =
+    emptyUserAnswers
+      .set(VerifyCisIdQuery(flowId.toString), "AB12")
+      .success
+      .value
+
   private def mockInitialSubmission(
     mockService: VerificationService,
     response: ChrisSubmissionResponse
   ): Unit =
     when(
       mockService.createSubmitAndPersistVerificationSubmission(
+        any[DataRequest[AnyContent]],
+        any[HeaderCarrier],
+        any[Messages]
+      )
+    ).thenReturn(Future.successful(response))
+
+  private def mockInitialSubmissionWithId(
+    mockService: VerificationService,
+    response: ChrisSubmissionResponse
+  ): Unit =
+    when(
+      mockService.createSubmitAndPersistVerificationSubmission(any[Option[String]])(
         any[DataRequest[AnyContent]],
         any[HeaderCarrier],
         any[Messages]
@@ -91,6 +128,22 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       mockService.pollStatusAndPersist(
         any[UserAnswers],
         any[VerificationSubmissionDetails]
+      )(any[HeaderCarrier])
+    ).thenReturn(Future.successful(response))
+  }
+
+  private def mockPollResponseWithId(
+    mockService: VerificationService,
+    response: ChrisPollResponse
+  ): Unit = {
+    when(
+      mockService.isPollDue(any[VerificationSubmissionDetails], any[Int])
+    ).thenReturn(true)
+    when(
+      mockService.pollStatusAndPersist(
+        any[UserAnswers],
+        any[VerificationSubmissionDetails],
+        any[Option[String]]
       )(any[HeaderCarrier])
     ).thenReturn(Future.successful(response))
   }
@@ -171,6 +224,50 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the poll page with id when initial submission returns ACCEPTED" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmissionWithId(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "ACCEPTED",
+          hmrcMarkGenerated = "hmrc-mark"
+        )
+      )
+
+      val application = applicationWith(mockService, userAnswersWithVerifyCisId)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(flowId).url
+      }
+    }
+
+    "must redirect to the poll page with id without creating again when nested submission details already exist" in {
+      val mockService = mock[VerificationService]
+      val application = applicationWith(mockService, userAnswersWithNestedSubmissionDetails)
+
+      running(application) {
+        val result = route(application, FakeRequest(GET, onPageLoadWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(flowId).url
+
+        verify(mockService, never).createSubmitAndPersistVerificationSubmission(any[Option[String]])(
+          any[DataRequest[AnyContent]],
+          any[HeaderCarrier],
+          any[Messages]
+        )
+      }
+    }
+
     "must redirect to submitted page when initial submission returns SUBMITTED_NO_RECEIPT" in {
       val mockService = mock[VerificationService]
 
@@ -194,6 +291,33 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustBe
           controllers.verify.routes.VerificationRequestSubmittedController
             .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to the submitted page with id when initial submission returns SUBMITTED_NO_RECEIPT" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmissionWithId(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "SUBMITTED_NO_RECEIPT",
+          hmrcMarkGenerated = "hmrc-mark"
+        )
+      )
+
+      val application = applicationWith(mockService, userAnswersWithVerifyCisId)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoadWithId(flowId)
             .url
       }
     }
@@ -458,6 +582,7 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           Future.successful(
             Some(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))
           )
+        override def forVerifyJourney(flowId: UUID)                                       = this
         override protected def executionContext: ExecutionContext                         = scala.concurrent.ExecutionContext.Implicits.global
       }
 
@@ -975,6 +1100,85 @@ class SubmissionSendingControllerSpec extends SpecBase with MockitoSugar {
           any[UserAnswers],
           any[VerificationSubmissionDetails]
         )(any[HeaderCarrier])
+      }
+    }
+  }
+
+  "SubmissionSendingController.onPollAndRedirectWithId" - {
+
+    "must show the sending page when nested submission details exist and the first poll interval has not elapsed" in {
+      val mockService = mock[VerificationService]
+
+      when(
+        mockService.isPollDue(any[VerificationSubmissionDetails], any[Int])
+      ).thenReturn(false)
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithNestedSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollWithIdRoute)).value
+
+        status(result) mustBe OK
+        header("Refresh", result).value mustBe "10"
+
+        verify(mockService, never()).pollStatusAndPersist(
+          any[UserAnswers],
+          any[VerificationSubmissionDetails],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to recovery when nested submission details are missing" in {
+      val mockService = mock[VerificationService]
+      val application =
+        applicationWith(
+          mockService,
+          emptyUserAnswers.set(VerifyCisIdQuery(flowId.toString), "AB12").success.value
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to the submitted page with id when poll returns SUBMITTED" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponseWithId(
+        mockService,
+        pollResponse(SubmissionStatus.SUBMITTED)
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithNestedSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoadWithId(flowId)
+            .url
       }
     }
   }

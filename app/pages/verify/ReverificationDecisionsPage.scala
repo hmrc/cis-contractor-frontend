@@ -20,6 +20,15 @@ import models.verify.ReverificationDecision
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class ReverificationDecisionsPage(id: String)
+    extends QuestionPage[Seq[ReverificationDecision]]
+    with VerifyJourney {
+
+  override def path: JsPath = JsPath \ "verify" \ id \ toString
+
+  override def toString: String = "reverificationDecisions"
+}
+
 case object ReverificationDecisionsPage extends QuestionPage[Seq[ReverificationDecision]] with VerifyJourney {
 
   override def path: JsPath =

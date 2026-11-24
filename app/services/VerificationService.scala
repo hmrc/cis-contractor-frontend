@@ -28,7 +28,7 @@ import play.api.Logging
 import play.api.i18n.Messages
 import play.api.libs.json.*
 import play.api.mvc.AnyContent
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.SubmissionUtils
@@ -52,36 +52,56 @@ class VerificationService @Inject() (
   private val ukZone = ZoneId.of("Europe/London")
 
   def refreshNewestVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    refreshNewestVerificationBatch(userAnswers, None)
+
+  def refreshNewestVerificationBatch(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[UserAnswers] =
     for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+      instanceId <- getCisId(userAnswers, subJourneyId)
 
       response  <- cisConnector.getNewestVerificationBatch(instanceId)
       unverified = unverifiedSubcontractors(response.subcontractors)
 
+      newestPage     =
+        subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+      unverifiedPage = subJourneyId.map(UnverifiedSubcontractorsPage.apply).getOrElse(UnverifiedSubcontractorsPage)
+
       updated <- Future.fromTry(
                    userAnswers
-                     .set(NewestVerificationBatchResponsePage, response)
-                     .flatMap(_.set(UnverifiedSubcontractorsPage, unverified))
-                     .flatMap(cleanupSelectionsNoLongerInNewestBatch(response))
+                     .set(newestPage, response)
+                     .flatMap(_.set(unverifiedPage, unverified))
+                     .flatMap(cleanupSelectionsNoLongerInNewestBatch(response, subJourneyId))
                  )
 
       _ <- sessionRepository.set(updated)
     } yield updated
 
+  private def getCisId(userAnswers: UserAnswers, subJourneyId: Option[String]): Future[String] = {
+    val answer =
+      subJourneyId.map(id => userAnswers.get(VerifyCisIdQuery(id))).getOrElse(userAnswers.get(CisIdQuery))
+    answer
+      .map(Future.successful)
+      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+  }
+
   private def cleanupSelectionsNoLongerInNewestBatch(
-    response: models.response.GetNewestVerificationBatchResponse
+    response: models.response.GetNewestVerificationBatchResponse,
+    subJourneyId: Option[String] = None
   )(userAnswers: UserAnswers): Try[UserAnswers] = {
     val newestSubcontractorIds =
       response.subcontractors.map(_.subcontractorId.toString).toSet
 
+    val selectPage   =
+      subJourneyId.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+    val reverifyPage =
+      subJourneyId.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
+
     val withSelectedSubcontractors =
-      userAnswers.get(SelectSubcontractorPage) match {
+      userAnswers.get(selectPage) match {
         case Some(selected) =>
           userAnswers.set(
-            SelectSubcontractorPage,
+            selectPage,
             selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
           )
 
@@ -90,10 +110,10 @@ class VerificationService @Inject() (
       }
 
     withSelectedSubcontractors.flatMap { updatedAnswers =>
-      updatedAnswers.get(SelectSubcontractorsToReverifyPage) match {
+      updatedAnswers.get(reverifyPage) match {
         case Some(selected) =>
           updatedAnswers.set(
-            SelectSubcontractorsToReverifyPage,
+            reverifyPage,
             selected.filter(subcontractor => newestSubcontractorIds.contains(subcontractor.id))
           )
 
@@ -104,10 +124,17 @@ class VerificationService @Inject() (
   }
 
   def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
-      val status =
+    refreshSubmittedVerificationRequest(userAnswers, None)
+
+  def refreshSubmittedVerificationRequest(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[UserAnswers] =
+    refreshNewestVerificationBatch(userAnswers, subJourneyId).flatMap { updatedAnswers =>
+      val newestPage =
+        subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+      val status     =
         updatedAnswers
-          .get(NewestVerificationBatchResponsePage)
+          .get(newestPage)
           .flatMap(_.submission)
           .flatMap(_.status)
 
@@ -123,16 +150,21 @@ class VerificationService @Inject() (
     }
 
   def getCurrentVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    getCurrentVerificationBatch(userAnswers, None)
+
+  def getCurrentVerificationBatch(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[UserAnswers] = {
+    val page =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
     for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+      instanceId <- getCisId(userAnswers, subJourneyId)
 
       response <- cisConnector.getCurrentVerificationBatch(instanceId)
-      updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
+      updated  <- Future.fromTry(userAnswers.set(page, response))
       _        <- sessionRepository.set(updated)
     } yield updated
+  }
 
   def getLastSubmittedVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
@@ -147,7 +179,10 @@ class VerificationService @Inject() (
     } yield updated
 
   def latestBatchCanBeModified(userAnswers: UserAnswers): Boolean =
-    latestBatchStatus(userAnswers).exists {
+    latestBatchCanBeModified(userAnswers, None)
+
+  def latestBatchCanBeModified(userAnswers: UserAnswers, subJourneyId: Option[String]): Boolean =
+    latestBatchStatus(userAnswers, subJourneyId).exists {
       case Started | Validated => true
       case _                   => false
     }
@@ -158,28 +193,39 @@ class VerificationService @Inject() (
       case _                                                               => false
     }
 
-  private def latestBatchStatus(userAnswers: UserAnswers): Option[VerificationBatchStatus] =
+  private def latestBatchStatus(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Option[VerificationBatchStatus] = {
+    val page =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
     userAnswers
-      .get(NewestVerificationBatchResponsePage)
+      .get(page)
       .flatMap(_.verificationBatch)
       .flatMap(_.status)
       .flatMap(VerificationBatchStatus.from)
+  }
 
   def createVerificationBatchAndVerifications(
     userAnswers: UserAnswers,
     selectedSubcontractorIds: Seq[Long],
     actionIndicator: Option[String] = None
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    createVerificationBatchAndVerifications(userAnswers, selectedSubcontractorIds, actionIndicator, None)
+
+  def createVerificationBatchAndVerifications(
+    userAnswers: UserAnswers,
+    selectedSubcontractorIds: Seq[Long],
+    actionIndicator: Option[String],
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+      instanceId <- getCisId(userAnswers, subJourneyId)
 
       _ <- if (selectedSubcontractorIds.nonEmpty) Future.successful(())
            else Future.failed(new RuntimeException("No subcontractors selected"))
 
-      idToRef <- subcontractorResourceRefs(userAnswers)
+      idToRef <- subcontractorResourceRefs(userAnswers, subJourneyId)
 
       verificationResourceRefs <- Future.fromTry {
                                     scala.util.Try {
@@ -202,14 +248,22 @@ class VerificationService @Inject() (
              )
            )
 
-      afterCurrent <- getCurrentVerificationBatch(userAnswers)
-      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      afterCurrent <- getCurrentVerificationBatch(userAnswers, subJourneyId)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent, subJourneyId)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
 
-  private def subcontractorResourceRefs(userAnswers: UserAnswers): Future[Map[Long, Long]] =
+  private def subcontractorResourceRefs(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Future[Map[Long, Long]] = {
+    val newestPage  =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+    val currentPage =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
+
     userAnswers
-      .get(NewestVerificationBatchResponsePage)
+      .get(newestPage)
       .map { newest =>
         Future.successful(
           newest.subcontractors
@@ -219,7 +273,7 @@ class VerificationService @Inject() (
       }
       .orElse {
         userAnswers
-          .get(CurrentVerificationBatchResponsePage)
+          .get(currentPage)
           .map { current =>
             Future.successful(
               current.subcontractors
@@ -235,6 +289,7 @@ class VerificationService @Inject() (
           )
         )
       )
+  }
 
   private def unverifiedSubcontractors(
     subcontractors: Seq[Subcontractor]
@@ -254,10 +309,17 @@ class VerificationService @Inject() (
     userAnswers: UserAnswers,
     request: ModifyVerificationsRequest
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    modifyVerificationBatchAndVerifications(userAnswers, request, None)
+
+  def modifyVerificationBatchAndVerifications(
+    userAnswers: UserAnswers,
+    request: ModifyVerificationsRequest,
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
       _            <- cisConnector.modifyVerificationBatch(request)
-      afterCurrent <- getCurrentVerificationBatch(userAnswers)
-      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
+      afterCurrent <- getCurrentVerificationBatch(userAnswers, subJourneyId)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent, subJourneyId)
       _            <- sessionRepository.set(afterNewest)
     } yield afterNewest
 
@@ -311,10 +373,19 @@ class VerificationService @Inject() (
     hc: HeaderCarrier,
     messages: Messages
   ): Future[ChrisSubmissionResponse] =
+    createSubmitAndPersistVerificationSubmission(None)
+
+  def createSubmitAndPersistVerificationSubmission(subJourneyId: Option[String])(implicit
+    request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    messages: Messages
+  ): Future[ChrisSubmissionResponse] = {
+    val currentPage =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
     for {
-      latestUa          <- getCurrentVerificationBatch(request.userAnswers)
-      chrisRequest      <- buildChrisVerificationRequest(latestUa)
-      existingSubmission = latestUa.get(CurrentVerificationBatchResponsePage).flatMap(_.submission)
+      latestUa          <- getCurrentVerificationBatch(request.userAnswers, subJourneyId)
+      chrisRequest      <- buildChrisVerificationRequest(latestUa, subJourneyId)
+      existingSubmission = latestUa.get(currentPage).flatMap(_.submission)
       isResubmission     = existingSubmission.isDefined
       submissionId      <- existingSubmission match {
                              case Some(existingSubmission) =>
@@ -326,25 +397,38 @@ class VerificationService @Inject() (
                              case None                     =>
                                for {
                                  createRequest  <-
-                                   buildCreateSubmissionRequest(latestUa, request.isAgent, request.agentReference)
+                                   buildCreateSubmissionRequest(
+                                     latestUa,
+                                     request.isAgent,
+                                     request.agentReference,
+                                     subJourneyId
+                                   )
                                  createResponse <- createSubmissionForVerification(createRequest)
                                } yield createResponse.submissionId
                            }
       verificationReq    = chrisRequest.copy(isResubmission = isResubmission)
       response          <- cisConnector.submitVerificationToChris(submissionId, verificationReq)
-      updatedUa         <- saveVerificationSubmissionDetailsToSession(latestUa, response)
+      updatedUa         <- saveVerificationSubmissionDetailsToSession(latestUa, response, subJourneyId)
     } yield response
+  }
 
   def pollStatusAndPersist(
     ua: UserAnswers,
     submissionDetails: VerificationSubmissionDetails
+  )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
+    pollStatusAndPersist(ua, submissionDetails, None)
+
+  def pollStatusAndPersist(
+    ua: UserAnswers,
+    submissionDetails: VerificationSubmissionDetails,
+    subJourneyId: Option[String]
   )(implicit hc: HeaderCarrier): Future[ChrisPollResponse] =
     for {
       pollUrl          <- required(submissionDetails.pollUrl, "Poll URL missing in submission details")
       response         <- cisConnector.getSubmissionStatus(pollUrl, submissionDetails.submissionId)
       effectiveResponse = response.copy(status = effectivePollStatus(response, submissionDetails.submittedAt))
       updatedDetails    = VerificationSubmissionDetailsBuilder.updateFromPollResponse(submissionDetails, effectiveResponse)
-      updatedUa        <- saveVerificationPollDetailsToSession(ua, updatedDetails)
+      updatedUa        <- saveVerificationPollDetailsToSession(ua, updatedDetails, subJourneyId)
     } yield effectiveResponse
 
   // A poll is only due once the poll interval has elapsed since the last message from ChRIS:
@@ -390,7 +474,8 @@ class VerificationService @Inject() (
     cisConnector.createSubmissionForVerification(request)
 
   private def buildChrisVerificationRequest(
-    ua: UserAnswers
+    ua: UserAnswers,
+    subJourneyId: Option[String]
   )(implicit
     request: DataRequest[AnyContent],
     hc: HeaderCarrier,
@@ -398,16 +483,17 @@ class VerificationService @Inject() (
   ): Future[ChrisVerificationRequest] =
     for {
       employerReference <- resolveEmployerReference(request.userId, request.isAgent, request.employerReference)
-      chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference)
+      chrisRequest      <- chrisVerificationRequestBuilder.build(ua, request.isAgent, employerReference, subJourneyId)
     } yield chrisRequest
 
   private def buildCreateSubmissionRequest(
     ua: UserAnswers,
     isAgent: Boolean,
-    agentReference: Option[String]
+    agentReference: Option[String],
+    subJourneyId: Option[String]
   )(implicit messages: Messages): Future[CreateSubmissionForVerificationRequest] =
     CreateSubmissionForVerificationRequestBuilder
-      .build(ua, isAgent, agentReference)
+      .build(ua, isAgent, agentReference, subJourneyId)
       .fold(
         error => Future.failed(new RuntimeException(error)),
         request => Future.successful(request)
@@ -454,14 +540,17 @@ class VerificationService @Inject() (
 
   private def saveVerificationSubmissionDetailsToSession(
     ua: UserAnswers,
-    response: ChrisSubmissionResponse
+    response: ChrisSubmissionResponse,
+    subJourneyId: Option[String]
   ): Future[UserAnswers] = {
     val details = VerificationSubmissionDetailsBuilder.fromSubmissionResponse(
       response,
       LocalDateTime.now(clock.withZone(ukZone))
     )
+    val page    =
+      subJourneyId.map(VerificationSubmissionDetailsPage.apply).getOrElse(VerificationSubmissionDetailsPage)
 
-    ua.set(VerificationSubmissionDetailsPage, details)
+    ua.set(page, details)
       .fold(
         error => Future.failed(error),
         updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
@@ -470,13 +559,16 @@ class VerificationService @Inject() (
 
   private def saveVerificationPollDetailsToSession(
     ua: UserAnswers,
-    details: VerificationSubmissionDetails
-  ): Future[UserAnswers] =
-    ua.set(VerificationSubmissionDetailsPage, details)
+    details: VerificationSubmissionDetails,
+    subJourneyId: Option[String]
+  ): Future[UserAnswers] = {
+    val page = subJourneyId.map(VerificationSubmissionDetailsPage.apply).getOrElse(VerificationSubmissionDetailsPage)
+    ua.set(page, details)
       .fold(
         error => Future.failed(error),
         updatedUa => sessionRepository.set(updatedUa).map(_ => updatedUa)
       )
+  }
 
   def resetUserAnswers(userAnswers: UserAnswers): Future[Unit] =
     userAnswers.get(CisIdQuery) match {

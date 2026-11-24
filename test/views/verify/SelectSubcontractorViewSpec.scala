@@ -49,7 +49,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
           PaginationViewModel(),
           page = 1,
           startIndex = 1,
-          totalCount = checkboxItems.size
+          totalCount = checkboxItems.size,
+          submitAction = submit()
         )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -79,7 +80,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         PaginationViewModel(),
         page = 1,
         startIndex = 1,
-        totalCount = checkboxItems.size
+        totalCount = checkboxItems.size,
+        submitAction = submit()
       )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -107,7 +109,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
           PaginationViewModel(),
           page = 1,
           startIndex = 1,
-          totalCount = allItems.size
+          totalCount = allItems.size,
+          submitAction = submit()
         ).body
       )
       docPage1.select(".govuk-error-summary__list a").attr("href") mustBe "#value_0"
@@ -120,7 +123,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
           PaginationViewModel(),
           page = 2,
           startIndex = 7,
-          totalCount = allItems.size
+          totalCount = allItems.size,
+          submitAction = submit(2)
         ).body
       )
       docPage2.select(".govuk-error-summary__list a").attr("href") mustBe "#value_6"
@@ -137,7 +141,16 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable =
-        view(form, mode, checkboxItems, pagination, page = 1, startIndex = 1, totalCount = checkboxItems.size)
+        view(
+          form,
+          mode,
+          checkboxItems,
+          pagination,
+          page = 1,
+          startIndex = 1,
+          totalCount = checkboxItems.size,
+          submitAction = submit()
+        )
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -159,7 +172,16 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable =
-        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+        view(
+          form,
+          mode,
+          checkboxItems,
+          pagination,
+          page = 2,
+          startIndex = 7,
+          totalCount = checkboxItems.size,
+          submitAction = submit(2)
+        )
 
       val doc: Document = Jsoup.parse(html.body)
 
@@ -176,7 +198,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         PaginationViewModel(),
         page = 1,
         startIndex = 1,
-        totalCount = checkboxItems.size
+        totalCount = checkboxItems.size,
+        submitAction = submit()
       )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -199,7 +222,16 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable =
-        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+        view(
+          form,
+          mode,
+          checkboxItems,
+          pagination,
+          page = 2,
+          startIndex = 7,
+          totalCount = checkboxItems.size,
+          submitAction = submit(2)
+        )
       val doc: Document               = Jsoup.parse(html.body)
 
       val prevButton: Elements =
@@ -230,7 +262,16 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
       )
 
       val html: HtmlFormat.Appendable =
-        view(form, mode, checkboxItems, pagination, page = 2, startIndex = 7, totalCount = checkboxItems.size)
+        view(
+          form,
+          mode,
+          checkboxItems,
+          pagination,
+          page = 2,
+          startIndex = 7,
+          totalCount = checkboxItems.size,
+          submitAction = submit(2)
+        )
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__item--current").size mustBe 1
@@ -257,7 +298,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
           page = 4,
           startIndex = 19,
           totalCount = checkboxItems.size,
-          totalPages = 7
+          totalPages = 7,
+          submitAction = submit(4)
         )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -276,7 +318,8 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
         page = 1,
         startIndex = 1,
         totalCount = checkboxItems.size,
-        totalPages = 1
+        totalPages = 1,
+        submitAction = submit()
       )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -298,6 +341,9 @@ class SelectSubcontractorViewSpec extends SpecBase with Matchers {
 
     val view: SelectSubcontractorView =
       app.injector.instanceOf[SelectSubcontractorView]
+
+    def submit(pageNumber: Int = 1) =
+      controllers.verify.routes.SelectSubcontractorController.onSubmit(mode, pageNumber)
 
     val formProvider: SelectSubcontractorFormProvider =
       app.injector.instanceOf[SelectSubcontractorFormProvider]
