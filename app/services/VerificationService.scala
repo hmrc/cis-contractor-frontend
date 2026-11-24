@@ -320,11 +320,16 @@ class VerificationService @Inject() (
     userAnswers: UserAnswers,
     verificationResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
+    deleteVerification(userAnswers, verificationResourceRef, None)
+
+  // DTR-9569 deleteVerification ID overload
+  def deleteVerification(
+    userAnswers: UserAnswers,
+    verificationResourceRef: Long,
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[DeleteVerificationResponse] =
     for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+      instanceId <- getCisId(userAnswers, subJourneyId)
 
       response <- cisConnector.deleteVerification(
                     DeleteVerificationRequest(
@@ -333,15 +338,23 @@ class VerificationService @Inject() (
                     )
                   )
 
-      afterCurrent <- getCurrentVerificationBatch(userAnswers)
-      afterNewest  <- refreshNewestVerificationBatch(afterCurrent)
-      updated      <- Future.fromTry(withVerificationBatchReadiness(afterNewest))
+      afterCurrent <- getCurrentVerificationBatch(userAnswers, subJourneyId)
+      afterNewest  <- refreshNewestVerificationBatch(afterCurrent, subJourneyId)
+      updated      <- Future.fromTry(withVerificationBatchReadiness(afterNewest, subJourneyId))
       _            <- sessionRepository.set(updated)
     } yield response
 
-  private def withVerificationBatchReadiness(userAnswers: UserAnswers): Try[UserAnswers] =
+  private def withVerificationBatchReadiness(
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Try[UserAnswers] = {
+    val currentPage   =
+      subJourneyId.map(CurrentVerificationBatchResponsePage.apply).getOrElse(CurrentVerificationBatchResponsePage)
+    val readinessPage =
+      subJourneyId.map(VerificationBatchReadinessPage.apply).getOrElse(VerificationBatchReadinessPage)
+
     userAnswers
-      .get(CurrentVerificationBatchResponsePage)
+      .get(currentPage)
       .map { batch =>
         val remainingVerifications =
           batch.verifications.flatMap { verification =>
@@ -357,9 +370,10 @@ class VerificationService @Inject() (
             VerificationBatchReadiness.isSubcontractorReady(subcontractor, Some(verification))
           }
 
-        userAnswers.set(VerificationBatchReadinessPage, batchReady)
+        userAnswers.set(readinessPage, batchReady)
       }
-      .getOrElse(userAnswers.remove(VerificationBatchReadinessPage))
+      .getOrElse(userAnswers.remove(readinessPage))
+  }
 
   def createSubmitAndPersistVerificationSubmission(implicit
     request: DataRequest[AnyContent],
