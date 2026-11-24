@@ -19,7 +19,7 @@ package controllers.actions
 import models.requests.{DataRequest, IdentifierRequest}
 import play.api.Logging
 import play.api.mvc.{ActionFilter, Result, Results}
-import queries.{CisIdQuery, AmendCisIdQuery}
+import queries.{AmendCisIdQuery, CisIdQuery}
 import services.CisTaxpayerService
 
 import java.util.UUID
