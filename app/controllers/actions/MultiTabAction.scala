@@ -19,7 +19,7 @@ package controllers.actions
 import models.requests.{DataRequest, IdentifierRequest}
 import play.api.Logging
 import play.api.mvc.{ActionFilter, Result, Results}
-import queries.CisIdQuery
+import queries.{CisIdQuery, AmendCisIdQuery}
 import services.CisTaxpayerService
 
 import java.util.UUID
@@ -42,11 +42,17 @@ class MultiTabAction @Inject() (cisTaxpayerService: CisTaxpayerService)(using ec
     }
 
   def forJourney(flowId: UUID): ActionFilter[DataRequest] =
+    authorisedJourney(flowId, CisIdQuery.apply)
+
+  def forAmendJourney(flowId: UUID): ActionFilter[DataRequest] =
+    authorisedJourney(flowId, AmendCisIdQuery.apply)
+
+  private def authorisedJourney(flowId: UUID, cisIdQuery: String => Gettable[String]): ActionFilter[DataRequest] =
     new ActionFilter[DataRequest] {
       override protected def executionContext: ExecutionContext = ec
 
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        request.userAnswers.get(CisIdQuery(flowId.toString)) match {
+        request.userAnswers.get(cisIdQuery(flowId.toString)) match {
           case None        =>
             Future.successful(Some(Results.Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           case Some(cisId) =>
