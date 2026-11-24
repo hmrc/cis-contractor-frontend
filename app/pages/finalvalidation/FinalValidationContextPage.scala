@@ -20,6 +20,15 @@ import models.finalvalidation.FinalValidationContext
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class FinalValidationContextPage(id: String) extends QuestionPage[FinalValidationContext] {
+
+  override def path: JsPath = JsPath \ "finalvalidation" \ id \ toString
+
+  override def toString: String = "finalValidationContext"
+
+}
+
+
 case object FinalValidationContextPage extends QuestionPage[FinalValidationContext] {
 
   override def path: JsPath = JsPath \ "finalvalidation" \ toString

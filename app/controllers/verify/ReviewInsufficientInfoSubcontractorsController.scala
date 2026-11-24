@@ -146,7 +146,11 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val id = flowId.toString
       contractorDetailsFinalValidationService
-        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+        .refreshAndValidate(
+          request.userAnswers,
+          ContractorDetailsValidationTarget.VerifySubcontractors,
+          Some(id)
+        )
         .flatMap { case (validatedAnswers, validation) =>
           if (!validation.allComplete) {
             Future.successful(
@@ -223,13 +227,13 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
       for {
         withContext <- Future.fromTry(
                          request.userAnswers.set(
-                           FinalValidationContextPage,
+                           FinalValidationContextPage(id),
                            FinalValidationContext.VerifySubcontractor
                          )
                        )
         withSource  <- Future.fromTry(
                          withContext.set(
-                           VerifyFinalValidationSourcePage,
+                           VerifyFinalValidationSourcePage(id),
                            VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
                          )
                        )

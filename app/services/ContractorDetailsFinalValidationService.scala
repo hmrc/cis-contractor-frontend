@@ -22,7 +22,7 @@ import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDet
 import models.requests.{UpdateSchemeRequest, UpdateSchemeVersionRequest}
 import pages.QuestionPage
 import pages.contractordetails.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -42,13 +42,24 @@ class ContractorDetailsFinalValidationService @Inject() (
     userAnswers: UserAnswers,
     target: ContractorDetailsValidationTarget
   )(implicit hc: HeaderCarrier): Future[(UserAnswers, ContractorDetailsFinalValidation)] =
+    refreshAndValidate(userAnswers, target, None)
+
+  def refreshAndValidate(
+    userAnswers: UserAnswers,
+    target: ContractorDetailsValidationTarget,
+    subJourneyId: Option[String]
+  )(implicit hc: HeaderCarrier): Future[(UserAnswers, ContractorDetailsFinalValidation)] =
+    val cisId =
+      subJourneyId.map(id => userAnswers.get(VerifyCisIdQuery(id))).getOrElse(userAnswers.get(CisIdQuery))
+
     for {
-      instanceId <- required(userAnswers.get(CisIdQuery), "CisIdQuery not found in session data")
+      instanceId <- required(cisId, "CisIdQuery not found in session data")
       scheme     <- contractorDetailsService.getScheme(instanceId)
       updated    <- Future.fromTry(populate(userAnswers, target, scheme))
       _          <- sessionRepository.set(updated)
     } yield (updated, validate(updated))
 
+  // TODO id scoped validate
   def validate(userAnswers: UserAnswers): ContractorDetailsFinalValidation =
     ContractorDetailsFinalValidation(
       utrComplete = userAnswers.get(ContractorUtrPage).exists(isValidContractorUtr),
@@ -84,6 +95,7 @@ class ContractorDetailsFinalValidationService @Inject() (
                          )
     } yield ()
 
+  // TODO id scoped populate
   private def populate(
     userAnswers: UserAnswers,
     target: ContractorDetailsValidationTarget,
