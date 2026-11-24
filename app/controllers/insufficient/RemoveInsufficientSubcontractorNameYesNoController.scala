@@ -247,14 +247,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                 } else {
                   Future.successful(
                     Redirect(
-                      routes.RemoveInsufficientSubcontractorNameYesNoController
-                        .onPageLoadWithId(flowId, verificationResourceRef)
+                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+                        .onPageLoadWithId(flowId)
                     )
-//                    TODO: uncomment below and replace above redirect
-//                    Redirect(
-//                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-//                        .onPageLoadWithId(flowId)
-//                    )
                   )
                 }
             } yield redirect
@@ -316,7 +311,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     )
   }
 
-  // TODO make ID overload of deleteAndRedirect
   private def deleteAndRedirect(
     userAnswers: models.UserAnswers,
     verificationResourceRef: Long
@@ -392,13 +386,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                   .refreshNewestVerificationBatch(updatedAnswers, Some(id))
                   .map(_ =>
                     Redirect(
-                      routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
+                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+                        .onPageLoadWithId(flowId)
                     )
-                    // TODO remove above, replace with below
-                    // Redirect(
-                    //   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-                    //     .onPageLoadWithId(flowId)
-                    // )
                   )
 
               case None =>
@@ -444,7 +434,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       }
 
   // DTR-9569 checkVerificationBatchReadiness ID overload
-  // TODO to be used in deleteAndRedirect Overload
   private def checkVerificationBatchReadinessWithId(
     flowId: UUID
   )(implicit request: DataRequest[?]): Future[Option[models.UserAnswers]] =
@@ -477,7 +466,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       }
 
   // DTR-9569 refreshNewestBatchAndRedirectToVerificationSelection ID overload
-  // TODO to be used in deleteAndRedirect ID overload method
   private def refreshNewestBatchAndRedirectToVerificationSelectionWithId(
     flowId: UUID,
     userAnswers: models.UserAnswers
@@ -488,13 +476,9 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       .map { updatedAnswers =>
         val redirect =
           if (updatedAnswers.get(UnverifiedSubcontractorsPage(id)).exists(_.nonEmpty)) {
-            routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
-            // TODO remove above replace with below
-//            controllers.verify.routes.SelectSubcontractorController.onPageLoadWithId(flowId, NormalMode)
+            controllers.verify.routes.SelectSubcontractorController.onPageLoadWithId(flowId, NormalMode)
           } else {
-            routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
-            // TODO remove above replace with below
-//            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoadWithId(id, NormalMode)
+            controllers.verify.routes.SelectSubcontractorsToReverifyController.onPageLoadWithId(flowId, NormalMode)
           }
 
         Redirect(redirect)
