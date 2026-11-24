@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.{CisIdQuery, AmendCisIdQuery}
+import queries.{AmendCisIdQuery, CisIdQuery}
 import services.CisTaxpayerService
 
 import java.util.UUID
@@ -184,7 +184,7 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
   }
 
   "MultiTabAction.forAmendJourney" - {
-    
+
     "allows the request when cisId under amend uuid is authorised" in {
       val service = mock[CisTaxpayerService]
       when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
@@ -216,6 +216,6 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.JourneyRecoveryController.onPageLoad().url)
     }
-    
+
   }
 }
