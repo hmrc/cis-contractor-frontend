@@ -79,19 +79,13 @@ class SubmissionSendingController @Inject() (
       logger.warn(
         "[SubmissionSendingController.onPageLoad] Submission already sent for this journey; redirecting to poll"
       )
-      Future.successful(
-        Redirect(
-          flowId
-            .map(fid => controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(fid))
-            .getOrElse(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
-        )
-      )
+      Future.successful(redirectToPoll(flowId))
     } else {
       id
         .fold(verificationService.createSubmitAndPersistVerificationSubmission)(nestedId =>
           verificationService.createSubmitAndPersistVerificationSubmission(Some(nestedId))
         )
-        .flatMap(redirectForInitialSubmissionResponse)
+        .flatMap(redirectForInitialSubmissionResponse(_, flowId))
         .recover { case ex =>
           logger.error(
             "[SubmissionSendingController.onPageLoad] Failed to create submission",
@@ -195,15 +189,21 @@ class SubmissionSendingController @Inject() (
         recovery
     }
 
+  private def redirectToPoll(flowId: Option[UUID]): Result =
+    Redirect(
+      flowId
+        .map(fid => controllers.verify.routes.SubmissionSendingController.onPollAndRedirectWithId(fid))
+        .getOrElse(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
+    )
+
   private def redirectForInitialSubmissionResponse(
-    response: ChrisSubmissionResponse
+    response: ChrisSubmissionResponse,
+    flowId: Option[UUID]
   ): Future[Result] =
     SubmissionStatus.fromString(response.status) match {
 
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
-        Future.successful(
-          Redirect(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
-        )
+        Future.successful(redirectToPoll(flowId))
 
       case SUBMITTED_NO_RECEIPT =>
         Future.successful(
