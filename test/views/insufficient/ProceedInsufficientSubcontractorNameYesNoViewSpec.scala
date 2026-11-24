@@ -47,8 +47,7 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
           form,
           NormalMode,
           subcontractorName,
-          subcontractorId,
-          formAction
+          subcontractorId
         )
 
       val doc: Document = Jsoup.parse(html.toString())
@@ -96,8 +95,7 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
           errorForm,
           NormalMode,
           subcontractorName,
-          subcontractorId,
-          formAction
+          subcontractorId
         )
 
       val doc: Document =
@@ -132,9 +130,6 @@ class ProceedInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with
     val subcontractorName = "Test Subcontractor"
 
     val subcontractorId = 10L
-
-    val formAction =
-      controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
 
     implicit val request: Request[_] = FakeRequest()
 

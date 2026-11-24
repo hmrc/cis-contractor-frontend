@@ -47,8 +47,7 @@ class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with 
           form,
           NormalMode,
           subcontractorName,
-          verificationResourceRef,
-          formAction
+          verificationResourceRef
         )
 
       val doc: Document =
@@ -123,8 +122,7 @@ class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with 
           errorForm,
           NormalMode,
           subcontractorName,
-          verificationResourceRef,
-          formAction
+          verificationResourceRef
         )
 
       val doc: Document =
@@ -163,10 +161,6 @@ class RemoveInsufficientSubcontractorNameYesNoViewSpec extends AnyWordSpec with 
 
     val verificationResourceRef =
       12345L
-
-    val formAction =
-      controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController
-        .onSubmit(verificationResourceRef)
 
     implicit val request: Request[_] =
       FakeRequest()

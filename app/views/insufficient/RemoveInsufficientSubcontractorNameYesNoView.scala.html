@@ -24,11 +24,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, subcontractorName: String, verificationResourceRef: Long = -1L, formAction: Call)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, subcontractorName: String, verificationResourceRef: Long = -1L, formAction: Option[Call] = None)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("removeInsufficientSubcontractorNameYesNo.title", subcontractorName))) {
 
-    @formHelper(action = formAction, Symbol("autoComplete") -> "off") {
+    @formHelper(action = formAction.getOrElse(controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)), Symbol("autoComplete") -> "off") {
 
     @if(form.errors.nonEmpty) {
         @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

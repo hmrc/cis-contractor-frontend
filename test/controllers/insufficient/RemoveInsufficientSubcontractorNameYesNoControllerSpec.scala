@@ -59,9 +59,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
   private val subcontractorId =
     10L
 
-  private val formAction =
-    controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)
-
   private val currentBatchResponse: GetCurrentVerificationBatchResponse =
     GetCurrentVerificationBatchResponse(
       subcontractors = Seq(
@@ -202,8 +199,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form,
               mode,
               subcontractorName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)
@@ -253,8 +249,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form.fill(true),
               mode,
               subcontractorName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)
@@ -307,8 +302,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form,
               mode,
               subcontractorName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)
@@ -350,8 +344,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form,
               mode,
               expectedName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)
@@ -363,11 +356,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
 
         val unknownVerificationResourceRef =
           99999L
-
-        val formActionRefNotPresent =
-          controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(
-            unknownVerificationResourceRef
-          )
 
         val application =
           applicationBuilder(
@@ -401,8 +389,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form,
               mode,
               expectedName,
-              unknownVerificationResourceRef,
-              formActionRefNotPresent
+              unknownVerificationResourceRef
             )(
               request,
               messages(application)
@@ -411,9 +398,6 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
       }
 
       "must display verify.noName when the default negative verification reference is used" in {
-
-        val formActionDefaultVerificationRef =
-          controllers.insufficient.routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(-1L)
 
         val application =
           applicationBuilder(
@@ -449,8 +433,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               form,
               mode,
               expectedName,
-              -1L,
-              formActionDefaultVerificationRef
+              -1L
             )(
               request,
               messages(application)
@@ -528,8 +511,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               boundForm,
               mode,
               subcontractorName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)
@@ -580,8 +562,7 @@ class RemoveInsufficientSubcontractorNameYesNoControllerSpec extends SpecBase wi
               boundForm,
               mode,
               expectedName,
-              verificationResourceRef,
-              formAction
+              verificationResourceRef
             )(
               request,
               messages(application)

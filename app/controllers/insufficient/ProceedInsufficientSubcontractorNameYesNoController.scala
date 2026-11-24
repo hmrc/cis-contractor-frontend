@@ -60,8 +60,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onPageLoad(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
-      val page       =
+      val page =
         ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId.toString)
 
       request.userAnswers
@@ -95,8 +94,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                     preparedForm,
                     mode,
                     subcontractor.displayName,
-                    subcontractorId,
-                    formAction
+                    subcontractorId
                   )
                 )
               }
@@ -113,7 +111,6 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   def onSubmit(subcontractorId: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val formAction = routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmit(subcontractorId)
 
       val result =
         (request.userAnswers.get(CisIdQuery), request.userAnswers.get(CurrentVerificationBatchResponsePage)) match {
@@ -131,8 +128,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                             formWithErrors,
                             mode,
                             subcontractor.displayName,
-                            subcontractorId,
-                            formAction
+                            subcontractorId
                           )
                         )
                       ),
@@ -207,7 +203,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val id         = flowId.toString
       val formAction =
-        routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
+        Some(routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId))
       val page       =
         ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString)
 
@@ -267,7 +263,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val id         = flowId.toString
       val formAction =
-        routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId)
+        Some(routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId))
       val result     =
         (
           request.userAnswers.get(CisIdQuery(id)),
