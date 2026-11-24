@@ -28,10 +28,11 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.mvc.Results.Ok
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import services.CisManageService
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -160,6 +161,27 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
       verify(connector, never).prepopulateContractorKnownFacts(any[String], any[String], any[String])(
         any[HeaderCarrier]
       )
+    }
+
+    "must use nested verify cisId when forVerifyJourney is used and root cisId is missing" in {
+      val flowId    = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val connector = mock[ConstructionIndustrySchemeConnector]
+      when(connector.prepopulateContractorKnownFacts(eqTo(cisId), eqTo("123"), eqTo("AB456"))(any[HeaderCarrier]))
+        .thenReturn(Future.unit)
+
+      val ua =
+        emptyUserAnswers
+          .set(VerifyCisIdQuery(flowId.toString), cisId)
+          .success
+          .value
+
+      val result =
+        newAction(connector)
+          .forVerifyJourney(flowId)
+          .invokeBlock(contractorRequest(ua), block)
+
+      status(result) mustBe OK
+      verify(connector).prepopulateContractorKnownFacts(eqTo(cisId), eqTo("123"), eqTo("AB456"))(any[HeaderCarrier])
     }
 
     "must redirect to the unauthorised organisation page and not call prepopulate when the cisId is missing" in {

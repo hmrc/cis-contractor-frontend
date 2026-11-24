@@ -17,8 +17,9 @@
 package controllers.actions
 
 import models.requests.DataRequest
-import play.api.mvc.Result
+import play.api.mvc.{ActionFilter, Result}
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,6 +27,8 @@ class FakeFormpRdsReconcileAction extends FormpRdsReconcileAction {
 
   override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
     Future.successful(None)
+
+  override def forVerifyJourney(flowId: UUID): ActionFilter[DataRequest] = this
 
   override protected def executionContext: ExecutionContext = global
 }

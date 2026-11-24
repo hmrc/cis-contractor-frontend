@@ -582,6 +582,7 @@ class SubmissionSendingControllerSpec extends SpecBase with WithFakeCisTaxpayer 
           Future.successful(
             Some(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))
           )
+        override def forVerifyJourney(flowId: UUID)                                       = this
         override protected def executionContext: ExecutionContext                         = scala.concurrent.ExecutionContext.Implicits.global
       }
 

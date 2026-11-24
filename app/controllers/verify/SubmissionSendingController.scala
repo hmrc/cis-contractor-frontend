@@ -65,7 +65,7 @@ class SubmissionSendingController @Inject() (
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(
       flowId
-    ) andThen reconcileFormpRds).async { implicit request =>
+    ) andThen reconcileFormpRds.forVerifyJourney(flowId)).async { implicit request =>
       startSubmission(Some(flowId))
     }
 
