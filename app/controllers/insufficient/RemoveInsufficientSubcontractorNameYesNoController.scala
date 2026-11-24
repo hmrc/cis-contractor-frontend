@@ -76,7 +76,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     mode: Mode = NormalMode
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)
 
       val subcontractorName =
         getSubcontractorName(request, verificationResourceRef)
@@ -86,8 +85,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
           preparedForm(verificationResourceRef),
           mode,
           subcontractorName,
-          verificationResourceRef,
-          formAction
+          verificationResourceRef
         )
       )
     }
@@ -97,7 +95,6 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     mode: Mode = NormalMode
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val formAction = routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmit(verificationResourceRef)
 
       val subcontractorName =
         getSubcontractorName(request, verificationResourceRef)
@@ -112,8 +109,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
                   formWithErrors,
                   mode,
                   subcontractorName,
-                  verificationResourceRef,
-                  formAction
+                  verificationResourceRef
                 )
               )
             ),
@@ -168,7 +164,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val id         = flowId.toString
       val formAction =
-        routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+        Some(routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef))
 
       val subcontractorName =
         getSubcontractorName(request, verificationResourceRef)
@@ -192,7 +188,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       val id         = flowId.toString
       val formAction =
-        routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+        Some(routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef))
 
       val subcontractorName =
         getSubcontractorNameWithId(id, request, verificationResourceRef)
@@ -247,7 +243,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
 
               redirect <-
                 if (value) {
-                  deleteAndRedirect(cleanedAnswers, verificationResourceRef)
+                  deleteAndRedirectWithId(flowId, cleanedAnswers, verificationResourceRef)
                 } else {
                   Future.successful(
                     Redirect(
@@ -372,7 +368,69 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         }
     }
 
-  // TODO ID overload
+  // DTR-9569 deleteAndRedirect ID overload
+  private def deleteAndRedirectWithId(
+    flowId: UUID,
+    userAnswers: models.UserAnswers,
+    verificationResourceRef: Long
+  )(implicit request: DataRequest[?]): Future[play.api.mvc.Result] = {
+    val id = flowId.toString
+
+    if (verificationResourceRef < 0) {
+      logger.error(
+        s"[RemoveInsufficientSubcontractorNameYesNoController][deleteAndRedirectWithId] - invalid verificationResourceRef=$verificationResourceRef"
+      )
+      Future.successful(recoveryRedirect)
+    } else {
+      verificationService
+        .deleteVerification(userAnswers, verificationResourceRef, Some(id)) // needs ID overload, see below
+        .flatMap {
+          case response if response.verificationsCounter.exists(_ > 0) =>
+            checkVerificationBatchReadinessWithId(flowId).flatMap {
+              case Some(updatedAnswers) =>
+                verificationService
+                  .refreshNewestVerificationBatch(updatedAnswers, Some(id))
+                  .map(_ =>
+                    Redirect(
+                      routes.RemoveInsufficientSubcontractorNameYesNoController.onPageLoadWithId(flowId)
+                    )
+                    // TODO remove above, replace with below
+                    // Redirect(
+                    //   controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+                    //     .onPageLoadWithId(flowId)
+                    // )
+                  )
+
+              case None =>
+                logger.error(
+                  "[RemoveInsufficientSubcontractorNameYesNoController][deleteAndRedirectWithId] - " +
+                    s"userAnswers missing or batch readiness check failed, verificationResourceRef=$verificationResourceRef"
+                )
+                Future.successful(recoveryRedirect)
+            }
+
+          case response if response.verificationsCounter.contains(0L) =>
+            verificationService
+              .getCurrentVerificationBatch(userAnswers, Some(id))
+              .flatMap(refreshNewestBatchAndRedirectToVerificationSelectionWithId(flowId, _))
+
+          case _ =>
+            logger.error(
+              s"[RemoveInsufficientSubcontractorNameYesNoController][deleteAndRedirectWithId] - " +
+                s"unexpected verificationsCounter after delete, verificationResourceRef=$verificationResourceRef"
+            )
+            Future.successful(recoveryRedirect)
+        }
+        .recover { case e =>
+          logger.error(
+            s"[RemoveInsufficientSubcontractorNameYesNoController.deleteAndRedirectWithId] Failed to delete verificationResourceRef=$verificationResourceRef",
+            e
+          )
+          recoveryRedirect
+        }
+    }
+  }
+
   private def checkVerificationBatchReadiness()(implicit request: DataRequest[?]): Future[Option[models.UserAnswers]] =
     sessionRepository
       .get(request.userId)
@@ -380,6 +438,23 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
         case Some(updatedAnswers) =>
           logger.info("Remove Insufficient verification batch readiness check")
           checkVerificationBatchReadinessController.updateVerificationBatchReadiness(updatedAnswers)
+
+        case None =>
+          Future.successful(None)
+      }
+
+  // DTR-9569 checkVerificationBatchReadiness ID overload
+  // TODO to be used in deleteAndRedirect Overload
+  private def checkVerificationBatchReadinessWithId(
+    flowId: UUID
+  )(implicit request: DataRequest[?]): Future[Option[models.UserAnswers]] =
+    sessionRepository
+      .get(request.userId)
+      .flatMap {
+        case Some(updatedAnswers) =>
+          logger.info(s"Remove Insufficient verification batch readiness check, flowId=$flowId")
+          checkVerificationBatchReadinessController
+            .updateVerificationBatchReadiness(updatedAnswers, Some(flowId.toString))
 
         case None =>
           Future.successful(None)
