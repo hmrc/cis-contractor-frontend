@@ -35,4 +35,19 @@ class FinalValidationContextPageSpec extends SpecBase {
         "finalValidationContext"
     }
   }
+
+  "UUID SCOPED FinalValidationContextPage" - {
+
+    "must have the correct path" in {
+
+      FinalValidationContextPage("cis-org-1").path mustBe
+        JsPath \ "finalvalidation" \ "cis-org-1" \ "finalValidationContext"
+    }
+
+    "must have the correct string representation" in {
+
+      FinalValidationContextPage("cis-org-1").toString mustBe
+        "finalValidationContext"
+    }
+  }
 }

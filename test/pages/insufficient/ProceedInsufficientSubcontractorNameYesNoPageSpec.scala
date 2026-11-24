@@ -35,4 +35,20 @@ class ProceedInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](ProceedInsufficientSubcontractorNameYesNoPage(subcontractorId))
   }
+
+  "UUID SCOPED ProceedInsufficientSubcontractorNameYesNoPage" - {
+    val subcontractorId = "10"
+    val flowId          = "cis-org-1"
+
+    "have the correct path" in {
+      ProceedInsufficientSubcontractorNameYesNoForFlowPage(flowId, subcontractorId).path mustBe
+        (JsPath \ "verify" \ flowId \ "proceedInsufficientSubcontractorNameYesNo" \ subcontractorId \ "proceeded")
+    }
+
+    beRetrievable[Boolean](ProceedInsufficientSubcontractorNameYesNoForFlowPage(flowId, subcontractorId))
+
+    beSettable[Boolean](ProceedInsufficientSubcontractorNameYesNoForFlowPage(flowId, subcontractorId))
+
+    beRemovable[Boolean](ProceedInsufficientSubcontractorNameYesNoForFlowPage(flowId, subcontractorId))
+  }
 }

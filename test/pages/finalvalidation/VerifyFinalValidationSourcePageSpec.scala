@@ -35,4 +35,19 @@ class VerifyFinalValidationSourcePageSpec extends SpecBase {
         "verifyFinalValidationSource"
     }
   }
+
+  "UUID SCOPED VerifyFinalValidationSourcePage" - {
+
+    "must have the correct path" in {
+
+      VerifyFinalValidationSourcePage("cis-org-1").path mustBe
+        JsPath \ "finalvalidations" \ "cis-org-1" \ "verifyFinalValidationSource"
+    }
+
+    "must have the correct string representation" in {
+
+      VerifyFinalValidationSourcePage("cis-org-1").toString mustBe
+        "verifyFinalValidationSource"
+    }
+  }
 }

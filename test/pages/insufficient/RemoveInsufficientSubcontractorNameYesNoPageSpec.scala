@@ -36,4 +36,19 @@ class RemoveInsufficientSubcontractorNameYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](Gen.const(page))
   }
+
+  "UUID SCOPED RemoveInsufficientSubcontractorNameYesNoPage" - {
+    val flowId     = "cis-org-1"
+    val scopedPage = RemoveInsufficientSubcontractorNameYesNoForFlowPage(flowId, 12345L)
+
+    "have the correct path" in {
+      scopedPage.path mustBe (JsPath \ "verify" \ flowId \ "removeInsufficientSubcontractorNameYesNo" \ "12345" \ "removed")
+    }
+
+    beRetrievable[Boolean](Gen.const(scopedPage))
+
+    beSettable[Boolean](Gen.const(scopedPage))
+
+    beRemovable[Boolean](Gen.const(scopedPage))
+  }
 }
