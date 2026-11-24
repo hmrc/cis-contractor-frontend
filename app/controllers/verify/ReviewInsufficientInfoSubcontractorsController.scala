@@ -29,6 +29,7 @@ import services.{ContractorDetailsFinalValidationService, ReviewInsufficientInfo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
+import java.util.UUID
 import scala.util.{Failure, Success}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +42,8 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   contractorDetailsFinalValidationService: ContractorDetailsFinalValidationService,
   val controllerComponents: MessagesControllerComponents,
   sessionRepository: SessionRepository,
-  view: ReviewInsufficientInfoSubcontractorsView
+  view: ReviewInsufficientInfoSubcontractorsView,
+  multiTabAction: MultiTabAction
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -139,4 +141,104 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
         controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
       )
     }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id = flowId.toString
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+        .flatMap { case (validatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(flowId))
+//              todo: replace above with below
+//              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoadWithId(flowId))
+            )
+          } else {
+            validatedAnswers.get(CurrentVerificationBatchResponsePage(id)) match {
+
+              case Some(batch) =>
+                reviewInsufficientInfoService.buildViewModel(batch) match {
+
+                  case Success(viewModel) =>
+                    if (viewModel.hasMissing || viewModel.hasReady) {
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            validatedAnswers.set(
+                              VerificationBatchReadinessPage(id),
+                              viewModel.allReady
+                            )
+                          )
+                        _              <- sessionRepository.set(updatedAnswers)
+                      } yield Ok(view(viewModel))
+                    } else {
+                      logger.error(
+                        "[ReviewInsufficientInfoSubcontractorsController][onPageLoadWithId] - no missing or ready subcontractors in view model"
+                      )
+                      Future.successful(
+                        Redirect(
+                          controllers.routes.JourneyRecoveryController.onPageLoad()
+                        )
+                      )
+                    }
+
+                  case Failure(error) =>
+                    logger.error(
+                      "[ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId] Failed to build view model",
+                      error
+                    )
+
+                    Future.successful(
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController.onPageLoad()
+                      )
+                    )
+                }
+
+              case None =>
+                logger.error(
+                  "[ReviewInsufficientInfoSubcontractorsController][onPageLoadWithId] - CurrentVerificationBatchResponsePage missing from userAnswers"
+                )
+                Future.successful(
+                  Redirect(
+                    controllers.routes.JourneyRecoveryController.onPageLoad()
+                  )
+                )
+            }
+          }
+        }
+        .recover { case t =>
+          logger.error(
+            "[ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId] Failed final contractor validation",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id = flowId.toString
+      for {
+        withContext <- Future.fromTry(
+                         request.userAnswers.set(
+                           FinalValidationContextPage,
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
+        withSource  <- Future.fromTry(
+                         withContext.set(
+                           VerifyFinalValidationSourcePage,
+                           VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+                         )
+                       )
+        _           <- sessionRepository.set(withSource)
+      } yield Redirect(
+        routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(flowId)
+//        todo: replace above with below
+//        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmitWithId(flowId)
+      )
+    }
+
 }
