@@ -132,6 +132,22 @@ class SubmissionSendingControllerSpec extends SpecBase with WithFakeCisTaxpayer 
     ).thenReturn(Future.successful(response))
   }
 
+  private def mockPollResponseWithId(
+    mockService: VerificationService,
+    response: ChrisPollResponse
+  ): Unit = {
+    when(
+      mockService.isPollDue(any[VerificationSubmissionDetails], any[Int])
+    ).thenReturn(true)
+    when(
+      mockService.pollStatusAndPersist(
+        any[UserAnswers],
+        any[VerificationSubmissionDetails],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+    ).thenReturn(Future.successful(response))
+  }
+
   private def pollResponse(
     status: SubmissionStatus,
     govTalkErrorStatus: Option[models.verify.GovTalkErrorStatus] = None
@@ -275,6 +291,33 @@ class SubmissionSendingControllerSpec extends SpecBase with WithFakeCisTaxpayer 
         redirectLocation(result).value mustBe
           controllers.verify.routes.VerificationRequestSubmittedController
             .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to the submitted page with id when initial submission returns SUBMITTED_NO_RECEIPT" in {
+      val mockService = mock[VerificationService]
+
+      mockInitialSubmissionWithId(
+        mockService,
+        ChrisSubmissionResponse(
+          submissionId = "13602",
+          status = "SUBMITTED_NO_RECEIPT",
+          hmrcMarkGenerated = "hmrc-mark"
+        )
+      )
+
+      val application = applicationWith(mockService, userAnswersWithVerifyCisId)
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPageLoadWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoadWithId(flowId)
             .url
       }
     }
@@ -1107,6 +1150,33 @@ class SubmissionSendingControllerSpec extends SpecBase with WithFakeCisTaxpayer 
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController
             .onPageLoad()
+            .url
+      }
+    }
+
+    "must redirect to the submitted page with id when poll returns SUBMITTED" in {
+      val mockService = mock[VerificationService]
+
+      mockPollResponseWithId(
+        mockService,
+        pollResponse(SubmissionStatus.SUBMITTED)
+      )
+
+      val application =
+        applicationWith(
+          mockService,
+          userAnswersWithNestedSubmissionDetails
+        )
+
+      running(application) {
+        val result =
+          route(application, FakeRequest(GET, onPollWithIdRoute)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.verify.routes.VerificationRequestSubmittedController
+            .onPageLoadWithId(flowId)
             .url
       }
     }

@@ -25,6 +25,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import services.VerificationService
 import viewmodels.verify.VerificationRequestSubmittedViewModel
 import views.html.verify.VerificationRequestSubmittedView
+
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -33,6 +35,7 @@ class VerificationRequestSubmittedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   verificationService: VerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationRequestSubmittedView,
@@ -44,25 +47,39 @@ class VerificationRequestSubmittedController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      verificationService
-        .refreshSubmittedVerificationRequest(request.userAnswers)
-        .flatMap { updatedAnswers =>
-          val viewModel =
-            VerificationRequestSubmittedViewModel.fromUserAnswers(
-              updatedAnswers,
-              appConfig
-            )
-
-          verificationService.resetUserAnswers(updatedAnswers).map { _ =>
-            Ok(view(viewModel))
-          }
-        }
-        .recover { case t =>
-          logger.error(
-            "[VerificationRequestSubmittedController.onPageLoad] Failed to refresh submitted verification request",
-            t
-          )
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+      showConfirmation(None)
     }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        showConfirmation(Some(flowId))
+    }
+
+  private def showConfirmation(flowId: Option[UUID])(implicit request: models.requests.DataRequest[AnyContent]) = {
+    val id = flowId.map(_.toString)
+    id
+      .fold(verificationService.refreshSubmittedVerificationRequest(request.userAnswers))(nestedId =>
+        verificationService.refreshSubmittedVerificationRequest(request.userAnswers, Some(nestedId))
+      )
+      .flatMap { updatedAnswers =>
+        val viewModel =
+          VerificationRequestSubmittedViewModel.fromUserAnswers(
+            updatedAnswers,
+            appConfig,
+            id
+          )
+
+        verificationService.resetUserAnswers(updatedAnswers).map { _ =>
+          Ok(view(viewModel))
+        }
+      }
+      .recover { case t =>
+        logger.error(
+          "[VerificationRequestSubmittedController.onPageLoad] Failed to refresh submitted verification request",
+          t
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+  }
 }

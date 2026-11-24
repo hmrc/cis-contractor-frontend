@@ -19,7 +19,7 @@ package viewmodels.verify
 import config.FrontendAppConfig
 import models.UserAnswers
 import pages.verify.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import utils.VerifyEmailResolver.resolvedEmail
 
 import java.time.LocalDateTime
@@ -44,17 +44,25 @@ object VerificationRequestSubmittedViewModel {
 
   def fromUserAnswers(
     userAnswers: UserAnswers,
-    appConfig: FrontendAppConfig
+    appConfig: FrontendAppConfig,
+    subJourneyId: Option[String] = None
   ): VerificationRequestSubmittedViewModel = {
 
-    val cisId = userAnswers
-      .get(CisIdQuery)
+    val cisId = subJourneyId
+      .map(id => userAnswers.get(VerifyCisIdQuery(id)))
+      .getOrElse(userAnswers.get(CisIdQuery))
       .getOrElse(
         throw new IllegalStateException("[VerificationRequestSubmittedViewModel] cisId missing from userAnswers")
       )
 
+    val newestPage   =
+      subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+    val selectPage   = subJourneyId.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+    val reverifyPage =
+      subJourneyId.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
+
     val backendResponse =
-      userAnswers.get(NewestVerificationBatchResponsePage)
+      userAnswers.get(newestPage)
 
     val newestBatch =
       backendResponse.getOrElse(
@@ -81,9 +89,9 @@ object VerificationRequestSubmittedViewModel {
       verificationHistoryUrl = appConfig.verificationHistoryUrl,
       referenceNumber = referenceNumber,
       submittedAt = submittedAt,
-      subcontractorsToVerify = namesFrom(userAnswers.get(SelectSubcontractorPage))(_.name),
-      subcontractorsToReverify = namesFrom(userAnswers.get(SelectSubcontractorsToReverifyPage))(_.name),
-      confirmationEmail = resolvedEmail(userAnswers)
+      subcontractorsToVerify = namesFrom(userAnswers.get(selectPage))(_.name),
+      subcontractorsToReverify = namesFrom(userAnswers.get(reverifyPage))(_.name),
+      confirmationEmail = resolvedEmail(userAnswers, subJourneyId)
     )
   }
 }

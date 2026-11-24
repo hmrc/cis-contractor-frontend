@@ -138,7 +138,7 @@ class SubmissionSendingController @Inject() (
               verificationService.pollStatusAndPersist(request.userAnswers, submissionDetails, Some(nestedId))
             )
             .flatMap { response =>
-              redirectForPollSubmissionResponse(response, refreshInterval)
+              redirectForPollSubmissionResponse(response, refreshInterval, flowId)
             }
             .recover { case ex =>
               logger.error(
@@ -196,6 +196,13 @@ class SubmissionSendingController @Inject() (
         .getOrElse(controllers.verify.routes.SubmissionSendingController.onPollAndRedirect)
     )
 
+  private def redirectToConfirmation(flowId: Option[UUID]): Result =
+    Redirect(
+      flowId
+        .map(fid => controllers.verify.routes.VerificationRequestSubmittedController.onPageLoadWithId(fid))
+        .getOrElse(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
+    )
+
   private def redirectForInitialSubmissionResponse(
     response: ChrisSubmissionResponse,
     flowId: Option[UUID]
@@ -206,9 +213,7 @@ class SubmissionSendingController @Inject() (
         Future.successful(redirectToPoll(flowId))
 
       case SUBMITTED_NO_RECEIPT =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         logger.error(
@@ -227,7 +232,8 @@ class SubmissionSendingController @Inject() (
 
   private def redirectForPollSubmissionResponse(
     response: ChrisPollResponse,
-    refreshInterval: Int
+    refreshInterval: Int,
+    flowId: Option[UUID]
   )(implicit request: Request[_]): Future[Result] =
     response.status match {
       case SubmissionStatus.PENDING | SubmissionStatus.ACCEPTED =>
@@ -237,14 +243,10 @@ class SubmissionSendingController @Inject() (
         )
 
       case SUBMITTED =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case SUBMITTED_NO_RECEIPT =>
-        Future.successful(
-          Redirect(controllers.verify.routes.VerificationRequestSubmittedController.onPageLoad())
-        )
+        Future.successful(redirectToConfirmation(flowId))
 
       case status @ (DEPARTMENTAL_ERROR | FATAL_ERROR) =>
         logger.error(
