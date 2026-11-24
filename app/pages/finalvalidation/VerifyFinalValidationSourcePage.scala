@@ -28,7 +28,6 @@ case class VerifyFinalValidationSourcePage(id: String) extends QuestionPage[Veri
 
 }
 
-
 case object VerifyFinalValidationSourcePage extends QuestionPage[VerifyFinalValidationSource] {
 
   override def path: JsPath = JsPath \ "finalvalidations" \ toString
