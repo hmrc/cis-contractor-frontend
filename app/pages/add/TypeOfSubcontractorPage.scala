@@ -17,10 +17,10 @@
 package pages.add
 
 import models.{TypeOfSubcontractor, UserAnswers}
-import models.TypeOfSubcontractor.*
+import models.TypeOfSubcontractor._
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.SubcontractorCleanup.*
+import utils.SubcontractorCleanup._
 
 import scala.util.Try
 
@@ -32,11 +32,37 @@ case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcon
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(Partnership) => removeTrustSubcontractor(ua, id)
-      case Some(Trust)       => removePartnershipSubcontractor(ua, id)
-      case Some(_)           =>
-        removePartnershipSubcontractor(ua, id).flatMap(removeTrustSubcontractor(_, id))
-      case _                 => super.cleanup(value, ua)
+      case Some(Individualorsoletrader) =>
+        removePartnershipSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removePartnershipSubcontractor(_, id))
+          .flatMap(removeTrustSubcontractor(_, id))
+
+      case Some(Limitedcompany) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removePartnershipSubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removePartnershipSubcontractor(ua, id))
+          .flatMap(removeTrustSubcontractor(_, id))
+
+      case Some(Partnership) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removeTrustSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removeTrustSubcontractor(_, id))
+
+      case Some(Trust) =>
+        removeIndividualSoleTraderSubcontractor(ua)
+          .flatMap(removeLimitedCompanySubcontractor)
+          .flatMap(removePartnershipSubcontractor)
+          .flatMap(ua => removeLimitedCompanySubcontractor(ua, id))
+          .flatMap(removePartnershipSubcontractor(_, id))
+
+      case _ =>
+        super.cleanup(value, ua)
     }
 }
 

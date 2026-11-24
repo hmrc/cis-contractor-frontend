@@ -16,39 +16,48 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.info.company.CompanyAnswers
+import controllers.add.company.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyCrnPage
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
-import models.info.company.CompanyAnswers
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
 
 object CompanyCrnSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyCrnPage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyCrn.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyCrnController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyCrnPage(id)))
+      .getOrElse(answers.get(CompanyCrnPage))
+      .map { crn =>
+        SummaryListRowViewModel(
+          key = "companyCrn.checkYourAnswersLabel",
+          value = ValueViewModel(Text(crn)),
+          actions = Seq(
+            ActionItemViewModel(
+              content = Text(messages("site.change")),
+              href = changeUrl.getOrElse(routes.CompanyCrnController.onPageLoad(mode).url)
+            ).withVisuallyHiddenText(messages("companyCrn.change.hidden"))
+              .withAttribute("id" -> "company-crn")
           )
-            .withVisuallyHiddenText(messages("companyCrn.change.hidden"))
-            .withAttribute("id" -> "company-crn")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers
   )(implicit messages: Messages): Option[SummaryListRow] =
-    answers.crn.map { answer =>
+    answers.crn.map { crn =>
       SummaryListRowViewModel(
         key = "companyCrn.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
+        value = ValueViewModel(Text(crn)),
         actions = Seq.empty
       )
     }

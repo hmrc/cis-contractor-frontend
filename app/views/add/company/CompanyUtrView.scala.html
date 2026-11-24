@@ -17,6 +17,7 @@
 @import viewmodels.LabelSize.Medium
 @import viewmodels.InputWidth._
 @import views.html.components._
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -28,11 +29,11 @@
     paragraph: Paragraph,
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("companyUtr.title"))) {
 
-    @formHelper(action = controllers.add.company.routes.CompanyUtrController.onSubmit(mode)) {
+    @formHelper(action = submitAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

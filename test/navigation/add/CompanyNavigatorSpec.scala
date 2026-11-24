@@ -23,6 +23,8 @@ import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import pages.Page
 import pages.add.company.*
 
+import java.util.UUID
+
 class CompanyNavigatorSpec extends SpecBase {
 
   val navigator                    = new CompanyNavigator
@@ -38,6 +40,82 @@ class CompanyNavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "must go from CompanyNamePage with id to the address yes no page with id" in {
+        val uuid = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id   = uuid.toString
+
+        navigator.nextPage(
+          CompanyNamePage(id),
+          NormalMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyAddressYesNoController
+          .onPageLoadWithId(uuid, NormalMode)
+      }
+
+      "must go from CompanyAddressYesNoPage with id to address lookup when yes" in {
+        val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id), true)
+
+        navigator.nextPage(
+          CompanyAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.company.routes.CompanyAddressController
+          .redirectToAddressLookupWithId(flowId, None)
+      }
+
+      "must go from CompanyAddressYesNoPage with id to contact methods when no" in {
+        val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id), false)
+
+        navigator.nextPage(
+          CompanyAddressYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from AddCompanyContactMethodsYesNoPage with id to CompanyUtrYesNo when no" in {
+        val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage(id), false)
+
+        navigator.nextPage(
+          AddCompanyContactMethodsYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+      }
+
+      "must go from CompanyWorksReferenceYesNoPage with id to CYA when no" in {
+        val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id      = flowId.toString
+        val answers = emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage(id), false)
+
+        navigator.nextPage(
+          CompanyWorksReferenceYesNoPage(id),
+          NormalMode,
+          answers
+        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
+          .onPageLoadWithId(flowId)
+      }
+
+      "must go from CompanyNamePage with id in CheckMode to CYA" in {
+        val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        navigator.nextPage(
+          CompanyNamePage(id),
+          CheckMode,
+          emptyUserAnswers
+        ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
+          .onPageLoadWithId(flowId)
       }
 
       "must go from CompanyNamePage to CompanyAddressYesNo in NormalMode" in {
