@@ -22,6 +22,22 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class CompanyCrnYesNoPage(index: String) extends QuestionPage[Boolean] with CompanyJourney {
+
+  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+
+  override def toString: String = "companyCrnYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers
+        .remove(CompanyCrnPage(id))
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+
+}
+
 case object CompanyCrnYesNoPage extends QuestionPage[Boolean] with CompanyJourney {
 
   override def path: JsPath = JsPath \ toString

@@ -33,6 +33,7 @@ import services.{CisManageService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -54,6 +55,82 @@ class AmendSubcontractorController @Inject() (
     journeyType: String
   ): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
+      AmendJourneyType.fromString(journeyType) match {
+        case None =>
+          logger.error(
+            s"[AmendSubcontractorController] Invalid journey type: $journeyType"
+          )
+
+          Future.successful(recovery)
+
+        case Some(amendJourneyType) =>
+          val userAnswers =
+            request.userAnswers.getOrElse(
+              UserAnswers(request.userId)
+            )
+
+          withAgentClientChecks(
+            request.userId,
+            request.isAgent,
+            userAnswers
+          ).flatMap {
+
+            case Left(redirect) =>
+              Future.successful(redirect)
+
+            case Right(checkedAnswers) =>
+              checkedAnswers.get(CisIdQuery) match {
+
+                case None =>
+                  logger.error(
+                    "[AmendSubcontractorController] CIS ID missing from checked answers"
+                  )
+
+                  Future.successful(recovery)
+
+                case Some(validatedCisId) =>
+                  subcontractorService
+                    .getSubcontractor(
+                      validatedCisId,
+                      subbieResourceRef
+                    )
+                    .flatMap(
+                      resolveSubcontractor(
+                        _,
+                        validatedCisId,
+                        subbieResourceRef,
+                        amendJourneyType,
+                        userAnswers
+                      )
+                    )
+                    .recover { case error =>
+                      logger.error(
+                        s"[AmendSubcontractorController] Failed to resolve subcontractor. " +
+                          s"cisId=$validatedCisId, subbieResourceRef=$subbieResourceRef",
+                        error
+                      )
+
+                      recovery
+                    }
+              }
+          }.recover { case error =>
+            logger.error(
+              s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
+                s"cisId=${userAnswers.get(CisIdQuery)}, subbieResourceRef=$subbieResourceRef",
+              error
+            )
+
+            recovery
+          }
+      }
+    }
+
+  def onPageLoadWithId( // TODO DTR-9463: Do I need to add id anywhere for this?
+    subbieResourceRef: Long,
+    journeyType: String,
+    flowId: UUID
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       AmendJourneyType.fromString(journeyType) match {
         case None =>
           logger.error(
@@ -161,6 +238,44 @@ class AmendSubcontractorController @Inject() (
         Future.successful(recovery)
     }
 
+  private def resolveSubcontractorWithId( // TODO DTR-9463: Is id needed in this?
+    response: GetSubcontractorResponse,
+    cisId: String,
+    subbieResourceRef: Long,
+    amendJourneyType: AmendJourneyType,
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Future[Result] =
+    response.subcontractor match {
+      case Some(subcontractor) =>
+        subcontractor.subcontractorType
+          .flatMap(TypeOfSubcontractor.fromString)
+          .fold[Future[Result]] {
+            logger.error(
+              s"[AmendSubcontractorController] Unsupported subcontractor type. " +
+                s"type=${subcontractor.subcontractorType.getOrElse("missing")}, " +
+                s"cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+            )
+            Future.successful(recovery)
+          } { subcontractorType =>
+            handleSubcontractor(
+              subcontractorType,
+              userAnswers,
+              cisId,
+              subbieResourceRef,
+              amendJourneyType,
+              subcontractor
+            )
+          }
+
+      case None =>
+        logger.error(
+          s"[AmendSubcontractorController] No subcontractor returned " +
+            s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef"
+        )
+        Future.successful(recovery)
+    }
+
   private def handleSubcontractor(
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers,
@@ -225,6 +340,75 @@ class AmendSubcontractorController @Inject() (
         Future.successful(recovery)
     }
 
+  private def handleSubcontractorWithId(
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    cisId: String,
+    subbieResourceRef: Long,
+    amendJourneyType: AmendJourneyType,
+    subcontractor: SubcontractorResponse,
+    flowId: UUID
+  ): Future[Result] = {
+    val subJourneyId = flowId.toString
+
+    cleanupService.cleanAmend(userAnswers, subJourneyId) match {
+
+      case Success(cleanedUserAnswers) =>
+        populateUserAnswersWithId(
+          subcontractorType,
+          cleanedUserAnswers,
+          cisId,
+          subcontractor,
+          flowId
+        ).fold(
+          error => {
+            logger.error(
+              s"[AmendSubcontractorController] Failed to populate UserAnswers " +
+                s"for type=$subcontractorType, " +
+                s"cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+              error
+            )
+
+            Future.successful(recovery)
+          },
+          updatedAnswers =>
+            updatedAnswers
+              .set(AmendJourneyTypePage(subJourneyId), amendJourneyType)
+              .fold(
+                error => {
+                  logger.error(
+                    s"[AmendSubcontractorController] Failed to set AmendJourneyTypePage " +
+                      s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+                    error
+                  )
+
+                  Future.successful(recovery)
+                },
+                updatedAnswersWithJourneyType =>
+                  sessionRepository
+                    .set(updatedAnswersWithJourneyType)
+                    .map(_ =>
+                      Redirect(
+                        onwardRoute(
+                          subcontractorType,
+                          subbieResourceRef
+                        )
+                      )
+                    )
+              )
+        )
+
+      case Failure(error) =>
+        logger.error(
+          s"[AmendSubcontractorController] Failed to clean amend UserAnswers " +
+            s"for cisId=$cisId, subbieResourceRef=$subbieResourceRef",
+          error
+        )
+
+        Future.successful(recovery)
+    }
+  }
+
   private def populateUserAnswers(
     subcontractorType: TypeOfSubcontractor,
     userAnswers: UserAnswers,
@@ -249,6 +433,34 @@ class AmendSubcontractorController @Inject() (
           .populate(userAnswers, cisId, subcontractor)
     }
 
+  private def populateUserAnswersWithId(
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    cisId: String,
+    subcontractor: SubcontractorResponse,
+    flowId: UUID
+  ): Try[UserAnswers] = {
+    val subJourneyId = flowId.toString
+
+    subcontractorType match {
+      case Individualorsoletrader =>
+        AmendSubcontractorPopulator.IndividualPopulator
+          .populate(userAnswers, cisId, subcontractor, subJourneyId)
+
+      case Limitedcompany =>
+        AmendSubcontractorPopulator.CompanyPopulator
+          .populate(userAnswers, cisId, subcontractor, subJourneyId)
+
+      case Partnership =>
+        AmendSubcontractorPopulator.PartnershipPopulator
+          .populate(userAnswers, cisId, subcontractor, subJourneyId)
+
+      case Trust =>
+        AmendSubcontractorPopulator.TrustPopulator
+          .populate(userAnswers, cisId, subcontractor, subJourneyId)
+    }
+  }
+
   private def onwardRoute(subcontractorType: TypeOfSubcontractor, subbieResourceRef: Long): Call =
     subcontractorType match {
       case Individualorsoletrader =>
@@ -267,6 +479,26 @@ class AmendSubcontractorController @Inject() (
         controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
           .onPageLoad(subbieResourceRef)
     }
-  private def recovery: Result                                                                   =
+
+  private def onwardRouteWithId(flowId: UUID, subcontractorType: TypeOfSubcontractor, subbieResourceRef: Long): Call =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        controllers.amend.routes.AmendIndividualCheckYourAnswersController
+          .onPageLoadWithId(flowId, subbieResourceRef)
+
+      case Limitedcompany =>
+        controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+          .onPageLoadWithId(flowId, subbieResourceRef)
+
+      case Partnership =>
+        controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+          .onPageLoadWithId(flowId, subbieResourceRef)
+
+      case Trust =>
+        controllers.amend.trust.routes.AmendTrustCheckYourAnswersController
+          .onPageLoadWithId(flowId, subbieResourceRef)
+    }
+
+  private def recovery: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 }

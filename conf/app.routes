@@ -94,6 +94,8 @@ POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  contro
 
 GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
+GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType/:flowId  controllers.amend.AmendSubcontractorController.onPageLoadWithId(flowId: UUID, subbieResourceRef: Long, journeyType: String)
+
 GET   /subcontractor/info/start/:subbieResourceRef/:journeyType  controllers.info.SubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
 GET   /subcontractor/info/partnership/subcontractor-information-read-only/:journeyType  controllers.info.partnership.PartnershipCheckYourAnswersController.onPageLoad(journeyType: String)

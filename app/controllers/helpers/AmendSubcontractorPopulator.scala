@@ -43,7 +43,8 @@ object AmendSubcontractorPopulator {
     def populate(
       userAnswers: UserAnswers,
       cisId: String,
-      subcontractor: SubcontractorResponse
+      subcontractor: SubcontractorResponse,
+      subJourneyId: Option[String] = None
     ): Try[UserAnswers] = {
       val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
       val methods    = SubcontractorPopulatorUtils.contactMethods(subcontractor)
@@ -64,31 +65,77 @@ object AmendSubcontractorPopulator {
         name = name
       )
 
-      for {
-        updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
-        updated <- updated.set(IndividualNamesOptionsPage, individualNamesOptions)
-        updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
-        updated <- setOptional(updated, SubcontractorNamePage, name)
-        updated <- updated.set(SubAddressYesNoPage, hasAddress)
-        updated <- setOptional(updated, AddressOfSubcontractorPage, address)
-        updated <- updated.set(AddIndividualContactMethodsYesNoPage, methods.nonEmpty)
-        updated <- if (methods.nonEmpty) { updated.set(IndividualContactMethodOptionsPage, methods) }
-                   else { Try(updated) }
-        updated <- setOptional(updated, IndividualEmailAddressPage, subcontractor.emailAddress)
-        updated <- setOptional(updated, IndividualPhoneNumberPage, subcontractor.phoneNumber)
-        updated <- setOptional(updated, IndividualMobileNumberPage, subcontractor.mobilePhoneNumber)
-        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
-        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
-        updated <- updated.set(UniqueTaxpayerReferenceYesNoPage, subcontractor.utr.isDefined)
-        updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage, subcontractor.utr)
-        updated <- updated.set(NationalInsuranceNumberYesNoPage, subcontractor.nino.isDefined)
-        updated <- setOptional(updated, SubNationalInsuranceNumberPage, subcontractor.nino)
-        updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
-        updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
-        updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
-        updated <- updated.set(CisIdQuery, cisId)
-        updated <- updated.set(OriginalIndividualAnswersQuery, original)
-      } yield updated
+      subJourneyId match {
+        case Some(id) =>
+          for {
+            updated <- userAnswers.set(
+                         TypeOfSubcontractorPage(id),
+                         Individualorsoletrader
+                       ) // TODO DTR-9463: Do I need to update page with amend path?
+            updated <- updated.set(IndividualNamesOptionsPage(id), individualNamesOptions)
+            updated <- setOptional(updated, TradingNameOfSubcontractorPage(id), subcontractor.tradingName)
+            updated <- setOptional(updated, SubcontractorNamePage(id), name)
+            updated <- updated.set(SubAddressYesNoPage(id), hasAddress)
+            updated <- setOptional(updated, AddressOfSubcontractorPage(id), address)
+            updated <- updated.set(AddIndividualContactMethodsYesNoPage(id), methods.nonEmpty)
+            updated <- if (methods.nonEmpty) {
+                         updated.set(IndividualContactMethodOptionsPage(id), methods)
+                       } else {
+                         Try(updated)
+                       }
+            updated <- setOptional(updated, IndividualEmailAddressPage(id), subcontractor.emailAddress)
+            updated <- setOptional(updated, IndividualPhoneNumberPage(id), subcontractor.phoneNumber)
+            updated <- setOptional(updated, IndividualMobileNumberPage(id), subcontractor.mobilePhoneNumber)
+            updated <- updated.set(
+                         OriginalSubcontractorQuery,
+                         subcontractor
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- setOptionalQuery(
+                         updated,
+                         AmendSubbieResourceRefQuery,
+                         subcontractor.subbieResourceRef
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- updated.set(UniqueTaxpayerReferenceYesNoPage(id), subcontractor.utr.isDefined)
+            updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage(id), subcontractor.utr)
+            updated <- updated.set(NationalInsuranceNumberYesNoPage(id), subcontractor.nino.isDefined)
+            updated <- setOptional(updated, SubNationalInsuranceNumberPage(id), subcontractor.nino)
+            updated <- updated.set(WorksReferenceNumberYesNoPage(id), subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, WorksReferenceNumberPage(id), subcontractor.worksReferenceNumber)
+            updated <- updated.set(ShowVerificationDetailsPage(id), shouldShowVerificationDetails(subcontractor))
+            updated <- updated.set(CisIdQuery(id), cisId) // TODO DTR-9463: Do I need to update query with amend path?
+            updated <-
+              updated.set(OriginalIndividualAnswersQuery, original) // TODO DTR-9463: Do I need to update query with id?
+          } yield updated
+        case None     =>
+          for {
+            updated <- userAnswers.set(TypeOfSubcontractorPage, Individualorsoletrader)
+            updated <- updated.set(IndividualNamesOptionsPage, individualNamesOptions)
+            updated <- setOptional(updated, TradingNameOfSubcontractorPage, subcontractor.tradingName)
+            updated <- setOptional(updated, SubcontractorNamePage, name)
+            updated <- updated.set(SubAddressYesNoPage, hasAddress)
+            updated <- setOptional(updated, AddressOfSubcontractorPage, address)
+            updated <- updated.set(AddIndividualContactMethodsYesNoPage, methods.nonEmpty)
+            updated <- if (methods.nonEmpty) {
+                         updated.set(IndividualContactMethodOptionsPage, methods)
+                       } else {
+                         Try(updated)
+                       }
+            updated <- setOptional(updated, IndividualEmailAddressPage, subcontractor.emailAddress)
+            updated <- setOptional(updated, IndividualPhoneNumberPage, subcontractor.phoneNumber)
+            updated <- setOptional(updated, IndividualMobileNumberPage, subcontractor.mobilePhoneNumber)
+            updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+            updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
+            updated <- updated.set(UniqueTaxpayerReferenceYesNoPage, subcontractor.utr.isDefined)
+            updated <- setOptional(updated, SubcontractorsUniqueTaxpayerReferencePage, subcontractor.utr)
+            updated <- updated.set(NationalInsuranceNumberYesNoPage, subcontractor.nino.isDefined)
+            updated <- setOptional(updated, SubNationalInsuranceNumberPage, subcontractor.nino)
+            updated <- updated.set(WorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, WorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+            updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
+            updated <- updated.set(CisIdQuery, cisId)
+            updated <- updated.set(OriginalIndividualAnswersQuery, original)
+          } yield updated
+      }
     }
 
     private def originalAnswers(
@@ -123,7 +170,8 @@ object AmendSubcontractorPopulator {
     def populate(
       userAnswers: UserAnswers,
       cisId: String,
-      subcontractor: SubcontractorResponse
+      subcontractor: SubcontractorResponse,
+      subJourneyId: Option[String] = None
     ): Try[UserAnswers] = {
 
       val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
@@ -136,39 +184,82 @@ object AmendSubcontractorPopulator {
           address = address,
           methods = methods
         )
-
-      for {
-        updated <- userAnswers.set(TypeOfSubcontractorPage, Limitedcompany)
-        updated <- setOptional(updated, CompanyNamePage, subcontractor.tradingName)
-        updated <- updated.set(CompanyAddressYesNoPage, hasAddress)
-        updated <- setOptional(updated, CompanyAddressPage, address)
-        updated <- updated.set(AddCompanyContactMethodsYesNoPage, methods.nonEmpty)
-        updated <- if (methods.nonEmpty) updated.set(CompanyContactMethodOptionsPage, methods) else Try(updated)
-        updated <- setOptional(updated, CompanyEmailAddressPage, subcontractor.emailAddress)
-        updated <- setOptional(updated, CompanyPhoneNumberPage, subcontractor.phoneNumber)
-        updated <- setOptional(updated, CompanyMobileNumberPage, subcontractor.mobilePhoneNumber)
-        updated <- updated.set(CompanyUtrYesNoPage, subcontractor.utr.isDefined)
-        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
-        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
-        updated <- setOptional(updated, CompanyUtrPage, subcontractor.utr)
-        updated <- updated.set(CompanyCrnYesNoPage, subcontractor.crn.isDefined)
-        updated <- setOptional(updated, CompanyCrnPage, subcontractor.crn)
-        updated <- updated.set(
-                     CompanyWorksReferenceYesNoPage,
-                     subcontractor.worksReferenceNumber.isDefined
-                   )
-        updated <- setOptional(
-                     updated,
-                     CompanyWorksReferencePage,
-                     subcontractor.worksReferenceNumber
-                   )
-        updated <- updated.set(
-                     ShowVerificationDetailsPage,
-                     shouldShowVerificationDetails(subcontractor)
-                   )
-        updated <- updated.set(CisIdQuery, cisId)
-        updated <- updated.set(OriginalCompanyAnswersQuery, original)
-      } yield updated
+      subJourneyId match {
+        case Some(id) =>
+          for {
+            updated <- userAnswers.set(TypeOfSubcontractorPage(id), Limitedcompany)
+            updated <- setOptional(updated, CompanyNamePage(id), subcontractor.tradingName)
+            updated <- updated.set(CompanyAddressYesNoPage(id), hasAddress)
+            updated <- setOptional(updated, CompanyAddressPage(id), address)
+            updated <- updated.set(AddCompanyContactMethodsYesNoPage(id), methods.nonEmpty)
+            updated <- if (methods.nonEmpty) updated.set(CompanyContactMethodOptionsPage(id), methods) else Try(updated)
+            updated <- setOptional(updated, CompanyEmailAddressPage(id), subcontractor.emailAddress)
+            updated <- setOptional(updated, CompanyPhoneNumberPage(id), subcontractor.phoneNumber)
+            updated <- setOptional(updated, CompanyMobileNumberPage(id), subcontractor.mobilePhoneNumber)
+            updated <- updated.set(CompanyUtrYesNoPage(id), subcontractor.utr.isDefined)
+            updated <- updated.set(
+                         OriginalSubcontractorQuery,
+                         subcontractor
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- setOptionalQuery(
+                         updated,
+                         AmendSubbieResourceRefQuery,
+                         subcontractor.subbieResourceRef
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- setOptional(updated, CompanyUtrPage(id), subcontractor.utr)
+            updated <- updated.set(CompanyCrnYesNoPage(id), subcontractor.crn.isDefined)
+            updated <- setOptional(updated, CompanyCrnPage(id), subcontractor.crn)
+            updated <- updated.set(
+                         CompanyWorksReferenceYesNoPage(id),
+                         subcontractor.worksReferenceNumber.isDefined
+                       )
+            updated <- setOptional(
+                         updated,
+                         CompanyWorksReferencePage(id),
+                         subcontractor.worksReferenceNumber
+                       )
+            updated <- updated.set(
+                         ShowVerificationDetailsPage(id),
+                         shouldShowVerificationDetails(subcontractor)
+                       )
+            updated <- updated.set(CisIdQuery(id), cisId) // TODO DTR-9463: Do I need to update query amend?
+            updated <-
+              updated.set(OriginalCompanyAnswersQuery, original) // TODO DTR-9463: Do I need to update query with id?
+          } yield updated
+        case None     =>
+          for {
+            updated <- userAnswers.set(TypeOfSubcontractorPage, Limitedcompany)
+            updated <- setOptional(updated, CompanyNamePage, subcontractor.tradingName)
+            updated <- updated.set(CompanyAddressYesNoPage, hasAddress)
+            updated <- setOptional(updated, CompanyAddressPage, address)
+            updated <- updated.set(AddCompanyContactMethodsYesNoPage, methods.nonEmpty)
+            updated <- if (methods.nonEmpty) updated.set(CompanyContactMethodOptionsPage, methods) else Try(updated)
+            updated <- setOptional(updated, CompanyEmailAddressPage, subcontractor.emailAddress)
+            updated <- setOptional(updated, CompanyPhoneNumberPage, subcontractor.phoneNumber)
+            updated <- setOptional(updated, CompanyMobileNumberPage, subcontractor.mobilePhoneNumber)
+            updated <- updated.set(CompanyUtrYesNoPage, subcontractor.utr.isDefined)
+            updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+            updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
+            updated <- setOptional(updated, CompanyUtrPage, subcontractor.utr)
+            updated <- updated.set(CompanyCrnYesNoPage, subcontractor.crn.isDefined)
+            updated <- setOptional(updated, CompanyCrnPage, subcontractor.crn)
+            updated <- updated.set(
+                         CompanyWorksReferenceYesNoPage,
+                         subcontractor.worksReferenceNumber.isDefined
+                       )
+            updated <- setOptional(
+                         updated,
+                         CompanyWorksReferencePage,
+                         subcontractor.worksReferenceNumber
+                       )
+            updated <- updated.set(
+                         ShowVerificationDetailsPage,
+                         shouldShowVerificationDetails(subcontractor)
+                       )
+            updated <- updated.set(CisIdQuery, cisId)
+            updated <- updated.set(OriginalCompanyAnswersQuery, original)
+          } yield updated
+      }
     }
 
     private def originalAnswers(
@@ -200,7 +291,8 @@ object AmendSubcontractorPopulator {
     def populate(
       userAnswers: UserAnswers,
       cisId: String,
-      subcontractor: SubcontractorResponse
+      subcontractor: SubcontractorResponse,
+      subJourneyId: Option[String] = None
     ): Try[UserAnswers] = {
 
       val address    = SubcontractorPopulatorUtils.toAddress(subcontractor)
@@ -218,30 +310,64 @@ object AmendSubcontractorPopulator {
         methods = methods,
         trustName = trustName
       )
-
-      for {
-        updated <- userAnswers.set(TypeOfSubcontractorPage, Trust)
-        updated <- setOptional(updated, TrustNamePage, trustName)
-        updated <- updated.set(TrustAddressYesNoPage, hasAddress)
-        updated <- setOptional(updated, TrustAddressPage, address)
-        updated <- updated.set(AddTrustContactMethodsYesNoPage, methods.nonEmpty)
-        updated <- if (methods.nonEmpty) updated.set(TrustContactMethodOptionsPage, methods) else Try(updated)
-        updated <- setOptional(updated, TrustEmailAddressPage, subcontractor.emailAddress)
-        updated <- setOptional(updated, TrustPhoneNumberPage, subcontractor.phoneNumber)
-        updated <- setOptional(updated, TrustMobileNumberPage, subcontractor.mobilePhoneNumber)
-        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
-        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
-        updated <- updated.set(TrustUtrYesNoPage, subcontractor.utr.isDefined)
-        updated <- setOptional(updated, TrustUtrPage, subcontractor.utr)
-        updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
-        updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
-        updated <- updated.set(
-                     ShowVerificationDetailsPage,
-                     shouldShowVerificationDetails(subcontractor)
-                   )
-        updated <- updated.set(CisIdQuery, cisId)
-        updated <- updated.set(OriginalTrustAnswersQuery, original)
-      } yield updated
+      subJourneyId match {
+        case Some(id) =>
+          for { // TODO DTR-9463: Do I need to update Trusts with amend path?
+            updated <- userAnswers.set(TypeOfSubcontractorPage(id), Trust)
+            updated <- setOptional(updated, TrustNamePage(id), trustName)
+            updated <- updated.set(TrustAddressYesNoPage(id), hasAddress)
+            updated <- setOptional(updated, TrustAddressPage(id), address)
+            updated <- updated.set(AddTrustContactMethodsYesNoPage(id), methods.nonEmpty)
+            updated <- if (methods.nonEmpty) updated.set(TrustContactMethodOptionsPage(id), methods) else Try(updated)
+            updated <- setOptional(updated, TrustEmailAddressPage(id), subcontractor.emailAddress)
+            updated <- setOptional(updated, TrustPhoneNumberPage(id), subcontractor.phoneNumber)
+            updated <- setOptional(updated, TrustMobileNumberPage(id), subcontractor.mobilePhoneNumber)
+            updated <- updated.set(
+                         OriginalSubcontractorQuery,
+                         subcontractor
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- setOptionalQuery(
+                         updated,
+                         AmendSubbieResourceRefQuery,
+                         subcontractor.subbieResourceRef
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- updated.set(TrustUtrYesNoPage(id), subcontractor.utr.isDefined)
+            updated <- setOptional(updated, TrustUtrPage(id), subcontractor.utr)
+            updated <- updated.set(TrustWorksReferenceYesNoPage(id), subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, TrustWorksReferencePage(id), subcontractor.worksReferenceNumber)
+            updated <- updated.set(
+                         ShowVerificationDetailsPage(id),
+                         shouldShowVerificationDetails(subcontractor)
+                       )
+            updated <- updated.set(CisIdQuery(id), cisId) // TODO DTR-9463: Do I need to update query with amend?
+            updated <-
+              updated.set(OriginalTrustAnswersQuery, original) // TODO DTR-9463: Do I need to update query with id?
+          } yield updated
+        case none     =>
+          for {
+            updated <- userAnswers.set(TypeOfSubcontractorPage, Trust)
+            updated <- setOptional(updated, TrustNamePage, trustName)
+            updated <- updated.set(TrustAddressYesNoPage, hasAddress)
+            updated <- setOptional(updated, TrustAddressPage, address)
+            updated <- updated.set(AddTrustContactMethodsYesNoPage, methods.nonEmpty)
+            updated <- if (methods.nonEmpty) updated.set(TrustContactMethodOptionsPage, methods) else Try(updated)
+            updated <- setOptional(updated, TrustEmailAddressPage, subcontractor.emailAddress)
+            updated <- setOptional(updated, TrustPhoneNumberPage, subcontractor.phoneNumber)
+            updated <- setOptional(updated, TrustMobileNumberPage, subcontractor.mobilePhoneNumber)
+            updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+            updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
+            updated <- updated.set(TrustUtrYesNoPage, subcontractor.utr.isDefined)
+            updated <- setOptional(updated, TrustUtrPage, subcontractor.utr)
+            updated <- updated.set(TrustWorksReferenceYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, TrustWorksReferencePage, subcontractor.worksReferenceNumber)
+            updated <- updated.set(
+                         ShowVerificationDetailsPage,
+                         shouldShowVerificationDetails(subcontractor)
+                       )
+            updated <- updated.set(CisIdQuery, cisId)
+            updated <- updated.set(OriginalTrustAnswersQuery, original)
+          } yield updated
+      }
     }
 
     private def originalAnswers(
@@ -271,7 +397,8 @@ object AmendSubcontractorPopulator {
     def populate(
       userAnswers: UserAnswers,
       cisId: String,
-      subcontractor: SubcontractorResponse
+      subcontractor: SubcontractorResponse,
+      subJourneyId: Option[String] = None
     ): Try[UserAnswers] = {
       val address              = SubcontractorPopulatorUtils.toAddress(subcontractor)
       val hasAddress           = SubcontractorPopulatorUtils.addressFieldsExist(subcontractor)
@@ -287,37 +414,85 @@ object AmendSubcontractorPopulator {
         nominatedPartnerName = nominatedPartnerName
       )
 
-      for {
-        updated <- userAnswers.set(TypeOfSubcontractorPage, Partnership)
-        updated <- setOptional(updated, PartnershipNamePage, partnershipName)
-        updated <- updated.set(PartnershipAddressYesNoPage, hasAddress)
-        updated <- setOptional(updated, PartnershipAddressPage, address)
-        updated <- updated.set(AddPartnershipContactMethodsYesNoPage, methods.nonEmpty)
-        updated <- if (methods.nonEmpty) updated.set(PartnershipContactMethodOptionsPage, methods) else Try(updated)
-        updated <- setOptional(updated, PartnershipEmailAddressPage, subcontractor.emailAddress)
-        updated <- setOptional(updated, PartnershipPhoneNumberPage, subcontractor.phoneNumber)
-        updated <- setOptional(updated, PartnershipMobileNumberPage, subcontractor.mobilePhoneNumber)
-        updated <- updated.set(PartnershipHasUtrYesNoPage, subcontractor.utr.isDefined)
-        updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage, subcontractor.utr)
-        updated <- setOptional(
-                     updated,
-                     PartnershipNominatedPartnerNamePage,
-                     nominatedPartnerName
-                   )
-        updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
-        updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
-        updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
-        updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage, subcontractor.nino.isDefined)
-        updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
-        updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
-        updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
-        updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
-        updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
-        updated <- updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
-        updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
-        updated <- updated.set(CisIdQuery, cisId)
-        updated <- updated.set(OriginalPartnershipAnswersQuery, original)
-      } yield updated
+      subJourneyId match {
+        case Some(id) =>
+          for { // TODO DTR-9463: Do I need to update Partnerships with amend path?
+            updated <- userAnswers.set(TypeOfSubcontractorPage(id), Partnership)
+            updated <- setOptional(updated, PartnershipNamePage(id), partnershipName)
+            updated <- updated.set(PartnershipAddressYesNoPage(id), hasAddress)
+            updated <- setOptional(updated, PartnershipAddressPage(id), address)
+            updated <- updated.set(AddPartnershipContactMethodsYesNoPage(id), methods.nonEmpty)
+            updated <-
+              if (methods.nonEmpty) updated.set(PartnershipContactMethodOptionsPage(id), methods) else Try(updated)
+            updated <- setOptional(updated, PartnershipEmailAddressPage(id), subcontractor.emailAddress)
+            updated <- setOptional(updated, PartnershipPhoneNumberPage(id), subcontractor.phoneNumber)
+            updated <- setOptional(updated, PartnershipMobileNumberPage(id), subcontractor.mobilePhoneNumber)
+            updated <- updated.set(PartnershipHasUtrYesNoPage(id), subcontractor.utr.isDefined)
+            updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage(id), subcontractor.utr)
+            updated <- setOptional(
+                         updated,
+                         PartnershipNominatedPartnerNamePage(id),
+                         nominatedPartnerName
+                       )
+            updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage(id), subcontractor.partnerUtr.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage(id), subcontractor.partnerUtr)
+            updated <- updated.set(ShowVerificationDetailsPage(id), shouldShowVerificationDetails(subcontractor))
+            updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage(id), subcontractor.nino.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage(id), subcontractor.nino)
+            updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage(id), subcontractor.crn.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage(id), subcontractor.crn)
+            updated <- updated.set(
+                         OriginalSubcontractorQuery,
+                         subcontractor
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <- setOptionalQuery(
+                         updated,
+                         AmendSubbieResourceRefQuery,
+                         subcontractor.subbieResourceRef
+                       ) // TODO DTR-9463: Do I need to update query with id?
+            updated <-
+              updated.set(PartnershipWorksReferenceNumberYesNoPage(id), subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, PartnershipWorksReferenceNumberPage(id), subcontractor.worksReferenceNumber)
+            updated <- updated.set(CisIdQuery(id), cisId) // TODO DTR-9463: Do I need to update query with amend?
+            updated <- updated.set(
+                         OriginalPartnershipAnswersQuery,
+                         original
+                       ) // TODO DTR-9463: Do I need to update query with id?
+          } yield updated
+        case None     =>
+          for {
+            updated <- userAnswers.set(TypeOfSubcontractorPage, Partnership)
+            updated <- setOptional(updated, PartnershipNamePage, partnershipName)
+            updated <- updated.set(PartnershipAddressYesNoPage, hasAddress)
+            updated <- setOptional(updated, PartnershipAddressPage, address)
+            updated <- updated.set(AddPartnershipContactMethodsYesNoPage, methods.nonEmpty)
+            updated <- if (methods.nonEmpty) updated.set(PartnershipContactMethodOptionsPage, methods) else Try(updated)
+            updated <- setOptional(updated, PartnershipEmailAddressPage, subcontractor.emailAddress)
+            updated <- setOptional(updated, PartnershipPhoneNumberPage, subcontractor.phoneNumber)
+            updated <- setOptional(updated, PartnershipMobileNumberPage, subcontractor.mobilePhoneNumber)
+            updated <- updated.set(PartnershipHasUtrYesNoPage, subcontractor.utr.isDefined)
+            updated <- setOptional(updated, PartnershipUniqueTaxpayerReferencePage, subcontractor.utr)
+            updated <- setOptional(
+                         updated,
+                         PartnershipNominatedPartnerNamePage,
+                         nominatedPartnerName
+                       )
+            updated <- updated.set(PartnershipNominatedPartnerUtrYesNoPage, subcontractor.partnerUtr.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerUtrPage, subcontractor.partnerUtr)
+            updated <- updated.set(ShowVerificationDetailsPage, shouldShowVerificationDetails(subcontractor))
+            updated <- updated.set(PartnershipNominatedPartnerNinoYesNoPage, subcontractor.nino.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerNinoPage, subcontractor.nino)
+            updated <- updated.set(PartnershipNominatedPartnerCrnYesNoPage, subcontractor.crn.isDefined)
+            updated <- setOptional(updated, PartnershipNominatedPartnerCrnPage, subcontractor.crn)
+            updated <- updated.set(OriginalSubcontractorQuery, subcontractor)
+            updated <- setOptionalQuery(updated, AmendSubbieResourceRefQuery, subcontractor.subbieResourceRef)
+            updated <-
+              updated.set(PartnershipWorksReferenceNumberYesNoPage, subcontractor.worksReferenceNumber.isDefined)
+            updated <- setOptional(updated, PartnershipWorksReferenceNumberPage, subcontractor.worksReferenceNumber)
+            updated <- updated.set(CisIdQuery, cisId)
+            updated <- updated.set(OriginalPartnershipAnswersQuery, original)
+          } yield updated
+      }
     }
 
     private def originalAnswers(

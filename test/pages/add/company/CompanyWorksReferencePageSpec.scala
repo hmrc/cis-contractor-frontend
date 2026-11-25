@@ -28,4 +28,14 @@ class CompanyWorksReferencePageSpec extends PageBehaviours {
 
     beRemovable[String](CompanyWorksReferencePage)
   }
+
+  "CompanyWorksReferencePage with id" - {
+    val id = "testId"
+
+    beRetrievable[String](CompanyWorksReferencePage(id))
+
+    beSettable[String](CompanyWorksReferencePage(id))
+
+    beRemovable[String](CompanyWorksReferencePage(id))
+  }
 }

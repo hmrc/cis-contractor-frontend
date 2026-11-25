@@ -27,13 +27,18 @@ import scala.util.Try
 
 trait SubcontractorCleanupService {
   def clean(ua: UserAnswers): Try[UserAnswers]
+  def clean(ua: UserAnswers, subJourneyId: String): Try[UserAnswers]
   def cleanAmend(ua: UserAnswers): Try[UserAnswers]
+  def cleanAmend(ua: UserAnswers, subJourneyId: String): Try[UserAnswers]
 }
 
 @Singleton
 class DefaultSubcontractorCleanupService extends SubcontractorCleanupService {
   override def clean(ua: UserAnswers): Try[UserAnswers] =
     removeAllSubcontractor(ua).flatMap(_.set(CheckYourAnswersSubmittedPage, false))
+
+  override def clean(ua: UserAnswers, subJourneyId: String): Try[UserAnswers] =
+    removeAllSubcontractor(ua, subJourneyId).flatMap(_.set(CheckYourAnswersSubmittedPage, false))
 
   override def cleanAmend(ua: UserAnswers): Try[UserAnswers] =
     removeAllSubcontractor(ua)
@@ -43,4 +48,16 @@ class DefaultSubcontractorCleanupService extends SubcontractorCleanupService {
       .flatMap(_.remove(OriginalTrustAnswersQuery))
       .flatMap(_.remove(ShowVerificationDetailsPage))
       .flatMap(_.set(AmendCheckYourAnswersSubmittedPage, false))
+
+  override def cleanAmend(
+    ua: UserAnswers,
+    subJourneyId: String
+  ): Try[UserAnswers] = // TODO DTR-9463: Do we need to update queries with id?
+    removeAllSubcontractor(ua, subJourneyId)
+      .flatMap(_.remove(OriginalIndividualAnswersQuery))
+      .flatMap(_.remove(OriginalCompanyAnswersQuery))
+      .flatMap(_.remove(OriginalPartnershipAnswersQuery))
+      .flatMap(_.remove(OriginalTrustAnswersQuery))
+      .flatMap(_.remove(ShowVerificationDetailsPage(subJourneyId)))
+      .flatMap(_.set(AmendCheckYourAnswersSubmittedPage(subJourneyId), false))
 }

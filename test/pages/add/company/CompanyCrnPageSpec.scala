@@ -28,4 +28,14 @@ class CompanyCrnPageSpec extends PageBehaviours {
 
     beRemovable[String](CompanyCrnPage)
   }
+
+  "CompanyCrnPage with id" - {
+    val id = "testId"
+
+    beRetrievable[String](CompanyCrnPage(id))
+
+    beSettable[String](CompanyCrnPage(id))
+
+    beRemovable[String](CompanyCrnPage(id))
+  }
 }

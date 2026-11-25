@@ -29,4 +29,14 @@ class CompanyAddressPageSpec extends PageBehaviours {
 
     beRemovable[Address](CompanyAddressPage)
   }
+
+  "CompanyAddressPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Address](CompanyAddressPage(id))
+
+    beSettable[Address](CompanyAddressPage(id))
+
+    beRemovable[Address](CompanyAddressPage(id))
+  }
 }

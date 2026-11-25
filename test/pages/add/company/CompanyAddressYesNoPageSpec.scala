@@ -47,4 +47,32 @@ class CompanyAddressYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(CompanyAddressPage) mustBe None
     }
   }
+
+  "CompanyAddressYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](CompanyAddressYesNoPage(id))
+
+    beSettable[Boolean](CompanyAddressYesNoPage(id))
+
+    beRemovable[Boolean](CompanyAddressYesNoPage(id))
+
+    "cleanup: must remove CompanyAddress userAnswers when No is selected" in {
+
+      val address = Address(
+        addressLine1 = "line 1",
+        addressLine2 = Some("line 2"),
+        addressLine3 = Some("line 3"),
+        addressLine4 = Some("line 4"),
+        postcode = Some("NX1 1AA"),
+        country = Some(Country(Some("GB"), Some("United Kingdom")))
+      )
+
+      val userAnswers = emptyUserAnswers.set(CompanyAddressPage(id), address).success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyAddressYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(CompanyAddressPage(id)) mustBe None
+    }
+  }
 }

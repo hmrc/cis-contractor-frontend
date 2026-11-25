@@ -28,4 +28,14 @@ class CompanyMobileNumberPageSpec extends PageBehaviours {
 
     beRemovable[String](CompanyMobileNumberPage)
   }
+
+  "CompanyMobileNumberPage" - {
+    val id = "testId"
+
+    beRetrievable[String](CompanyMobileNumberPage(id))
+
+    beSettable[String](CompanyMobileNumberPage(id))
+
+    beRemovable[String](CompanyMobileNumberPage(id))
+  }
 }
