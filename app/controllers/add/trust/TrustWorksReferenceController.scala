@@ -41,7 +41,7 @@ class TrustWorksReferenceController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustWorksReferenceFormProvider,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
@@ -100,15 +100,15 @@ class TrustWorksReferenceController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(TrustWorksReferenceYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(TrustWorksReferenceYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getTrustDisplayName(request.userAnswers, mode, id)
+          .getTrustDisplayName(request.userAnswers, mode, id, namespace)
           .map { trustName =>
-            val page         = TrustWorksReferencePage(id)
+            val page         = TrustWorksReferencePage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -129,14 +129,14 @@ class TrustWorksReferenceController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.TrustWorksReferenceController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(TrustWorksReferenceYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(TrustWorksReferenceYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getTrustDisplayName(request.userAnswers, mode, id)
+          .getTrustDisplayName(request.userAnswers, mode, id, namespace)
           .map { trustName =>
             form
               .bindFromRequest()
@@ -146,18 +146,16 @@ class TrustWorksReferenceController @Inject() (
                   for {
                     updatedAnswers <-
                       Future.fromTry(
-                        request.userAnswers.set(TrustWorksReferencePage(id), value)
+                        request.userAnswers.set(TrustWorksReferencePage(id, namespace), value)
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
-                    navigator.nextPage(TrustWorksReferencePage(id), mode, updatedAnswers)
+                    navigator.nextPage(TrustWorksReferencePage(id, namespace), mode, updatedAnswers)
                   )
               )
           }
           .getOrElse {
-            logger.error(
-              s"[TrustWorksReferenceController][onSubmitWithId] - TrustNamePage missing from userAnswers"
-            )
+            logger.error(s"[TrustWorksReferenceController][onSubmitWithId] - TrustNamePage missing from userAnswers")
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
       }

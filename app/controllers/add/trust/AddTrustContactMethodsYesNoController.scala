@@ -40,7 +40,7 @@ class AddTrustContactMethodsYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: AddTrustContactMethodsYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddTrustContactMethodsYesNoView
@@ -96,12 +96,12 @@ class AddTrustContactMethodsYesNoController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
-          val page         = AddTrustContactMethodsYesNoPage(id)
+          val page         = AddTrustContactMethodsYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -121,11 +121,11 @@ class AddTrustContactMethodsYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.AddTrustContactMethodsYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
           form
             .bindFromRequest()
@@ -135,11 +135,11 @@ class AddTrustContactMethodsYesNoController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(
-                      request.userAnswers.set(AddTrustContactMethodsYesNoPage(id), value)
+                      request.userAnswers.set(AddTrustContactMethodsYesNoPage(id, namespace), value)
                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  navigator.nextPage(AddTrustContactMethodsYesNoPage(id), mode, updatedAnswers)
+                  navigator.nextPage(AddTrustContactMethodsYesNoPage(id, namespace), mode, updatedAnswers)
                 )
             )
         }

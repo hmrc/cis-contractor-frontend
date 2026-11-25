@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.trust.TrustWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -33,7 +34,7 @@ object TrustWorksReferenceYesNoSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(TrustWorksReferenceYesNoPage(id)))
+      .map(id => answers.get(TrustWorksReferenceYesNoPage(id, AddSubcontractor)))
       .getOrElse(answers.get(TrustWorksReferenceYesNoPage))
       .map { answer =>
 

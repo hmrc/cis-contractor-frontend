@@ -40,7 +40,7 @@ class TrustUtrYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustUtrYesNoFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -95,12 +95,12 @@ class TrustUtrYesNoController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
-          val page         = TrustUtrYesNoPage(id)
+          val page         = TrustUtrYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -120,11 +120,11 @@ class TrustUtrYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.TrustUtrYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { name =>
           form
             .bindFromRequest()
@@ -133,9 +133,9 @@ class TrustUtrYesNoController @Inject() (
               value =>
                 for {
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(TrustUtrYesNoPage(id), value))
+                    Future.fromTry(request.userAnswers.set(TrustUtrYesNoPage(id, namespace), value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(TrustUtrYesNoPage(id), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(TrustUtrYesNoPage(id, namespace), mode, updatedAnswers))
             )
         }
         .getOrElse {

@@ -886,7 +886,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       case AddressYesNo =>
         trustRoutes.TrustAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
       case Address =>
-        trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, None)
+        trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None)
       case ContactDetailsYesNo =>
         trustRoutes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
       case EmailAddress =>
@@ -1089,14 +1089,12 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       case TrustAddressYesNoPage(_, `namespace`) =>
         yesNoNextPage(
           userAnswers.get(TrustAddressYesNoPage(id, namespace)),
-          trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, None),
+          trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None),
           flowId
         )
 
       case _ =>
-        logger.error(
-          s"[FinalValidationNavigator][addressYesNoNextPage] - unexpected scoped page=$page"
-        )
+        logger.error(s"[FinalValidationNavigator][addressYesNoNextPage] - unexpected scoped page=$page")
         recovery
     }
 

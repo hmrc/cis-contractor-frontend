@@ -41,7 +41,7 @@ class TrustContactMethodOptionsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -102,15 +102,15 @@ class TrustContactMethodOptionsController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(AddTrustContactMethodsYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(AddTrustContactMethodsYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getTrustDisplayName(request.userAnswers, mode, id)
+          .getTrustDisplayName(request.userAnswers, mode, id, namespace)
           .map { trustName =>
-            val page         = TrustContactMethodOptionsPage(id)
+            val page         = TrustContactMethodOptionsPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -131,14 +131,14 @@ class TrustContactMethodOptionsController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.TrustContactMethodOptionsController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(AddTrustContactMethodsYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(AddTrustContactMethodsYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getTrustDisplayName(request.userAnswers, mode, id)
+          .getTrustDisplayName(request.userAnswers, mode, id, namespace)
           .map { trustName =>
             form
               .bindFromRequest()
@@ -148,11 +148,11 @@ class TrustContactMethodOptionsController @Inject() (
                   for {
                     updatedAnswers <-
                       Future.fromTry(
-                        request.userAnswers.set(TrustContactMethodOptionsPage(id), value)
+                        request.userAnswers.set(TrustContactMethodOptionsPage(id, namespace), value)
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
-                    navigator.nextPage(TrustContactMethodOptionsPage(id), mode, updatedAnswers)
+                    navigator.nextPage(TrustContactMethodOptionsPage(id, namespace), mode, updatedAnswers)
                   )
               )
           }

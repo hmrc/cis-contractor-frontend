@@ -40,7 +40,7 @@ class TrustWorksReferenceYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustWorksReferenceYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustWorksReferenceYesNoView
@@ -96,12 +96,12 @@ class TrustWorksReferenceYesNoController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
-          val page         = TrustWorksReferenceYesNoPage(id)
+          val page         = TrustWorksReferenceYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -121,11 +121,11 @@ class TrustWorksReferenceYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.TrustWorksReferenceYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
           form
             .bindFromRequest()
@@ -135,11 +135,11 @@ class TrustWorksReferenceYesNoController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(
-                      request.userAnswers.set(TrustWorksReferenceYesNoPage(id), value)
+                      request.userAnswers.set(TrustWorksReferenceYesNoPage(id, namespace), value)
                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  navigator.nextPage(TrustWorksReferenceYesNoPage(id), mode, updatedAnswers)
+                  navigator.nextPage(TrustWorksReferenceYesNoPage(id, namespace), mode, updatedAnswers)
                 )
             )
         }

@@ -26,26 +26,9 @@ import play.api.i18n.Messages
 object SubcontractorNameDisplayHelper {
 
   def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    getTrustDisplayName(userAnswers, mode, TrustNamePage)
+    getDisplayName(userAnswers, mode, TrustNamePage)
 
-  def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
-    messages: Messages
-  ): Option[String] =
-    getTrustDisplayName(userAnswers, mode, TrustNamePage(id))
-
-  private def getTrustDisplayName(
-    userAnswers: UserAnswers,
-    mode: Mode,
-    page: QuestionPage[String]
-  )(implicit messages: Messages): Option[String] =
-    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode || mode == FinalValidationMode) {
-        Some(messages("verify.noName"))
-      } else {
-        None
-      }
-    }
-
+  // Multi-tab
   def getTrustDisplayName(
     userAnswers: UserAnswers,
     mode: Mode,
@@ -53,7 +36,7 @@ object SubcontractorNameDisplayHelper {
     namespace: JourneyNamespace
   )(implicit messages: Messages): Option[String] =
     getDisplayName(userAnswers, mode, TrustNamePage(id, namespace))
-  
+
   def trustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
     userAnswers
       .get(TrustNamePage)
@@ -109,23 +92,14 @@ object SubcontractorNameDisplayHelper {
       }
 
   def getCompanyDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    getCompanyDisplayName(userAnswers, mode, CompanyNamePage)
+    getDisplayName(userAnswers, mode, CompanyNamePage)
 
-  def getCompanyDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
-    messages: Messages
-  ): Option[String] =
-    getCompanyDisplayName(userAnswers, mode, CompanyNamePage(id))
-
-  private def getCompanyDisplayName(
+  // Multi-tab
+  def getCompanyDisplayName(
     userAnswers: UserAnswers,
     mode: Mode,
-    page: QuestionPage[String]
+    id: String,
+    namespace: JourneyNamespace
   )(implicit messages: Messages): Option[String] =
-    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
-      if (mode == AmendMode || mode == FinalValidationMode) {
-        Some(messages("verify.noName"))
-      } else {
-        None
-      }
-    }
+    getDisplayName(userAnswers, mode, CompanyNamePage(id, namespace))
 }

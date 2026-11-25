@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add.trust
 import models.contact.ContactMethodOptions
 import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.trust.TrustContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -37,7 +38,7 @@ object TrustContactMethodOptionsSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(TrustContactMethodOptionsPage(id)))
+      .map(id => answers.get(TrustContactMethodOptionsPage(id, AddSubcontractor)))
       .getOrElse(answers.get(TrustContactMethodOptionsPage))
       .map { selectedMethods =>
         val options =

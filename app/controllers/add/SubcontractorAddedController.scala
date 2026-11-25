@@ -63,14 +63,14 @@ class SubcontractorAddedController @Inject() (
     }
 
   def companySubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id               = flowId.toString
       def recoveryRedirect =
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(CompanyNamePage(id))
-        val cisId = request.userAnswers.get(CisIdQuery(id))
+        val name  = request.userAnswers.get(CompanyNamePage(id, AddSubcontractor))
+        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
         (name, cisId) match {
           case (Some(name), Some(cisId)) =>
@@ -104,14 +104,14 @@ class SubcontractorAddedController @Inject() (
     }
 
   def trustSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id               = flowId.toString
       def recoveryRedirect =
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(TrustNamePage(id))
-        val cisId = request.userAnswers.get(CisIdQuery(id))
+        val name  = request.userAnswers.get(TrustNamePage(id, AddSubcontractor))
+        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
         (name, cisId) match {
           case (Some(name), Some(cisId)) =>

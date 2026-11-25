@@ -17,8 +17,9 @@
 package controllers.add.trust
 
 import controllers.actions.*
-import models.CheckMode
+import models.{CheckMode, NormalMode}
 import models.add.trust.ValidatedTrust
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.trust.TrustUtrPage
 import play.api.Logging
@@ -116,10 +117,10 @@ class TrustCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id = flowId.toString
       val ua = request.userAnswers
-      ValidatedTrust.build(ua, id) match {
+      ValidatedTrust.build(ua, id, AddSubcontractor) match {
         case Right(_)    =>
           val list = SummaryListViewModel(
             rows = Seq(
@@ -143,7 +144,7 @@ class TrustCheckYourAnswersController @Inject() (
               TrustAddressSummary.row(
                 ua,
                 changeUrl = Some(
-                  routes.TrustAddressController.redirectToAddressLookupWithId(flowId, Some("change")).url
+                  routes.TrustAddressController.redirectToAddressLookupWithId(flowId, NormalMode, Some("change")).url
                 ),
                 subJourneyId = Some(id)
               ),
@@ -205,7 +206,7 @@ class TrustCheckYourAnswersController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async { implicit request =>
       val id = flowId.toString
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
         logger.error(
@@ -213,11 +214,11 @@ class TrustCheckYourAnswersController @Inject() (
         )
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
-        ValidatedTrust.build(request.userAnswers, id) match {
+        ValidatedTrust.build(request.userAnswers, id, AddSubcontractor) match {
           case Right(_) =>
             val duplicateUtr =
-              request.userAnswers.get(TrustUtrPage(id)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, Some(id))
+              request.userAnswers.get(TrustUtrPage(id, AddSubcontractor)) match {
+                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
                 case None      => Future.successful(false)
               }
 
@@ -228,9 +229,9 @@ class TrustCheckYourAnswersController @Inject() (
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 case false =>
                   subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, Some(id))
+                    .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
                     .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, Some(id))
+                      auditService.addSubcontractorEvent(request.userAnswers, id)
                       Future
                         .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
                         .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
