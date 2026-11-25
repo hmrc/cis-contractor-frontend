@@ -18,6 +18,7 @@ package controllers.helpers
 
 import models.{AmendMode, FinalValidationMode, JourneyNamespace, Mode, UserAnswers}
 import pages.QuestionPage
+import pages.add.company.CompanyNamePage
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
 import play.api.i18n.Messages
@@ -25,7 +26,19 @@ import play.api.i18n.Messages
 object SubcontractorNameDisplayHelper {
 
   def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    userAnswers.get(TrustNamePage).map(_.trim).filter(_.nonEmpty).orElse {
+    getTrustDisplayName(userAnswers, mode, TrustNamePage)
+
+  def getTrustDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    getTrustDisplayName(userAnswers, mode, TrustNamePage(id))
+
+  private def getTrustDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: QuestionPage[String]
+  )(implicit messages: Messages): Option[String] =
+    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
       if (mode == AmendMode || mode == FinalValidationMode) {
         Some(messages("verify.noName"))
       } else {
@@ -94,4 +107,25 @@ object SubcontractorNameDisplayHelper {
       .getOrElse {
         if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
       }
+
+  def getCompanyDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
+    getCompanyDisplayName(userAnswers, mode, CompanyNamePage)
+
+  def getCompanyDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    getCompanyDisplayName(userAnswers, mode, CompanyNamePage(id))
+
+  private def getCompanyDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    page: QuestionPage[String]
+  )(implicit messages: Messages): Option[String] =
+    userAnswers.get(page).map(_.trim).filter(_.nonEmpty).orElse {
+      if (mode == AmendMode || mode == FinalValidationMode) {
+        Some(messages("verify.noName"))
+      } else {
+        None
+      }
+    }
 }

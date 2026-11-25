@@ -50,7 +50,9 @@ object TypeOfSubcontractorSummary {
             Seq(
               ActionItemViewModel(
                 "site.change",
-                changeUrl.getOrElse(controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url)
+                changeUrl.getOrElse(
+                  controllers.add.routes.TypeOfSubcontractorController.onPageLoad(CheckMode).url
+                )
               )
                 .withVisuallyHiddenText(messages("typeOfSubcontractor.change.hidden"))
                 .withAttribute("id" -> "type-of-subcontractor")

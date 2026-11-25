@@ -26,26 +26,36 @@ import viewmodels.implicits.*
 
 object TrustAddressYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(TrustAddressYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(TrustAddressYesNoPage(id)))
+      .getOrElse(answers.get(TrustAddressYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "trustAddressYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("address").url
-            else controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "trustAddressYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoad("address").url
+                else controllers.add.trust.routes.TrustAddressYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
+              .withAttribute("id" -> "add-trust-address")
           )
-            .withVisuallyHiddenText(messages("trustAddressYesNo.change.hidden"))
-            .withAttribute("id" -> "add-trust-address")
         )
-      )
-    }
+      }
 
   def row(
     answers: TrustAnswers

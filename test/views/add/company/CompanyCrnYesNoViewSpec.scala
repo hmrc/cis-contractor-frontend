@@ -32,13 +32,18 @@ import views.html.add.company.CompanyCrnYesNoView
 
 class CompanyCrnYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  private val companyName = "Test Company Name"
-
   "CompanyCrnYesNoView" should {
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      private val companyName = "Test Company Name"
+
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("companyCrnYesNo.title"))
 
@@ -66,10 +71,18 @@ class CompanyCrnYesNoViewSpec extends AnyWordSpec with Matchers with GuiceOneApp
     }
 
     "display error summary and inline error when no option is selected" in new Setup {
+
+      private val companyName = "Test Company Name"
+
       val errorForm: Form[Boolean] =
         form.withError("value", "companyCrnYesNo.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyCrnYesNoController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

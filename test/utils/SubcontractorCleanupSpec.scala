@@ -208,6 +208,32 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(CompanyWorksReferencePage) mustBe None
       result.get(CompanyWorksReferenceYesNoPage) mustBe None
     }
+
+    "remove nested LimitedCompanySubcontractor answers for the subjourney id and leave root answers" in {
+      val id = "11111111-1111-1111-1111-111111111111"
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CompanyNamePage, name)
+          .success
+          .value
+          .set(CompanyNamePage(id), "Nested Company Ltd")
+          .success
+          .value
+          .set(CompanyAddressYesNoPage(id), true)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage(id), true)
+          .success
+          .value
+
+      val result = removeLimitedCompanySubcontractor(userAnswers, id).success.value
+
+      result.get(CompanyNamePage) mustBe Some(name)
+      result.get(CompanyNamePage(id)) mustBe None
+      result.get(CompanyAddressYesNoPage(id)) mustBe None
+      result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
+    }
   }
 
   ".removePartnershipSubcontractor" - {
@@ -386,6 +412,31 @@ class SubcontractorCleanupSpec extends SpecBase {
       result.get(TrustUtrYesNoPage) mustBe None
       result.get(TrustWorksReferencePage) mustBe None
       result.get(TrustWorksReferenceYesNoPage) mustBe None
+    }
+
+    "remove nested TrustSubcontractor answers for the subjourney id and leave root answers" in {
+      val id          = "11111111-1111-1111-1111-111111111111"
+      val userAnswers =
+        emptyUserAnswers
+          .set(TrustNamePage, name)
+          .success
+          .value
+          .set(TrustNamePage(id), "Nested Trust")
+          .success
+          .value
+          .set(TrustAddressYesNoPage(id), true)
+          .success
+          .value
+          .set(CheckYourAnswersSubmittedPage(id), true)
+          .success
+          .value
+
+      val result = removeTrustSubcontractor(userAnswers, id).success.value
+
+      result.get(TrustNamePage) mustBe Some(name)
+      result.get(TrustNamePage(id)) mustBe None
+      result.get(TrustAddressYesNoPage(id)) mustBe None
+      result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
     }
   }
 

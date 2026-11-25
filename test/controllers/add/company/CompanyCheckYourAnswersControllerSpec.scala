@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import models.{TypeOfSubcontractor, UserAnswers}
 import models.address.{Address, Country}
@@ -36,7 +36,7 @@ import models.contact.ContactMethodOptions
 
 import scala.concurrent.Future
 
-class CompanyCheckYourAnswersControllerSpec extends SpecBase {
+class CompanyCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpayer {
 
   import play.api.libs.json.*
 
@@ -833,6 +833,252 @@ class CompanyCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value must include("/there-is-a-problem")
       }
+    }
+  }
+
+  "CompanyCheckYourAnswers Controller with id" - {
+
+    val flowId = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+    val id     = flowId.toString
+
+    val minUaWithId = emptyUserAnswers
+      .set(queries.CisIdQuery(id), "AB12")
+      .success
+      .value
+      .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany)
+      .success
+      .value
+      .set(CompanyNamePage(id), "Test Company Ltd")
+      .success
+      .value
+      .set(CompanyAddressYesNoPage(id), false)
+      .success
+      .value
+      .set(AddCompanyContactMethodsYesNoPage(id), false)
+      .success
+      .value
+      .set(CompanyUtrYesNoPage(id), false)
+      .success
+      .value
+      .set(CompanyCrnYesNoPage(id), false)
+      .success
+      .value
+      .set(CompanyWorksReferenceYesNoPage(id), false)
+      .success
+      .value
+
+    "must return OK for a GET when the subjourney has the minimum answers" in {
+      val repo        = mockSessionRepository(Some(minUaWithId))
+      val application =
+        applicationBuilder(userAnswers = Some(minUaWithId))
+          .overrides(bind[SessionRepository].toInstance(repo))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoadWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("Test Company Ltd")
+        contentAsString(result) must include(s"/check-your-answers/$flowId")
+      }
+    }
+
+    "must submit nested answers and redirect to the added page with id" in {
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(
+        mockSubcontractorService.createAndUpdateSubcontractor(
+          any[UserAnswers],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(minUaWithId)))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(minUaWithId))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.company.routes.CompanyCheckYourAnswersController.onSubmitWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.routes.SubcontractorAddedController.companySubcontractorAddedWithId(flowId).url
+      }
+
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+
+      verify(mockSessionRepository).set(any[UserAnswers])
+      verify(mockAuditService).addSubcontractorEvent(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+    }
+
+    "must redirect to Journey Recovery when the UTR is already used and not create the subcontractor" in {
+      val uaWithUtr = minUaWithId
+        .set(CompanyUtrYesNoPage(id), true)
+        .success
+        .value
+        .set(CompanyUtrPage(id), "1111111111")
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(uaWithUtr)))
+
+      when(
+        mockSubcontractorService.isDuplicateUTR(
+          any[UserAnswers],
+          any[String],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithUtr))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.company.routes.CompanyCheckYourAnswersController.onSubmitWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(
+        any[UserAnswers],
+        any[String],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+
+      verify(
+        mockSubcontractorService,
+        never()
+      ).createAndUpdateSubcontractor(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+
+      verify(mockSessionRepository, never()).set(any[UserAnswers])
+
+      verify(
+        mockAuditService,
+        never()
+      ).addSubcontractorEvent(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+    }
+
+    "must submit nested answers when the UTR is not a duplicate" in {
+      val uaWithUtr = minUaWithId
+        .set(CompanyUtrYesNoPage(id), true)
+        .success
+        .value
+        .set(CompanyUtrPage(id), "1111111111")
+        .success
+        .value
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSessionRepository.get(any[String]))
+        .thenReturn(Future.successful(Some(uaWithUtr)))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockSubcontractorService.isDuplicateUTR(
+          any[UserAnswers],
+          any[String],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(false))
+
+      when(
+        mockSubcontractorService.createAndUpdateSubcontractor(
+          any[UserAnswers],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithUtr))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          controllers.add.company.routes.CompanyCheckYourAnswersController.onSubmitWithId(flowId).url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.add.routes.SubcontractorAddedController.companySubcontractorAddedWithId(flowId).url
+      }
+
+      verify(mockSubcontractorService).isDuplicateUTR(
+        any[UserAnswers],
+        any[String],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+
+      verify(mockSubcontractorService).createAndUpdateSubcontractor(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
+
+      verify(mockSessionRepository).set(any[UserAnswers])
+
+      verify(mockAuditService).addSubcontractorEvent(
+        any[UserAnswers],
+        any[Option[String]]
+      )(any[HeaderCarrier])
     }
   }
 }

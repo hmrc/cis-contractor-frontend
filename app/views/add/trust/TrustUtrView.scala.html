@@ -17,6 +17,7 @@
 @import viewmodels.LabelSize.Medium
 @import viewmodels.InputWidth._
 @import views.html.components._
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -29,11 +30,11 @@
     link: Link,
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, submitAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("trustUtr.title"))) {
 
-    @formHelper(action = controllers.add.trust.routes.TrustUtrController.onSubmit(mode)) {
+    @formHelper(action = submitAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

@@ -26,21 +26,31 @@ import models.info.company.CompanyAnswers
 
 object CompanyWorksReferenceSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyWorksReferencePage).map { answer =>
-      SummaryListRowViewModel(
-        key = "companyWorksReference.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(mode).url
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyWorksReferencePage(id)))
+      .getOrElse(answers.get(CompanyWorksReferencePage))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "companyWorksReference.checkYourAnswersLabel",
+          value = ValueViewModel(answer),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                controllers.add.company.routes.CompanyWorksReferenceController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyWorksReference.change.hidden"))
+              .withAttribute("id" -> "company-works-reference")
           )
-            .withVisuallyHiddenText(messages("companyWorksReference.change.hidden"))
-            .withAttribute("id" -> "company-works-reference")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

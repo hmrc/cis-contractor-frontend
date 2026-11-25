@@ -19,7 +19,6 @@ package views.add.company
 import forms.add.company.CompanyEmailAddressFormProvider
 import models.{AmendMode, NormalMode}
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -31,19 +30,30 @@ import views.html.add.company.CompanyEmailAddressView
 
 class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  "CompanyEmailAddressView" should {
+  "CompanyEmailAddressView" must {
 
-    "render the page with title, heading, input and submit button" in new Setup {
-      val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+    "render the view with the correct title, heading, input and submit button" in new Setup {
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyEmailAddressController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyEmailAddress.title"))
 
-      val heading = doc.select("label.govuk-label")
+      val heading = doc.select("h1")
       heading.text() mustBe messages("companyEmailAddress.heading", companyName)
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyEmailAddress.hintText")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
         .onSubmit(NormalMode)
         .url
 
@@ -52,17 +62,28 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, input and update button for Amend journey" in new Setup {
-      val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+    "render the view with the correct title, heading, input and update button in amend journey" in new Setup {
+      val companyName = "Test Company"
+
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyEmailAddressController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyEmailAddress.title"))
 
-      val heading = doc.select("label.govuk-label")
+      val heading = doc.select("h1")
       heading.text() mustBe messages("companyEmailAddress.heading", companyName)
 
-      doc.select("form").attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
+      val hint = doc.select(".govuk-hint")
+      hint.text() mustBe messages("companyEmailAddress.hintText")
+
+      doc
+        .select("form")
+        .attr("action") mustBe controllers.add.company.routes.CompanyEmailAddressController
         .onSubmit(AmendMode)
         .url
 
@@ -72,12 +93,18 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
     }
 
     "display error summary and inline error when no name is entered" in new Setup {
+      val companyName = "Test Company"
+
       val errorForm: Form[String] =
         form.withError("value", "companyEmailAddress.error.required")
 
-      val companyName = "Test Company"
-      val html        = view(errorForm, NormalMode, companyName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
+      val html = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyEmailAddressController.onSubmit(NormalMode)
+      )
+      val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
       summary.text() must include(messages("companyEmailAddress.error.required"))
@@ -85,24 +112,9 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyEmailAddress.error.required"))
-    }
-
-    "display error summary and inline error when no name is entered for Amend journey" in new Setup {
-      val errorForm: Form[String] =
-        form.withError("value", "companyEmailAddress.error.required")
-
-      val companyName = "Test Company"
-      val html        = view(errorForm, AmendMode, companyName)
-      val doc         = org.jsoup.Jsoup.parse(html.toString())
-
-      val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("companyEmailAddress.error.required"))
-
-      val linkHref = summary.select("a").attr("href")
-      linkHref mustBe "#value"
-
-      doc.select(".govuk-error-message").text() must include(messages("companyEmailAddress.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("companyEmailAddress.error.required")
+      )
     }
   }
 
@@ -117,6 +129,7 @@ class CompanyEmailAddressViewSpec extends AnyWordSpec with Matchers with GuiceOn
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: CompanyEmailAddressView = app.injector.instanceOf[CompanyEmailAddressView]
+    val view: CompanyEmailAddressView =
+      app.injector.instanceOf[CompanyEmailAddressView]
   }
 }

@@ -69,7 +69,7 @@ object SubcontractorCleanup {
       .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage(id, namespace)))
       .flatMap(_.remove(WorksReferenceNumberPage(id, namespace)))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage(id, namespace)))
-  
+
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(CompanyAddressPage)
@@ -107,7 +107,13 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CompanyUtrYesNoPage(id, namespace)))
       .flatMap(_.remove(CompanyWorksReferencePage(id, namespace)))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage(id, namespace)))
-  
+      .flatMap { updatedAnswers =>
+        if namespace == JourneyNamespace.AddSubcontractor then
+          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else
+          Success(updatedAnswers)
+      }
+
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(PartnershipAddressPage)
@@ -195,7 +201,13 @@ object SubcontractorCleanup {
       .flatMap(_.remove(TrustUtrYesNoPage(id, namespace)))
       .flatMap(_.remove(TrustWorksReferencePage(id, namespace)))
       .flatMap(_.remove(TrustWorksReferenceYesNoPage(id, namespace)))
-  
+      .flatMap { updatedAnswers =>
+        if namespace == JourneyNamespace.AddSubcontractor then
+          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else
+          Success(updatedAnswers)
+      }
+
   def removeAllSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     removeIndividualSoleTraderSubcontractor(userAnswers)
       .flatMap(removeLimitedCompanySubcontractor)

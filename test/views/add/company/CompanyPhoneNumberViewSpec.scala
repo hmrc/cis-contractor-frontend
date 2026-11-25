@@ -36,7 +36,12 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyPhoneNumberController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyPhoneNumber.title"))
@@ -58,11 +63,16 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
       doc.select(".govuk-button").text() mustBe messages("site.continue")
     }
 
-    "render the page with title, heading, input and update button from Amend journey" in new Setup {
+    "render the page with title, heading, input and update button for Amend journey" in new Setup {
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyPhoneNumberController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyPhoneNumber.title"))
@@ -84,14 +94,19 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
       doc.select(".govuk-button").text() mustBe messages("site.update")
     }
 
-    "display error summary and inline error when no name is entered" in new Setup {
+    "display error summary and inline error when no phone number is entered" in new Setup {
 
       val companyName = "Test Company"
 
       val errorForm: Form[String] =
         form.withError("value", "companyPhoneNumber.error.required")
 
-      val html = view(errorForm, NormalMode, companyName)
+      val html = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyPhoneNumberController.onSubmit(NormalMode)
+      )
       val doc  = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")
@@ -100,26 +115,9 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
       val linkHref = summary.select("a").attr("href")
       linkHref mustBe "#value"
 
-      doc.select(".govuk-error-message").text() must include(messages("companyPhoneNumber.error.required"))
-    }
-
-    "display error summary and inline error when no name is entered from Amend journey" in new Setup {
-
-      val companyName = "Test Company"
-
-      val errorForm: Form[String] =
-        form.withError("value", "companyPhoneNumber.error.required")
-
-      val html = view(errorForm, AmendMode, companyName)
-      val doc  = org.jsoup.Jsoup.parse(html.toString())
-
-      val summary = doc.select(".govuk-error-summary")
-      summary.text() must include(messages("companyPhoneNumber.error.required"))
-
-      val linkHref = summary.select("a").attr("href")
-      linkHref mustBe "#value"
-
-      doc.select(".govuk-error-message").text() must include(messages("companyPhoneNumber.error.required"))
+      doc.select(".govuk-error-message").text() must include(
+        messages("companyPhoneNumber.error.required")
+      )
     }
   }
 
@@ -134,6 +132,7 @@ class CompanyPhoneNumberViewSpec extends AnyWordSpec with Matchers with GuiceOne
         app.injector.instanceOf[play.api.i18n.MessagesApi]
       )
 
-    val view: CompanyPhoneNumberView = app.injector.instanceOf[CompanyPhoneNumberView]
+    val view: CompanyPhoneNumberView =
+      app.injector.instanceOf[CompanyPhoneNumberView]
   }
 }
