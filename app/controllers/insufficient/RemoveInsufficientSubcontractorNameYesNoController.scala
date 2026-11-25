@@ -377,7 +377,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
       Future.successful(recoveryRedirect)
     } else {
       verificationService
-        .deleteVerification(userAnswers, verificationResourceRef, Some(id)) // needs ID overload, see below
+        .deleteVerification(userAnswers, verificationResourceRef, Some(id))
         .flatMap {
           case response if response.verificationsCounter.exists(_ > 0) =>
             checkVerificationBatchReadinessWithId(flowId).flatMap {
@@ -472,7 +472,7 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
   )(implicit request: DataRequest[?]): Future[play.api.mvc.Result] = {
     val id = flowId.toString
     verificationService
-      .refreshNewestVerificationBatch(userAnswers)
+      .refreshNewestVerificationBatch(userAnswers, Some(id))
       .map { updatedAnswers =>
         val redirect =
           if (updatedAnswers.get(UnverifiedSubcontractorsPage(id)).exists(_.nonEmpty)) {

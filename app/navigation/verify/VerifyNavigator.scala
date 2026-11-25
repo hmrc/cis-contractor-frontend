@@ -23,7 +23,7 @@ import navigation.NavigatorForJourney
 import pages.Page
 import pages.verify.*
 import models.verify.ContractorEmailConfirmationStored.{CurrentEmail, DifferentEmail, DoNotSend}
-import pages.insufficient.ProceedInsufficientSubcontractorNameYesNoPage
+import pages.insufficient.{ProceedInsufficientSubcontractorNameYesNoForFlowPage, ProceedInsufficientSubcontractorNameYesNoPage}
 import pages.unmatched.ProceedSubcontractorVerifyRequestPage
 import play.api.mvc.Call
 
@@ -45,41 +45,44 @@ class VerifyNavigator @Inject() () extends NavigatorForJourney {
 
   private def normalRoutes: Page => UserAnswers => Call = {
 
-    case ContractorEmailConfirmationNotStoredPage(id)     =>
+    case ContractorEmailConfirmationNotStoredPage(id)                =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode, Some(id))(userAnswers)
-    case ContractorEmailConfirmationNotStoredPage         =>
+    case ContractorEmailConfirmationNotStoredPage                    =>
       userAnswers => navigatorFromContractorEmailConfirmationNotStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorPage(id)                      =>
+    case SelectSubcontractorPage(id)                                 =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode, Some(id))(userAnswers)
-    case SelectSubcontractorPage                          =>
+    case SelectSubcontractorPage                                     =>
       userAnswers => navigatorFromSelectSubcontractorPage(NormalMode)(userAnswers)
-    case VerifyYourSubcontractorsYesNoPage(id)            =>
+    case VerifyYourSubcontractorsYesNoPage(id)                       =>
       userAnswers => navigatorFromVerifyYourSubcontractorsYesNoPage(NormalMode, Some(id))(userAnswers)
-    case VerifyYourSubcontractorsYesNoPage                =>
+    case VerifyYourSubcontractorsYesNoPage                           =>
       userAnswers => navigatorFromVerifyYourSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ReverifyExistingSubcontractorsYesNoPage(id)      =>
+    case ReverifyExistingSubcontractorsYesNoPage(id)                 =>
       userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode, Some(id))(userAnswers)
-    case ReverifyExistingSubcontractorsYesNoPage          =>
+    case ReverifyExistingSubcontractorsYesNoPage                     =>
       userAnswers => navigatorFromReverifyExistingSubcontractorsYesNoPage(NormalMode)(userAnswers)
-    case ContractorEmailConfirmationStoredPage(id)        =>
+    case ContractorEmailConfirmationStoredPage(id)                   =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode, Some(id))(userAnswers)
-    case ContractorEmailConfirmationStoredPage            =>
+    case ContractorEmailConfirmationStoredPage                       =>
       userAnswers => navigatorFromContractorEmailConfirmationStoredPage(NormalMode)(userAnswers)
-    case SelectSubcontractorsToReverifyPage(id)           =>
+    case SelectSubcontractorsToReverifyPage(id)                      =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode, Some(id))(userAnswers)
-    case SelectSubcontractorsToReverifyPage               =>
+    case SelectSubcontractorsToReverifyPage                          =>
       userAnswers => navigatorFromSelectSubcontractorsToReverifyPage(NormalMode)(userAnswers)
-    case EmailAddressPage(id)                             =>
+    case EmailAddressPage(id)                                        =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoadWithId(UUID.fromString(id))
-    case EmailAddressPage                                 =>
+    case EmailAddressPage                                            =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case VerificationDeclarationPage                      =>
+    case VerificationDeclarationPage                                 =>
       _ => controllers.verify.routes.VerifyCheckYourAnswersController.onPageLoad()
-    case ProceedInsufficientSubcontractorNameYesNoPage(_) =>
+    case ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, _) =>
+      _ =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(UUID.fromString(id))
+    case ProceedInsufficientSubcontractorNameYesNoPage(_)            =>
       _ => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
-    case ProceedSubcontractorVerifyRequestPage(_)         =>
+    case ProceedSubcontractorVerifyRequestPage(_)                    =>
       _ => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad()
-    case unexpected                                       =>
+    case unexpected                                                  =>
       _ =>
         logger.error(s"[VerifyNavigator][normalRoutes] - navigator fallback reached, page=$unexpected")
         controllers.routes.JourneyRecoveryController.onPageLoad()

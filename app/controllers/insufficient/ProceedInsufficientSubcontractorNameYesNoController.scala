@@ -221,17 +221,12 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
               if (verification.exists(_.proceed.exists(_.trim.equalsIgnoreCase("Y")))) {
                 Redirect(
-                  controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-                    .onPageLoadWithId(flowId, subcontractorId)
+                  navigator.nextPage(
+                    page,
+                    mode,
+                    request.userAnswers
+                  )
                 )
-// TODO: uncomment & Remove prior redirect call when flow is complete
-//                Redirect(
-//                  navigator.nextPage(
-//                    page,
-//                    mode,
-//                    request.userAnswers
-//                  )
-//                )
               } else {
                 val preparedForm =
                   request.userAnswers
@@ -302,9 +297,9 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                                 )
                             )
                           uaWithUpdatedCurrentBatch <-
-                            verificationBatchService.getCurrentVerificationBatch(updatedAnswers)
+                            verificationBatchService.getCurrentVerificationBatch(updatedAnswers, Some(id))
                           uaWithNewestBatch         <-
-                            verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch)
+                            verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch, Some(id))
                           _                         <- sessionRepository.set(uaWithNewestBatch)
                         } yield Redirect(
                           navigator.nextPage(
@@ -325,17 +320,12 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
                             )
                           _              <- sessionRepository.set(updatedAnswers)
                         } yield Redirect(
-                          controllers.insufficient.routes.ProceedInsufficientSubcontractorNameYesNoController
-                            .onPageLoadWithId(flowId, subcontractorId)
+                          navigator.nextPage(
+                            ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                            mode,
+                            updatedAnswers
+                          )
                         )
-// TODO: uncomment & Remove prior redirect call when flow is complete
-//                          Redirect(
-//                          navigator.nextPage(
-//                            ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
-//                            mode,
-//                            updatedAnswers
-//                          )
-//                        )
                       }
                   )
               }
