@@ -17,6 +17,7 @@
 package navigation.add
 
 import controllers.routes
+import models.JourneyNamespace.AddSubcontractor
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.NavigatorForJourney
@@ -44,96 +45,96 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def extractId(page: Page): Option[String] =
     page match {
-      case PartnershipNamePage(id)                      => Some(id)
-      case PartnershipAddressYesNoPage(id)              => Some(id)
-      case PartnershipAddressPage(id)                   => Some(id)
-      case AddPartnershipContactMethodsYesNoPage(id)    => Some(id)
-      case PartnershipContactMethodOptionsPage(id)      => Some(id)
-      case PartnershipEmailAddressPage(id)              => Some(id)
-      case PartnershipPhoneNumberPage(id)               => Some(id)
-      case PartnershipMobileNumberPage(id)              => Some(id)
-      case PartnershipHasUtrYesNoPage(id)               => Some(id)
-      case PartnershipUniqueTaxpayerReferencePage(id)   => Some(id)
-      case PartnershipNominatedPartnerNamePage(id)      => Some(id)
-      case PartnershipNominatedPartnerUtrYesNoPage(id)  => Some(id)
-      case PartnershipNominatedPartnerUtrPage(id)       => Some(id)
-      case PartnershipNominatedPartnerNinoYesNoPage(id) => Some(id)
-      case PartnershipNominatedPartnerNinoPage(id)      => Some(id)
-      case PartnershipNominatedPartnerCrnYesNoPage(id)  => Some(id)
-      case PartnershipNominatedPartnerCrnPage(id)       => Some(id)
-      case PartnershipWorksReferenceNumberYesNoPage(id) => Some(id)
-      case PartnershipWorksReferenceNumberPage(id)      => Some(id)
-      case _                                            => None
+      case PartnershipNamePage(id, AddSubcontractor)                      => Some(id)
+      case PartnershipAddressYesNoPage(id, AddSubcontractor)              => Some(id)
+      case PartnershipAddressPage(id, AddSubcontractor)                   => Some(id)
+      case AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor)    => Some(id)
+      case PartnershipContactMethodOptionsPage(id, AddSubcontractor)      => Some(id)
+      case PartnershipEmailAddressPage(id, AddSubcontractor)              => Some(id)
+      case PartnershipPhoneNumberPage(id, AddSubcontractor)               => Some(id)
+      case PartnershipMobileNumberPage(id, AddSubcontractor)              => Some(id)
+      case PartnershipHasUtrYesNoPage(id, AddSubcontractor)               => Some(id)
+      case PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)   => Some(id)
+      case PartnershipNominatedPartnerNamePage(id, AddSubcontractor)      => Some(id)
+      case PartnershipNominatedPartnerUtrYesNoPage(id, AddSubcontractor)  => Some(id)
+      case PartnershipNominatedPartnerUtrPage(id, AddSubcontractor)       => Some(id)
+      case PartnershipNominatedPartnerNinoYesNoPage(id, AddSubcontractor) => Some(id)
+      case PartnershipNominatedPartnerNinoPage(id, AddSubcontractor)      => Some(id)
+      case PartnershipNominatedPartnerCrnYesNoPage(id, AddSubcontractor)  => Some(id)
+      case PartnershipNominatedPartnerCrnPage(id, AddSubcontractor)       => Some(id)
+      case PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor) => Some(id)
+      case PartnershipWorksReferenceNumberPage(id, AddSubcontractor)      => Some(id)
+      case _                                                              => None
     }
 
   private def cyaRouteWithId(flowId: UUID): Call =
     controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoadWithId(flowId)
 
   private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case PartnershipNamePage(_)                      =>
+    case PartnershipNamePage(_, AddSubcontractor)                      =>
       _ => controllers.add.partnership.routes.PartnershipAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
-    case PartnershipAddressYesNoPage(_)              =>
+    case PartnershipAddressYesNoPage(_, AddSubcontractor)              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case AddPartnershipContactMethodsYesNoPage(_)    =>
+    case AddPartnershipContactMethodsYesNoPage(_, AddSubcontractor)    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipContactMethodOptionsPage(_)      =>
+    case PartnershipContactMethodOptionsPage(_, AddSubcontractor)      =>
       userAnswers => nextSelectedContactMethodPageAfter(flowId, id, current = None)(userAnswers)
-    case PartnershipEmailAddressPage(_)              =>
+    case PartnershipEmailAddressPage(_, AddSubcontractor)              =>
       userAnswers =>
         nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Email))(userAnswers)
-    case PartnershipPhoneNumberPage(_)               =>
+    case PartnershipPhoneNumberPage(_, AddSubcontractor)               =>
       userAnswers =>
         nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Phone))(userAnswers)
-    case PartnershipMobileNumberPage(_)              =>
+    case PartnershipMobileNumberPage(_, AddSubcontractor)              =>
       userAnswers =>
         nextSelectedContactMethodPageAfter(flowId, id, current = Some(ContactMethodOptions.Mobile))(userAnswers)
-    case PartnershipHasUtrYesNoPage(_)               =>
+    case PartnershipHasUtrYesNoPage(_, AddSubcontractor)               =>
       userAnswers => navigatorFromPartnershipHasUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipUniqueTaxpayerReferencePage(_)   =>
+    case PartnershipUniqueTaxpayerReferencePage(_, AddSubcontractor)   =>
       _ =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
           .onPageLoadWithId(flowId, NormalMode)
-    case PartnershipNominatedPartnerNamePage(_)      =>
+    case PartnershipNominatedPartnerNamePage(_, AddSubcontractor)      =>
       _ =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController
           .onPageLoadWithId(flowId, NormalMode)
-    case PartnershipWorksReferenceNumberYesNoPage(_) =>
+    case PartnershipWorksReferenceNumberYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromPartnershipWorksReferenceNumberYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerNinoPage(_)      =>
+    case PartnershipNominatedPartnerNinoPage(_, AddSubcontractor)      =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipWorksReferenceNumberPage(_)      =>
+    case PartnershipWorksReferenceNumberPage(_, AddSubcontractor)      =>
       _ => cyaRouteWithId(flowId)
-    case PartnershipNominatedPartnerCrnPage(_)       =>
+    case PartnershipNominatedPartnerCrnPage(_, AddSubcontractor)       =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerNinoYesNoPage(_) =>
+    case PartnershipNominatedPartnerNinoYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerCrnYesNoPage(_)  =>
+    case PartnershipNominatedPartnerCrnYesNoPage(_, AddSubcontractor)  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerCrnYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case PartnershipNominatedPartnerUtrPage(_)       =>
+    case PartnershipNominatedPartnerUtrPage(_, AddSubcontractor)       =>
       _ =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController
           .onPageLoadWithId(flowId, NormalMode)
-    case PartnershipNominatedPartnerUtrYesNoPage(_)  =>
+    case PartnershipNominatedPartnerUtrYesNoPage(_, AddSubcontractor)  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
     case _                                           => _ => routes.IndexController.onPageLoad()
   }
 
   private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case PartnershipHasUtrYesNoPage(_)               =>
+    case PartnershipHasUtrYesNoPage(_, AddSubcontractor)               =>
       navigatorFromPartnershipHasUtrYesNoPage(flowId, id, CheckMode)(_)
-    case PartnershipWorksReferenceNumberYesNoPage(_) =>
+    case PartnershipWorksReferenceNumberYesNoPage(_, AddSubcontractor) =>
       navigatorFromPartnershipWorksReferenceNumberYesNoPage(flowId, id, CheckMode)(_)
-    case PartnershipNominatedPartnerCrnYesNoPage(_)  =>
+    case PartnershipNominatedPartnerCrnYesNoPage(_, AddSubcontractor)  =>
       navigatorFromPartnershipNominatedPartnerCrnYesNoPage(flowId, id, CheckMode)(_)
-    case PartnershipNamePage(_)                      =>
+    case PartnershipNamePage(_, AddSubcontractor)                      =>
       _ => cyaRouteWithId(flowId)
-    case PartnershipAddressYesNoPage(_)              =>
+    case PartnershipAddressYesNoPage(_, AddSubcontractor)              =>
       userAnswers => navigatorFromPartnershipAddressYesNoPage(flowId, id, CheckMode)(userAnswers)
-    case AddPartnershipContactMethodsYesNoPage(_)    =>
+    case AddPartnershipContactMethodsYesNoPage(_, AddSubcontractor)    =>
       userAnswers => navigatorFromAddPartnershipContactMethodsYesNoPage(flowId, id, CheckMode)(userAnswers)
-    case PartnershipContactMethodOptionsPage(_)      =>
+    case PartnershipContactMethodOptionsPage(_, AddSubcontractor)      =>
       userAnswers => nextMissingSelectedContactMethodPageAfter(flowId, id, current = None, CheckMode)(userAnswers)
-    case PartnershipEmailAddressPage(_)              =>
+    case PartnershipEmailAddressPage(_, AddSubcontractor)              =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -143,7 +144,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         )(
           userAnswers
         )
-    case PartnershipPhoneNumberPage(_)               =>
+    case PartnershipPhoneNumberPage(_, AddSubcontractor)               =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -153,7 +154,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         )(
           userAnswers
         )
-    case PartnershipMobileNumberPage(_)              =>
+    case PartnershipMobileNumberPage(_, AddSubcontractor)              =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -163,21 +164,21 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         )(
           userAnswers
         )
-    case PartnershipNominatedPartnerNinoYesNoPage(_) =>
+    case PartnershipNominatedPartnerNinoYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromPartnershipNominatedPartnerNinoYesNoPage(flowId, id, CheckMode)(userAnswers)
-    case PartnershipNominatedPartnerNinoPage(_)      =>
+    case PartnershipNominatedPartnerNinoPage(_, AddSubcontractor)      =>
       navigatorFromPartnershipNominatedPartnerNinoPage(flowId, id, CheckMode)(_)
-    case PartnershipNominatedPartnerNamePage(_)      =>
+    case PartnershipNominatedPartnerNamePage(_, AddSubcontractor)      =>
       _ => cyaRouteWithId(flowId)
-    case PartnershipNominatedPartnerUtrYesNoPage(_)  =>
+    case PartnershipNominatedPartnerUtrYesNoPage(_, AddSubcontractor)  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(flowId, id, CheckMode)(userAnswers)
-    case PartnershipNominatedPartnerUtrPage(_)       =>
+    case PartnershipNominatedPartnerUtrPage(_, AddSubcontractor)       =>
       _ => cyaRouteWithId(flowId)
-    case PartnershipNominatedPartnerCrnPage(_)       =>
+    case PartnershipNominatedPartnerCrnPage(_, AddSubcontractor)       =>
       navigatorFromPartnershipNominatedPartnerCrnPage(flowId, id, CheckMode)(_)
-    case PartnershipWorksReferenceNumberPage(_)      =>
+    case PartnershipWorksReferenceNumberPage(_, AddSubcontractor)      =>
       _ => cyaRouteWithId(flowId)
-    case PartnershipUniqueTaxpayerReferencePage(_)   =>
+    case PartnershipUniqueTaxpayerReferencePage(_, AddSubcontractor)   =>
       _ => cyaRouteWithId(flowId)
     case _                                           => _ => cyaRouteWithId(flowId)
   }
@@ -187,7 +188,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(ua: UserAnswers): Call =
-    (ua.get(PartnershipNominatedPartnerNinoPage(id)), mode) match {
+    (ua.get(PartnershipNominatedPartnerNinoPage(id, AddSubcontractor)), mode) match {
       case (Some(_), NormalMode) =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController
           .onPageLoadWithId(flowId, NormalMode)
@@ -204,7 +205,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(ua: UserAnswers): Call =
-    (ua.get(PartnershipNominatedPartnerCrnPage(id)), mode) match {
+    (ua.get(PartnershipNominatedPartnerCrnPage(id, AddSubcontractor)), mode) match {
       case (Some(_), NormalMode) =>
         controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController
           .onPageLoadWithId(flowId, NormalMode)
@@ -221,8 +222,8 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(ua: UserAnswers): Call =
-    (ua.get(PartnershipHasUtrYesNoPage(id)), mode) match {
-      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage(id)).isDefined =>
+    (ua.get(PartnershipHasUtrYesNoPage(id, AddSubcontractor)), mode) match {
+      case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)).isDefined =>
         cyaRouteWithId(flowId)
       case (Some(true), CheckMode)                                                                 =>
         controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
@@ -246,9 +247,9 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(ua: UserAnswers): Call =
-    (ua.get(PartnershipWorksReferenceNumberYesNoPage(id)), mode) match {
+    (ua.get(PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), CheckMode)   =>
-        ua.get(PartnershipWorksReferenceNumberPage(id))
+        ua.get(PartnershipWorksReferenceNumberPage(id, AddSubcontractor))
           .fold(
             controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
               .onPageLoadWithId(flowId, mode)
@@ -270,7 +271,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage(id)), mode) match {
+    (userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), NormalMode)  =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
           .onPageLoadWithId(flowId, NormalMode)
@@ -279,7 +280,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
           .onPageLoadWithId(flowId, NormalMode)
       case (Some(true), CheckMode)   =>
         userAnswers
-          .get(PartnershipNominatedPartnerUtrPage(id))
+          .get(PartnershipNominatedPartnerUtrPage(id, AddSubcontractor))
           .fold(
             controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
               .onPageLoadWithId(flowId, mode)
@@ -297,7 +298,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id)), mode) match {
+    (userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), NormalMode)  =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
           .onPageLoadWithId(flowId, NormalMode)
@@ -306,7 +307,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
           .onPageLoadWithId(flowId, NormalMode)
       case (Some(true), CheckMode)   =>
         userAnswers
-          .get(PartnershipNominatedPartnerCrnPage(id))
+          .get(PartnershipNominatedPartnerCrnPage(id, AddSubcontractor))
           .fold(
             controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
               .onPageLoadWithId(flowId, mode)
@@ -326,12 +327,12 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
   )(userAnswers: UserAnswers): Call =
     addressLookupYesNoRoute(
       mode,
-      userAnswers.get(PartnershipAddressYesNoPage(id)),
-      userAnswers.get(PartnershipAddressPage(id)).isDefined,
+      userAnswers.get(PartnershipAddressYesNoPage(id, AddSubcontractor)),
+      userAnswers.get(PartnershipAddressPage(id, AddSubcontractor)).isDefined,
       onYes = controllers.add.partnership.routes.PartnershipAddressController
-        .redirectToAddressLookupWithId(flowId, None),
+        .redirectToAddressLookupWithId(flowId, NormalMode, None),
       onYesChange = controllers.add.partnership.routes.PartnershipAddressController
-        .redirectToAddressLookupWithId(flowId, Some(CheckMode.toString)),
+        .redirectToAddressLookupWithId(flowId, NormalMode, Some(CheckMode.toString)),
       onNo = controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
         .onPageLoadWithId(flowId, NormalMode),
       checkYourAnswers = cyaRouteWithId(flowId)
@@ -342,7 +343,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage(id)), mode) match {
+    (userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), NormalMode)  =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
           .onPageLoadWithId(flowId, NormalMode)
@@ -351,7 +352,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
           .onPageLoadWithId(flowId, NormalMode)
       case (Some(true), CheckMode)   =>
         userAnswers
-          .get(PartnershipNominatedPartnerNinoPage(id))
+          .get(PartnershipNominatedPartnerNinoPage(id, AddSubcontractor))
           .fold(
             controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
               .onPageLoadWithId(flowId, mode)
@@ -369,7 +370,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(AddPartnershipContactMethodsYesNoPage(id)), mode) match {
+    (userAnswers.get(AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), NormalMode)  =>
         controllers.add.partnership.routes.PartnershipContactMethodOptionsController
           .onPageLoadWithId(flowId, NormalMode)
@@ -377,7 +378,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
         controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, NormalMode)
       case (Some(true), CheckMode)   =>
         userAnswers
-          .get(PartnershipContactMethodOptionsPage(id))
+          .get(PartnershipContactMethodOptionsPage(id, AddSubcontractor))
           .fold(
             controllers.add.partnership.routes.PartnershipContactMethodOptionsController
               .onPageLoadWithId(flowId, mode)
@@ -449,7 +450,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     userAnswers: UserAnswers
   ): Option[Seq[ContactMethodOptions]] =
-    userAnswers.get(PartnershipContactMethodOptionsPage(id)).map(ContactMethodOptions.ordered)
+    userAnswers.get(PartnershipContactMethodOptionsPage(id, AddSubcontractor)).map(ContactMethodOptions.ordered)
 
   private def contactMethodPageCall(
     flowId: UUID,
@@ -470,9 +471,9 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
 
   private def contactMethodPage(id: String, contactMethod: ContactMethodOptions): QuestionPage[String] =
     contactMethod match {
-      case ContactMethodOptions.Email  => PartnershipEmailAddressPage(id)
-      case ContactMethodOptions.Phone  => PartnershipPhoneNumberPage(id)
-      case ContactMethodOptions.Mobile => PartnershipMobileNumberPage(id)
+      case ContactMethodOptions.Email  => PartnershipEmailAddressPage(id, AddSubcontractor)
+      case ContactMethodOptions.Phone  => PartnershipPhoneNumberPage(id, AddSubcontractor)
+      case ContactMethodOptions.Mobile => PartnershipMobileNumberPage(id, AddSubcontractor)
     }
 
   private def nextPageWithoutId(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

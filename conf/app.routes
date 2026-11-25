@@ -161,6 +161,9 @@ GET   /subcontractor/final-validations/handoff/:handoffId  controllers.finalvali
 
 GET   /subcontractor/final-validations/complete  controllers.finalvalidations.FinalValidationCompleteController.onPageLoad()
 
+# Multi-tab
+GET   /subcontractor/final-validations/complete/:flowId  controllers.finalvalidations.FinalValidationCompleteController.onPageLoadWithId(flowId: UUID)
+
 GET   /subcontractor/final-validations/review-subcontractor-details  controllers.finalvalidations.ReviewSubcontractorDetailsController.onPageLoad()
 POST  /subcontractor/final-validations/review-subcontractor-details  controllers.finalvalidations.ReviewSubcontractorDetailsController.onSubmit
 
@@ -173,51 +176,116 @@ GET   /final-validations/change/:subcontractorId/:fieldKey/:targetKey  controlle
 GET   /subcontractor/final-validation/individual/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/name/:flowId  controllers.add.SubcontractorNameController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/name/:flowId  controllers.add.SubcontractorNameController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/trading-name/:flowId  controllers.add.TradingNameOfSubcontractorController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/trading-name/:flowId  controllers.add.TradingNameOfSubcontractorController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/names  controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/names  controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/names/:flowId  controllers.add.IndividualNamesOptionsController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/names/:flowId  controllers.add.IndividualNamesOptionsController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/check-address  controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/check-address  controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/check-address/:flowId  controllers.add.SubAddressYesNoController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-address/:flowId  controllers.add.SubAddressYesNoController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/address                controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/final-validation/individual/address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
 GET   /subcontractor/final-validation/individual/address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/address/:flowId                controllers.add.AddressOfSubcontractorController.redirectToAddressLookupWithId(flowId: UUID, mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/individual/address-return/:flowId         controllers.add.AddressOfSubcontractorController.addressLookupCallbackWithId(flowId: UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/individual/address-return/change/:flowId  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChangeWithId(flowId: UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/add-contact-details  controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/add-contact-details/:flowId  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/add-contact-details/:flowId  controllers.add.AddIndividualContactMethodsYesNoController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/select-contact-details/:flowId  controllers.add.IndividualContactMethodOptionsController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/select-contact-details/:flowId  controllers.add.IndividualContactMethodOptionsController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/email-address/:flowId  controllers.add.IndividualEmailAddressController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/email-address/:flowId  controllers.add.IndividualEmailAddressController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/phone-number  controllers.add.IndividualPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/phone-number  controllers.add.IndividualPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/phone-number/:flowId  controllers.add.IndividualPhoneNumberController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/phone-number/:flowId  controllers.add.IndividualPhoneNumberController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/mobile-number  controllers.add.IndividualMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/mobile-number  controllers.add.IndividualMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/mobile-number/:flowId  controllers.add.IndividualMobileNumberController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/mobile-number/:flowId  controllers.add.IndividualMobileNumberController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/check-unique-taxpayer-reference/:flowId  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-unique-taxpayer-reference/:flowId  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/unique-taxpayer-reference  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/unique-taxpayer-reference/:flowId  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/unique-taxpayer-reference/:flowId  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/check-national-insurance-number  controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/check-national-insurance-number/:flowId  controllers.add.NationalInsuranceNumberYesNoController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-national-insurance-number/:flowId  controllers.add.NationalInsuranceNumberYesNoController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/national-insurance-number/:flowId  controllers.add.SubNationalInsuranceNumberController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/national-insurance-number/:flowId  controllers.add.SubNationalInsuranceNumberController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/individual/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/check-works-reference-number  controllers.add.WorksReferenceNumberYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/individual/check-works-reference-number/:flowId  controllers.add.WorksReferenceNumberYesNoController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/check-works-reference-number/:flowId  controllers.add.WorksReferenceNumberYesNoController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/individual/works-reference-number  controllers.add.WorksReferenceNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/individual/works-reference-number  controllers.add.WorksReferenceNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/individual/works-reference-number/:flowId  controllers.add.WorksReferenceNumberController.onPageLoadWithId(flowId: UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/individual/works-reference-number/:flowId  controllers.add.WorksReferenceNumberController.onSubmitWithId(flowId: UUID, mode: Mode = FinalValidationMode)
 
 # Errors & Auth
 GET  /unauthorised/standard-user  controllers.UnauthorisedWrongRoleController.onPageLoad()

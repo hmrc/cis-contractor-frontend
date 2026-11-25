@@ -16,8 +16,19 @@
 
 package pages.add.trust
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+case class TrustUtrPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String] with TrustJourney {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
+
+  override def toString: String = "trustUtr"
+}
 
 case object TrustUtrPage extends QuestionPage[String] with TrustJourney {
 

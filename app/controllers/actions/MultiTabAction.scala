@@ -17,6 +17,7 @@
 package controllers.actions
 
 import models.requests.{DataRequest, IdentifierRequest}
+import models.JourneyNamespace
 import play.api.Logging
 import play.api.mvc.{ActionFilter, Result, Results}
 import queries.CisIdQuery
@@ -41,12 +42,12 @@ class MultiTabAction @Inject() (cisTaxpayerService: CisTaxpayerService)(using ec
         }
     }
 
-  def forJourney(flowId: UUID): ActionFilter[DataRequest] =
+  def forJourney(flowId: UUID, namespace: JourneyNamespace): ActionFilter[DataRequest] =
     new ActionFilter[DataRequest] {
       override protected def executionContext: ExecutionContext = ec
 
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        request.userAnswers.get(CisIdQuery(flowId.toString)) match {
+        request.userAnswers.get(CisIdQuery(flowId.toString, namespace)) match {
           case None        =>
             Future.successful(Some(Results.Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
           case Some(cisId) =>

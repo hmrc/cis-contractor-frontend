@@ -16,6 +16,8 @@
 
 @import models.add.IndividualNamesOptions
 @import viewmodels.LegendSize.Large
+@import java.util.UUID
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -25,11 +27,18 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, flowId: Option[UUID] = None)(implicit request: Request[_], messages: Messages)
+
+@submitAction: Call = @{
+    flowId match {
+        case Some(id) => controllers.add.routes.IndividualNamesOptionsController.onSubmitWithId(id, mode)
+        case None     => controllers.add.routes.IndividualNamesOptionsController.onSubmit(mode)
+    }
+}
 
 @layout(pageTitle = title(form, messages("individualNamesOptions.title"))) {
 
-    @formHelper(action = controllers.add.routes.IndividualNamesOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

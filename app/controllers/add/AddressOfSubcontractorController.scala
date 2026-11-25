@@ -19,7 +19,7 @@ package controllers.add
 import controllers.actions.*
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.individualQuestionsAddress
-import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, JourneyNamespace, Mode, UserAnswers}
 import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -28,6 +28,7 @@ import repositories.SessionRepository
 import services.AddressLookupService
 import utils.SubcontractorNameExtractor
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class AddressOfSubcontractorController @Inject() (
   override protected val identify: IdentifierAction,
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
+  override protected val sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   override protected val addressLookupService: AddressLookupService,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents
@@ -83,5 +85,46 @@ class AddressOfSubcontractorController @Inject() (
           )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+    }
+
+  // Multi-tab
+  override protected def addressPage(id: String, namespace: JourneyNamespace): Settable[Address] =
+    AddressOfSubcontractorPage(id, namespace)
+
+  // Multi-tab
+  override protected def subcontractorName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String] =
+    subcontractorNameExtractor.getSubcontractorName(userAnswers, mode, id, namespace)
+
+  // Multi-tab
+  override protected def standardCallback(mode: Mode, flowId: UUID): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallbackWithId(flowId = flowId, id = "")
+
+  // Multi-tab
+  override protected def changeCallback(mode: Mode, flowId: UUID): Call =
+    routes.AddressOfSubcontractorController.addressLookupCallbackChangeWithId(flowId = flowId, id = "")
+
+  // Multi-tab
+  override protected def onCompletion(mode: Mode, flowId: UUID): Call =
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
+      case _ =>
+        // TODO: Integrate scoped Individual Add Subcontractor routes.
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
+
+  // Multi-tab
+  override protected def onChangeCompletion(mode: Mode, flowId: UUID): Call =
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
+      case _ =>
+        // TODO: Integrate the scoped Individual Add Subcontractor CYA route.
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }

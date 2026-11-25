@@ -20,7 +20,7 @@ import controllers.add.routes as soleTraderRoutes
 import controllers.add.company.routes as companyRoutes
 import controllers.add.partnership.routes as partnershipRoutes
 import controllers.add.trust.routes as trustRoutes
-import models.{FinalValidationMode, Mode, UserAnswers}
+import models.{FinalValidationMode, JourneyNamespace, Mode, UserAnswers}
 import models.finalvalidation.FinalValidationChangeTarget
 import models.finalvalidation.FinalValidationChangeTarget.*
 import models.TypeOfSubcontractor.*
@@ -36,10 +36,13 @@ import pages.finalvalidation.FinalValidationChangeTargetPage
 import play.api.Logging
 import play.api.mvc.Call
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class FinalValidationNavigator @Inject() extends NavigatorForJourney with Logging {
+
+  private val namespace = JourneyNamespace.SubcontractorFinalValidation
 
   def startPage(target: FinalValidationChangeTarget, userAnswers: UserAnswers): Call =
     userAnswers.get(TypeOfSubcontractorPage) match {
@@ -53,42 +56,41 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
     }
 
   override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call =
-    val target =
-      userAnswers.get(FinalValidationChangeTargetPage)
+    extractScopedId(page) match {
+      // Multi-tab
+      case Some(id) =>
+        nextPage(page, mode, userAnswers, id)
 
-    logger.info(
-      s"[FinalValidationNavigator][nextPage] " +
-        s"page=$page mode=$mode target=$target"
-    )
+      case None =>
+        val target =
+          userAnswers.get(FinalValidationChangeTargetPage)
 
-    mode match {
-      case FinalValidationMode =>
-        userAnswers.get(FinalValidationChangeTargetPage) match {
-          case Some(Names)               =>
-            individualNamesNextPage(page, userAnswers)
-          case Some(AddressYesNo)        =>
-            addressYesNoNextPage(page, userAnswers)
-          case Some(ContactDetailsYesNo) =>
-            contactDetailsYesNoNextPage(page, userAnswers)
-          case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(
-                WorksReferenceNumberYesNo
-              ) =>
-            identifierYesNoNextPage(page, userAnswers)
-          case Some(_)                   =>
-            complete
-          case None                      =>
-            logger.error(
-              "[FinalValidationNavigator][nextPage] " +
-                "FinalValidationChangeTargetPage missing"
-            )
+        logger.info(
+          s"[FinalValidationNavigator][nextPage] " +
+            s"page=$page mode=$mode target=$target"
+        )
+
+        mode match {
+          case FinalValidationMode =>
+            userAnswers.get(FinalValidationChangeTargetPage) match {
+              case Some(Names) =>
+                individualNamesNextPage(page, userAnswers)
+              case Some(AddressYesNo) =>
+                addressYesNoNextPage(page, userAnswers)
+              case Some(ContactDetailsYesNo) =>
+                contactDetailsYesNoNextPage(page, userAnswers)
+              case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(WorksReferenceNumberYesNo) =>
+                identifierYesNoNextPage(page, userAnswers)
+              case Some(_) =>
+                complete
+              case None =>
+                logger.error("[FinalValidationNavigator][nextPage] FinalValidationChangeTargetPage missing")
+                recovery
+            }
+          case _ =>
+            logger.error(s"[FinalValidationNavigator][nextPage] Unexpected mode=$mode")
             recovery
         }
-      case _                   =>
-        logger.error(
-          s"[FinalValidationNavigator][nextPage] " +
-            s"Unexpected mode=$mode"
-        )
-        recovery
     }
 
   private def complete: Call =
@@ -604,4 +606,685 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
         recovery
     }
 
+  // Multi-tab
+  def startPage(
+    target: FinalValidationChangeTarget,
+    userAnswers: UserAnswers,
+    id: String
+  ): Call =
+    val flowId = UUID.fromString(id)
+
+    userAnswers.get(TypeOfSubcontractorPage(id, namespace)) match {
+      case Some(Individualorsoletrader) => soleTraderStartPage(target, flowId)
+      case Some(Limitedcompany)         => companyStartPage(target, flowId)
+      case Some(Partnership)            => partnershipStartPage(target, flowId)
+      case Some(Trust)                  => trustStartPage(target, flowId)
+      case None                         =>
+        logger.error("[FinalValidationNavigator][startPage] - scoped TypeOfSubcontractorPage missing from userAnswers")
+        recovery
+    }
+
+  private def nextPage(
+    page: Page,
+    mode: Mode,
+    userAnswers: UserAnswers,
+    id: String
+  ): Call =
+    val flowId = UUID.fromString(id)
+    val target = userAnswers.get(FinalValidationChangeTargetPage(id))
+
+    logger.info(s"[FinalValidationNavigator][nextPage] page=$page mode=$mode target=$target flowId=$id")
+
+    mode match {
+      case FinalValidationMode =>
+        target match {
+          case Some(Names) =>
+            individualNamesNextPage(page, userAnswers, flowId)
+
+          case Some(AddressYesNo) =>
+            addressYesNoNextPage(page, userAnswers, flowId)
+
+          case Some(ContactDetailsYesNo) =>
+            contactDetailsYesNoNextPage(page, userAnswers, flowId)
+
+          case Some(UtrYesNo) | Some(NinoYesNo) | Some(CrnYesNo) | Some(PartnerUtrYesNo) | Some(WorksReferenceNumberYesNo) =>
+            identifierYesNoNextPage(page, userAnswers, flowId)
+
+          case Some(_) =>
+            complete(flowId)
+
+          case None =>
+            logger.error("[FinalValidationNavigator][nextPage] - scoped FinalValidationChangeTargetPage missing")
+            recovery
+        }
+
+      case _ =>
+        logger.error(s"[FinalValidationNavigator][nextPage] - Unexpected mode=$mode")
+        recovery
+    }
+
+  private def extractScopedId(page: Page): Option[String] =
+    page match {
+
+      // Individual / sole trader
+      case IndividualNamesOptionsPage(id, `namespace`) => Some(id)
+      case SubcontractorNamePage(id, `namespace`) => Some(id)
+      case TradingNameOfSubcontractorPage(id, `namespace`) => Some(id)
+      case SubAddressYesNoPage(id, `namespace`) => Some(id)
+      case AddressOfSubcontractorPage(id, `namespace`) => Some(id)
+      case AddIndividualContactMethodsYesNoPage(id, `namespace`) => Some(id)
+      case IndividualContactMethodOptionsPage(id, `namespace`) => Some(id)
+      case IndividualEmailAddressPage(id, `namespace`) => Some(id)
+      case IndividualPhoneNumberPage(id, `namespace`) => Some(id)
+      case IndividualMobileNumberPage(id, `namespace`) => Some(id)
+      case UniqueTaxpayerReferenceYesNoPage(id, `namespace`) => Some(id)
+      case SubcontractorsUniqueTaxpayerReferencePage(id, `namespace`) => Some(id)
+      case NationalInsuranceNumberYesNoPage(id, `namespace`) => Some(id)
+      case SubNationalInsuranceNumberPage(id, `namespace`) => Some(id)
+      case WorksReferenceNumberYesNoPage(id, `namespace`) => Some(id)
+      case WorksReferenceNumberPage(id, `namespace`) => Some(id)
+
+      // Company
+      case CompanyNamePage(id, `namespace`) => Some(id)
+      case CompanyAddressYesNoPage(id, `namespace`) => Some(id)
+      case CompanyAddressPage(id, `namespace`) => Some(id)
+      case AddCompanyContactMethodsYesNoPage(id, `namespace`) => Some(id)
+      case CompanyContactMethodOptionsPage(id, `namespace`) => Some(id)
+      case CompanyEmailAddressPage(id, `namespace`) => Some(id)
+      case CompanyPhoneNumberPage(id, `namespace`) => Some(id)
+      case CompanyMobileNumberPage(id, `namespace`) => Some(id)
+      case CompanyUtrYesNoPage(id, `namespace`) => Some(id)
+      case CompanyUtrPage(id, `namespace`) => Some(id)
+      case CompanyCrnYesNoPage(id, `namespace`) => Some(id)
+      case CompanyCrnPage(id, `namespace`) => Some(id)
+      case CompanyWorksReferenceYesNoPage(id, `namespace`) => Some(id)
+      case CompanyWorksReferencePage(id, `namespace`) => Some(id)
+
+      // Partnership
+      case PartnershipNamePage(id, `namespace`) => Some(id)
+      case PartnershipAddressYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipAddressPage(id, `namespace`) => Some(id)
+      case AddPartnershipContactMethodsYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipContactMethodOptionsPage(id, `namespace`) => Some(id)
+      case PartnershipEmailAddressPage(id, `namespace`) => Some(id)
+      case PartnershipPhoneNumberPage(id, `namespace`) => Some(id)
+      case PartnershipMobileNumberPage(id, `namespace`) => Some(id)
+      case PartnershipHasUtrYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipUniqueTaxpayerReferencePage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerNamePage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerUtrYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerUtrPage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerNinoYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerNinoPage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerCrnYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipNominatedPartnerCrnPage(id, `namespace`) => Some(id)
+      case PartnershipWorksReferenceNumberYesNoPage(id, `namespace`) => Some(id)
+      case PartnershipWorksReferenceNumberPage(id, `namespace`) => Some(id)
+
+      // Trust
+      case TrustNamePage(id, `namespace`) => Some(id)
+      case TrustAddressYesNoPage(id, `namespace`) => Some(id)
+      case TrustAddressPage(id, `namespace`) => Some(id)
+      case AddTrustContactMethodsYesNoPage(id, `namespace`) => Some(id)
+      case TrustContactMethodOptionsPage(id, `namespace`) => Some(id)
+      case TrustEmailAddressPage(id, `namespace`) => Some(id)
+      case TrustPhoneNumberPage(id, `namespace`) => Some(id)
+      case TrustMobileNumberPage(id, `namespace`) => Some(id)
+      case TrustUtrYesNoPage(id, `namespace`) => Some(id)
+      case TrustUtrPage(id, `namespace`) => Some(id)
+      case TrustWorksReferenceYesNoPage(id, `namespace`) => Some(id)
+      case TrustWorksReferencePage(id, `namespace`) => Some(id)
+
+      case _ => None
+    }
+
+  private def complete(flowId: UUID): Call =
+    controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
+
+  private def yesNoNextPage(
+    answer: Option[Boolean],
+    onYes: => Call,
+    flowId: UUID
+  ): Call =
+    answer match {
+      case Some(true) => onYes
+      case Some(false) => complete(flowId)
+      case None =>
+        logger.error("[FinalValidationNavigator][yesNoNextPage] - scoped yes/no answer missing from userAnswers")
+        recovery
+    }
+
+  private def soleTraderStartPage(
+    target: FinalValidationChangeTarget,
+    flowId: UUID
+  ): Call =
+    target match {
+      case Names =>
+        soleTraderRoutes.IndividualNamesOptionsController.onPageLoadWithId(flowId, FinalValidationMode)
+      case SubcontractorName =>
+        soleTraderRoutes.SubcontractorNameController.onPageLoadWithId(flowId, FinalValidationMode)
+      case TradingName =>
+        soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoadWithId(flowId, FinalValidationMode)
+      case AddressYesNo =>
+        soleTraderRoutes.SubAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Address =>
+        soleTraderRoutes.AddressOfSubcontractorController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None)
+      case ContactDetailsYesNo =>
+        soleTraderRoutes.AddIndividualContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case EmailAddress =>
+        soleTraderRoutes.IndividualEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PhoneNumber =>
+        soleTraderRoutes.IndividualPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case MobilePhoneNumber =>
+        soleTraderRoutes.IndividualMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case UtrYesNo =>
+        soleTraderRoutes.UniqueTaxpayerReferenceYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Utr =>
+        soleTraderRoutes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, FinalValidationMode)
+      case NinoYesNo =>
+        soleTraderRoutes.NationalInsuranceNumberYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Nino =>
+        soleTraderRoutes.SubNationalInsuranceNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumberYesNo =>
+        soleTraderRoutes.WorksReferenceNumberYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumber =>
+        soleTraderRoutes.WorksReferenceNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case _ =>
+        logger.error(s"[FinalValidationNavigator][soleTraderStartPage] - scoped fallback, target=$target")
+        recovery
+    }
+
+  private def companyStartPage(
+    target: FinalValidationChangeTarget,
+    flowId: UUID
+  ): Call =
+    target match {
+      case TradingName =>
+        companyRoutes.CompanyNameController.onPageLoadWithId(flowId, FinalValidationMode)
+      case AddressYesNo =>
+        companyRoutes.CompanyAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Address =>
+        companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, None)
+      case ContactDetailsYesNo =>
+        companyRoutes.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case EmailAddress =>
+        companyRoutes.CompanyEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PhoneNumber =>
+        companyRoutes.CompanyPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case MobilePhoneNumber =>
+        companyRoutes.CompanyMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case UtrYesNo =>
+        companyRoutes.CompanyUtrYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Utr =>
+        companyRoutes.CompanyUtrController.onPageLoadWithId(flowId, FinalValidationMode)
+      case CrnYesNo =>
+        companyRoutes.CompanyCrnYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Crn =>
+        companyRoutes.CompanyCrnController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumberYesNo =>
+        companyRoutes.CompanyWorksReferenceYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumber =>
+        companyRoutes.CompanyWorksReferenceController.onPageLoadWithId(flowId, FinalValidationMode)
+      case _ =>
+        logger.error(s"[FinalValidationNavigator][companyStartPage] - scoped fallback, target=$target")
+        recovery
+    }
+
+  private def partnershipStartPage(
+    target: FinalValidationChangeTarget,
+    flowId: UUID
+  ): Call =
+    target match {
+      case PartnershipTradingName =>
+        partnershipRoutes.PartnershipNameController.onPageLoadWithId(flowId, FinalValidationMode)
+      case TradingName =>
+        partnershipRoutes.PartnershipNominatedPartnerNameController.onPageLoadWithId(flowId, FinalValidationMode)
+      case AddressYesNo =>
+        partnershipRoutes.PartnershipAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Address =>
+        partnershipRoutes.PartnershipAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None)
+      case ContactDetailsYesNo =>
+        partnershipRoutes.AddPartnershipContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case EmailAddress =>
+        partnershipRoutes.PartnershipEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PhoneNumber =>
+        partnershipRoutes.PartnershipPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case MobilePhoneNumber =>
+        partnershipRoutes.PartnershipMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case UtrYesNo =>
+        partnershipRoutes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Utr =>
+        partnershipRoutes.PartnershipUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PartnerUtrYesNo =>
+        partnershipRoutes.PartnershipNominatedPartnerUtrYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PartnerUtr =>
+        partnershipRoutes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, FinalValidationMode)
+      case NinoYesNo =>
+        partnershipRoutes.PartnershipNominatedPartnerNinoYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Nino =>
+        partnershipRoutes.PartnershipNominatedPartnerNinoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case CrnYesNo =>
+        partnershipRoutes.PartnershipNominatedPartnerCrnYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Crn =>
+        partnershipRoutes.PartnershipNominatedPartnerCrnController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumberYesNo =>
+        partnershipRoutes.PartnershipWorksReferenceNumberYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumber =>
+        partnershipRoutes.PartnershipWorksReferenceNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case _ =>
+        logger.error(s"[FinalValidationNavigator][partnershipStartPage] - scoped fallback, target=$target")
+        recovery
+    }
+
+  private def trustStartPage(
+    target: FinalValidationChangeTarget,
+    flowId: UUID
+  ): Call =
+    target match {
+      case TradingName =>
+        trustRoutes.TrustNameController.onPageLoadWithId(flowId, FinalValidationMode)
+      case AddressYesNo =>
+        trustRoutes.TrustAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Address =>
+        trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, None)
+      case ContactDetailsYesNo =>
+        trustRoutes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case EmailAddress =>
+        trustRoutes.TrustEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case PhoneNumber =>
+        trustRoutes.TrustPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case MobilePhoneNumber =>
+        trustRoutes.TrustMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case UtrYesNo =>
+        trustRoutes.TrustUtrYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case Utr =>
+        trustRoutes.TrustUtrController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumberYesNo =>
+        trustRoutes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
+      case WorksReferenceNumber =>
+        trustRoutes.TrustWorksReferenceController.onPageLoadWithId(flowId, FinalValidationMode)
+      case _ =>
+        logger.error(s"[FinalValidationNavigator][trustStartPage] - scoped fallback, target=$target")
+        recovery
+    }
+
+  private def identifierYesNoNextPage(
+    page: Page,
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    val id = flowId.toString
+
+    page match {
+      // Individual / sole trader
+      case UniqueTaxpayerReferenceYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(UniqueTaxpayerReferenceYesNoPage(id, namespace)),
+          soleTraderRoutes.SubcontractorsUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case NationalInsuranceNumberYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(NationalInsuranceNumberYesNoPage(id, namespace)),
+          soleTraderRoutes.SubNationalInsuranceNumberController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case WorksReferenceNumberYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(WorksReferenceNumberYesNoPage(id, namespace)),
+          soleTraderRoutes.WorksReferenceNumberController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      // Company
+      case CompanyUtrYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(CompanyUtrYesNoPage(id, namespace)),
+          companyRoutes.CompanyUtrController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case CompanyCrnYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(CompanyCrnYesNoPage(id, namespace)),
+          companyRoutes.CompanyCrnController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case CompanyWorksReferenceYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(CompanyWorksReferenceYesNoPage(id, namespace)),
+          companyRoutes.CompanyWorksReferenceController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      // Partnership
+      case PartnershipHasUtrYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipHasUtrYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case PartnershipNominatedPartnerUtrYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerUtrYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case PartnershipNominatedPartnerNinoYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerNinoYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipNominatedPartnerNinoController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case PartnershipNominatedPartnerCrnYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipNominatedPartnerCrnController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case PartnershipWorksReferenceNumberYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipWorksReferenceNumberYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipWorksReferenceNumberController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      // Trust
+      case TrustUtrYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(TrustUtrYesNoPage(id, namespace)),
+          trustRoutes.TrustUtrController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case TrustWorksReferenceYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(TrustWorksReferenceYesNoPage(id, namespace)),
+          trustRoutes.TrustWorksReferenceController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case _ =>
+        complete(flowId)
+    }
+
+  private def individualNamesNextPage(
+    page: Page,
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call = {
+
+    val id = flowId.toString
+
+    val selected =
+      userAnswers
+        .get(IndividualNamesOptionsPage(id, namespace))
+        .getOrElse(Set.empty)
+
+    page match {
+      case IndividualNamesOptionsPage(_, `namespace`) =>
+        if (selected.contains(IndividualNamesOptions.SubcontractorName)) {
+          soleTraderRoutes.SubcontractorNameController.onPageLoadWithId(flowId, FinalValidationMode)
+        } else if (selected.contains(IndividualNamesOptions.TradingName)) {
+          soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoadWithId(flowId, FinalValidationMode)
+        } else {
+          logger.error("[FinalValidationNavigator][individualNamesNextPage] - scoped names option missing")
+          recovery
+        }
+
+      case SubcontractorNamePage(_, `namespace`) =>
+        if (selected.contains(IndividualNamesOptions.TradingName)) {
+          soleTraderRoutes.TradingNameOfSubcontractorController.onPageLoadWithId(flowId, FinalValidationMode)
+        } else {
+          complete(flowId)
+        }
+
+      case TradingNameOfSubcontractorPage(_, `namespace`) =>
+        complete(flowId)
+
+      case _ =>
+        logger.error(
+          s"[FinalValidationNavigator][individualNamesNextPage] - unexpected scoped page=$page"
+        )
+        recovery
+    }
+  }
+
+  private def addressYesNoNextPage(
+    page: Page,
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    val id = flowId.toString
+
+    page match {
+      case SubAddressYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(SubAddressYesNoPage(id, namespace)),
+          soleTraderRoutes.AddressOfSubcontractorController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None),
+          flowId
+        )
+
+      case CompanyAddressYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(CompanyAddressYesNoPage(id, namespace)),
+          companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, None),
+          flowId
+        )
+
+      case PartnershipAddressYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(PartnershipAddressYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None),
+          flowId
+        )
+
+      case TrustAddressYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(TrustAddressYesNoPage(id, namespace)),
+          trustRoutes.TrustAddressController.redirectToAddressLookupWithId(flowId, None),
+          flowId
+        )
+
+      case _ =>
+        logger.error(
+          s"[FinalValidationNavigator][addressYesNoNextPage] - unexpected scoped page=$page"
+        )
+        recovery
+    }
+
+  private def contactDetailsYesNoNextPage(
+    page: Page,
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    val id = flowId.toString
+
+    page match {
+      // Individual / sole trader
+      case AddIndividualContactMethodsYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(AddIndividualContactMethodsYesNoPage(id, namespace)),
+          soleTraderRoutes.IndividualContactMethodOptionsController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case IndividualContactMethodOptionsPage(_, `namespace`) =>
+        nextSelectedIndividualContactMethodPageAfter(None, userAnswers, flowId)
+
+      case IndividualEmailAddressPage(_, `namespace`) =>
+        nextSelectedIndividualContactMethodPageAfter(Some(ContactMethodOptions.Email), userAnswers, flowId)
+
+      case IndividualPhoneNumberPage(_, `namespace`) =>
+        nextSelectedIndividualContactMethodPageAfter(Some(ContactMethodOptions.Phone), userAnswers, flowId)
+
+      case IndividualMobileNumberPage(_, `namespace`) =>
+        nextSelectedIndividualContactMethodPageAfter(Some(ContactMethodOptions.Mobile), userAnswers, flowId)
+
+      // Company
+      case AddCompanyContactMethodsYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(AddCompanyContactMethodsYesNoPage(id, namespace)),
+          companyRoutes.CompanyContactMethodOptionsController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case CompanyContactMethodOptionsPage(_, `namespace`) =>
+        nextSelectedCompanyContactMethodPageAfter(None, userAnswers, flowId)
+
+      case CompanyEmailAddressPage(_, `namespace`) =>
+        nextSelectedCompanyContactMethodPageAfter(Some(ContactMethodOptions.Email), userAnswers, flowId)
+
+      case CompanyPhoneNumberPage(_, `namespace`) =>
+        nextSelectedCompanyContactMethodPageAfter(Some(ContactMethodOptions.Phone), userAnswers, flowId)
+
+      case CompanyMobileNumberPage(_, `namespace`) =>
+        nextSelectedCompanyContactMethodPageAfter(Some(ContactMethodOptions.Mobile), userAnswers, flowId)
+
+      // Partnership
+      case AddPartnershipContactMethodsYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(AddPartnershipContactMethodsYesNoPage(id, namespace)),
+          partnershipRoutes.PartnershipContactMethodOptionsController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case PartnershipContactMethodOptionsPage(_, `namespace`) =>
+        nextSelectedPartnershipContactMethodPageAfter(None, userAnswers, flowId)
+
+      case PartnershipEmailAddressPage(_, `namespace`) =>
+        nextSelectedPartnershipContactMethodPageAfter(Some(ContactMethodOptions.Email), userAnswers, flowId)
+
+      case PartnershipPhoneNumberPage(_, `namespace`) =>
+        nextSelectedPartnershipContactMethodPageAfter(Some(ContactMethodOptions.Phone), userAnswers, flowId)
+
+      case PartnershipMobileNumberPage(_, `namespace`) =>
+        nextSelectedPartnershipContactMethodPageAfter(Some(ContactMethodOptions.Mobile), userAnswers, flowId)
+
+      // Trust
+      case AddTrustContactMethodsYesNoPage(_, `namespace`) =>
+        yesNoNextPage(
+          userAnswers.get(AddTrustContactMethodsYesNoPage(id, namespace)),
+          trustRoutes.TrustContactMethodOptionsController.onPageLoadWithId(flowId, FinalValidationMode),
+          flowId
+        )
+
+      case TrustContactMethodOptionsPage(_, `namespace`) =>
+        nextSelectedTrustContactMethodPageAfter(None, userAnswers, flowId)
+
+      case TrustEmailAddressPage(_, `namespace`) =>
+        nextSelectedTrustContactMethodPageAfter(Some(ContactMethodOptions.Email), userAnswers, flowId)
+
+      case TrustPhoneNumberPage(_, `namespace`) =>
+        nextSelectedTrustContactMethodPageAfter(Some(ContactMethodOptions.Phone), userAnswers, flowId)
+
+      case TrustMobileNumberPage(_, `namespace`) =>
+        nextSelectedTrustContactMethodPageAfter(Some(ContactMethodOptions.Mobile), userAnswers, flowId)
+
+      case _ =>
+        logger.error(
+          s"[FinalValidationNavigator][contactDetailsYesNoNextPage] - unexpected scoped page=$page"
+        )
+        recovery
+    }
+
+  private def nextSelectedContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    selectedContactMethods: Option[Seq[ContactMethodOptions]],
+    flowId: UUID
+  )(contactMethodPageCall: ContactMethodOptions => Call): Call =
+    navigateFromContactMethodPage(current, selectedContactMethods) { remaining =>
+      remaining.headOption.fold {
+        complete(flowId)
+      } { contactMethod =>
+        contactMethodPageCall(contactMethod)
+      }
+    }
+
+  private def nextSelectedIndividualContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      userAnswers
+        .get(IndividualContactMethodOptionsPage(flowId.toString, namespace))
+        .map(ContactMethodOptions.ordered),
+      flowId
+    ) {
+      case ContactMethodOptions.Email =>
+        soleTraderRoutes.IndividualEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Phone =>
+        soleTraderRoutes.IndividualPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        soleTraderRoutes.IndividualMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+    }
+
+  private def nextSelectedCompanyContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      userAnswers
+        .get(CompanyContactMethodOptionsPage(flowId.toString, namespace))
+        .map(ContactMethodOptions.ordered),
+      flowId
+    ) {
+      case ContactMethodOptions.Email =>
+        companyRoutes.CompanyEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Phone =>
+        companyRoutes.CompanyPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        companyRoutes.CompanyMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+    }
+
+  private def nextSelectedPartnershipContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      userAnswers
+        .get(PartnershipContactMethodOptionsPage(flowId.toString, namespace))
+        .map(ContactMethodOptions.ordered),
+      flowId
+    ) {
+      case ContactMethodOptions.Email =>
+        partnershipRoutes.PartnershipEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Phone =>
+        partnershipRoutes.PartnershipPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        partnershipRoutes.PartnershipMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+    }
+
+  private def nextSelectedTrustContactMethodPageAfter(
+    current: Option[ContactMethodOptions],
+    userAnswers: UserAnswers,
+    flowId: UUID
+  ): Call =
+    nextSelectedContactMethodPageAfter(
+      current,
+      userAnswers
+        .get(TrustContactMethodOptionsPage(flowId.toString, namespace))
+        .map(ContactMethodOptions.ordered),
+      flowId
+    ) {
+      case ContactMethodOptions.Email =>
+        trustRoutes.TrustEmailAddressController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Phone =>
+        trustRoutes.TrustPhoneNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+      case ContactMethodOptions.Mobile =>
+        trustRoutes.TrustMobileNumberController.onPageLoadWithId(flowId, FinalValidationMode)
+    }
 }

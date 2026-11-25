@@ -16,7 +16,7 @@
 
 package pages.add
 
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.{JourneyNamespace, TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.*
 import pages.QuestionPage
 import play.api.libs.json.JsPath
@@ -24,17 +24,40 @@ import utils.SubcontractorCleanup.*
 
 import scala.util.{Success, Try}
 
-case class TypeOfSubcontractorPage(id: String) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
+// Multi-tab
+case class TypeOfSubcontractorPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "typeOfSubcontractor"
 
   override def cleanup(value: Option[TypeOfSubcontractor], ua: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(Partnership) => Success(ua)
-      case Some(_)           => removePartnershipSubcontractor(ua, id)
-      case _                 => super.cleanup(value, ua)
+      case Some(Individualorsoletrader) =>
+        removePartnershipSubcontractor(ua, id, namespace)
+          .flatMap(removeLimitedCompanySubcontractor(_, id, namespace))
+          .flatMap(removeTrustSubcontractor(_, id, namespace))
+
+      case Some(Limitedcompany) =>
+        removeIndividualSoleTraderSubcontractor(ua, id, namespace)
+          .flatMap(removePartnershipSubcontractor(_, id, namespace))
+          .flatMap(removeTrustSubcontractor(_, id, namespace))
+
+      case Some(Partnership) =>
+        removeIndividualSoleTraderSubcontractor(ua, id, namespace)
+          .flatMap(removeLimitedCompanySubcontractor(_, id, namespace))
+          .flatMap(removeTrustSubcontractor(_, id, namespace))
+
+      case Some(Trust) =>
+        removeIndividualSoleTraderSubcontractor(ua, id, namespace)
+          .flatMap(removeLimitedCompanySubcontractor(_, id, namespace))
+          .flatMap(removePartnershipSubcontractor(_, id, namespace))
+
+      case _ =>
+        super.cleanup(value, ua)
     }
 }
 

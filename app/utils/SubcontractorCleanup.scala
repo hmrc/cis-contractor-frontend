@@ -16,14 +16,14 @@
 
 package utils
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.add.*
 import pages.add.partnership.*
 import pages.add.company.*
 import pages.add.trust.*
 import pages.verify.*
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 object SubcontractorCleanup {
 
@@ -46,6 +46,30 @@ object SubcontractorCleanup {
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
 
+  // Multi-tab
+  def removeIndividualSoleTraderSubcontractor(
+    userAnswers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Try[UserAnswers] =
+    userAnswers
+      .remove(AddressOfSubcontractorPage(id, namespace))
+      .flatMap(_.remove(AddIndividualContactMethodsYesNoPage(id, namespace)))
+      .flatMap(_.remove(IndividualNamesOptionsPage(id, namespace)))
+      .flatMap(_.remove(IndividualContactMethodOptionsPage(id, namespace)))
+      .flatMap(_.remove(IndividualEmailAddressPage(id, namespace)))
+      .flatMap(_.remove(IndividualMobileNumberPage(id, namespace)))
+      .flatMap(_.remove(IndividualPhoneNumberPage(id, namespace)))
+      .flatMap(_.remove(NationalInsuranceNumberYesNoPage(id, namespace)))
+      .flatMap(_.remove(SubAddressYesNoPage(id, namespace)))
+      .flatMap(_.remove(SubcontractorNamePage(id, namespace)))
+      .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage(id, namespace)))
+      .flatMap(_.remove(SubNationalInsuranceNumberPage(id, namespace)))
+      .flatMap(_.remove(TradingNameOfSubcontractorPage(id, namespace)))
+      .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage(id, namespace)))
+      .flatMap(_.remove(WorksReferenceNumberPage(id, namespace)))
+      .flatMap(_.remove(WorksReferenceNumberYesNoPage(id, namespace)))
+  
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(CompanyAddressPage)
@@ -63,6 +87,27 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CompanyWorksReferencePage))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage))
 
+  def removeLimitedCompanySubcontractor(
+    userAnswers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Try[UserAnswers] =
+    userAnswers
+      .remove(CompanyAddressPage(id, namespace))
+      .flatMap(_.remove(CompanyAddressYesNoPage(id, namespace)))
+      .flatMap(_.remove(AddCompanyContactMethodsYesNoPage(id, namespace)))
+      .flatMap(_.remove(CompanyContactMethodOptionsPage(id, namespace)))
+      .flatMap(_.remove(CompanyCrnPage(id, namespace)))
+      .flatMap(_.remove(CompanyCrnYesNoPage(id, namespace)))
+      .flatMap(_.remove(CompanyEmailAddressPage(id, namespace)))
+      .flatMap(_.remove(CompanyMobileNumberPage(id, namespace)))
+      .flatMap(_.remove(CompanyNamePage(id, namespace)))
+      .flatMap(_.remove(CompanyPhoneNumberPage(id, namespace)))
+      .flatMap(_.remove(CompanyUtrPage(id, namespace)))
+      .flatMap(_.remove(CompanyUtrYesNoPage(id, namespace)))
+      .flatMap(_.remove(CompanyWorksReferencePage(id, namespace)))
+      .flatMap(_.remove(CompanyWorksReferenceYesNoPage(id, namespace)))
+  
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(PartnershipAddressPage)
@@ -85,28 +130,37 @@ object SubcontractorCleanup {
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage))
 
-  def removePartnershipSubcontractor(userAnswers: UserAnswers, id: String): Try[UserAnswers] =
+  def removePartnershipSubcontractor(
+    userAnswers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Try[UserAnswers] =
     userAnswers
-      .remove(PartnershipAddressPage(id))
-      .flatMap(_.remove(PartnershipAddressYesNoPage(id)))
-      .flatMap(_.remove(AddPartnershipContactMethodsYesNoPage(id)))
-      .flatMap(_.remove(PartnershipContactMethodOptionsPage(id)))
-      .flatMap(_.remove(PartnershipEmailAddressPage(id)))
-      .flatMap(_.remove(PartnershipHasUtrYesNoPage(id)))
-      .flatMap(_.remove(PartnershipMobileNumberPage(id)))
-      .flatMap(_.remove(PartnershipNamePage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerCrnPage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerCrnYesNoPage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerNamePage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerNinoPage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerNinoYesNoPage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerUtrPage(id)))
-      .flatMap(_.remove(PartnershipNominatedPartnerUtrYesNoPage(id)))
-      .flatMap(_.remove(PartnershipPhoneNumberPage(id)))
-      .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage(id)))
-      .flatMap(_.remove(PartnershipWorksReferenceNumberPage(id)))
-      .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage(id)))
-      .flatMap(_.remove(CheckYourAnswersSubmittedPage(id)))
+      .remove(PartnershipAddressPage(id, namespace))
+      .flatMap(_.remove(PartnershipAddressYesNoPage(id, namespace)))
+      .flatMap(_.remove(AddPartnershipContactMethodsYesNoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipContactMethodOptionsPage(id, namespace)))
+      .flatMap(_.remove(PartnershipEmailAddressPage(id, namespace)))
+      .flatMap(_.remove(PartnershipHasUtrYesNoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipMobileNumberPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNamePage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerCrnPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerCrnYesNoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNamePage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNinoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerNinoYesNoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerUtrPage(id, namespace)))
+      .flatMap(_.remove(PartnershipNominatedPartnerUtrYesNoPage(id, namespace)))
+      .flatMap(_.remove(PartnershipPhoneNumberPage(id, namespace)))
+      .flatMap(_.remove(PartnershipUniqueTaxpayerReferencePage(id, namespace)))
+      .flatMap(_.remove(PartnershipWorksReferenceNumberPage(id, namespace)))
+      .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage(id, namespace)))
+      .flatMap { updatedAnswers =>
+        if namespace == JourneyNamespace.AddSubcontractor then
+          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else
+          Success(updatedAnswers)
+      }
 
   def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
@@ -123,6 +177,25 @@ object SubcontractorCleanup {
       .flatMap(_.remove(TrustWorksReferencePage))
       .flatMap(_.remove(TrustWorksReferenceYesNoPage))
 
+  def removeTrustSubcontractor(
+    userAnswers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Try[UserAnswers] =
+    userAnswers
+      .remove(TrustAddressPage(id, namespace))
+      .flatMap(_.remove(TrustAddressYesNoPage(id, namespace)))
+      .flatMap(_.remove(AddTrustContactMethodsYesNoPage(id, namespace)))
+      .flatMap(_.remove(TrustContactMethodOptionsPage(id, namespace)))
+      .flatMap(_.remove(TrustEmailAddressPage(id, namespace)))
+      .flatMap(_.remove(TrustMobileNumberPage(id, namespace)))
+      .flatMap(_.remove(TrustNamePage(id, namespace)))
+      .flatMap(_.remove(TrustPhoneNumberPage(id, namespace)))
+      .flatMap(_.remove(TrustUtrPage(id, namespace)))
+      .flatMap(_.remove(TrustUtrYesNoPage(id, namespace)))
+      .flatMap(_.remove(TrustWorksReferencePage(id, namespace)))
+      .flatMap(_.remove(TrustWorksReferenceYesNoPage(id, namespace)))
+  
   def removeAllSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     removeIndividualSoleTraderSubcontractor(userAnswers)
       .flatMap(removeLimitedCompanySubcontractor)

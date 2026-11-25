@@ -105,4 +105,59 @@ class FinalValidationHandoffService @Inject() (
                               }
         } yield Some((updatedAnswers, payload))
     }
+
+  // Multi-tab
+  def prepareMonthlyReturnJourney(
+    userAnswers: UserAnswers,
+    handoffId: String,
+    id: String
+  )(implicit hc: HeaderCarrier): Future[Option[(UserAnswers, FinalValidationHandoffPayload)]] =
+    getPayload(handoffId).flatMap {
+
+      case None =>
+        Future.successful(None)
+
+      case Some(payload) if !payload.flowId.contains(id) =>
+        Future.failed(
+          new RuntimeException(s"Final Validation flowId does not match handoff payload for handoffId: $handoffId")
+        )
+
+      case Some(payload) =>
+        for {
+          existingAnswers  <- sessionRepository.get(userAnswers.id)
+          currentAnswers    = existingAnswers.getOrElse(userAnswers)
+          draft            <- finalValidationDraftService.get(payload.instanceId, payload.draftId)
+          subcontractor    <- draft.subcontractor(payload.subcontractorId) match {
+                                case Some(subcontractor) =>
+                                  Future.successful(subcontractor)
+                                case None =>
+                                  Future.failed(new RuntimeException(s"Subcontractor ${payload.subcontractorId} not found in Final Validation draft ${payload.draftId}"))
+                              }
+          populatedAnswers <- Future.fromTry(
+                                finalValidationSubcontractorService.populateFinalValidationUserAnswers(
+                                  userAnswers = currentAnswers,
+                                  instanceId = payload.instanceId,
+                                  subcontractor = subcontractor,
+                                  changeTarget = payload.changeTarget,
+                                  id = id
+                                )
+                              )
+          withContext      <- Future.fromTry(
+                                populatedAnswers.set(
+                                  FinalValidationContextPage(id),
+                                  FinalValidationContext.MonthlyReturn
+                                )
+                              )
+          withDraftId      <- Future.fromTry(withContext.set(FinalValidationDraftIdPage(id), payload.draftId))
+          updatedAnswers   <- Future.fromTry(withDraftId.set(FinalValidationHandoffPage(id), handoffId))
+          stored           <- sessionRepository.set(updatedAnswers)
+
+          _                <- if stored then Future.unit
+                              else {
+                                Future.failed(
+                                  new RuntimeException(s"Failed to store updated UserAnswers for handoffId: $handoffId")
+                                )
+                              }
+        } yield Some((updatedAnswers, payload))
+    }  
 }

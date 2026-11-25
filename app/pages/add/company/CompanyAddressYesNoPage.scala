@@ -16,11 +16,25 @@
 
 package pages.add.company
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
+
+case class CompanyAddressYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean] with CompanyJourney {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
+
+  override def toString: String = "companyAddressYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then userAnswers.remove(CompanyAddressPage(id, namespace))
+    else super.cleanup(value, userAnswers)
+}
 
 case object CompanyAddressYesNoPage extends QuestionPage[Boolean] with CompanyJourney {
 

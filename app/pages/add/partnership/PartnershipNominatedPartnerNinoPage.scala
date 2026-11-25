@@ -16,12 +16,16 @@
 
 package pages.add.partnership
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class PartnershipNominatedPartnerNinoPage(id: String) extends QuestionPage[String] with PartnershipJourney {
+case class PartnershipNominatedPartnerNinoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String] with PartnershipJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "nominatedPartnerNationalInsuranceNumber"
 }

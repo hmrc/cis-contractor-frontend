@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.partnership
 
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.info.partnership.PartnershipAnswers
+import models.JourneyNamespace.AddSubcontractor
 import models.{CheckMode, Mode, UserAnswers}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -33,7 +34,7 @@ object PartnershipNominatedPartnerNameSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode, id))
+      .map(id => SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode, id, AddSubcontractor))
       .getOrElse(SubcontractorNameDisplayHelper.getPartnerDisplayName(answers, mode))
       .map { answer =>
         SummaryListRowViewModel(

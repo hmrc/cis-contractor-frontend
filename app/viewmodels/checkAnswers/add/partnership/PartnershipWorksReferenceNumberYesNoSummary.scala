@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipWorksReferenceNumberYesNoPage
@@ -34,7 +35,7 @@ object PartnershipWorksReferenceNumberYesNoSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipWorksReferenceNumberYesNoPage(id)))
+      .map(id => answers.get(PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipWorksReferenceNumberYesNoPage))
       .map { answer =>
 

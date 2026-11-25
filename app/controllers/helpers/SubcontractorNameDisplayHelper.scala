@@ -16,7 +16,7 @@
 
 package controllers.helpers
 
-import models.{AmendMode, FinalValidationMode, Mode, UserAnswers}
+import models.{AmendMode, FinalValidationMode, JourneyNamespace, Mode, UserAnswers}
 import pages.QuestionPage
 import pages.add.partnership.{PartnershipNamePage, PartnershipNominatedPartnerNamePage}
 import pages.add.trust.TrustNamePage
@@ -33,6 +33,14 @@ object SubcontractorNameDisplayHelper {
       }
     }
 
+  def getTrustDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String] =
+    getDisplayName(userAnswers, mode, TrustNamePage(id, namespace))
+  
   def trustDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
     userAnswers
       .get(TrustNamePage)
@@ -43,14 +51,17 @@ object SubcontractorNameDisplayHelper {
       }
 
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage)
+    getDisplayName(userAnswers, mode, PartnershipNamePage)
 
-  def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
-    messages: Messages
-  ): Option[String] =
-    getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage(id))
+  def getPartnershipDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String] =
+    getDisplayName(userAnswers, mode, PartnershipNamePage(id, namespace))
 
-  private def getPartnershipDisplayName(
+  private def getDisplayName(
     userAnswers: UserAnswers,
     mode: Mode,
     page: QuestionPage[String]
@@ -64,12 +75,15 @@ object SubcontractorNameDisplayHelper {
     }
 
   def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
-    getPartnershipDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage)
+    getDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage)
 
-  def getPartnerDisplayName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
-    messages: Messages
-  ): Option[String] =
-    getPartnershipDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage(id))
+  def getPartnerDisplayName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String] =
+    getDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage(id, namespace))
 
   def partnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
     userAnswers

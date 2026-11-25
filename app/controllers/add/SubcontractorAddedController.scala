@@ -18,6 +18,7 @@ package controllers.add
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.JourneyNamespace.AddSubcontractor
 import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.requests.DataRequest
@@ -72,14 +73,14 @@ class SubcontractorAddedController @Inject() (
     }
 
   def partnershipSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id               = flowId.toString
       def recoveryRedirect =
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(PartnershipNamePage(id))
-        val cisId = request.userAnswers.get(CisIdQuery(id))
+        val name  = request.userAnswers.get(PartnershipNamePage(id, AddSubcontractor))
+        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
         (name, cisId) match {
           case (Some(name), Some(cisId)) =>

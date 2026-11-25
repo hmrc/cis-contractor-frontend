@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.info.partnership.PartnershipAnswers
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
@@ -38,7 +39,7 @@ object PartnershipNominatedPartnerUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipNominatedPartnerUtrPage(id)))
+      .map(id => answers.get(PartnershipNominatedPartnerUtrPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipNominatedPartnerUtrPage))
       .map { answer =>
         val value = UtrViewModel(answer)

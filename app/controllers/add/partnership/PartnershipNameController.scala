@@ -38,7 +38,7 @@ class PartnershipNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -71,27 +71,29 @@ class PartnershipNameController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
-      val id           = flowId.toString
-      val page         = PartnershipNamePage(id)
-      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
-      Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmitWithId(flowId, mode)))
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
+      implicit request =>
+        val id           = flowId.toString
+        val page         = PartnershipNamePage(id, namespace)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+        Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmitWithId(flowId, mode)))
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id           = flowId.toString
-      val submitAction = routes.PartnershipNameController.onSubmitWithId(flowId, mode)
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
-          value =>
-            for {
-              updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(PartnershipNamePage(id), value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipNamePage(id), mode, updatedAnswers))
-        )
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
+      implicit request =>
+        val id           = flowId.toString
+        val submitAction = routes.PartnershipNameController.onSubmitWithId(flowId, mode)
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+            value =>
+              for {
+                updatedAnswers <-
+                  Future.fromTry(request.userAnswers.set(PartnershipNamePage(id, namespace), value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(PartnershipNamePage(id, namespace), mode, updatedAnswers))
+          )
     }
 }

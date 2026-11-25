@@ -16,11 +16,27 @@
 
 package pages.add
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
+
+case class UniqueTaxpayerReferenceYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean] with IndividualJourney {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
+
+  override def toString: String = "uniqueTaxpayerReferenceYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then
+      userAnswers.remove(SubcontractorsUniqueTaxpayerReferencePage(id, namespace))
+    else
+      super.cleanup(value, userAnswers)
+}
 
 case object UniqueTaxpayerReferenceYesNoPage extends QuestionPage[Boolean] with IndividualJourney {
 

@@ -17,6 +17,7 @@
 package navigation.add
 
 import controllers.routes
+import models.JourneyNamespace.AddSubcontractor
 import models.TypeOfSubcontractor.{Individualorsoletrader, Limitedcompany, Partnership, Trust}
 import models.add.ValidatedSubcontractor
 import models.add.company.ValidatedCompany
@@ -45,14 +46,14 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage(id) =>
+    case TypeOfSubcontractorPage(id, AddSubcontractor) =>
       userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode, Some(id))(userAnswers)
     case TypeOfSubcontractorPage     => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
     case _                           => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage(id) => navigatorFromTypeOfSubcontractorPage(CheckMode, Some(id))(_)
+    case TypeOfSubcontractorPage(id, AddSubcontractor) => navigatorFromTypeOfSubcontractorPage(CheckMode, Some(id))(_)
     case TypeOfSubcontractorPage     => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
     case _                           => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
@@ -61,7 +62,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     userAnswers: UserAnswers
   ): Call = {
     val selectedType =
-      id.map(value => userAnswers.get(TypeOfSubcontractorPage(value)))
+      id.map(value => userAnswers.get(TypeOfSubcontractorPage(value, AddSubcontractor)))
         .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
     selectedType match {
       case None                    =>
@@ -115,7 +116,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case Individualorsoletrader => ValidatedSubcontractor.build(userAnswers).isRight
       case Limitedcompany         => ValidatedCompany.build(userAnswers).isRight
       case Partnership            =>
-        id.map(ValidatedPartnership.build(userAnswers, _)).getOrElse(ValidatedPartnership.build(userAnswers)).isRight
+        id.map(ValidatedPartnership.build(userAnswers, _, AddSubcontractor)).getOrElse(ValidatedPartnership.build(userAnswers)).isRight
       case Trust                  => ValidatedTrust.build(userAnswers).isRight
     }
 

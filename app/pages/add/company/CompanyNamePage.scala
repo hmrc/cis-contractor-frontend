@@ -16,8 +16,19 @@
 
 package pages.add.company
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+case class CompanyNamePage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String] with CompanyJourney {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
+
+  override def toString: String = "companyName"
+}
 
 case object CompanyNamePage extends QuestionPage[String] with CompanyJourney {
 

@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.mappings.Constants.MaxLength35
-import models.{Mode, UserAnswers}
+import models.{JourneyNamespace, Mode, UserAnswers}
 import models.address.{Address, AddressLookupJourneyIdentifier, MandatoryFieldsConfigModel}
 import models.requests.DataRequest
 import play.api.Logging
@@ -30,6 +30,7 @@ import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import queries.AddressLookupAmendReturnQuery
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 /** Shared behaviour for the Address Lookup Frontend (ALF) journeys. Each subcontractor type (individual, company,
@@ -69,6 +70,32 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     */
   protected def onChangeCompletion(isAmend: Boolean): Call
 
+  // Multi-tab
+  protected val sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction
+
+  // Multi-tab
+  protected def addressPage(id: String, namespace: JourneyNamespace): Settable[Address]
+
+  // Multi-tab
+  protected def subcontractorName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String]
+
+  // Multi-tab
+  protected def standardCallback(mode: Mode, flowId: UUID): Call
+
+  // Multi-tab
+  protected def changeCallback(mode: Mode, flowId: UUID): Call
+
+  // Multi-tab
+  protected def onCompletion(mode: Mode, flowId: UUID): Call
+
+  // Multi-tab
+  protected def onChangeCompletion(mode: Mode, flowId: UUID): Call
+  
   private val mandatoryFields = MandatoryFieldsConfigModel(
     addressLine1 = Some(true),
     town = Some(true),
@@ -142,4 +169,105 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
         Redirect(journeyRecovery)
       }
 
+  // Multi-tab
+  def redirectToAddressLookupWithId(
+    flowId: UUID,
+    mode: Mode,
+    changeRoute: Option[String]
+  ): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
+      implicit request =>
+
+        val callback =
+          if changeRoute.isDefined then changeCallback(mode, flowId)
+          else standardCallback(mode, flowId)
+
+        subcontractorName(request.userAnswers, mode, flowId.toString, namespace) match {
+          case Some(name) =>
+            addressLookupService
+              .getJourneyUrl(
+                journeyId,
+                callback,
+                optName = Some(name),
+                mandatoryFieldsConfigModel = mandatoryFields,
+                line1MaxLength = Some(MaxLength35),
+                line2MaxLength = Some(MaxLength35),
+                line3MaxLength = Some(MaxLength35),
+                townMaxLength = Some(MaxLength35)
+              )
+              .map(Redirect)
+              .recover { case ex =>
+                logger.error(
+                  "[AddressLookupJourneyController][redirectToAddressLookupWithId] - failed to get ALF journey URL",
+                  ex
+                )
+                Redirect(journeyRecovery)
+              }
+
+          case None =>
+            logger.error(
+              "[AddressLookupJourneyController][redirectToAddressLookupWithId] - subcontractor name missing from userAnswers"
+            )
+            Future.successful(Redirect(journeyRecovery))
+        }
+    }
+
+  // Multi-tab
+  def addressLookupCallbackWithId(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  ): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
+      implicit request =>
+        saveAddressAndRedirect(
+          id,
+          addressPage(flowId.toString, namespace),
+          onCompletion(mode, flowId)
+        )
+    }
+
+  // Multi-tab
+  def addressLookupCallbackChangeWithId(
+    flowId: UUID,
+    id: String,
+    mode: Mode
+  ): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
+      implicit request =>
+        saveAddressAndRedirect(
+          id,
+          addressPage(flowId.toString, namespace),
+          onChangeCompletion(mode, flowId)
+        )
+    }
+
+  // Multi-tab
+  private def saveAddressAndRedirect(
+    id: String,
+    page: Settable[Address],
+    onSuccess: Call
+  )(implicit request: DataRequest[AnyContent]): Future[Result] =
+    (for {
+      address <- addressLookupService.getAddressById(id)
+      updated <- addressLookupService.saveAddressDetails(
+        address,
+        page,
+        request.userAnswers
+      )
+    } yield
+      if (updated) Redirect(onSuccess)
+      else {
+        logger.error(
+          "[AddressLookupJourneyController][saveAddressAndRedirect] - scoped address not saved, update returned false"
+        )
+        Redirect(journeyRecovery)
+      })
+      .recover { case ex =>
+        logger.error(
+          "[AddressLookupJourneyController][saveAddressAndRedirect] - failed to retrieve or save scoped address",
+          ex
+        )
+        Redirect(journeyRecovery)
+      }
 }

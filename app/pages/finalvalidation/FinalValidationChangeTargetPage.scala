@@ -17,8 +17,16 @@
 package pages.finalvalidation
 
 import models.finalvalidation.FinalValidationChangeTarget
+import models.JourneyNamespace.SubcontractorFinalValidation
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+case class FinalValidationChangeTargetPage(id: String) extends QuestionPage[FinalValidationChangeTarget] {
+
+  override def path: JsPath = JsPath \ SubcontractorFinalValidation.key \ id \ toString
+
+  override def toString: String = "finalValidationChangeTarget"
+}
 
 case object FinalValidationChangeTargetPage extends QuestionPage[FinalValidationChangeTarget] {
 

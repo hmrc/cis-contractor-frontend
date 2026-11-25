@@ -17,7 +17,8 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import models.CheckMode
+import models.{CheckMode, NormalMode}
+import models.JourneyNamespace.AddSubcontractor
 import models.add.partnership.ValidatedPartnership
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
@@ -125,10 +126,10 @@ class PartnershipCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id = flowId.toString
       val ua = request.userAnswers
-      ValidatedPartnership.build(ua, id) match {
+      ValidatedPartnership.build(ua, id, AddSubcontractor) match {
         case Right(_)    =>
           val list = SummaryListViewModel(
             rows = Seq(
@@ -153,7 +154,7 @@ class PartnershipCheckYourAnswersController @Inject() (
                 ua,
                 changeUrl = Some(
                   routes.PartnershipAddressController
-                    .redirectToAddressLookupWithId(flowId, Some("change"))
+                    .redirectToAddressLookupWithId(flowId, NormalMode, Some("change"))
                     .url
                 ),
                 subJourneyId = Some(id)
@@ -268,7 +269,7 @@ class PartnershipCheckYourAnswersController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async { implicit request =>
       val id = flowId.toString
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
         logger.error(
@@ -276,11 +277,11 @@ class PartnershipCheckYourAnswersController @Inject() (
         )
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
-        ValidatedPartnership.build(request.userAnswers, id) match {
+        ValidatedPartnership.build(request.userAnswers, id, AddSubcontractor) match {
           case Right(_) =>
             val duplicateUtr =
-              request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage(id)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, Some(id))
+              request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)) match {
+                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
                 case None      => Future.successful(false)
               }
 
@@ -291,9 +292,9 @@ class PartnershipCheckYourAnswersController @Inject() (
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 case false =>
                   subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, Some(id))
+                    .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
                     .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, Some(id))
+                      auditService.addSubcontractorEvent(request.userAnswers, id)
                       Future
                         .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
                         .flatMap(updated => sessionRepository.set(updated).map(_ => ()))

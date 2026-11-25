@@ -17,6 +17,8 @@
 @import viewmodels.InputWidth._
 @import views.html.components._
 @import viewmodels.LabelSize.Medium
+@import java.util.UUID
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -29,11 +31,19 @@
     link: Link,
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, flowId: Option[UUID] = None)(implicit request: Request[_], messages: Messages)
+
+@submitAction = @{
+    val action: Call = flowId match {
+        case Some(id) => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onSubmitWithId(id, mode)
+        case None     => controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode)
+    }
+    action
+}
 
 @layout(pageTitle = title(form, messages("subcontractorsUniqueTaxpayerReference.title"))) {
 
-    @formHelper(action = controllers.add.routes.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode)) {
+    @formHelper(action = submitAction) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

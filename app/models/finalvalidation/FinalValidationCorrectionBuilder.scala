@@ -16,7 +16,7 @@
 
 package models.finalvalidation
 
-import models.UserAnswers
+import models.{JourneyNamespace, TypeOfSubcontractor, UserAnswers}
 import models.address.Address
 import models.finalvalidation.FinalValidationChangeTarget.{Address as AddressTarget, *}
 import pages.QuestionPage
@@ -25,7 +25,6 @@ import pages.add.company.*
 import pages.add.partnership.*
 import pages.add.trust.*
 import play.api.libs.json.Reads
-import models.TypeOfSubcontractor
 import models.TypeOfSubcontractor.*
 import models.add.IndividualNamesOptions
 
@@ -34,6 +33,8 @@ import scala.util.{Failure, Success, Try}
 
 @Singleton
 class FinalValidationCorrectionBuilder @Inject() {
+
+  private val namespace = JourneyNamespace.SubcontractorFinalValidation
 
   def build(
     userAnswers: UserAnswers,
@@ -488,6 +489,447 @@ class FinalValidationCorrectionBuilder @Inject() {
             s"${IndividualNamesOptionsPage.toString} not found"
           )
         )
+    }
+
+  // Multi-tab
+  def build(
+    userAnswers: UserAnswers,
+    payload: FinalValidationHandoffPayload,
+    id: String
+  ): Try[FinalValidationCorrection] =
+    userAnswers.get(TypeOfSubcontractorPage(id, namespace)) match {
+      case Some(subcontractorType) =>
+        buildPatch(subcontractorType, userAnswers, payload.changeTarget, id)
+          .map { patch =>
+            FinalValidationCorrection(
+              subcontractorId = payload.subcontractorId,
+              changeTarget = payload.changeTarget,
+              patch = patch
+            )
+          }
+
+      case None =>
+        Failure(new RuntimeException("Type of subcontractor not found"))
+    }
+
+  private def buildPatch(
+    subcontractorType: TypeOfSubcontractor,
+    userAnswers: UserAnswers,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[FinalValidationSubcontractorPatch] =
+    (subcontractorType, target) match {
+
+      // Individual or Sole Trader
+      case (Individualorsoletrader, Names) =>
+        buildIndividualNamesPatch(userAnswers, id)
+
+      case (Individualorsoletrader, SubcontractorName) =>
+        update(userAnswers, SubcontractorNamePage(id, namespace)) { name =>
+          FinalValidationSubcontractorPatch(
+            firstName = Some(name.firstName),
+            secondName = name.middleName,
+            surname = Some(name.lastName)
+          )
+        }
+
+      case (Individualorsoletrader, TradingName) =>
+        update(userAnswers, TradingNameOfSubcontractorPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
+        }
+
+      case (Individualorsoletrader, AddressYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          SubAddressYesNoPage(id, namespace),
+          AddressOfSubcontractorPage(id, namespace)
+        ) { address =>
+          addressPatch(address)
+        }
+
+      case (Individualorsoletrader, AddressTarget) =>
+        updateAddress(userAnswers, AddressOfSubcontractorPage(id, namespace))
+
+      case (Individualorsoletrader, ContactDetailsYesNo) =>
+        clearContactsOnNoOrUpdateOnYes(
+          userAnswers,
+          AddIndividualContactMethodsYesNoPage(id, namespace),
+          IndividualEmailAddressPage(id, namespace),
+          IndividualPhoneNumberPage(id, namespace),
+          IndividualMobileNumberPage(id, namespace)
+        )
+
+      case (Individualorsoletrader, EmailAddress) =>
+        update(userAnswers, IndividualEmailAddressPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        }
+
+      case (Individualorsoletrader, PhoneNumber) =>
+        update(userAnswers, IndividualPhoneNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        }
+
+      case (Individualorsoletrader, MobilePhoneNumber) =>
+        update(userAnswers, IndividualMobileNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        }
+
+      case (Individualorsoletrader, UtrYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          UniqueTaxpayerReferenceYesNoPage(id, namespace),
+          SubcontractorsUniqueTaxpayerReferencePage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Individualorsoletrader, Utr) =>
+        update(userAnswers, SubcontractorsUniqueTaxpayerReferencePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Individualorsoletrader, NinoYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          NationalInsuranceNumberYesNoPage(id, namespace),
+          SubNationalInsuranceNumberPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
+        }
+
+      case (Individualorsoletrader, Nino) =>
+        update(userAnswers, SubNationalInsuranceNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
+        }
+
+      case (Individualorsoletrader, WorksReferenceNumberYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          WorksReferenceNumberYesNoPage(id, namespace),
+          WorksReferenceNumberPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      case (Individualorsoletrader, WorksReferenceNumber) =>
+        update(userAnswers, WorksReferenceNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      // Company
+      case (Limitedcompany, TradingName) =>
+        update(userAnswers, CompanyNamePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
+        }
+
+      case (Limitedcompany, AddressYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          CompanyAddressYesNoPage(id, namespace),
+          CompanyAddressPage(id, namespace)
+        )(addressPatch)
+
+      case (Limitedcompany, AddressTarget) =>
+        updateAddress(userAnswers, CompanyAddressPage(id, namespace))
+
+      case (Limitedcompany, ContactDetailsYesNo) =>
+        clearContactsOnNoOrUpdateOnYes(
+          userAnswers,
+          AddCompanyContactMethodsYesNoPage(id, namespace),
+          CompanyEmailAddressPage(id, namespace),
+          CompanyPhoneNumberPage(id, namespace),
+          CompanyMobileNumberPage(id, namespace)
+        )
+
+      case (Limitedcompany, EmailAddress) =>
+        update(userAnswers, CompanyEmailAddressPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        }
+
+      case (Limitedcompany, PhoneNumber) =>
+        update(userAnswers, CompanyPhoneNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        }
+
+      case (Limitedcompany, MobilePhoneNumber) =>
+        update(userAnswers, CompanyMobileNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        }
+
+      case (Limitedcompany, UtrYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          CompanyUtrYesNoPage(id, namespace),
+          CompanyUtrPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Limitedcompany, Utr) =>
+        update(userAnswers, CompanyUtrPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Limitedcompany, CrnYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          CompanyCrnYesNoPage(id, namespace),
+          CompanyCrnPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
+        }
+
+      case (Limitedcompany, Crn) =>
+        update(userAnswers, CompanyCrnPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
+        }
+
+      case (Limitedcompany, WorksReferenceNumberYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          CompanyWorksReferenceYesNoPage(id, namespace),
+          CompanyWorksReferencePage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      case (Limitedcompany, WorksReferenceNumber) =>
+        update(userAnswers, CompanyWorksReferencePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      // Trust
+      case (Trust, TradingName) =>
+        update(userAnswers, TrustNamePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
+        }
+
+      case (Trust, AddressYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          TrustAddressYesNoPage(id, namespace),
+          TrustAddressPage(id, namespace)
+        )(addressPatch)
+
+      case (Trust, AddressTarget) =>
+        updateAddress(userAnswers, TrustAddressPage(id, namespace))
+
+      case (Trust, ContactDetailsYesNo) =>
+        clearContactsOnNoOrUpdateOnYes(
+          userAnswers,
+          AddTrustContactMethodsYesNoPage(id, namespace),
+          TrustEmailAddressPage(id, namespace),
+          TrustPhoneNumberPage(id, namespace),
+          TrustMobileNumberPage(id, namespace)
+        )
+
+      case (Trust, EmailAddress) =>
+        update(userAnswers, TrustEmailAddressPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        }
+
+      case (Trust, PhoneNumber) =>
+        update(userAnswers, TrustPhoneNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        }
+
+      case (Trust, MobilePhoneNumber) =>
+        update(userAnswers, TrustMobileNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        }
+
+      case (Trust, UtrYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          TrustUtrYesNoPage(id, namespace),
+          TrustUtrPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Trust, Utr) =>
+        update(userAnswers, TrustUtrPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Trust, WorksReferenceNumberYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          TrustWorksReferenceYesNoPage(id, namespace),
+          TrustWorksReferencePage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      case (Trust, WorksReferenceNumber) =>
+        update(userAnswers, TrustWorksReferencePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      // Partnership
+      case (Partnership, PartnershipTradingName) =>
+        update(userAnswers, PartnershipNamePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(partnershipTradingName = Some(value))
+        }
+
+      case (Partnership, TradingName) =>
+        update(userAnswers, PartnershipNominatedPartnerNamePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(tradingName = Some(value))
+        }
+
+      case (Partnership, AddressYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipAddressYesNoPage(id, namespace),
+          PartnershipAddressPage(id, namespace)
+        )(addressPatch)
+
+      case (Partnership, AddressTarget) =>
+        updateAddress(userAnswers, PartnershipAddressPage(id, namespace))
+
+      case (Partnership, ContactDetailsYesNo) =>
+        clearContactsOnNoOrUpdateOnYes(
+          userAnswers,
+          AddPartnershipContactMethodsYesNoPage(id, namespace),
+          PartnershipEmailAddressPage(id, namespace),
+          PartnershipPhoneNumberPage(id, namespace),
+          PartnershipMobileNumberPage(id, namespace)
+        )
+
+      case (Partnership, EmailAddress) =>
+        update(userAnswers, PartnershipEmailAddressPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(emailAddress = Some(value))
+        }
+
+      case (Partnership, PhoneNumber) =>
+        update(userAnswers, PartnershipPhoneNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(phoneNumber = Some(value))
+        }
+
+      case (Partnership, MobilePhoneNumber) =>
+        update(userAnswers, PartnershipMobileNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(mobilePhoneNumber = Some(value))
+        }
+
+      // Partnership UTR
+      case (Partnership, UtrYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipHasUtrYesNoPage(id, namespace),
+          PartnershipUniqueTaxpayerReferencePage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      case (Partnership, Utr) =>
+        update(userAnswers, PartnershipUniqueTaxpayerReferencePage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(utr = Some(value))
+        }
+
+      // Nominated partner UTR
+      case (Partnership, PartnerUtrYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipNominatedPartnerUtrYesNoPage(id, namespace),
+          PartnershipNominatedPartnerUtrPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(partnerUtr = Some(value))
+        }
+
+      case (Partnership, PartnerUtr) =>
+        update(userAnswers, PartnershipNominatedPartnerUtrPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(partnerUtr = Some(value))
+        }
+
+      case (Partnership, NinoYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipNominatedPartnerNinoYesNoPage(id, namespace),
+          PartnershipNominatedPartnerNinoPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
+        }
+
+      case (Partnership, Nino) =>
+        update(userAnswers, PartnershipNominatedPartnerNinoPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(nino = Some(value))
+        }
+
+      case (Partnership, CrnYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipNominatedPartnerCrnYesNoPage(id, namespace),
+          PartnershipNominatedPartnerCrnPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
+        }
+
+      case (Partnership, Crn) =>
+        update(userAnswers, PartnershipNominatedPartnerCrnPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(crn = Some(value))
+        }
+
+      case (Partnership, WorksReferenceNumberYesNo) =>
+        clearOnNoOrUpdateOnYes(
+          userAnswers,
+          PartnershipWorksReferenceNumberYesNoPage(id, namespace),
+          PartnershipWorksReferenceNumberPage(id, namespace)
+        ) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      case (Partnership, WorksReferenceNumber) =>
+        update(userAnswers, PartnershipWorksReferenceNumberPage(id, namespace)) { value =>
+          FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
+        }
+
+      case _ =>
+        Failure(
+          new RuntimeException(
+            s"Unsupported combination of subcontractor type: $subcontractorType " +
+              s"and change target: $target"
+          )
+        )
+    }
+
+  private def buildIndividualNamesPatch(
+    userAnswers: UserAnswers,
+    id: String
+  ): Try[FinalValidationSubcontractorPatch] =
+    userAnswers.get(IndividualNamesOptionsPage(id, namespace)) match {
+
+      case Some(selected) =>
+        val subcontractorName =
+          if (selected.contains(IndividualNamesOptions.SubcontractorName)) {
+            userAnswers.get(SubcontractorNamePage(id, namespace))
+          } else {
+            None
+          }
+
+        val tradingName =
+          if (selected.contains(IndividualNamesOptions.TradingName)) {
+            userAnswers.get(TradingNameOfSubcontractorPage(id, namespace))
+          } else {
+            None
+          }
+
+        if (selected.contains(IndividualNamesOptions.SubcontractorName) && subcontractorName.isEmpty) {
+          Failure(new RuntimeException(s"${SubcontractorNamePage(id, namespace).toString} not found"))
+        } else if (selected.contains(IndividualNamesOptions.TradingName) && tradingName.isEmpty) {
+          Failure(new RuntimeException(s"${TradingNameOfSubcontractorPage(id, namespace).toString} not found"))
+        } else {
+          Success(
+            FinalValidationSubcontractorPatch(
+              firstName = subcontractorName.map(_.firstName),
+              secondName = subcontractorName.flatMap(_.middleName),
+              surname = subcontractorName.map(_.lastName),
+              tradingName = tradingName
+            )
+          )
+        }
+
+      case None =>
+        Failure(new RuntimeException(s"${IndividualNamesOptionsPage(id, namespace).toString} not found"))
     }
 
   private def answer[A: Reads](

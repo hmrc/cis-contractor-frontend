@@ -16,9 +16,8 @@
 
 package services
 
-import models.TypeOfSubcontractor
+import models.{JourneyNamespace, TypeOfSubcontractor, UserAnswers}
 import models.TypeOfSubcontractor.*
-import models.UserAnswers
 import models.add.{IndividualNamesOptions, SubcontractorName as AddSubcontractorName}
 import models.address.{Address, Country}
 import models.finalvalidation.{FinalValidationChangeTarget, FinalValidationDraftSubcontractor, FinalValidationSubcontractorDetails}
@@ -36,6 +35,8 @@ import scala.util.{Failure, Success, Try}
 
 @Singleton
 class FinalValidationSubcontractorService @Inject() {
+
+  private val namespace = JourneyNamespace.SubcontractorFinalValidation
 
   def populateFinalValidationUserAnswers(
     userAnswers: UserAnswers,
@@ -491,4 +492,463 @@ class FinalValidationSubcontractorService @Inject() {
     } yield result
   }
 
+  // Multi-tab
+  def populateFinalValidationUserAnswers(
+    userAnswers: UserAnswers,
+    instanceId: String,
+    subcontractor: FinalValidationDraftSubcontractor,
+    changeTarget: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] = {
+    val details = subcontractor.proposed
+
+    for {
+      subcontractorType <- getFinalValidationSubcontractorType(subcontractor)
+      withCisId <- userAnswers.set(CisIdQuery(id, namespace), instanceId)
+      withType <- withCisId.set(TypeOfSubcontractorPage(id, namespace), subcontractorType)
+      withName <- populateFinalValidationName(withType, subcontractorType, details, id)
+      withTarget <- withName.set(FinalValidationChangeTargetPage(id), changeTarget)
+      withBaseUtr <- populateBaseUtr(withTarget, subcontractor, id)
+      result <- populateFinalValidationTarget(
+        withBaseUtr,
+        subcontractorType,
+        details,
+        changeTarget,
+        id
+      )
+    } yield result
+  }
+
+  private def populateBaseUtr(
+    userAnswers: UserAnswers,
+    subcontractor: FinalValidationDraftSubcontractor,
+    id: String
+  ): Try[UserAnswers] =
+    subcontractor.base.utr match {
+      case Some(utr) => userAnswers.set(FinalValidationBaseUtrPage(id), utr)
+      case None      => userAnswers.remove(FinalValidationBaseUtrPage(id))
+    }
+
+  private def populateFinalValidationName(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    id: String
+  ): Try[UserAnswers] =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        userAnswers.set(
+          SubcontractorNamePage(id, namespace),
+          AddSubcontractorName(
+            firstName = details.firstName.getOrElse(""),
+            middleName = details.secondName,
+            lastName = details.surname.getOrElse("")
+          )
+        )
+
+      case Limitedcompany =>
+        userAnswers.set(CompanyNamePage(id, namespace), details.tradingName.getOrElse(""))
+
+      case Trust =>
+        userAnswers.set(TrustNamePage(id, namespace), details.tradingName.getOrElse(""))
+
+      case Partnership =>
+        for {
+          withPartnershipName <- userAnswers.set(
+            PartnershipNamePage(id, namespace),
+            details.partnershipTradingName.getOrElse("")
+          )
+          result <- withPartnershipName.set(
+            PartnershipNominatedPartnerNamePage(id, namespace),
+            details.tradingName.getOrElse("")
+          )
+        } yield result
+    }
+
+  private def populateFinalValidationTarget(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] =
+    target match {
+      case Names =>
+        subcontractorType match {
+          case Individualorsoletrader =>
+            populateIndividualNamesOptions(userAnswers, details, id)
+
+          case _ =>
+            Failure(new RuntimeException(s"Names not applicable for subcontractor type: $subcontractorType"))
+        }
+
+      case SubcontractorNameTarget | TradingName | PartnershipTradingName =>
+        populateNameTarget(userAnswers, subcontractorType, details, target, id)
+
+      case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn |
+           WorksReferenceNumberYesNo | WorksReferenceNumber =>
+        populateIdentifierTarget(userAnswers, subcontractorType, details, target, id)
+
+      case AddressYesNo | AddressTarget =>
+        populateAddressTarget(userAnswers, subcontractorType, details, target, id)
+
+      case ContactDetailsYesNo | EmailAddress | PhoneNumber | MobilePhoneNumber =>
+        populateContactTarget(userAnswers, subcontractorType, details, target, id)
+    }
+
+  private def populateNameTarget(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] =
+    target match {
+      case SubcontractorNameTarget | PartnershipTradingName =>
+        Success(userAnswers)
+
+      case TradingName =>
+        subcontractorType match {
+          case Individualorsoletrader =>
+            setStringOrRemove(
+              userAnswers,
+              TradingNameOfSubcontractorPage(id, namespace),
+              details.tradingName
+            )
+
+          case Limitedcompany | Trust =>
+            Success(userAnswers)
+
+          case Partnership =>
+            setStringOrRemove(
+              userAnswers,
+              PartnershipNominatedPartnerNamePage(id, namespace),
+              details.tradingName
+            )
+        }
+
+      case _ =>
+        Failure(new RuntimeException(s"Unexpected target for name population: $target"))
+    }
+
+  private def populateIdentifierTarget(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] =
+    target match {
+      case UtrYesNo | Utr =>
+        val (yesNoPage, valuePage) = utrPages(subcontractorType, id)
+
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = details.utr,
+          forceYes = target == Utr
+        )
+
+      case PartnerUtrYesNo | PartnerUtr if subcontractorType == Partnership =>
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = PartnershipNominatedPartnerUtrYesNoPage(id, namespace),
+          valuePage = PartnershipNominatedPartnerUtrPage(id, namespace),
+          value = details.partnerUtr,
+          forceYes = target == PartnerUtr
+        )
+
+      case NinoYesNo | Nino =>
+        ninoPages(subcontractorType, id).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = details.nino,
+            forceYes = target == Nino
+          )
+        }
+
+      case CrnYesNo | Crn =>
+        crnPages(subcontractorType, id).flatMap { case (yesNoPage, valuePage) =>
+          populateStringYesNoPair(
+            userAnswers = userAnswers,
+            yesNoPage = yesNoPage,
+            valuePage = valuePage,
+            value = details.crn,
+            forceYes = target == Crn
+          )
+        }
+
+      case WorksReferenceNumberYesNo | WorksReferenceNumber =>
+        val (yesNoPage, valuePage) = worksReferenceNumberPages(subcontractorType, id)
+
+        populateStringYesNoPair(
+          userAnswers = userAnswers,
+          yesNoPage = yesNoPage,
+          valuePage = valuePage,
+          value = details.worksReferenceNumber,
+          forceYes = target == WorksReferenceNumber
+        )
+
+      case _ =>
+        Failure(new RuntimeException(s"Unexpected target for identifier population: $target"))
+    }
+
+  private def populateAddressTarget(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] = {
+    val (yesNoPage, addressPage) = addressPages(subcontractorType, id)
+
+    val yesNoValue = target match {
+      case AddressYesNo => hasAddress(details)
+      case AddressTarget => true
+      case _ => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
+    }
+
+    for {
+      withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
+      result <- setAddressOrRemove(withYesNo, addressPage, toAddress(details))
+    } yield result
+  }
+
+  private def populateContactTarget(
+    userAnswers: UserAnswers,
+    subcontractorType: TypeOfSubcontractor,
+    details: FinalValidationSubcontractorDetails,
+    target: FinalValidationChangeTarget,
+    id: String
+  ): Try[UserAnswers] = {
+    val (yesNoPage, emailPage, phonePage, mobilePage) =
+      contactPages(subcontractorType, id)
+
+    val yesNoValue = target match {
+      case ContactDetailsYesNo =>
+        hasAnyContact(details)
+
+      case EmailAddress | PhoneNumber | MobilePhoneNumber =>
+        true
+
+      case _ =>
+        return Failure(new RuntimeException(s"Unexpected target for contact population: $target"))
+    }
+
+    for {
+      withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
+      withEmail <- setStringOrRemove(withYesNo, emailPage, details.emailAddress)
+      withPhone <- setStringOrRemove(withEmail, phonePage, details.phoneNumber)
+      result <- setStringOrRemove(withPhone, mobilePage, details.mobilePhoneNumber)
+    } yield result
+  }
+  
+  private def utrPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): (QuestionPage[Boolean], QuestionPage[String]) =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        (UniqueTaxpayerReferenceYesNoPage(id, namespace), SubcontractorsUniqueTaxpayerReferencePage(id, namespace))
+
+      case Limitedcompany =>
+        (CompanyUtrYesNoPage(id, namespace), CompanyUtrPage(id, namespace))
+
+      case Partnership =>
+        (PartnershipHasUtrYesNoPage(id, namespace), PartnershipUniqueTaxpayerReferencePage(id, namespace))
+
+      case Trust =>
+        (TrustUtrYesNoPage(id, namespace), TrustUtrPage(id, namespace))
+    }
+
+  private def ninoPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): Try[(QuestionPage[Boolean], QuestionPage[String])] =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        Success(
+          (
+            NationalInsuranceNumberYesNoPage(id, namespace),
+            SubNationalInsuranceNumberPage(id, namespace)
+          )
+        )
+
+      case Partnership =>
+        Success(
+          (
+            PartnershipNominatedPartnerNinoYesNoPage(id, namespace),
+            PartnershipNominatedPartnerNinoPage(id, namespace)
+          )
+        )
+
+      case other =>
+        Failure(new RuntimeException(s"NINO not applicable for subcontractor type: $other"))
+    }
+
+  private def crnPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): Try[(QuestionPage[Boolean], QuestionPage[String])] =
+    subcontractorType match {
+      case Limitedcompany =>
+        Success(
+          (
+            CompanyCrnYesNoPage(id, namespace),
+            CompanyCrnPage(id, namespace)
+          )
+        )
+
+      case Partnership =>
+        Success(
+          (
+            PartnershipNominatedPartnerCrnYesNoPage(id, namespace),
+            PartnershipNominatedPartnerCrnPage(id, namespace)
+          )
+        )
+
+      case other =>
+        Failure(new RuntimeException(s"CRN not applicable for subcontractor type: $other"))
+    }
+
+  private def worksReferenceNumberPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): (QuestionPage[Boolean], QuestionPage[String]) =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        (
+          WorksReferenceNumberYesNoPage(id, namespace),
+          WorksReferenceNumberPage(id, namespace)
+        )
+
+      case Limitedcompany =>
+        (
+          CompanyWorksReferenceYesNoPage(id, namespace),
+          CompanyWorksReferencePage(id, namespace)
+        )
+
+      case Partnership =>
+        (
+          PartnershipWorksReferenceNumberYesNoPage(id, namespace),
+          PartnershipWorksReferenceNumberPage(id, namespace)
+        )
+
+      case Trust =>
+        (
+          TrustWorksReferenceYesNoPage(id, namespace),
+          TrustWorksReferencePage(id, namespace)
+        )
+    }
+
+  private def addressPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): (QuestionPage[Boolean], QuestionPage[Address]) =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        (
+          SubAddressYesNoPage(id, namespace),
+          AddressOfSubcontractorPage(id, namespace)
+        )
+
+      case Limitedcompany =>
+        (
+          CompanyAddressYesNoPage(id, namespace),
+          CompanyAddressPage(id, namespace)
+        )
+
+      case Partnership =>
+        (
+          PartnershipAddressYesNoPage(id, namespace),
+          PartnershipAddressPage(id, namespace)
+        )
+
+      case Trust =>
+        (
+          TrustAddressYesNoPage(id, namespace),
+          TrustAddressPage(id, namespace)
+        )
+    }
+
+  private def contactPages(
+    subcontractorType: TypeOfSubcontractor,
+    id: String
+  ): (QuestionPage[Boolean], QuestionPage[String], QuestionPage[String], QuestionPage[String]) =
+    subcontractorType match {
+      case Individualorsoletrader =>
+        (
+          AddIndividualContactMethodsYesNoPage(id, namespace),
+          IndividualEmailAddressPage(id, namespace),
+          IndividualPhoneNumberPage(id, namespace),
+          IndividualMobileNumberPage(id, namespace)
+        )
+
+      case Limitedcompany =>
+        (
+          AddCompanyContactMethodsYesNoPage(id, namespace),
+          CompanyEmailAddressPage(id, namespace),
+          CompanyPhoneNumberPage(id, namespace),
+          CompanyMobileNumberPage(id, namespace)
+        )
+
+      case Partnership =>
+        (
+          AddPartnershipContactMethodsYesNoPage(id, namespace),
+          PartnershipEmailAddressPage(id, namespace),
+          PartnershipPhoneNumberPage(id, namespace),
+          PartnershipMobileNumberPage(id, namespace)
+        )
+
+      case Trust =>
+        (
+          AddTrustContactMethodsYesNoPage(id, namespace),
+          TrustEmailAddressPage(id, namespace),
+          TrustPhoneNumberPage(id, namespace),
+          TrustMobileNumberPage(id, namespace)
+        )
+    }
+
+  private def populateIndividualNamesOptions(
+    userAnswers: UserAnswers,
+    details: FinalValidationSubcontractorDetails,
+    id: String
+  ): Try[UserAnswers] = {
+
+    val hasSubcontractorName =
+      Seq(
+        details.firstName,
+        details.secondName,
+        details.surname
+      ).flatten
+        .exists(_.trim.nonEmpty)
+
+    val hasTradingName =
+      details.tradingName
+        .exists(_.trim.nonEmpty)
+
+    val selected =
+      Set.empty[IndividualNamesOptions] ++
+        Option.when(hasSubcontractorName)(
+          IndividualNamesOptions.SubcontractorName
+        ) ++
+        Option.when(hasTradingName)(
+          IndividualNamesOptions.TradingName
+        )
+
+    for {
+      withNames <- userAnswers.set(
+        IndividualNamesOptionsPage(id, namespace),
+        selected
+      )
+      result <- setStringOrRemove(
+        withNames,
+        TradingNameOfSubcontractorPage(id, namespace),
+        details.tradingName
+      )
+    } yield result
+  }  
 }

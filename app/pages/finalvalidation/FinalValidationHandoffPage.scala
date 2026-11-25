@@ -18,6 +18,15 @@ package pages.finalvalidation
 
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import models.JourneyNamespace.SubcontractorFinalValidation
+
+case class FinalValidationHandoffPage(id: String) extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ SubcontractorFinalValidation.key \ id \ toString
+
+  override def toString: String = "finalValidationHandoffId"
+
+}
 
 case object FinalValidationHandoffPage extends QuestionPage[String] {
 

@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.WorksReferenceNumberFormProvider
-import models.Mode
+import models.{JourneyNamespace, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.{WorksReferenceNumberPage, WorksReferenceNumberYesNoPage}
@@ -31,6 +31,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.WorksReferenceNumberView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,6 +42,7 @@ class WorksReferenceNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: WorksReferenceNumberFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
@@ -58,6 +60,10 @@ class WorksReferenceNumberController @Inject() (
 
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(WorksReferenceNumberPage).fold(form)(form.fill)
+
+  // Multi-tab
+  private def preparedForm(id: String, namespace: JourneyNamespace)(implicit request: DataRequest[?]) =
+    request.userAnswers.get(WorksReferenceNumberPage(id, namespace)).fold(form)(form.fill)
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -95,6 +101,59 @@ class WorksReferenceNumberController @Inject() (
                 } yield Redirect(navigator.nextPage(WorksReferenceNumberPage, mode, updatedAnswers))
             )
         }
+    }
+
+  // Multi-tab
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
+      implicit request =>
+
+        val id = flowId.toString
+        val yesOrNoPage = WorksReferenceNumberYesNoPage(id, namespace)
+        val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
+
+        subcontractorNameExtractor
+          .getSubcontractorName(request.userAnswers, mode, id, namespace)
+          .fold {
+            logger.error("[WorksReferenceNumberController][onPageLoadWithId] - subcontractor name missing or invalid")
+            recoveryRedirect
+          } { subcontractorName =>
+            val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+
+            yesOrNoPageGuardService.yesOrNoPageRoute(
+              result,
+              yesOrNoPageOption,
+              yesOrNoPage,
+              mode
+            )
+          }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
+      implicit request =>
+
+        val id = flowId.toString
+        val page = WorksReferenceNumberPage(id, namespace)
+
+        subcontractorNameExtractor
+          .getSubcontractorName(request.userAnswers, mode, id, namespace)
+          .fold {
+            logger.error("[WorksReferenceNumberController][onSubmitWithId] - subcontractor name missing or invalid")
+            Future.successful(recoveryRedirect)
+          } { subcontractorName =>
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+                value =>
+                  for {
+                    updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                    _ <- sessionRepository.set(updatedAnswers)
+                  } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+              )
+          }
     }
 
 }
