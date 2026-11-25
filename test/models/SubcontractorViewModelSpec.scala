@@ -30,13 +30,13 @@ class SubcontractorViewModelSpec extends SpecBase {
   )
 
   private def subcontractor(
-    subcontractorId: Long,
-    firstName: Option[String] = None,
-    surname: Option[String] = None,
-    tradingName: Option[String] = None,
-    partnershipTradingName: Option[String] = None,
-    subcontractorType: Option[String]
-  ): Subcontractor =
+                             subcontractorId: Long,
+                             firstName: Option[String] = None,
+                             surname: Option[String] = None,
+                             tradingName: Option[String] = None,
+                             partnershipTradingName: Option[String] = None,
+                             subcontractorType: Option[String]
+                           ): Subcontractor =
     Subcontractor(
       subcontractorId = subcontractorId,
       firstName = firstName,
@@ -89,6 +89,17 @@ class SubcontractorViewModelSpec extends SpecBase {
           value = "10"
         )
       )
+    }
+
+    "must sort A-Z, case insensitivity, with individuals ordered by surname" in {
+      val subs = Seq(
+        SubcontractorViewModel("1", "Flooring and Tiles"),
+        SubcontractorViewModel("2", "Armstrong, Noel"),
+        SubcontractorViewModel("3", "abc Trust"),
+        SubcontractorViewModel("4", "ABC Company")
+      )
+
+      SubcontractorViewModel.checkboxItems(subs).map(_.value) mustBe Seq("4", "3", "2", "1")
     }
   }
 

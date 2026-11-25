@@ -33,10 +33,7 @@ class VerificationPreSelectionService @Inject() () {
     if (hasOpenCurrentVerificationBatch(userAnswers)) {
       preSelectedFromNewestBatch(displayedSubcontractors, userAnswers)
     } else {
-      displayedSubcontractors
-        .take(100)
-        .map(_.subcontractorId.toString)
-        .toSet
+      Set.empty[String]
     }
 
   private def hasOpenCurrentVerificationBatch(userAnswers: UserAnswers): Boolean =
