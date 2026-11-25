@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewUnmatchedSubcontractorsView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -36,6 +37,7 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   sessionRepository: SessionRepository,
@@ -70,6 +72,32 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
       }
     }
 
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val subJourneyId = flowId.toString
+      
+      request.userAnswers.get(CurrentVerificationBatchResponsePage(subJourneyId)) match {
+        case Some(currentBatch) =>
+          reviewUnmatchedSubcontractorsService.buildViewModel(currentBatch) match { // TODO DTR-9463: Ivestigate if need to update with id
+            case Success(viewModel) =>
+              Ok(view(viewModel))
+
+            case Failure(e) =>
+              logger.error(
+                "[ReviewUnmatchedSubcontractorsController] Failed to build review unmatched subcontractors view model",
+                e
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+
+        case None =>
+          logger.error(
+            "[ReviewUnmatchedSubcontractorsController][onPageLoadWithId] - CurrentVerificationBatchResponsePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       for {
@@ -88,6 +116,28 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
         _           <- sessionRepository.set(withSource)
       } yield Redirect(
         controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
+      )
+    }
+
+  def onSubmitWithId(flowId :UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      for {
+        withContext <- Future.fromTry(
+          request.userAnswers.set(
+            FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope
+            FinalValidationContext.VerifySubcontractor
+          )
+        )
+        withSource <- Future.fromTry(
+          withContext.set(
+            VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope
+            VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+          )
+        )
+        _ <- sessionRepository.set(withSource)
+      } yield Redirect(
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit() // TODO DTR-9463: Final validation out of scope
       )
     }
 }

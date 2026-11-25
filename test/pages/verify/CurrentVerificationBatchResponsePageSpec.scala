@@ -81,4 +81,66 @@ class CurrentVerificationBatchResponsePageSpec extends SpecBase {
       (uaWithValue.data \ "currentVerificationBatchResponse").toOption mustBe Some(Json.toJson(model))
     }
   }
+
+  "CurrentVerificationBatchResponsePage with id" - {
+    val id = "testId"
+
+    "must have the correct path" in {
+      CurrentVerificationBatchResponsePage(id).path.toString mustBe "/currentVerificationBatchResponse"
+    }
+
+    "must be able to set and get a value" in {
+      val model = GetCurrentVerificationBatchResponse(
+        subcontractors = Nil,
+        verificationBatch = None,
+        verifications = Nil
+      )
+
+      val uaWithValue =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage(id), model)
+          .success
+          .value
+
+      uaWithValue.get(CurrentVerificationBatchResponsePage(id)) mustBe Some(model)
+    }
+
+    "must be able to remove the value" in {
+      val model = GetCurrentVerificationBatchResponse(
+        subcontractors = Nil,
+        verificationBatch = None,
+        verifications = Nil
+      )
+
+      val uaWithValue =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage(id), model)
+          .success
+          .value
+
+      val uaRemoved =
+        uaWithValue
+          .remove(CurrentVerificationBatchResponsePage(id))
+          .success
+          .value
+
+      uaRemoved.get(CurrentVerificationBatchResponsePage(id)) mustBe None
+    }
+
+    "must serialise to the expected JSON key" in {
+      val model = GetCurrentVerificationBatchResponse(
+        subcontractors = Nil,
+        verificationBatch = None,
+        verifications = Nil
+      )
+
+      val uaWithValue =
+        emptyUserAnswers
+          .set(CurrentVerificationBatchResponsePage(id), model)
+          .success
+          .value
+
+      (uaWithValue.data \ "amendSubcontractor" \ id \ "currentVerificationBatchResponse").toOption mustBe Some(Json.toJson(model))
+    }
+  }
 }

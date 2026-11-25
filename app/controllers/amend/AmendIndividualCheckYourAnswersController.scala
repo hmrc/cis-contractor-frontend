@@ -486,10 +486,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
               .map { _ =>
                 auditService.amendSubcontractorEvent(updated)
 
-                Redirect(
-                  controllers.amend.routes.AmendIndividualConfirmationController // TODO DTR-9463: Update with id
-                    .onPageLoad()
-                )
+                Redirect(controllers.amend.routes.AmendIndividualConfirmationController.onPageLoadWithId(flowId))
               }
           }
           .recover { case t =>
@@ -539,6 +536,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   private def handleNoChangesWithId(flowId: UUID)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] = {
+    val subJourneyId = flowId.toString
     val cisId            = request.userAnswers.get(CisIdQuery(flowId.toString))
     def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
@@ -553,7 +551,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
         Future
           .fromTry(
-            cleanupService.cleanAmend(request.userAnswers)
+            cleanupService.cleanAmend(request.userAnswers, subJourneyId)
           )
           .flatMap(sessionRepository.set)
           .map { _ =>
@@ -622,12 +620,12 @@ class AmendIndividualCheckYourAnswersController @Inject() (
         )
 
       case Some(AmendJourneyType.InsufficientInfo) =>
-        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController // TODO DTR-9463: Update with id
-          .onPageLoad()
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoadWithId(flowId)
 
       case Some(AmendJourneyType.UnmatchedInfo) =>
-        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController // TODO DTR-9463: Update with id
-          .onPageLoad()
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoadWithId(flowId)
 
       case None =>
         logger.error(
@@ -678,6 +676,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
   def onCancelWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
       val cisId = request.userAnswers.get(CisIdQuery(flowId.toString))
 
       def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
@@ -693,7 +692,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
           Future
             .fromTry(
-              cleanupService.cleanAmend(request.userAnswers) // TODO DTR-9463: Does this need id?
+              cleanupService.cleanAmend(request.userAnswers, subJourneyId) 
             )
             .flatMap(sessionRepository.set)
             .map { _ =>

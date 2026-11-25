@@ -31,12 +31,14 @@ import views.html.verify.ReviewInsufficientInfoSubcontractorsView
 
 import scala.util.{Failure, Success}
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReviewInsufficientInfoSubcontractorsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   reviewInsufficientInfoService: ReviewInsufficientInfoService,
   contractorDetailsFinalValidationService: ContractorDetailsFinalValidationService,
   val controllerComponents: MessagesControllerComponents,
@@ -119,6 +121,80 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
         }
     }
 
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
+        .flatMap { case (validatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()) // TODO DTR-9463: Final validation out of scope
+            )
+          } else {
+            validatedAnswers.get(CurrentVerificationBatchResponsePage(subJourneyId)) match {
+
+              case Some(batch) =>
+                reviewInsufficientInfoService.buildViewModel(batch) match {
+
+                  case Success(viewModel) =>
+                    if (viewModel.hasMissing || viewModel.hasReady) {
+                      for {
+                        updatedAnswers <-
+                          Future.fromTry(
+                            validatedAnswers.set(
+                              VerificationBatchReadinessPage(subJourneyId),
+                              viewModel.allReady
+                            )
+                          )
+                        _ <- sessionRepository.set(updatedAnswers)
+                      } yield Ok(view(viewModel))
+                    } else {
+                      logger.error(
+                        "[ReviewInsufficientInfoSubcontractorsController][onPageLoadWithId] - no missing or ready subcontractors in view model"
+                      )
+                      Future.successful(
+                        Redirect(
+                          controllers.routes.JourneyRecoveryController.onPageLoad()
+                        )
+                      )
+                    }
+
+                  case Failure(error) =>
+                    logger.error(
+                      "[ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId] Failed to build view model",
+                      error
+                    )
+
+                    Future.successful(
+                      Redirect(
+                        controllers.routes.JourneyRecoveryController.onPageLoad()
+                      )
+                    )
+                }
+
+              case None =>
+                logger.error(
+                  "[ReviewInsufficientInfoSubcontractorsController][onPageLoadWithId] - CurrentVerificationBatchResponsePage missing from userAnswers"
+                )
+                Future.successful(
+                  Redirect(
+                    controllers.routes.JourneyRecoveryController.onPageLoad()
+                  )
+                )
+            }
+          }
+        }
+        .recover { case t =>
+          logger.error(
+            "[ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId] Failed final contractor validation",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       for {
@@ -137,6 +213,28 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
         _           <- sessionRepository.set(withSource)
       } yield Redirect(
         controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
+      )
+    }
+
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      for {
+        withContext <- Future.fromTry(
+          request.userAnswers.set(
+            FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope of ticket
+            FinalValidationContext.VerifySubcontractor
+          )
+        )
+        withSource <- Future.fromTry(
+          withContext.set(
+            VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope of ticket
+            VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+          )
+        )
+        _ <- sessionRepository.set(withSource)
+      } yield Redirect(
+        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit() // TODO DTR-9463: Final validation out of scope of ticket
       )
     }
 }
