@@ -16,26 +16,30 @@
 
 package controllers.verify
 
-import base.SpecBase
-import models.{Submission, UserAnswers, VerificationBatch}
+import base.{SpecBase, WithFakeCisTaxpayer}
+import models.verify.SelectedSubcontractors
+import models.{SubcontractorViewModel, Submission, UserAnswers, VerificationBatch}
 import models.response.GetNewestVerificationBatchResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.NewestVerificationBatchResponsePage
+import pages.verify.{NewestVerificationBatchResponsePage, SelectSubcontractorPage, SelectSubcontractorsToReverifyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import services.VerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
+import java.util.UUID
 import scala.concurrent.Future
 
-class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSugar {
+class VerificationRequestSubmittedControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
-  private val cisId = "12345"
+  private val cisId = "AB12"
+
+  private val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
 
   private val verificationBatch =
     VerificationBatch(
@@ -152,6 +156,64 @@ class VerificationRequestSubmittedControllerSpec extends SpecBase with MockitoSu
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK for a GET with id and show nested subcontractors" in {
+
+      val ua =
+        emptyUserAnswers
+          .set(VerifyCisIdQuery(flowId.toString), cisId)
+          .success
+          .value
+          .set(NewestVerificationBatchResponsePage(flowId.toString), newestBatchResponse)
+          .success
+          .value
+          .set(SelectSubcontractorPage(flowId.toString), Set(SubcontractorViewModel("1", "ABC Company")))
+          .success
+          .value
+          .set(
+            SelectSubcontractorsToReverifyPage(flowId.toString),
+            Set(SelectedSubcontractors("2", "Smith, John"))
+          )
+          .success
+          .value
+
+      val mockVerificationService =
+        mock[VerificationService]
+
+      when(
+        mockVerificationService.refreshSubmittedVerificationRequest(
+          any[UserAnswers],
+          any[Option[String]]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(ua))
+
+      when(mockVerificationService.resetUserAnswers(any[UserAnswers]))
+        .thenReturn(Future.successful(()))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(ua),
+          additionalBindings = Seq(
+            bind[VerificationService].toInstance(mockVerificationService)
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.VerificationRequestSubmittedController.onPageLoadWithId(flowId).url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("ABC Company")
+        contentAsString(result) must include("Smith, John")
       }
     }
   }

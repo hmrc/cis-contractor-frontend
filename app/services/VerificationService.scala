@@ -124,10 +124,17 @@ class VerificationService @Inject() (
   }
 
   def refreshSubmittedVerificationRequest(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    refreshNewestVerificationBatch(userAnswers).flatMap { updatedAnswers =>
-      val status =
+    refreshSubmittedVerificationRequest(userAnswers, None)
+
+  def refreshSubmittedVerificationRequest(userAnswers: UserAnswers, subJourneyId: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[UserAnswers] =
+    refreshNewestVerificationBatch(userAnswers, subJourneyId).flatMap { updatedAnswers =>
+      val newestPage =
+        subJourneyId.map(NewestVerificationBatchResponsePage.apply).getOrElse(NewestVerificationBatchResponsePage)
+      val status     =
         updatedAnswers
-          .get(NewestVerificationBatchResponsePage)
+          .get(newestPage)
           .flatMap(_.submission)
           .flatMap(_.status)
 

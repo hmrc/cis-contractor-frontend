@@ -715,6 +715,7 @@ GET   /subcontractor/verify/no-subcontractors-selected-warning/check-mode  contr
 GET   /subcontractor/verify/no-subcontractors-selected-warning             controllers.verify.NoSubcontractorsSelectedWarningController.onPageLoad()
 GET   /subcontractor/verify/no-subcontractors-selected-warning/cancel      controllers.verify.NoSubcontractorsSelectedWarningController.onCancel()
 
+GET   /subcontractor/verify/verification-request-submitted/:flowId  controllers.verify.VerificationRequestSubmittedController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/verification-request-submitted  controllers.verify.VerificationRequestSubmittedController.onPageLoad()
 
 GET   /subcontractor/verify/verification-sent-not-received-warning  controllers.verify.VerifySendErrorController.onPageLoad()
