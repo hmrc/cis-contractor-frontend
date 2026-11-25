@@ -82,22 +82,23 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CompanyWorksReferencePage))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage))
 
-  def removeLimitedCompanySubcontractor(userAnswers: UserAnswers, subJourneyId: String): Try[UserAnswers] =
+  def removeLimitedCompanySubcontractor(userAnswers: UserAnswers, id: String): Try[UserAnswers] =
     userAnswers
-      .remove(CompanyAddressPage(subJourneyId))
-      .flatMap(_.remove(CompanyAddressYesNoPage(subJourneyId)))
-      .flatMap(_.remove(AddCompanyContactMethodsYesNoPage(subJourneyId)))
-      .flatMap(_.remove(CompanyContactMethodOptionsPage(subJourneyId)))
-      .flatMap(_.remove(CompanyCrnPage(subJourneyId)))
-      .flatMap(_.remove(CompanyCrnYesNoPage(subJourneyId)))
-      .flatMap(_.remove(CompanyEmailAddressPage(subJourneyId)))
-      .flatMap(_.remove(CompanyMobileNumberPage(subJourneyId)))
-      .flatMap(_.remove(CompanyNamePage(subJourneyId)))
-      .flatMap(_.remove(CompanyPhoneNumberPage(subJourneyId)))
-      .flatMap(_.remove(CompanyUtrPage(subJourneyId)))
-      .flatMap(_.remove(CompanyUtrYesNoPage(subJourneyId)))
-      .flatMap(_.remove(CompanyWorksReferencePage(subJourneyId)))
-      .flatMap(_.remove(CompanyWorksReferenceYesNoPage(subJourneyId)))
+      .remove(CompanyAddressPage(id))
+      .flatMap(_.remove(CompanyAddressYesNoPage(id)))
+      .flatMap(_.remove(AddCompanyContactMethodsYesNoPage(id)))
+      .flatMap(_.remove(CompanyContactMethodOptionsPage(id)))
+      .flatMap(_.remove(CompanyCrnPage(id)))
+      .flatMap(_.remove(CompanyCrnYesNoPage(id)))
+      .flatMap(_.remove(CompanyEmailAddressPage(id)))
+      .flatMap(_.remove(CompanyMobileNumberPage(id)))
+      .flatMap(_.remove(CompanyNamePage(id)))
+      .flatMap(_.remove(CompanyPhoneNumberPage(id)))
+      .flatMap(_.remove(CompanyUtrPage(id)))
+      .flatMap(_.remove(CompanyUtrYesNoPage(id)))
+      .flatMap(_.remove(CompanyWorksReferencePage(id)))
+      .flatMap(_.remove(CompanyWorksReferenceYesNoPage(id)))
+      .flatMap(_.remove(CheckYourAnswersSubmittedPage(id)))
 
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers

@@ -36,7 +36,7 @@ import play.api.mvc.PlayBodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
-import services.{CisTaxpayerService, FakeCisTaxpayerService}
+import services.{CisTaxpayerService, FakeCisTaxpayerServiceSpec}
 
 import scala.concurrent.Future
 
@@ -113,7 +113,7 @@ trait WithFakeCisTaxpayer extends SpecBase {
   ): GuiceApplicationBuilder =
     super.applicationBuilder(
       userAnswers,
-      additionalBindings :+ bind[CisTaxpayerService].toInstance(new FakeCisTaxpayerService),
+      additionalBindings :+ bind[CisTaxpayerService].toInstance(new FakeCisTaxpayerServiceSpec),
       isAgent,
       hasAgentRef,
       hasEmployeeRef,

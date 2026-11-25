@@ -22,9 +22,9 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class AddCompanyContactMethodsYesNoPageWithId(id: String) extends QuestionPage[Boolean] with CompanyJourney {
+case class AddCompanyContactMethodsYesNoPage(id: String) extends QuestionPage[Boolean] with CompanyJourney {
 
-  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "addCompanyContactMethodsYesNo"
 

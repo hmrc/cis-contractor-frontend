@@ -644,7 +644,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
             .url
         saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Trust)
         saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe Some("1")
+        saved.get(CisIdQuery) mustBe Some(startCisId)
       }
     }
 

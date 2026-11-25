@@ -21,7 +21,7 @@ import play.api.libs.json.JsPath
 
 case class CompanyEmailAddressPage(id: String) extends QuestionPage[String] with CompanyJourney {
 
-  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "companyEmailAddress"
 }

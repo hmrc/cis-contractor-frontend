@@ -16,29 +16,42 @@
 
 package viewmodels.checkAnswers.add.company
 
+import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.add.AddressSummaryRow
-import models.info.company.CompanyAnswers
 
 object CompanyAddressSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyAddressPage).map { answer =>
-      AddressSummaryRow.row(
-        address = answer,
-        key = "companyAddress.checkYourAnswersLabel",
-        changeCall = if (mode == AmendMode) {
-          controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
-        } else {
-          controllers.add.company.routes.CompanyAddressController.redirectToAddressLookup(NormalMode, Some("change"))
-        },
-        hiddenTextKey = "companyAddress.change.hidden",
-        id = "address-of-company"
-      )
-    }
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyAddressPage(id)))
+      .getOrElse(answers.get(CompanyAddressPage))
+      .map { answer =>
+        AddressSummaryRow.row(
+          address = answer,
+          key = "companyAddress.checkYourAnswersLabel",
+          changeCall = changeUrl
+            .map(url => play.api.mvc.Call("GET", url))
+            .getOrElse(
+              if (mode == AmendMode) {
+                controllers.add.company.routes.CompanyAddressController.redirectToAmendAddressLookup()
+              } else {
+                controllers.add.company.routes.CompanyAddressController
+                  .redirectToAddressLookup(NormalMode, Some("change"))
+              }
+            ),
+          hiddenTextKey = "companyAddress.change.hidden",
+          id = "address-of-company"
+        )
+      }
 
   def row(
     answers: CompanyAnswers

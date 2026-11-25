@@ -40,7 +40,12 @@ class CompanyContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyContactMethodOptionsController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("companyContactMethodOptions.title"))
 
@@ -74,7 +79,12 @@ class CompanyContactMethodOptionsViewSpec extends AnyWordSpec with Matchers with
       val errorForm: Form[Set[CompanyContactMethodOptions]] =
         form.withError("value", "companyContactMethodOptions.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyContactMethodOptionsController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

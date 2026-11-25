@@ -30,7 +30,7 @@ case class CompanyContactMethodOptionsPage(id: String)
     with CompanyJourney
     with ContactMethodOptionsCleanup {
 
-  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "companyContactMethodOptions"
 
@@ -39,13 +39,12 @@ case class CompanyContactMethodOptionsPage(id: String)
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
     value match {
-
       case Some(selectedAnswers) =>
         removeIfNotSelected(selectedAnswers, Email, CompanyEmailAddressPage(id), userAnswers)
           .flatMap(removeIfNotSelected(selectedAnswers, Phone, CompanyPhoneNumberPage(id), _))
           .flatMap(removeIfNotSelected(selectedAnswers, Mobile, CompanyMobileNumberPage(id), _))
-
-      case _ => super.cleanup(value, userAnswers)
+      case _                     =>
+        super.cleanup(value, userAnswers)
     }
 }
 

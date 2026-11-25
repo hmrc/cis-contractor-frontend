@@ -24,17 +24,13 @@ import scala.util.Try
 
 case class CompanyWorksReferenceYesNoPage(id: String) extends QuestionPage[Boolean] with CompanyJourney {
 
-  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
 
   override def toString: String = "companyWorksReferenceYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then {
-      userAnswers
-        .remove(CompanyWorksReferencePage(id))
-    } else {
-      super.cleanup(value, userAnswers)
-    }
+    if value.contains(false) then userAnswers.remove(CompanyWorksReferencePage(id))
+    else super.cleanup(value, userAnswers)
 }
 
 case object CompanyWorksReferenceYesNoPage extends QuestionPage[Boolean] with CompanyJourney {

@@ -35,7 +35,12 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
 
     "render the page with title, heading, input and submit button" in new Setup {
       val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(NormalMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyWorksReference.title"))
@@ -54,7 +59,12 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
 
     "render the page with title, heading, input and update button for Amend journey" in new Setup {
       val companyName                 = "Test Company"
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(AmendMode)
+      )
       val doc                         = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyWorksReference.title"))
@@ -76,7 +86,12 @@ class CompanyWorksReferenceViewSpec extends AnyWordSpec with Matchers with Guice
         form.withError("value", "companyWorksReference.error.required")
 
       val companyName = "Test Company"
-      val html        = view(errorForm, NormalMode, companyName)
+      val html        = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyWorksReferenceController.onSubmit(NormalMode)
+      )
       val doc         = org.jsoup.Jsoup.parse(html.toString())
 
       val summary = doc.select(".govuk-error-summary")

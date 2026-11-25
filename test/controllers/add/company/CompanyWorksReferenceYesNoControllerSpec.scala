@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyWorksReferenceYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -33,7 +33,7 @@ import views.html.add.company.CompanyWorksReferenceYesNoView
 
 import scala.concurrent.Future
 
-class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSugar {
+class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   private val companyName = "Test Company"
 
@@ -63,7 +63,15 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[CompanyWorksReferenceYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -81,7 +89,12 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -158,7 +171,12 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString
@@ -212,7 +230,12 @@ class CompanyWorksReferenceYesNoControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyWorksReferenceYesNoController.onSubmit(NormalMode)
+        )(
           request,
           messages(application)
         ).toString

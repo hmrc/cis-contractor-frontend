@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.company.CompanyNameView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,6 +38,7 @@ class CompanyNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: CompanyNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -55,7 +57,13 @@ class CompanyNameController @Inject() (
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      Ok(
+        view(
+          preparedForm,
+          mode,
+          routes.CompanyNameController.onSubmit(mode)
+        )
+      )
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
@@ -63,12 +71,58 @@ class CompanyNameController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(
+                view(
+                  formWithErrors,
+                  mode,
+                  routes.CompanyNameController.onSubmit(mode)
+                )
+              )
+            ),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyNamePage, value))
+              updatedAnswers <-
+                Future.fromTry(
+                  request.userAnswers.set(
+                    CompanyNamePage,
+                    value
+                  )
+                )
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyNamePage, mode, updatedAnswers))
+            } yield Redirect(
+              navigator.nextPage(
+                CompanyNamePage,
+                mode,
+                updatedAnswers
+              )
+            )
+        )
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = CompanyNamePage(id)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.CompanyNameController.onSubmitWithId(flowId, mode)))
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.CompanyNameController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(CompanyNamePage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyNamePage(id), mode, updatedAnswers))
         )
     }
 }

@@ -16,7 +16,7 @@
 
 package controllers.add.company
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.{NormalMode, UserAnswers}
@@ -33,7 +33,7 @@ import views.html.add.company.CompanyAddressYesNoView
 
 import scala.concurrent.Future
 
-class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
+class CompanyAddressYesNoControllerSpec extends SpecBase with WithFakeCisTaxpayer with MockitoSugar {
 
   val formProvider        = new CompanyAddressYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
@@ -60,7 +60,12 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CompanyAddressYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, companyName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -78,10 +83,12 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        contentAsString(result) mustEqual view(
+          form.fill(true),
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -155,10 +162,12 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, companyName)(
-          request,
-          messages(application)
-        ).toString
+        view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -238,8 +247,12 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual
-          view(boundForm, NormalMode, companyName)(request, messages(application)).toString
+        view(
+          boundForm,
+          NormalMode,
+          companyName,
+          controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -259,7 +272,166 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode, companyName)(request, messages(application)).toString
+          view(
+            boundForm,
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.CompanyAddressYesNoController.onSubmit(NormalMode)
+          )(request, messages(application)).toString
+      }
+    }
+
+    "with id" - {
+
+      val flowId = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val id     = flowId.toString
+
+      val answers = emptyUserAnswers
+        .set(queries.CisIdQuery(id), "AB12")
+        .success
+        .value
+        .set(CompanyNamePage(id), companyName)
+        .success
+        .value
+
+      lazy val withIdRoute =
+        controllers.add.company.routes.CompanyAddressYesNoController
+          .onPageLoadWithId(flowId, NormalMode)
+          .url
+
+      "must return OK and the correct view for a GET" in {
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, withIdRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CompanyAddressYesNoView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            form,
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.CompanyAddressYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must populate the view correctly on a GET when the question has previously been answered" in {
+
+        val userAnswers = answers.set(pages.add.company.CompanyAddressYesNoPage(id), true).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, withIdRoute)
+
+          val view = application.injector.instanceOf[CompanyAddressYesNoView]
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(
+            form.fill(true),
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.CompanyAddressYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
+      }
+
+      "must redirect to the CompanyAddress page when valid data with value Yes is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.CompanyAddressYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.add.company.routes.CompanyAddressController
+              .redirectToAddressLookupWithId(flowId, None)
+              .url
+        }
+      }
+
+      "must redirect to the AddCompanyContactMethodsYesNo page when valid data with value No is submitted" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(answers))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.CompanyAddressYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.add.company.routes.AddCompanyContactMethodsYesNoController
+              .onPageLoadWithId(flowId, NormalMode)
+              .url
+        }
+      }
+
+      "must return a Bad Request when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request =
+            FakeRequest(
+              POST,
+              controllers.add.company.routes.CompanyAddressYesNoController
+                .onSubmitWithId(flowId, NormalMode)
+                .url
+            ).withFormUrlEncodedBody(("value", ""))
+
+          val boundForm = form.bind(Map("value" -> ""))
+          val view      = application.injector.instanceOf[CompanyAddressYesNoView]
+
+          val result = route(application, request).value
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(
+            boundForm,
+            NormalMode,
+            companyName,
+            controllers.add.company.routes.CompanyAddressYesNoController
+              .onSubmitWithId(flowId, NormalMode)
+          )(request, messages(application)).toString
+        }
       }
     }
   }
