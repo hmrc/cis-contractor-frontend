@@ -55,9 +55,9 @@ class VerificationPreSelectionServiceSpec extends SpecBase {
     )
 
   private def newestBatch(
-                           status: Option[String],
-                           verifications: Seq[Verification] = Seq.empty
-                         ): GetNewestVerificationBatchResponse =
+    status: Option[String],
+    verifications: Seq[Verification] = Seq.empty
+  ): GetNewestVerificationBatchResponse =
     GetNewestVerificationBatchResponse(
       scheme = None,
       subcontractors = displayedSubcontractors,

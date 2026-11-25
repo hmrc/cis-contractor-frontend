@@ -30,13 +30,13 @@ class SubcontractorViewModelSpec extends SpecBase {
   )
 
   private def subcontractor(
-                             subcontractorId: Long,
-                             firstName: Option[String] = None,
-                             surname: Option[String] = None,
-                             tradingName: Option[String] = None,
-                             partnershipTradingName: Option[String] = None,
-                             subcontractorType: Option[String]
-                           ): Subcontractor =
+    subcontractorId: Long,
+    firstName: Option[String] = None,
+    surname: Option[String] = None,
+    tradingName: Option[String] = None,
+    partnershipTradingName: Option[String] = None,
+    subcontractorType: Option[String]
+  ): Subcontractor =
     Subcontractor(
       subcontractorId = subcontractorId,
       firstName = firstName,
