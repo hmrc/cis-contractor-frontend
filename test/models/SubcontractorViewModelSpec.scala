@@ -90,6 +90,17 @@ class SubcontractorViewModelSpec extends SpecBase {
         )
       )
     }
+
+    "must sort A-Z, case insensitivity, with individuals ordered by surname" in {
+      val subs = Seq(
+        SubcontractorViewModel("1", "Flooring and Tiles"),
+        SubcontractorViewModel("2", "Armstrong, Noel"),
+        SubcontractorViewModel("3", "abc Trust"),
+        SubcontractorViewModel("4", "ABC Company")
+      )
+
+      SubcontractorViewModel.checkboxItems(subs).map(_.value) mustBe Seq("4", "3", "2", "1")
+    }
   }
 
   "SubcontractorViewModel.fromSubcontractors" - {
