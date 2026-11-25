@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.mvc.{JavascriptLiteral, PathBindable}
+import play.api.mvc.*
 
 sealed trait Mode
 
@@ -61,5 +61,20 @@ object Mode {
           case AmendMode           => "AmendMode"
           case FinalValidationMode => "FinalValidationMode"
         }
+    }
+
+  // TODO DTR-9477: Remove this temporary binder once the Add Individual
+  // multi-tab routes are merged and fixed mode parameters are restored.
+  implicit val queryStringBindable: QueryStringBindable[Mode] =
+    new QueryStringBindable[Mode] {
+
+      override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Mode]] =
+        params.get(key).map {
+          case Seq("FinalValidationMode") => Right(FinalValidationMode)
+          case _ => Left("Unsupported mode")
+        }
+
+      override def unbind(key: String, value: Mode): String =
+        s"$key=${pathBindable.unbind(key, value)}"
     }
 }

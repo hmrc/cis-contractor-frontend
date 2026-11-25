@@ -804,7 +804,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       case AddressYesNo =>
         companyRoutes.CompanyAddressYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
       case Address =>
-        companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, None)
+        companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None)
       case ContactDetailsYesNo =>
         companyRoutes.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId, FinalValidationMode)
       case EmailAddress =>
@@ -1075,7 +1075,7 @@ class FinalValidationNavigator @Inject() extends NavigatorForJourney with Loggin
       case CompanyAddressYesNoPage(_, `namespace`) =>
         yesNoNextPage(
           userAnswers.get(CompanyAddressYesNoPage(id, namespace)),
-          companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, None),
+          companyRoutes.CompanyAddressController.redirectToAddressLookupWithId(flowId, FinalValidationMode, None),
           flowId
         )
 

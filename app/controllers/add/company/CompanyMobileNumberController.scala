@@ -42,7 +42,7 @@ class CompanyMobileNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyMobileNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyMobileNumberView
@@ -155,16 +155,17 @@ class CompanyMobileNumberController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id                = flowId.toString
-      val contactOption     = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val contactOption     = request.userAnswers.get(CompanyContactMethodOptionsPage(id, namespace))
       val companyName       =
-        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
-      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id, namespace)
+      val mobileIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Mobile))
 
       (companyName, mobileIsAvailable) match {
         case (Some(companyName), true) =>
-          val page         = CompanyMobileNumberPage(id)
+          val page         = CompanyMobileNumberPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -183,13 +184,14 @@ class CompanyMobileNumberController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id                = flowId.toString
       val submitAction      = routes.CompanyMobileNumberController.onSubmitWithId(flowId, mode)
-      val contactOption     = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
+      val contactOption     = request.userAnswers.get(CompanyContactMethodOptionsPage(id, namespace))
       val companyName       =
-        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
-      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+        SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id, namespace)
+      val mobileIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Mobile))
 
       (for {
         companyName <- companyName
@@ -201,9 +203,9 @@ class CompanyMobileNumberController @Inject() (
           value =>
             for {
               updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(CompanyMobileNumberPage(id), value))
+                Future.fromTry(request.userAnswers.set(CompanyMobileNumberPage(id, namespace), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyMobileNumberPage(id), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CompanyMobileNumberPage(id, namespace), mode, updatedAnswers))
         ))
         .getOrElse {
           logger.error(

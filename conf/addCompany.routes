@@ -8,10 +8,10 @@ POST    /subcontractor/add/company/check-address/:flowId       controllers.add.c
 GET     /subcontractor/add/company/change-check-address/:flowId   controllers.add.company.CompanyAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 POST    /subcontractor/add/company/change-check-address/:flowId   controllers.add.company.CompanyAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
-GET     /subcontractor/add/company/address/:flowId                  controllers.add.company.CompanyAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, changeRoute: Option[String] ?= None)
-GET     /subcontractor/add/company/address-return/change/:flowId    controllers.add.company.CompanyAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "")
+GET     /subcontractor/add/company/address/:flowId                  controllers.add.company.CompanyAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET     /subcontractor/add/company/address-return/change/:flowId    controllers.add.company.CompanyAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
 GET     /subcontractor/add/company/address-return/change            controllers.add.company.CompanyAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
-GET     /subcontractor/add/company/address-return/:flowId           controllers.add.company.CompanyAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "")
+GET     /subcontractor/add/company/address-return/:flowId           controllers.add.company.CompanyAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
 
 GET     /subcontractor/add/company/email-address/:flowId     controllers.add.company.CompanyEmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 POST    /subcontractor/add/company/email-address/:flowId      controllers.add.company.CompanyEmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
@@ -216,3 +216,48 @@ POST  /subcontractor/final-validation/company/company-has-works-reference  contr
 
 GET   /subcontractor/final-validation/company/company-works-reference  controllers.add.company.CompanyWorksReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/company/company-works-reference  controllers.add.company.CompanyWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab - Company Final Validation
+
+GET   /subcontractor/final-validation/company/company-name/:flowId  controllers.add.company.CompanyNameController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-name/:flowId  controllers.add.company.CompanyNameController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/check-address/:flowId  controllers.add.company.CompanyAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/check-address/:flowId  controllers.add.company.CompanyAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/address/:flowId                controllers.add.company.CompanyAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/company/address-return/:flowId         controllers.add.company.CompanyAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/company/address-return/change/:flowId  controllers.add.company.CompanyAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/add-contact-details/:flowId  controllers.add.company.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/add-contact-details/:flowId  controllers.add.company.AddCompanyContactMethodsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/select-contact-details/:flowId  controllers.add.company.CompanyContactMethodOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/select-contact-details/:flowId  controllers.add.company.CompanyContactMethodOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/email-address/:flowId  controllers.add.company.CompanyEmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/email-address/:flowId  controllers.add.company.CompanyEmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/phone-number/:flowId  controllers.add.company.CompanyPhoneNumberController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/phone-number/:flowId  controllers.add.company.CompanyPhoneNumberController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/mobile-number/:flowId  controllers.add.company.CompanyMobileNumberController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/mobile-number/:flowId  controllers.add.company.CompanyMobileNumberController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-has-utr/:flowId  controllers.add.company.CompanyUtrYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-utr/:flowId  controllers.add.company.CompanyUtrYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-utr/:flowId  controllers.add.company.CompanyUtrController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-utr/:flowId  controllers.add.company.CompanyUtrController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-has-registration-number/:flowId  controllers.add.company.CompanyCrnYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-registration-number/:flowId  controllers.add.company.CompanyCrnYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-registration-number/:flowId  controllers.add.company.CompanyCrnController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-registration-number/:flowId  controllers.add.company.CompanyCrnController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-has-works-reference/:flowId  controllers.add.company.CompanyWorksReferenceYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-has-works-reference/:flowId  controllers.add.company.CompanyWorksReferenceYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
+GET   /subcontractor/final-validation/company/company-works-reference/:flowId  controllers.add.company.CompanyWorksReferenceController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/company/company-works-reference/:flowId  controllers.add.company.CompanyWorksReferenceController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)

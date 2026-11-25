@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add.company
 import models.contact.ContactMethodOptions
 import models.info.company.CompanyAnswers
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.CompanyContactMethodOptionsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -37,7 +38,7 @@ object CompanyContactMethodOptionsSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(CompanyContactMethodOptionsPage(id)))
+      .map(id => answers.get(CompanyContactMethodOptionsPage(id, AddSubcontractor)))
       .getOrElse(answers.get(CompanyContactMethodOptionsPage))
       .map { selectedMethods =>
         val options =

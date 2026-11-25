@@ -18,7 +18,7 @@ package models.add.company
 
 import models.address.Address
 import models.contact.ContactMethodOptions
-import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
+import models.*
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.*
 import play.api.libs.json.Reads
@@ -43,63 +43,63 @@ object ValidatedCompany extends Validation {
       getPageValue(answers, CompanyNamePage)
     )
 
-  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedCompany] =
+  def build(answers: UserAnswers, id: String, namespace: JourneyNamespace): Either[ValidationError, ValidatedCompany] =
     for {
-      _                           <- validateType(answers, id)
-      companyName                 <- getPageValue(answers, CompanyNamePage(id))
+      _                           <- validateType(answers, id, namespace)
+      companyName                 <- getPageValue(answers, CompanyNamePage(id, namespace))
       companyAddress              <- getOptionalPageValue(
                                        answers,
-                                       CompanyAddressPage(id),
-                                       CompanyAddressYesNoPage(id)
+                                       CompanyAddressPage(id, namespace),
+                                       CompanyAddressYesNoPage(id, namespace)
                                      )
       companyContactMethodOptions <-
         getOptionalPageValue(
           answers,
-          CompanyContactMethodOptionsPage(id),
-          AddCompanyContactMethodsYesNoPage(id)
+          CompanyContactMethodOptionsPage(id, namespace),
+          AddCompanyContactMethodsYesNoPage(id, namespace)
         ).flatMap {
           case Some(methods) if methods.nonEmpty =>
             Right(Some(methods))
           case Some(_)                           =>
-            Left(InvalidAnswer(CompanyContactMethodOptionsPage(id)))
+            Left(InvalidAnswer(CompanyContactMethodOptionsPage(id, namespace)))
           case None                              =>
             Right(None)
         }
       companyEmail                <- getContactPageValue(
                                        answers,
                                        companyContactMethodOptions,
-                                       CompanyEmailAddressPage(id),
+                                       CompanyEmailAddressPage(id, namespace),
                                        ContactMethodOptions.Email
                                      )
       companyPhone                <- getContactPageValue(
                                        answers,
                                        companyContactMethodOptions,
-                                       CompanyPhoneNumberPage(id),
+                                       CompanyPhoneNumberPage(id, namespace),
                                        ContactMethodOptions.Phone
                                      )
       companyMobile               <- getContactPageValue(
                                        answers,
                                        companyContactMethodOptions,
-                                       CompanyMobileNumberPage(id),
+                                       CompanyMobileNumberPage(id, namespace),
                                        ContactMethodOptions.Mobile
                                      )
       companyUtr                  <-
         getOptionalPageValue(
           answers,
-          CompanyUtrPage(id),
-          CompanyUtrYesNoPage(id)
+          CompanyUtrPage(id, namespace),
+          CompanyUtrYesNoPage(id, namespace)
         )
       companyCrn                  <-
         getOptionalPageValue(
           answers,
-          CompanyCrnPage(id),
-          CompanyCrnYesNoPage(id)
+          CompanyCrnPage(id, namespace),
+          CompanyCrnYesNoPage(id, namespace)
         )
       companyWorksReferenceNumber <-
         getOptionalPageValue(
           answers,
-          CompanyWorksReferencePage(id),
-          CompanyWorksReferenceYesNoPage(id)
+          CompanyWorksReferencePage(id, namespace),
+          CompanyWorksReferenceYesNoPage(id, namespace)
         )
 
     } yield ValidatedCompany(
@@ -200,9 +200,13 @@ object ValidatedCompany extends Validation {
       case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
-  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
-    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+  private def validateType(
+    answers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id, namespace)).flatMap {
       case TypeOfSubcontractor.Limitedcompany => Right(())
-      case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
+      case _                                  => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
     }
 }

@@ -18,7 +18,8 @@ package controllers.add.company
 
 import controllers.actions.*
 import models.add.company.ValidatedCompany
-import models.CheckMode
+import models.{CheckMode, NormalMode}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.company.CompanyUtrPage
 import play.api.Logging
@@ -130,11 +131,11 @@ class CompanyCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
       val id = flowId.toString
       val ua = request.userAnswers
 
-      ValidatedCompany.build(ua, id) match {
+      ValidatedCompany.build(ua, id, AddSubcontractor) match {
         case Right(_) =>
           val list = SummaryListViewModel(
             rows = Seq(
@@ -159,7 +160,7 @@ class CompanyCheckYourAnswersController @Inject() (
                 ua,
                 changeUrl = Some(
                   routes.CompanyAddressController
-                    .redirectToAddressLookupWithId(flowId, Some("change"))
+                    .redirectToAddressLookupWithId(flowId, NormalMode, Some("change"))
                     .url
                 ),
                 subJourneyId = Some(id)
@@ -241,7 +242,7 @@ class CompanyCheckYourAnswersController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async { implicit request =>
       val id = flowId.toString
       if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
         logger.error(
@@ -249,11 +250,11 @@ class CompanyCheckYourAnswersController @Inject() (
         )
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
-        ValidatedCompany.build(request.userAnswers, id) match {
+        ValidatedCompany.build(request.userAnswers, id, AddSubcontractor) match {
           case Right(_) =>
             val duplicateUtr =
-              request.userAnswers.get(CompanyUtrPage(id)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, Some(id))
+              request.userAnswers.get(CompanyUtrPage(id, AddSubcontractor)) match {
+                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
                 case None      => Future.successful(false)
               }
 
@@ -265,9 +266,9 @@ class CompanyCheckYourAnswersController @Inject() (
 
                 case false =>
                   subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, Some(id))
+                    .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
                     .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, Some(id))
+                      auditService.addSubcontractorEvent(request.userAnswers, id)
                       Future
                         .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
                         .flatMap(updated => sessionRepository.set(updated).map(_ => ()))

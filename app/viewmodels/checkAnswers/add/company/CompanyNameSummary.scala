@@ -22,6 +22,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.company.CompanyAnswers
+import models.JourneyNamespace.AddSubcontractor
 import controllers.helpers.SubcontractorNameDisplayHelper
 
 object CompanyNameSummary {
@@ -33,7 +34,7 @@ object CompanyNameSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => SubcontractorNameDisplayHelper.getCompanyDisplayName(answers, mode, id))
+      .map(id => SubcontractorNameDisplayHelper.getCompanyDisplayName(answers, mode, id, AddSubcontractor))
       .getOrElse(SubcontractorNameDisplayHelper.getCompanyDisplayName(answers, mode))
       .map { answer =>
         SummaryListRowViewModel(

@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add.company
 import models.info.company.CompanyAnswers
 import controllers.add.company.routes
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.CompanyCrnPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -35,7 +36,7 @@ object CompanyCrnSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(CompanyCrnPage(id)))
+      .map(id => answers.get(CompanyCrnPage(id, AddSubcontractor)))
       .getOrElse(answers.get(CompanyCrnPage))
       .map { crn =>
         SummaryListRowViewModel(

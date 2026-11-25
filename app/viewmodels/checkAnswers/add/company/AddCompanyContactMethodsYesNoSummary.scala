@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add.company
 import models.amend.company.AmendCompanyRemoveDetail
 import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.AddCompanyContactMethodsYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,7 +35,7 @@ object AddCompanyContactMethodsYesNoSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(AddCompanyContactMethodsYesNoPage(id)))
+      .map(id => answers.get(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor)))
       .getOrElse(answers.get(AddCompanyContactMethodsYesNoPage))
       .map { answer =>
 

@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import models.amend.company.AmendCompanyRemoveDetail
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.CompanyWorksReferenceYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,7 +35,7 @@ object CompanyWorksReferenceYesNoSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(CompanyWorksReferenceYesNoPage(id)))
+      .map(id => answers.get(CompanyWorksReferenceYesNoPage(id, AddSubcontractor)))
       .getOrElse(answers.get(CompanyWorksReferenceYesNoPage))
       .map { answer =>
 

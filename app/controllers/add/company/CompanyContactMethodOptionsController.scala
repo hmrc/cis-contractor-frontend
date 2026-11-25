@@ -41,7 +41,7 @@ class CompanyContactMethodOptionsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyContactMethodOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -136,15 +136,15 @@ class CompanyContactMethodOptionsController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(AddCompanyContactMethodsYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(AddCompanyContactMethodsYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
-            val page         = CompanyContactMethodOptionsPage(id)
+            val page         = CompanyContactMethodOptionsPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
 
             Ok(
@@ -166,18 +166,18 @@ class CompanyContactMethodOptionsController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
       val id           = flowId.toString
       val submitAction = routes.CompanyContactMethodOptionsController.onSubmitWithId(flowId, mode)
 
-      if (!request.userAnswers.get(AddCompanyContactMethodsYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(AddCompanyContactMethodsYesNoPage(id, namespace)).contains(true)) {
         Future.successful(
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         )
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
             form
               .bindFromRequest()
@@ -198,14 +198,14 @@ class CompanyContactMethodOptionsController @Inject() (
                     updatedAnswers <-
                       Future.fromTry(
                         request.userAnswers.set(
-                          CompanyContactMethodOptionsPage(id),
+                          CompanyContactMethodOptionsPage(id, namespace),
                           value
                         )
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
                     navigator.nextPage(
-                      CompanyContactMethodOptionsPage(id),
+                      CompanyContactMethodOptionsPage(id, namespace),
                       mode,
                       updatedAnswers
                     )
