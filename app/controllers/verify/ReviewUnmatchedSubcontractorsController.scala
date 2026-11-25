@@ -75,10 +75,11 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val subJourneyId = flowId.toString
-      
+
       request.userAnswers.get(CurrentVerificationBatchResponsePage(subJourneyId)) match {
         case Some(currentBatch) =>
-          reviewUnmatchedSubcontractorsService.buildViewModel(currentBatch) match { // TODO DTR-9463: Ivestigate if need to update with id
+          reviewUnmatchedSubcontractorsService
+            .buildViewModel(currentBatch) match { // TODO DTR-9463: Ivestigate if need to update with id
             case Success(viewModel) =>
               Ok(view(viewModel))
 
@@ -119,25 +120,26 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
       )
     }
 
-  def onSubmitWithId(flowId :UUID): Action[AnyContent] =
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val subJourneyId = flowId.toString
       for {
         withContext <- Future.fromTry(
-          request.userAnswers.set(
-            FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope
-            FinalValidationContext.VerifySubcontractor
-          )
-        )
-        withSource <- Future.fromTry(
-          withContext.set(
-            VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope
-            VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
-          )
-        )
-        _ <- sessionRepository.set(withSource)
+                         request.userAnswers.set(
+                           FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
+        withSource  <- Future.fromTry(
+                         withContext.set(
+                           VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope
+                           VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+                         )
+                       )
+        _           <- sessionRepository.set(withSource)
       } yield Redirect(
-        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit() // TODO DTR-9463: Final validation out of scope
+        controllers.verify.routes.ContinueVerificationSubmissionController
+          .onSubmit() // TODO DTR-9463: Final validation out of scope
       )
     }
 }

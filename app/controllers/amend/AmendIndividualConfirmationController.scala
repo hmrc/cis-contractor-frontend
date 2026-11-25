@@ -75,7 +75,7 @@ class AmendIndividualConfirmationController @Inject() (
       }
     }
 
-  def onPageLoadWithId(flowId: UUID): Action[AnyContent] = {
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
 
       val subJourneyId = flowId.toString
@@ -98,7 +98,6 @@ class AmendIndividualConfirmationController @Inject() (
         renderConfirmation(userAnswers)
       }
     }
-  }
 
   private def renderConfirmation(
     userAnswers: UserAnswers
@@ -199,10 +198,10 @@ class AmendIndividualConfirmationController @Inject() (
     ) match {
 
       case (
-        Some(originalIndividualAnswers),
-        Some(cisId),
-        Some(journeyType)
-      ) =>
+            Some(originalIndividualAnswers),
+            Some(cisId),
+            Some(journeyType)
+          ) =>
         val tableRows =
           IndividualAmendedViewModel.rows(
             originalIndividualAnswers,

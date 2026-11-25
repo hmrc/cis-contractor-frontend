@@ -140,7 +140,9 @@ class CurrentVerificationBatchResponsePageSpec extends SpecBase {
           .success
           .value
 
-      (uaWithValue.data \ "amendSubcontractor" \ id \ "currentVerificationBatchResponse").toOption mustBe Some(Json.toJson(model))
+      (uaWithValue.data \ "amendSubcontractor" \ id \ "currentVerificationBatchResponse").toOption mustBe Some(
+        Json.toJson(model)
+      )
     }
   }
 }

@@ -536,7 +536,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   private def handleNoChangesWithId(flowId: UUID)(implicit
     request: DataRequest[AnyContent]
   ): Future[Result] = {
-    val subJourneyId = flowId.toString
+    val subJourneyId     = flowId.toString
     val cisId            = request.userAnswers.get(CisIdQuery(flowId.toString))
     def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
@@ -677,7 +677,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
   def onCancelWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val subJourneyId = flowId.toString
-      val cisId = request.userAnswers.get(CisIdQuery(flowId.toString))
+      val cisId        = request.userAnswers.get(CisIdQuery(flowId.toString))
 
       def recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
 
@@ -692,7 +692,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
           Future
             .fromTry(
-              cleanupService.cleanAmend(request.userAnswers, subJourneyId) 
+              cleanupService.cleanAmend(request.userAnswers, subJourneyId)
             )
             .flatMap(sessionRepository.set)
             .map { _ =>

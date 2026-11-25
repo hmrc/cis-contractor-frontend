@@ -124,13 +124,15 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val subJourneyId = flowId.toString
-      
+
       contractorDetailsFinalValidationService
         .refreshAndValidate(request.userAnswers, ContractorDetailsValidationTarget.VerifySubcontractors)
         .flatMap { case (validatedAnswers, validation) =>
           if (!validation.allComplete) {
             Future.successful(
-              Redirect(controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()) // TODO DTR-9463: Final validation out of scope
+              Redirect(
+                controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
+              ) // TODO DTR-9463: Final validation out of scope
             )
           } else {
             validatedAnswers.get(CurrentVerificationBatchResponsePage(subJourneyId)) match {
@@ -148,7 +150,7 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
                               viewModel.allReady
                             )
                           )
-                        _ <- sessionRepository.set(updatedAnswers)
+                        _              <- sessionRepository.set(updatedAnswers)
                       } yield Ok(view(viewModel))
                     } else {
                       logger.error(
@@ -221,20 +223,21 @@ class ReviewInsufficientInfoSubcontractorsController @Inject() (
       val subJourneyId = flowId.toString
       for {
         withContext <- Future.fromTry(
-          request.userAnswers.set(
-            FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope of ticket
-            FinalValidationContext.VerifySubcontractor
-          )
-        )
-        withSource <- Future.fromTry(
-          withContext.set(
-            VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope of ticket
-            VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
-          )
-        )
-        _ <- sessionRepository.set(withSource)
+                         request.userAnswers.set(
+                           FinalValidationContextPage, // TODO DTR-9463: Final validation out of scope of ticket
+                           FinalValidationContext.VerifySubcontractor
+                         )
+                       )
+        withSource  <- Future.fromTry(
+                         withContext.set(
+                           VerifyFinalValidationSourcePage, // TODO DTR-9463: Final validation out of scope of ticket
+                           VerifyFinalValidationSource.ReviewInsufficientInfoSubcontractors
+                         )
+                       )
+        _           <- sessionRepository.set(withSource)
       } yield Redirect(
-        controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit() // TODO DTR-9463: Final validation out of scope of ticket
+        controllers.verify.routes.ContinueVerificationSubmissionController
+          .onSubmit() // TODO DTR-9463: Final validation out of scope of ticket
       )
     }
 }

@@ -33,7 +33,7 @@ object AmendConfirmationLinks {
     cisId: String,
     appConfig: FrontendAppConfig,
     flowId: Option[UUID] = None
-  ): AmendConfirmationLink = {
+  ): AmendConfirmationLink =
     journeyType match {
 
       case AmendJourneyType.Standard =>
@@ -46,8 +46,9 @@ object AmendConfirmationLinks {
       case AmendJourneyType.InsufficientInfo =>
         AmendConfirmationLink(
           url = flowId match {
-            case Some(id) => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(id.toString).url
-            case None => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+            case Some(id) =>
+              controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(id.toString).url
+            case None     => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
           },
           textKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
           showBeforeYouGo = false
@@ -57,11 +58,10 @@ object AmendConfirmationLinks {
         AmendConfirmationLink(
           url = flowId match {
             case Some(id) => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoadWithId(id).url
-            case None => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
+            case None     => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
           },
           textKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
           showBeforeYouGo = false
         )
     }
-  }
 }
