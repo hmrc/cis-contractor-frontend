@@ -18,7 +18,7 @@ package models.add.trust
 
 import models.address.Address
 import models.contact.ContactMethodOptions
-import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
+import models.*
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
 import play.api.libs.json.Reads
@@ -39,45 +39,57 @@ object ValidatedTrust extends Validation {
   def build(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
     buildTrust(answers, getPageValue(answers, TrustNamePage))
 
-  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedTrust] =
+  // Multi-tab
+  def build(
+    answers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Either[ValidationError, ValidatedTrust] =
     for {
-      _                         <- validateType(answers, id)
-      trustName                 <- getPageValue(answers, TrustNamePage(id))
-      trustAddress              <- getOptionalPageValue(answers, TrustAddressPage(id), TrustAddressYesNoPage(id))
-      trustContactMethodOptions <-
-        getOptionalPageValue(
-          answers,
-          TrustContactMethodOptionsPage(id),
-          AddTrustContactMethodsYesNoPage(id)
-        ).flatMap {
-          case Some(methods) if methods.nonEmpty =>
-            Right(Some(methods))
-          case Some(_)                           =>
-            Left(InvalidAnswer(TrustContactMethodOptionsPage(id)))
-          case None                              =>
-            Right(None)
-        }
+      _                         <- validateType(answers, id, namespace)
+      trustName                 <- getPageValue(answers, TrustNamePage(id, namespace))
+      trustAddress              <- getOptionalPageValue(
+                                     answers,
+                                     TrustAddressPage(id, namespace),
+                                     TrustAddressYesNoPage(id, namespace)
+                                   )
+      trustContactMethodOptions <- getOptionalPageValue(
+                                     answers,
+                                     TrustContactMethodOptionsPage(id, namespace),
+                                     AddTrustContactMethodsYesNoPage(id, namespace)
+                                   ).flatMap {
+                                     case Some(methods) if methods.nonEmpty => Right(Some(methods))
+                                     case Some(_)                           => Left(InvalidAnswer(TrustContactMethodOptionsPage(id, namespace)))
+                                     case None                              => Right(None)
+                                   }
       trustEmail                <- getContactPageValue(
                                      answers,
                                      trustContactMethodOptions,
-                                     TrustEmailAddressPage(id),
+                                     TrustEmailAddressPage(id, namespace),
                                      ContactMethodOptions.Email
                                    )
       trustPhone                <- getContactPageValue(
                                      answers,
                                      trustContactMethodOptions,
-                                     TrustPhoneNumberPage(id),
+                                     TrustPhoneNumberPage(id, namespace),
                                      ContactMethodOptions.Phone
                                    )
       trustMobile               <- getContactPageValue(
                                      answers,
                                      trustContactMethodOptions,
-                                     TrustMobileNumberPage(id),
+                                     TrustMobileNumberPage(id, namespace),
                                      ContactMethodOptions.Mobile
                                    )
-      trustUtr                  <- getOptionalPageValue(answers, TrustUtrPage(id), TrustUtrYesNoPage(id))
-      trustWorkRefNumber        <-
-        getOptionalPageValue(answers, TrustWorksReferencePage(id), TrustWorksReferenceYesNoPage(id))
+      trustUtr                  <- getOptionalPageValue(
+                                     answers,
+                                     TrustUtrPage(id, namespace),
+                                     TrustUtrYesNoPage(id, namespace)
+                                   )
+      trustWorkRefNumber        <- getOptionalPageValue(
+                                     answers,
+                                     TrustWorksReferencePage(id, namespace),
+                                     TrustWorksReferenceYesNoPage(id, namespace)
+                                   )
     } yield ValidatedTrust(
       trustName = trustName,
       trustAddress = trustAddress,
@@ -143,9 +155,14 @@ object ValidatedTrust extends Validation {
       case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
-  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
-    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+  // Multi-tab
+  private def validateType(
+    answers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id, namespace)).flatMap {
       case TypeOfSubcontractor.Trust => Right(())
-      case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
+      case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
     }
 }

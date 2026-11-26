@@ -16,8 +16,20 @@
 
 package pages.add
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+
+case class SubcontractorsUniqueTaxpayerReferencePage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String]
+    with IndividualJourney {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
+
+  override def toString: String = "subcontractorsUniqueTaxpayerReference"
+}
 
 case object SubcontractorsUniqueTaxpayerReferencePage extends QuestionPage[String] with IndividualJourney {
 

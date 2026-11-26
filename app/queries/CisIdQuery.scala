@@ -16,10 +16,12 @@
 
 package queries
 
+import models.JourneyNamespace
 import play.api.libs.json.JsPath
 
-case class CisIdQuery(id: String) extends Gettable[String] with Settable[String] {
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ "cisId"
+case class CisIdQuery(id: String, namespace: JourneyNamespace) extends Gettable[String] with Settable[String] {
+
+  override def path: JsPath = JsPath \ namespace.key \ id \ "cisId"
 }
 
 case object CisIdQuery extends Gettable[String] with Settable[String] {

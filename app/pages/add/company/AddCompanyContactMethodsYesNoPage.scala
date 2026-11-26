@@ -16,25 +16,29 @@
 
 package pages.add.company
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class AddCompanyContactMethodsYesNoPage(id: String) extends QuestionPage[Boolean] with CompanyJourney {
+case class AddCompanyContactMethodsYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean]
+    with CompanyJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "addCompanyContactMethodsYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers
-        .remove(CompanyEmailAddressPage(id))
-        .flatMap(_.remove(CompanyPhoneNumberPage(id)))
-        .flatMap(_.remove(CompanyMobileNumberPage(id)))
-        .flatMap(_.remove(CompanyContactMethodOptionsPage(id)))
+        .remove(CompanyEmailAddressPage(id, namespace))
+        .flatMap(_.remove(CompanyPhoneNumberPage(id, namespace)))
+        .flatMap(_.remove(CompanyMobileNumberPage(id, namespace)))
+        .flatMap(_.remove(CompanyContactMethodOptionsPage(id, namespace)))
     } else {
       super.cleanup(value, userAnswers)
     }

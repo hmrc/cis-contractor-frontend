@@ -16,12 +16,17 @@
 
 package pages.add.company
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class CompanyPhoneNumberPage(id: String) extends QuestionPage[String] with CompanyJourney {
+case class CompanyPhoneNumberPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String]
+    with CompanyJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "companyPhoneNumber"
 }

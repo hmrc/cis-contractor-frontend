@@ -23,7 +23,7 @@ import forms.mappings.Constants.MaxLength35
 import models.address.Address
 import models.address.AddressLookupJourneyIdentifier.trustQuestionsAddress
 import models.address.MandatoryFieldsConfigModel
-import models.{AmendMode, FinalValidationMode, Mode, NormalMode, UserAnswers}
+import models.*
 import pages.add.trust.{TrustAddressPage, TrustNamePage}
 import play.api.Logging
 import play.api.i18n.{Messages, MessagesApi}
@@ -42,7 +42,7 @@ class TrustAddressController @Inject() (
   override protected val identify: IdentifierAction,
   override protected val getData: DataRetrievalAction,
   override protected val requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  override protected val sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   override protected val addressLookupService: AddressLookupService,
   val controllerComponents: MessagesControllerComponents
 )(implicit override protected val executionContext: ExecutionContext)
@@ -94,94 +94,43 @@ class TrustAddressController @Inject() (
         }
     }
 
-  def redirectToAddressLookupWithId(
-    flowId: UUID,
-    changeRoute: Option[String] = None
-  ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id       = flowId.toString
-      val callback =
-        if (changeRoute.isDefined)
-          routes.TrustAddressController.addressLookupCallbackChangeWithId(flowId, id = "")
-        else
-          routes.TrustAddressController.addressLookupCallbackWithId(flowId, id = "")
+  // Multi-tab
+  override protected def addressPage(id: String, namespace: JourneyNamespace): Settable[Address] =
+    TrustAddressPage(id, namespace)
 
-      request.userAnswers.get(TrustNamePage(id)).map(_.trim).filter(_.nonEmpty) match {
-        case Some(name) =>
-          addressLookupService
-            .getJourneyUrl(
-              journeyId,
-              callback,
-              optName = Some(name),
-              mandatoryFieldsConfigModel = MandatoryFieldsConfigModel(
-                addressLine1 = Some(true),
-                town = Some(true),
-                postcode = Some(true)
-              ),
-              line1MaxLength = Some(MaxLength35),
-              line2MaxLength = Some(MaxLength35),
-              line3MaxLength = Some(MaxLength35),
-              townMaxLength = Some(MaxLength35)
-            )
-            .map(Redirect)
-            .recover { case ex =>
-              logger.error(
-                "[TrustAddressController][redirectToAddressLookupWithId] - failed to get ALF journey URL",
-                ex
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-        case None       =>
-          logger.error(
-            "[TrustAddressController][redirectToAddressLookupWithId] - TrustNamePage missing from userAnswers"
-          )
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
+  override protected def subcontractorName(
+    userAnswers: UserAnswers,
+    mode: Mode,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit messages: Messages): Option[String] =
+    SubcontractorNameDisplayHelper.getTrustDisplayName(userAnswers, mode, id, namespace)
 
-  def addressLookupCallbackWithId(flowId: UUID, id: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      saveAddressAndRedirectWithId(
-        flowId.toString,
-        id,
+  override protected def standardCallback(mode: Mode, flowId: UUID): Call =
+    routes.TrustAddressController.addressLookupCallbackWithId(flowId = flowId, id = "", mode = mode)
+
+  override protected def changeCallback(mode: Mode, flowId: UUID): Call =
+    routes.TrustAddressController.addressLookupCallbackChangeWithId(flowId = flowId, id = "", mode = mode)
+
+  override protected def onCompletion(mode: Mode, flowId: UUID): Call =
+    mode match {
+      case FinalValidationMode =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
+      case NormalMode          =>
         routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, NormalMode)
-      )
-    }
-
-  def addressLookupCallbackChangeWithId(flowId: UUID, id: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      saveAddressAndRedirectWithId(
-        flowId.toString,
-        id,
+      case CheckMode           =>
         routes.TrustCheckYourAnswersController.onPageLoadWithId(flowId)
-      )
+      case _                   =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
-  private def saveAddressAndRedirectWithId(subJourneyId: String, addressId: String, onSuccess: Call)(implicit
-    request: models.requests.DataRequest[AnyContent]
-  ) =
-    (for {
-      address <- addressLookupService.getAddressById(addressId)
-      updated <-
-        addressLookupService.saveAddressDetails(
-          address,
-          TrustAddressPage(subJourneyId),
-          request.userAnswers
-        )
-    } yield
-      if (updated) Redirect(onSuccess)
-      else {
-        logger.error(
-          "[TrustAddressController][saveAddressAndRedirectWithId] - address not saved, update returned false"
-        )
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      })
-      .recover { case ex =>
-        logger.error(
-          "[TrustAddressController][saveAddressAndRedirectWithId] - failed to retrieve or save address",
-          ex
-        )
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
-
+  override protected def onChangeCompletion(mode: Mode, flowId: UUID): Call =
+    mode match {
+      case FinalValidationMode    =>
+        controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
+      case NormalMode | CheckMode =>
+        routes.TrustCheckYourAnswersController.onPageLoadWithId(flowId)
+      case _                      =>
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 }

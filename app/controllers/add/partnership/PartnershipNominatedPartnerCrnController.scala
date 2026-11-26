@@ -41,7 +41,7 @@ class PartnershipNominatedPartnerCrnController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipNominatedPartnerCrnFormProvider,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
   val controllerComponents: MessagesControllerComponents,
@@ -103,15 +103,15 @@ class PartnershipNominatedPartnerCrnController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getPartnerDisplayName(request.userAnswers, mode, id)
+          .getPartnerDisplayName(request.userAnswers, mode, id, namespace)
           .map { nominatedPartnerName =>
-            val page         = PartnershipNominatedPartnerCrnPage(id)
+            val page         = PartnershipNominatedPartnerCrnPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -132,14 +132,14 @@ class PartnershipNominatedPartnerCrnController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.PartnershipNominatedPartnerCrnController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(PartnershipNominatedPartnerCrnYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getPartnerDisplayName(request.userAnswers, mode, id)
+          .getPartnerDisplayName(request.userAnswers, mode, id, namespace)
           .map { nominatedPartnerName =>
             form
               .bindFromRequest()
@@ -150,11 +150,11 @@ class PartnershipNominatedPartnerCrnController @Inject() (
                   for {
                     updatedAnswers <-
                       Future.fromTry(
-                        request.userAnswers.set(PartnershipNominatedPartnerCrnPage(id), value)
+                        request.userAnswers.set(PartnershipNominatedPartnerCrnPage(id, namespace), value)
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
-                    navigator.nextPage(PartnershipNominatedPartnerCrnPage(id), mode, updatedAnswers)
+                    navigator.nextPage(PartnershipNominatedPartnerCrnPage(id, namespace), mode, updatedAnswers)
                   )
               )
           }

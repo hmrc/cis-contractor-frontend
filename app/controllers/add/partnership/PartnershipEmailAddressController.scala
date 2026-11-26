@@ -41,7 +41,7 @@ class PartnershipEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipEmailAddressView
@@ -112,16 +112,17 @@ class PartnershipEmailAddressController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
-      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(id))
+      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(id, namespace))
       val partnershipName  =
-        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (partnershipName, emailIsAvailable) match {
         case (Some(partnershipName), true) =>
-          val page         = PartnershipEmailAddressPage(id)
+          val page         = PartnershipEmailAddressPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -140,13 +141,14 @@ class PartnershipEmailAddressController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
       val submitAction     = routes.PartnershipEmailAddressController.onSubmitWithId(flowId, mode)
-      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(id))
+      val contactOption    = request.userAnswers.get(PartnershipContactMethodOptionsPage(id, namespace))
       val partnershipName  =
-        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+        SubcontractorNameDisplayHelper.getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
         partnershipName <- partnershipName
@@ -158,9 +160,9 @@ class PartnershipEmailAddressController @Inject() (
           value =>
             for {
               updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage(id), value))
+                Future.fromTry(request.userAnswers.set(PartnershipEmailAddressPage(id, namespace), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage(id), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(PartnershipEmailAddressPage(id, namespace), mode, updatedAnswers))
         ))
         .getOrElse {
           logger.error(

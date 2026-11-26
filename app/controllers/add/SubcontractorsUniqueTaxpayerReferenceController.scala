@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.UtrFormProvider
-import models.{AmendMode, FinalValidationMode, Mode}
+import models.{AmendMode, FinalValidationMode, JourneyNamespace, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.{SubcontractorsUniqueTaxpayerReferencePage, UniqueTaxpayerReferenceYesNoPage}
@@ -32,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubcontractorsUniqueTaxpayerReferenceView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +43,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: UtrFormProvider,
   subcontractorService: SubcontractorService,
   subcontractorNameExtractor: SubcontractorNameExtractor,
@@ -62,6 +64,9 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage).fold(form)(form.fill)
 
+  private def preparedForm(id: String, namespace: JourneyNamespace)(implicit request: DataRequest[?]) =
+    request.userAnswers.get(SubcontractorsUniqueTaxpayerReferencePage(id, namespace)).fold(form)(form.fill)
+
   private def saveAndContinue(mode: Mode, value: String)(implicit request: DataRequest[?]) =
     for {
       updatedAnswers <-
@@ -70,6 +75,24 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
     } yield Redirect(
       navigator.nextPage(SubcontractorsUniqueTaxpayerReferencePage, mode, updatedAnswers)
     )
+
+  // Multi-tab
+  private def saveAndContinue(
+    mode: Mode,
+    value: String,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit request: DataRequest[?]) = {
+
+    val page = SubcontractorsUniqueTaxpayerReferencePage(id, namespace)
+
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(page, mode, updatedAnswers)
+    )
+  }
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
@@ -128,6 +151,89 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
                       case false =>
                         saveAndContinue(mode, value)
                     }
+                }
+            )
+        }
+    }
+
+  // Multi-tab
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
+
+      val id                = flowId.toString
+      val yesOrNoPage       = UniqueTaxpayerReferenceYesNoPage(id, namespace)
+      val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
+
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[SubcontractorsUniqueTaxpayerReferenceController][onPageLoadWithId] - subcontractor name missing"
+          )
+          recoveryRedirect
+        } { subcontractorName =>
+          val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+
+          yesOrNoPageGuardService.yesOrNoPageRoute(
+            result,
+            yesOrNoPageOption,
+            yesOrNoPage,
+            mode
+          )
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+
+      val id   = flowId.toString
+      val page = SubcontractorsUniqueTaxpayerReferencePage(id, namespace)
+
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error("[SubcontractorsUniqueTaxpayerReferenceController][onSubmitWithId] - subcontractor name missing")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))
+                ),
+              value =>
+                val prevValue = request.userAnswers.get(page)
+                val baseValue =
+                  if (mode == FinalValidationMode) {
+                    request.userAnswers.get(FinalValidationBaseUtrPage(id))
+                  } else {
+                    None
+                  }
+
+                mode match {
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                    saveAndContinue(mode, value, id, namespace)
+
+                  case _ =>
+                    subcontractorService
+                      .isDuplicateUTR(request.userAnswers, value, id, namespace)
+                      .flatMap {
+                        case true =>
+                          val errorForm = form
+                            .fill(value)
+                            .withError(
+                              key = "value",
+                              message = "subcontractorsUniqueTaxpayerReference.error.duplicate"
+                            )
+
+                          Future.successful(
+                            BadRequest(view(errorForm, mode, subcontractorName, Some(flowId)))
+                          )
+
+                        case false =>
+                          saveAndContinue(mode, value, id, namespace)
+                      }
                 }
             )
         }

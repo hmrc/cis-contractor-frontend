@@ -18,7 +18,8 @@ package controllers.add.trust
 
 import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
+import models.{JourneyNamespace, TypeOfSubcontractor, UserAnswers}
 import models.address.{Address, Country}
 import models.contact.ContactMethodOptions
 import org.mockito.ArgumentMatchers.any
@@ -788,25 +789,25 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
     val id     = flowId.toString
 
     val minUaWithId = emptyUserAnswers
-      .set(queries.CisIdQuery(id), "AB12")
+      .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
       .success
       .value
-      .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+      .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Trust)
       .success
       .value
-      .set(TrustNamePage(id), "Test Trust")
+      .set(TrustNamePage(id, AddSubcontractor), "Test Trust")
       .success
       .value
-      .set(TrustAddressYesNoPage(id), false)
+      .set(TrustAddressYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(AddTrustContactMethodsYesNoPage(id), false)
+      .set(AddTrustContactMethodsYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(TrustUtrYesNoPage(id), false)
+      .set(TrustUtrYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(TrustWorksReferenceYesNoPage(id), false)
+      .set(TrustWorksReferenceYesNoPage(id, AddSubcontractor), false)
       .success
       .value
 
@@ -840,7 +841,9 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
       when(
-        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(()))
 
@@ -865,19 +868,20 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
           controllers.add.routes.SubcontractorAddedController.trustSubcontractorAddedWithId(flowId).url
       }
 
-      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository).set(any[UserAnswers])
-      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
 
     "must redirect to Journey Recovery when the UTR is already used and not create the subcontractor" in {
       val uaWithUtr = minUaWithId
-        .set(TrustUtrYesNoPage(id), true)
+        .set(TrustUtrYesNoPage(id, AddSubcontractor), true)
         .success
         .value
-        .set(TrustUtrPage(id), "1111111111")
+        .set(TrustUtrPage(id, AddSubcontractor), "1111111111")
         .success
         .value
 
@@ -888,7 +892,9 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
       when(mockSessionRepository.get(any[String]))
         .thenReturn(Future.successful(Some(uaWithUtr)))
       when(
-        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(true))
 
@@ -912,22 +918,24 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
-        any[HeaderCarrier]
-      )
-      verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
+      verify(mockSubcontractorService, never())
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository, never()).set(any[UserAnswers])
-      verify(mockAuditService, never()).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService, never()).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
 
     "must submit nested answers when the UTR is not a duplicate" in {
       val uaWithUtr = minUaWithId
-        .set(TrustUtrYesNoPage(id), true)
+        .set(TrustUtrYesNoPage(id, AddSubcontractor), true)
         .success
         .value
-        .set(TrustUtrPage(id), "1111111111")
+        .set(TrustUtrPage(id, AddSubcontractor), "1111111111")
         .success
         .value
 
@@ -940,11 +948,15 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
       when(
-        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(false))
       when(
-        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(()))
 
@@ -969,14 +981,16 @@ class TrustCheckYourAnswersControllerSpec extends SpecBase with WithFakeCisTaxpa
           controllers.add.routes.SubcontractorAddedController.trustSubcontractorAddedWithId(flowId).url
       }
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
-        any[HeaderCarrier]
-      )
-      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository).set(any[UserAnswers])
-      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
   }
 }

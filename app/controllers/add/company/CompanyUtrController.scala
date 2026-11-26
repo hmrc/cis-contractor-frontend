@@ -19,13 +19,13 @@ package controllers.add.company
 import controllers.actions.*
 import forms.add.company.CompanyUtrFormProvider
 import models.requests.DataRequest
-import models.{AmendMode, FinalValidationMode, Mode}
+import models.{AmendMode, FinalValidationMode, JourneyNamespace, Mode}
 import navigation.Navigator
 import pages.add.company.{CompanyUtrPage, CompanyUtrYesNoPage}
 import pages.finalvalidation.FinalValidationBaseUtrPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.{SubcontractorService, YesOrNoPageGuardService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -43,7 +43,7 @@ class CompanyUtrController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyUtrFormProvider,
   subcontractorService: SubcontractorService,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -77,6 +77,18 @@ class CompanyUtrController @Inject() (
         updatedAnswers
       )
     )
+
+  // Multi-tab
+  private def saveAndContinue(
+    mode: Mode,
+    value: String,
+    id: String,
+    namespace: JourneyNamespace
+  )(implicit request: DataRequest[?]): Future[Result] =
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyUtrPage(id, namespace), value))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(navigator.nextPage(CompanyUtrPage(id, namespace), mode, updatedAnswers))
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
@@ -198,15 +210,15 @@ class CompanyUtrController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(CompanyUtrYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(CompanyUtrYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
-            val page         = CompanyUtrPage(id)
+            val page         = CompanyUtrPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -227,40 +239,41 @@ class CompanyUtrController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.CompanyUtrController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(CompanyUtrYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(CompanyUtrYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
             form
               .bindFromRequest()
               .fold(
                 formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName, submitAction))),
                 value =>
-                  subcontractorService.isDuplicateUTR(request.userAnswers, value, Some(id)).flatMap {
-                    case true  =>
-                      val errorForm = form
-                        .fill(value)
-                        .withError(
-                          key = "value",
-                          message = "companyUtr.error.duplicate"
-                        )
-                      Future.successful(BadRequest(view(errorForm, mode, companyName, submitAction)))
-                    case false =>
-                      for {
-                        updatedAnswers <-
-                          Future.fromTry(
-                            request.userAnswers
-                              .set(CompanyUtrPage(id), value)
-                          )
-                        _              <- sessionRepository.set(updatedAnswers)
-                      } yield Redirect(
-                        navigator.nextPage(CompanyUtrPage(id), mode, updatedAnswers)
-                      )
+                  val prevValue = request.userAnswers.get(CompanyUtrPage(id, namespace))
+                  val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage(id))
+
+                  mode match {
+                    case AmendMode if prevValue.contains(value)                                        =>
+                      saveAndContinue(mode, value, id, namespace)
+                    case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                      saveAndContinue(mode, value, id, namespace)
+                    case _                                                                             =>
+                      subcontractorService.isDuplicateUTR(request.userAnswers, value, id, namespace).flatMap {
+                        case true  =>
+                          val errorForm = form
+                            .fill(value)
+                            .withError(
+                              key = "value",
+                              message = "companyUtr.error.duplicate"
+                            )
+                          Future.successful(BadRequest(view(errorForm, mode, companyName, submitAction)))
+                        case false =>
+                          saveAndContinue(mode, value, id, namespace)
+                      }
                   }
               )
           }

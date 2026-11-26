@@ -41,7 +41,7 @@ class CompanyCrnController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyCrnFormProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -136,15 +136,15 @@ class CompanyCrnController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(CompanyCrnYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(CompanyCrnYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
-            val page         = CompanyCrnPage(id)
+            val page         = CompanyCrnPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -165,14 +165,14 @@ class CompanyCrnController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.CompanyCrnController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(CompanyCrnYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(CompanyCrnYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getCompanyDisplayName(request.userAnswers, mode, id)
+          .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
           .map { companyName =>
             form
               .bindFromRequest()
@@ -182,11 +182,11 @@ class CompanyCrnController @Inject() (
                   for {
                     updatedAnswers <-
                       Future.fromTry(
-                        request.userAnswers.set(CompanyCrnPage(id), value)
+                        request.userAnswers.set(CompanyCrnPage(id, namespace), value)
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
-                    navigator.nextPage(CompanyCrnPage(id), mode, updatedAnswers)
+                    navigator.nextPage(CompanyCrnPage(id, namespace), mode, updatedAnswers)
                   )
               )
           }

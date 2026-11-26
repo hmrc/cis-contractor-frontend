@@ -25,6 +25,7 @@ import scala.io.Source
 import play.api.libs.json.Json
 
 import java.net.URLEncoder
+import java.util.UUID
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -155,6 +156,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def cisFrontendFinalValidationReturnUrl(handoffId: String): String =
     s"$cisFrontendFinalValidationReturn/$handoffId"
+
+  def cisFrontendFinalValidationReturnUrl(handoffId: String, flowId: UUID): String =
+    s"${cisFrontendFinalValidationReturnUrl(handoffId)}/$flowId"
 
   lazy val cisFrontendFinalValidationReturn: String =
     configuration.get[String]("urls.cisFrontendFinalValidationReturn")

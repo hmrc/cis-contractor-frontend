@@ -16,25 +16,29 @@
 
 package pages.add.partnership
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class AddPartnershipContactMethodsYesNoPage(id: String) extends QuestionPage[Boolean] with PartnershipJourney {
+case class AddPartnershipContactMethodsYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean]
+    with PartnershipJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "addPartnershipContactMethodsYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers
-        .remove(PartnershipEmailAddressPage(id))
-        .flatMap(_.remove(PartnershipPhoneNumberPage(id)))
-        .flatMap(_.remove(PartnershipMobileNumberPage(id)))
-        .flatMap(_.remove(PartnershipContactMethodOptionsPage(id)))
+        .remove(PartnershipEmailAddressPage(id, namespace))
+        .flatMap(_.remove(PartnershipPhoneNumberPage(id, namespace)))
+        .flatMap(_.remove(PartnershipMobileNumberPage(id, namespace)))
+        .flatMap(_.remove(PartnershipContactMethodOptionsPage(id, namespace)))
     } else {
       super.cleanup(value, userAnswers)
     }

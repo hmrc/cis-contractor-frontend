@@ -16,7 +16,7 @@
 
 package pages.add.partnership
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import models.add.partnership.PartnershipContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
@@ -25,12 +25,14 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class PartnershipContactMethodOptionsPage(id: String)
-    extends QuestionPage[Set[PartnershipContactMethodOptions]]
+case class PartnershipContactMethodOptionsPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Set[PartnershipContactMethodOptions]]
     with PartnershipJourney
     with ContactMethodOptionsCleanup {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "partnershipContactMethodOptions"
 
@@ -40,10 +42,11 @@ case class PartnershipContactMethodOptionsPage(id: String)
   ): Try[UserAnswers] =
     value match {
       case Some(selectedAnswers) =>
-        removeIfNotSelected(selectedAnswers, Email, PartnershipEmailAddressPage(id), userAnswers)
-          .flatMap(removeIfNotSelected(selectedAnswers, Phone, PartnershipPhoneNumberPage(id), _))
-          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, PartnershipMobileNumberPage(id), _))
-      case _                     =>
+        removeIfNotSelected(selectedAnswers, Email, PartnershipEmailAddressPage(id, namespace), userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, Phone, PartnershipPhoneNumberPage(id, namespace), _))
+          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, PartnershipMobileNumberPage(id, namespace), _))
+
+      case _ =>
         super.cleanup(value, userAnswers)
     }
 }

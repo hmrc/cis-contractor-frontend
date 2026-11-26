@@ -16,12 +16,17 @@
 
 package pages.add.trust
 
+import models.JourneyNamespace
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class TrustWorksReferencePage(id: String) extends QuestionPage[String] with TrustJourney {
+case class TrustWorksReferencePage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[String]
+    with TrustJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "trustWorksReference"
 }

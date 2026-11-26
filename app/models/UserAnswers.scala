@@ -68,9 +68,23 @@ final case class UserAnswers(
       page.cleanup(None, updatedAnswers)
     }
   }
+
+  def resetLegacyAnswers: UserAnswers =
+    copy(
+      data = JsObject(
+        data.fields.filter { case (key, _) =>
+          UserAnswers.scopedJourneyNames.contains(key)
+        }
+      )
+    )
 }
 
 object UserAnswers {
+
+  // Multi-tab
+  // Register additional journey names here as multi-tab support is introduced.
+  private val scopedJourneyNames: Set[String] =
+    JourneyNamespace.values.map(_.key).toSet
 
   val reads: Reads[UserAnswers] = {
 

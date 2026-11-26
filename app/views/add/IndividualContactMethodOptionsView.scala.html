@@ -16,6 +16,8 @@
 
 @import models.add.IndividualContactMethodOptions
 @import viewmodels.LegendSize.Large
+@import java.util.UUID
+@import play.api.mvc.Call
 
 @this(
     layout: templates.Layout,
@@ -25,11 +27,19 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, name: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, name: String, flowId: Option[UUID] = None)(implicit request: Request[_], messages: Messages)
+
+@submitAction = @{
+    val action: Call = flowId match {
+        case Some(id) => controllers.add.routes.IndividualContactMethodOptionsController.onSubmitWithId(id, mode)
+        case None     => controllers.add.routes.IndividualContactMethodOptionsController.onSubmit(mode)
+    }
+    action
+}
 
 @layout(pageTitle = title(form, messages("individualContactMethodOptions.title"))) {
 
-    @formHelper(action = controllers.add.routes.IndividualContactMethodOptionsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = submitAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

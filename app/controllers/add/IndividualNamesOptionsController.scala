@@ -30,6 +30,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.IndividualNamesOptionsView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class IndividualNamesOptionsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: IndividualNamesOptionsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: IndividualNamesOptionsView
@@ -82,4 +84,37 @@ class IndividualNamesOptionsController @Inject() (
             } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage, mode, updatedAnswers))
         )
   }
+
+  // Multi-tab
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
+
+      val id   = flowId.toString
+      val page = IndividualNamesOptionsPage(id, namespace)
+
+      val preparedForm = request.userAnswers.get(page) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, Some(flowId)))
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+
+      val id   = flowId.toString
+      val page = IndividualNamesOptionsPage(id, namespace)
+
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, Some(flowId)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        )
+    }
 }

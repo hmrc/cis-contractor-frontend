@@ -17,19 +17,23 @@
 package pages.add.trust
 
 import pages.QuestionPage
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class TrustWorksReferenceYesNoPage(id: String) extends QuestionPage[Boolean] with TrustJourney {
+case class TrustWorksReferenceYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean]
+    with TrustJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "trustWorksReferenceYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then userAnswers.remove(TrustWorksReferencePage(id))
+    if value.contains(false) then userAnswers.remove(TrustWorksReferencePage(id, namespace))
     else super.cleanup(value, userAnswers)
 }
 

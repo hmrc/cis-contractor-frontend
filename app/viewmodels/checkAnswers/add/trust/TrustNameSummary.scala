@@ -19,6 +19,7 @@ package viewmodels.checkAnswers.add.trust
 import controllers.helpers.SubcontractorNameDisplayHelper
 import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -33,7 +34,7 @@ object TrustNameSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => SubcontractorNameDisplayHelper.getTrustDisplayName(answers, mode, id))
+      .map(id => SubcontractorNameDisplayHelper.getTrustDisplayName(answers, mode, id, AddSubcontractor))
       .getOrElse(SubcontractorNameDisplayHelper.getTrustDisplayName(answers, mode))
       .map { answer =>
         SummaryListRowViewModel(

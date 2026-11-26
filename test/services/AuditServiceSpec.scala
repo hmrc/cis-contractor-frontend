@@ -23,6 +23,7 @@ import models.address.{Address, Country}
 import models.audit.AuthFailureAuditEventModel
 import models.amend.OriginalIndividualAnswers
 import models.contact.ContactMethodOptions
+import models.JourneyNamespace.AddSubcontractor
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, verify, when}
@@ -230,17 +231,17 @@ class AuditServiceSpec
         .set(CisIdQuery, "ROOT")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Limitedcompany)
         .success
         .value
-        .set(CompanyNamePage(id), "Nested Company")
+        .set(CompanyNamePage(id, AddSubcontractor), "Nested Company")
         .success
         .value
-        .set(CisIdQuery(id), "AB12")
+        .set(CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
 
-      service.addSubcontractorEvent(ua, Some(id))
+      service.addSubcontractorEvent(ua, id)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "company"
@@ -276,17 +277,17 @@ class AuditServiceSpec
         .set(CisIdQuery, "ROOT")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership)
         .success
         .value
-        .set(PartnershipNamePage(id), "Nested Partnership")
+        .set(PartnershipNamePage(id, AddSubcontractor), "Nested Partnership")
         .success
         .value
-        .set(CisIdQuery(id), "AB12")
+        .set(CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
 
-      service.addSubcontractorEvent(ua, Some(id))
+      service.addSubcontractorEvent(ua, id)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "partnership"
@@ -322,17 +323,17 @@ class AuditServiceSpec
         .set(CisIdQuery, "ROOT")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Trust)
         .success
         .value
-        .set(TrustNamePage(id), "Nested Trust")
+        .set(TrustNamePage(id, AddSubcontractor), "Nested Trust")
         .success
         .value
-        .set(CisIdQuery(id), "AB12")
+        .set(CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
 
-      service.addSubcontractorEvent(ua, Some(id))
+      service.addSubcontractorEvent(ua, id)
 
       val detail = captureDetail()
       (detail \ "typeOfSubcontractor").as[String] mustBe "trust"

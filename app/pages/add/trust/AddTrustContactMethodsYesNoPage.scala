@@ -16,25 +16,29 @@
 
 package pages.add.trust
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class AddTrustContactMethodsYesNoPage(id: String) extends QuestionPage[Boolean] with TrustJourney {
+case class AddTrustContactMethodsYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean]
+    with TrustJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "addTrustContactMethodsYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     if value.contains(false) then {
       userAnswers
-        .remove(TrustEmailAddressPage(id))
-        .flatMap(_.remove(TrustPhoneNumberPage(id)))
-        .flatMap(_.remove(TrustMobileNumberPage(id)))
-        .flatMap(_.remove(TrustContactMethodOptionsPage(id)))
+        .remove(TrustEmailAddressPage(id, namespace))
+        .flatMap(_.remove(TrustPhoneNumberPage(id, namespace)))
+        .flatMap(_.remove(TrustMobileNumberPage(id, namespace)))
+        .flatMap(_.remove(TrustContactMethodOptionsPage(id, namespace)))
     } else {
       super.cleanup(value, userAnswers)
     }

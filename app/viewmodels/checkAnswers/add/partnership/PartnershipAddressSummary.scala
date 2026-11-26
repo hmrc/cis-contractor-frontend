@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.info.partnership.PartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
 import pages.add.partnership.PartnershipAddressPage
@@ -32,7 +33,7 @@ object PartnershipAddressSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipAddressPage(id)))
+      .map(id => answers.get(PartnershipAddressPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipAddressPage))
       .map { answer =>
         AddressSummaryRow.row(

@@ -24,7 +24,8 @@ import pages.add.partnership.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import controllers.routes
-import models.{TypeOfSubcontractor, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
+import models.{JourneyNamespace, TypeOfSubcontractor, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, verifyNoMoreInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -910,37 +911,37 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
     val id     = flowId.toString
 
     val minUaWithId = emptyUserAnswers
-      .set(queries.CisIdQuery(id), "AB12")
+      .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
       .success
       .value
-      .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+      .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership)
       .success
       .value
-      .set(PartnershipNamePage(id), "Test Partnership")
+      .set(PartnershipNamePage(id, AddSubcontractor), "Test Partnership")
       .success
       .value
-      .set(PartnershipAddressYesNoPage(id), false)
+      .set(PartnershipAddressYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(AddPartnershipContactMethodsYesNoPage(id), false)
+      .set(AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(PartnershipHasUtrYesNoPage(id), false)
+      .set(PartnershipHasUtrYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(PartnershipNominatedPartnerNamePage(id), "Test Nominated Partner")
+      .set(PartnershipNominatedPartnerNamePage(id, AddSubcontractor), "Test Nominated Partner")
       .success
       .value
-      .set(PartnershipNominatedPartnerNinoYesNoPage(id), false)
+      .set(PartnershipNominatedPartnerNinoYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(PartnershipNominatedPartnerCrnYesNoPage(id), false)
+      .set(PartnershipNominatedPartnerCrnYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(PartnershipNominatedPartnerUtrYesNoPage(id), false)
+      .set(PartnershipNominatedPartnerUtrYesNoPage(id, AddSubcontractor), false)
       .success
       .value
-      .set(PartnershipWorksReferenceNumberYesNoPage(id), false)
+      .set(PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor), false)
       .success
       .value
 
@@ -970,7 +971,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
       val mockAuditService         = mock[AuditService]
 
       when(
-        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(()))
 
@@ -1000,19 +1003,20 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
           controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAddedWithId(flowId).url
       }
 
-      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository).set(any[UserAnswers])
-      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
 
     "must redirect to Journey Recovery when the UTR is already used and not create the subcontractor" in {
       val uaWithUtr = minUaWithId
-        .set(PartnershipHasUtrYesNoPage(id), true)
+        .set(PartnershipHasUtrYesNoPage(id, AddSubcontractor), true)
         .success
         .value
-        .set(PartnershipUniqueTaxpayerReferencePage(id), "1111111111")
+        .set(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor), "1111111111")
         .success
         .value
 
@@ -1023,7 +1027,9 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
       when(mockSessionRepository.get(any[String]))
         .thenReturn(Future.successful(Some(uaWithUtr)))
       when(
-        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(true))
 
@@ -1047,22 +1053,24 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
-        any[HeaderCarrier]
-      )
-      verify(mockSubcontractorService, never()).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
+      verify(mockSubcontractorService, never())
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository, never()).set(any[UserAnswers])
-      verify(mockAuditService, never()).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService, never()).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
 
     "must submit nested answers when the UTR is not a duplicate" in {
       val uaWithUtr = minUaWithId
-        .set(PartnershipHasUtrYesNoPage(id), true)
+        .set(PartnershipHasUtrYesNoPage(id, AddSubcontractor), true)
         .success
         .value
-        .set(PartnershipUniqueTaxpayerReferencePage(id), "1111111111")
+        .set(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor), "1111111111")
         .success
         .value
 
@@ -1075,11 +1083,15 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
       when(mockSessionRepository.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
       when(
-        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(false))
       when(
-        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+        mockSubcontractorService.createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       )
         .thenReturn(Future.successful(()))
 
@@ -1104,14 +1116,16 @@ class PartnershipCheckYourAnswersControllerSpec extends SpecBase with WithFakeCi
           controllers.add.routes.SubcontractorAddedController.partnershipSubcontractorAddedWithId(flowId).url
       }
 
-      verify(mockSubcontractorService).isDuplicateUTR(any[UserAnswers], any[String], any[Option[String]])(
-        any[HeaderCarrier]
-      )
-      verify(mockSubcontractorService).createAndUpdateSubcontractor(any[UserAnswers], any[Option[String]])(
-        any[HeaderCarrier]
-      )
+      verify(mockSubcontractorService)
+        .isDuplicateUTR(any[UserAnswers], any[String], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
+      verify(mockSubcontractorService)
+        .createAndUpdateSubcontractor(any[UserAnswers], any[String], any[JourneyNamespace])(
+          any[HeaderCarrier]
+        )
       verify(mockSessionRepository).set(any[UserAnswers])
-      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[Option[String]])(any[HeaderCarrier])
+      verify(mockAuditService).addSubcontractorEvent(any[UserAnswers], any[String])(any[HeaderCarrier])
     }
   }
 

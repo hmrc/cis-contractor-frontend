@@ -40,7 +40,7 @@ class TrustAddressYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustAddressYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustAddressYesNoView
@@ -94,12 +94,12 @@ class TrustAddressYesNoController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
-          val page         = TrustAddressYesNoPage(id)
+          val page         = TrustAddressYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -111,19 +111,17 @@ class TrustAddressYesNoController @Inject() (
           )
         }
         .getOrElse {
-          logger.error(
-            s"[TrustAddressYesNoController][onPageLoadWithId] - TrustNamePage missing from userAnswers"
-          )
+          logger.error(s"[TrustAddressYesNoController][onPageLoadWithId] - TrustNamePage missing from userAnswers")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.TrustAddressYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getTrustDisplayName(request.userAnswers, mode, id)
+        .getTrustDisplayName(request.userAnswers, mode, id, namespace)
         .map { trustName =>
           form
             .bindFromRequest()
@@ -132,9 +130,9 @@ class TrustAddressYesNoController @Inject() (
               value =>
                 for {
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage(id), value))
+                    Future.fromTry(request.userAnswers.set(TrustAddressYesNoPage(id, namespace), value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(TrustAddressYesNoPage(id), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(TrustAddressYesNoPage(id, namespace), mode, updatedAnswers))
             )
         }
         .getOrElse {

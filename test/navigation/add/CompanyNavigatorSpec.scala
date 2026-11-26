@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.Page
 import pages.add.company.*
 
@@ -47,7 +48,7 @@ class CompanyNavigatorSpec extends SpecBase {
         val id   = uuid.toString
 
         navigator.nextPage(
-          CompanyNamePage(id),
+          CompanyNamePage(id, AddSubcontractor),
           NormalMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyAddressYesNoController
@@ -57,23 +58,23 @@ class CompanyNavigatorSpec extends SpecBase {
       "must go from CompanyAddressYesNoPage with id to address lookup when yes" in {
         val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id), true)
+        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id, AddSubcontractor), true)
 
         navigator.nextPage(
-          CompanyAddressYesNoPage(id),
+          CompanyAddressYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.company.routes.CompanyAddressController
-          .redirectToAddressLookupWithId(flowId, None)
+          .redirectToAddressLookupWithId(flowId, NormalMode, None)
       }
 
       "must go from CompanyAddressYesNoPage with id to contact methods when no" in {
         val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id), false)
+        val answers = emptyUserAnswers.setOrException(CompanyAddressYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          CompanyAddressYesNoPage(id),
+          CompanyAddressYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.company.routes.AddCompanyContactMethodsYesNoController
@@ -83,10 +84,10 @@ class CompanyNavigatorSpec extends SpecBase {
       "must go from AddCompanyContactMethodsYesNoPage with id to CompanyUtrYesNo when no" in {
         val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage(id), false)
+        val answers = emptyUserAnswers.setOrException(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          AddCompanyContactMethodsYesNoPage(id),
+          AddCompanyContactMethodsYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.company.routes.CompanyUtrYesNoController
@@ -96,10 +97,10 @@ class CompanyNavigatorSpec extends SpecBase {
       "must go from CompanyWorksReferenceYesNoPage with id to CYA when no" in {
         val flowId  = UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage(id), false)
+        val answers = emptyUserAnswers.setOrException(CompanyWorksReferenceYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          CompanyWorksReferenceYesNoPage(id),
+          CompanyWorksReferenceYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController
@@ -111,7 +112,7 @@ class CompanyNavigatorSpec extends SpecBase {
         val id     = flowId.toString
 
         navigator.nextPage(
-          CompanyNamePage(id),
+          CompanyNamePage(id, AddSubcontractor),
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.company.routes.CompanyCheckYourAnswersController

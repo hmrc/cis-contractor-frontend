@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.IndividualMobileNumberView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class IndividualMobileNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: IndividualMobileNumberFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
@@ -107,4 +109,78 @@ class IndividualMobileNumberController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  // Multi-tab
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
+
+      val id = flowId.toString
+
+      val contactOption =
+        request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
+
+      val subcontractorName =
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
+
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (subcontractorName, mobileIsAvailable) match {
+        case (Some(subcontractorName), true) =>
+          val preparedForm = request.userAnswers.get(IndividualMobileNumberPage(id, namespace)) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, subcontractorName, Some(flowId)))
+
+        case (Some(_), false) =>
+          // TODO: Restore scoped Add Subcontractor navigation when Add routes are integrated.
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+        case _ =>
+          logger.error(
+            "[IndividualMobileNumberController][onPageLoadWithId] - subcontractor name missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+
+      val id   = flowId.toString
+      val page = IndividualMobileNumberPage(id, namespace)
+
+      val contactOption =
+        request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
+
+      val subcontractorName =
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
+
+      val mobileIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+
+      (for {
+        subcontractorName <- subcontractorName
+        if mobileIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            "[IndividualMobileNumberController][onSubmitWithId] - subcontractor name missing or mobile not selected"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.add.IndividualNamesOptions
 import models.{CheckMode, NormalMode, TypeOfSubcontractor, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.Page
 import pages.add.TypeOfSubcontractorPage
 import pages.add.company.{CompanyCrnYesNoPage, CompanyUtrYesNoPage, CompanyWorksReferenceYesNoPage}
@@ -100,10 +101,10 @@ class SharedNavigatorSpec extends SpecBase {
         val id = "11111111-1111-1111-1111-111111111111"
 
         navigator.nextPage(
-          TypeOfSubcontractorPage(id),
+          TypeOfSubcontractorPage(id, AddSubcontractor),
           NormalMode,
           emptyUserAnswers.setOrException(
-            TypeOfSubcontractorPage(id),
+            TypeOfSubcontractorPage(id, AddSubcontractor),
             TypeOfSubcontractor.Limitedcompany
           )
         ) mustBe controllers.add.company.routes.CompanyNameController
@@ -129,9 +130,9 @@ class SharedNavigatorSpec extends SpecBase {
       "must go from a TypeOfSubcontractorPage with id to TrustNameController when Trust is selected" in {
         val id = "11111111-1111-1111-1111-111111111111"
         navigator.nextPage(
-          TypeOfSubcontractorPage(id),
+          TypeOfSubcontractorPage(id, AddSubcontractor),
           NormalMode,
-          emptyUserAnswers.setOrException(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+          emptyUserAnswers.setOrException(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Trust)
         ) mustBe controllers.add.trust.routes.TrustNameController
           .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
       }

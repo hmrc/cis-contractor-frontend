@@ -17,7 +17,8 @@
 package controllers.add.partnership
 
 import controllers.actions.*
-import models.CheckMode
+import models.{CheckMode, NormalMode}
+import models.JourneyNamespace.AddSubcontractor
 import models.add.partnership.ValidatedPartnership
 import pages.add.CheckYourAnswersSubmittedPage
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
@@ -125,206 +126,208 @@ class PartnershipCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
-      val id = flowId.toString
-      val ua = request.userAnswers
-      ValidatedPartnership.build(ua, id) match {
-        case Right(_)    =>
-          val list = SummaryListViewModel(
-            rows = Seq(
-              TypeOfSubcontractorSummary.row(
-                ua,
-                subJourneyId = Some(id),
-                changeUrl = Some(
-                  controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id = flowId.toString
+        val ua = request.userAnswers
+        ValidatedPartnership.build(ua, id, AddSubcontractor) match {
+          case Right(_)    =>
+            val list = SummaryListViewModel(
+              rows = Seq(
+                TypeOfSubcontractorSummary.row(
+                  ua,
+                  subJourneyId = Some(id),
+                  changeUrl = Some(
+                    controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+                  )
+                ),
+                PartnershipNameSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipNameController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipAddressYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipAddressSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipAddressController
+                      .redirectToAddressLookupWithId(flowId, NormalMode, Some("change"))
+                      .url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                AddPartnershipContactMethodsYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.AddPartnershipContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipContactMethodOptionsSummary.row(
+                  ua,
+                  changeUrl =
+                    Some(routes.PartnershipContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipEmailAddressSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipPhoneNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipMobileNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipHasUtrYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipUniqueTaxpayerReferenceSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerNameSummary.row(
+                  ua,
+                  changeUrl =
+                    Some(routes.PartnershipNominatedPartnerNameController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerUtrYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerUtrSummary.row(
+                  ua,
+                  changeUrl =
+                    Some(routes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerNinoYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerNinoSummary.row(
+                  ua,
+                  changeUrl =
+                    Some(routes.PartnershipNominatedPartnerNinoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerCrnYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipNominatedPartnerCrnSummary.row(
+                  ua,
+                  changeUrl =
+                    Some(routes.PartnershipNominatedPartnerCrnController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipWorksReferenceNumberYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipWorksReferenceNumberYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                PartnershipWorksReferenceNumberSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.PartnershipWorksReferenceNumberController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
                 )
-              ),
-              PartnershipNameSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipNameController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipAddressYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipAddressSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipAddressController
-                    .redirectToAddressLookupWithId(flowId, Some("change"))
-                    .url
-                ),
-                subJourneyId = Some(id)
-              ),
-              AddPartnershipContactMethodsYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.AddPartnershipContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipContactMethodOptionsSummary.row(
-                ua,
-                changeUrl =
-                  Some(routes.PartnershipContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipEmailAddressSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipPhoneNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipMobileNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipHasUtrYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipUniqueTaxpayerReferenceSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipUniqueTaxpayerReferenceController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerNameSummary.row(
-                ua,
-                changeUrl =
-                  Some(routes.PartnershipNominatedPartnerNameController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerUtrYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerUtrSummary.row(
-                ua,
-                changeUrl =
-                  Some(routes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerNinoYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerNinoSummary.row(
-                ua,
-                changeUrl =
-                  Some(routes.PartnershipNominatedPartnerNinoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerCrnYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipNominatedPartnerCrnSummary.row(
-                ua,
-                changeUrl =
-                  Some(routes.PartnershipNominatedPartnerCrnController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              PartnershipWorksReferenceNumberYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipWorksReferenceNumberYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              PartnershipWorksReferenceNumberSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.PartnershipWorksReferenceNumberController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              )
-            ).flatten
-          )
+              ).flatten
+            )
 
-          Ok(view(list, routes.PartnershipCheckYourAnswersController.onSubmitWithId(flowId)))
-        case Left(error) =>
-          logger.error(s"[PartnershipCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+            Ok(view(list, routes.PartnershipCheckYourAnswersController.onSubmitWithId(flowId)))
+          case Left(error) =>
+            logger.error(s"[PartnershipCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id = flowId.toString
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        logger.error(
-          "[PartnershipCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
-        )
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      } else {
-        ValidatedPartnership.build(request.userAnswers, id) match {
-          case Right(_) =>
-            val duplicateUtr =
-              request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage(id)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, Some(id))
-                case None      => Future.successful(false)
-              }
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async {
+      implicit request =>
+        val id = flowId.toString
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          logger.error(
+            "[PartnershipCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        } else {
+          ValidatedPartnership.build(request.userAnswers, id, AddSubcontractor) match {
+            case Right(_) =>
+              val duplicateUtr =
+                request.userAnswers.get(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)) match {
+                  case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
+                  case None      => Future.successful(false)
+                }
 
-            duplicateUtr
-              .flatMap {
-                case true  =>
-                  logger.error("[PartnershipCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                case false =>
-                  subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, Some(id))
-                    .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, Some(id))
-                      Future
-                        .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
-                        .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                        .map { _ =>
-                          Redirect(
-                            controllers.add.routes.SubcontractorAddedController
-                              .partnershipSubcontractorAddedWithId(flowId)
-                          )
-                        }
-                    }
-                    .recover { case t =>
-                      logger.error(
-                        "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
-                        t
-                      )
-                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    }
-              }
-              .recover { case t =>
-                logger.error(
-                  "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
-                  t
-                )
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
+              duplicateUtr
+                .flatMap {
+                  case true  =>
+                    logger.error("[PartnershipCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
+                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                  case false =>
+                    subcontractorService
+                      .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
+                      .flatMap { _ =>
+                        auditService.addSubcontractorEvent(request.userAnswers, id)
+                        Future
+                          .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
+                          .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                          .map { _ =>
+                            Redirect(
+                              controllers.add.routes.SubcontractorAddedController
+                                .partnershipSubcontractorAddedWithId(flowId)
+                            )
+                          }
+                      }
+                      .recover { case t =>
+                        logger.error(
+                          "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
+                          t
+                        )
+                        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      }
+                }
+                .recover { case t =>
+                  logger.error(
+                    "[PartnershipCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
+                    t
+                  )
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
 
-          case Left(error) =>
-            logger.error(s"[PartnershipCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Left(error) =>
+              logger.error(s"[PartnershipCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
         }
-      }
     }
 
 }

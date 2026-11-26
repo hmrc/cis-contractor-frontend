@@ -41,7 +41,7 @@ class TrustMobileNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustMobileNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustMobileNumberView
@@ -111,16 +111,17 @@ class TrustMobileNumberController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id                = flowId.toString
-      val contactOption     = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val contactOption     = request.userAnswers.get(TrustContactMethodOptionsPage(id, namespace))
       val trustName         =
-        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
-      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id, namespace)
+      val mobileIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Mobile))
 
       (trustName, mobileIsAvailable) match {
         case (Some(trustName), true) =>
-          val page         = TrustMobileNumberPage(id)
+          val page         = TrustMobileNumberPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -139,13 +140,14 @@ class TrustMobileNumberController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id                = flowId.toString
       val submitAction      = routes.TrustMobileNumberController.onSubmitWithId(flowId, mode)
-      val contactOption     = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val contactOption     = request.userAnswers.get(TrustContactMethodOptionsPage(id, namespace))
       val trustName         =
-        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
-      val mobileIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Mobile))
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id, namespace)
+      val mobileIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Mobile))
 
       (for {
         trustName <- trustName
@@ -157,9 +159,9 @@ class TrustMobileNumberController @Inject() (
           value =>
             for {
               updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(TrustMobileNumberPage(id), value))
+                Future.fromTry(request.userAnswers.set(TrustMobileNumberPage(id, namespace), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TrustMobileNumberPage(id), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(TrustMobileNumberPage(id, namespace), mode, updatedAnswers))
         ))
         .getOrElse {
           logger.error(

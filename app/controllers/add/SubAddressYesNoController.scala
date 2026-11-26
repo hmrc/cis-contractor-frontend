@@ -18,7 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.SubAddressYesNoFormProvider
-import models.Mode
+import models.{JourneyNamespace, Mode}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.add.SubAddressYesNoPage
@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.SubAddressYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +41,7 @@ class SubAddressYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: SubAddressYesNoFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
@@ -56,6 +58,10 @@ class SubAddressYesNoController @Inject() (
 
   private def preparedForm(implicit request: DataRequest[?]) =
     request.userAnswers.get(SubAddressYesNoPage).fold(form)(form.fill)
+
+  // Multi-tab
+  private def preparedForm(id: String, namespace: JourneyNamespace)(implicit request: DataRequest[?]) =
+    request.userAnswers.get(SubAddressYesNoPage(id, namespace)).fold(form)(form.fill)
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -86,6 +92,48 @@ class SubAddressYesNoController @Inject() (
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
+            )
+        }
+    }
+
+  // Multi-tab
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
+
+      val id = flowId.toString
+
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error("[SubAddressYesNoController][onPageLoadWithId] - subcontractor name missing or invalid")
+          recoveryRedirect
+        } { subcontractorName =>
+          Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+
+      val id   = flowId.toString
+      val page = SubAddressYesNoPage(id, namespace)
+
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error("[SubAddressYesNoController][onSubmitWithId] - subcontractor name missing or invalid")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
             )
         }
     }

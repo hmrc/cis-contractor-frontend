@@ -42,7 +42,7 @@ class CompanyEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyEmailAddressView
@@ -155,15 +155,15 @@ class CompanyEmailAddressController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
-      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
-      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id, namespace))
+      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable = mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (companyName, emailIsAvailable) match {
         case (Some(companyName), true) =>
-          val page         = CompanyEmailAddressPage(id)
+          val page         = CompanyEmailAddressPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -182,12 +182,12 @@ class CompanyEmailAddressController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
       val submitAction     = routes.CompanyEmailAddressController.onSubmitWithId(flowId, mode)
-      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id))
-      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+      val contactOption    = request.userAnswers.get(CompanyContactMethodOptionsPage(id, namespace))
+      val companyName      = SubcontractorNameDisplayHelper.getCompanyDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable = mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
         companyName <- companyName
@@ -199,9 +199,9 @@ class CompanyEmailAddressController @Inject() (
           value =>
             for {
               updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage(id), value))
+                Future.fromTry(request.userAnswers.set(CompanyEmailAddressPage(id, namespace), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage(id), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CompanyEmailAddressPage(id, namespace), mode, updatedAnswers))
         ))
         .getOrElse {
           logger.error(

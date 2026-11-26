@@ -21,6 +21,7 @@ import controllers.routes
 import forms.add.company.CompanyContactMethodOptionsFormProvider
 import models.add.company.CompanyContactMethodOptions
 import models.contact.ContactMethodOptions
+import models.JourneyNamespace.AddSubcontractor
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -406,13 +407,13 @@ class CompanyContactMethodOptionsControllerSpec extends SpecBase with WithFakeCi
       val id     = flowId.toString
 
       val minUaWithId = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(CompanyNamePage(id), companyName)
+        .set(CompanyNamePage(id, AddSubcontractor), companyName)
         .success
         .value
-        .set(AddCompanyContactMethodsYesNoPage(id), true)
+        .set(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor), true)
         .success
         .value
 

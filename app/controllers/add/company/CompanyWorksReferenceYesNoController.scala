@@ -40,7 +40,7 @@ class CompanyWorksReferenceYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyWorksReferenceYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyWorksReferenceYesNoView
@@ -123,12 +123,12 @@ class CompanyWorksReferenceYesNoController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
         .map { companyName =>
-          val page         = CompanyWorksReferenceYesNoPage(id)
+          val page         = CompanyWorksReferenceYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -148,11 +148,11 @@ class CompanyWorksReferenceYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.CompanyWorksReferenceYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
         .map { companyName =>
           form
             .bindFromRequest()
@@ -162,11 +162,11 @@ class CompanyWorksReferenceYesNoController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(
-                      request.userAnswers.set(CompanyWorksReferenceYesNoPage(id), value)
+                      request.userAnswers.set(CompanyWorksReferenceYesNoPage(id, namespace), value)
                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  navigator.nextPage(CompanyWorksReferenceYesNoPage(id), mode, updatedAnswers)
+                  navigator.nextPage(CompanyWorksReferenceYesNoPage(id, namespace), mode, updatedAnswers)
                 )
             )
         }

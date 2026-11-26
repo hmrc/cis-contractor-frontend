@@ -21,7 +21,7 @@ import models.UserAnswers
 import models.finalvalidation.*
 import navigation.finalvalidation.FinalValidationNavigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, verifyNoInteractions, when}
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -46,7 +46,8 @@ class FinalValidationHandoffControllerSpec extends SpecBase {
       subcontractorId = subcontractorId,
       subbieResourceRef = 100L,
       field = FinalValidationField.Utr,
-      changeTarget = FinalValidationChangeTarget.TradingName
+      changeTarget = FinalValidationChangeTarget.TradingName,
+      flowId = None
     )
 
   private val updatedAnswers =
@@ -84,6 +85,14 @@ class FinalValidationHandoffControllerSpec extends SpecBase {
 
       val finalValidationNavigator =
         mock[FinalValidationNavigator]
+
+      when(
+        finalValidationHandoffService.getPayload(
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(Some(payload))
+      )
 
       when(
         finalValidationHandoffService.prepareMonthlyReturnJourney(
@@ -153,8 +162,7 @@ class FinalValidationHandoffControllerSpec extends SpecBase {
         mock[FinalValidationNavigator]
 
       when(
-        finalValidationHandoffService.prepareMonthlyReturnJourney(
-          any[UserAnswers],
+        finalValidationHandoffService.getPayload(
           any[String]
         )(any[HeaderCarrier])
       ).thenReturn(
@@ -208,6 +216,14 @@ class FinalValidationHandoffControllerSpec extends SpecBase {
             "failed to prepare journey"
           )
         )
+      )
+
+      when(
+        finalValidationHandoffService.getPayload(
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(Some(payload))
       )
 
       val application =

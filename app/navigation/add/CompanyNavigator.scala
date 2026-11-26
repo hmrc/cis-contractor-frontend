@@ -19,6 +19,7 @@ package navigation.add
 import controllers.routes
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import navigation.NavigatorForJourney
 import pages.{Page, QuestionPage}
 import pages.add.company.*
@@ -44,75 +45,75 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def extractId(page: Page): Option[String] =
     page match {
-      case CompanyNamePage(id)                   => Some(id)
-      case CompanyAddressYesNoPage(id)           => Some(id)
-      case CompanyAddressPage(id)                => Some(id)
-      case AddCompanyContactMethodsYesNoPage(id) => Some(id)
-      case CompanyContactMethodOptionsPage(id)   => Some(id)
-      case CompanyEmailAddressPage(id)           => Some(id)
-      case CompanyPhoneNumberPage(id)            => Some(id)
-      case CompanyMobileNumberPage(id)           => Some(id)
-      case CompanyUtrYesNoPage(id)               => Some(id)
-      case CompanyUtrPage(id)                    => Some(id)
-      case CompanyCrnYesNoPage(id)               => Some(id)
-      case CompanyCrnPage(id)                    => Some(id)
-      case CompanyWorksReferenceYesNoPage(id)    => Some(id)
-      case CompanyWorksReferencePage(id)         => Some(id)
-      case _                                     => None
+      case CompanyNamePage(id, AddSubcontractor)                   => Some(id)
+      case CompanyAddressYesNoPage(id, AddSubcontractor)           => Some(id)
+      case CompanyAddressPage(id, AddSubcontractor)                => Some(id)
+      case AddCompanyContactMethodsYesNoPage(id, AddSubcontractor) => Some(id)
+      case CompanyContactMethodOptionsPage(id, AddSubcontractor)   => Some(id)
+      case CompanyEmailAddressPage(id, AddSubcontractor)           => Some(id)
+      case CompanyPhoneNumberPage(id, AddSubcontractor)            => Some(id)
+      case CompanyMobileNumberPage(id, AddSubcontractor)           => Some(id)
+      case CompanyUtrYesNoPage(id, AddSubcontractor)               => Some(id)
+      case CompanyUtrPage(id, AddSubcontractor)                    => Some(id)
+      case CompanyCrnYesNoPage(id, AddSubcontractor)               => Some(id)
+      case CompanyCrnPage(id, AddSubcontractor)                    => Some(id)
+      case CompanyWorksReferenceYesNoPage(id, AddSubcontractor)    => Some(id)
+      case CompanyWorksReferencePage(id, AddSubcontractor)         => Some(id)
+      case _                                                       => None
     }
 
   private def cyaRouteWithId(flowId: UUID): Call =
     controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoadWithId(flowId)
 
   private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case CompanyNamePage(_) =>
+    case CompanyNamePage(_, AddSubcontractor) =>
       _ =>
         controllers.add.company.routes.CompanyAddressYesNoController
           .onPageLoadWithId(flowId, NormalMode)
 
-    case CompanyAddressYesNoPage(_) =>
+    case CompanyAddressYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromCompanyAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
 
-    case CompanyAddressPage(_) =>
+    case CompanyAddressPage(_, AddSubcontractor) =>
       _ =>
         controllers.add.company.routes.AddCompanyContactMethodsYesNoController
           .onPageLoadWithId(flowId, NormalMode)
 
-    case AddCompanyContactMethodsYesNoPage(_) =>
+    case AddCompanyContactMethodsYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(flowId, id, NormalMode)(userAnswers)
 
-    case CompanyContactMethodOptionsPage(_) =>
+    case CompanyContactMethodOptionsPage(_, AddSubcontractor) =>
       userAnswers => nextSelectedContactMethodPageAfter(flowId, id, None)(userAnswers)
 
-    case CompanyEmailAddressPage(_) =>
+    case CompanyEmailAddressPage(_, AddSubcontractor) =>
       userAnswers => nextSelectedContactMethodPageAfter(flowId, id, Some(ContactMethodOptions.Email))(userAnswers)
 
-    case CompanyPhoneNumberPage(_) =>
+    case CompanyPhoneNumberPage(_, AddSubcontractor) =>
       userAnswers => nextSelectedContactMethodPageAfter(flowId, id, Some(ContactMethodOptions.Phone))(userAnswers)
 
-    case CompanyMobileNumberPage(_) =>
+    case CompanyMobileNumberPage(_, AddSubcontractor) =>
       userAnswers => nextSelectedContactMethodPageAfter(flowId, id, Some(ContactMethodOptions.Mobile))(userAnswers)
 
-    case CompanyUtrYesNoPage(_) =>
+    case CompanyUtrYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromCompanyUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
 
-    case CompanyUtrPage(_) =>
+    case CompanyUtrPage(_, AddSubcontractor) =>
       _ =>
         controllers.add.company.routes.CompanyCrnYesNoController
           .onPageLoadWithId(flowId, NormalMode)
 
-    case CompanyCrnYesNoPage(_) =>
+    case CompanyCrnYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromCompanyCrnYesNoPage(flowId, id, NormalMode)(userAnswers)
 
-    case CompanyCrnPage(_) =>
+    case CompanyCrnPage(_, AddSubcontractor) =>
       _ =>
         controllers.add.company.routes.CompanyWorksReferenceYesNoController
           .onPageLoadWithId(flowId, NormalMode)
 
-    case CompanyWorksReferenceYesNoPage(_) =>
+    case CompanyWorksReferenceYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromCompanyWorksReferenceYesNoPage(flowId, id, NormalMode)(userAnswers)
 
-    case CompanyWorksReferencePage(_) =>
+    case CompanyWorksReferencePage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
     case _ =>
@@ -120,31 +121,31 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   }
 
   private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case CompanyUtrYesNoPage(_) =>
+    case CompanyUtrYesNoPage(_, AddSubcontractor) =>
       navigatorFromCompanyUtrYesNoPage(flowId, id, CheckMode)(_)
 
-    case CompanyCrnYesNoPage(_) =>
+    case CompanyCrnYesNoPage(_, AddSubcontractor) =>
       navigatorFromCompanyCrnYesNoPage(flowId, id, CheckMode)(_)
 
-    case CompanyWorksReferenceYesNoPage(_) =>
+    case CompanyWorksReferenceYesNoPage(_, AddSubcontractor) =>
       navigatorFromCompanyWorksReferenceYesNoPage(flowId, id, CheckMode)(_)
 
-    case CompanyNamePage(_) =>
+    case CompanyNamePage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
-    case CompanyAddressYesNoPage(_) =>
+    case CompanyAddressYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromCompanyAddressYesNoPage(flowId, id, CheckMode)(userAnswers)
 
-    case CompanyAddressPage(_) =>
+    case CompanyAddressPage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
-    case AddCompanyContactMethodsYesNoPage(_) =>
+    case AddCompanyContactMethodsYesNoPage(_, AddSubcontractor) =>
       userAnswers => navigatorFromAddCompanyContactMethodsYesNoPage(flowId, id, CheckMode)(userAnswers)
 
-    case CompanyContactMethodOptionsPage(_) =>
+    case CompanyContactMethodOptionsPage(_, AddSubcontractor) =>
       userAnswers => nextMissingSelectedContactMethodPageAfter(flowId, id, None, CheckMode)(userAnswers)
 
-    case CompanyEmailAddressPage(_) =>
+    case CompanyEmailAddressPage(_, AddSubcontractor) =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -153,7 +154,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
           CheckMode
         )(userAnswers)
 
-    case CompanyPhoneNumberPage(_) =>
+    case CompanyPhoneNumberPage(_, AddSubcontractor) =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -162,7 +163,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
           CheckMode
         )(userAnswers)
 
-    case CompanyMobileNumberPage(_) =>
+    case CompanyMobileNumberPage(_, AddSubcontractor) =>
       userAnswers =>
         nextMissingSelectedContactMethodPageAfter(
           flowId,
@@ -171,13 +172,13 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
           CheckMode
         )(userAnswers)
 
-    case CompanyUtrPage(_) =>
+    case CompanyUtrPage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
-    case CompanyCrnPage(_) =>
+    case CompanyCrnPage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
-    case CompanyWorksReferencePage(_) =>
+    case CompanyWorksReferencePage(_, AddSubcontractor) =>
       _ => cyaRouteWithId(flowId)
 
     case _ =>
@@ -191,12 +192,12 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
   )(userAnswers: UserAnswers): Call =
     addressLookupYesNoRoute(
       mode,
-      userAnswers.get(CompanyAddressYesNoPage(id)),
-      userAnswers.get(CompanyAddressPage(id)).isDefined,
+      userAnswers.get(CompanyAddressYesNoPage(id, AddSubcontractor)),
+      userAnswers.get(CompanyAddressPage(id, AddSubcontractor)).isDefined,
       onYes = controllers.add.company.routes.CompanyAddressController
-        .redirectToAddressLookupWithId(flowId, None),
+        .redirectToAddressLookupWithId(flowId, NormalMode, None),
       onYesChange = controllers.add.company.routes.CompanyAddressController
-        .redirectToAddressLookupWithId(flowId, Some(CheckMode.toString)),
+        .redirectToAddressLookupWithId(flowId, NormalMode, Some(CheckMode.toString)),
       onNo = controllers.add.company.routes.AddCompanyContactMethodsYesNoController
         .onPageLoadWithId(flowId, NormalMode),
       checkYourAnswers = cyaRouteWithId(flowId)
@@ -207,7 +208,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(AddCompanyContactMethodsYesNoPage(id)), mode) match {
+    (userAnswers.get(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), NormalMode) =>
         controllers.add.company.routes.CompanyContactMethodOptionsController
           .onPageLoadWithId(flowId, NormalMode)
@@ -218,7 +219,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
       case (Some(true), CheckMode) =>
         userAnswers
-          .get(CompanyContactMethodOptionsPage(id))
+          .get(CompanyContactMethodOptionsPage(id, AddSubcontractor))
           .fold(
             controllers.add.company.routes.CompanyContactMethodOptionsController
               .onPageLoadWithId(flowId, mode)
@@ -239,8 +240,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(CompanyUtrYesNoPage(id)), mode) match {
-      case (Some(true), CheckMode) if userAnswers.get(CompanyUtrPage(id)).isDefined =>
+    (userAnswers.get(CompanyUtrYesNoPage(id, AddSubcontractor)), mode) match {
+      case (Some(true), CheckMode) if userAnswers.get(CompanyUtrPage(id, AddSubcontractor)).isDefined =>
         cyaRouteWithId(flowId)
 
       case (Some(true), CheckMode) =>
@@ -270,8 +271,8 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(CompanyCrnYesNoPage(id)), mode) match {
-      case (Some(true), CheckMode) if userAnswers.get(CompanyCrnPage(id)).isDefined =>
+    (userAnswers.get(CompanyCrnYesNoPage(id, AddSubcontractor)), mode) match {
+      case (Some(true), CheckMode) if userAnswers.get(CompanyCrnPage(id, AddSubcontractor)).isDefined =>
         cyaRouteWithId(flowId)
 
       case (Some(true), CheckMode) =>
@@ -301,10 +302,10 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     mode: Mode
   )(userAnswers: UserAnswers): Call =
-    (userAnswers.get(CompanyWorksReferenceYesNoPage(id)), mode) match {
+    (userAnswers.get(CompanyWorksReferenceYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), CheckMode) =>
         userAnswers
-          .get(CompanyWorksReferencePage(id))
+          .get(CompanyWorksReferencePage(id, AddSubcontractor))
           .fold(
             controllers.add.company.routes.CompanyWorksReferenceController
               .onPageLoadWithId(flowId, mode)
@@ -391,7 +392,7 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     id: String,
     userAnswers: UserAnswers
   ): Option[Seq[ContactMethodOptions]] =
-    userAnswers.get(CompanyContactMethodOptionsPage(id)).map(ContactMethodOptions.ordered)
+    userAnswers.get(CompanyContactMethodOptionsPage(id, AddSubcontractor)).map(ContactMethodOptions.ordered)
 
   private def contactMethodPageCall(
     flowId: UUID,
@@ -417,9 +418,9 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
     contactMethod: ContactMethodOptions
   ): QuestionPage[String] =
     contactMethod match {
-      case ContactMethodOptions.Email  => CompanyEmailAddressPage(id)
-      case ContactMethodOptions.Phone  => CompanyPhoneNumberPage(id)
-      case ContactMethodOptions.Mobile => CompanyMobileNumberPage(id)
+      case ContactMethodOptions.Email  => CompanyEmailAddressPage(id, AddSubcontractor)
+      case ContactMethodOptions.Phone  => CompanyPhoneNumberPage(id, AddSubcontractor)
+      case ContactMethodOptions.Mobile => CompanyMobileNumberPage(id, AddSubcontractor)
     }
 
   private def isMissingAnswer(

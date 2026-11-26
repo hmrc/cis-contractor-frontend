@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.company
 
 import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.CompanyAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +33,7 @@ object CompanyAddressSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(CompanyAddressPage(id)))
+      .map(id => answers.get(CompanyAddressPage(id, AddSubcontractor)))
       .getOrElse(answers.get(CompanyAddressPage))
       .map { answer =>
         AddressSummaryRow.row(

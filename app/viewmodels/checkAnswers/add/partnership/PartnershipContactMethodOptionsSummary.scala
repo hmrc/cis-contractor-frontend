@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.contact.ContactMethodOptions
 import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
@@ -37,7 +38,7 @@ object PartnershipContactMethodOptionsSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipContactMethodOptionsPage(id)))
+      .map(id => answers.get(PartnershipContactMethodOptionsPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipContactMethodOptionsPage))
       .map { selectedMethods =>
         val options =

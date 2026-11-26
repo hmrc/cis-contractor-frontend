@@ -22,10 +22,10 @@ GET   /subcontractor/add/trust/check-address/:flowId         controllers.add.tru
 POST  /subcontractor/add/trust/check-address/:flowId         controllers.add.trust.TrustAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-check-address/:flowId  controllers.add.trust.TrustAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 POST  /subcontractor/add/trust/change-check-address/:flowId  controllers.add.trust.TrustAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
-GET   /subcontractor/add/trust/address/:flowId                  controllers.add.trust.TrustAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, changeRoute: Option[String] ?= None)
-GET   /subcontractor/add/trust/address-return/change/:flowId    controllers.add.trust.TrustAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "")
+GET   /subcontractor/add/trust/address/:flowId                  controllers.add.trust.TrustAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/add/trust/address-return/change/:flowId    controllers.add.trust.TrustAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/address-return/change            controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
-GET   /subcontractor/add/trust/address-return/:flowId           controllers.add.trust.TrustAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "")
+GET   /subcontractor/add/trust/address-return/:flowId           controllers.add.trust.TrustAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/email-address/:flowId         controllers.add.trust.TrustEmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 POST  /subcontractor/add/trust/email-address/:flowId         controllers.add.trust.TrustEmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
 GET   /subcontractor/add/trust/change-email-address/:flowId  controllers.add.trust.TrustEmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
@@ -140,36 +140,85 @@ POST  /subcontractor/amend/trust/select-contact-details       controllers.add.tr
 GET   /subcontractor/final-validation/trust/trust-name  controllers.add.trust.TrustNameController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/trust-name  controllers.add.trust.TrustNameController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/name/:flowId   controllers.add.trust.TrustNameController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/name/:flowId   controllers.add.trust.TrustNameController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/check-address  controllers.add.trust.TrustAddressYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/check-address  controllers.add.trust.TrustAddressYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/check-address/:flowId  controllers.add.trust.TrustAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/check-address/:flowId  controllers.add.trust.TrustAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/trust/address                controllers.add.trust.TrustAddressController.redirectToAddressLookup(mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/final-validation/trust/address-return         controllers.add.trust.TrustAddressController.addressLookupCallback(id: String ?= "", mode: Mode = FinalValidationMode)
 GET   /subcontractor/final-validation/trust/address-return/change  controllers.add.trust.TrustAddressController.addressLookupCallbackChange(id: String ?= "", mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/address/:flowId                 controllers.add.trust.TrustAddressController.redirectToAddressLookupWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/final-validation/trust/address-return/:flowId          controllers.add.trust.TrustAddressController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+GET   /subcontractor/final-validation/trust/address-return/change/:flowId   controllers.add.trust.TrustAddressController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/add-contact-details  controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/add-contact-details/:flowId  controllers.add.trust.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/add-contact-details/:flowId  controllers.add.trust.AddTrustContactMethodsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/trust/select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/select-contact-details  controllers.add.trust.TrustContactMethodOptionsController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/select-contact-details/:flowId  controllers.add.trust.TrustContactMethodOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/select-contact-details/:flowId  controllers.add.trust.TrustContactMethodOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/email-address  controllers.add.trust.TrustEmailAddressController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/email-address  controllers.add.trust.TrustEmailAddressController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/email-address/:flowId  controllers.add.trust.TrustEmailAddressController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/email-address/:flowId  controllers.add.trust.TrustEmailAddressController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/trust/phone-number  controllers.add.trust.TrustPhoneNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/phone-number  controllers.add.trust.TrustPhoneNumberController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/phone-number/:flowId  controllers.add.trust.TrustPhoneNumberController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/phone-number/:flowId  controllers.add.trust.TrustPhoneNumberController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/mobile-number  controllers.add.trust.TrustMobileNumberController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/mobile-number  controllers.add.trust.TrustMobileNumberController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/mobile-number/:flowId  controllers.add.trust.TrustMobileNumberController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/mobile-number/:flowId  controllers.add.trust.TrustMobileNumberController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/trust/trust-has-utr  controllers.add.trust.TrustUtrYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/trust-has-utr  controllers.add.trust.TrustUtrYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/trust-has-utr/:flowId  controllers.add.trust.TrustUtrYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-has-utr/:flowId  controllers.add.trust.TrustUtrYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/trust-utr  controllers.add.trust.TrustUtrController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/trust-utr  controllers.add.trust.TrustUtrController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/trust-utr/:flowId  controllers.add.trust.TrustUtrController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-utr/:flowId  controllers.add.trust.TrustUtrController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
 
 GET   /subcontractor/final-validation/trust/trust-has-works-reference  controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/trust-has-works-reference  controllers.add.trust.TrustWorksReferenceYesNoController.onSubmit(mode: Mode = FinalValidationMode)
 
+# Multi-tab
+GET   /subcontractor/final-validation/trust/trust-has-works-reference/:flowId  controllers.add.trust.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-has-works-reference/:flowId  controllers.add.trust.TrustWorksReferenceYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+
 GET   /subcontractor/final-validation/trust/trust-works-reference  controllers.add.trust.TrustWorksReferenceController.onPageLoad(mode: Mode = FinalValidationMode)
 POST  /subcontractor/final-validation/trust/trust-works-reference  controllers.add.trust.TrustWorksReferenceController.onSubmit(mode: Mode = FinalValidationMode)
+
+# Multi-tab
+GET   /subcontractor/final-validation/trust/trust-works-reference/:flowId  controllers.add.trust.TrustWorksReferenceController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)
+POST  /subcontractor/final-validation/trust/trust-works-reference/:flowId  controllers.add.trust.TrustWorksReferenceController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = FinalValidationMode)

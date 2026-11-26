@@ -23,8 +23,9 @@ import navigation.finalvalidation.FinalValidationNavigator
 import services.FinalValidationHandoffService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 @Singleton
@@ -42,11 +43,28 @@ class FinalValidationHandoffController @Inject() (
     val emptyUserAnswers = UserAnswers(request.userId)
 
     finalValidationHandoffService
-      .prepareMonthlyReturnJourney(emptyUserAnswers, handoffId)
+      .getPayload(handoffId)
+      .flatMap {
+        case Some(payload) =>
+          payload.flowId match {
+            // Multi-tab
+            case Some(id) => finalValidationHandoffService.prepareMonthlyReturnJourney(emptyUserAnswers, handoffId, id)
+            case None     => finalValidationHandoffService.prepareMonthlyReturnJourney(emptyUserAnswers, handoffId)
+          }
+        case None          =>
+          Future.successful(None)
+      }
       .map {
         case Some((updatedAnswers, payload)) =>
-          Redirect(finalValidationNavigator.startPage(payload.changeTarget, updatedAnswers))
-        case None                            =>
+          val nextPage = payload.flowId match {
+            // Multi-tab
+            case Some(id) => finalValidationNavigator.startPage(payload.changeTarget, updatedAnswers, id)
+            case None     => finalValidationNavigator.startPage(payload.changeTarget, updatedAnswers)
+          }
+
+          Redirect(nextPage)
+
+        case None =>
           logger.error("[FinalValidationHandoffController][onPageLoad] - handoff journey not prepared")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }

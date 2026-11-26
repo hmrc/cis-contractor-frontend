@@ -17,6 +17,7 @@
 package queries
 
 import base.SpecBase
+import models.JourneyNamespace.AddSubcontractor
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.{JsPath, Json}
@@ -30,7 +31,7 @@ class CisIdQuerySpec extends AnyFreeSpec with Matchers with SpecBase {
     }
 
     "must nest the WithId path under addSubcontractor" in {
-      CisIdQuery("uuid-1").path mustEqual (JsPath \ "addSubcontractor" \ "uuid-1" \ "cisId")
+      CisIdQuery("uuid-1", AddSubcontractor).path mustEqual (JsPath \ "addSubcontractor" \ "uuid-1" \ "cisId")
     }
 
     "must set a CIS ID value" in {

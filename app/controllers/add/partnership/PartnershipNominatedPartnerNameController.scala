@@ -40,7 +40,7 @@ class PartnershipNominatedPartnerNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipNominatedPartnerNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: PartnershipNominatedPartnerNameView
@@ -104,13 +104,14 @@ class PartnershipNominatedPartnerNameController @Inject() (
         }
     }
 
+  // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getPartnershipDisplayName(request.userAnswers, mode, id)
+        .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
         .map { partnershipName =>
-          val page         = PartnershipNominatedPartnerNamePage(id)
+          val page         = PartnershipNominatedPartnerNamePage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -130,11 +131,11 @@ class PartnershipNominatedPartnerNameController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.PartnershipNominatedPartnerNameController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getPartnershipDisplayName(request.userAnswers, mode, id)
+        .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
         .map { partnershipName =>
           form
             .bindFromRequest()
@@ -145,11 +146,11 @@ class PartnershipNominatedPartnerNameController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(
-                      request.userAnswers.set(PartnershipNominatedPartnerNamePage(id), value)
+                      request.userAnswers.set(PartnershipNominatedPartnerNamePage(id, namespace), value)
                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  navigator.nextPage(PartnershipNominatedPartnerNamePage(id), mode, updatedAnswers)
+                  navigator.nextPage(PartnershipNominatedPartnerNamePage(id, namespace), mode, updatedAnswers)
                 )
             )
         }

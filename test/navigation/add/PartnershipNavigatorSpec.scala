@@ -21,6 +21,7 @@ import controllers.routes
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.partnership.*
 import pages.Page
 import pages.QuestionPage
@@ -49,7 +50,7 @@ class PartnershipNavigatorSpec extends SpecBase {
         val uuid = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id   = uuid.toString
         navigator.nextPage(
-          PartnershipNamePage(id),
+          PartnershipNamePage(id, AddSubcontractor),
           NormalMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipAddressYesNoController
@@ -59,23 +60,23 @@ class PartnershipNavigatorSpec extends SpecBase {
       "must go from PartnershipAddressYesNoPage with id to address lookup when yes" in {
         val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), true)
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id, AddSubcontractor), true)
 
         navigator.nextPage(
-          PartnershipAddressYesNoPage(id),
+          PartnershipAddressYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.partnership.routes.PartnershipAddressController
-          .redirectToAddressLookupWithId(flowId, None)
+          .redirectToAddressLookupWithId(flowId, NormalMode, None)
       }
 
       "must go from PartnershipAddressYesNoPage with id to contact methods when no" in {
         val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id), false)
+        val answers = emptyUserAnswers.setOrException(PartnershipAddressYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          PartnershipAddressYesNoPage(id),
+          PartnershipAddressYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController
@@ -85,10 +86,11 @@ class PartnershipNavigatorSpec extends SpecBase {
       "must go from AddPartnershipContactMethodsYesNoPage with id to has UTR when no" in {
         val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage(id), false)
+        val answers =
+          emptyUserAnswers.setOrException(AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          AddPartnershipContactMethodsYesNoPage(id),
+          AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.partnership.routes.PartnershipHasUtrYesNoController
@@ -98,10 +100,10 @@ class PartnershipNavigatorSpec extends SpecBase {
       "must go from PartnershipHasUtrYesNoPage with id to nominated partner name when no" in {
         val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage(id), false)
+        val answers = emptyUserAnswers.setOrException(PartnershipHasUtrYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          PartnershipHasUtrYesNoPage(id),
+          PartnershipHasUtrYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
@@ -111,10 +113,11 @@ class PartnershipNavigatorSpec extends SpecBase {
       "must go from PartnershipWorksReferenceNumberYesNoPage with id to CYA when no" in {
         val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id      = flowId.toString
-        val answers = emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage(id), false)
+        val answers =
+          emptyUserAnswers.setOrException(PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor), false)
 
         navigator.nextPage(
-          PartnershipWorksReferenceNumberYesNoPage(id),
+          PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor),
           NormalMode,
           answers
         ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController
@@ -126,7 +129,7 @@ class PartnershipNavigatorSpec extends SpecBase {
         val id     = flowId.toString
 
         navigator.nextPage(
-          PartnershipNamePage(id),
+          PartnershipNamePage(id, AddSubcontractor),
           CheckMode,
           emptyUserAnswers
         ) mustBe controllers.add.partnership.routes.PartnershipCheckYourAnswersController

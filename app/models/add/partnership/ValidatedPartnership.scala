@@ -18,7 +18,7 @@ package models.add.partnership
 
 import models.address.Address
 import models.contact.ContactMethodOptions
-import models.{InvalidAnswer, TypeOfSubcontractor, UserAnswers, Validation, ValidationError}
+import models.*
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json.*
@@ -47,76 +47,80 @@ object ValidatedPartnership extends Validation {
       getPageValue(answers, PartnershipNominatedPartnerNamePage)
     )
 
-  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedPartnership] =
+  def build(
+    answers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Either[ValidationError, ValidatedPartnership] =
     for {
-      _                               <- validateType(answers, id)
-      partnershipName                 <- getPageValue(answers, PartnershipNamePage(id))
+      _                               <- validateType(answers, id, namespace)
+      partnershipName                 <- getPageValue(answers, PartnershipNamePage(id, namespace))
       partnershipAddress              <- getOptionalPageValue(
                                            answers,
-                                           PartnershipAddressPage(id),
-                                           PartnershipAddressYesNoPage(id)
+                                           PartnershipAddressPage(id, namespace),
+                                           PartnershipAddressYesNoPage(id, namespace)
                                          )
       partnershipContactMethodOptions <-
         getOptionalPageValue(
           answers,
-          PartnershipContactMethodOptionsPage(id),
-          AddPartnershipContactMethodsYesNoPage(id)
+          PartnershipContactMethodOptionsPage(id, namespace),
+          AddPartnershipContactMethodsYesNoPage(id, namespace)
         ).flatMap {
           case Some(methods) if methods.nonEmpty =>
             Right(Some(methods))
           case Some(_)                           =>
-            Left(InvalidAnswer(PartnershipContactMethodOptionsPage(id)))
+            Left(InvalidAnswer(PartnershipContactMethodOptionsPage(id, namespace)))
           case None                              =>
             Right(None)
         }
       partnershipEmail                <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,
-                                           PartnershipEmailAddressPage(id),
+                                           PartnershipEmailAddressPage(id, namespace),
                                            ContactMethodOptions.Email
                                          )
       partnershipPhone                <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,
-                                           PartnershipPhoneNumberPage(id),
+                                           PartnershipPhoneNumberPage(id, namespace),
                                            ContactMethodOptions.Phone
                                          )
       partnershipMobile               <- getContactPageValue(
                                            answers,
                                            partnershipContactMethodOptions,
-                                           PartnershipMobileNumberPage(id),
+                                           PartnershipMobileNumberPage(id, namespace),
                                            ContactMethodOptions.Mobile
                                          )
       partnershipUtr                  <-
         getOptionalPageValue(
           answers,
-          PartnershipUniqueTaxpayerReferencePage(id),
-          PartnershipHasUtrYesNoPage(id)
+          PartnershipUniqueTaxpayerReferencePage(id, namespace),
+          PartnershipHasUtrYesNoPage(id, namespace)
         )
-      partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage(id))
+      partnershipNominatedPartnerName <- getPageValue(answers, PartnershipNominatedPartnerNamePage(id, namespace))
       partnershipNominatedPartnerUtr  <-
         getOptionalPageValue(
           answers,
-          PartnershipNominatedPartnerUtrPage(id),
-          PartnershipNominatedPartnerUtrYesNoPage(id)
+          PartnershipNominatedPartnerUtrPage(id, namespace),
+          PartnershipNominatedPartnerUtrYesNoPage(id, namespace)
         )
       partnershipNominatedPartnerNino <-
         getOptionalPageValue(
           answers,
-          PartnershipNominatedPartnerNinoPage(id),
-          PartnershipNominatedPartnerNinoYesNoPage(id)
+          PartnershipNominatedPartnerNinoPage(id, namespace),
+          PartnershipNominatedPartnerNinoYesNoPage(id, namespace)
         )
       partnershipNominatedPartnerCrn  <-
         getOptionalPageValue(
           answers,
-          PartnershipNominatedPartnerCrnPage(id),
-          PartnershipNominatedPartnerCrnYesNoPage(id)
+          PartnershipNominatedPartnerCrnPage(id, namespace),
+          PartnershipNominatedPartnerCrnYesNoPage(id, namespace)
         )
       partnershipWorkRefNumber        <-
         getOptionalPageValue(
           answers,
-          PartnershipWorksReferenceNumberPage(id),
-          PartnershipWorksReferenceNumberYesNoPage(id)
+          PartnershipWorksReferenceNumberPage(id, namespace),
+          PartnershipWorksReferenceNumberYesNoPage(id, namespace)
         )
 
     } yield ValidatedPartnership(
@@ -238,9 +242,13 @@ object ValidatedPartnership extends Validation {
       case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage))
     }
 
-  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
-    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+  private def validateType(
+    answers: UserAnswers,
+    id: String,
+    namespace: JourneyNamespace
+  ): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id, namespace)).flatMap {
       case TypeOfSubcontractor.Partnership => Right(())
-      case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
+      case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
     }
 }

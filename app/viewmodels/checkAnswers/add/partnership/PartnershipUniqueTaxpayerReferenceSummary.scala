@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import controllers.add.partnership.routes
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipUniqueTaxpayerReferencePage
@@ -38,7 +39,7 @@ object PartnershipUniqueTaxpayerReferenceSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipUniqueTaxpayerReferencePage(id)))
+      .map(id => answers.get(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipUniqueTaxpayerReferencePage))
       .map { answer =>
         val value = UtrViewModel(answer)

@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import models.info.trust.TrustAnswers
 import models.{AmendMode, CheckMode, Mode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.trust.TrustAddressPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +33,7 @@ object TrustAddressSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(TrustAddressPage(id)))
+      .map(id => answers.get(TrustAddressPage(id, AddSubcontractor)))
       .getOrElse(answers.get(TrustAddressPage))
       .map { answer =>
         AddressSummaryRow.row(

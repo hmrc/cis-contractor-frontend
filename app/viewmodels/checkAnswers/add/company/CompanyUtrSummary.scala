@@ -17,6 +17,7 @@
 package viewmodels.checkAnswers.add.company
 
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.CompanyUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -37,7 +38,7 @@ object CompanyUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(CompanyUtrPage(id)))
+      .map(id => answers.get(CompanyUtrPage(id, AddSubcontractor)))
       .getOrElse(answers.get(CompanyUtrPage))
       .map { answer =>
         val value = UtrViewModel(answer)

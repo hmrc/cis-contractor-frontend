@@ -20,6 +20,7 @@ import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.partnership.PartnershipAddressYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -273,10 +274,10 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with WithFakeCisTax
       val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = uuid.toString
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(PartnershipNamePage(id), partnershipName)
+        .set(PartnershipNamePage(id, AddSubcontractor), partnershipName)
         .success
         .value
       val repo    = mockSessionRepository(Some(answers))
@@ -304,10 +305,10 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with WithFakeCisTax
       val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = uuid.toString
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(PartnershipNamePage(id), partnershipName)
+        .set(PartnershipNamePage(id, AddSubcontractor), partnershipName)
         .success
         .value
       val repo    = mockSessionRepository(Some(answers))
@@ -333,7 +334,7 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with WithFakeCisTax
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.add.partnership.routes.PartnershipAddressController
-            .redirectToAddressLookupWithId(uuid, None)
+            .redirectToAddressLookupWithId(uuid, NormalMode, None)
             .url
       }
     }
@@ -342,10 +343,10 @@ class PartnershipAddressYesNoControllerSpec extends SpecBase with WithFakeCisTax
       val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = uuid.toString
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(PartnershipNamePage(id), partnershipName)
+        .set(PartnershipNamePage(id, AddSubcontractor), partnershipName)
         .success
         .value
       val repo    = mockSessionRepository(Some(answers))

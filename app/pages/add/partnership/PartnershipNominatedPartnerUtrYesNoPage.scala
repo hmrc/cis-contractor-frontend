@@ -16,20 +16,24 @@
 
 package pages.add.partnership
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class PartnershipNominatedPartnerUtrYesNoPage(id: String) extends QuestionPage[Boolean] with PartnershipJourney {
+case class PartnershipNominatedPartnerUtrYesNoPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Boolean]
+    with PartnershipJourney {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "partnershipNominatedPartnerUtrYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then userAnswers.remove(PartnershipNominatedPartnerUtrPage(id))
+    if value.contains(false) then userAnswers.remove(PartnershipNominatedPartnerUtrPage(id, namespace))
     else super.cleanup(value, userAnswers)
 }
 

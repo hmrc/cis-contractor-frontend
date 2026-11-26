@@ -17,6 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
+import models.JourneyNamespace.AddSubcontractor
 import models.{EmployerReference, UserAnswers}
 import models.requests.{DataRequest, IdentifierRequest}
 import models.response.CisTaxpayerResponse
@@ -138,10 +139,10 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
         .thenReturn(Future.successful(taxpayer))
 
-      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString), cisId).success.value
+      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString, AddSubcontractor), cisId).success.value
 
       val result = new MultiTabAction(service)
-        .forJourney(flowId)
+        .forJourney(flowId, AddSubcontractor)
         .invokeBlock(
           journeyRequest(answers),
           _ => Future.successful(Results.Ok)
@@ -154,7 +155,7 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       val service = mock[CisTaxpayerService]
 
       val result = new MultiTabAction(service)
-        .forJourney(flowId)
+        .forJourney(flowId, AddSubcontractor)
         .invokeBlock(
           journeyRequest(emptyUserAnswers),
           _ => Future.successful(Results.Ok)
@@ -169,10 +170,10 @@ class MultiTabActionSpec extends SpecBase with MockitoSugar {
       when(service.findForOrganisation(using any[IdentifierRequest[?]]()))
         .thenReturn(Future.successful(taxpayer.copy(uniqueId = "other")))
 
-      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString), cisId).success.value
+      val answers = emptyUserAnswers.set(CisIdQuery(flowId.toString, AddSubcontractor), cisId).success.value
 
       val result = new MultiTabAction(service)
-        .forJourney(flowId)
+        .forJourney(flowId, AddSubcontractor)
         .invokeBlock(
           journeyRequest(answers),
           _ => Future.successful(Results.Ok)

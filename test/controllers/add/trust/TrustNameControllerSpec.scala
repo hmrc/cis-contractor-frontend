@@ -19,6 +19,7 @@ package controllers.add.trust
 import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.trust.TrustNameFormProvider
+import models.JourneyNamespace.AddSubcontractor
 import models.{AmendMode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -289,7 +290,7 @@ class TrustNameControllerSpec extends SpecBase with WithFakeCisTaxpayer with Moc
     "must return OK for a GET with id when the subjourney exists" in {
       val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = uuid.toString
-      val answers = emptyUserAnswers.set(queries.CisIdQuery(id), "AB12").success.value
+      val answers = emptyUserAnswers.set(queries.CisIdQuery(id, AddSubcontractor), "AB12").success.value
       val repo    = mockSessionRepository(Some(answers))
 
       val application =
@@ -312,7 +313,7 @@ class TrustNameControllerSpec extends SpecBase with WithFakeCisTaxpayer with Moc
     "must redirect to the address yes no page with id when valid data is submitted" in {
       val uuid    = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = uuid.toString
-      val answers = emptyUserAnswers.set(queries.CisIdQuery(id), "AB12").success.value
+      val answers = emptyUserAnswers.set(queries.CisIdQuery(id, AddSubcontractor), "AB12").success.value
       val repo    = mockSessionRepository(Some(answers))
 
       when(repo.set(any())) thenReturn Future.successful(true)

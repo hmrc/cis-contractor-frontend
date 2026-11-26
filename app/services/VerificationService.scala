@@ -485,7 +485,7 @@ class VerificationService @Inject() (
         Future.successful(())
 
       case Some(cisId) =>
-        UserAnswers(userAnswers.id)
+        userAnswers.resetLegacyAnswers
           .set(CisIdQuery, cisId)
           .fold(
             _ => {

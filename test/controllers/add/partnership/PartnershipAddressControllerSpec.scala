@@ -20,6 +20,7 @@ import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import models.{AmendMode, FinalValidationMode, NormalMode, UserAnswers}
 import models.address.{Address, Country}
+import models.JourneyNamespace.AddSubcontractor
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, verify, when}
@@ -550,10 +551,10 @@ class PartnershipAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer
       val flowId  = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
       val id      = flowId.toString
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(PartnershipNamePage(id), partnershipName)
+        .set(PartnershipNamePage(id, AddSubcontractor), partnershipName)
         .success
         .value
 
@@ -579,7 +580,7 @@ class PartnershipAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer
           val request = FakeRequest(
             GET,
             controllers.add.partnership.routes.PartnershipAddressController
-              .redirectToAddressLookupWithId(flowId, None)
+              .redirectToAddressLookupWithId(flowId, NormalMode, None)
               .url
           )
           val result  = route(application, request).value
@@ -604,7 +605,7 @@ class PartnershipAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer
 
           callbackCaptor.getValue.url mustBe
             controllers.add.partnership.routes.PartnershipAddressController
-              .addressLookupCallbackWithId(flowId, id = "")
+              .addressLookupCallbackWithId(flowId, id = "", mode = NormalMode)
               .url
         }
       }
@@ -629,7 +630,7 @@ class PartnershipAddressControllerSpec extends SpecBase with WithFakeCisTaxpayer
           val request = FakeRequest(
             GET,
             controllers.add.partnership.routes.PartnershipAddressController
-              .addressLookupCallbackWithId(flowId, "addr-id")
+              .addressLookupCallbackWithId(flowId, "addr-id", NormalMode)
               .url
           )
           val result  = route(application, request).value

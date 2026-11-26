@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.amend.partnership.AmendPartnershipRemoveDetail
 import models.info.partnership.PartnershipAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
@@ -35,12 +36,12 @@ object PartnershipHasUtrYesNoSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipHasUtrYesNoPage(id)))
+      .map(id => answers.get(PartnershipHasUtrYesNoPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipHasUtrYesNoPage))
       .map { answer =>
         val partnershipName =
           subJourneyId
-            .map(id => answers.get(PartnershipNamePage(id)))
+            .map(id => answers.get(PartnershipNamePage(id, AddSubcontractor)))
             .getOrElse(answers.get(PartnershipNamePage)) match {
             case Some(name)                => name.trim
             case None if mode == AmendMode =>

@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add
 
+import models.JourneyNamespace.AddSubcontractor
 import models.{CheckMode, TypeOfSubcontractor, UserAnswers}
 import pages.add.TypeOfSubcontractorPage
 import play.api.i18n.Messages
@@ -34,7 +35,7 @@ object TypeOfSubcontractorSummary {
     changeUrl: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(TypeOfSubcontractorPage(id)))
+      .map(id => answers.get(TypeOfSubcontractorPage(id, AddSubcontractor)))
       .getOrElse(answers.get(TypeOfSubcontractorPage))
       .map { answer =>
 

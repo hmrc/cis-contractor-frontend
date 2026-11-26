@@ -16,7 +16,7 @@
 
 package pages.add.trust
 
-import models.UserAnswers
+import models.{JourneyNamespace, UserAnswers}
 import models.add.trust.TrustContactMethodOptions
 import models.contact.ContactMethodOptions.{Email, Mobile, Phone}
 import pages.QuestionPage
@@ -25,22 +25,28 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
-case class TrustContactMethodOptionsPage(id: String)
-    extends QuestionPage[Set[TrustContactMethodOptions]]
+case class TrustContactMethodOptionsPage(
+  id: String,
+  namespace: JourneyNamespace
+) extends QuestionPage[Set[TrustContactMethodOptions]]
     with TrustJourney
     with ContactMethodOptionsCleanup {
 
-  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+  override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "trustContactMethodOptions"
 
-  override def cleanup(value: Option[Set[TrustContactMethodOptions]], userAnswers: UserAnswers): Try[UserAnswers] =
+  override def cleanup(
+    value: Option[Set[TrustContactMethodOptions]],
+    userAnswers: UserAnswers
+  ): Try[UserAnswers] =
     value match {
       case Some(selectedAnswers) =>
-        removeIfNotSelected(selectedAnswers, Email, TrustEmailAddressPage(id), userAnswers)
-          .flatMap(removeIfNotSelected(selectedAnswers, Phone, TrustPhoneNumberPage(id), _))
-          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, TrustMobileNumberPage(id), _))
-      case _                     =>
+        removeIfNotSelected(selectedAnswers, Email, TrustEmailAddressPage(id, namespace), userAnswers)
+          .flatMap(removeIfNotSelected(selectedAnswers, Phone, TrustPhoneNumberPage(id, namespace), _))
+          .flatMap(removeIfNotSelected(selectedAnswers, Mobile, TrustMobileNumberPage(id, namespace), _))
+
+      case _ =>
         super.cleanup(value, userAnswers)
     }
 }

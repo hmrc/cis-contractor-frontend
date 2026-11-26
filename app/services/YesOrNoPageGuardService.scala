@@ -17,15 +17,17 @@
 package services
 import models.Mode
 import pages.QuestionPage
-import pages.add._
-import pages.add.company._
-import pages.add.partnership._
-import pages.add.trust._
+import pages.add.*
+import pages.add.company.*
+import pages.add.partnership.*
+import pages.add.trust.*
 import play.api.mvc.Results.Redirect
 import utils.LoggingUtil
 
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Call, Result}
+
+import java.util.UUID
 
 @Singleton
 class YesOrNoPageGuardService @Inject() extends LoggingUtil {
@@ -76,14 +78,101 @@ class YesOrNoPageGuardService @Inject() extends LoggingUtil {
     case PartnershipHasUtrYesNoPage               =>
       controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoad(mode)
 
-    case AddTrustContactMethodsYesNoPage =>
+    case AddTrustContactMethodsYesNoPage             =>
       controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoad(mode)
-    case TrustUtrYesNoPage               => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
-    case TrustWorksReferenceYesNoPage    =>
+    case TrustUtrYesNoPage                           => controllers.add.trust.routes.TrustUtrYesNoController.onPageLoad(mode)
+    case TrustWorksReferenceYesNoPage                =>
       controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoad(mode)
-    case _                               =>
+
+    // Multi-tab — Individual
+    case AddIndividualContactMethodsYesNoPage(id, _) => fetchRoute(page, mode, id)
+    case UniqueTaxpayerReferenceYesNoPage(id, _)     => fetchRoute(page, mode, id)
+    case NationalInsuranceNumberYesNoPage(id, _)     => fetchRoute(page, mode, id)
+    case WorksReferenceNumberYesNoPage(id, _)        => fetchRoute(page, mode, id)
+
+    // Multi-tab — Company
+    case AddCompanyContactMethodsYesNoPage(id, _) => fetchRoute(page, mode, id)
+    case CompanyUtrYesNoPage(id, _)               => fetchRoute(page, mode, id)
+    case CompanyCrnYesNoPage(id, _)               => fetchRoute(page, mode, id)
+    case CompanyWorksReferenceYesNoPage(id, _)    => fetchRoute(page, mode, id)
+
+    // Multi-tab — Partnership
+    case AddPartnershipContactMethodsYesNoPage(id, _)    => fetchRoute(page, mode, id)
+    case PartnershipWorksReferenceNumberYesNoPage(id, _) => fetchRoute(page, mode, id)
+    case PartnershipNominatedPartnerUtrYesNoPage(id, _)  => fetchRoute(page, mode, id)
+    case PartnershipNominatedPartnerNinoYesNoPage(id, _) => fetchRoute(page, mode, id)
+    case PartnershipNominatedPartnerCrnYesNoPage(id, _)  => fetchRoute(page, mode, id)
+    case PartnershipHasUtrYesNoPage(id, _)               => fetchRoute(page, mode, id)
+
+    // Multi-tab — Trust
+    case AddTrustContactMethodsYesNoPage(id, _) => fetchRoute(page, mode, id)
+    case TrustUtrYesNoPage(id, _)               => fetchRoute(page, mode, id)
+    case TrustWorksReferenceYesNoPage(id, _)    => fetchRoute(page, mode, id)
+
+    case _ =>
       logger.error(s"[YesOrNoPageGuardService][fetchRoute] - navigator fallback reached for page=$page")
       controllers.routes.JourneyRecoveryController.onPageLoad()
+  }
+
+  // Multi-tab
+  private def fetchRoute(
+    page: QuestionPage[Boolean],
+    mode: Mode,
+    id: String
+  ): Call = {
+
+    val flowId = UUID.fromString(id)
+
+    page match {
+
+      // Individual
+      case _: AddIndividualContactMethodsYesNoPage     =>
+        controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoadWithId(flowId, mode)
+      case _: UniqueTaxpayerReferenceYesNoPage         =>
+        controllers.add.routes.UniqueTaxpayerReferenceYesNoController.onPageLoadWithId(flowId, mode)
+      case _: NationalInsuranceNumberYesNoPage         =>
+        controllers.add.routes.NationalInsuranceNumberYesNoController.onPageLoadWithId(flowId, mode)
+      case _: WorksReferenceNumberYesNoPage            =>
+        controllers.add.routes.WorksReferenceNumberYesNoController.onPageLoadWithId(flowId, mode)
+
+      // Company
+      case _: AddCompanyContactMethodsYesNoPage        =>
+        controllers.add.company.routes.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId, mode)
+      case _: CompanyUtrYesNoPage                      =>
+        controllers.add.company.routes.CompanyUtrYesNoController.onPageLoadWithId(flowId, mode)
+      case _: CompanyCrnYesNoPage                      =>
+        controllers.add.company.routes.CompanyCrnYesNoController.onPageLoadWithId(flowId, mode)
+      case _: CompanyWorksReferenceYesNoPage           =>
+        controllers.add.company.routes.CompanyWorksReferenceYesNoController.onPageLoadWithId(flowId, mode)
+
+      // Partnership
+      case _: AddPartnershipContactMethodsYesNoPage    =>
+        controllers.add.partnership.routes.AddPartnershipContactMethodsYesNoController.onPageLoadWithId(flowId, mode)
+      case _: PartnershipWorksReferenceNumberYesNoPage =>
+        controllers.add.partnership.routes.PartnershipWorksReferenceNumberYesNoController.onPageLoadWithId(flowId, mode)
+      case _: PartnershipNominatedPartnerUtrYesNoPage  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerUtrYesNoController.onPageLoadWithId(flowId, mode)
+      case _: PartnershipNominatedPartnerNinoYesNoPage =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerNinoYesNoController.onPageLoadWithId(flowId, mode)
+      case _: PartnershipNominatedPartnerCrnYesNoPage  =>
+        controllers.add.partnership.routes.PartnershipNominatedPartnerCrnYesNoController.onPageLoadWithId(flowId, mode)
+      case _: PartnershipHasUtrYesNoPage               =>
+        controllers.add.partnership.routes.PartnershipHasUtrYesNoController.onPageLoadWithId(flowId, mode)
+
+      // Trust
+      case _: AddTrustContactMethodsYesNoPage          =>
+        controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, mode)
+      case _: TrustUtrYesNoPage                        =>
+        controllers.add.trust.routes.TrustUtrYesNoController.onPageLoadWithId(flowId, mode)
+      case _: TrustWorksReferenceYesNoPage             =>
+        controllers.add.trust.routes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, mode)
+
+      case _ =>
+        logger.error(
+          s"[YesOrNoPageGuardService][fetchRoute] - scoped navigator fallback reached for page=$page"
+        )
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
   }
 
 }

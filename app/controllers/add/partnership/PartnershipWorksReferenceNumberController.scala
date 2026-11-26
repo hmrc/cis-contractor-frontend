@@ -41,7 +41,7 @@ class PartnershipWorksReferenceNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipWorksReferenceNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   yesOrNoPageGuardService: YesOrNoPageGuardService,
@@ -103,15 +103,15 @@ class PartnershipWorksReferenceNumberController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
-      if (!request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage(id, namespace)).contains(true)) {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       } else {
         SubcontractorNameDisplayHelper
-          .getPartnershipDisplayName(request.userAnswers, mode, id)
+          .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
           .map { partnershipName =>
-            val page         = PartnershipWorksReferenceNumberPage(id)
+            val page         = PartnershipWorksReferenceNumberPage(id, namespace)
             val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
             Ok(
               view(
@@ -132,14 +132,14 @@ class PartnershipWorksReferenceNumberController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.PartnershipWorksReferenceNumberController.onSubmitWithId(flowId, mode)
-      if (!request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage(id)).contains(true)) {
+      if (!request.userAnswers.get(PartnershipWorksReferenceNumberYesNoPage(id, namespace)).contains(true)) {
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       } else {
         SubcontractorNameDisplayHelper
-          .getPartnershipDisplayName(request.userAnswers, mode, id)
+          .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
           .map { partnershipName =>
             form
               .bindFromRequest()
@@ -150,11 +150,11 @@ class PartnershipWorksReferenceNumberController @Inject() (
                   for {
                     updatedAnswers <-
                       Future.fromTry(
-                        request.userAnswers.set(PartnershipWorksReferenceNumberPage(id), value)
+                        request.userAnswers.set(PartnershipWorksReferenceNumberPage(id, namespace), value)
                       )
                     _              <- sessionRepository.set(updatedAnswers)
                   } yield Redirect(
-                    navigator.nextPage(PartnershipWorksReferenceNumberPage(id), mode, updatedAnswers)
+                    navigator.nextPage(PartnershipWorksReferenceNumberPage(id, namespace), mode, updatedAnswers)
                   )
               )
           }

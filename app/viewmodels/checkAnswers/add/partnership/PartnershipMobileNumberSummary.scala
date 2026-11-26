@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.add.partnership
 
+import models.JourneyNamespace.AddSubcontractor
 import models.info.partnership.PartnershipAnswers
 import models.{CheckMode, Mode, UserAnswers}
 import pages.add.partnership.PartnershipMobileNumberPage
@@ -33,7 +34,7 @@ object PartnershipMobileNumberSummary {
     subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(PartnershipMobileNumberPage(id)))
+      .map(id => answers.get(PartnershipMobileNumberPage(id, AddSubcontractor)))
       .getOrElse(answers.get(PartnershipMobileNumberPage))
       .map { answer =>
         SummaryListRowViewModel(

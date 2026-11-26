@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.add.trust
 
 import models.info.trust.TrustAnswers
 import models.{CheckMode, Mode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.trust.TrustUtrPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -37,7 +38,7 @@ object TrustUtrSummary {
     messages: Messages
   ): Option[SummaryListRow] =
     subJourneyId
-      .map(id => answers.get(TrustUtrPage(id)))
+      .map(id => answers.get(TrustUtrPage(id, AddSubcontractor)))
       .getOrElse(answers.get(TrustUtrPage))
       .map { answer =>
         val value = UtrViewModel(answer)

@@ -23,6 +23,7 @@ import models.add.{IndividualNamesOptions, SubcontractorName}
 import models.contact.ContactMethodOptions
 import models.address.{Address, Country}
 import models.amend.AmendJourneyType
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.company.*
 import models.requests.{CreateAndUpdateSubcontractorPayload, SubcontractorRequest, UpdateSubcontractorForEditRequest, UpdateSubcontractorRequest, UpdateVerificationForEditRequest}
 import models.requests.CreateAndUpdateSubcontractorPayload.{CompanyPayload, IndividualOrSoleTraderPayload, PartnershipPayload, TrustPayload}
@@ -697,19 +698,19 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(CisIdQuery, cisId)
             .success
             .value
-            .set(queries.CisIdQuery(id), "AB12")
+            .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
             .success
             .value
-            .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+            .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership)
             .success
             .value
-            .set(PartnershipNamePage(id), "Folder Partnership")
+            .set(PartnershipNamePage(id, AddSubcontractor), "Folder Partnership")
             .success
             .value
-            .set(PartnershipNominatedPartnerNamePage(id), "Folder Partner")
+            .set(PartnershipNominatedPartnerNamePage(id, AddSubcontractor), "Folder Partner")
             .success
             .value
-            .set(PartnershipAddressPage(id), nestedAddress)
+            .set(PartnershipAddressPage(id, AddSubcontractor), nestedAddress)
             .success
             .value
 
@@ -738,7 +739,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+        service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).futureValue mustBe (())
 
         verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -889,20 +890,20 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           emptyUserAnswers
-            .set(CisIdQuery(id), nestedCisId)
-            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany))
-            .flatMap(_.set(CompanyNamePage(id), "Test Company Ltd"))
-            .flatMap(_.set(CompanyAddressYesNoPage(id), true))
-            .flatMap(_.set(CompanyAddressPage(id), companyAddress))
-            .flatMap(_.set(CompanyUtrYesNoPage(id), true))
-            .flatMap(_.set(CompanyUtrPage(id), "1234567890"))
-            .flatMap(_.set(CompanyCrnYesNoPage(id), true))
-            .flatMap(_.set(CompanyCrnPage(id), "AC012345"))
-            .flatMap(_.set(CompanyWorksReferenceYesNoPage(id), true))
-            .flatMap(_.set(CompanyWorksReferencePage(id), "WRN-CMP"))
-            .flatMap(_.set(AddCompanyContactMethodsYesNoPage(id), true))
-            .flatMap(_.set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Email)))
-            .flatMap(_.set(CompanyEmailAddressPage(id), "c@example.com"))
+            .set(CisIdQuery(id, AddSubcontractor), nestedCisId)
+            .flatMap(_.set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Limitedcompany))
+            .flatMap(_.set(CompanyNamePage(id, AddSubcontractor), "Test Company Ltd"))
+            .flatMap(_.set(CompanyAddressYesNoPage(id, AddSubcontractor), true))
+            .flatMap(_.set(CompanyAddressPage(id, AddSubcontractor), companyAddress))
+            .flatMap(_.set(CompanyUtrYesNoPage(id, AddSubcontractor), true))
+            .flatMap(_.set(CompanyUtrPage(id, AddSubcontractor), "1234567890"))
+            .flatMap(_.set(CompanyCrnYesNoPage(id, AddSubcontractor), true))
+            .flatMap(_.set(CompanyCrnPage(id, AddSubcontractor), "AC012345"))
+            .flatMap(_.set(CompanyWorksReferenceYesNoPage(id, AddSubcontractor), true))
+            .flatMap(_.set(CompanyWorksReferencePage(id, AddSubcontractor), "WRN-CMP"))
+            .flatMap(_.set(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor), true))
+            .flatMap(_.set(CompanyContactMethodOptionsPage(id, AddSubcontractor), Set(ContactMethodOptions.Email)))
+            .flatMap(_.set(CompanyEmailAddressPage(id, AddSubcontractor), "c@example.com"))
             .success
             .value
 
@@ -928,7 +929,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+        service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).futureValue mustBe (())
 
         verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -942,12 +943,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val userAnswers =
           emptyUserAnswers
             .set(CisIdQuery, cisId)
-            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany))
+            .flatMap(_.set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Limitedcompany))
             .success
             .value
 
         val exception =
-          service.createAndUpdateSubcontractor(userAnswers, Some(id)).failed.futureValue
+          service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
         verifyNoMoreInteractions(mockConnector)
@@ -1361,16 +1362,16 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           emptyUserAnswers
-            .set(CisIdQuery(id), "AB12")
+            .set(CisIdQuery(id, AddSubcontractor), "AB12")
             .success
             .value
-            .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+            .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Trust)
             .success
             .value
-            .set(TrustNamePage(id), "Nested Trust")
+            .set(TrustNamePage(id, AddSubcontractor), "Nested Trust")
             .success
             .value
-            .set(TrustAddressPage(id), nestedAddress)
+            .set(TrustAddressPage(id, AddSubcontractor), nestedAddress)
             .success
             .value
             .set(TrustNamePage, "Root Trust")
@@ -1398,7 +1399,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+        service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).futureValue mustBe (())
 
         verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -1422,8 +1423,8 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
 
         val userAnswers =
           emptyUserAnswers
-            .set(CisIdQuery(id), nestedCisId)
-            .flatMap(_.set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership))
+            .set(CisIdQuery(id, AddSubcontractor), nestedCisId)
+            .flatMap(_.set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership))
             .flatMap(_.set(PartnershipUniqueTaxpayerReferencePage, "1234567890"))
             .flatMap(_.set(PartnershipNamePage, "Test Partnership"))
             .flatMap(_.set(PartnershipNominatedPartnerNamePage, "Nominated Partner"))
@@ -1459,7 +1460,7 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         when(mockConnector.createAndUpdateSubcontractor(any[CreateAndUpdateSubcontractorPayload])(any[HeaderCarrier]))
           .thenReturn(Future.successful(()))
 
-        service.createAndUpdateSubcontractor(userAnswers, Some(id)).futureValue mustBe (())
+        service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).futureValue mustBe (())
 
         verify(mockConnector).createAndUpdateSubcontractor(eqTo(expectedPayload))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)
@@ -1475,12 +1476,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
             .set(CisIdQuery, cisId)
             .success
             .value
-            .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+            .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership)
             .success
             .value
 
         val exception =
-          service.createAndUpdateSubcontractor(userAnswers, Some(id)).failed.futureValue
+          service.createAndUpdateSubcontractor(userAnswers, id, AddSubcontractor).failed.futureValue
 
         exception.getMessage must include("CisIdQuery not found in session data")
         verifyNoMoreInteractions(mockConnector)
@@ -1515,12 +1516,12 @@ final class SubcontractorServiceSpec extends SpecBase with MockitoSugar {
         val id            = "11111111-1111-1111-1111-111111111111"
         val nestedCisId   = "1045"
 
-        val userAnswers = emptyUserAnswers.set(CisIdQuery(id), nestedCisId).success.value
+        val userAnswers = emptyUserAnswers.set(CisIdQuery(id, AddSubcontractor), nestedCisId).success.value
 
         when(mockConnector.getSubcontractorUTRs(eqTo(nestedCisId))(any[HeaderCarrier]))
           .thenReturn(Future.successful(GetSubcontractorUTRsResponse(subcontractorUTRs = subcontractorUTRs)))
 
-        service.isDuplicateUTR(userAnswers, utr, Some(id)).futureValue mustBe true
+        service.isDuplicateUTR(userAnswers, utr, id, AddSubcontractor).futureValue mustBe true
 
         verify(mockConnector).getSubcontractorUTRs(eqTo(nestedCisId))(any[HeaderCarrier])
         verifyNoMoreInteractions(mockConnector)

@@ -20,6 +20,7 @@ import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.AddCompanyContactMethodsYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -56,10 +57,10 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with WithFake
 
   private def uaWithNameAndId(id: String): UserAnswers =
     emptyUserAnswers
-      .set(queries.CisIdQuery(id), "AB12")
+      .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
       .success
       .value
-      .set(CompanyNamePage(id), companyName)
+      .set(CompanyNamePage(id, AddSubcontractor), companyName)
       .success
       .value
 
@@ -310,7 +311,7 @@ class AddCompanyContactMethodsYesNoControllerSpec extends SpecBase with WithFake
       "must populate the view correctly on a GET when the question has previously been answered" in {
 
         val userAnswers =
-          uaWithNameAndId(id).set(AddCompanyContactMethodsYesNoPage(id), true).success.value
+          uaWithNameAndId(id).set(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor), true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

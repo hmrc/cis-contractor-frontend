@@ -41,7 +41,7 @@ class TrustEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: TrustEmailAddressFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TrustEmailAddressView
@@ -111,16 +111,17 @@ class TrustEmailAddressController @Inject() (
   }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
-      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id, namespace))
       val trustName        =
-        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (trustName, emailIsAvailable) match {
         case (Some(trustName), true) =>
-          val page         = TrustEmailAddressPage(id)
+          val page         = TrustEmailAddressPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -139,13 +140,14 @@ class TrustEmailAddressController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id               = flowId.toString
       val submitAction     = routes.TrustEmailAddressController.onSubmitWithId(flowId, mode)
-      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id))
+      val contactOption    = request.userAnswers.get(TrustContactMethodOptionsPage(id, namespace))
       val trustName        =
-        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id)
-      val emailIsAvailable = contactOption.exists(_.contains(ContactMethodOptions.Email))
+        SubcontractorNameDisplayHelper.getTrustDisplayName(request.userAnswers, mode, id, namespace)
+      val emailIsAvailable =
+        mode == FinalValidationMode || contactOption.exists(_.contains(ContactMethodOptions.Email))
 
       (for {
         trustName <- trustName
@@ -157,9 +159,9 @@ class TrustEmailAddressController @Inject() (
           value =>
             for {
               updatedAnswers <-
-                Future.fromTry(request.userAnswers.set(TrustEmailAddressPage(id), value))
+                Future.fromTry(request.userAnswers.set(TrustEmailAddressPage(id, namespace), value))
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TrustEmailAddressPage(id), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(TrustEmailAddressPage(id, namespace), mode, updatedAnswers))
         ))
         .getOrElse {
           logger.error(

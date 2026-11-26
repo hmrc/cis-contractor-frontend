@@ -18,6 +18,7 @@ package controllers.add
 
 import controllers.actions.*
 import forms.add.TypeOfSubcontractorFormProvider
+import models.JourneyNamespace.AddSubcontractor
 import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.add.TypeOfSubcontractorPage
@@ -134,13 +135,12 @@ class TypeOfSubcontractorController @Inject() (
                 Future
                   .fromTry(
                     cleanedAnswers
-                      .set(TypeOfSubcontractorPage(id), value)
-                      .flatMap(_.set(CisIdQuery(id), cisId))
-                      .flatMap(_.set(CisIdQuery, cisId))
+                      .set(TypeOfSubcontractorPage(id, AddSubcontractor), value)
+                      .flatMap(_.set(CisIdQuery(id, AddSubcontractor), cisId))
                   )
                   .flatMap { updatedAnswers =>
                     sessionRepository.set(updatedAnswers).map { _ =>
-                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id, AddSubcontractor), mode, updatedAnswers))
                     }
                   }
             }
@@ -149,38 +149,43 @@ class TypeOfSubcontractorController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
-      val id           = flowId.toString
-      val page         = TypeOfSubcontractorPage(id)
-      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
-      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id           = flowId.toString
+        val page         = TypeOfSubcontractorPage(id, AddSubcontractor)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+        Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id           = flowId.toString
-      val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
-          value =>
-            cleanupService.clean(request.userAnswers) match {
-              case Failure(exception)      =>
-                logger.error(
-                  "[TypeOfSubcontractorController][onSubmitWithId] Failed to clean previous subcontractor answers",
-                  exception
-                )
-                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-              case Success(cleanedAnswers) =>
-                Future
-                  .fromTry(cleanedAnswers.set(TypeOfSubcontractorPage(id), value))
-                  .flatMap { updatedAnswers =>
-                    sessionRepository.set(updatedAnswers).map { _ =>
-                      Redirect(navigator.nextPage(TypeOfSubcontractorPage(id), mode, updatedAnswers))
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async {
+      implicit request =>
+        val id           = flowId.toString
+        val page         = TypeOfSubcontractorPage(id, AddSubcontractor)
+        val submitAction = routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)
+
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+            value =>
+              cleanupService.clean(request.userAnswers) match {
+                case Failure(exception) =>
+                  logger.error(
+                    "[TypeOfSubcontractorController][onSubmitWithId] Failed to clean previous subcontractor answers",
+                    exception
+                  )
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+                case Success(cleanedAnswers) =>
+                  Future
+                    .fromTry(cleanedAnswers.set(page, value))
+                    .flatMap { updatedAnswers =>
+                      sessionRepository.set(updatedAnswers).map { _ =>
+                        Redirect(navigator.nextPage(page, mode, updatedAnswers))
+                      }
                     }
-                  }
-            }
-        )
+              }
+          )
     }
 }

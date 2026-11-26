@@ -56,7 +56,7 @@ class CompanyCrnYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: CompanyCrnYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyCrnYesNoView
@@ -145,12 +145,12 @@ class CompanyCrnYesNoController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
         .map { companyName =>
-          val page         = CompanyCrnYesNoPage(id)
+          val page         = CompanyCrnYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -170,11 +170,11 @@ class CompanyCrnYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.CompanyCrnYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .getCompanyDisplayName(request.userAnswers, mode, id, namespace)
         .map { companyName =>
           form
             .bindFromRequest()
@@ -184,11 +184,11 @@ class CompanyCrnYesNoController @Inject() (
                 for {
                   updatedAnswers <-
                     Future.fromTry(
-                      request.userAnswers.set(CompanyCrnYesNoPage(id), value)
+                      request.userAnswers.set(CompanyCrnYesNoPage(id, namespace), value)
                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  navigator.nextPage(CompanyCrnYesNoPage(id), mode, updatedAnswers)
+                  navigator.nextPage(CompanyCrnYesNoPage(id, namespace), mode, updatedAnswers)
                 )
             )
         }

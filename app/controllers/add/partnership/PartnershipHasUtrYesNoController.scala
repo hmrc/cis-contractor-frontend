@@ -40,7 +40,7 @@ class PartnershipHasUtrYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  multiTabAction: MultiTabAction,
+  sharedSubcontractorJourneyAction: SharedSubcontractorJourneyAction,
   formProvider: PartnershipHasUtrYesNoFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -95,12 +95,12 @@ class PartnershipHasUtrYesNoController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
       SubcontractorNameDisplayHelper
-        .getPartnershipDisplayName(request.userAnswers, mode, id)
+        .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
         .map { partnershipName =>
-          val page         = PartnershipHasUtrYesNoPage(id)
+          val page         = PartnershipHasUtrYesNoPage(id, namespace)
           val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
           Ok(
             view(
@@ -120,11 +120,11 @@ class PartnershipHasUtrYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
       val id           = flowId.toString
       val submitAction = routes.PartnershipHasUtrYesNoController.onSubmitWithId(flowId, mode)
       SubcontractorNameDisplayHelper
-        .getPartnershipDisplayName(request.userAnswers, mode, id)
+        .getPartnershipDisplayName(request.userAnswers, mode, id, namespace)
         .map { name =>
           form
             .bindFromRequest()
@@ -133,9 +133,9 @@ class PartnershipHasUtrYesNoController @Inject() (
               value =>
                 for {
                   updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage(id), value))
+                    Future.fromTry(request.userAnswers.set(PartnershipHasUtrYesNoPage(id, namespace), value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(PartnershipHasUtrYesNoPage(id), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(PartnershipHasUtrYesNoPage(id, namespace), mode, updatedAnswers))
             )
         }
         .getOrElse {
