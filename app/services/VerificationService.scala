@@ -122,17 +122,33 @@ class VerificationService @Inject() (
       }
     }
 
-  def getCurrentVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    for {
-      instanceId <- userAnswers
-                      .get(CisIdQuery)
-                      .map(Future.successful)
-                      .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+  def getCurrentVerificationBatch(userAnswers: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    hc: HeaderCarrier
+  ): Future[UserAnswers] =
+    subJourneyId match {
+      case Some(id) =>
+        for {
+          instanceId <- userAnswers
+                          .get(CisIdQuery(id))
+                          .map(Future.successful)
+                          .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
 
-      response <- cisConnector.getCurrentVerificationBatch(instanceId)
-      updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
-      _        <- sessionRepository.set(updated)
-    } yield updated
+          response <- cisConnector.getCurrentVerificationBatch(instanceId)
+          updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage(id), response))
+          _        <- sessionRepository.set(updated)
+        } yield updated
+      case None     =>
+        for {
+          instanceId <- userAnswers
+                          .get(CisIdQuery)
+                          .map(Future.successful)
+                          .getOrElse(Future.failed(new RuntimeException("InstanceIdQuery not found in session data")))
+
+          response <- cisConnector.getCurrentVerificationBatch(instanceId)
+          updated  <- Future.fromTry(userAnswers.set(CurrentVerificationBatchResponsePage, response))
+          _        <- sessionRepository.set(updated)
+        } yield updated
+    }
 
   def getLastSubmittedVerificationBatch(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[UserAnswers] =
     for {
@@ -511,22 +527,45 @@ class VerificationService @Inject() (
 
   def recreateCurrentBatchFromUnmatchedVerifications(
     cisId: String,
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit hc: HeaderCarrier): Future[UserAnswers] =
-    userAnswers.get(CurrentVerificationBatchResponsePage) match {
-      case Some(_) =>
-        Future.successful(userAnswers)
-      case None    =>
-        initialiseCurrentBatchFromUnmatchedVerifications(cisId, userAnswers)
+    subJourneyId match {
+      case Some(id) =>
+        userAnswers.get(CurrentVerificationBatchResponsePage(id)) match {
+          case Some(_) =>
+            Future.successful(userAnswers)
+          case None    =>
+            initialiseCurrentBatchFromUnmatchedVerifications(cisId, userAnswers, Some(id))
+        }
+      case None     =>
+        userAnswers.get(CurrentVerificationBatchResponsePage) match {
+          case Some(_) =>
+            Future.successful(userAnswers)
+          case None    =>
+            initialiseCurrentBatchFromUnmatchedVerifications(cisId, userAnswers)
+        }
     }
 
   private def initialiseCurrentBatchFromUnmatchedVerifications(
     cisId: String,
-    userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[UserAnswers] =
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
+  )(implicit hc: HeaderCarrier): Future[UserAnswers] = {
+
+    val lastSubmittedVerificationBatchResponsePage = subJourneyId match {
+      case Some(id) => LastSubmittedVerificationBatchResponsePage(id)
+      case None     => LastSubmittedVerificationBatchResponsePage
+    }
+
+    val currentVerificationBatchResponsePage = subJourneyId match {
+      case Some(id) => CurrentVerificationBatchResponsePage(id)
+      case None     => CurrentVerificationBatchResponsePage
+    }
+
     for {
       lastSubmitted <- userAnswers
-                         .get(LastSubmittedVerificationBatchResponsePage)
+                         .get(lastSubmittedVerificationBatchResponsePage)
                          .map(Future.successful)
                          .getOrElse(
                            Future.failed(
@@ -553,10 +592,10 @@ class VerificationService @Inject() (
       _ <-
         if (latestBatchCanBeModified(latestUa)) {
           for {
-            refreshedUa <- getCurrentVerificationBatch(latestUa)
+            refreshedUa <- getCurrentVerificationBatch(latestUa, subJourneyId)
 
             current <- refreshedUa
-                         .get(CurrentVerificationBatchResponsePage)
+                         .get(currentVerificationBatchResponsePage)
                          .map(Future.successful)
                          .getOrElse(
                            Future.failed(
@@ -619,6 +658,7 @@ class VerificationService @Inject() (
       _            <- sessionRepository.set(afterNewest)
 
     } yield afterNewest
+  }
 
   private def unmatchedSubcontractorRefs(
     response: GetLastSubmittedVerificationBatchResponse

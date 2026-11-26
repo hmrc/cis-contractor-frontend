@@ -24,14 +24,17 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{CheckUnmatchedSubcontractorsService, ContractorDetailsFinalValidationService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import queries.CisIdQuery
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   cisIdRequired: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -114,6 +117,113 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
                         controllers.routes.SystemErrorController.onPageLoad()
                       )
                     }
+                }
+
+              case _ =>
+                logger.error(
+                  "[ReviewUnmatchedSubcontractorsRoutingController][onPageLoad] - LastSubmittedVerificationBatchResponsePage missing from userAnswers"
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            }
+          }
+        }
+        .recover { case t =>
+          logger.error(
+            "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoad] Failed final contractor validation",
+            t
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
+      contractorDetailsFinalValidationService
+        .refreshAndValidate(
+          request.userAnswers,
+          ContractorDetailsValidationTarget.ReviewUnmatchedSubcontractors
+        ) // TODO DTR-9463: Does this need updated with id?
+        .flatMap { case (updatedAnswers, validation) =>
+          if (!validation.allComplete) {
+            Future.successful(
+              Redirect(
+                controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad()
+              ) // TODO DTR-9463: Final validation out of scope
+            )
+          } else {
+            updatedAnswers.get(LastSubmittedVerificationBatchResponsePage(subJourneyId)) match {
+              case Some(response) =>
+                val hasUnmatched = response.verifications.exists(CheckUnmatchedSubcontractorsService.isUnmatched)
+
+                if (!hasUnmatched) {
+                  Future.successful(
+                    Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad())
+                  ) // TODO DTR-9463: Final validation out of scope
+                } else {
+                  request.userAnswers.get(CisIdQuery(subJourneyId)) match {
+                    case Some(cisId: String) =>
+                      verificationService
+                        .anyUnmatchedResourceRefsStillPresent(cisId, response)
+                        .recoverWith { case t =>
+                          logger.error(
+                            "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId] " +
+                              "Failed to check whether unmatched subcontractors are still present",
+                            t
+                          )
+
+                          Future.failed(t)
+                        }
+                        .flatMap {
+                          case true =>
+                            verificationService
+                              .recreateCurrentBatchFromUnmatchedVerifications(
+                                cisId,
+                                updatedAnswers,
+                                subJourneyId
+                              )
+                              .map { _ =>
+                                Redirect(
+                                  controllers.verify.routes.ReviewUnmatchedSubcontractorsController
+                                    .onPageLoadWithId(flowId)
+                                )
+                              }
+                              .recover { case t =>
+                                logger.error(
+                                  "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId] " +
+                                    "Failed to recreate the current batch from unmatched verifications",
+                                  t
+                                )
+
+                                Redirect(
+                                  controllers.routes.SystemErrorController.onPageLoad()
+                                )
+                              }
+
+                          case false =>
+                            Future.successful(
+                              Redirect(
+                                controllers.routes.NoUnmatchedSubcontractorsController
+                                  .onPageLoad()
+                              )
+                            )
+                        }
+                        .recover { case t =>
+                          logger.error(
+                            "[ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId] " +
+                              "Unexpected failure routing unmatched subcontractors",
+                            t
+                          )
+
+                          Redirect(
+                            controllers.routes.SystemErrorController.onPageLoad()
+                          )
+                        }
+                    case _                   =>
+                      logger.error("[ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId] - cisId missing")
+                      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                  }
                 }
 
               case _ =>
