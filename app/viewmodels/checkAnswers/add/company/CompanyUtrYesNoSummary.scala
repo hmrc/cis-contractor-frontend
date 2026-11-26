@@ -27,28 +27,38 @@ import models.info.company.CompanyAnswers
 
 object CompanyUtrYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyUtrYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyUtrYesNoPage(id)))
+      .getOrElse(answers.get(CompanyUtrYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "companyUtrYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-                .onPageLoad(AmendCompanyRemoveDetail.Utr.key)
-                .url
-            else controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "companyUtrYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                    .onPageLoad(AmendCompanyRemoveDetail.Utr.key)
+                    .url
+                else controllers.add.company.routes.CompanyUtrYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyUtrYesNo.change.hidden"))
+              .withAttribute("id" -> "add-company-utr")
           )
-            .withVisuallyHiddenText(messages("companyUtrYesNo.change.hidden"))
-            .withAttribute("id" -> "add-company-utr")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers

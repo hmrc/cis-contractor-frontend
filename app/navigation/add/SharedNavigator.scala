@@ -47,28 +47,38 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
   private val normalRoutes: Page => UserAnswers => Call = {
     case TypeOfSubcontractorPage(id) =>
       userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode, Some(id))(userAnswers)
-    case TypeOfSubcontractorPage     => userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
-    case _                           => _ => routes.IndexController.onPageLoad()
+    case TypeOfSubcontractorPage     =>
+      userAnswers => navigatorFromTypeOfSubcontractorPage(NormalMode)(userAnswers)
+    case _                           =>
+      _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case TypeOfSubcontractorPage(id) => navigatorFromTypeOfSubcontractorPage(CheckMode, Some(id))(_)
-    case TypeOfSubcontractorPage     => navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
-    case _                           => _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
+    case TypeOfSubcontractorPage(id) =>
+      navigatorFromTypeOfSubcontractorPage(CheckMode, Some(id))(_)
+    case TypeOfSubcontractorPage     =>
+      navigatorFromTypeOfSubcontractorPage(CheckMode)(_)
+    case _                           =>
+      _ => controllers.add.routes.CheckYourAnswersController.onPageLoad()
   }
 
-  private def navigatorFromTypeOfSubcontractorPage(mode: Mode, id: Option[String] = None)(
+  private def navigatorFromTypeOfSubcontractorPage(
+    mode: Mode,
+    id: Option[String] = None
+  )(
     userAnswers: UserAnswers
   ): Call = {
     val selectedType =
       id.map(value => userAnswers.get(TypeOfSubcontractorPage(value)))
         .getOrElse(userAnswers.get(TypeOfSubcontractorPage))
+
     selectedType match {
-      case None                    =>
+      case None =>
         logger.error(
           "[SharedNavigator][navigatorFromTypeOfSubcontractorPage] - TypeOfSubcontractorPage missing"
         )
         routes.JourneyRecoveryController.onPageLoad()
+
       case Some(subcontractorType) =>
         mode match {
           case NormalMode => firstJourneyPageFor(subcontractorType, id)
@@ -82,36 +92,53 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     }
   }
 
-  private def firstJourneyPageFor(subcontractorType: TypeOfSubcontractor, id: Option[String] = None): Call =
+  private def firstJourneyPageFor(
+    subcontractorType: TypeOfSubcontractor,
+    id: Option[String] = None
+  ): Call =
     (subcontractorType, id) match {
-      case (Partnership, Some(value))            =>
+      case (Limitedcompany, Some(value)) =>
+        controllers.add.company.routes.CompanyNameController
+          .onPageLoadWithId(UUID.fromString(value), NormalMode)
+      case (Individualorsoletrader, _)   =>
+        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
+      case (Limitedcompany, _)           =>
+        controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Individualorsoletrader, Some(value)) =>
-        controllers.add.routes.IndividualNamesOptionsController
+      case (Partnership, _)              =>
+        controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case (Trust, Some(value))          =>
+        controllers.add.trust.routes.TrustNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Individualorsoletrader, _)           =>
-        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Limitedcompany, _)                   => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, _)                      => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Trust, Some(value))                  =>
-        controllers.add.trust.routes.TrustNameController.onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Trust, _)                            => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
+      case (Trust, _)                    =>
+        controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
-  private def checkYourAnswersFor(subcontractorType: TypeOfSubcontractor, id: Option[String] = None): Call =
+  private def checkYourAnswersFor(
+    subcontractorType: TypeOfSubcontractor,
+    id: Option[String] = None
+  ): Call =
     (subcontractorType, id) match {
-      case (Partnership, Some(value))  =>
-        controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+      case (Limitedcompany, Some(value)) =>
+        controllers.add.company.routes.CompanyCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
       // TODO: ADD THE INDIVIDUAL CHECK YOUR ANSWERS CONTROLLER HERE ON PAGE LOAD WITH ID
-      case (Individualorsoletrader, _) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
-      case (Limitedcompany, _)         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case (Individualorsoletrader, _)   =>
+        controllers.add.routes.CheckYourAnswersController.onPageLoad()
+      case (Limitedcompany, _)           =>
+        controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
+      case (Partnership, Some(value))    =>
+        controllers.add.partnership.routes.PartnershipCheckYourAnswersController
+          .onPageLoadWithId(UUID.fromString(value))
       case (Partnership, _)            =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
-      case (Trust, Some(value))        =>
-        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoadWithId(UUID.fromString(value))
-      case (Trust, _)                  => controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
+      case (Trust, Some(value))          =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController
+          .onPageLoadWithId(UUID.fromString(value))
+      case (Trust, _)                    =>
+        controllers.add.trust.routes.TrustCheckYourAnswersController.onPageLoad()
     }
 
   private def journeyComplete(
@@ -120,12 +147,19 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     id: Option[String] = None
   ): Boolean =
     subcontractorType match {
-      case Individualorsoletrader => ValidatedSubcontractor.build(userAnswers).isRight
-      case Limitedcompany         => ValidatedCompany.build(userAnswers).isRight
+      case Individualorsoletrader =>
+        ValidatedSubcontractor.build(userAnswers).isRight
+      case Limitedcompany         =>
+        id.map(ValidatedCompany.build(userAnswers, _))
+          .getOrElse(ValidatedCompany.build(userAnswers))
+          .isRight
       case Partnership            =>
-        id.map(ValidatedPartnership.build(userAnswers, _)).getOrElse(ValidatedPartnership.build(userAnswers)).isRight
+        id.map(ValidatedPartnership.build(userAnswers, _))
+          .getOrElse(ValidatedPartnership.build(userAnswers))
+          .isRight
       case Trust                  =>
-        id.map(ValidatedTrust.build(userAnswers, _)).getOrElse(ValidatedTrust.build(userAnswers)).isRight
+        id.map(ValidatedTrust.build(userAnswers, _))
+          .getOrElse(ValidatedTrust.build(userAnswers))
+          .isRight
     }
-
 }

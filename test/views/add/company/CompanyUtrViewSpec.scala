@@ -38,7 +38,12 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyUtrController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyUtr.title"))
@@ -68,7 +73,12 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
 
       val companyName = "Test Company"
 
-      val html: HtmlFormat.Appendable = view(form, AmendMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        form,
+        AmendMode,
+        companyName,
+        controllers.add.company.routes.CompanyUtrController.onSubmit(AmendMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("title").text() must include(messages("companyUtr.title"))
@@ -101,7 +111,12 @@ class CompanyUtrViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSu
       val errorForm: Form[String] =
         form.withError("value", "companyUtr.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, companyName)
+      val html: HtmlFormat.Appendable = view(
+        errorForm,
+        NormalMode,
+        companyName,
+        controllers.add.company.routes.CompanyUtrController.onSubmit(NormalMode)
+      )
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")

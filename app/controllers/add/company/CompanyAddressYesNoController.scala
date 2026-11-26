@@ -27,9 +27,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.SubcontractorNameExtractor
+import controllers.helpers.SubcontractorNameDisplayHelper
 import views.html.add.company.CompanyAddressYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,8 +41,8 @@ class CompanyAddressYesNoController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: CompanyAddressYesNoFormProvider,
-  subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
   view: CompanyAddressYesNoView
 )(implicit ec: ExecutionContext)
@@ -51,32 +52,52 @@ class CompanyAddressYesNoController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    subcontractorNameExtractor
-      .getCompanyName(request.userAnswers, mode)
-      .map { companyName =>
-        val preparedForm = request.userAnswers.get(CompanyAddressYesNoPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode)
+        .map { companyName =>
+          val preparedForm = request.userAnswers.get(CompanyAddressYesNoPage) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
 
-        Ok(view(preparedForm, mode, companyName))
-      }
-      .getOrElse {
-        logger.error("[CompanyAddressYesNoController][onPageLoad] - CompanyNamePage missing from userAnswers")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
-  }
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyAddressYesNoController.onSubmit(mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            "[CompanyAddressYesNoController][onPageLoad] - CompanyNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      subcontractorNameExtractor
-        .getCompanyName(request.userAnswers, mode)
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode)
         .map { companyName =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      companyName,
+                      routes.CompanyAddressYesNoController.onSubmit(mode)
+                    )
+                  )
+                ),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyAddressYesNoPage, value))
@@ -85,8 +106,65 @@ class CompanyAddressYesNoController @Inject() (
             )
         }
         .getOrElse {
-          logger.error("[CompanyAddressYesNoController][onSubmit] - CompanyNamePage missing from userAnswers")
+          logger.error(
+            "[CompanyAddressYesNoController][onSubmit] - CompanyNamePage missing from userAnswers"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id = flowId.toString
+
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .map { companyName =>
+          val page         = CompanyAddressYesNoPage(id)
+          val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              companyName,
+              routes.CompanyAddressYesNoController.onSubmitWithId(flowId, mode)
+            )
+          )
+        }
+        .getOrElse {
+          logger.error(
+            "[CompanyAddressYesNoController][onPageLoadWithId] - CompanyNamePage missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.CompanyAddressYesNoController.onSubmitWithId(flowId, mode)
+
+      SubcontractorNameDisplayHelper
+        .getCompanyDisplayName(request.userAnswers, mode, id)
+        .map { companyName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, companyName, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(CompanyAddressYesNoPage(id), value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CompanyAddressYesNoPage(id), mode, updatedAnswers))
+            )
+        }
+        .getOrElse {
+          logger.error(
+            "[CompanyAddressYesNoController][onSubmitWithId] - CompanyNamePage missing from userAnswers"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 }

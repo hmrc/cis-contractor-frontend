@@ -17,38 +17,48 @@
 package viewmodels.checkAnswers.add.company
 
 import models.amend.company.AmendCompanyRemoveDetail
+import models.info.company.CompanyAnswers
 import models.{AmendMode, CheckMode, Mode, UserAnswers}
 import pages.add.company.CompanyCrnYesNoPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
-import models.info.company.CompanyAnswers
 
 object CompanyCrnYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(CompanyCrnYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(CompanyCrnYesNoPage(id)))
+      .getOrElse(answers.get(CompanyCrnYesNoPage))
+      .map { answer =>
 
-      val value = if (answer) "site.yes" else "site.no"
+        val value = if (answer) "site.yes" else "site.no"
 
-      SummaryListRowViewModel(
-        key = "companyCrnYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
-                .onPageLoad(AmendCompanyRemoveDetail.CompanyRegistrationNumber.key)
-                .url
-            else controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "companyCrnYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                    .onPageLoad(AmendCompanyRemoveDetail.CompanyRegistrationNumber.key)
+                    .url
+                else controllers.add.company.routes.CompanyCrnYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("companyCrnYesNo.change.hidden"))
+              .withAttribute("id" -> "add-company-crn")
           )
-            .withVisuallyHiddenText(messages("companyCrnYesNo.change.hidden"))
-            .withAttribute("id" -> "add-company-crn")
         )
-      )
-    }
+      }
 
   def row(
     answers: CompanyAnswers
