@@ -129,6 +129,8 @@ POST  /subcontractor/amend/company/remove/information/:subcontractorDetail/:flow
 
 GET   /subcontractor/amend/partnership/subcontractor-details-updated  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoad()
 
+GET   /subcontractor/amend/partnership/subcontractor-details-updated/:flowId  controllers.amend.partnership.AmendPartnershipConfirmationController.onPageLoadWithId(flowId: java.util.UUID)
+
 GET   /subcontractor/amend/company/subcontractor-details-updated  controllers.amend.company.AmendCompanyConfirmationController.onPageLoad()
 
 GET   /subcontractor/amend/company/subcontractor-details-updated/:flowId  controllers.amend.company.AmendCompanyConfirmationController.onPageLoadWithId(flowId: java.util.UUID)

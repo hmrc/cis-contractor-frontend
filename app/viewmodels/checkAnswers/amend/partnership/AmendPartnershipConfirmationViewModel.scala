@@ -31,17 +31,31 @@ object AmendPartnershipConfirmationViewModel {
 
   def rows(
     original: OriginalPartnershipAnswers,
-    current: UserAnswers
+    current: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    nameRow(original, current) ++
-      addressRows(original, current) ++
-      contactRows(original, current) ++
-      utrRows(original, current) ++
-      nominatedPartnerNameRow(original, current) ++
-      nominatedPartnerUtrRows(original, current) ++
-      nominatedPartnerCrnRows(original, current) ++
-      nominatedPartnerNinoRows(original, current) ++
-      worksReferenceRows(original, current)
+    subJourneyId match {
+      case Some(id: String) =>
+        nameRow(original, current, id) ++
+          addressRows(original, current, id) ++
+          contactRows(original, current, id) ++
+          utrRows(original, current, id) ++
+          nominatedPartnerNameRow(original, current, id) ++
+          nominatedPartnerUtrRows(original, current, id) ++
+          nominatedPartnerCrnRows(original, current, id) ++
+          nominatedPartnerNinoRows(original, current, id) ++
+          worksReferenceRows(original, current, id)
+      case None     =>
+        nameRow(original, current) ++
+          addressRows(original, current) ++
+          contactRows(original, current) ++
+          utrRows(original, current) ++
+          nominatedPartnerNameRow(original, current) ++
+          nominatedPartnerUtrRows(original, current) ++
+          nominatedPartnerCrnRows(original, current) ++
+          nominatedPartnerNinoRows(original, current) ++
+          worksReferenceRows(original, current)
+    }
 
   private def nameRow(
     original: OriginalPartnershipAnswers,
@@ -50,6 +64,20 @@ object AmendPartnershipConfirmationViewModel {
     Seq(
       fieldRow(
         PartnershipNamePage,
+        messages("partnershipName.checkYourAnswersLabel"),
+        original.partnershipName,
+        current
+      )
+    ).flatten
+
+  private def nameRow(
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    Seq(
+      fieldRow(
+        PartnershipNamePage(subJourneyId),
         messages("partnershipName.checkYourAnswersLabel"),
         original.partnershipName,
         current
@@ -69,6 +97,20 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
+  private def nominatedPartnerNameRow(
+                                       original: OriginalPartnershipAnswers,
+                                       current: UserAnswers,
+                                       subJourneyId: String
+                                     )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    Seq(
+      fieldRow(
+        PartnershipNominatedPartnerNamePage(subJourneyId),
+        messages("partnershipNominatedPartnerName.checkYourAnswersLabel"),
+        original.nominatedPartnerName,
+        current
+      )
+    ).flatten
+
   private def addressRows(
     original: OriginalPartnershipAnswers,
     current: UserAnswers
@@ -78,6 +120,32 @@ object AmendPartnershipConfirmationViewModel {
     Seq(
       yesNoRow(
         PartnershipAddressYesNoPage,
+        messages("partnershipAddressYesNo.checkYourAnswersLabel"),
+        original.addressYesNo,
+        current
+      ),
+      Option.when(
+        original.address != currentAddress
+      ) {
+        htmlRow(
+          messages("partnershipAddress.checkYourAnswersLabel"),
+          original.address.map(formatAddress).getOrElse(missingValue),
+          currentAddress.map(formatAddress).getOrElse(missingValue)
+        )
+      }
+    ).flatten
+  }
+
+  private def addressRows(
+                           original: OriginalPartnershipAnswers,
+                           current: UserAnswers,
+                           subJourneyId: String
+                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentAddress = current.get(PartnershipAddressPage)
+
+    Seq(
+      yesNoRow(
+        PartnershipAddressYesNoPage(subJourneyId),
         messages("partnershipAddressYesNo.checkYourAnswersLabel"),
         original.addressYesNo,
         current
@@ -137,6 +205,50 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten
   }
 
+  private def contactRows(
+                           original: OriginalPartnershipAnswers,
+                           current: UserAnswers,
+                           subJourneyId: String
+                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentMethods = current.get(PartnershipContactMethodOptionsPage(subJourneyId)).getOrElse(Set.empty)
+
+    Seq(
+      yesNoRow(
+        AddPartnershipContactMethodsYesNoPage(subJourneyId),
+        messages("addPartnershipContactMethodsYesNo.checkYourAnswersLabel"),
+        original.partnershipContactMethodsYesNo,
+        current
+      ),
+      Option.when(
+        original.partnershipContactMethodOptions != currentMethods
+      ) {
+        htmlRow(
+          messages("partnershipContactMethodOptions.checkYourAnswersLabel"),
+          formatContactMethods(original.partnershipContactMethodOptions),
+          formatContactMethods(currentMethods)
+        )
+      },
+      fieldRow(
+        PartnershipEmailAddressPage(subJourneyId),
+        messages("partnershipEmailAddress.checkYourAnswersLabel"),
+        original.email,
+        current
+      ),
+      fieldRow(
+        PartnershipPhoneNumberPage(subJourneyId),
+        messages("partnershipPhoneNumber.checkYourAnswersLabel"),
+        original.phone,
+        current
+      ),
+      fieldRow(
+        PartnershipMobileNumberPage(subJourneyId),
+        messages("partnershipMobileNumber.checkYourAnswersLabel"),
+        original.mobile,
+        current
+      )
+    ).flatten
+  }
+
   private def formatContactMethods(
     methods: Set[ContactMethodOptions]
   )(implicit messages: Messages): String =
@@ -181,6 +293,24 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
+  private def worksReferenceRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
+                                                                                             messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipWorksReferenceNumberYesNoPage(subJourneyId),
+        messages("partnershipWorksReferenceNumberYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerWorksReferenceYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipWorksReferenceNumberPage(subJourneyId),
+        messages("partnershipWorksReferenceNumber.checkYourAnswersLabel"),
+        original.nominatedPartnerWorksReference,
+        current
+      )
+    ).flatten
+
   private def utrRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] =
@@ -193,6 +323,24 @@ object AmendPartnershipConfirmationViewModel {
       ),
       fieldRow(
         PartnershipUniqueTaxpayerReferencePage,
+        messages("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"),
+        original.utr,
+        current
+      )
+    ).flatten
+
+  private def utrRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
+                                                                                  messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipHasUtrYesNoPage(subJourneyId),
+        messages("partnershipHasUtrYesNo.checkYourAnswersLabel"),
+        original.hasUtrYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipUniqueTaxpayerReferencePage(subJourneyId),
         messages("partnershipUniqueTaxpayerReference.checkYourAnswersLabel"),
         original.utr,
         current
@@ -217,6 +365,24 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
+  private def nominatedPartnerUtrRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
+                                                                                                  messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipNominatedPartnerUtrYesNoPage(subJourneyId),
+        messages("partnershipNominatedPartnerUtrYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerUtrYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipNominatedPartnerUtrPage(subJourneyId),
+        messages("partnershipNominatedPartnerUtr.checkYourAnswersLabel"),
+        original.nominatedPartnerUtr,
+        current
+      )
+    ).flatten
+
   private def nominatedPartnerCrnRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] =
@@ -235,6 +401,24 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
+  private def nominatedPartnerCrnRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
+                                                                                                  messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipNominatedPartnerCrnYesNoPage(subJourneyId),
+        messages("partnershipNominatedPartnerCrnYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerCrnYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipNominatedPartnerCrnPage(subJourneyId),
+        messages("partnershipNominatedPartnerCrn.checkYourAnswersLabel"),
+        original.nominatedPartnerCrn,
+        current
+      )
+    ).flatten
+
   private def nominatedPartnerNinoRows(original: OriginalPartnershipAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] =
@@ -247,6 +431,24 @@ object AmendPartnershipConfirmationViewModel {
       ),
       fieldRow(
         PartnershipNominatedPartnerNinoPage,
+        messages("partnershipNominatedPartnerNino.checkYourAnswersLabel"),
+        original.nominatedPartnerNino,
+        current
+      )
+    ).flatten
+
+  private def nominatedPartnerNinoRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
+                                                                                                   messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        PartnershipNominatedPartnerNinoYesNoPage(subJourneyId),
+        messages("partnershipNominatedPartnerNinoYesNo.checkYourAnswersLabel"),
+        original.nominatedPartnerNinoYesNo,
+        current
+      ),
+      fieldRow(
+        PartnershipNominatedPartnerNinoPage(subJourneyId),
         messages("partnershipNominatedPartnerNino.checkYourAnswersLabel"),
         original.nominatedPartnerNino,
         current

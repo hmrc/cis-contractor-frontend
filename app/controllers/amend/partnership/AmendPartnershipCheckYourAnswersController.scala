@@ -299,9 +299,11 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
           PartnershipHasUtrYesNoSummary.row(
             ua,
             AmendMode,
-            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController // TODO DTR-9463: Update with id
-              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.Utr.key)
-              .url,
+            Some(
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+                .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.Utr.key)
+                .url
+            ),
             Some(subJourneyId)
           ),
           PartnershipUniqueTaxpayerReferenceSummary.row(
@@ -669,7 +671,7 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
                 Redirect(
                   controllers.amend.partnership.routes.AmendPartnershipConfirmationController
-                    .onPageLoadWithId(flowId) // TODO DTR-9463: Update with id
+                    .onPageLoadWithId(flowId)
                 )
               }
           }

@@ -17,7 +17,7 @@
 package controllers.amend.partnership
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.AmendMode
@@ -35,12 +35,14 @@ import viewmodels.checkAnswers.amend.partnership.AmendPartnershipConfirmationVie
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendPartnershipConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService,
@@ -99,6 +101,104 @@ class AmendPartnershipConfirmationController @Inject() (
                         journeyType,
                         cisId,
                         appConfig
+                      )
+
+                    val persistFinalUserAnswers =
+                      journeyType match {
+
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
+
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(
+                            ua
+                          )
+                      }
+
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            partnershipName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
+                          "[AmendPartnershipConfirmationController.onPageLoad] " +
+                            "Failed to persist confirmation session data",
+                          exception
+                        )
+
+                        recoveryRedirect
+                      }
+
+                  case None =>
+                    logger.error(
+                      "[AmendPartnershipConfirmationController] Missing AmendJourneyTypePage"
+                    )
+
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
+      }
+    }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+      val ua = request.userAnswers
+
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage(subJourneyId)).contains(true)) {
+        logger.error(
+          s"[AmendPartnershipConfirmationController][onPageLoadWithId] " +
+            "Accessed confirmation page without prior submission"
+        )
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      } else {
+
+        ua.get(OriginalPartnershipAnswersQuery) match { // TODO DTR-9463: Do I need to update queries with id?
+
+          case None =>
+            logger.error("[AmendPartnershipConfirmationController] Missing OriginalPartnershipAnswersQuery")
+            Future.successful(recoveryRedirect)
+
+          case Some(originalPartnershipAnswers) =>
+            ua.get(CisIdQuery(subJourneyId)) match {
+
+              case None =>
+                logger.error("[AmendPartnershipConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
+
+              case Some(cisId) =>
+                ua.get(AmendJourneyTypePage(subJourneyId)) match {
+
+                  case Some(journeyType) =>
+                    val tableRows =
+                      AmendPartnershipConfirmationViewModel.rows(
+                        originalPartnershipAnswers,
+                        ua,
+                        Some(subJourneyId)
+                      )
+
+                    val partnershipName =
+                      SubcontractorNameDisplayHelper.partnershipDisplayName(ua, AmendMode, Some(subJourneyId))
+
+                    val confirmationLink =
+                      AmendConfirmationLinks.build(
+                        journeyType,
+                        cisId,
+                        appConfig,
+                        Some(flowId)
                       )
 
                     val persistFinalUserAnswers =
