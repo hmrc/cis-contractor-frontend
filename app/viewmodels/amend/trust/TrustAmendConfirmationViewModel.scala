@@ -31,13 +31,23 @@ object TrustAmendConfirmationViewModel {
 
   def rows(
     original: OriginalTrustAnswers,
-    current: UserAnswers
+    current: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit messages: Messages): Seq[Seq[TableRow]] =
-    nameRow(original, current) ++
-      addressRows(original, current) ++
-      contactRows(original, current) ++
-      utrRows(original, current) ++
-      worksReferenceRows(original, current)
+    subJourneyId match {
+      case Some(id) =>
+        nameRow(original, current, id) ++
+          addressRows(original, current, id) ++
+          contactRows(original, current, id) ++
+          utrRows(original, current, id) ++
+          worksReferenceRows(original, current, id)
+      case None     =>
+        nameRow(original, current) ++
+          addressRows(original, current) ++
+          contactRows(original, current) ++
+          utrRows(original, current) ++
+          worksReferenceRows(original, current)
+    }
 
   private def nameRow(
     original: OriginalTrustAnswers,
@@ -46,6 +56,20 @@ object TrustAmendConfirmationViewModel {
     Seq(
       fieldRow(
         TrustNamePage,
+        messages("trustName.checkYourAnswersLabel"),
+        original.trustName,
+        current
+      )
+    ).flatten
+
+  private def nameRow(
+    original: OriginalTrustAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    Seq(
+      fieldRow(
+        TrustNamePage(subJourneyId),
         messages("trustName.checkYourAnswersLabel"),
         original.trustName,
         current
@@ -61,6 +85,32 @@ object TrustAmendConfirmationViewModel {
     Seq(
       yesNoRow(
         TrustAddressYesNoPage,
+        messages("trustAddressYesNo.checkYourAnswersLabel"),
+        original.addressYesNo,
+        current
+      ),
+      Option.when(
+        original.address != currentAddress
+      ) {
+        htmlRow(
+          messages("trustAddress.checkYourAnswersLabel"),
+          original.address.map(formatAddress).getOrElse(missingValue),
+          currentAddress.map(formatAddress).getOrElse(missingValue)
+        )
+      }
+    ).flatten
+  }
+
+  private def addressRows(
+    original: OriginalTrustAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentAddress = current.get(TrustAddressPage)
+
+    Seq(
+      yesNoRow(
+        TrustAddressYesNoPage(subJourneyId),
         messages("trustAddressYesNo.checkYourAnswersLabel"),
         original.addressYesNo,
         current
@@ -120,6 +170,50 @@ object TrustAmendConfirmationViewModel {
     ).flatten
   }
 
+  private def contactRows(
+    original: OriginalTrustAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    val currentMethods = current.get(TrustContactMethodOptionsPage).getOrElse(Set.empty)
+
+    Seq(
+      yesNoRow(
+        AddTrustContactMethodsYesNoPage(subJourneyId),
+        messages("addTrustContactMethodsYesNo.checkYourAnswersLabel"),
+        original.trustContactMethodsYesNo,
+        current
+      ),
+      Option.when(
+        original.trustContactMethod != currentMethods
+      ) {
+        htmlRow(
+          messages("trustContactMethodOptions.checkYourAnswersLabel"),
+          formatContactMethods(original.trustContactMethod),
+          formatContactMethods(currentMethods)
+        )
+      },
+      fieldRow(
+        TrustEmailAddressPage(subJourneyId),
+        messages("trustEmailAddress.checkYourAnswersLabel"),
+        original.email,
+        current
+      ),
+      fieldRow(
+        TrustPhoneNumberPage(subJourneyId),
+        messages("trustPhoneNumber.checkYourAnswersLabel"),
+        original.phone,
+        current
+      ),
+      fieldRow(
+        TrustMobileNumberPage(subJourneyId),
+        messages("trustMobileNumber.checkYourAnswersLabel"),
+        original.mobile,
+        current
+      )
+    ).flatten
+  }
+
   private def formatContactMethods(
     methods: Set[ContactMethodOptions]
   )(implicit messages: Messages): String =
@@ -164,6 +258,24 @@ object TrustAmendConfirmationViewModel {
       )
     ).flatten
 
+  private def worksReferenceRows(original: OriginalTrustAnswers, current: UserAnswers, subJourneyId: String)(implicit
+    messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        TrustWorksReferenceYesNoPage(subJourneyId),
+        messages("trustWorksReferenceYesNo.checkYourAnswersLabel"),
+        original.worksReferenceYesNo,
+        current
+      ),
+      fieldRow(
+        TrustWorksReferencePage(subJourneyId),
+        messages("trustWorksReference.checkYourAnswersLabel"),
+        original.worksReference,
+        current
+      )
+    ).flatten
+
   private def utrRows(original: OriginalTrustAnswers, current: UserAnswers)(implicit
     messages: Messages
   ): Seq[Seq[TableRow]] =
@@ -176,6 +288,24 @@ object TrustAmendConfirmationViewModel {
       ),
       fieldRow(
         TrustUtrPage,
+        messages("trustUtr.checkYourAnswersLabel"),
+        original.utr,
+        current
+      )
+    ).flatten
+
+  private def utrRows(original: OriginalTrustAnswers, current: UserAnswers, subJourneyId: String)(implicit
+    messages: Messages
+  ): Seq[Seq[TableRow]] =
+    Seq(
+      yesNoRow(
+        TrustUtrYesNoPage(subJourneyId),
+        messages("trustUtrYesNo.checkYourAnswersLabel"),
+        original.utrYesNo,
+        current
+      ),
+      fieldRow(
+        TrustUtrPage(subJourneyId),
         messages("trustUtr.checkYourAnswersLabel"),
         original.utr,
         current

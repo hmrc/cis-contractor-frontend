@@ -522,7 +522,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
                 auditService.amendSubcontractorEvent(updated)
 
                 Redirect(
-                  controllers.amend.trust.routes.AmendTrustConfirmationController // TODO DTR-9463: Update with id
+                  controllers.amend.trust.routes.AmendTrustConfirmationController
                     .onPageLoadWithId(flowId)
                 )
               }
