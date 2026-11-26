@@ -93,6 +93,9 @@ POST  /subcontractor/amend/remove/information/:subcontractorDetail  controllers.
 GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoad(subcontractorDetail: String)
 POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmit(subcontractorDetail: String)
 
+GET   /subcontractor/amend/trust/remove/information/:subcontractorDetail/:flowId  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onPageLoadWithId(flowId: java.util.UUID, subcontractorDetail: String)
+POST  /subcontractor/amend/trust/remove/information/:subcontractorDetail/:flowId  controllers.amend.trust.AmendTrustRemoveDetailYesNoController.onSubmitWithId(flowId: java.util.UUID, subcontractorDetail: String)
+
 GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType  controllers.amend.AmendSubcontractorController.onPageLoad(subbieResourceRef: Long, journeyType: String)
 
 GET   /subcontractor/amend/start/:subbieResourceRef/:journeyType/:flowId  controllers.amend.AmendSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, subbieResourceRef: Long, journeyType: String)

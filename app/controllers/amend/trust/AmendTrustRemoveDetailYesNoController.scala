@@ -32,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.trust.AmendTrustRemoveDetailYesNoView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendTrustRemoveDetailYesNoController @Inject() (
@@ -39,6 +40,7 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
   sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   formProvider: AmendTrustRemoveDetailYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -95,6 +97,35 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
           .contains(true)
     }
 
+  private def detailIsPresentWithId(
+    detail: AmendTrustRemoveDetail,
+    userAnswers: UserAnswers,
+    subJourneyId: String
+  ): Boolean =
+    detail match {
+
+      case AmendTrustRemoveDetail.Address =>
+        userAnswers
+          .get(TrustAddressYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendTrustRemoveDetail.ContactDetails =>
+        userAnswers
+          .get(AddTrustContactMethodsYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendTrustRemoveDetail.Utr =>
+        userAnswers
+          .get(TrustUtrYesNoPage(subJourneyId))
+          .contains(true) &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
+
+      case AmendTrustRemoveDetail.WorksReferenceNumber =>
+        userAnswers
+          .get(TrustWorksReferenceYesNoPage(subJourneyId))
+          .contains(true)
+    }
+
   private def journeyRecovery: Result =
     Redirect(
       controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -128,6 +159,47 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
         }
         .getOrElse {
           logger.error("[AmendTrustRemoveDetailYesNoController][onPageLoad] - trust name missing from userAnswers")
+          Future.successful(journeyRecovery)
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, subcontractorDetail: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      val formAction   =
+        Some(
+          controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+            .onSubmitWithId(flowId, subcontractorDetail)
+        )
+
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, AmendMode, subJourneyId)
+        .map { trustName =>
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+              logger.error(
+                s"[AmendTrustRemoveDetailYesNoController][onPageLoadWithId] - detail missing, detail=$subcontractorDetail"
+              )
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              val form = formProvider()
+
+              val messages =
+                messagesApi.preferred(request)
+
+              val subcontractorDetailTitle =
+                messages(detailType.messageKey)
+
+              Future.successful(Ok(view(trustName, subcontractorDetail, subcontractorDetailTitle, form, formAction)))
+            }
+          }
+        }
+        .getOrElse {
+          logger.error(
+            "[AmendTrustRemoveDetailYesNoController][onPageLoadWithId] - trust name missing from userAnswers"
+          )
           Future.successful(journeyRecovery)
         }
     }
@@ -187,4 +259,77 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
           Future.successful(journeyRecovery)
         }
   }
+
+  def onSubmitWithId(flowId: UUID, subcontractorDetail: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
+      SubcontractorNameDisplayHelper
+        .getTrustDisplayName(request.userAnswers, AmendMode, subJourneyId)
+        .map { trustName =>
+          withValidDetail(subcontractorDetail) { detailType =>
+            if (!detailIsPresent(detailType, request.userAnswers)) {
+              logger.error(
+                s"[AmendTrustRemoveDetailYesNoController][onSubmitWithId] - detail missing, detail=$subcontractorDetail"
+              )
+
+              Future.successful(journeyRecovery)
+
+            } else {
+              formProvider()
+                .bindFromRequest()
+                .fold(
+                  formWithErrors =>
+                    val messages =
+                      messagesApi.preferred(request)
+
+                    val subcontractorDetailTitle =
+                      messages(detailType.messageKey)
+
+                    Future.successful(
+                      BadRequest(
+                        view(
+                          trustName,
+                          subcontractorDetail,
+                          subcontractorDetailTitle,
+                          formWithErrors,
+                          Some(
+                            controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+                              .onSubmitWithId(flowId, subcontractorDetail)
+                          )
+                        )
+                      )
+                    )
+                  ,
+                  value =>
+                    (for {
+                      updatedAnswers <-
+                        Future.fromTry(
+                          request.userAnswers
+                            .set(AmendTrustRemoveDetailYesNoPage(detailType), value) // TODO DTR-9463: Update with id
+                            .flatMap(
+                              _.remove(AmendTrustRemoveDetailYesNoPage(detailType))
+                            ) // TODO DTR-9463: Update with id
+                        )
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(
+                      controllers.amend.trust.routes.AmendTrustCheckYourAnswersController.onPageLoadWithId(flowId).url
+                    )).recover { case ex =>
+                      logger.error(
+                        s"Failed to save remove detail answer for '$subcontractorDetail'",
+                        ex
+                      )
+                      journeyRecovery
+                    }
+                )
+            }
+          }
+        }
+        .getOrElse {
+          logger.error(
+            "[AmendTrustRemoveDetailYesNoController][onSubmitWithId] - trust name missing from userAnswers"
+          )
+          Future.successful(journeyRecovery)
+        }
+    }
 }
