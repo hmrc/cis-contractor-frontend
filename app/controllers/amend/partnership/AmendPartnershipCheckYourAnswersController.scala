@@ -330,11 +330,12 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
           PartnershipNominatedPartnerUtrYesNoSummary.row(
             ua,
             AmendMode,
-            true,
-            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController // TODO DTR-9463: Update with id
-              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
-              .url,
-            subJourneyId
+            Some(
+              controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController // TODO DTR-9463: Update with id
+                .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.NominatedPartnerUtr.key)
+                .url
+            ),
+            Some(subJourneyId)
           ),
           PartnershipNominatedPartnerUtrSummary.row(
             ua,
@@ -355,24 +356,31 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         PartnershipAddressYesNoSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController // TODO DTR-9463: Update with id
-            .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.Address.key)
-            .url,
+          Some(
+            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.Address.key)
+              .url
+          ),
           Some(subJourneyId)
         ),
         PartnershipAddressSummary.row(
           ua,
           AmendMode,
-          controllers.add.partnership.routes.PartnershipAddressController
-            .redirectToAmendAddressLookupWithId(flowId), // TODO DTR-9463: Update with id
+          Some(
+            controllers.add.partnership.routes.PartnershipAddressController
+              .redirectToAddressLookupWithId(flowId)
+              .url
+          ),
           Some(subJourneyId)
         ),
         AddPartnershipContactMethodsYesNoSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-            .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.ContactDetails.key) // TODO DTR-9463: Update with id
-            .url,
+          Some(
+            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.ContactDetails.key)
+              .url
+          ),
           Some(subJourneyId)
         ),
         PartnershipContactMethodOptionsSummary.row(
@@ -415,50 +423,62 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         PartnershipNominatedPartnerNinoYesNoSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-            .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.NominatedPartnerNino.key)
-            .url,
-          subJourneyId
+          Some(
+            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.NominatedPartnerNino.key)
+              .url
+          ),
+          Some(subJourneyId)
         ),
         PartnershipNominatedPartnerNinoSummary.row(
           ua,
           AmendMode,
-          controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
-            .onPageLoadWithId(flowId, AmendMode)
-            .url,
-          subJourneyId
+          Some(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerNinoController
+              .onPageLoadWithId(flowId, AmendMode)
+              .url
+          ),
+          Some(subJourneyId)
         ),
         PartnershipNominatedPartnerCrnYesNoSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-            .onPageLoadWithId(AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key)
-            .url,
-          subJourneyId
+          Some(
+            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber.key)
+              .url
+          ),
+          Some(subJourneyId)
         ),
         PartnershipNominatedPartnerCrnSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.PartnershipNominatedPartnerCrnController
-            .onPageLoadWithId(flowId, AmendMode)
-            .url,
-          subJourneyId
+          Some(
+            controllers.add.partnership.routes.PartnershipNominatedPartnerCrnController
+              .onPageLoadWithId(flowId, AmendMode)
+              .url
+          ),
+          Some(subJourneyId)
         ),
         PartnershipWorksReferenceNumberYesNoSummary.row(
           ua,
           AmendMode,
-          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
-            .onPageLoadWithId(AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
-            .url,
-          subJourneyId
+          Some(
+            controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, AmendPartnershipRemoveDetail.WorksReferenceNumber.key)
+              .url
+          ),
+          Some(subJourneyId)
         ),
         PartnershipWorksReferenceNumberSummary.row(
           ua,
           AmendMode,
-          controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
-            .onPageLoadWithId(flowId, AmendMode)
-            .url,
-          subJourneyId
+          Some(
+            controllers.add.partnership.routes.PartnershipWorksReferenceNumberController
+              .onPageLoadWithId(flowId, AmendMode)
+              .url
+          ),
+          Some(subJourneyId)
         )
       )
   }

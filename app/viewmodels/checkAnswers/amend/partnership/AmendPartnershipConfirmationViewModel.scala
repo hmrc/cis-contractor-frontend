@@ -45,7 +45,7 @@ object AmendPartnershipConfirmationViewModel {
           nominatedPartnerCrnRows(original, current, id) ++
           nominatedPartnerNinoRows(original, current, id) ++
           worksReferenceRows(original, current, id)
-      case None     =>
+      case None             =>
         nameRow(original, current) ++
           addressRows(original, current) ++
           contactRows(original, current) ++
@@ -98,10 +98,10 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten
 
   private def nominatedPartnerNameRow(
-                                       original: OriginalPartnershipAnswers,
-                                       current: UserAnswers,
-                                       subJourneyId: String
-                                     )(implicit messages: Messages): Seq[Seq[TableRow]] =
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] =
     Seq(
       fieldRow(
         PartnershipNominatedPartnerNamePage(subJourneyId),
@@ -137,10 +137,10 @@ object AmendPartnershipConfirmationViewModel {
   }
 
   private def addressRows(
-                           original: OriginalPartnershipAnswers,
-                           current: UserAnswers,
-                           subJourneyId: String
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentAddress = current.get(PartnershipAddressPage)
 
     Seq(
@@ -206,10 +206,10 @@ object AmendPartnershipConfirmationViewModel {
   }
 
   private def contactRows(
-                           original: OriginalPartnershipAnswers,
-                           current: UserAnswers,
-                           subJourneyId: String
-                         )(implicit messages: Messages): Seq[Seq[TableRow]] = {
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit messages: Messages): Seq[Seq[TableRow]] = {
     val currentMethods = current.get(PartnershipContactMethodOptionsPage(subJourneyId)).getOrElse(Set.empty)
 
     Seq(
@@ -293,8 +293,8 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
-  private def worksReferenceRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
-                                                                                             messages: Messages
+  private def worksReferenceRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(
+    implicit messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -330,7 +330,7 @@ object AmendPartnershipConfirmationViewModel {
     ).flatten
 
   private def utrRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
-                                                                                  messages: Messages
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -365,8 +365,8 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
-  private def nominatedPartnerUtrRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
-                                                                                                  messages: Messages
+  private def nominatedPartnerUtrRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(
+    implicit messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -401,8 +401,8 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
-  private def nominatedPartnerCrnRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
-                                                                                                  messages: Messages
+  private def nominatedPartnerCrnRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(
+    implicit messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
@@ -437,8 +437,12 @@ object AmendPartnershipConfirmationViewModel {
       )
     ).flatten
 
-  private def nominatedPartnerNinoRows(original: OriginalPartnershipAnswers, current: UserAnswers, subJourneyId: String)(implicit
-                                                                                                   messages: Messages
+  private def nominatedPartnerNinoRows(
+    original: OriginalPartnershipAnswers,
+    current: UserAnswers,
+    subJourneyId: String
+  )(implicit
+    messages: Messages
   ): Seq[Seq[TableRow]] =
     Seq(
       yesNoRow(
