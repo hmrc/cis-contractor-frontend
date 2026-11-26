@@ -68,6 +68,7 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
       case TradingNameOfSubcontractorPage(id)            => Some(id)
       case SubcontractorNamePage(id)                     => Some(id)
       case AddressOfSubcontractorPage(id)                => Some(id)
+      case SubAddressYesNoPage(id)                       => Some(id)
       case IndividualContactMethodOptionsPage(id)        => Some(id)
       case AddIndividualContactMethodsYesNoPage(id)      => Some(id)
       case IndividualEmailAddressPage(id)                => Some(id)
@@ -86,7 +87,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case IndividualNamesOptionsPage(_)             =>
       userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, NormalMode)(userAnswers)
     case SubcontractorNamePage(_)                  => userAnswers => navigatorFromSubcontractorNamePage(NormalMode)(userAnswers)
-    case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
+    case TradingNameOfSubcontractorPage            =>
+      _ => controllers.add.routes.SubAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
     case SubAddressYesNoPage(_)                    => userAnswers => navigatorFromSubAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)

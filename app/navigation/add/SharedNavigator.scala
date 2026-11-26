@@ -97,22 +97,25 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
     id: Option[String] = None
   ): Call =
     (subcontractorType, id) match {
-      case (Limitedcompany, Some(value)) =>
+      case (Limitedcompany, Some(value))         =>
         controllers.add.company.routes.CompanyNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Individualorsoletrader, _)   =>
-        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Limitedcompany, _)           =>
+      case (Limitedcompany, _)                   =>
         controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, Some(value))    =>
+      case (Individualorsoletrader, Some(value)) =>
+        controllers.add.routes.IndividualNamesOptionsController
+          .onPageLoadWithId(UUID.fromString(value), NormalMode)
+      case (Individualorsoletrader, _)           =>
+        controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
+      case (Partnership, Some(value))            =>
         controllers.add.partnership.routes.PartnershipNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Partnership, _)              =>
+      case (Partnership, _)                      =>
         controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Trust, Some(value))          =>
+      case (Trust, Some(value))                  =>
         controllers.add.trust.routes.TrustNameController
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Trust, _)                    =>
+      case (Trust, _)                            =>
         controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
