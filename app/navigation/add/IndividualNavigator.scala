@@ -83,12 +83,10 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case IndividualNamesOptionsPage(_)             =>
-      userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, NormalMode)(userAnswers)
+    case IndividualNamesOptionsPage(_)             => userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, NormalMode)(userAnswers)
     case SubcontractorNamePage(_)                  => userAnswers => navigatorFromSubcontractorNamePage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
-    case SubAddressYesNoPage                       =>
-      userAnswers => navigatorFromSubAddressYesNoPage(NormalMode)(userAnswers)
+    case SubAddressYesNoPage(_)                    => userAnswers => navigatorFromSubAddressYesNoPage(flowId, id, NormalMode)(userAnswers)
     case UniqueTaxpayerReferenceYesNoPage          =>
       userAnswers => navigatorFromUniqueTaxpayerReferenceYesNoPage(NormalMode)(userAnswers)
     case SubcontractorsUniqueTaxpayerReferencePage =>
@@ -114,12 +112,12 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     case _                                         => _ => routes.IndexController.onPageLoad()
   }
 
-  // TODO: DID NOT EDIT THIS SO FAR
   private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
     case IndividualNamesOptionsPage(_)        =>
       userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, CheckMode)(userAnswers)
-    case SubcontractorNamePage                => userAnswers => navigatorFromSubcontractorNamePage(CheckMode)(userAnswers)
-    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(CheckMode)(_)
+    case SubcontractorNamePage                =>
+      userAnswers => navigatorFromSubcontractorNamePage(CheckMode)(userAnswers)
+    case SubAddressYesNoPage                  => navigatorFromSubAddressYesNoPage(flowId, id, CheckMode)(_)
     case NationalInsuranceNumberYesNoPage     => navigatorFromNationalInsuranceNumberYesNoPage(CheckMode)(_)
     case UniqueTaxpayerReferenceYesNoPage     => navigatorFromUniqueTaxpayerReferenceYesNoPage(CheckMode)(_)
     case WorksReferenceNumberYesNoPage        => navigatorFromWorksReferenceNumberYesNoPage(CheckMode)(_)
@@ -319,6 +317,19 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
         logger.error(s"[IndividualNavigator][navigatorFromSubcontractorNamePage] - unexpected state, mode=$mode")
         routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def navigatorFromSubAddressYesNoPage(flowId: UUID, id: String, mode: Mode)(ua: UserAnswers): Call =
+    addressLookupYesNoRoute(
+      mode,
+      ua.get(SubAddressYesNoPage(id)),
+      ua.get(AddressOfSubcontractorPage(id)).isDefined,
+      onYes = controllers.add.routes.AddressOfSubcontractorController.redirectToAddressLookupWithId(flowId, None),
+      onYesChange = controllers.add.routes.AddressOfSubcontractorController
+        .redirectToAddressLookupWithId(flowId, Some(CheckMode.toString)),
+      onNo = controllers.add.routes.AddIndividualContactMethodsYesNoController
+        .onPageLoadWithId(flowId, NormalMode),
+      checkYourAnswers = controllers.add.routes.CheckYourAnswersController.onPageLoad() // TODO: cyaRouteWithId method
+    )
 
   private def navigatorFromSubAddressYesNoPage(mode: Mode)(ua: UserAnswers): Call =
     mode match {

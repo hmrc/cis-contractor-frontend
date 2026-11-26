@@ -57,7 +57,7 @@ class SubcontractorAddedController @Inject() (
       subcontractorAdded(TypeOfSubcontractor.Individualorsoletrader)
     }
 
-  // TODO: NEED TO FINISH THIS METHOD.
+  // TODO: NEED TO FINISH THIS METHOD OR IS DONE?
   def individualSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val id = flowId.toString

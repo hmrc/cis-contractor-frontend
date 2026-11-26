@@ -92,11 +92,11 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
           .onPageLoadWithId(UUID.fromString(value), NormalMode)
       case (Individualorsoletrader, _)           =>
         controllers.add.routes.IndividualNamesOptionsController.onPageLoad(NormalMode)
-      case (Limitedcompany, _)         => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
-      case (Partnership, _)            => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
-      case (Trust, Some(value))        =>
+      case (Limitedcompany, _)                   => controllers.add.company.routes.CompanyNameController.onPageLoad(NormalMode)
+      case (Partnership, _)                      => controllers.add.partnership.routes.PartnershipNameController.onPageLoad(NormalMode)
+      case (Trust, Some(value))                  =>
         controllers.add.trust.routes.TrustNameController.onPageLoadWithId(UUID.fromString(value), NormalMode)
-      case (Trust, _)                  => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
+      case (Trust, _)                            => controllers.add.trust.routes.TrustNameController.onPageLoad(NormalMode)
     }
 
   private def checkYourAnswersFor(subcontractorType: TypeOfSubcontractor, id: Option[String] = None): Call =
@@ -104,6 +104,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Partnership, Some(value))  =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
+      // TODO: ADD THE INDIVIDUAL CHECK YOUR ANSWERS CONTROLLER HERE ON PAGE LOAD WITH ID
       case (Individualorsoletrader, _) => controllers.add.routes.CheckYourAnswersController.onPageLoad()
       case (Limitedcompany, _)         => controllers.add.company.routes.CompanyCheckYourAnswersController.onPageLoad()
       case (Partnership, _)            =>
