@@ -26,7 +26,7 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import services.VerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -200,7 +200,7 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
 
   //  DTR-9569: MultiTab
   def onPageLoadWithId(flowId: UUID, subcontractorId: Long, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
       val id         = flowId.toString
       val formAction =
         Some(routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId))
@@ -255,104 +255,106 @@ class ProceedInsufficientSubcontractorNameYesNoController @Inject() (
     }
 
   def onSubmitWithId(flowId: UUID, subcontractorId: Long, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val id         = flowId.toString
-      val formAction =
-        Some(routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId))
-      val result     =
-        (
-          request.userAnswers.get(CisIdQuery(id)),
-          request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
-        ) match {
-          case (Some(cisId), Some(batch)) =>
-            batch.subcontractors
-              .find(_.subcontractorId == subcontractorId)
-              .map { subcontractor =>
-                form
-                  .bindFromRequest()
-                  .fold(
-                    formWithErrors =>
-                      Future.successful(
-                        BadRequest(
-                          view(
-                            formWithErrors,
-                            mode,
-                            subcontractor.displayName,
-                            subcontractorId,
-                            formAction
-                          )
-                        )
-                      ),
-                    value =>
-                      if (value) {
-                        for {
-                          _                         <-
-                            verificationBatchService.proceedInsufficientVerification(cisId, subcontractorId, batch)
-                          updatedAnswers            <-
-                            Future.fromTry(
-                              request.userAnswers
-                                .set(
-                                  ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
-                                  value
-                                )
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id         = flowId.toString
+        val formAction =
+          Some(routes.ProceedInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, subcontractorId))
+        val result     =
+          (
+            request.userAnswers.get(VerifyCisIdQuery(id)),
+            request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+          ) match {
+            case (Some(cisId), Some(batch)) =>
+              batch.subcontractors
+                .find(_.subcontractorId == subcontractorId)
+                .map { subcontractor =>
+                  form
+                    .bindFromRequest()
+                    .fold(
+                      formWithErrors =>
+                        Future.successful(
+                          BadRequest(
+                            view(
+                              formWithErrors,
+                              mode,
+                              subcontractor.displayName,
+                              subcontractorId,
+                              formAction
                             )
-                          uaWithUpdatedCurrentBatch <-
-                            verificationBatchService.getCurrentVerificationBatch(updatedAnswers, Some(id))
-                          uaWithNewestBatch         <-
-                            verificationBatchService.refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch, Some(id))
-                          _                         <- sessionRepository.set(uaWithNewestBatch)
-                        } yield Redirect(
-                          navigator.nextPage(
-                            ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
-                            mode,
-                            uaWithNewestBatch
                           )
-                        )
-                      } else {
-                        for {
-                          updatedAnswers <-
-                            Future.fromTry(
-                              request.userAnswers
-                                .set(
-                                  ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
-                                  value
-                                )
+                        ),
+                      value =>
+                        if (value) {
+                          for {
+                            _                         <-
+                              verificationBatchService.proceedInsufficientVerification(cisId, subcontractorId, batch)
+                            updatedAnswers            <-
+                              Future.fromTry(
+                                request.userAnswers
+                                  .set(
+                                    ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                                    value
+                                  )
+                              )
+                            uaWithUpdatedCurrentBatch <-
+                              verificationBatchService.getCurrentVerificationBatch(updatedAnswers, Some(id))
+                            uaWithNewestBatch         <-
+                              verificationBatchService
+                                .refreshNewestVerificationBatch(uaWithUpdatedCurrentBatch, Some(id))
+                            _                         <- sessionRepository.set(uaWithNewestBatch)
+                          } yield Redirect(
+                            navigator.nextPage(
+                              ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                              mode,
+                              uaWithNewestBatch
                             )
-                          _              <- sessionRepository.set(updatedAnswers)
-                        } yield Redirect(
-                          navigator.nextPage(
-                            ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
-                            mode,
-                            updatedAnswers
                           )
-                        )
-                      }
+                        } else {
+                          for {
+                            updatedAnswers <-
+                              Future.fromTry(
+                                request.userAnswers
+                                  .set(
+                                    ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                                    value
+                                  )
+                              )
+                            _              <- sessionRepository.set(updatedAnswers)
+                          } yield Redirect(
+                            navigator.nextPage(
+                              ProceedInsufficientSubcontractorNameYesNoForFlowPage(id, subcontractorId.toString),
+                              mode,
+                              updatedAnswers
+                            )
+                          )
+                        }
+                    )
+                }
+                .getOrElse {
+                  logger.error(
+                    "[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] - " +
+                      s"subcontractor not in CurrentVerificationBatchResponsePage, subcontractorId=$subcontractorId"
                   )
-              }
-              .getOrElse {
-                logger.error(
-                  "[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] - " +
-                    s"subcontractor not in CurrentVerificationBatchResponsePage, subcontractorId=$subcontractorId"
-                )
-                Future.successful(recoveryRedirect)
-              }
+                  Future.successful(recoveryRedirect)
+                }
 
-          case _ =>
-            logger.error(
-              "[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] - " +
-                "CisIdQuery or CurrentVerificationBatchResponsePage missing from userAnswers"
-            )
-            Future.successful(recoveryRedirect)
+            case _ =>
+              logger.error(
+                "[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] - " +
+                  "CisIdQuery or CurrentVerificationBatchResponsePage missing from userAnswers"
+              )
+              Future.successful(recoveryRedirect)
+          }
+
+        result.recover { case ex =>
+          logger.error(
+            s"[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] Failed to submit insufficient verification for subcontractorId=$subcontractorId",
+            ex
+          )
+
+          recoveryRedirect
         }
-
-      result.recover { case ex =>
-        logger.error(
-          s"[ProceedInsufficientSubcontractorNameYesNoController][onSubmit] Failed to submit insufficient verification for subcontractorId=$subcontractorId",
-          ex
-        )
-
-        recoveryRedirect
-      }
     }
 
 }

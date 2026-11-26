@@ -161,13 +161,13 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     verificationResourceRef: Long = -1L,
     mode: Mode = NormalMode
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
       val id         = flowId.toString
       val formAction =
         Some(routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef))
 
       val subcontractorName =
-        getSubcontractorName(request, verificationResourceRef)
+        getSubcontractorNameWithId(id, request, verificationResourceRef)
 
       Ok(
         view(
@@ -185,75 +185,78 @@ class RemoveInsufficientSubcontractorNameYesNoController @Inject() (
     verificationResourceRef: Long = -1L,
     mode: Mode = NormalMode
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val id         = flowId.toString
-      val formAction =
-        Some(routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef))
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id         = flowId.toString
+        val formAction =
+          Some(
+            routes.RemoveInsufficientSubcontractorNameYesNoController.onSubmitWithId(flowId, verificationResourceRef)
+          )
 
-      val subcontractorName =
-        getSubcontractorNameWithId(id, request, verificationResourceRef)
+        val subcontractorName =
+          getSubcontractorNameWithId(id, request, verificationResourceRef)
 
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(
-                view(
-                  formWithErrors,
-                  mode,
-                  subcontractorName,
-                  verificationResourceRef,
-                  formAction
-                )
-              )
-            ),
-          value =>
-            val subcontractorIdOpt = for {
-              batch        <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
-              verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
-              subId        <- verification.subcontractorId
-            } yield subId.toString
-
-            for {
-              updatedAnswers <-
-                Future.fromTry(
-                  request.userAnswers.set(
-                    RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef),
-                    value
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    mode,
+                    subcontractorName,
+                    verificationResourceRef,
+                    formAction
                   )
                 )
+              ),
+            value =>
+              val subcontractorIdOpt = for {
+                batch        <- request.userAnswers.get(CurrentVerificationBatchResponsePage(id))
+                verification <- batch.verifications.find(_.verificationResourceRef.contains(verificationResourceRef))
+                subId        <- verification.subcontractorId
+              } yield subId.toString
 
-              cleanedAnswers <-
-                Future.fromTry(
+              for {
+                updatedAnswers <-
+                  Future.fromTry(
+                    request.userAnswers.set(
+                      RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef),
+                      value
+                    )
+                  )
+
+                cleanedAnswers <-
+                  Future.fromTry(
+                    if (value) {
+                      removeSubcontractorFromSelectionWithId(
+                        id,
+                        updatedAnswers,
+                        verificationResourceRef,
+                        subcontractorIdOpt
+                      )
+                    } else {
+                      updatedAnswers
+                        .remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
+                    }
+                  )
+
+                _ <- sessionRepository.set(cleanedAnswers)
+
+                redirect <-
                   if (value) {
-                    removeSubcontractorFromSelectionWithId(
-                      id,
-                      updatedAnswers,
-                      verificationResourceRef,
-                      subcontractorIdOpt
-                    )
+                    deleteAndRedirectWithId(flowId, cleanedAnswers, verificationResourceRef)
                   } else {
-                    updatedAnswers
-                      .remove(RemoveInsufficientSubcontractorNameYesNoForFlowPage(id, verificationResourceRef))
-                  }
-                )
-
-              _ <- sessionRepository.set(cleanedAnswers)
-
-              redirect <-
-                if (value) {
-                  deleteAndRedirectWithId(flowId, cleanedAnswers, verificationResourceRef)
-                } else {
-                  Future.successful(
-                    Redirect(
-                      controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-                        .onPageLoadWithId(flowId)
+                    Future.successful(
+                      Redirect(
+                        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+                          .onPageLoadWithId(flowId)
+                      )
                     )
-                  )
-                }
-            } yield redirect
-        )
+                  }
+              } yield redirect
+          )
     }
 
   private def removeSubcontractorFromSelection(

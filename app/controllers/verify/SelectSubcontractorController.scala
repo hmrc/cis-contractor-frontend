@@ -230,6 +230,8 @@ class SelectSubcontractorController @Inject() (
     val selectPage  = id.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
     val unverifiedP = id.map(UnverifiedSubcontractorsPage.apply).getOrElse(UnverifiedSubcontractorsPage)
     val rebuildPage = id.map(RebuildVerificationFromWarningPage.apply).getOrElse(RebuildVerificationFromWarningPage)
+    val contextPage = id.map(FinalValidationContextPage.apply).getOrElse(FinalValidationContextPage)
+    val sourcePage  = id.map(VerifyFinalValidationSourcePage.apply).getOrElse(VerifyFinalValidationSourcePage)
 
     redirectIfVerificationRequestInProgress(ua, id) match {
       case Some(redirectResult) =>
@@ -317,14 +319,14 @@ class SelectSubcontractorController @Inject() (
 
                     withContext <- Future.fromTry(
                                      cleanedAnswers.set(
-                                       FinalValidationContextPage,
+                                       contextPage,
                                        FinalValidationContext.VerifySubcontractor
                                      )
                                    )
 
                     withSource <- Future.fromTry(
                                     withContext.set(
-                                      VerifyFinalValidationSourcePage,
+                                      sourcePage,
                                       VerifyFinalValidationSource.SelectSubcontractor
                                     )
                                   )

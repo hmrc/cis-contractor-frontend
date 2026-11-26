@@ -82,7 +82,11 @@ class CheckVerificationBatchReadinessController @Inject() (
         Redirect(redirect)
 
       case Some(_) =>
-        Redirect(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
+        Redirect(
+          flowId
+            .map(fid => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(fid))
+            .getOrElse(controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad())
+        )
 
       case None =>
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

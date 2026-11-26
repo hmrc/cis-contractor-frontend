@@ -627,10 +627,10 @@ GET   /subcontractor/verify/polling                                  controllers
 
 GET   /subcontractor/verify/no-subcontractors-added  controllers.verify.NoSubcontractorsAddedController.onPageLoad()
 
-GET   /subcontractor/verify/check-verification-batch-readiness/:flowId         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
-GET   /subcontractor/verify/check-verification-batch-readiness/change/:flowId  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/verify/check-verification-batch-readiness                 controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = NormalMode)
 GET   /subcontractor/verify/check-verification-batch-readiness/change          controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadiness(mode: Mode = CheckMode)
+GET   /subcontractor/verify/check-verification-batch-readiness/:flowId         controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/verify/check-verification-batch-readiness/change/:flowId  controllers.verify.CheckVerificationBatchReadinessController.checkVerificationBatchReadinessWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/verify/newest/start/:cisId  controllers.verify.NewestVerificationBatchController.onPageLoadStart(cisId: String)
 GET   /subcontractor/verify/newest               controllers.verify.NewestVerificationBatchController.onPageLoad()

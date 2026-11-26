@@ -339,6 +339,8 @@ class SelectSubcontractorsToReverifyController @Inject() (
           id.map(SelectSubcontractorsToReverifyPage.apply).getOrElse(SelectSubcontractorsToReverifyPage)
         val unverifiedPage = id.map(UnverifiedSubcontractorsPage.apply).getOrElse(UnverifiedSubcontractorsPage)
         val selectPage     = id.map(SelectSubcontractorPage.apply).getOrElse(SelectSubcontractorPage)
+        val contextPage    = id.map(FinalValidationContextPage.apply).getOrElse(FinalValidationContextPage)
+        val sourcePage     = id.map(VerifyFinalValidationSourcePage.apply).getOrElse(VerifyFinalValidationSourcePage)
 
         val allRows: Seq[SubcontractorReverifyRow] =
           request.userAnswers
@@ -474,14 +476,14 @@ class SelectSubcontractorsToReverifyController @Inject() (
 
                     withContext <- Future.fromTry(
                                      withSelections.set(
-                                       FinalValidationContextPage,
+                                       contextPage,
                                        FinalValidationContext.VerifySubcontractor
                                      )
                                    )
 
                     withSource <- Future.fromTry(
                                     withContext.set(
-                                      VerifyFinalValidationSourcePage,
+                                      sourcePage,
                                       VerifyFinalValidationSource.SelectSubcontractorsToReverify
                                     )
                                   )
