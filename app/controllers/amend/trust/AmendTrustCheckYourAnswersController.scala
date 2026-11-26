@@ -262,7 +262,9 @@ class AmendTrustCheckYourAnswersController @Inject() (
           TrustUtrYesNoSummary.row(
             ua,
             AmendMode,
-            Some(controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoadWithId("utr").url), // TODO DTR-9463: Update with id
+            Some(
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoadWithId("utr").url
+            ), // TODO DTR-9463: Update with id
             Some(subJourneyId)
           ),
           TrustUtrSummary.row(
@@ -281,14 +283,18 @@ class AmendTrustCheckYourAnswersController @Inject() (
           ua,
           AmendMode,
           Some(
-            controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoadWithId(flowId, "address").url // TODO DTR-9463: Update with id
+            controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController
+              .onPageLoadWithId(flowId, "address")
+              .url // TODO DTR-9463: Update with id
           ),
           Some(subJourneyId)
         ),
         TrustAddressSummary.row(
           ua,
           AmendMode,
-          Some(controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookupWithId(flowId)), // TODO DTR-9463: Update with id
+          Some(
+            controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookupWithId(flowId)
+          ), // TODO DTR-9463: Update with id
           Some(subJourneyId)
         ),
         AddTrustContactMethodsYesNoSummary.row(
