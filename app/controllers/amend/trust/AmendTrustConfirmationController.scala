@@ -168,18 +168,18 @@ class AmendTrustConfirmationController @Inject() (
                       TrustAmendConfirmationViewModel.rows(
                         originalTrustAnswers,
                         ua,
-                        subJourneyId
+                        Some(subJourneyId)
                       )
 
                     val trustName =
-                      trustDisplayName(ua, subJourneyId)
+                      trustDisplayName(ua, Some(subJourneyId))
 
                     val confirmationLink =
                       AmendConfirmationLinks.build(
                         journeyType,
                         cisId,
                         appConfig,
-                        flowId
+                        Some(flowId)
                       )
 
                     val persistFinalUserAnswers =

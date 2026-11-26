@@ -185,7 +185,7 @@ object SubcontractorCleanup {
 
   def removeAllSubcontractor(userAnswers: UserAnswers, subJourneyId: String): Try[UserAnswers] =
     removeIndividualSoleTraderSubcontractor(userAnswers, subJourneyId)
-      .flatMap(removeLimitedCompanySubcontractor(subJourneyId))
+      .flatMap(removeLimitedCompanySubcontractor(userAnswers, subJourneyId))
       .flatMap(removePartnershipSubcontractor(subJourneyId))
       .flatMap(removeTrustSubcontractor(subJourneyId))
       .flatMap(_.remove(TypeOfSubcontractorPage(subJourneyId)))

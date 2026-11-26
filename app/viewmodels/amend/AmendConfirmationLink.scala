@@ -47,7 +47,7 @@ object AmendConfirmationLinks {
         AmendConfirmationLink(
           url = flowId match {
             case Some(id) =>
-              controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(id.toString).url
+              controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(id).url
             case None     => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
           },
           textKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
