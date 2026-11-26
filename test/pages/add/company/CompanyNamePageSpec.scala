@@ -16,6 +16,7 @@
 
 package pages.add.company
 
+import models.JourneyNamespace.AddSubcontractor
 import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
 
@@ -30,7 +31,7 @@ class CompanyNamePageSpec extends PageBehaviours {
     beRemovable[String](CompanyNamePage)
 
     "must nest the WithId path under addSubcontractor" in {
-      CompanyNamePage("uuid-1").path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "companyName")
+      CompanyNamePage("uuid-1", AddSubcontractor).path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "companyName")
       CompanyNamePage.path mustBe (JsPath \ "companyName")
     }
   }

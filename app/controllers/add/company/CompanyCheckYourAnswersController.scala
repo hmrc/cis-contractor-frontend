@@ -131,174 +131,176 @@ class CompanyCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id = flowId.toString
-      val ua = request.userAnswers
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id = flowId.toString
+        val ua = request.userAnswers
 
-      ValidatedCompany.build(ua, id, AddSubcontractor) match {
-        case Right(_) =>
-          val list = SummaryListViewModel(
-            rows = Seq(
-              TypeOfSubcontractorSummary.row(
-                ua,
-                subJourneyId = Some(id),
-                changeUrl = Some(
-                  controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+        ValidatedCompany.build(ua, id, AddSubcontractor) match {
+          case Right(_) =>
+            val list = SummaryListViewModel(
+              rows = Seq(
+                TypeOfSubcontractorSummary.row(
+                  ua,
+                  subJourneyId = Some(id),
+                  changeUrl = Some(
+                    controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+                  )
+                ),
+                CompanyNameSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyNameController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyAddressYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyAddressSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.CompanyAddressController
+                      .redirectToAddressLookupWithId(flowId, NormalMode, Some("change"))
+                      .url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                AddCompanyContactMethodsYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                CompanyContactMethodOptionsSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.CompanyContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                CompanyEmailAddressSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyPhoneNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyMobileNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyUtrYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyUtrSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyUtrController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyCrnYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyCrnYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyCrnSummary.row(
+                  ua,
+                  changeUrl = Some(routes.CompanyCrnController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                CompanyWorksReferenceYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.CompanyWorksReferenceYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                CompanyWorksReferenceSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.CompanyWorksReferenceController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
                 )
-              ),
-              CompanyNameSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyNameController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyAddressYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyAddressSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.CompanyAddressController
-                    .redirectToAddressLookupWithId(flowId, NormalMode, Some("change"))
-                    .url
-                ),
-                subJourneyId = Some(id)
-              ),
-              AddCompanyContactMethodsYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.AddCompanyContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              CompanyContactMethodOptionsSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.CompanyContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              CompanyEmailAddressSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyPhoneNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyMobileNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyUtrYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyUtrSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyUtrController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyCrnYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyCrnYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyCrnSummary.row(
-                ua,
-                changeUrl = Some(routes.CompanyCrnController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              CompanyWorksReferenceYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.CompanyWorksReferenceYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              CompanyWorksReferenceSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.CompanyWorksReferenceController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              )
-            ).flatten
-          )
+              ).flatten
+            )
 
-          Ok(view(list, routes.CompanyCheckYourAnswersController.onSubmitWithId(flowId)))
+            Ok(view(list, routes.CompanyCheckYourAnswersController.onSubmitWithId(flowId)))
 
-        case Left(error) =>
-          logger.error(
-            s"[CompanyCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error"
-          )
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+          case Left(error) =>
+            logger.error(
+              s"[CompanyCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error"
+            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async { implicit request =>
-      val id = flowId.toString
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        logger.error(
-          "[CompanyCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
-        )
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      } else {
-        ValidatedCompany.build(request.userAnswers, id, AddSubcontractor) match {
-          case Right(_) =>
-            val duplicateUtr =
-              request.userAnswers.get(CompanyUtrPage(id, AddSubcontractor)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
-                case None      => Future.successful(false)
-              }
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async {
+      implicit request =>
+        val id = flowId.toString
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          logger.error(
+            "[CompanyCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        } else {
+          ValidatedCompany.build(request.userAnswers, id, AddSubcontractor) match {
+            case Right(_) =>
+              val duplicateUtr =
+                request.userAnswers.get(CompanyUtrPage(id, AddSubcontractor)) match {
+                  case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
+                  case None      => Future.successful(false)
+                }
 
-            duplicateUtr
-              .flatMap {
-                case true =>
-                  logger.error("[CompanyCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              duplicateUtr
+                .flatMap {
+                  case true =>
+                    logger.error("[CompanyCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
+                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-                case false =>
-                  subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
-                    .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, id)
-                      Future
-                        .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
-                        .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                        .map { _ =>
-                          Redirect(
-                            controllers.add.routes.SubcontractorAddedController
-                              .companySubcontractorAddedWithId(flowId)
-                          )
-                        }
-                    }
-                    .recover { case t =>
-                      logger.error(
-                        "[CompanyCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
-                        t
-                      )
-                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    }
-              }
-              .recover { case t =>
-                logger.error(
-                  "[CompanyCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
-                  t
-                )
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
+                  case false =>
+                    subcontractorService
+                      .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
+                      .flatMap { _ =>
+                        auditService.addSubcontractorEvent(request.userAnswers, id)
+                        Future
+                          .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
+                          .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                          .map { _ =>
+                            Redirect(
+                              controllers.add.routes.SubcontractorAddedController
+                                .companySubcontractorAddedWithId(flowId)
+                            )
+                          }
+                      }
+                      .recover { case t =>
+                        logger.error(
+                          "[CompanyCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
+                          t
+                        )
+                        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      }
+                }
+                .recover { case t =>
+                  logger.error(
+                    "[CompanyCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
+                    t
+                  )
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
 
-          case Left(error) =>
-            logger.error(s"[CompanyCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Left(error) =>
+              logger.error(s"[CompanyCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
         }
-      }
     }
 }

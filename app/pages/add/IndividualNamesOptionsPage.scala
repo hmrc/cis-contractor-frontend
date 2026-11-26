@@ -27,7 +27,8 @@ import scala.util.{Success, Try}
 case class IndividualNamesOptionsPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
+) extends QuestionPage[Set[IndividualNamesOptions]]
+    with IndividualJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
@@ -54,8 +55,7 @@ case class IndividualNamesOptionsPage(
   ): Try[UserAnswers] =
     if (selectedAnswers.contains(answer)) {
       Success(userAnswers)
-    }
-    else {
+    } else {
       userAnswers.remove(page)
     }
 }

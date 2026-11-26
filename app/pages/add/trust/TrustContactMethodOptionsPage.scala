@@ -29,8 +29,8 @@ case class TrustContactMethodOptionsPage(
   id: String,
   namespace: JourneyNamespace
 ) extends QuestionPage[Set[TrustContactMethodOptions]]
-  with TrustJourney
-  with ContactMethodOptionsCleanup {
+    with TrustJourney
+    with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

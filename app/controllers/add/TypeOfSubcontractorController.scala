@@ -149,11 +149,12 @@ class TypeOfSubcontractorController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id           = flowId.toString
-      val page         = TypeOfSubcontractorPage(id, AddSubcontractor)
-      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
-      Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id           = flowId.toString
+        val page         = TypeOfSubcontractorPage(id, AddSubcontractor)
+        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+        Ok(view(preparedForm, mode, routes.TypeOfSubcontractorController.onSubmitWithId(flowId, mode)))
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =

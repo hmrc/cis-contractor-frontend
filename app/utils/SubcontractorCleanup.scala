@@ -108,10 +108,8 @@ object SubcontractorCleanup {
       .flatMap(_.remove(CompanyWorksReferencePage(id, namespace)))
       .flatMap(_.remove(CompanyWorksReferenceYesNoPage(id, namespace)))
       .flatMap { updatedAnswers =>
-        if namespace == JourneyNamespace.AddSubcontractor then
-          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
-        else
-          Success(updatedAnswers)
+        if namespace == JourneyNamespace.AddSubcontractor then updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else Success(updatedAnswers)
       }
 
   def removePartnershipSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
@@ -162,10 +160,8 @@ object SubcontractorCleanup {
       .flatMap(_.remove(PartnershipWorksReferenceNumberPage(id, namespace)))
       .flatMap(_.remove(PartnershipWorksReferenceNumberYesNoPage(id, namespace)))
       .flatMap { updatedAnswers =>
-        if namespace == JourneyNamespace.AddSubcontractor then
-          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
-        else
-          Success(updatedAnswers)
+        if namespace == JourneyNamespace.AddSubcontractor then updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else Success(updatedAnswers)
       }
 
   def removeTrustSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
@@ -202,10 +198,8 @@ object SubcontractorCleanup {
       .flatMap(_.remove(TrustWorksReferencePage(id, namespace)))
       .flatMap(_.remove(TrustWorksReferenceYesNoPage(id, namespace)))
       .flatMap { updatedAnswers =>
-        if namespace == JourneyNamespace.AddSubcontractor then
-          updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
-        else
-          Success(updatedAnswers)
+        if namespace == JourneyNamespace.AddSubcontractor then updatedAnswers.remove(CheckYourAnswersSubmittedPage(id))
+        else Success(updatedAnswers)
       }
 
   def removeAllSubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =

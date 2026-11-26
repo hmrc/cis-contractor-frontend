@@ -113,7 +113,7 @@ class AddressOfSubcontractorController @Inject() (
     mode match {
       case FinalValidationMode =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                   =>
         // TODO: Integrate scoped Individual Add Subcontractor routes.
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
@@ -123,7 +123,7 @@ class AddressOfSubcontractorController @Inject() (
     mode match {
       case FinalValidationMode =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                   =>
         // TODO: Integrate the scoped Individual Add Subcontractor CYA route.
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }

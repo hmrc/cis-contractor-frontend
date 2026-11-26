@@ -23,7 +23,8 @@ import play.api.libs.json.JsPath
 case class PartnershipEmailAddressPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[String] with PartnershipJourney {
+) extends QuestionPage[String]
+    with PartnershipJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

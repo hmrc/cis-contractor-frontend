@@ -49,7 +49,7 @@ class IndexController @Inject() (
     val userAnswers = request.userAnswers match {
       case Some(existingAnswers) =>
         existingAnswers.resetLegacyAnswers
-      case None =>
+      case None                  =>
         UserAnswers(request.userId)
     }
 

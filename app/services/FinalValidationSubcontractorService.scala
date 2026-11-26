@@ -504,18 +504,18 @@ class FinalValidationSubcontractorService @Inject() {
 
     for {
       subcontractorType <- getFinalValidationSubcontractorType(subcontractor)
-      withCisId <- userAnswers.set(CisIdQuery(id, namespace), instanceId)
-      withType <- withCisId.set(TypeOfSubcontractorPage(id, namespace), subcontractorType)
-      withName <- populateFinalValidationName(withType, subcontractorType, details, id)
-      withTarget <- withName.set(FinalValidationChangeTargetPage(id), changeTarget)
-      withBaseUtr <- populateBaseUtr(withTarget, subcontractor, id)
-      result <- populateFinalValidationTarget(
-        withBaseUtr,
-        subcontractorType,
-        details,
-        changeTarget,
-        id
-      )
+      withCisId         <- userAnswers.set(CisIdQuery(id, namespace), instanceId)
+      withType          <- withCisId.set(TypeOfSubcontractorPage(id, namespace), subcontractorType)
+      withName          <- populateFinalValidationName(withType, subcontractorType, details, id)
+      withTarget        <- withName.set(FinalValidationChangeTargetPage(id), changeTarget)
+      withBaseUtr       <- populateBaseUtr(withTarget, subcontractor, id)
+      result            <- populateFinalValidationTarget(
+                             withBaseUtr,
+                             subcontractorType,
+                             details,
+                             changeTarget,
+                             id
+                           )
     } yield result
   }
 
@@ -555,13 +555,13 @@ class FinalValidationSubcontractorService @Inject() {
       case Partnership =>
         for {
           withPartnershipName <- userAnswers.set(
-            PartnershipNamePage(id, namespace),
-            details.partnershipTradingName.getOrElse("")
-          )
-          result <- withPartnershipName.set(
-            PartnershipNominatedPartnerNamePage(id, namespace),
-            details.tradingName.getOrElse("")
-          )
+                                   PartnershipNamePage(id, namespace),
+                                   details.partnershipTradingName.getOrElse("")
+                                 )
+          result              <- withPartnershipName.set(
+                                   PartnershipNominatedPartnerNamePage(id, namespace),
+                                   details.tradingName.getOrElse("")
+                                 )
         } yield result
     }
 
@@ -586,7 +586,7 @@ class FinalValidationSubcontractorService @Inject() {
         populateNameTarget(userAnswers, subcontractorType, details, target, id)
 
       case UtrYesNo | Utr | PartnerUtrYesNo | PartnerUtr | NinoYesNo | Nino | CrnYesNo | Crn |
-           WorksReferenceNumberYesNo | WorksReferenceNumber =>
+          WorksReferenceNumberYesNo | WorksReferenceNumber =>
         populateIdentifierTarget(userAnswers, subcontractorType, details, target, id)
 
       case AddressYesNo | AddressTarget =>
@@ -706,14 +706,14 @@ class FinalValidationSubcontractorService @Inject() {
     val (yesNoPage, addressPage) = addressPages(subcontractorType, id)
 
     val yesNoValue = target match {
-      case AddressYesNo => hasAddress(details)
+      case AddressYesNo  => hasAddress(details)
       case AddressTarget => true
-      case _ => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
+      case _             => return Failure(new RuntimeException(s"Unexpected target for address population: $target"))
     }
 
     for {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
-      result <- setAddressOrRemove(withYesNo, addressPage, toAddress(details))
+      result    <- setAddressOrRemove(withYesNo, addressPage, toAddress(details))
     } yield result
   }
 
@@ -742,10 +742,10 @@ class FinalValidationSubcontractorService @Inject() {
       withYesNo <- userAnswers.set(yesNoPage, yesNoValue)
       withEmail <- setStringOrRemove(withYesNo, emailPage, details.emailAddress)
       withPhone <- setStringOrRemove(withEmail, phonePage, details.phoneNumber)
-      result <- setStringOrRemove(withPhone, mobilePage, details.mobilePhoneNumber)
+      result    <- setStringOrRemove(withPhone, mobilePage, details.mobilePhoneNumber)
     } yield result
   }
-  
+
   private def utrPages(
     subcontractorType: TypeOfSubcontractor,
     id: String
@@ -941,14 +941,14 @@ class FinalValidationSubcontractorService @Inject() {
 
     for {
       withNames <- userAnswers.set(
-        IndividualNamesOptionsPage(id, namespace),
-        selected
-      )
-      result <- setStringOrRemove(
-        withNames,
-        TradingNameOfSubcontractorPage(id, namespace),
-        details.tradingName
-      )
+                     IndividualNamesOptionsPage(id, namespace),
+                     selected
+                   )
+      result    <- setStringOrRemove(
+                     withNames,
+                     TradingNameOfSubcontractorPage(id, namespace),
+                     details.tradingName
+                   )
     } yield result
-  }  
+  }
 }

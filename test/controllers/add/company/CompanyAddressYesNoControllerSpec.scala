@@ -20,6 +20,7 @@ import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyAddressYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -287,10 +288,10 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with WithFakeCisTaxpaye
       val id     = flowId.toString
 
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(CompanyNamePage(id), companyName)
+        .set(CompanyNamePage(id, AddSubcontractor), companyName)
         .success
         .value
 
@@ -323,7 +324,8 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with WithFakeCisTaxpaye
 
       "must populate the view correctly on a GET when the question has previously been answered" in {
 
-        val userAnswers = answers.set(pages.add.company.CompanyAddressYesNoPage(id), true).success.value
+        val userAnswers =
+          answers.set(pages.add.company.CompanyAddressYesNoPage(id, AddSubcontractor), true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -370,7 +372,7 @@ class CompanyAddressYesNoControllerSpec extends SpecBase with WithFakeCisTaxpaye
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.add.company.routes.CompanyAddressController
-              .redirectToAddressLookupWithId(flowId, None)
+              .redirectToAddressLookupWithId(flowId, NormalMode, None)
               .url
         }
       }

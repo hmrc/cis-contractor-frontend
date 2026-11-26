@@ -48,7 +48,7 @@ class FinalValidationCompleteController @Inject() (
     with Logging {
 
   private val namespace = JourneyNamespace.SubcontractorFinalValidation
-  
+
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(FinalValidationContextPage) match {
       case Some(FinalValidationContext.VerifySubcontractor) =>
@@ -77,15 +77,19 @@ class FinalValidationCompleteController @Inject() (
             completeMonthlyReturn(id)
 
           case Some(FinalValidationContext.VerifySubcontractor) =>
-            logger.error("[FinalValidationCompleteController][onPageLoadWithId] - scoped Verify completion not yet supported")
+            logger.error(
+              "[FinalValidationCompleteController][onPageLoadWithId] - scoped Verify completion not yet supported"
+            )
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
           case None =>
-            logger.error("[FinalValidationCompleteController][onPageLoadWithId] - scoped FinalValidationContextPage missing")
+            logger.error(
+              "[FinalValidationCompleteController][onPageLoadWithId] - scoped FinalValidationContextPage missing"
+            )
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }
-  
+
   private def completeVerify()(implicit request: DataRequest[?]): Future[Result] =
     (
       request.userAnswers.get(VerifyFinalValidationPayloadPage),
@@ -196,8 +200,8 @@ class FinalValidationCompleteController @Inject() (
                                   draftId = draftId,
                                   correction = correction
                                 )
-                } yield Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId))
-              case Some(draftId) =>
+                } yield Redirect(appConfig.cisFrontendFinalValidationReturnUrl(handoffId, UUID.fromString(id)))
+              case Some(draftId)                               =>
                 logger.error(
                   s"Final Validation draft ID mismatch for scoped Monthly Return. " +
                     s"Payload draftId: ${payload.draftId}, session draftId: $draftId"
@@ -208,19 +212,20 @@ class FinalValidationCompleteController @Inject() (
                 logger.error("[FinalValidationCompleteController][completeMonthlyReturn] - scoped draftId missing")
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             }
-          case Some(payload) =>
+          case Some(payload)                                =>
             logger.error(
               s"[FinalValidationCompleteController][completeMonthlyReturn] - " +
                 s"flowId mismatch. Expected: $id, payload: ${payload.flowId}"
             )
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          case None =>
-            logger.error("[FinalValidationCompleteController][completeMonthlyReturn] - scoped handoff payload not found")
+          case None                                         =>
+            logger
+              .error("[FinalValidationCompleteController][completeMonthlyReturn] - scoped handoff payload not found")
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-      case None =>
+      case None            =>
         logger.error("[FinalValidationCompleteController][completeMonthlyReturn] - scoped handoffId missing")
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
-  
+
 }

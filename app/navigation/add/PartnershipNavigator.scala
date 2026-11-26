@@ -116,7 +116,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
           .onPageLoadWithId(flowId, NormalMode)
     case PartnershipNominatedPartnerUtrYesNoPage(_, AddSubcontractor)  =>
       userAnswers => navigatorFromPartnershipNominatedPartnerUtrYesNoPage(flowId, id, NormalMode)(userAnswers)
-    case _                                           => _ => routes.IndexController.onPageLoad()
+    case _                                                             => _ => routes.IndexController.onPageLoad()
   }
 
   private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
@@ -180,7 +180,7 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
       _ => cyaRouteWithId(flowId)
     case PartnershipUniqueTaxpayerReferencePage(_, AddSubcontractor)   =>
       _ => cyaRouteWithId(flowId)
-    case _                                           => _ => cyaRouteWithId(flowId)
+    case _                                                             => _ => cyaRouteWithId(flowId)
   }
 
   private def navigatorFromPartnershipNominatedPartnerNinoPage(
@@ -225,17 +225,17 @@ class PartnershipNavigator @Inject() () extends NavigatorForJourney {
     (ua.get(PartnershipHasUtrYesNoPage(id, AddSubcontractor)), mode) match {
       case (Some(true), CheckMode) if ua.get(PartnershipUniqueTaxpayerReferencePage(id, AddSubcontractor)).isDefined =>
         cyaRouteWithId(flowId)
-      case (Some(true), CheckMode)                                                                 =>
+      case (Some(true), CheckMode)                                                                                   =>
         controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
           .onPageLoadWithId(flowId, mode)
-      case (Some(false), CheckMode)                                                                => cyaRouteWithId(flowId)
-      case (Some(true), NormalMode)                                                                =>
+      case (Some(false), CheckMode)                                                                                  => cyaRouteWithId(flowId)
+      case (Some(true), NormalMode)                                                                                  =>
         controllers.add.partnership.routes.PartnershipUniqueTaxpayerReferenceController
           .onPageLoadWithId(flowId, NormalMode)
-      case (Some(false), NormalMode)                                                               =>
+      case (Some(false), NormalMode)                                                                                 =>
         controllers.add.partnership.routes.PartnershipNominatedPartnerNameController
           .onPageLoadWithId(flowId, NormalMode)
-      case _                                                                                       =>
+      case _                                                                                                         =>
         logger.error(
           s"[PartnershipNavigator][navigatorFromPartnershipHasUtrYesNoPage] - unexpected state, mode=$mode"
         )

@@ -24,7 +24,8 @@ import play.api.libs.json.JsPath
 case class TrustAddressPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[Address] with TrustJourney {
+) extends QuestionPage[Address]
+    with TrustJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

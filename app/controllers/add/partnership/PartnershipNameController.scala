@@ -71,29 +71,27 @@ class PartnershipNameController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
-        val id           = flowId.toString
-        val page         = PartnershipNamePage(id, namespace)
-        val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
-        Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmitWithId(flowId, mode)))
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
+      val id           = flowId.toString
+      val page         = PartnershipNamePage(id, namespace)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.PartnershipNameController.onSubmitWithId(flowId, mode)))
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
-        val id           = flowId.toString
-        val submitAction = routes.PartnershipNameController.onSubmitWithId(flowId, mode)
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
-            value =>
-              for {
-                updatedAnswers <-
-                  Future.fromTry(request.userAnswers.set(PartnershipNamePage(id, namespace), value))
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(PartnershipNamePage(id, namespace), mode, updatedAnswers))
-          )
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.PartnershipNameController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <-
+                Future.fromTry(request.userAnswers.set(PartnershipNamePage(id, namespace), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipNamePage(id, namespace), mode, updatedAnswers))
+        )
     }
 }

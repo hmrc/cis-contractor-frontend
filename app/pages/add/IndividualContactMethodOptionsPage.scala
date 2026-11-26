@@ -28,8 +28,8 @@ case class IndividualContactMethodOptionsPage(
   id: String,
   namespace: JourneyNamespace
 ) extends QuestionPage[Set[IndividualContactMethodOptions]]
-  with IndividualJourney
-  with ContactMethodOptionsCleanup {
+    with IndividualJourney
+    with ContactMethodOptionsCleanup {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

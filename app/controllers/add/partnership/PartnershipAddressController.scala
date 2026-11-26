@@ -123,21 +123,21 @@ class PartnershipAddressController @Inject() (
     mode match {
       case FinalValidationMode =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
-      case NormalMode =>
+      case NormalMode          =>
         routes.AddPartnershipContactMethodsYesNoController.onPageLoadWithId(flowId, NormalMode)
-      case CheckMode =>
+      case CheckMode           =>
         routes.PartnershipCheckYourAnswersController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                   =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def onChangeCompletion(mode: Mode, flowId: UUID): Call =
     mode match {
-      case FinalValidationMode =>
+      case FinalValidationMode    =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
       case NormalMode | CheckMode =>
         routes.PartnershipCheckYourAnswersController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                      =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }

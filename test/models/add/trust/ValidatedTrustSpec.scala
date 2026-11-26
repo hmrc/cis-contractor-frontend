@@ -21,6 +21,7 @@ import models.{RichJsObject, TypeOfSubcontractor}
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import org.scalatest.matchers.must.Matchers
 import pages.add.TypeOfSubcontractorPage
 import pages.add.trust.*
@@ -68,29 +69,29 @@ class ValidatedTrustSpec extends SpecBase with Matchers {
     "build successfully from a subjourney" in {
       val id      = "11111111-1111-1111-1111-111111111111"
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Trust)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Trust)
         .success
         .value
-        .set(TrustNamePage(id), "Folder Trust")
+        .set(TrustNamePage(id, AddSubcontractor), "Folder Trust")
         .success
         .value
-        .set(TrustAddressYesNoPage(id), false)
+        .set(TrustAddressYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(AddTrustContactMethodsYesNoPage(id), false)
+        .set(AddTrustContactMethodsYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(TrustUtrYesNoPage(id), false)
+        .set(TrustUtrYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(TrustWorksReferenceYesNoPage(id), false)
+        .set(TrustWorksReferenceYesNoPage(id, AddSubcontractor), false)
         .success
         .value
 
-      ValidatedTrust.build(answers, id) mustBe a[Right[?, ?]]
+      ValidatedTrust.build(answers, id, AddSubcontractor) mustBe a[Right[?, ?]]
     }
 
     "fail when TypeOfSubcontractor is not Trust" in {

@@ -28,7 +28,8 @@ import scala.util.{Success, Try}
 case class TypeOfSubcontractorPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[TypeOfSubcontractor] with SharedJourney {
+) extends QuestionPage[TypeOfSubcontractor]
+    with SharedJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

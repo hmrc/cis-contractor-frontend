@@ -25,7 +25,8 @@ import scala.util.Try
 case class AddCompanyContactMethodsYesNoPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[Boolean] with CompanyJourney {
+) extends QuestionPage[Boolean]
+    with CompanyJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

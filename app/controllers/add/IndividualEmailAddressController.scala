@@ -114,78 +114,75 @@ class IndividualEmailAddressController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
+      val id = flowId.toString
 
-        val contactOption =
-          request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
+      val contactOption =
+        request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
 
-        val subcontractorName =
-          subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
+      val subcontractorName =
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
 
-        val emailIsAvailable =
-          mode == FinalValidationMode ||
-            contactOption.exists(_.contains(ContactMethodOptions.Email))
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
 
-        (subcontractorName, emailIsAvailable) match {
-          case (Some(subcontractorName), true) =>
-            val preparedForm = request.userAnswers.get(IndividualEmailAddressPage(id, namespace)) match {
-              case None => form
-              case Some(value) => form.fill(value)
-            }
+      (subcontractorName, emailIsAvailable) match {
+        case (Some(subcontractorName), true) =>
+          val preparedForm = request.userAnswers.get(IndividualEmailAddressPage(id, namespace)) match {
+            case None        => form
+            case Some(value) => form.fill(value)
+          }
 
-            Ok(view(preparedForm, mode, subcontractorName, Some(flowId)))
+          Ok(view(preparedForm, mode, subcontractorName, Some(flowId)))
 
-          case (Some(_), false) =>
-            // TODO: Restore scoped Add Subcontractor navigation when Add routes are integrated.
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
+        case (Some(_), false) =>
+          // TODO: Restore scoped Add Subcontractor navigation when Add routes are integrated.
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
 
-          case _ =>
-            logger.error(
-              "[IndividualEmailAddressController][onPageLoadWithId] - subcontractor name missing from userAnswers"
-            )
-            Redirect(routes.JourneyRecoveryController.onPageLoad())
-        }
+        case _ =>
+          logger.error(
+            "[IndividualEmailAddressController][onPageLoadWithId] - subcontractor name missing from userAnswers"
+          )
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = IndividualEmailAddressPage(id, namespace)
+      val id   = flowId.toString
+      val page = IndividualEmailAddressPage(id, namespace)
 
-        val contactOption =
-          request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
+      val contactOption =
+        request.userAnswers.get(IndividualContactMethodOptionsPage(id, namespace))
 
-        val subcontractorName =
-          subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
+      val subcontractorName =
+        subcontractorNameExtractor.getSubcontractorName(request.userAnswers, mode, id, namespace)
 
-        val emailIsAvailable =
-          mode == FinalValidationMode ||
-            contactOption.exists(_.contains(ContactMethodOptions.Email))
+      val emailIsAvailable =
+        mode == FinalValidationMode ||
+          contactOption.exists(_.contains(ContactMethodOptions.Email))
 
-        (for {
-          subcontractorName <- subcontractorName
-          if emailIsAvailable
-        } yield form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
-          ))
-          .getOrElse {
-            logger.error(
-              "[IndividualEmailAddressController][onSubmitWithId] - subcontractor name missing or email not selected"
-            )
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          }
+      (for {
+        subcontractorName <- subcontractorName
+        if emailIsAvailable
+      } yield form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        ))
+        .getOrElse {
+          logger.error(
+            "[IndividualEmailAddressController][onSubmitWithId] - subcontractor name missing or email not selected"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
     }
 }

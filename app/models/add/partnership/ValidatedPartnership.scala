@@ -249,6 +249,6 @@ object ValidatedPartnership extends Validation {
   ): Either[ValidationError, Unit] =
     getPageValue(answers, TypeOfSubcontractorPage(id, namespace)).flatMap {
       case TypeOfSubcontractor.Partnership => Right(())
-      case _ => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
+      case _                               => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
     }
 }

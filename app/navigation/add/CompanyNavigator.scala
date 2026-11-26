@@ -45,21 +45,21 @@ class CompanyNavigator @Inject() () extends NavigatorForJourney {
 
   private def extractId(page: Page): Option[String] =
     page match {
-      case CompanyNamePage(id, AddSubcontractor) => Some(id)
-      case CompanyAddressYesNoPage(id, AddSubcontractor) => Some(id)
-      case CompanyAddressPage(id, AddSubcontractor) => Some(id)
+      case CompanyNamePage(id, AddSubcontractor)                   => Some(id)
+      case CompanyAddressYesNoPage(id, AddSubcontractor)           => Some(id)
+      case CompanyAddressPage(id, AddSubcontractor)                => Some(id)
       case AddCompanyContactMethodsYesNoPage(id, AddSubcontractor) => Some(id)
-      case CompanyContactMethodOptionsPage(id, AddSubcontractor) => Some(id)
-      case CompanyEmailAddressPage(id, AddSubcontractor) => Some(id)
-      case CompanyPhoneNumberPage(id, AddSubcontractor) => Some(id)
-      case CompanyMobileNumberPage(id, AddSubcontractor) => Some(id)
-      case CompanyUtrYesNoPage(id, AddSubcontractor) => Some(id)
-      case CompanyUtrPage(id, AddSubcontractor) => Some(id)
-      case CompanyCrnYesNoPage(id, AddSubcontractor) => Some(id)
-      case CompanyCrnPage(id, AddSubcontractor) => Some(id)
-      case CompanyWorksReferenceYesNoPage(id, AddSubcontractor) => Some(id)
-      case CompanyWorksReferencePage(id, AddSubcontractor) => Some(id)
-      case _ => None
+      case CompanyContactMethodOptionsPage(id, AddSubcontractor)   => Some(id)
+      case CompanyEmailAddressPage(id, AddSubcontractor)           => Some(id)
+      case CompanyPhoneNumberPage(id, AddSubcontractor)            => Some(id)
+      case CompanyMobileNumberPage(id, AddSubcontractor)           => Some(id)
+      case CompanyUtrYesNoPage(id, AddSubcontractor)               => Some(id)
+      case CompanyUtrPage(id, AddSubcontractor)                    => Some(id)
+      case CompanyCrnYesNoPage(id, AddSubcontractor)               => Some(id)
+      case CompanyCrnPage(id, AddSubcontractor)                    => Some(id)
+      case CompanyWorksReferenceYesNoPage(id, AddSubcontractor)    => Some(id)
+      case CompanyWorksReferencePage(id, AddSubcontractor)         => Some(id)
+      case _                                                       => None
     }
 
   private def cyaRouteWithId(flowId: UUID): Call =

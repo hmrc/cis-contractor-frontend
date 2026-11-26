@@ -97,7 +97,7 @@ class AddIndividualContactMethodsYesNoController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
       val id = flowId.toString
 
       subcontractorNameExtractor
@@ -109,31 +109,30 @@ class AddIndividualContactMethodsYesNoController @Inject() (
           Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
         }
     }
-  
+
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = AddIndividualContactMethodsYesNoPage(id, namespace)
+      val id   = flowId.toString
+      val page = AddIndividualContactMethodsYesNoPage(id, namespace)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error("[AddIndividualContactMethodsYesNoController][onSubmitWithId] - subcontractor name missing")
-            Future.successful(recoveryRedirect)
-          } { subcontractorName =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
-                value =>
-                  for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                    _ <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
-              )
-          }
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error("[AddIndividualContactMethodsYesNoController][onSubmitWithId] - subcontractor name missing")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+            )
+        }
     }
 }

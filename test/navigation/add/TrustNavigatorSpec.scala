@@ -21,6 +21,7 @@ import controllers.routes
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import org.scalactic.Prettifier.default
 import pages.Page
 import pages.add.trust.*
@@ -51,7 +52,7 @@ class TrustNavigatorSpec extends SpecBase {
       "must go from TrustNamePage with id to TrustAddressYesNoPage with id" in {
         val flowId = java.util.UUID.fromString("11111111-1111-1111-1111-111111111111")
         val id     = flowId.toString
-        navigator.nextPage(TrustNamePage(id), NormalMode, UserAnswers("id")) mustBe
+        navigator.nextPage(TrustNamePage(id, AddSubcontractor), NormalMode, UserAnswers("id")) mustBe
           controllers.add.trust.routes.TrustAddressYesNoController.onPageLoadWithId(flowId, NormalMode)
       }
 

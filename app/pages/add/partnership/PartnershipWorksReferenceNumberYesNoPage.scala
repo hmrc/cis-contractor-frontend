@@ -25,7 +25,8 @@ import scala.util.Try
 case class PartnershipWorksReferenceNumberYesNoPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[Boolean] with PartnershipJourney {
+) extends QuestionPage[Boolean]
+    with PartnershipJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 

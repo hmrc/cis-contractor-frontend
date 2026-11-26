@@ -63,34 +63,35 @@ class SubcontractorAddedController @Inject() (
     }
 
   def companySubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id               = flowId.toString
-      def recoveryRedirect =
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id               = flowId.toString
+        def recoveryRedirect =
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(CompanyNamePage(id, AddSubcontractor))
-        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          val name  = request.userAnswers.get(CompanyNamePage(id, AddSubcontractor))
+          val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
-        (name, cisId) match {
-          case (Some(name), Some(cisId)) =>
-            val manageSubcontractorsUrl =
-              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          (name, cisId) match {
+            case (Some(name), Some(cisId)) =>
+              val manageSubcontractorsUrl =
+                s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
-            Ok(view(name, Messages("subcontractorAdded.company"), manageSubcontractorsUrl))
+              Ok(view(name, Messages("subcontractorAdded.company"), manageSubcontractorsUrl))
 
-          case _ =>
-            logger.error(
-              "[SubcontractorAddedController][companySubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
-            )
-            recoveryRedirect
+            case _ =>
+              logger.error(
+                "[SubcontractorAddedController][companySubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+              )
+              recoveryRedirect
+          }
+        } else {
+          logger.error(
+            "[SubcontractorAddedController][companySubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+          )
+          recoveryRedirect
         }
-      } else {
-        logger.error(
-          "[SubcontractorAddedController][companySubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
-        )
-        recoveryRedirect
-      }
     }
 
   def partnershipSubcontractorAdded: Action[AnyContent] =
@@ -104,65 +105,67 @@ class SubcontractorAddedController @Inject() (
     }
 
   def trustSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id               = flowId.toString
-      def recoveryRedirect =
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id               = flowId.toString
+        def recoveryRedirect =
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(TrustNamePage(id, AddSubcontractor))
-        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          val name  = request.userAnswers.get(TrustNamePage(id, AddSubcontractor))
+          val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
-        (name, cisId) match {
-          case (Some(name), Some(cisId)) =>
-            val manageSubcontractorsUrl =
-              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          (name, cisId) match {
+            case (Some(name), Some(cisId)) =>
+              val manageSubcontractorsUrl =
+                s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
-            Ok(view(name, Messages("subcontractorAdded.trust"), manageSubcontractorsUrl))
+              Ok(view(name, Messages("subcontractorAdded.trust"), manageSubcontractorsUrl))
 
-          case _ =>
-            logger.error(
-              "[SubcontractorAddedController][trustSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
-            )
-            recoveryRedirect
+            case _ =>
+              logger.error(
+                "[SubcontractorAddedController][trustSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+              )
+              recoveryRedirect
+          }
+        } else {
+          logger.error(
+            "[SubcontractorAddedController][trustSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+          )
+          recoveryRedirect
         }
-      } else {
-        logger.error(
-          "[SubcontractorAddedController][trustSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
-        )
-        recoveryRedirect
-      }
     }
 
   def partnershipSubcontractorAddedWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id               = flowId.toString
-      def recoveryRedirect =
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id               = flowId.toString
+        def recoveryRedirect =
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        val name  = request.userAnswers.get(PartnershipNamePage(id, AddSubcontractor))
-        val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          val name  = request.userAnswers.get(PartnershipNamePage(id, AddSubcontractor))
+          val cisId = request.userAnswers.get(CisIdQuery(id, AddSubcontractor))
 
-        (name, cisId) match {
-          case (Some(name), Some(cisId)) =>
-            val manageSubcontractorsUrl =
-              s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          (name, cisId) match {
+            case (Some(name), Some(cisId)) =>
+              val manageSubcontractorsUrl =
+                s"${appConfig.manageSubcontractorsUrl}/$cisId"
 
-            Ok(view(name, Messages("subcontractorAdded.partnership"), manageSubcontractorsUrl))
+              Ok(view(name, Messages("subcontractorAdded.partnership"), manageSubcontractorsUrl))
 
-          case _ =>
-            logger.error(
-              "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
-            )
-            recoveryRedirect
+            case _ =>
+              logger.error(
+                "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - name or CIS ID missing from userAnswers"
+              )
+              recoveryRedirect
+          }
+        } else {
+          logger.error(
+            "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
+          )
+          recoveryRedirect
         }
-      } else {
-        logger.error(
-          "[SubcontractorAddedController][partnershipSubcontractorAddedWithId] - CheckYourAnswersSubmitted not true"
-        )
-        recoveryRedirect
-      }
     }
 
   private def subcontractorAdded(

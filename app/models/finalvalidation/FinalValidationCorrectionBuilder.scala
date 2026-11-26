@@ -617,7 +617,7 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       // Company
-      case (Limitedcompany, TradingName) =>
+      case (Limitedcompany, TradingName)                  =>
         update(userAnswers, CompanyNamePage(id, namespace)) { value =>
           FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
@@ -699,7 +699,7 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       // Trust
-      case (Trust, TradingName) =>
+      case (Trust, TradingName)                   =>
         update(userAnswers, TrustNamePage(id, namespace)) { value =>
           FinalValidationSubcontractorPatch(tradingName = Some(value))
         }
@@ -761,7 +761,7 @@ class FinalValidationCorrectionBuilder @Inject() {
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
 
-      case (Trust, WorksReferenceNumber) =>
+      case (Trust, WorksReferenceNumber)         =>
         update(userAnswers, TrustWorksReferencePage(id, namespace)) { value =>
           FinalValidationSubcontractorPatch(worksReferenceNumber = Some(value))
         }
@@ -812,7 +812,7 @@ class FinalValidationCorrectionBuilder @Inject() {
         }
 
       // Partnership UTR
-      case (Partnership, UtrYesNo) =>
+      case (Partnership, UtrYesNo)          =>
         clearOnNoOrUpdateOnYes(
           userAnswers,
           PartnershipHasUtrYesNoPage(id, namespace),
@@ -821,7 +821,7 @@ class FinalValidationCorrectionBuilder @Inject() {
           FinalValidationSubcontractorPatch(utr = Some(value))
         }
 
-      case (Partnership, Utr) =>
+      case (Partnership, Utr)             =>
         update(userAnswers, PartnershipUniqueTaxpayerReferencePage(id, namespace)) { value =>
           FinalValidationSubcontractorPatch(utr = Some(value))
         }

@@ -88,7 +88,7 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-      _ <- sessionRepository.set(updatedAnswers)
+      _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(
       navigator.nextPage(page, mode, updatedAnswers)
     )
@@ -158,84 +158,84 @@ class SubcontractorsUniqueTaxpayerReferenceController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val yesOrNoPage = UniqueTaxpayerReferenceYesNoPage(id, namespace)
-        val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
+      val id                = flowId.toString
+      val yesOrNoPage       = UniqueTaxpayerReferenceYesNoPage(id, namespace)
+      val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error("[SubcontractorsUniqueTaxpayerReferenceController][onPageLoadWithId] - subcontractor name missing")
-            recoveryRedirect
-          } { subcontractorName =>
-            val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[SubcontractorsUniqueTaxpayerReferenceController][onPageLoadWithId] - subcontractor name missing"
+          )
+          recoveryRedirect
+        } { subcontractorName =>
+          val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
 
-            yesOrNoPageGuardService.yesOrNoPageRoute(
-              result,
-              yesOrNoPageOption,
-              yesOrNoPage,
-              mode
-            )
-          }
+          yesOrNoPageGuardService.yesOrNoPageRoute(
+            result,
+            yesOrNoPageOption,
+            yesOrNoPage,
+            mode
+          )
+        }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = SubcontractorsUniqueTaxpayerReferencePage(id, namespace)
+      val id   = flowId.toString
+      val page = SubcontractorsUniqueTaxpayerReferencePage(id, namespace)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error("[SubcontractorsUniqueTaxpayerReferenceController][onSubmitWithId] - subcontractor name missing")
-            Future.successful(recoveryRedirect)
-          } { subcontractorName =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(
-                    BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))
-                  ),
-                value =>
-                  val prevValue = request.userAnswers.get(page)
-                  val baseValue =
-                    if (mode == FinalValidationMode) {
-                      request.userAnswers.get(FinalValidationBaseUtrPage(id))
-                    } else {
-                      None
-                    }
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error("[SubcontractorsUniqueTaxpayerReferenceController][onSubmitWithId] - subcontractor name missing")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))
+                ),
+              value =>
+                val prevValue = request.userAnswers.get(page)
+                val baseValue =
+                  if (mode == FinalValidationMode) {
+                    request.userAnswers.get(FinalValidationBaseUtrPage(id))
+                  } else {
+                    None
+                  }
 
-                  mode match {
-                    case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
-                      saveAndContinue(mode, value, id, namespace)
+                mode match {
+                  case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
+                    saveAndContinue(mode, value, id, namespace)
 
-                    case _ =>
-                      subcontractorService
-                        .isDuplicateUTR(request.userAnswers, value, id, namespace)
-                        .flatMap {
-                          case true =>
-                            val errorForm = form
-                              .fill(value)
-                              .withError(
-                                key = "value",
-                                message = "subcontractorsUniqueTaxpayerReference.error.duplicate"
-                              )
-
-                            Future.successful(
-                              BadRequest(view(errorForm, mode, subcontractorName, Some(flowId)))
+                  case _ =>
+                    subcontractorService
+                      .isDuplicateUTR(request.userAnswers, value, id, namespace)
+                      .flatMap {
+                        case true =>
+                          val errorForm = form
+                            .fill(value)
+                            .withError(
+                              key = "value",
+                              message = "subcontractorsUniqueTaxpayerReference.error.duplicate"
                             )
 
-                          case false =>
-                            saveAndContinue(mode, value, id, namespace)
-                        }
-                  }
-              )
-          }
+                          Future.successful(
+                            BadRequest(view(errorForm, mode, subcontractorName, Some(flowId)))
+                          )
+
+                        case false =>
+                          saveAndContinue(mode, value, id, namespace)
+                      }
+                }
+            )
+        }
     }
 }

@@ -20,6 +20,7 @@ import base.SpecBase
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor}
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.TypeOfSubcontractorPage
 import pages.add.partnership.*
 import play.api.libs.json.*
@@ -80,41 +81,41 @@ class ValidatedPartnershipSpec extends SpecBase with Matchers {
     "build successfully from a subjourney" in {
       val id      = "11111111-1111-1111-1111-111111111111"
       val answers = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Partnership)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Partnership)
         .success
         .value
-        .set(PartnershipNamePage(id), "Folder Partnership")
+        .set(PartnershipNamePage(id, AddSubcontractor), "Folder Partnership")
         .success
         .value
-        .set(PartnershipAddressYesNoPage(id), false)
+        .set(PartnershipAddressYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(AddPartnershipContactMethodsYesNoPage(id), false)
+        .set(AddPartnershipContactMethodsYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(PartnershipHasUtrYesNoPage(id), false)
+        .set(PartnershipHasUtrYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(PartnershipNominatedPartnerNamePage(id), "Folder Partner")
+        .set(PartnershipNominatedPartnerNamePage(id, AddSubcontractor), "Folder Partner")
         .success
         .value
-        .set(PartnershipNominatedPartnerUtrYesNoPage(id), false)
+        .set(PartnershipNominatedPartnerUtrYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(PartnershipNominatedPartnerNinoYesNoPage(id), false)
+        .set(PartnershipNominatedPartnerNinoYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(PartnershipNominatedPartnerCrnYesNoPage(id), false)
+        .set(PartnershipNominatedPartnerCrnYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(PartnershipWorksReferenceNumberYesNoPage(id), false)
+        .set(PartnershipWorksReferenceNumberYesNoPage(id, AddSubcontractor), false)
         .success
         .value
 
-      ValidatedPartnership.build(answers, id) mustBe a[Right[?, ?]]
+      ValidatedPartnership.build(answers, id, AddSubcontractor) mustBe a[Right[?, ?]]
     }
 
     "fail when TypeOfSubcontractor is not Partnership" in {

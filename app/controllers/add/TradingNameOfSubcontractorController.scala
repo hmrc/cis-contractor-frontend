@@ -102,52 +102,49 @@ class TradingNameOfSubcontractorController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = TradingNameOfSubcontractorPage(id, namespace)
+      val id   = flowId.toString
+      val page = TradingNameOfSubcontractorPage(id, namespace)
 
-        val preparedForm = request.userAnswers.get(page) match {
-          case Some(value) => form.fill(value)
-          case None => form
-        }
+      val preparedForm = request.userAnswers.get(page) match {
+        case Some(value) => form.fill(value)
+        case None        => form
+      }
 
-        mode match {
-          case FinalValidationMode =>
-            Ok(view(preparedForm, mode, Some(flowId)))
+      mode match {
+        case FinalValidationMode =>
+          Ok(view(preparedForm, mode, Some(flowId)))
 
-          case _ =>
-            request.userAnswers.get(IndividualNamesOptionsPage(id, namespace)) match {
-              case Some(namesOptions) if namesOptions.contains(TradingName) =>
-                Ok(view(preparedForm, mode, Some(flowId)))
+        case _ =>
+          request.userAnswers.get(IndividualNamesOptionsPage(id, namespace)) match {
+            case Some(namesOptions) if namesOptions.contains(TradingName) =>
+              Ok(view(preparedForm, mode, Some(flowId)))
 
-              case _ =>
-                // TODO: Restore scoped Add Subcontractor navigation once Individual Add routes are integrated.
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-        }
+            case _ =>
+              // TODO: Restore scoped Add Subcontractor navigation once Individual Add routes are integrated.
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+      }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = TradingNameOfSubcontractorPage(id, namespace)
+      val id   = flowId.toString
+      val page = TradingNameOfSubcontractorPage(id, namespace)
 
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, Some(flowId)))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(page, mode, updatedAnswers)
-              )
-          )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, Some(flowId)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(
+              navigator.nextPage(page, mode, updatedAnswers)
+            )
+        )
     }
 }

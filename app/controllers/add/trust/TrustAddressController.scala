@@ -54,7 +54,7 @@ class TrustAddressController @Inject() (
   override protected def addressPage: Settable[Address] = TrustAddressPage
 
   override protected def subcontractorName(userAnswers: UserAnswers, mode: Mode)(implicit
-                                                                                 messages: Messages
+    messages: Messages
   ): Option[String] =
     SubcontractorNameDisplayHelper.getTrustDisplayName(userAnswers, mode)
 
@@ -116,21 +116,21 @@ class TrustAddressController @Inject() (
     mode match {
       case FinalValidationMode =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
-      case NormalMode =>
+      case NormalMode          =>
         routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, NormalMode)
-      case CheckMode =>
+      case CheckMode           =>
         routes.TrustCheckYourAnswersController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                   =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 
   override protected def onChangeCompletion(mode: Mode, flowId: UUID): Call =
     mode match {
-      case FinalValidationMode =>
+      case FinalValidationMode    =>
         controllers.finalvalidations.routes.FinalValidationCompleteController.onPageLoadWithId(flowId)
       case NormalMode | CheckMode =>
         routes.TrustCheckYourAnswersController.onPageLoadWithId(flowId)
-      case _ =>
+      case _                      =>
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }

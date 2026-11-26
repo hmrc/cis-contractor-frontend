@@ -108,58 +108,56 @@ class IndividualContactMethodOptionsController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val yesOrNoPage = AddIndividualContactMethodsYesNoPage(id, namespace)
-        val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
+      val id                = flowId.toString
+      val yesOrNoPage       = AddIndividualContactMethodsYesNoPage(id, namespace)
+      val yesOrNoPageOption = request.userAnswers.get(yesOrNoPage)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error(
-              "[IndividualContactMethodOptionsController][onPageLoadWithId] - subcontractor name missing from userAnswers"
-            )
-            recoveryRedirect
-          } { subcontractorName =>
-            val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[IndividualContactMethodOptionsController][onPageLoadWithId] - subcontractor name missing from userAnswers"
+          )
+          recoveryRedirect
+        } { subcontractorName =>
+          val result = Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
 
-            yesOrNoPageGuardService.yesOrNoPageRoute(
-              result,
-              yesOrNoPageOption,
-              yesOrNoPage,
-              mode
-            )
-          }
+          yesOrNoPageGuardService.yesOrNoPageRoute(
+            result,
+            yesOrNoPageOption,
+            yesOrNoPage,
+            mode
+          )
+        }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = IndividualContactMethodOptionsPage(id, namespace)
+      val id   = flowId.toString
+      val page = IndividualContactMethodOptionsPage(id, namespace)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error(
-              "[IndividualContactMethodOptionsController][onSubmitWithId] - subcontractor name missing from userAnswers"
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[IndividualContactMethodOptionsController][onSubmitWithId] - subcontractor name missing from userAnswers"
+          )
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
             )
-            Future.successful(recoveryRedirect)
-          } { subcontractorName =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
-                value =>
-                  for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                    _ <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
-              )
-          }
+        }
     }
 }

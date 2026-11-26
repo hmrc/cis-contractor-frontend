@@ -117,150 +117,152 @@ class TrustCheckYourAnswersController @Inject() (
     }
 
   def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) { implicit request =>
-      val id = flowId.toString
-      val ua = request.userAnswers
-      ValidatedTrust.build(ua, id, AddSubcontractor) match {
-        case Right(_)    =>
-          val list = SummaryListViewModel(
-            rows = Seq(
-              TypeOfSubcontractorSummary.row(
-                ua,
-                subJourneyId = Some(id),
-                changeUrl = Some(
-                  controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)) {
+      implicit request =>
+        val id = flowId.toString
+        val ua = request.userAnswers
+        ValidatedTrust.build(ua, id, AddSubcontractor) match {
+          case Right(_)    =>
+            val list = SummaryListViewModel(
+              rows = Seq(
+                TypeOfSubcontractorSummary.row(
+                  ua,
+                  subJourneyId = Some(id),
+                  changeUrl = Some(
+                    controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, CheckMode).url
+                  )
+                ),
+                TrustNameSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustNameController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustAddressYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustAddressSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.TrustAddressController.redirectToAddressLookupWithId(flowId, NormalMode, Some("change")).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                AddTrustContactMethodsYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(
+                    routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
+                  ),
+                  subJourneyId = Some(id)
+                ),
+                TrustContactMethodOptionsSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustEmailAddressSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustPhoneNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustMobileNumberSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustUtrYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustUtrSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustUtrController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustWorksReferenceYesNoSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
+                ),
+                TrustWorksReferenceSummary.row(
+                  ua,
+                  changeUrl = Some(routes.TrustWorksReferenceController.onPageLoadWithId(flowId, CheckMode).url),
+                  subJourneyId = Some(id)
                 )
-              ),
-              TrustNameSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustNameController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustAddressYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustAddressYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustAddressSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.TrustAddressController.redirectToAddressLookupWithId(flowId, NormalMode, Some("change")).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              AddTrustContactMethodsYesNoSummary.row(
-                ua,
-                changeUrl = Some(
-                  routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, CheckMode).url
-                ),
-                subJourneyId = Some(id)
-              ),
-              TrustContactMethodOptionsSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustContactMethodOptionsController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustEmailAddressSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustEmailAddressController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustPhoneNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustPhoneNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustMobileNumberSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustMobileNumberController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustUtrYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustUtrYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustUtrSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustUtrController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustWorksReferenceYesNoSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustWorksReferenceYesNoController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              ),
-              TrustWorksReferenceSummary.row(
-                ua,
-                changeUrl = Some(routes.TrustWorksReferenceController.onPageLoadWithId(flowId, CheckMode).url),
-                subJourneyId = Some(id)
-              )
-            ).flatten
-          )
+              ).flatten
+            )
 
-          Ok(view(list, routes.TrustCheckYourAnswersController.onSubmitWithId(flowId)))
-        case Left(error) =>
-          logger.error(s"[TrustCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+            Ok(view(list, routes.TrustCheckYourAnswersController.onSubmitWithId(flowId)))
+          case Left(error) =>
+            logger.error(s"[TrustCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmitWithId(flowId: UUID): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async { implicit request =>
-      val id = flowId.toString
-      if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
-        logger.error(
-          "[TrustCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
-        )
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      } else {
-        ValidatedTrust.build(request.userAnswers, id, AddSubcontractor) match {
-          case Right(_) =>
-            val duplicateUtr =
-              request.userAnswers.get(TrustUtrPage(id, AddSubcontractor)) match {
-                case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
-                case None      => Future.successful(false)
-              }
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId, AddSubcontractor)).async {
+      implicit request =>
+        val id = flowId.toString
+        if (request.userAnswers.get(CheckYourAnswersSubmittedPage(id)).contains(true)) {
+          logger.error(
+            "[TrustCheckYourAnswersController][onSubmitWithId] - CheckYourAnswersSubmittedPage already true"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        } else {
+          ValidatedTrust.build(request.userAnswers, id, AddSubcontractor) match {
+            case Right(_) =>
+              val duplicateUtr =
+                request.userAnswers.get(TrustUtrPage(id, AddSubcontractor)) match {
+                  case Some(utr) => subcontractorService.isDuplicateUTR(request.userAnswers, utr, id, AddSubcontractor)
+                  case None      => Future.successful(false)
+                }
 
-            duplicateUtr
-              .flatMap {
-                case true  =>
-                  logger.error("[TrustCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                case false =>
-                  subcontractorService
-                    .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
-                    .flatMap { _ =>
-                      auditService.addSubcontractorEvent(request.userAnswers, id)
-                      Future
-                        .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
-                        .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
-                        .map { _ =>
-                          Redirect(
-                            controllers.add.routes.SubcontractorAddedController.trustSubcontractorAddedWithId(flowId)
-                          )
-                        }
-                    }
-                    .recover { case t =>
-                      logger.error(
-                        "[TrustCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
-                        t
-                      )
-                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                    }
-              }
-              .recover { case t =>
-                logger.error(
-                  "[TrustCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
-                  t
-                )
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
+              duplicateUtr
+                .flatMap {
+                  case true  =>
+                    logger.error("[TrustCheckYourAnswersController][onSubmitWithId] - duplicate UTR")
+                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                  case false =>
+                    subcontractorService
+                      .createAndUpdateSubcontractor(request.userAnswers, id, AddSubcontractor)
+                      .flatMap { _ =>
+                        auditService.addSubcontractorEvent(request.userAnswers, id)
+                        Future
+                          .fromTry(request.userAnswers.set(CheckYourAnswersSubmittedPage(id), true))
+                          .flatMap(updated => sessionRepository.set(updated).map(_ => ()))
+                          .map { _ =>
+                            Redirect(
+                              controllers.add.routes.SubcontractorAddedController.trustSubcontractorAddedWithId(flowId)
+                            )
+                          }
+                      }
+                      .recover { case t =>
+                        logger.error(
+                          "[TrustCheckYourAnswersController.onSubmitWithId] Failed to create/update subcontractor",
+                          t
+                        )
+                        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      }
+                }
+                .recover { case t =>
+                  logger.error(
+                    "[TrustCheckYourAnswersController.onSubmitWithId] Failed duplicate UTR check",
+                    t
+                  )
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
 
-          case Left(error) =>
-            logger.error(s"[TrustCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Left(error) =>
+              logger.error(s"[TrustCheckYourAnswersController.onSubmitWithId] Validation failed: $error")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
         }
-      }
     }
 }

@@ -18,6 +18,7 @@ package pages.add.trust
 
 import pages.behaviours.PageBehaviours
 import play.api.libs.json.JsPath
+import models.JourneyNamespace.AddSubcontractor
 
 class TrustNamePageSpec extends PageBehaviours {
 
@@ -30,7 +31,7 @@ class TrustNamePageSpec extends PageBehaviours {
     beRemovable[String](TrustNamePage)
 
     "must nest the WithId path under addSubcontractor" in {
-      TrustNamePage("uuid-1").path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "trustName")
+      TrustNamePage("uuid-1", AddSubcontractor).path mustBe (JsPath \ "addSubcontractor" \ "uuid-1" \ "trustName")
       TrustNamePage.path mustBe (JsPath \ "trustName")
     }
   }

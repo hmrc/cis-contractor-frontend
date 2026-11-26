@@ -78,11 +78,11 @@ class AuditService @Inject() (
     val namespace = JourneyNamespace.AddSubcontractor
 
     userAnswers.get(TypeOfSubcontractorPage(id, namespace)) match {
-      case Some(TypeOfSubcontractor.Limitedcompany) => send(buildCompanyModel(userAnswers, id))
-      case Some(TypeOfSubcontractor.Partnership) => send(buildPartnershipModel(userAnswers, id))
-      case Some(TypeOfSubcontractor.Trust) => send(buildTrustModel(userAnswers, id))
+      case Some(TypeOfSubcontractor.Limitedcompany)         => send(buildCompanyModel(userAnswers, id))
+      case Some(TypeOfSubcontractor.Partnership)            => send(buildPartnershipModel(userAnswers, id))
+      case Some(TypeOfSubcontractor.Trust)                  => send(buildTrustModel(userAnswers, id))
       case Some(TypeOfSubcontractor.Individualorsoletrader) => send(buildIndividualModel(userAnswers, id))
-      case None => throw new IllegalStateException("TypeOfSubcontractorPage not found in scoped session data")
+      case None                                             => throw new IllegalStateException("TypeOfSubcontractorPage not found in scoped session data")
     }
   }
 
@@ -200,8 +200,8 @@ class AuditService @Inject() (
     ua: UserAnswers,
     id: String
   ): AddSubcontractorAuditEventModel = {
-    val namespace = JourneyNamespace.AddSubcontractor
-    val namesOpts = ua.get(IndividualNamesOptionsPage(id, namespace))
+    val namespace   = JourneyNamespace.AddSubcontractor
+    val namesOpts   = ua.get(IndividualNamesOptionsPage(id, namespace))
     val contactOpts = ua.get(IndividualContactMethodOptionsPage(id, namespace))
 
     AddSubcontractorAuditEventModel(
@@ -235,7 +235,7 @@ class AuditService @Inject() (
     ua: UserAnswers,
     id: String
   ): AddCompanySubcontractorAuditEventModel = {
-    val namespace = JourneyNamespace.AddSubcontractor
+    val namespace   = JourneyNamespace.AddSubcontractor
     val contactOpts = ua.get(CompanyContactMethodOptionsPage(id, namespace))
 
     AddCompanySubcontractorAuditEventModel(
@@ -264,7 +264,7 @@ class AuditService @Inject() (
     ua: UserAnswers,
     id: String
   ): AddPartnershipSubcontractorAuditEventModel = {
-    val namespace = JourneyNamespace.AddSubcontractor
+    val namespace   = JourneyNamespace.AddSubcontractor
     val contactOpts = ua.get(PartnershipContactMethodOptionsPage(id, namespace))
 
     AddPartnershipSubcontractorAuditEventModel(
@@ -298,7 +298,7 @@ class AuditService @Inject() (
     ua: UserAnswers,
     id: String
   ): AddTrustSubcontractorAuditEventModel = {
-    val namespace = JourneyNamespace.AddSubcontractor
+    val namespace   = JourneyNamespace.AddSubcontractor
     val contactOpts = ua.get(TrustContactMethodOptionsPage(id, namespace))
 
     AddTrustSubcontractorAuditEventModel(

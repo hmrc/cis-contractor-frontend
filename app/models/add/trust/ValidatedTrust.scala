@@ -59,8 +59,8 @@ object ValidatedTrust extends Validation {
                                      AddTrustContactMethodsYesNoPage(id, namespace)
                                    ).flatMap {
                                      case Some(methods) if methods.nonEmpty => Right(Some(methods))
-                                     case Some(_) => Left(InvalidAnswer(TrustContactMethodOptionsPage(id, namespace)))
-                                     case None => Right(None)
+                                     case Some(_)                           => Left(InvalidAnswer(TrustContactMethodOptionsPage(id, namespace)))
+                                     case None                              => Right(None)
                                    }
       trustEmail                <- getContactPageValue(
                                      answers,
@@ -163,6 +163,6 @@ object ValidatedTrust extends Validation {
   ): Either[ValidationError, Unit] =
     getPageValue(answers, TypeOfSubcontractorPage(id, namespace)).flatMap {
       case TypeOfSubcontractor.Trust => Right(())
-      case _                        => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
+      case _                         => Left(InvalidAnswer(TypeOfSubcontractorPage(id, namespace)))
     }
 }

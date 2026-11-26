@@ -95,7 +95,7 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
 
   // Multi-tab
   protected def onChangeCompletion(mode: Mode, flowId: UUID): Call
-  
+
   private val mandatoryFields = MandatoryFieldsConfigModel(
     addressLine1 = Some(true),
     town = Some(true),
@@ -175,41 +175,40 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     mode: Mode,
     changeRoute: Option[String]
   ): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val callback =
-          if changeRoute.isDefined then changeCallback(mode, flowId)
-          else standardCallback(mode, flowId)
+      val callback =
+        if changeRoute.isDefined then changeCallback(mode, flowId)
+        else standardCallback(mode, flowId)
 
-        subcontractorName(request.userAnswers, mode, flowId.toString, namespace) match {
-          case Some(name) =>
-            addressLookupService
-              .getJourneyUrl(
-                journeyId,
-                callback,
-                optName = Some(name),
-                mandatoryFieldsConfigModel = mandatoryFields,
-                line1MaxLength = Some(MaxLength35),
-                line2MaxLength = Some(MaxLength35),
-                line3MaxLength = Some(MaxLength35),
-                townMaxLength = Some(MaxLength35)
-              )
-              .map(Redirect)
-              .recover { case ex =>
-                logger.error(
-                  "[AddressLookupJourneyController][redirectToAddressLookupWithId] - failed to get ALF journey URL",
-                  ex
-                )
-                Redirect(journeyRecovery)
-              }
-
-          case None =>
-            logger.error(
-              "[AddressLookupJourneyController][redirectToAddressLookupWithId] - subcontractor name missing from userAnswers"
+      subcontractorName(request.userAnswers, mode, flowId.toString, namespace) match {
+        case Some(name) =>
+          addressLookupService
+            .getJourneyUrl(
+              journeyId,
+              callback,
+              optName = Some(name),
+              mandatoryFieldsConfigModel = mandatoryFields,
+              line1MaxLength = Some(MaxLength35),
+              line2MaxLength = Some(MaxLength35),
+              line3MaxLength = Some(MaxLength35),
+              townMaxLength = Some(MaxLength35)
             )
-            Future.successful(Redirect(journeyRecovery))
-        }
+            .map(Redirect)
+            .recover { case ex =>
+              logger.error(
+                "[AddressLookupJourneyController][redirectToAddressLookupWithId] - failed to get ALF journey URL",
+                ex
+              )
+              Redirect(journeyRecovery)
+            }
+
+        case None =>
+          logger.error(
+            "[AddressLookupJourneyController][redirectToAddressLookupWithId] - subcontractor name missing from userAnswers"
+          )
+          Future.successful(Redirect(journeyRecovery))
+      }
     }
 
   // Multi-tab
@@ -218,13 +217,12 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     id: String,
     mode: Mode
   ): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
-        saveAddressAndRedirect(
-          id,
-          addressPage(flowId.toString, namespace),
-          onCompletion(mode, flowId)
-        )
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+      saveAddressAndRedirect(
+        id,
+        addressPage(flowId.toString, namespace),
+        onCompletion(mode, flowId)
+      )
     }
 
   // Multi-tab
@@ -233,13 +231,12 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     id: String,
     mode: Mode
   ): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
-        saveAddressAndRedirect(
-          id,
-          addressPage(flowId.toString, namespace),
-          onChangeCompletion(mode, flowId)
-        )
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
+      saveAddressAndRedirect(
+        id,
+        addressPage(flowId.toString, namespace),
+        onChangeCompletion(mode, flowId)
+      )
     }
 
   // Multi-tab
@@ -251,10 +248,10 @@ trait AddressLookupJourneyController extends FrontendBaseController with I18nSup
     (for {
       address <- addressLookupService.getAddressById(id)
       updated <- addressLookupService.saveAddressDetails(
-        address,
-        page,
-        request.userAnswers
-      )
+                   address,
+                   page,
+                   request.userAnswers
+                 )
     } yield
       if (updated) Redirect(onSuccess)
       else {

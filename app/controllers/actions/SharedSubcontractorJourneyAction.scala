@@ -38,10 +38,7 @@ class SharedSubcontractorJourneyAction @Inject() (
   def apply(flowId: UUID, mode: Mode)(
     block: JourneyNamespace => DataRequest[AnyContent] => Result
   ): Action[AnyContent] =
-    async(flowId, mode)(
-      namespace => request =>
-        Future.successful(block(namespace)(request))
-    )
+    async(flowId, mode)(namespace => request => Future.successful(block(namespace)(request)))
 
   def async(flowId: UUID, mode: Mode)(
     block: JourneyNamespace => DataRequest[AnyContent] => Future[Result]
@@ -49,10 +46,10 @@ class SharedSubcontractorJourneyAction @Inject() (
     JourneyNamespace.resolveNamespace(mode) match {
       case Some(namespace) =>
         (identify andThen getData andThen requireData andThen
-          multiTabAction.forJourney(flowId, namespace)).async {
-          request => block(namespace)(request)
+          multiTabAction.forJourney(flowId, namespace)).async { request =>
+          block(namespace)(request)
         }
-      case None =>
+      case None            =>
         identify { _ =>
           Results.Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }

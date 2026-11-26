@@ -78,19 +78,19 @@ class SubcontractorService @Inject() (
       Future.failed(new IllegalArgumentException("Subcontractor creation is only supported for Add Subcontractor"))
     } else {
       for {
-        cisId <- getCisId(userAnswers, id, namespace)
+        cisId             <- getCisId(userAnswers, id, namespace)
         subcontractorType <- getSubcontractorType(userAnswers, id, namespace)
 
         payload = subcontractorType match {
-          case Individualorsoletrader =>
-            individualOrSoleTraderPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
-          case Partnership =>
-            partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
-          case Limitedcompany =>
-            companyPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
-          case Trust =>
-            trustPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
-        }
+                    case Individualorsoletrader =>
+                      individualOrSoleTraderPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
+                    case Partnership            =>
+                      partnershipPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
+                    case Limitedcompany         =>
+                      companyPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
+                    case Trust                  =>
+                      trustPayloadFromUserAnswers(cisId, subcontractorType, userAnswers, id, namespace)
+                  }
 
         _ <- cisConnector.createAndUpdateSubcontractor(payload)
       } yield ()
@@ -101,7 +101,7 @@ class SubcontractorService @Inject() (
     utr: String
   )(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
-      cisId <- getCisId(userAnswers)
+      cisId   <- getCisId(userAnswers)
       utrList <- cisConnector.getSubcontractorUTRs(cisId)
     } yield utrList.subcontractorUTRs.contains(utr)
 
@@ -113,7 +113,8 @@ class SubcontractorService @Inject() (
   )(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       cisId     <- getCisId(userAnswers, id, namespace)
-      duplicate <- if (namespace == JourneyNamespace.SubcontractorFinalValidation &&
+      duplicate <- if (
+                     namespace == JourneyNamespace.SubcontractorFinalValidation &&
                      userAnswers.get(FinalValidationBaseUtrPage(id)).contains(utr)
                    ) {
                      Future.successful(false)
@@ -141,7 +142,7 @@ class SubcontractorService @Inject() (
   private def getSubcontractorType(userAnswers: UserAnswers): Future[TypeOfSubcontractor] =
     userAnswers.get(TypeOfSubcontractorPage) match {
       case Some(subcontractorType) => Future.successful(subcontractorType)
-      case None => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
+      case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
 
   private def getSubcontractorType(
@@ -151,7 +152,7 @@ class SubcontractorService @Inject() (
   ): Future[TypeOfSubcontractor] =
     userAnswers.get(TypeOfSubcontractorPage(id, namespace)) match {
       case Some(subcontractorType) => Future.successful(subcontractorType)
-      case None => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
+      case None                    => Future.failed(new RuntimeException("TypeOfSubcontractorPage not found in session data"))
     }
 
   private def partnershipPayloadFromUserAnswers(

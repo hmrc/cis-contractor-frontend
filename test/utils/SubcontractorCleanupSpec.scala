@@ -17,6 +17,7 @@
 package utils
 
 import base.SpecBase
+import models.JourneyNamespace.AddSubcontractor
 import models.add.*
 import models.contact.ContactMethodOptions
 import models.TypeOfSubcontractor
@@ -217,21 +218,21 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(CompanyNamePage, name)
           .success
           .value
-          .set(CompanyNamePage(id), "Nested Company Ltd")
+          .set(CompanyNamePage(id, AddSubcontractor), "Nested Company Ltd")
           .success
           .value
-          .set(CompanyAddressYesNoPage(id), true)
+          .set(CompanyAddressYesNoPage(id, AddSubcontractor), true)
           .success
           .value
           .set(CheckYourAnswersSubmittedPage(id), true)
           .success
           .value
 
-      val result = removeLimitedCompanySubcontractor(userAnswers, id).success.value
+      val result = removeLimitedCompanySubcontractor(userAnswers, id, AddSubcontractor).success.value
 
       result.get(CompanyNamePage) mustBe Some(name)
-      result.get(CompanyNamePage(id)) mustBe None
-      result.get(CompanyAddressYesNoPage(id)) mustBe None
+      result.get(CompanyNamePage(id, AddSubcontractor)) mustBe None
+      result.get(CompanyAddressYesNoPage(id, AddSubcontractor)) mustBe None
       result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
     }
   }
@@ -333,21 +334,21 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(PartnershipNamePage, name)
           .success
           .value
-          .set(PartnershipNamePage(id), "Nested Partnership")
+          .set(PartnershipNamePage(id, AddSubcontractor), "Nested Partnership")
           .success
           .value
-          .set(PartnershipAddressYesNoPage(id), true)
+          .set(PartnershipAddressYesNoPage(id, AddSubcontractor), true)
           .success
           .value
           .set(CheckYourAnswersSubmittedPage(id), true)
           .success
           .value
 
-      val result = removePartnershipSubcontractor(userAnswers, id).success.value
+      val result = removePartnershipSubcontractor(userAnswers, id, AddSubcontractor).success.value
 
       result.get(PartnershipNamePage) mustBe Some(name)
-      result.get(PartnershipNamePage(id)) mustBe None
-      result.get(PartnershipAddressYesNoPage(id)) mustBe None
+      result.get(PartnershipNamePage(id, AddSubcontractor)) mustBe None
+      result.get(PartnershipAddressYesNoPage(id, AddSubcontractor)) mustBe None
       result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
     }
   }
@@ -421,21 +422,21 @@ class SubcontractorCleanupSpec extends SpecBase {
           .set(TrustNamePage, name)
           .success
           .value
-          .set(TrustNamePage(id), "Nested Trust")
+          .set(TrustNamePage(id, AddSubcontractor), "Nested Trust")
           .success
           .value
-          .set(TrustAddressYesNoPage(id), true)
+          .set(TrustAddressYesNoPage(id, AddSubcontractor), true)
           .success
           .value
           .set(CheckYourAnswersSubmittedPage(id), true)
           .success
           .value
 
-      val result = removeTrustSubcontractor(userAnswers, id).success.value
+      val result = removeTrustSubcontractor(userAnswers, id, AddSubcontractor).success.value
 
       result.get(TrustNamePage) mustBe Some(name)
-      result.get(TrustNamePage(id)) mustBe None
-      result.get(TrustAddressYesNoPage(id)) mustBe None
+      result.get(TrustNamePage(id, AddSubcontractor)) mustBe None
+      result.get(TrustAddressYesNoPage(id, AddSubcontractor)) mustBe None
       result.get(CheckYourAnswersSubmittedPage(id)) mustBe None
     }
   }

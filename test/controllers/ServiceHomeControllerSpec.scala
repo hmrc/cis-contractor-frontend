@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.JourneyNamespace.AddSubcontractor
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import queries.CisIdQuery
@@ -71,7 +72,7 @@ class ServiceHomeControllerSpec extends SpecBase {
 
       val nestedAnswers =
         emptyUserAnswers
-          .set(CisIdQuery("468fc177-69f3-431e-8dc3-1b9f80bcab4a"), "100")
+          .set(CisIdQuery("468fc177-69f3-431e-8dc3-1b9f80bcab4a", AddSubcontractor), "100")
           .success
           .value
 

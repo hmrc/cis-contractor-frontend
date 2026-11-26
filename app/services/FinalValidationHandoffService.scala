@@ -130,8 +130,12 @@ class FinalValidationHandoffService @Inject() (
           subcontractor    <- draft.subcontractor(payload.subcontractorId) match {
                                 case Some(subcontractor) =>
                                   Future.successful(subcontractor)
-                                case None =>
-                                  Future.failed(new RuntimeException(s"Subcontractor ${payload.subcontractorId} not found in Final Validation draft ${payload.draftId}"))
+                                case None                =>
+                                  Future.failed(
+                                    new RuntimeException(
+                                      s"Subcontractor ${payload.subcontractorId} not found in Final Validation draft ${payload.draftId}"
+                                    )
+                                  )
                               }
           populatedAnswers <- Future.fromTry(
                                 finalValidationSubcontractorService.populateFinalValidationUserAnswers(
@@ -152,12 +156,12 @@ class FinalValidationHandoffService @Inject() (
           updatedAnswers   <- Future.fromTry(withDraftId.set(FinalValidationHandoffPage(id), handoffId))
           stored           <- sessionRepository.set(updatedAnswers)
 
-          _                <- if stored then Future.unit
-                              else {
-                                Future.failed(
-                                  new RuntimeException(s"Failed to store updated UserAnswers for handoffId: $handoffId")
-                                )
-                              }
+          _ <- if stored then Future.unit
+               else {
+                 Future.failed(
+                   new RuntimeException(s"Failed to store updated UserAnswers for handoffId: $handoffId")
+                 )
+               }
         } yield Some((updatedAnswers, payload))
-    }  
+    }
 }

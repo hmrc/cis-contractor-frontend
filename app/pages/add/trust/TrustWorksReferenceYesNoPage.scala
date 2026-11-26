@@ -25,17 +25,16 @@ import scala.util.Try
 case class TrustWorksReferenceYesNoPage(
   id: String,
   namespace: JourneyNamespace
-) extends QuestionPage[Boolean] with TrustJourney {
+) extends QuestionPage[Boolean]
+    with TrustJourney {
 
   override def path: JsPath = JsPath \ namespace.key \ id \ toString
 
   override def toString: String = "trustWorksReferenceYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if value.contains(false) then
-      userAnswers.remove(TrustWorksReferencePage(id, namespace))
-    else
-      super.cleanup(value, userAnswers)
+    if value.contains(false) then userAnswers.remove(TrustWorksReferencePage(id, namespace))
+    else super.cleanup(value, userAnswers)
 }
 
 case object TrustWorksReferenceYesNoPage extends QuestionPage[Boolean] with TrustJourney {

@@ -17,6 +17,7 @@
 package models
 
 import base.SpecBase
+import models.JourneyNamespace.AddSubcontractor
 import pages.add.TypeOfSubcontractorPage
 import play.api.libs.json.{JsDefined, JsString}
 import queries.CisIdQuery
@@ -27,17 +28,17 @@ class UserAnswersSpec extends SpecBase {
 
     "keep two subjourneys in one login document" in {
       val answers = UserAnswers("user-1")
-        .set(TypeOfSubcontractorPage("uuid-1"), TypeOfSubcontractor.Partnership)
-        .flatMap(_.set(CisIdQuery("uuid-1"), "1045"))
-        .flatMap(_.set(TypeOfSubcontractorPage("uuid-2"), TypeOfSubcontractor.Partnership))
-        .flatMap(_.set(CisIdQuery("uuid-2"), "800"))
+        .set(TypeOfSubcontractorPage("uuid-1", AddSubcontractor), TypeOfSubcontractor.Partnership)
+        .flatMap(_.set(CisIdQuery("uuid-1", AddSubcontractor), "1045"))
+        .flatMap(_.set(TypeOfSubcontractorPage("uuid-2", AddSubcontractor), TypeOfSubcontractor.Partnership))
+        .flatMap(_.set(CisIdQuery("uuid-2", AddSubcontractor), "800"))
         .success
         .value
 
-      answers.get(TypeOfSubcontractorPage("uuid-1")) mustBe Some(TypeOfSubcontractor.Partnership)
-      answers.get(CisIdQuery("uuid-1")) mustBe Some("1045")
-      answers.get(TypeOfSubcontractorPage("uuid-2")) mustBe Some(TypeOfSubcontractor.Partnership)
-      answers.get(CisIdQuery("uuid-2")) mustBe Some("800")
+      answers.get(TypeOfSubcontractorPage("uuid-1", AddSubcontractor)) mustBe Some(TypeOfSubcontractor.Partnership)
+      answers.get(CisIdQuery("uuid-1", AddSubcontractor)) mustBe Some("1045")
+      answers.get(TypeOfSubcontractorPage("uuid-2", AddSubcontractor)) mustBe Some(TypeOfSubcontractor.Partnership)
+      answers.get(CisIdQuery("uuid-2", AddSubcontractor)) mustBe Some("800")
       (answers.data \ "addSubcontractor" \ "uuid-1" \ "cisId") mustBe JsDefined(JsString("1045"))
       (answers.data \ "addSubcontractor" \ "uuid-2" \ "cisId") mustBe JsDefined(JsString("800"))
     }
@@ -45,12 +46,12 @@ class UserAnswersSpec extends SpecBase {
     "do not overwrite root cisId when a subjourney cisId is set" in {
       val answers = UserAnswers("user-1")
         .set(CisIdQuery, "1")
-        .flatMap(_.set(CisIdQuery("uuid-1"), "1045"))
+        .flatMap(_.set(CisIdQuery("uuid-1", AddSubcontractor), "1045"))
         .success
         .value
 
       answers.get(CisIdQuery) mustBe Some("1")
-      answers.get(CisIdQuery("uuid-1")) mustBe Some("1045")
+      answers.get(CisIdQuery("uuid-1", AddSubcontractor)) mustBe Some("1045")
     }
   }
 }

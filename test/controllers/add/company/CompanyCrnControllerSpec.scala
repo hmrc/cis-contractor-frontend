@@ -20,6 +20,7 @@ import base.{SpecBase, WithFakeCisTaxpayer}
 import controllers.routes
 import forms.add.company.CompanyCrnFormProvider
 import models.{NormalMode, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -258,13 +259,13 @@ class CompanyCrnControllerSpec extends SpecBase with WithFakeCisTaxpayer with Mo
       val id     = flowId.toString
 
       val minUaWithId = emptyUserAnswers
-        .set(queries.CisIdQuery(id), "AB12")
+        .set(queries.CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(CompanyNamePage(id), companyName)
+        .set(CompanyNamePage(id, AddSubcontractor), companyName)
         .success
         .value
-        .set(CompanyCrnYesNoPage(id), true)
+        .set(CompanyCrnYesNoPage(id, AddSubcontractor), true)
         .success
         .value
 

@@ -19,6 +19,7 @@ package controllers.add
 import base.SpecBase
 import controllers.routes
 import forms.add.TypeOfSubcontractorFormProvider
+import models.JourneyNamespace.AddSubcontractor
 import models.requests.IdentifierRequest
 import models.response.CisTaxpayerResponse
 import models.{NormalMode, TypeOfSubcontractor, UserAnswers}
@@ -602,9 +603,9 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           controllers.add.partnership.routes.PartnershipNameController
             .onPageLoadWithId(UUID.fromString(id), NormalMode)
             .url
-        saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Partnership)
-        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe Some(startCisId)
+        saved.get(TypeOfSubcontractorPage(id, AddSubcontractor)) mustBe Some(TypeOfSubcontractor.Partnership)
+        saved.get(CisIdQuery(id, AddSubcontractor)) mustBe Some(startCisId)
+        saved.get(CisIdQuery) mustBe userAnswersWithCisId.get(CisIdQuery)
       }
     }
 
@@ -642,9 +643,9 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
           controllers.add.trust.routes.TrustNameController
             .onPageLoadWithId(UUID.fromString(id), NormalMode)
             .url
-        saved.get(TypeOfSubcontractorPage(id)) mustBe Some(TypeOfSubcontractor.Trust)
-        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe Some(startCisId)
+        saved.get(TypeOfSubcontractorPage(id, AddSubcontractor)) mustBe Some(TypeOfSubcontractor.Trust)
+        saved.get(CisIdQuery(id, AddSubcontractor)) mustBe Some(startCisId)
+        saved.get(CisIdQuery) mustBe userAnswersWithCisId.get(CisIdQuery)
       }
     }
 
@@ -683,7 +684,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         captor.getValue.get(PartnershipNamePage) mustBe None
-        captor.getValue.get(CisIdQuery) mustBe Some(startCisId)
+        captor.getValue.get(CisIdQuery) mustBe leftoverAnswers.get(CisIdQuery)
       }
     }
 
@@ -782,8 +783,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
         val saved = captor.getValue
         val id    = (saved.data \ "addSubcontractor").as[play.api.libs.json.JsObject].value.keys.head
-        saved.get(CisIdQuery(id)) mustBe Some(startCisId)
-        saved.get(CisIdQuery) mustBe Some(startCisId)
+        saved.get(CisIdQuery(id, AddSubcontractor)) mustBe Some(startCisId)
+        saved.get(CisIdQuery) mustBe None
       }
     }
 
@@ -882,7 +883,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(flowId.toString), startCisId)
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
           .success
           .value
       val application =
@@ -920,8 +921,8 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(flowId.toString), startCisId)
-          .flatMap(_.set(TypeOfSubcontractorPage(flowId.toString), TypeOfSubcontractor.Partnership))
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
+          .flatMap(_.set(TypeOfSubcontractorPage(flowId.toString, AddSubcontractor), TypeOfSubcontractor.Partnership))
           .success
           .value
 
@@ -963,7 +964,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(flowId.toString), startCisId)
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
           .success
           .value
 
@@ -990,10 +991,12 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         val saved = captor.getValue
-        saved.get(TypeOfSubcontractorPage(flowId.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
+        saved.get(TypeOfSubcontractorPage(flowId.toString, AddSubcontractor)) mustBe Some(
+          TypeOfSubcontractor.Partnership
+        )
         saved.get(TypeOfSubcontractorPage) mustBe None
         saved.get(CisIdQuery) mustBe Some("1")
-        saved.get(CisIdQuery(flowId.toString)) mustBe Some(startCisId)
+        saved.get(CisIdQuery(flowId.toString, AddSubcontractor)) mustBe Some(startCisId)
       }
     }
 
@@ -1001,7 +1004,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val leftoverAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(flowId.toString), startCisId)
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
           .flatMap(_.set(PartnershipNamePage, "Old name"))
           .success
           .value
@@ -1030,7 +1033,9 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         verify(mockSessionRepository).set(captor.capture())
 
         captor.getValue.get(PartnershipNamePage) mustBe None
-        captor.getValue.get(TypeOfSubcontractorPage(flowId.toString)) mustBe Some(TypeOfSubcontractor.Partnership)
+        captor.getValue.get(TypeOfSubcontractorPage(flowId.toString, AddSubcontractor)) mustBe Some(
+          TypeOfSubcontractor.Partnership
+        )
       }
     }
 
@@ -1042,7 +1047,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         userAnswersWithCisId
-          .set(CisIdQuery(flowId.toString), startCisId)
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
           .success
           .value
 
@@ -1072,7 +1077,7 @@ class TypeOfSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers =
         emptyUserAnswers
-          .set(CisIdQuery(flowId.toString), startCisId)
+          .set(CisIdQuery(flowId.toString, AddSubcontractor), startCisId)
           .success
           .value
       val application =

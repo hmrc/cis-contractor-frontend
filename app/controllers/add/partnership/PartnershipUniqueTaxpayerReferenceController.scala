@@ -182,8 +182,8 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
     sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
-      val id = flowId.toString
-      val page = PartnershipUniqueTaxpayerReferencePage(id, namespace)
+      val id           = flowId.toString
+      val page         = PartnershipUniqueTaxpayerReferencePage(id, namespace)
       val submitAction = routes.PartnershipUniqueTaxpayerReferenceController.onSubmitWithId(flowId, mode)
 
       if (!request.userAnswers.get(PartnershipHasUtrYesNoPage(id, namespace)).contains(true)) {
@@ -195,8 +195,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
             form
               .bindFromRequest()
               .fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
+                formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, name, submitAction))),
                 value =>
                   val prevValue = request.userAnswers.get(page)
                   val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage(id))
@@ -210,7 +209,7 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
 
                     case _ =>
                       subcontractorService.isDuplicateUTR(request.userAnswers, value, id, namespace).flatMap {
-                        case true =>
+                        case true  =>
                           val errorForm = form
                             .fill(value)
                             .withError(
@@ -225,7 +224,9 @@ class PartnershipUniqueTaxpayerReferenceController @Inject() (
               )
           }
           .getOrElse {
-            logger.error(s"[PartnershipUniqueTaxpayerReferenceController][onSubmitWithId] - PartnershipNamePage missing from userAnswers")
+            logger.error(
+              s"[PartnershipUniqueTaxpayerReferenceController][onSubmitWithId] - PartnershipNamePage missing from userAnswers"
+            )
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
       }

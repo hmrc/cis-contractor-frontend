@@ -171,7 +171,9 @@ class CompanyWorksReferenceYesNoController @Inject() (
             )
         }
         .getOrElse {
-          logger.error(s"[CompanyWorksReferenceYesNoController][onSubmitWithId] - CompanyNamePage missing from userAnswers")
+          logger.error(
+            s"[CompanyWorksReferenceYesNoController][onSubmitWithId] - CompanyNamePage missing from userAnswers"
+          )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
     }

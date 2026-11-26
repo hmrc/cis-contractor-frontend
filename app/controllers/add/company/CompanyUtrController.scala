@@ -89,7 +89,7 @@ class CompanyUtrController @Inject() (
       updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyUtrPage(id, namespace), value))
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(navigator.nextPage(CompanyUtrPage(id, namespace), mode, updatedAnswers))
-  
+
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
 
@@ -255,13 +255,13 @@ class CompanyUtrController @Inject() (
                 value =>
                   val prevValue = request.userAnswers.get(CompanyUtrPage(id, namespace))
                   val baseValue = request.userAnswers.get(FinalValidationBaseUtrPage(id))
-      
+
                   mode match {
-                    case AmendMode if prevValue.contains(value) =>
+                    case AmendMode if prevValue.contains(value)                                        =>
                       saveAndContinue(mode, value, id, namespace)
                     case FinalValidationMode if prevValue.contains(value) || baseValue.contains(value) =>
                       saveAndContinue(mode, value, id, namespace)
-                    case _ =>
+                    case _                                                                             =>
                       subcontractorService.isDuplicateUTR(request.userAnswers, value, id, namespace).flatMap {
                         case true  =>
                           val errorForm = form

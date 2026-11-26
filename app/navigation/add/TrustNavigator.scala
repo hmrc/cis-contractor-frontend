@@ -45,19 +45,19 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
 
   private def extractId(page: Page): Option[String] =
     page match {
-      case TrustNamePage(id, AddSubcontractor) => Some(id)
-      case TrustAddressYesNoPage(id, AddSubcontractor) => Some(id)
-      case TrustAddressPage(id, AddSubcontractor) => Some(id)
+      case TrustNamePage(id, AddSubcontractor)                   => Some(id)
+      case TrustAddressYesNoPage(id, AddSubcontractor)           => Some(id)
+      case TrustAddressPage(id, AddSubcontractor)                => Some(id)
       case AddTrustContactMethodsYesNoPage(id, AddSubcontractor) => Some(id)
-      case TrustContactMethodOptionsPage(id, AddSubcontractor) => Some(id)
-      case TrustEmailAddressPage(id, AddSubcontractor) => Some(id)
-      case TrustPhoneNumberPage(id, AddSubcontractor) => Some(id)
-      case TrustMobileNumberPage(id, AddSubcontractor) => Some(id)
-      case TrustUtrYesNoPage(id, AddSubcontractor) => Some(id)
-      case TrustUtrPage(id, AddSubcontractor) => Some(id)
-      case TrustWorksReferenceYesNoPage(id, AddSubcontractor) => Some(id)
-      case TrustWorksReferencePage(id, AddSubcontractor) => Some(id)
-      case _ => None
+      case TrustContactMethodOptionsPage(id, AddSubcontractor)   => Some(id)
+      case TrustEmailAddressPage(id, AddSubcontractor)           => Some(id)
+      case TrustPhoneNumberPage(id, AddSubcontractor)            => Some(id)
+      case TrustMobileNumberPage(id, AddSubcontractor)           => Some(id)
+      case TrustUtrYesNoPage(id, AddSubcontractor)               => Some(id)
+      case TrustUtrPage(id, AddSubcontractor)                    => Some(id)
+      case TrustWorksReferenceYesNoPage(id, AddSubcontractor)    => Some(id)
+      case TrustWorksReferencePage(id, AddSubcontractor)         => Some(id)
+      case _                                                     => None
     }
 
   private def cyaRouteWithId(flowId: UUID): Call =
@@ -98,7 +98,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       userAnswers => navigatorFromTrustWorksReferenceYesNoPage(flowId, id, NormalMode)(userAnswers)
     case TrustWorksReferencePage(_, AddSubcontractor)         =>
       _ => cyaRouteWithId(flowId)
-    case _                                  => _ => routes.IndexController.onPageLoad()
+    case _                                                    => _ => routes.IndexController.onPageLoad()
   }
 
   private def checkRouteMapWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
@@ -139,7 +139,7 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
     case TrustWorksReferenceYesNoPage(_, AddSubcontractor)    =>
       navigatorFromTrustWorksReferenceYesNoPage(flowId, id, CheckMode)(_)
     case TrustWorksReferencePage(_, AddSubcontractor)         => _ => cyaRouteWithId(flowId)
-    case _                                  => _ => cyaRouteWithId(flowId)
+    case _                                                    => _ => cyaRouteWithId(flowId)
   }
 
   private def navigatorFromTrustUtrYesNoPage(flowId: UUID, id: String, mode: Mode)(ua: UserAnswers): Call =
@@ -165,7 +165,8 @@ class TrustNavigator @Inject() () extends NavigatorForJourney {
       mode,
       ua.get(TrustAddressYesNoPage(id, AddSubcontractor)),
       ua.get(TrustAddressPage(id, AddSubcontractor)).isDefined,
-      onYes = controllers.add.trust.routes.TrustAddressController.redirectToAddressLookupWithId(flowId, NormalMode, None),
+      onYes =
+        controllers.add.trust.routes.TrustAddressController.redirectToAddressLookupWithId(flowId, NormalMode, None),
       onYesChange = controllers.add.trust.routes.TrustAddressController
         .redirectToAddressLookupWithId(flowId, NormalMode, Some(CheckMode.toString)),
       onNo = controllers.add.trust.routes.AddTrustContactMethodsYesNoController.onPageLoadWithId(flowId, NormalMode),

@@ -87,37 +87,34 @@ class IndividualNamesOptionsController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = IndividualNamesOptionsPage(id, namespace)
+      val id   = flowId.toString
+      val page = IndividualNamesOptionsPage(id, namespace)
 
-        val preparedForm = request.userAnswers.get(page) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
+      val preparedForm = request.userAnswers.get(page) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-        Ok(view(preparedForm, mode, Some(flowId)))
+      Ok(view(preparedForm, mode, Some(flowId)))
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = IndividualNamesOptionsPage(id, namespace)
+      val id   = flowId.toString
+      val page = IndividualNamesOptionsPage(id, namespace)
 
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, Some(flowId)))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
-          )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, Some(flowId)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+        )
     }
 }

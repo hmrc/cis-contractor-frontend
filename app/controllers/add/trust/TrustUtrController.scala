@@ -77,7 +77,7 @@ class TrustUtrController @Inject() (
       updatedAnswers <- Future.fromTry(request.userAnswers.set(TrustUtrPage(id, namespace), value))
       _              <- sessionRepository.set(updatedAnswers)
     } yield Redirect(navigator.nextPage(TrustUtrPage(id, namespace), mode, updatedAnswers))
-  
+
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
       val yesOrNoPage       = TrustUtrYesNoPage

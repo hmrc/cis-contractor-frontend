@@ -51,7 +51,7 @@ class FinalValidationHandoffController @Inject() (
             case Some(id) => finalValidationHandoffService.prepareMonthlyReturnJourney(emptyUserAnswers, handoffId, id)
             case None     => finalValidationHandoffService.prepareMonthlyReturnJourney(emptyUserAnswers, handoffId)
           }
-        case None =>
+        case None          =>
           Future.successful(None)
       }
       .map {

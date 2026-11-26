@@ -71,7 +71,7 @@ object Mode {
       override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Mode]] =
         params.get(key).map {
           case Seq("FinalValidationMode") => Right(FinalValidationMode)
-          case _ => Left("Unsupported mode")
+          case _                          => Left("Unsupported mode")
         }
 
       override def unbind(key: String, value: Mode): String =

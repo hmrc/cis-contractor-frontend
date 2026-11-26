@@ -62,7 +62,7 @@ class NationalInsuranceNumberYesNoController @Inject() (
   // Multi-tab
   private def preparedForm(id: String, namespace: JourneyNamespace)(implicit request: DataRequest[?]) =
     request.userAnswers.get(NationalInsuranceNumberYesNoPage(id, namespace)).fold(form)(form.fill)
-  
+
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       subcontractorNameExtractor
@@ -98,45 +98,47 @@ class NationalInsuranceNumberYesNoController @Inject() (
 
   // Multi-tab
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
+      val id = flowId.toString
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error("[NationalInsuranceNumberYesNoController][onPageLoadWithId] - subcontractor name missing or invalid")
-            recoveryRedirect
-          } { subcontractorName =>
-            Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
-          }
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[NationalInsuranceNumberYesNoController][onPageLoadWithId] - subcontractor name missing or invalid"
+          )
+          recoveryRedirect
+        } { subcontractorName =>
+          Ok(view(preparedForm(id, namespace), mode, subcontractorName, Some(flowId)))
+        }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
-    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace =>
-      implicit request =>
+    sharedSubcontractorJourneyAction.async(flowId, mode) { namespace => implicit request =>
 
-        val id = flowId.toString
-        val page = NationalInsuranceNumberYesNoPage(id, namespace)
+      val id   = flowId.toString
+      val page = NationalInsuranceNumberYesNoPage(id, namespace)
 
-        subcontractorNameExtractor
-          .getSubcontractorName(request.userAnswers, mode, id, namespace)
-          .fold {
-            logger.error("[NationalInsuranceNumberYesNoController][onSubmitWithId] - subcontractor name missing or invalid")
-            Future.successful(recoveryRedirect)
-          } { subcontractorName =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
-                value =>
-                  for {
-                    updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
-                    _ <- sessionRepository.set(updatedAnswers)
-                  } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
-              )
-          }
-    }  
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id, namespace)
+        .fold {
+          logger.error(
+            "[NationalInsuranceNumberYesNoController][onSubmitWithId] - subcontractor name missing or invalid"
+          )
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, Some(flowId)))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
+            )
+        }
+    }
 }

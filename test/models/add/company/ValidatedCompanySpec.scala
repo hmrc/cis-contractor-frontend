@@ -20,6 +20,7 @@ import base.SpecBase
 import models.address.Address
 import models.contact.ContactMethodOptions
 import models.{InvalidAnswer, MissingAnswer, TypeOfSubcontractor, UserAnswers}
+import models.JourneyNamespace.AddSubcontractor
 import models.RichJsObject
 import pages.QuestionPage
 import pages.add.TypeOfSubcontractorPage
@@ -73,32 +74,32 @@ class ValidatedCompanySpec extends SpecBase with Matchers {
     "build successfully from a subjourney" in {
       val id      = "11111111-1111-1111-1111-111111111111"
       val answers = emptyUserAnswers
-        .set(CisIdQuery(id), "AB12")
+        .set(CisIdQuery(id, AddSubcontractor), "AB12")
         .success
         .value
-        .set(TypeOfSubcontractorPage(id), TypeOfSubcontractor.Limitedcompany)
+        .set(TypeOfSubcontractorPage(id, AddSubcontractor), TypeOfSubcontractor.Limitedcompany)
         .success
         .value
-        .set(CompanyNamePage(id), "Folder Company Ltd")
+        .set(CompanyNamePage(id, AddSubcontractor), "Folder Company Ltd")
         .success
         .value
-        .set(CompanyAddressYesNoPage(id), false)
+        .set(CompanyAddressYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(AddCompanyContactMethodsYesNoPage(id), false)
+        .set(AddCompanyContactMethodsYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(CompanyUtrYesNoPage(id), false)
+        .set(CompanyUtrYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(CompanyCrnYesNoPage(id), false)
+        .set(CompanyCrnYesNoPage(id, AddSubcontractor), false)
         .success
         .value
-        .set(CompanyWorksReferenceYesNoPage(id), false)
+        .set(CompanyWorksReferenceYesNoPage(id, AddSubcontractor), false)
         .success
         .value
 
-      ValidatedCompany.build(answers, id) mustBe a[Right[?, ?]]
+      ValidatedCompany.build(answers, id, AddSubcontractor) mustBe a[Right[?, ?]]
     }
 
     "fail when TypeOfSubcontractor is not Limitedcompany" in {
