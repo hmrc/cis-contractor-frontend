@@ -101,25 +101,28 @@ class SubAddressYesNoController @Inject() (
   def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
       val id           = flowId.toString
+      val page         = SubAddressYesNoPage(id)
       val submitAction = routes.SubAddressYesNoController.onSubmitWithId(flowId, mode)
-      SubcontractorNameDisplayHelper
-        .getSubcontractorDisplayName(request.userAnswers, mode, id)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
         .fold {
-          logger.error("[SubAddressYesNoController][onPageLoad] - subcontractor name missing or invalid")
+          logger.error("[SubAddressYesNoController][onPageLoadWithId] - subcontractor name missing or invalid")
           recoveryRedirect
         } { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName, submitAction))
+          val filledForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(view(filledForm, mode, subcontractorName, submitAction))
         }
     }
 
   def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
       val id           = flowId.toString
+      val page         = SubAddressYesNoPage(id)
       val submitAction = routes.SubAddressYesNoController.onSubmitWithId(flowId, mode)
-      SubcontractorNameDisplayHelper
-        .getSubcontractorDisplayName(request.userAnswers, mode, id)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
         .fold {
-          logger.error("[SubAddressYesNoController][onSubmit] - subcontractor name missing or invalid")
+          logger.error("[SubAddressYesNoController][onSubmitWithId] - subcontractor name missing or invalid")
           Future.successful(recoveryRedirect)
         } { subcontractorName =>
           form
@@ -129,9 +132,9 @@ class SubAddressYesNoController @Inject() (
                 Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, submitAction))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(SubAddressYesNoPage, value))
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(SubAddressYesNoPage, mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
             )
         }
     }
