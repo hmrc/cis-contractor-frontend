@@ -40,6 +40,8 @@ import scala.util.{Failure, Success, Try}
 class AmendSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   subcontractorService: SubcontractorService,
   cleanupService: DefaultSubcontractorCleanupService,
   val controllerComponents: MessagesControllerComponents,
@@ -440,7 +442,7 @@ class AmendSubcontractorController @Inject() (
     subcontractor: SubcontractorResponse,
     flowId: UUID
   ): Try[UserAnswers] = {
-    val subJourneyId = flowId.toString
+    val subJourneyId = Some(flowId.toString)
 
     subcontractorType match {
       case Individualorsoletrader =>

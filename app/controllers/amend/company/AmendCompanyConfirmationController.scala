@@ -17,7 +17,7 @@
 package controllers.amend.company
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import controllers.routes
 import models.amend.AmendJourneyType
 import pages.add.company.CompanyNamePage
@@ -34,12 +34,14 @@ import viewmodels.amend.company.CompanyAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendCompanyConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService,
@@ -128,6 +130,105 @@ class AmendCompanyConfirmationController @Inject() (
                       .recover { case exception =>
                         logger.error(
                           "[AmendCompanyConfirmationController.onPageLoad] " +
+                            "Failed to persist confirmation session data",
+                          exception
+                        )
+
+                        recoveryRedirect
+                      }
+
+                  case None =>
+                    logger.error(
+                      "[AmendCompanyConfirmationController] Missing AmendJourneyTypePage"
+                    )
+
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
+      }
+    }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
+      val recoveryRedirect =
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+      val ua = request.userAnswers
+
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage(subJourneyId)).contains(true)) {
+        logger.error(
+          "[AmendCompanyConfirmationController] Accessed without prior CYA submission"
+        )
+        Future.successful(recoveryRedirect)
+      } else {
+        ua.get(OriginalCompanyAnswersQuery) match { // TODO DTR-9463: Do I need to update query with id?
+
+          case None =>
+            logger.error(
+              "[AmendCompanyConfirmationController] Missing OriginalCompanyAnswersQuery"
+            )
+            Future.successful(recoveryRedirect)
+
+          case Some(originalCompanyAnswers) =>
+            ua.get(CisIdQuery(subJourneyId)) match {
+
+              case None =>
+                logger.error(
+                  "[AmendCompanyConfirmationController] Missing CisIdQuery"
+                )
+                Future.successful(recoveryRedirect)
+
+              case Some(cisId) =>
+                ua.get(AmendJourneyTypePage(subJourneyId)) match {
+
+                  case Some(journeyType) =>
+                    val tableRows =
+                      CompanyAmendConfirmationViewModel.rows(
+                        originalCompanyAnswers,
+                        ua
+                      )
+
+                    val companyName =
+                      ua.get(CompanyNamePage(subJourneyId)).getOrElse(Messages("verify.noName"))
+
+                    val confirmationLink =
+                      AmendConfirmationLinks.build(
+                        journeyType,
+                        cisId,
+                        appConfig,
+                        Some(flowId)
+                      )
+
+                    val persistFinalUserAnswers =
+                      journeyType match {
+
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
+
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(
+                            ua
+                          )
+                      }
+
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            companyName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
+                          "[AmendCompanyConfirmationController.onPageLoadWithId] " +
                             "Failed to persist confirmation session data",
                           exception
                         )

@@ -134,12 +134,21 @@ object ValidatedPartnership extends Validation {
       partnershipWorkRefNumber
     )
 
-  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedPartnership] =
-    buildPartnership(
-      answers,
-      getAmendPageValue(answers, PartnershipNamePage),
-      getAmendPageValue(answers, PartnershipNominatedPartnerNamePage)
-    )
+  def buildForAmend(answers: UserAnswers, subJourneyId: Option[String] = None): Either[ValidationError, ValidatedPartnership] =
+    subJourneyId match {
+      case Some(id) =>
+        buildPartnership(
+          answers,
+          getAmendPageValue(answers, PartnershipNamePage(id)),
+          getAmendPageValue(answers, PartnershipNominatedPartnerNamePage(id))
+        )
+      case None     =>
+        buildPartnership(
+          answers,
+          getAmendPageValue(answers, PartnershipNamePage),
+          getAmendPageValue(answers, PartnershipNominatedPartnerNamePage)
+        )
+    }
 
   private def buildPartnership(
     answers: UserAnswers,
