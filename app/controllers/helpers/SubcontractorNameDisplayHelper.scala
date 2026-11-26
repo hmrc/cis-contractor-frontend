@@ -55,6 +55,17 @@ object SubcontractorNameDisplayHelper {
         if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
       }
 
+  def trustDisplayName(userAnswers: UserAnswers, mode: Mode, subJourneyId: String)(implicit
+    messages: Messages
+  ): String =
+    userAnswers
+      .get(TrustNamePage(subJourneyId))
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse {
+        if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
+      }
+
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage)
 

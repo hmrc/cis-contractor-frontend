@@ -92,6 +92,9 @@ object ValidatedTrust extends Validation {
   def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedTrust] =
     buildTrust(answers, getAmendPageValue(answers, TrustNamePage))
 
+  def buildForAmend(answers: UserAnswers, subJourneyId: String): Either[ValidationError, ValidatedTrust] =
+    buildTrust(answers, getAmendPageValue(answers, TrustNamePage(subJourneyId)), subJourneyId)
+
   private def buildTrust(
     answers: UserAnswers,
     trustName: Either[ValidationError, String]
@@ -125,6 +128,72 @@ object ValidatedTrust extends Validation {
       trustUtr <- getOptionalPageValue(answers, TrustUtrPage, TrustUtrYesNoPage)
 
       trustWorkRefNumber <- getOptionalPageValue(answers, TrustWorksReferencePage, TrustWorksReferenceYesNoPage)
+
+    } yield ValidatedTrust(
+      trustName = trustName,
+      trustAddress = trustAddress,
+      trustContactMethodOptions = trustContactMethodOptions,
+      trustEmail = trustEmail,
+      trustPhone = trustPhone,
+      trustMobile = trustMobile,
+      trustUtr = trustUtr,
+      trustWorkRefNumber = trustWorkRefNumber
+    )
+
+  private def buildTrust(
+    answers: UserAnswers,
+    trustName: Either[ValidationError, String],
+    subJourneyId: String
+  ): Either[ValidationError, ValidatedTrust] =
+    for {
+      _ <- validateType(answers, subJourneyId)
+
+      trustName <- trustName
+
+      trustAddress <- getOptionalPageValue(answers, TrustAddressPage(subJourneyId), TrustAddressYesNoPage(subJourneyId))
+
+      trustContactMethodOptions <-
+        getOptionalPageValue(
+          answers,
+          TrustContactMethodOptionsPage(subJourneyId),
+          AddTrustContactMethodsYesNoPage(subJourneyId)
+        ).flatMap {
+          case Some(methods) if methods.nonEmpty =>
+            Right(Some(methods))
+
+          case Some(_) =>
+            Left(InvalidAnswer(TrustContactMethodOptionsPage(subJourneyId)))
+
+          case None =>
+            Right(None)
+        }
+
+      trustEmail  <-
+        getContactPageValue(
+          answers,
+          trustContactMethodOptions,
+          TrustEmailAddressPage(subJourneyId),
+          ContactMethodOptions.Email
+        )
+      trustPhone  <-
+        getContactPageValue(
+          answers,
+          trustContactMethodOptions,
+          TrustPhoneNumberPage(subJourneyId),
+          ContactMethodOptions.Phone
+        )
+      trustMobile <-
+        getContactPageValue(
+          answers,
+          trustContactMethodOptions,
+          TrustMobileNumberPage(subJourneyId),
+          ContactMethodOptions.Mobile
+        )
+
+      trustUtr <- getOptionalPageValue(answers, TrustUtrPage(subJourneyId), TrustUtrYesNoPage(subJourneyId))
+
+      trustWorkRefNumber <-
+        getOptionalPageValue(answers, TrustWorksReferencePage(subJourneyId), TrustWorksReferenceYesNoPage(subJourneyId))
 
     } yield ValidatedTrust(
       trustName = trustName,
