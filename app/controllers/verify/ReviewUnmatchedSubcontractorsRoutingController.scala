@@ -181,7 +181,7 @@ class ReviewUnmatchedSubcontractorsRoutingController @Inject() (
                               .recreateCurrentBatchFromUnmatchedVerifications(
                                 cisId,
                                 updatedAnswers,
-                                subJourneyId
+                                Some(subJourneyId)
                               )
                               .map { _ =>
                                 Redirect(
