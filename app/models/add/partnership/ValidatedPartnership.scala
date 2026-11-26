@@ -134,7 +134,10 @@ object ValidatedPartnership extends Validation {
       partnershipWorkRefNumber
     )
 
-  def buildForAmend(answers: UserAnswers, subJourneyId: Option[String] = None): Either[ValidationError, ValidatedPartnership] =
+  def buildForAmend(
+    answers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Either[ValidationError, ValidatedPartnership] =
     subJourneyId match {
       case Some(id) =>
         buildPartnership(

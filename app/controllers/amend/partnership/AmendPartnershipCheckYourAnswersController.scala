@@ -110,7 +110,8 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
             SummaryListViewModel(rows = detailsRows(ua, isVerified).flatten)
 
           val submitUrl =
-            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onSubmitWithId(flowId, subbieResourceRef)
+            controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController
+              .onSubmitWithId(flowId, subbieResourceRef)
           val cancelUrl =
             controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onCancelWithId(flowId)
 
@@ -177,7 +178,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
               AmendMode,
               showActions = false,
               Some(
-                controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, AmendMode).url
+                controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+                  .onPageLoadWithId(flowId, AmendMode)
+                  .url
               ),
               Some(subJourneyId)
             ),
@@ -186,7 +189,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
               AmendMode,
               showActions = false,
               Some(
-                controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController.onPageLoadWithId(flowId, AmendMode).url
+                controllers.add.partnership.routes.PartnershipNominatedPartnerUtrController
+                  .onPageLoadWithId(flowId, AmendMode)
+                  .url
               ),
               Some(subJourneyId)
             )
@@ -356,7 +361,8 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
         PartnershipAddressSummary.row(
           ua,
           AmendMode,
-          controllers.add.partnership.routes.PartnershipAddressController.redirectToAmendAddressLookupWithId(flowId), // TODO DTR-9463: Update with id
+          controllers.add.partnership.routes.PartnershipAddressController
+            .redirectToAmendAddressLookupWithId(flowId), // TODO DTR-9463: Update with id
           Some(subJourneyId)
         ),
         AddPartnershipContactMethodsYesNoSummary.row(
@@ -780,9 +786,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   private def noChangesRedirectWithId(
     flowId: UUID,
-                                 userAnswers: UserAnswers,
-                                 cisId: String
-                               ): Call = {
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call = {
     val subJourneyId = flowId.toString
     userAnswers.get(AmendJourneyTypePage(subJourneyId)) match {
 
@@ -845,9 +851,8 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
 
   def onCancelWithId(flowId: UUID): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-
       request.userAnswers.get(CisIdQuery(flowId.toString)) match {
-        case Some(id) => {
+        case Some(id) =>
           val redirectCall =
             noChangesRedirect(
               request.userAnswers,
@@ -873,11 +878,9 @@ class AmendPartnershipCheckYourAnswersController @Inject() (
                 routes.JourneyRecoveryController.onPageLoad()
               )
             }
-        }
-        case None => {
+        case None     =>
           logger.error(s"[AmendPartnershipCheckYourAnswersController.onCancelWithId] - No cisId")
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-        }
       }
     }
 }
