@@ -263,8 +263,8 @@ class AmendTrustCheckYourAnswersController @Inject() (
             ua,
             AmendMode,
             Some(
-              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoadWithId("utr").url
-            ), // TODO DTR-9463: Update with id
+              controllers.amend.trust.routes.AmendTrustRemoveDetailYesNoController.onPageLoadWithId(flowId, "utr").url
+            ),
             Some(subJourneyId)
           ),
           TrustUtrSummary.row(
@@ -294,7 +294,7 @@ class AmendTrustCheckYourAnswersController @Inject() (
           AmendMode,
           Some(
             controllers.add.trust.routes.TrustAddressController.redirectToAmendAddressLookupWithId(flowId)
-          ), // TODO DTR-9463: Update with id
+          ), // TODO DTR-9463: Investigate failure
           Some(subJourneyId)
         ),
         AddTrustContactMethodsYesNoSummary.row(

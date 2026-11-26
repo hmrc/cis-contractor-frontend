@@ -94,6 +94,26 @@ class TrustAddressController @Inject() (
         }
     }
 
+  def redirectToAmendAddressLookupWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      (for {
+        ua <- Future.fromTry(
+                request.userAnswers.set(AddressLookupAmendReturnQuery, true)
+              ) // TODO DTR-9463: Do we need to update query with id?
+        _  <- sessionRepository.set(ua)
+      } yield Redirect(
+        routes.TrustAddressController.redirectToAddressLookup(AmendMode, Some("change"))
+      )) // TODO DTR-9463: investigate this
+        .recover { case ex =>
+          logger.error(
+            "[TrustAddressController][redirectToAmendAddressLookupWithID] - failed to set session data for amend",
+            ex
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
   def redirectToAddressLookupWithId(
     flowId: UUID,
     changeRoute: Option[String] = None
