@@ -83,7 +83,8 @@ class IndividualNavigator @Inject() () extends NavigatorForJourney {
     }
 
   private def normalRoutesWithId(flowId: UUID, id: String): Page => UserAnswers => Call = {
-    case IndividualNamesOptionsPage(_)             => userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, NormalMode)(userAnswers)
+    case IndividualNamesOptionsPage(_)             =>
+      userAnswers => navigatorFromIndividualNamesOptionsPage(flowId, id, NormalMode)(userAnswers)
     case SubcontractorNamePage(_)                  => userAnswers => navigatorFromSubcontractorNamePage(NormalMode)(userAnswers)
     case TradingNameOfSubcontractorPage            => _ => controllers.add.routes.SubAddressYesNoController.onPageLoad(NormalMode)
     case SubAddressYesNoPage(_)                    => userAnswers => navigatorFromSubAddressYesNoPage(flowId, id, NormalMode)(userAnswers)

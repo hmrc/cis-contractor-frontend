@@ -132,7 +132,7 @@ class SharedNavigator @Inject() () extends NavigatorForJourney {
       case (Partnership, Some(value))    =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController
           .onPageLoadWithId(UUID.fromString(value))
-      case (Partnership, _)            =>
+      case (Partnership, _)              =>
         controllers.add.partnership.routes.PartnershipCheckYourAnswersController.onPageLoad()
       case (Trust, Some(value))          =>
         controllers.add.trust.routes.TrustCheckYourAnswersController
