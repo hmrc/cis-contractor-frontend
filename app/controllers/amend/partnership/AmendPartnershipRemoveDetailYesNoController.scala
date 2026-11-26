@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.amend.partnership.AmendPartnershipRemoveDetailYesNoView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendPartnershipRemoveDetailYesNoController @Inject() (
@@ -40,6 +41,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
   sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   formProvider: AmendPartnershipRemoveDetailYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -72,23 +74,41 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
     }
 
   private def getPartnershipName(
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[String] =
-    SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode)
+    subJourneyId match {
+      case Some(id) => SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode, id)
+      case None     => SubcontractorNameDisplayHelper.getPartnershipDisplayName(userAnswers, AmendMode)
+    }
 
   private def getNominatedPartnerName(
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[String] =
-    SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
+    subJourneyId match {
+      case Some(id) => SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode, id)
+      case None     => SubcontractorNameDisplayHelper.getPartnerDisplayName(userAnswers, AmendMode)
+    }
 
   private def getDetailName(
     subcontractorDetail: AmendPartnershipRemoveDetail,
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    subJourneyId: Option[String] = None
   )(implicit messages: Messages): Option[String] =
-    if (subcontractorDetail.isNominatedPartnerDetail) {
-      getNominatedPartnerName(userAnswers)
-    } else {
-      getPartnershipName(userAnswers)
+    subJourneyId match {
+      case Some(id) =>
+        if (subcontractorDetail.isNominatedPartnerDetail) {
+          getNominatedPartnerName(userAnswers, subJourneyId)
+        } else {
+          getPartnershipName(userAnswers, subJourneyId)
+        }
+      case None     =>
+        if (subcontractorDetail.isNominatedPartnerDetail) {
+          getNominatedPartnerName(userAnswers)
+        } else {
+          getPartnershipName(userAnswers)
+        }
     }
 
   private def detailIsPresent(
@@ -135,8 +155,56 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
           .contains(true)
     }
 
+  private def detailIsPresentWithId(
+    flowId: UUID,
+    subcontractorDetail: AmendPartnershipRemoveDetail,
+    userAnswers: UserAnswers
+  ): Boolean = {
+    val subJourneyId = flowId.toString
+
+    subcontractorDetail match {
+      case AmendPartnershipRemoveDetail.Address =>
+        userAnswers
+          .get(PartnershipAddressYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendPartnershipRemoveDetail.ContactDetails =>
+        userAnswers
+          .get(AddPartnershipContactMethodsYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendPartnershipRemoveDetail.Utr =>
+        userAnswers
+          .get(PartnershipHasUtrYesNoPage(subJourneyId))
+          .contains(true) &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers, subJourneyId)
+
+      case AmendPartnershipRemoveDetail.WorksReferenceNumber =>
+        userAnswers
+          .get(PartnershipWorksReferenceNumberYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendPartnershipRemoveDetail.NominatedPartnerUtr =>
+        userAnswers
+          .get(PartnershipNominatedPartnerUtrYesNoPage(subJourneyId))
+          .contains(true) &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers, subJourneyId)
+
+      case AmendPartnershipRemoveDetail.NominatedPartnerNino =>
+        userAnswers
+          .get(PartnershipNominatedPartnerNinoYesNoPage(subJourneyId))
+          .contains(true)
+
+      case AmendPartnershipRemoveDetail.NominatedPartnerCompanyRegistrationNumber =>
+        userAnswers
+          .get(PartnershipNominatedPartnerCrnYesNoPage(subJourneyId))
+          .contains(true)
+    }
+  }
+
   private def withDetailContext(
-    subcontractorDetail: String
+    subcontractorDetail: String,
+    subJourneyId: Option[String] = None
   )(
     block: (String, String) => Future[Result]
   )(implicit request: DataRequest[_], messages: Messages): Future[Result] =
@@ -148,7 +216,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
         Future.successful(journeyRecovery)
       } else {
 
-        getDetailName(detailType, request.userAnswers) match {
+        getDetailName(detailType, request.userAnswers, subJourneyId) match {
 
           case Some(detailName) =>
             block(
@@ -177,6 +245,32 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
               subcontractorDetail,
               detailTitle,
               detailName
+            )
+          )
+        )
+      }
+    }
+
+  def onPageLoadWithId(
+    flowId: UUID,
+    subcontractorDetail: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+      val formAction   = Some(
+        controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+          .onSubmitWithId(flowId, subcontractorDetail)
+      )
+
+      withDetailContext(subcontractorDetail, Some(subJourneyId)) { (detailTitle, detailName) =>
+        Future.successful(
+          Ok(
+            view(
+              formProvider(),
+              subcontractorDetail,
+              detailTitle,
+              detailName,
+              formAction
             )
           )
         )
@@ -216,6 +310,62 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
 
               } yield Redirect(
                 controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoad()
+              )).recover { case ex =>
+                logger.error(
+                  s"Failed to save remove subcontractorDetail answer for '$subcontractorDetail'",
+                  ex
+                )
+
+                Redirect(
+                  controllers.routes.JourneyRecoveryController
+                    .onPageLoad()
+                )
+              }
+          )
+      }
+    }
+
+  def onSubmitWithId(
+    flowId: UUID,
+    subcontractorDetail: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      withDetailContext(subcontractorDetail) { (detailTitle, detailName) =>
+        val subJourneyId = flowId.toString
+        val formAction   = Some(
+          controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController
+            .onSubmitWithId(flowId, subcontractorDetail)
+        )
+
+        formProvider()
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    subcontractorDetail,
+                    detailTitle,
+                    detailName,
+                    formAction
+                  )
+                )
+              ),
+            value =>
+              (for {
+                updatedAnswers <-
+                  Future.fromTry(
+                    request.userAnswers.set(
+                      AmendPartnershipRemoveDetailYesNoPage(subcontractorDetail), // TODO DTR-9463: Update with di
+                      value
+                    )
+                  )
+
+                _ <- sessionRepository.set(updatedAnswers)
+
+              } yield Redirect(
+                controllers.amend.partnership.routes.AmendPartnershipCheckYourAnswersController.onPageLoadWithId(flowId)
               )).recover { case ex =>
                 logger.error(
                   s"Failed to save remove subcontractorDetail answer for '$subcontractorDetail'",
