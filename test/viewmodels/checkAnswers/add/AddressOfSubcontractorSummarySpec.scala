@@ -246,7 +246,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val result = AddressOfSubcontractorSummary.row(userAnswers, CheckMode, )
+      val result = AddressOfSubcontractorSummary.row(userAnswers)
 
       result shouldBe defined
 
