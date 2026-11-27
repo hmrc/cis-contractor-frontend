@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import models.finalvalidation.{FinalValidationContext, VerifyFinalValidationSource}
 import models.response.GetCurrentVerificationBatchResponse
 import org.mockito.ArgumentCaptor
@@ -27,12 +27,14 @@ import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 import models.UserAnswers
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoSugar {
+class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoSugar with WithFakeCisTaxpayer {
 
   private val endpointUrl = "/subcontractor/verify/review-unmatched-subcontractors"
 
@@ -88,6 +90,61 @@ class ReviewUnmatchedSubcontractorsControllerSpec extends SpecBase with MockitoS
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
+
+        val savedAnswers = savedAnswersCaptor.getValue
+        savedAnswers
+          .get(VerifyFinalValidationSourcePage)
+          .value mustEqual VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+        savedAnswers.get(FinalValidationContextPage).value mustEqual FinalValidationContext.VerifySubcontractor
+      }
+    }
+
+    "onPageLoad with id must render the review unmatched subcontractors view when the nested current batch is present" in {
+      val flowId      = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val userAnswers = emptyUserAnswers
+        .set(CurrentVerificationBatchResponsePage(flowId.toString), currentBatchResponse)
+        .success
+        .value
+        .set(VerifyCisIdQuery(flowId.toString), "AB12")
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ReviewUnmatchedSubcontractorsController.onPageLoadWithId(flowId).url)
+          ).value
+
+        status(result) mustEqual OK
+      }
+    }
+
+    "onSubmit with id must set the final validation source and context in session and redirect with id" in {
+      val flowId                = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val mockSessionRepository = mock[SessionRepository]
+      val savedAnswersCaptor    = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      when(mockSessionRepository.set(savedAnswersCaptor.capture())).thenReturn(Future.successful(true))
+
+      val userAnswers = emptyUserAnswers.set(VerifyCisIdQuery(flowId.toString), "AB12").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(POST, routes.ReviewUnmatchedSubcontractorsController.onSubmitWithId(flowId).url)
+          ).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.ContinueVerificationSubmissionController.onSubmitWithId(flowId).url
 
         val savedAnswers = savedAnswersCaptor.getValue
         savedAnswers

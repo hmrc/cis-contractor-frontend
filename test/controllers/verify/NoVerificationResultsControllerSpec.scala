@@ -16,12 +16,15 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.VerifyCisIdQuery
 import views.html.verify.NoVerificationResultsView
 
-class NoVerificationResultsControllerSpec extends SpecBase {
+import java.util.UUID
+
+class NoVerificationResultsControllerSpec extends SpecBase with WithFakeCisTaxpayer {
 
   "NoVerificationResults Controller" - {
 
@@ -33,6 +36,27 @@ class NoVerificationResultsControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, controllers.verify.routes.NoVerificationResultsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[NoVerificationResultsView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(manageSubcontractorsUrl)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET with id" in {
+      val flowId      = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val answers     = emptyUserAnswers.set(VerifyCisIdQuery(flowId.toString), "AB12").success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      val manageSubcontractorsUrl =
+        s"${applicationConfig.manageSubcontractorsUrl}/AB12"
+
+      running(application) {
+        val request =
+          FakeRequest(GET, controllers.verify.routes.NoVerificationResultsController.onPageLoadWithId(flowId).url)
 
         val result = route(application, request).value
 

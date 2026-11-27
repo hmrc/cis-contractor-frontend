@@ -27,7 +27,7 @@
     link: components.Link
 )
 
-@(verificationResults: Seq[VerificationResultsViewModel], manageSubcontractorsUrl: String)(implicit request: Request[_], messages: Messages)
+@(verificationResults: Seq[VerificationResultsViewModel], manageSubcontractorsUrl: String, unmatchedReviewUrl: String = controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.verificationResults.title")), isFullWidth = true) {
 
@@ -67,7 +67,7 @@
         <div>
             @govukButton(
                 ButtonViewModel(messages("verify.verificationResults.reviewUnmatchedSubcontractors.button"))
-                    .asLink(controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad().url)
+                    .asLink(unmatchedReviewUrl)
             )
         </div>
     } else {

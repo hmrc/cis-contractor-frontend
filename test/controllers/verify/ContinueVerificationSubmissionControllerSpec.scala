@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import models.response.GetCurrentVerificationBatchResponse
 import models.verify.SelectedSubcontractors
 import models.{NormalMode, SubcontractorCurrentVerification, SubcontractorViewModel, UserAnswers, VerificationCurrentVerification}
@@ -27,11 +27,13 @@ import pages.verify.{CurrentVerificationBatchResponsePage, ReverifyExistingSubco
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class ContinueVerificationSubmissionControllerSpec extends SpecBase {
+class ContinueVerificationSubmissionControllerSpec extends SpecBase with WithFakeCisTaxpayer {
 
   private lazy val endpointUrl =
     controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit().url
@@ -452,6 +454,82 @@ class ContinueVerificationSubmissionControllerSpec extends SpecBase {
             controllers.routes.JourneyRecoveryController
               .onPageLoad()
               .url
+        }
+      }
+    }
+
+    "when continuing with id" - {
+
+      "must prepare the nested ready unmatched batch as subcontractors to reverify" in {
+        val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+        val id     = flowId.toString
+
+        val userAnswers =
+          emptyUserAnswers
+            .set(VerifyCisIdQuery(id), "AB12")
+            .success
+            .value
+            .setOrException(
+              CurrentVerificationBatchResponsePage(id),
+              readyCurrentBatch
+            )
+
+        val sessionRepository =
+          mockSessionRepository(Some(userAnswers))
+
+        when(sessionRepository.set(any[UserAnswers]))
+          .thenReturn(Future.successful(true))
+
+        val application =
+          applicationBuilder(
+            userAnswers = Some(userAnswers),
+            additionalBindings = Seq(
+              bind[SessionRepository].toInstance(sessionRepository)
+            )
+          ).build()
+
+        running(application) {
+          val result =
+            route(
+              application,
+              FakeRequest(GET, routes.ContinueVerificationSubmissionController.onSubmitWithId(flowId).url)
+            ).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            routes.CheckVerificationBatchReadinessController
+              .checkVerificationBatchReadinessWithId(flowId, NormalMode)
+              .url
+
+          val captor =
+            ArgumentCaptor.forClass(classOf[UserAnswers])
+
+          verify(sessionRepository)
+            .set(captor.capture())
+
+          val savedAnswers =
+            captor.getValue
+
+          savedAnswers
+            .get(ReverifyExistingSubcontractorsYesNoPage(id)) mustBe Some(true)
+
+          savedAnswers
+            .get(SelectSubcontractorsToReverifyPage(id)) mustBe Some(
+            Set(
+              SelectedSubcontractors(
+                "1",
+                "Subcontractor One"
+              ),
+              SelectedSubcontractors(
+                "2",
+                "Subcontractor Two"
+              )
+            )
+          )
+
+          savedAnswers
+            .get(SelectSubcontractorPage(id)) mustBe None
         }
       }
     }

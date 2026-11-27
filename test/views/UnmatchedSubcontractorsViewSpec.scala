@@ -30,7 +30,7 @@ class UnmatchedSubcontractorsViewSpec extends SpecBase {
   "UnmatchedSubcontractorsView" - {
     "render the page with title, heading, paragraphs and link" in new Setup {
       val link                        = "/subcontractor/verify/check-results"
-      val html: HtmlFormat.Appendable = view()
+      val html: HtmlFormat.Appendable = view(link)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("title").text must include(messages("unmatchedSubcontractors.title"))

@@ -23,15 +23,18 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.utils.UriEncoding
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.NoUnmatchedSubcontractorsView
+
+import java.util.UUID
 
 class NoUnmatchedSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: NoUnmatchedSubcontractorsView
 )(implicit appConfig: FrontendAppConfig)
@@ -42,12 +45,26 @@ class NoUnmatchedSubcontractorsController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(CisIdQuery) match {
       case Some(cisId) =>
-        val manageSubcontractorsUrl =
-          s"${appConfig.manageSubcontractorsUrl}/${UriEncoding.encodePathSegment(cisId, "UTF-8")}"
-        Ok(view(manageSubcontractorsUrl))
+        Ok(view(manageUrl(cisId)))
       case None        =>
         logger.error("[NoUnmatchedSubcontractorsController][onPageLoad] - CIS ID missing from userAnswers")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      request.userAnswers.get(VerifyCisIdQuery(flowId.toString)) match {
+        case Some(cisId) =>
+          Ok(view(manageUrl(cisId)))
+        case None        =>
+          logger.error(
+            "[NoUnmatchedSubcontractorsController][onPageLoadWithId] - VerifyCisIdQuery missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
+  private def manageUrl(cisId: String): String =
+    s"${appConfig.manageSubcontractorsUrl}/${UriEncoding.encodePathSegment(cisId, "UTF-8")}"
 }

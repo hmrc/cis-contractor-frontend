@@ -17,7 +17,7 @@
 package controllers.verify
 
 import controllers.AgentClientChecks
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import models.UserAnswers
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.verify.VerificationBatchStatus
@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import services.{CheckLatestSubmissionStatusService, CisManageService, SubmissionStatusCheckResult, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +37,8 @@ class CheckVerificationResultsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService,
   override protected val cisManageService: CisManageService,
@@ -77,7 +80,36 @@ class CheckVerificationResultsController @Inject() (
         }
     }
 
-  private def routeFromResponse(response: GetLastSubmittedVerificationBatchResponse): Result = {
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id = flowId.toString
+        verificationService
+          .getLastSubmittedVerificationBatch(request.userAnswers, Some(id))
+          .map { updatedAnswers =>
+            updatedAnswers.get(LastSubmittedVerificationBatchResponsePage(id)) match {
+              case None           =>
+                logger.error(
+                  "[CheckVerificationResultsController][onPageLoadWithId] - LastSubmittedVerificationBatchResponsePage missing from userAnswers"
+                )
+                Redirect(controllers.routes.SystemErrorController.onPageLoad())
+              case Some(response) =>
+                routeFromResponse(response, Some(flowId))
+            }
+          }
+          .recover { case t =>
+            logger.error(
+              "[CheckVerificationResultsController.onPageLoadWithId] Failed to retrieve last submitted verification batch",
+              t
+            )
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          }
+    }
+
+  private def routeFromResponse(
+    response: GetLastSubmittedVerificationBatchResponse,
+    flowId: Option[UUID] = None
+  ): Result = {
     val batchIdMissing = response.verificationBatch.map(_.verificationBatchId).isEmpty
     val status         = response.verificationBatch
       .flatMap(_.status)
@@ -96,9 +128,17 @@ class CheckVerificationResultsController @Inject() (
         CheckLatestSubmissionStatusService.check(status) == SubmissionStatusCheckResult.ShowPendingVerificationWarning
 
     if (showNoResults) {
-      Redirect(controllers.verify.routes.NoVerificationResultsController.onPageLoad())
+      Redirect(
+        flowId
+          .map(id => controllers.verify.routes.NoVerificationResultsController.onPageLoadWithId(id))
+          .getOrElse(controllers.verify.routes.NoVerificationResultsController.onPageLoad())
+      )
     } else {
-      Redirect(controllers.verify.routes.VerificationResultsController.onPageLoad())
+      Redirect(
+        flowId
+          .map(id => controllers.verify.routes.VerificationResultsController.onPageLoadWithId(id))
+          .getOrElse(controllers.verify.routes.VerificationResultsController.onPageLoad())
+      )
     }
   }
 }

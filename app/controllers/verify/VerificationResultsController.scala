@@ -24,11 +24,13 @@ import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +40,7 @@ class VerificationResultsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  multiTabAction: MultiTabAction,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationResultsView
@@ -62,6 +65,36 @@ class VerificationResultsController @Inject() (
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        val id = flowId.toString
+        (
+          request.userAnswers.get(LastSubmittedVerificationBatchResponsePage(id)),
+          request.userAnswers.get(VerifyCisIdQuery(id))
+        ) match {
+          case (Some(response), Some(cisId)) =>
+            val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+            val unmatchedReviewUrl      =
+              controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId(flowId).url
+            cleanseSessionPages(request.userAnswers)
+              .map { _ =>
+                Ok(
+                  view(
+                    VerificationResultsViewModel.from(response),
+                    manageSubcontractorsUrl,
+                    unmatchedReviewUrl
+                  )
+                )
+              }
+          case _                             =>
+            logger.error(
+              "[VerificationResultsController][onPageLoadWithId] - LastSubmittedVerificationBatchResponsePage or VerifyCisIdQuery missing from userAnswers"
+            )
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+    }
 
   private def cleanseSessionPages(userAnswers: UserAnswers): Future[UserAnswers] =
     for {
