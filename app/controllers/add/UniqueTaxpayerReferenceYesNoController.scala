@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.UniqueTaxpayerReferenceYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,6 +44,7 @@ class UniqueTaxpayerReferenceYesNoController @Inject() (
   formProvider: UniqueTaxpayerReferenceYesNoFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: UniqueTaxpayerReferenceYesNoView
 )(implicit ec: ExecutionContext)
@@ -66,7 +68,14 @@ class UniqueTaxpayerReferenceYesNoController @Inject() (
           logger.error("[UniqueTaxpayerReferenceYesNoController][onPageLoad] - subcontractor name missing or invalid")
           recoveryRedirect
         } { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              subcontractorName,
+              routes.UniqueTaxpayerReferenceYesNoController.onSubmit(mode)
+            )
+          )
         }
     }
 
@@ -81,12 +90,63 @@ class UniqueTaxpayerReferenceYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      subcontractorName,
+                      routes.UniqueTaxpayerReferenceYesNoController.onSubmit(mode)
+                    )
+                  )
+                ),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(UniqueTaxpayerReferenceYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(UniqueTaxpayerReferenceYesNoPage, mode, updatedAnswers))
+            )
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val page         = UniqueTaxpayerReferenceYesNoPage(id)
+      val submitAction = routes.UniqueTaxpayerReferenceYesNoController.onSubmitWithId(flowId, mode)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode)
+        .fold {
+          logger.error("[UniqueTaxpayerReferenceYesNoController][onPageLoad] - subcontractor name missing or invalid")
+          recoveryRedirect
+        } { subcontractorName =>
+          val filledForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(view(filledForm, mode, subcontractorName, submitAction))
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val page         = UniqueTaxpayerReferenceYesNoPage(id)
+      val submitAction = routes.UniqueTaxpayerReferenceYesNoController.onSubmitWithId(flowId, mode)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
+        .fold {
+          logger.error("[UniqueTaxpayerReferenceYesNoController][onSubmit] - subcontractor name missing or invalid")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, submitAction))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
             )
         }
     }

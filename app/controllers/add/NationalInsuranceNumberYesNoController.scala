@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.NationalInsuranceNumberYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +43,7 @@ class NationalInsuranceNumberYesNoController @Inject() (
   requireData: DataRequiredAction,
   formProvider: NationalInsuranceNumberYesNoFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: NationalInsuranceNumberYesNoView
 )(implicit ec: ExecutionContext)
@@ -65,7 +67,7 @@ class NationalInsuranceNumberYesNoController @Inject() (
           logger.error("[NationalInsuranceNumberYesNoController][onPageLoad] - subcontractor name missing or invalid")
           recoveryRedirect
         } { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          Ok(view(preparedForm, mode, subcontractorName, routes.NationalInsuranceNumberYesNoController.onSubmit(mode)))
         }
     }
 
@@ -80,12 +82,78 @@ class NationalInsuranceNumberYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      subcontractorName,
+                      routes.NationalInsuranceNumberYesNoController.onSubmit(mode)
+                    )
+                  )
+                ),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberYesNoPage, value))
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(NationalInsuranceNumberYesNoPage, mode, updatedAnswers))
+            )
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.NationalInsuranceNumberYesNoController.onSubmitWithId(flowId, mode)
+      val page         = NationalInsuranceNumberYesNoPage(id)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
+        .fold {
+          logger.error("[NationalInsuranceNumberYesNoController][onPageLoad] - subcontractor name missing or invalid")
+          recoveryRedirect
+        } { subcontractorName =>
+          val filledForm = request.userAnswers.get(page).fold(form)(form.fill)
+          Ok(
+            view(
+              filledForm,
+              mode,
+              subcontractorName,
+              submitAction
+            )
+          )
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.NationalInsuranceNumberYesNoController.onSubmitWithId(flowId, mode)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
+        .fold {
+          logger.error("[NationalInsuranceNumberYesNoController][onSubmit] - subcontractor name missing or invalid")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      subcontractorName,
+                      submitAction
+                    )
+                  )
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberYesNoPage(id), value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(NationalInsuranceNumberYesNoPage(id), mode, updatedAnswers))
             )
         }
     }
