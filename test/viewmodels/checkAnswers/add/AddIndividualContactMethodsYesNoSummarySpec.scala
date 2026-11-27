@@ -28,6 +28,7 @@ import pages.add.AddIndividualContactMethodsYesNoPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import java.util.UUID
 
 class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
@@ -107,6 +108,100 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
     "must return a SummaryListRow with 'No' when the answer is false" in {
       val answers = UserAnswers("test-id")
         .set(AddIndividualContactMethodsYesNoPage, false)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row           = maybeRow.value
+      val expectedValue = messages("site.no")
+      row.value.content.asHtml.toString should include(expectedValue)
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      AddIndividualContactMethodsYesNoSummary.row(answers) shouldBe None
+    }
+  }
+
+  "AddIndividualContactMethodsYesNoSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id     = flowId.toString
+
+    "must return a SummaryListRow with 'Yes' when the answer is true" in {
+      val answers = UserAnswers("test-id")
+        .set(AddIndividualContactMethodsYesNoPage(id), true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.AddIndividualContactMethodsYesNoController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "add-individual-contact-details")
+    }
+
+    "must return a SummaryListRow with 'Yes' when the answer is true in AmendMode" in {
+      val answers = UserAnswers("test-id")
+        .set(AddIndividualContactMethodsYesNoPage(id), true)
+        .success
+        .value
+
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row =
+        maybeRow.value
+
+      val expectedKeyText = messages("addIndividualContactMethodsYesNo.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      val expectedValue = messages("site.yes")
+      row.value.content.asHtml.toString should include(expectedValue)
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
+          .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+          .url
+      val expectedHiddenText = messages("addIndividualContactMethodsYesNo.change.hidden")
+
+      changeAction.content.asHtml.toString    should include(expectedChangeText)
+      changeAction.href                     shouldBe expectedHref
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+      changeAction.attributes                 should contain("id" -> "add-individual-contact-details")
+    }
+
+    "must return a SummaryListRow with 'No' when the answer is false" in {
+      val answers = UserAnswers("test-id")
+        .set(AddIndividualContactMethodsYesNoPage(id), false)
         .success
         .value
 

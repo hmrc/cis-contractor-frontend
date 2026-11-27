@@ -29,4 +29,14 @@ class AddressOfSubcontractorPageSpec extends PageBehaviours {
 
     beRemovable[Address](AddressOfSubcontractorPage)
   }
+
+  "AddressOfSubcontractorPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Address](AddressOfSubcontractorPage(id))
+
+    beSettable[Address](AddressOfSubcontractorPage(id))
+
+    beRemovable[Address](AddressOfSubcontractorPage(id))
+  }
 }

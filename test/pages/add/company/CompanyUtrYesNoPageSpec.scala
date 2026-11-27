@@ -36,4 +36,22 @@ class CompanyUtrYesNoPageSpec extends PageBehaviours {
       updatedUserAnswers.get(CompanyUtrPage) mustBe None
     }
   }
+
+  "CompanyUtrYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](CompanyUtrYesNoPage(id))
+
+    beSettable[Boolean](CompanyUtrYesNoPage(id))
+
+    beRemovable[Boolean](CompanyUtrYesNoPage(id))
+
+    "cleanup: must remove CompanyUtr userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(CompanyUtrPage(id), "7777777777").success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyUtrYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(CompanyUtrPage(id)) mustBe None
+    }
+  }
 }

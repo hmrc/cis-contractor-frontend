@@ -28,4 +28,14 @@ class NationalInsuranceNumberYesNoPageSpec extends PageBehaviours {
 
     beRemovable[Boolean](NationalInsuranceNumberYesNoPage)
   }
+
+  "NationalInsuranceNumberPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](NationalInsuranceNumberYesNoPage(id))
+
+    beSettable[Boolean](NationalInsuranceNumberYesNoPage(id))
+
+    beRemovable[Boolean](NationalInsuranceNumberYesNoPage(id))
+  }
 }

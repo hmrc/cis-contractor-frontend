@@ -106,4 +106,91 @@ class CompanyContactMethodOptionsPageSpec extends PageBehaviours {
       }
     }
   }
+
+  "CompanyContactMethodOptionsPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Set[CompanyContactMethodOptions]](CompanyContactMethodOptionsPage(id))
+
+    beSettable[Set[CompanyContactMethodOptions]](CompanyContactMethodOptionsPage(id))
+
+    beRemovable[Set[CompanyContactMethodOptions]](CompanyContactMethodOptionsPage(id))
+
+    "cleanup" - {
+
+      val userAnswers = emptyUserAnswers
+        .set(CompanyEmailAddressPage(id), "old@email.com")
+        .success
+        .value
+        .set(CompanyPhoneNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(CompanyMobileNumberPage(id), "1111111111")
+        .success
+        .value
+
+      "must remove CompanyPhoneNumberPage and CompanyMobileNumberPage when Email is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Email)).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe None
+      }
+
+      "must remove CompanyEmailAddressPage and CompanyMobileNumberPage when Phone is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Phone)).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe None
+      }
+
+      "must remove CompanyEmailAddressPage and CompanyPhoneNumberPage when Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Mobile)).success.value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+
+      "must remove CompanyMobileNumberPage when Email and Phone is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe None
+      }
+
+      "must remove CompanyPhoneNumberPage when Email and Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+
+      "must remove CompanyEmailAddressPage when Phone and Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(CompanyContactMethodOptionsPage(id), Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(CompanyPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(CompanyMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+    }
+  }
 }

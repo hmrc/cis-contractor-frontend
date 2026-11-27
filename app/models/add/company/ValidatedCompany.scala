@@ -114,11 +114,16 @@ object ValidatedCompany extends Validation {
       companyWorksReferenceNumber
     )
 
-  def buildForAmend(answers: UserAnswers): Either[ValidationError, ValidatedCompany] =
-    buildCompany(
-      answers,
-      getAmendPageValue(answers, CompanyNamePage)
-    )
+  def buildForAmend(
+    answers: UserAnswers,
+    subJourneyId: Option[String] = None
+  ): Either[ValidationError, ValidatedCompany] =
+    subJourneyId match {
+      case Some(id) =>
+        buildCompany(answers, getAmendPageValue(answers, CompanyNamePage(id)))
+      case None     =>
+        buildCompany(answers, getAmendPageValue(answers, CompanyNamePage))
+    }
 
   private def buildCompany(
     answers: UserAnswers,

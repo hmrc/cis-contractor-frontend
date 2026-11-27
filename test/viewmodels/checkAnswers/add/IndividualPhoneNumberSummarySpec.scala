@@ -28,6 +28,7 @@ import pages.add.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import java.util.UUID
 
 class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with CyaEncodingSpecHelper {
   implicit val messages: Messages = stubMessages()
@@ -110,6 +111,100 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
       val answers =
         UserAnswers("id")
           .set(IndividualPhoneNumberPage, phone)
+          .success
+          .value
+
+      val row = IndividualPhoneNumberSummary.row(answers).value
+
+      val html = extractHtml(row)
+
+      assertEscaped(html, "020 7946 0958 &amp; ext&#x27;78")
+      assertNoDoubleEncoding(html)
+    }
+  }
+
+  "IndividualPhoneNumberSummary.row with id" - {
+    val flowId = UUID.randomUUID()
+    val id     = flowId.toString
+
+    "must return a Summary List Row when the answer exists" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(IndividualPhoneNumberPage(id), "0987456231")
+          .success
+          .value
+
+      val maybeRow = IndividualPhoneNumberSummary.row(answers)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("individualPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.IndividualPhoneNumberController.onPageLoad(CheckMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("individualPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return a Summary List Row when the answer exists in AmendMode" in {
+      val answers =
+        UserAnswers("test-id")
+          .set(IndividualPhoneNumberPage(id), "0987456231")
+          .success
+          .value
+
+      val maybeRow = IndividualPhoneNumberSummary.row(answers, AmendMode)
+      maybeRow shouldBe defined
+
+      val row = maybeRow.value
+
+      val expectedKeyText = messages("individualPhoneNumber.checkYourAnswersLabel")
+      row.key.content.asHtml.toString should include(expectedKeyText)
+
+      row.value.content.asHtml.toString should include("0987456231")
+
+      row.actions shouldBe defined
+      val actions = row.actions.value.items
+      actions should have size 1
+
+      val changeAction       = actions.head
+      val expectedChangeText = messages("site.change")
+      val expectedHref       =
+        routes.IndividualPhoneNumberController.onPageLoad(AmendMode).url // TODO DTR-9463: Update with id
+      val expectedHiddenText = messages("individualPhoneNumber.change.hidden")
+
+      changeAction.content.asHtml.toString should include(expectedChangeText)
+      changeAction.href                  shouldBe expectedHref
+
+      changeAction.visuallyHiddenText.value shouldBe expectedHiddenText
+    }
+
+    "must return None when the answer does not exist" in {
+      val answers = UserAnswers("test-id")
+      IndividualPhoneNumberSummary.row(answers) shouldBe None
+    }
+
+    "must HTML-escape special characters correctly (single encoding only)" in {
+
+      val phone = "020 7946 0958 & ext'78"
+
+      val answers =
+        UserAnswers("id")
+          .set(IndividualPhoneNumberPage(id), phone)
           .success
           .value
 

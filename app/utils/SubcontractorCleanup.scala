@@ -46,6 +46,25 @@ object SubcontractorCleanup {
       .flatMap(_.remove(WorksReferenceNumberPage))
       .flatMap(_.remove(WorksReferenceNumberYesNoPage))
 
+  def removeIndividualSoleTraderSubcontractor(userAnswers: UserAnswers, subJourneyId: String): Try[UserAnswers] =
+    userAnswers
+      .remove(AddressOfSubcontractorPage(subJourneyId))
+      .flatMap(_.remove(AddIndividualContactMethodsYesNoPage(subJourneyId)))
+      .flatMap(_.remove(IndividualNamesOptionsPage(subJourneyId)))
+      .flatMap(_.remove(IndividualContactMethodOptionsPage(subJourneyId)))
+      .flatMap(_.remove(IndividualEmailAddressPage(subJourneyId)))
+      .flatMap(_.remove(IndividualMobileNumberPage(subJourneyId)))
+      .flatMap(_.remove(IndividualPhoneNumberPage(subJourneyId)))
+      .flatMap(_.remove(NationalInsuranceNumberYesNoPage(subJourneyId)))
+      .flatMap(_.remove(SubAddressYesNoPage(subJourneyId)))
+      .flatMap(_.remove(SubcontractorNamePage(subJourneyId)))
+      .flatMap(_.remove(SubcontractorsUniqueTaxpayerReferencePage(subJourneyId)))
+      .flatMap(_.remove(SubNationalInsuranceNumberPage(subJourneyId)))
+      .flatMap(_.remove(TradingNameOfSubcontractorPage(subJourneyId)))
+      .flatMap(_.remove(UniqueTaxpayerReferenceYesNoPage(subJourneyId)))
+      .flatMap(_.remove(WorksReferenceNumberPage(subJourneyId)))
+      .flatMap(_.remove(WorksReferenceNumberYesNoPage(subJourneyId)))
+
   def removeLimitedCompanySubcontractor(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers
       .remove(CompanyAddressPage)
@@ -163,6 +182,13 @@ object SubcontractorCleanup {
       .flatMap(removePartnershipSubcontractor)
       .flatMap(removeTrustSubcontractor)
       .flatMap(_.remove(TypeOfSubcontractorPage))
+
+  def removeAllSubcontractor(userAnswers: UserAnswers, subJourneyId: String): Try[UserAnswers] =
+    removeIndividualSoleTraderSubcontractor(userAnswers, subJourneyId)
+      .flatMap(removeLimitedCompanySubcontractor(userAnswers, subJourneyId))
+      .flatMap(removePartnershipSubcontractor(subJourneyId))
+      .flatMap(removeTrustSubcontractor(subJourneyId))
+      .flatMap(_.remove(TypeOfSubcontractorPage(subJourneyId)))
 
   def removeVerifyJourney(userAnswers: UserAnswers): Try[UserAnswers] =
     userAnswers

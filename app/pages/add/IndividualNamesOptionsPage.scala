@@ -24,6 +24,13 @@ import play.api.libs.json.JsPath
 
 import scala.util.{Success, Try}
 
+case class IndividualNamesOptionsPage(id: String)
+    extends QuestionPage[Set[IndividualNamesOptions]]
+    with IndividualJourney {
+  override def path: JsPath     = JsPath \ "amendSubcontractor" \ id \ toString
+  override def toString: String = "individualNamesOptions"
+}
+
 case object IndividualNamesOptionsPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString

@@ -20,9 +20,11 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.amend.AmendControllerUtils
 import controllers.routes
+import queries.CisIdQuery
 import models.add.company.ValidatedCompany
 import models.amend.AmendJourneyType
-import models.requests.CisIdDataRequest
+import models.amend.company.AmendCompanyRemoveDetail
+import models.requests.{CisIdDataRequest, DataRequest}
 import models.{AmendMode, UserAnswers}
 import pages.add.*
 import pages.add.company.CompanyNamePage
@@ -43,12 +45,14 @@ import viewmodels.govuk.summarylist.*
 import views.html.amend.AmendCheckYourAnswersView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendCompanyCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  multiTabAction: MultiTabAction,
   requireData: DataRequiredAction,
   cisIdRequiredAction: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -90,6 +94,38 @@ class AmendCompanyCheckYourAnswersController @Inject() (
       }
   }
 
+  def onPageLoadWithId(flowId: UUID, subbieResourceRef: Long = -1L): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+
+      val subJourneyId = flowId.toString
+      val ua           = request.userAnswers
+
+      ValidatedCompany.buildForAmend(ua) match {
+        case Right(_) =>
+          val isVerified  = AmendControllerUtils.isVerifiedForAmendJourney(ua, subJourneyId)
+          val companyName = ua
+            .get(CompanyNamePage(subJourneyId))
+            .getOrElse(Messages("verify.noName")) // TODO DTR-9463: add/amend conflict
+
+          val subcontractorInformationList =
+            SummaryListViewModel(rows = subcontractorInformationRowsWithId(flowId, ua, isVerified).flatten)
+
+          val detailsList =
+            SummaryListViewModel(rows = detailsRowsWithId(flowId, ua, isVerified).flatten)
+
+          val submitUrl =
+            controllers.amend.company.routes.AmendCompanyCheckYourAnswersController
+              .onSubmitWithId(flowId, subbieResourceRef)
+          val cancelUrl = controllers.amend.company.routes.AmendCompanyCheckYourAnswersController.onCancelWithId(flowId)
+
+          Ok(view(subcontractorInformationList, detailsList, companyName, submitUrl, cancelUrl))
+
+        case Left(error) =>
+          logger.error(s"[AmendCompanyCheckYourAnswersController.onPageLoadWithId] Failed to load the page: $error")
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
+
   private def subcontractorInformationRows(
     ua: UserAnswers,
     isVerified: Boolean
@@ -126,6 +162,47 @@ class AmendCompanyCheckYourAnswersController @Inject() (
     ) ++ verificationRows
   }
 
+  private def subcontractorInformationRowsWithId(
+    flowId: UUID,
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+    val subJourneyId     = Some(flowId.toString)
+    val verificationRows =
+      if (isVerified) {
+
+        Seq(
+          CompanyUtrSummary.row(
+            ua,
+            AmendMode,
+            showActions = false,
+            Some(controllers.add.company.routes.CompanyUtrController.onPageLoadWithId(flowId, AmendMode).url),
+            subJourneyId
+          ),
+          ua.get(OriginalCompanyAnswersQuery) // TODO DTR-9463: Do I need to update with id?
+            .flatMap(_.verificationNumber)
+            .filter(_.trim.nonEmpty)
+            .map { verificationNumber =>
+              SummaryListRowViewModel(
+                key = Key(Text(messages("amendCheckYourAnswers.verificationNumber.label"))),
+                value = Value(Text(verificationNumber))
+              )
+            }
+        )
+      } else {
+        Nil
+      }
+
+    Seq(
+      TypeOfSubcontractorSummary.row(
+        ua,
+        showActions = false,
+        subJourneyId,
+        Some(controllers.add.routes.TypeOfSubcontractorController.onPageLoadWithId(flowId, AmendMode).url)
+      )
+    ) ++ verificationRows
+  }
+
   private def detailsRows(
     ua: UserAnswers,
     isVerified: Boolean
@@ -145,6 +222,71 @@ class AmendCompanyCheckYourAnswersController @Inject() (
         Seq(
           CompanyUtrYesNoSummary.row(ua, AmendMode),
           CompanyUtrSummary.row(ua, AmendMode)
+        )
+      }
+
+    nameRows ++
+      Seq(
+        CompanyAddressYesNoSummary.row(ua, AmendMode),
+        CompanyAddressSummary.row(ua, AmendMode),
+        AddCompanyContactMethodsYesNoSummary.row(ua, AmendMode),
+        CompanyContactMethodOptionsSummary.row(ua, AmendMode),
+        CompanyEmailAddressSummary.row(ua, AmendMode),
+        CompanyPhoneNumberSummary.row(ua, AmendMode),
+        CompanyMobileNumberSummary.row(ua, AmendMode)
+      ) ++
+      utrRows ++
+      Seq(
+        CompanyCrnYesNoSummary.row(ua, AmendMode),
+        CompanyCrnSummary.row(ua, AmendMode),
+        CompanyWorksReferenceYesNoSummary.row(ua, AmendMode),
+        CompanyWorksReferenceSummary.row(ua, AmendMode)
+      )
+  }
+
+  private def detailsRowsWithId(
+    flowId: UUID,
+    ua: UserAnswers,
+    isVerified: Boolean
+  )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
+
+    val subJourneyId = flowId.toString
+    val nameRows     =
+      if (isVerified) {
+        Nil
+      } else {
+        Seq(
+          CompanyNameSummary.row(
+            ua,
+            AmendMode,
+            Some(controllers.add.company.routes.CompanyNameController.onPageLoadWithId(flowId, AmendMode).url),
+            Some(subJourneyId)
+          )
+        )
+      }
+
+    val utrRows =
+      if (isVerified) {
+        Nil
+      } else {
+        Seq(
+          CompanyUtrYesNoSummary.row(
+            ua,
+            AmendMode,
+            Some(
+              controllers.amend.company.routes.AmendCompanyRemoveDetailYesNoController
+                .onPageLoadWithId(flowId, AmendCompanyRemoveDetail.Utr.key)
+                .url
+            ), // TODO DTR-9463: Update with id
+            Some(subJourneyId)
+          ),
+          CompanyUtrSummary.row(
+            ua,
+            AmendMode,
+            true,
+            Some(controllers.add.company.routes.CompanyUtrController.onPageLoadWithId(flowId, AmendMode).url),
+            Some(subJourneyId)
+          )
         )
       }
 
@@ -206,6 +348,48 @@ class AmendCompanyCheckYourAnswersController @Inject() (
       }
     }
 
+  def onSubmitWithId(flowId: UUID, subbieResourceRef: Long = -1L): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
+      ValidatedCompany.buildForAmend(request.userAnswers, Some(subJourneyId)) match {
+
+        case Left(error) =>
+          logger.error(
+            s"[AmendCompanyCheckYourAnswersController.onSubmitWithId] Validation failed: $error"
+          )
+
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Right(_)
+            if request.userAnswers
+              .get(AmendCheckYourAnswersSubmittedPage(subJourneyId))
+              .contains(true) =>
+          logger.error(
+            "[AmendCompanyCheckYourAnswersController.onSubmitWithId] AmendCheckYourAnswersSubmittedPage already submitted"
+          )
+
+          Future.successful(
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          )
+
+        case Right(_)
+            if !AmendmentHelper.companyHasChanges(
+              request.userAnswers
+            ) =>
+          handleNoChangesWithId(flowId)
+
+        case Right(_) =>
+          submitAmendJourneyWithId(
+            flowId,
+            request.userAnswers,
+            subbieResourceRef
+          )
+      }
+    }
+
   private def handleNoChanges()(implicit
     request: CisIdDataRequest[AnyContent]
   ): Future[Result] = {
@@ -237,6 +421,38 @@ class AmendCompanyCheckYourAnswersController @Inject() (
       }
   }
 
+  private def handleNoChangesWithId(flowId: UUID)(implicit
+    request: DataRequest[AnyContent]
+  ): Future[Result] =
+    request.userAnswers.get(CisIdQuery(flowId.toString)) match {
+      case Some(id: String) =>
+        val redirectCall = noChangesRedirect(request.userAnswers, id)
+
+        Future
+          .fromTry(
+            cleanupService.cleanAmend(request.userAnswers)
+          )
+          .flatMap(sessionRepository.set)
+          .map { _ =>
+            Redirect(redirectCall)
+          }
+          .recover { case t =>
+            logger.error(
+              s"[AmendCompanyCheckYourAnswersController.onSubmit] " +
+                s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+              t
+            )
+
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+
+      case _ =>
+        logger.error(s"[AmendCompanyCheckYourAnswersController.handleNoChangesWithId] - No cisId found")
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
+
   private def noChangesRedirect(
     userAnswers: UserAnswers,
     cisId: String
@@ -264,6 +480,38 @@ class AmendCompanyCheckYourAnswersController @Inject() (
 
         routes.JourneyRecoveryController.onPageLoad()
     }
+
+  private def noChangesRedirectWithId(
+    flowId: UUID,
+    userAnswers: UserAnswers,
+    cisId: String
+  ): Call = {
+    val subJourneyId = flowId.toString
+
+    userAnswers.get(AmendJourneyTypePage(subJourneyId)) match {
+
+      case Some(AmendJourneyType.Standard) =>
+        Call(
+          "GET",
+          appConfig.manageYourSubcontractorsUrl(cisId)
+        )
+
+      case Some(AmendJourneyType.InsufficientInfo) =>
+        controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
+          .onPageLoadWithId(flowId)
+
+      case Some(AmendJourneyType.UnmatchedInfo) =>
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController
+          .onPageLoadWithId(flowId)
+
+      case None =>
+        logger.error(
+          "[AmendCompanyCheckYourAnswersController.onSubmitWithId] Missing AmendJourneyTypePage when handling no changes"
+        )
+
+        routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
 
   private def submitAmendJourney(
     userAnswers: UserAnswers,
@@ -318,6 +566,63 @@ class AmendCompanyCheckYourAnswersController @Inject() (
           }
       }
 
+  private def submitAmendJourneyWithId(
+    flowId: UUID,
+    userAnswers: UserAnswers,
+    subbieResourceRef: Long
+  )(implicit request: DataRequest[AnyContent]): Future[Result] = {
+    val subJourneyId = flowId.toString
+
+    userAnswers
+      .get(AmendJourneyTypePage(subJourneyId))
+      .fold {
+        logger.error(
+          "[AmendCompanyCheckYourAnswersController.onSubmitWithId] Missing AmendJourneyTypePage"
+        )
+
+        Future.successful(
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        )
+      } { journeyType =>
+        Future
+          .fromTry(
+            userAnswers.set(
+              AmendCheckYourAnswersSubmittedPage(subJourneyId),
+              true
+            )
+          )
+          .flatMap { updated =>
+            sessionRepository
+              .set(updated)
+              .flatMap { _ =>
+                subcontractorService.submitAmendSubcontractor(
+                  journeyType,
+                  updated,
+                  submittedSubbieResourceRef(subbieResourceRef)
+                )
+              }
+              .map { _ =>
+                auditService.amendSubcontractorEvent(updated)
+
+                Redirect(
+                  controllers.amend.company.routes.AmendCompanyConfirmationController
+                    .onPageLoadWithId(flowId)
+                )
+              }
+          }
+          .recover { case t =>
+            logger.error(
+              "[AmendCompanyCheckYourAnswersController.onSubmitWithId] Failed to submit amend subcontractor",
+              t
+            )
+
+            Redirect(
+              routes.JourneyRecoveryController.onPageLoad()
+            )
+          }
+      }
+  }
+
   private def submittedSubbieResourceRef(subbieResourceRef: Long): Option[Long] =
     Option.when(subbieResourceRef >= 0L)(subbieResourceRef)
 
@@ -349,5 +654,36 @@ class AmendCompanyCheckYourAnswersController @Inject() (
             routes.JourneyRecoveryController.onPageLoad()
           )
         }
+    }
+
+  def onCancelWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      request.userAnswers.get(CisIdQuery(flowId.toString)) match {
+        case Some(id: String) =>
+          val redirectCall = noChangesRedirect(request.userAnswers, id)
+
+          Future
+            .fromTry(
+              cleanupService.cleanAmend(request.userAnswers)
+            )
+            .flatMap(sessionRepository.set)
+            .map { _ =>
+              Redirect(redirectCall)
+            }
+            .recover { case t =>
+              logger.error(
+                s"[AmendCompanyCheckYourAnswersController.onCancel] " +
+                  s"Failed to clean amend user answers for session ${request.userAnswers.id}",
+                t
+              )
+
+              Redirect(
+                routes.JourneyRecoveryController.onPageLoad()
+              )
+            }
+        case _                =>
+          logger.error(s"[AmendCompanyCheckYourAnswersController.onCancel] - No cisId found")
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }

@@ -37,4 +37,23 @@ class CompanyWorksReferenceYesNoPageSpec extends PageBehaviours {
     }
 
   }
+
+  "CompanyWorksReferenceYesNoPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Boolean](CompanyWorksReferenceYesNoPage(id))
+
+    beSettable[Boolean](CompanyWorksReferenceYesNoPage(id))
+
+    beRemovable[Boolean](CompanyWorksReferenceYesNoPage(id))
+
+    "cleanup: must remove CompanyWorksReference userAnswers when No is selected" in {
+      val userAnswers = emptyUserAnswers.set(CompanyWorksReferencePage(id), "WR-001").success.value
+
+      val updatedUserAnswers = userAnswers.set(CompanyWorksReferenceYesNoPage(id), false).success.value
+
+      updatedUserAnswers.get(CompanyWorksReferencePage(id)) mustBe None
+    }
+
+  }
 }

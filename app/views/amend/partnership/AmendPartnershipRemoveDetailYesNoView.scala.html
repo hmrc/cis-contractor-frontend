@@ -28,7 +28,8 @@
   form: Form[_],
   subcontractorDetail: String,
   detailTitle: String,
-  detailName: String
+  detailName: String,
+  formAction: Option[Call] = None
 )(implicit request: Request[_], messages: Messages)
 
 @layout(
@@ -41,7 +42,7 @@
 ) {
 
 @formHelper(
-   action = controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail),
+   action = formAction.getOrElse(controllers.amend.partnership.routes.AmendPartnershipRemoveDetailYesNoController.onSubmit(subcontractorDetail)),
    Symbol("autoComplete") -> "off"
 ) {
 

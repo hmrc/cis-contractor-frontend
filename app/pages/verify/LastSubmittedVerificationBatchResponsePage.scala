@@ -20,6 +20,14 @@ import models.response.GetLastSubmittedVerificationBatchResponse
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
+case class LastSubmittedVerificationBatchResponsePage(id: String)
+    extends QuestionPage[GetLastSubmittedVerificationBatchResponse] {
+
+  override def path: JsPath = JsPath \ "amendSubcontractor" \ id \ toString
+
+  override def toString: String = "lastSubmittedVerificationBatchResponse"
+}
+
 case object LastSubmittedVerificationBatchResponsePage extends QuestionPage[GetLastSubmittedVerificationBatchResponse] {
 
   override def path: JsPath = JsPath \ toString

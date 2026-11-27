@@ -24,31 +24,41 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import java.util.UUID
 
 object AddIndividualContactMethodsYesNoSummary {
 
-  def row(answers: UserAnswers, mode: Mode = CheckMode)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddIndividualContactMethodsYesNoPage).map { answer =>
+  def row(
+    answers: UserAnswers,
+    mode: Mode = CheckMode,
+    changeUrl: Option[String] = None,
+    subJourneyId: Option[String] = None
+  )(implicit messages: Messages): Option[SummaryListRow] =
+    subJourneyId
+      .map(id => answers.get(AddIndividualContactMethodsYesNoPage(id)))
+      .getOrElse(answers.get(AddIndividualContactMethodsYesNoPage))
+      .map { answer =>
+        val value = if (answer) "site.yes" else "site.no"
 
-      val value = if (answer) "site.yes" else "site.no"
-
-      SummaryListRowViewModel(
-        key = "addIndividualContactMethodsYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-                .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
-                .url
-            else controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
+        SummaryListRowViewModel(
+          key = "addIndividualContactMethodsYesNo.checkYourAnswersLabel",
+          value = ValueViewModel(value),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              changeUrl.getOrElse(
+                if answer && mode == AmendMode then
+                  controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+                    .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+                    .url
+                else controllers.add.routes.AddIndividualContactMethodsYesNoController.onPageLoad(mode).url
+              )
+            )
+              .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
+              .withAttribute("id" -> "add-individual-contact-details")
           )
-            .withVisuallyHiddenText(messages("addIndividualContactMethodsYesNo.change.hidden"))
-            .withAttribute("id" -> "add-individual-contact-details")
         )
-      )
-    }
+      }
 
   def row(
     answers: IndividualAnswers

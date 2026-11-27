@@ -17,7 +17,7 @@
 package controllers.amend.trust
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MultiTabAction}
 import controllers.helpers.SubcontractorNameDisplayHelper
 import controllers.routes
 import models.{AmendMode, UserAnswers}
@@ -36,6 +36,7 @@ import viewmodels.amend.trust.TrustAmendConfirmationViewModel
 import views.html.amend.AmendConfirmationView
 
 import javax.inject.Inject
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class AmendTrustConfirmationController @Inject() (
@@ -43,6 +44,7 @@ class AmendTrustConfirmationController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   verificationService: VerificationService,
   sessionRepository: SessionRepository,
@@ -137,6 +139,99 @@ class AmendTrustConfirmationController @Inject() (
       }
     }
 
-  private def trustDisplayName(ua: UserAnswers)(implicit messages: Messages): String =
-    SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId     = flowId.toString
+      val recoveryRedirect = Redirect(routes.JourneyRecoveryController.onPageLoad())
+
+      val ua = request.userAnswers
+
+      if (!ua.get(AmendCheckYourAnswersSubmittedPage(subJourneyId)).contains(true)) {
+        logger.error("[AmendTrustConfirmationController] Accessed without prior CYA submission")
+        Future.successful(recoveryRedirect)
+      } else {
+        ua.get(OriginalTrustAnswersQuery) match { // TODO DTR-9463: Do we need to update queries with id?
+          case None                       =>
+            logger.error("[AmendTrustConfirmationController] Missing OriginalTrustAnswersQuery")
+            Future.successful(recoveryRedirect)
+          case Some(originalTrustAnswers) =>
+            ua.get(CisIdQuery(subJourneyId)) match {
+              case None =>
+                logger.error("[AmendTrustConfirmationController] Missing CisIdQuery")
+                Future.successful(recoveryRedirect)
+
+              case Some(cisId) =>
+                ua.get(AmendJourneyTypePage(subJourneyId)) match {
+
+                  case Some(journeyType) =>
+                    val tableRows =
+                      TrustAmendConfirmationViewModel.rows(
+                        originalTrustAnswers,
+                        ua,
+                        Some(subJourneyId)
+                      )
+
+                    val trustName =
+                      trustDisplayName(ua, Some(subJourneyId))
+
+                    val confirmationLink =
+                      AmendConfirmationLinks.build(
+                        journeyType,
+                        cisId,
+                        appConfig,
+                        Some(flowId)
+                      )
+
+                    val persistFinalUserAnswers =
+                      journeyType match {
+
+                        case AmendJourneyType.Standard =>
+                          sessionRepository
+                            .set(ua)
+                            .map(_ => ua)
+
+                        case AmendJourneyType.InsufficientInfo | AmendJourneyType.UnmatchedInfo =>
+                          verificationService.refreshVerificationBatches(ua)
+                      }
+
+                    persistFinalUserAnswers
+                      .map { _ =>
+                        Ok(
+                          view(
+                            tableRows,
+                            trustName,
+                            confirmationLink
+                          )
+                        )
+                      }
+                      .recover { case exception =>
+                        logger.error(
+                          "[AmendTrustConfirmationController.onPageLoadWithId] " +
+                            "Failed to persist confirmation session data",
+                          exception
+                        )
+
+                        recoveryRedirect
+                      }
+
+                  case None =>
+                    logger.error(
+                      "[AmendTrustConfirmationController] Missing AmendJourneyTypePage"
+                    )
+
+                    Future.successful(recoveryRedirect)
+                }
+            }
+        }
+      }
+    }
+
+  private def trustDisplayName(ua: UserAnswers, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): String =
+    subJourneyId match {
+      case Some(id) => SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode, id)
+      case None     => SubcontractorNameDisplayHelper.trustDisplayName(ua, AmendMode)
+    }
+
 }

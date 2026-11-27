@@ -28,4 +28,14 @@ class CompanyUtrPageSpec extends PageBehaviours {
 
     beRemovable[String](CompanyUtrPage)
   }
+
+  "CompanyUtrPage with id" - {
+    val id = "testId"
+
+    beRetrievable[String](CompanyUtrPage(id))
+
+    beSettable[String](CompanyUtrPage(id))
+
+    beRemovable[String](CompanyUtrPage(id))
+  }
 }

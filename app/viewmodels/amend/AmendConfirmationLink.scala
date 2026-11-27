@@ -18,6 +18,7 @@ package viewmodels.amend
 
 import config.FrontendAppConfig
 import models.amend.AmendJourneyType
+import java.util.UUID
 
 case class AmendConfirmationLink(
   url: String,
@@ -30,7 +31,8 @@ object AmendConfirmationLinks {
   def build(
     journeyType: AmendJourneyType,
     cisId: String,
-    appConfig: FrontendAppConfig
+    appConfig: FrontendAppConfig,
+    flowId: Option[UUID] = None
   ): AmendConfirmationLink =
     journeyType match {
 
@@ -43,18 +45,21 @@ object AmendConfirmationLinks {
 
       case AmendJourneyType.InsufficientInfo =>
         AmendConfirmationLink(
-          url = controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController
-            .onPageLoad()
-            .url,
+          url = flowId match {
+            case Some(id) =>
+              controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoadWithId(id).url
+            case None     => controllers.verify.routes.ReviewInsufficientInfoSubcontractorsController.onPageLoad().url
+          },
           textKey = "insufficientSubcontractorDetailsUpdated.cannotVerifyAllSubcontractors",
           showBeforeYouGo = false
         )
 
       case AmendJourneyType.UnmatchedInfo =>
         AmendConfirmationLink(
-          url = controllers.verify.routes.ReviewUnmatchedSubcontractorsController
-            .onPageLoad()
-            .url,
+          url = flowId match {
+            case Some(id) => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoadWithId(id).url
+            case None     => controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onPageLoad().url
+          },
           textKey = "unmatched.unmatchedSubcontractorDetailsUpdated.reviewUnmatchedSubcontractors",
           showBeforeYouGo = false
         )

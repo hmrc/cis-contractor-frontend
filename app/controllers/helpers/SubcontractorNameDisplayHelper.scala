@@ -55,6 +55,17 @@ object SubcontractorNameDisplayHelper {
         if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
       }
 
+  def trustDisplayName(userAnswers: UserAnswers, mode: Mode, subJourneyId: String)(implicit
+    messages: Messages
+  ): String =
+    userAnswers
+      .get(TrustNamePage(subJourneyId))
+      .map(_.trim)
+      .filter(_.nonEmpty)
+      .getOrElse {
+        if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
+      }
+
   def getPartnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     getPartnershipDisplayName(userAnswers, mode, PartnershipNamePage)
 
@@ -84,15 +95,29 @@ object SubcontractorNameDisplayHelper {
   ): Option[String] =
     getPartnershipDisplayName(userAnswers, mode, PartnershipNominatedPartnerNamePage(id))
 
-  def partnershipDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): String =
-    userAnswers
-      .get(PartnershipNamePage)
-      .map(_.trim)
-      .filter(_.nonEmpty)
-      .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty))
-      .getOrElse {
-        if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
-      }
+  def partnershipDisplayName(userAnswers: UserAnswers, mode: Mode, subJourneyId: Option[String] = None)(implicit
+    messages: Messages
+  ): String =
+    subJourneyId match {
+      case Some(id) =>
+        userAnswers
+          .get(PartnershipNamePage(id))
+          .map(_.trim)
+          .filter(_.nonEmpty)
+          .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage(id)).map(_.trim).filter(_.nonEmpty))
+          .getOrElse {
+            if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
+          }
+      case None     =>
+        userAnswers
+          .get(PartnershipNamePage)
+          .map(_.trim)
+          .filter(_.nonEmpty)
+          .orElse(userAnswers.get(PartnershipNominatedPartnerNamePage).map(_.trim).filter(_.nonEmpty))
+          .getOrElse {
+            if (mode == AmendMode || mode == FinalValidationMode) messages("verify.noName") else ""
+          }
+    }
 
   def getCompanyDisplayName(userAnswers: UserAnswers, mode: Mode)(implicit messages: Messages): Option[String] =
     getCompanyDisplayName(userAnswers, mode, CompanyNamePage)

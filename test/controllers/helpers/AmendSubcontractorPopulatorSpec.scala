@@ -268,6 +268,208 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
       }
     }
 
+    "IndividualPopulator with id" - {
+      val id = "testId"
+
+      "must populate individual user answers" in {
+        val result =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, baseSubcontractor, id)
+
+        result.isSuccess mustBe true
+
+        val answers = result.get
+
+        answers.get(TypeOfSubcontractorPage(id)).value mustBe Individualorsoletrader
+        answers.get(IndividualNamesOptionsPage(id)).value mustBe Set(
+          IndividualNamesOptions.SubcontractorName,
+          IndividualNamesOptions.TradingName
+        )
+        answers.get(TradingNameOfSubcontractorPage(id)).value mustBe "Test Trading Name"
+        answers
+          .get(OriginalSubcontractorQuery)
+          .value mustBe baseSubcontractor // TODO DTR-9463: Do I need to update query with id?
+        answers
+          .get(AmendSubbieResourceRefQuery)
+          .value mustBe subbieResourceRef // TODO DTR-9463: Do I need to update query with id?
+
+        answers.get(SubcontractorNamePage(id)).value mustBe SubcontractorName(
+          firstName = "John",
+          middleName = Some("Middle"),
+          lastName = "Smith"
+        )
+
+        answers.get(SubAddressYesNoPage(id)).value mustBe true
+        answers.get(AddressOfSubcontractorPage(id)).value mustBe expectedAddress
+
+        answers.get(AddIndividualContactMethodsYesNoPage(id)).value mustBe true
+        answers.get(IndividualContactMethodOptionsPage(id)).value mustBe Set(Email, Phone, Mobile)
+        answers.get(IndividualEmailAddressPage(id)).value mustBe "test@example.com"
+        answers.get(IndividualPhoneNumberPage(id)).value mustBe "02070000000"
+        answers.get(IndividualMobileNumberPage(id)).value mustBe "07123456789"
+
+        answers.get(UniqueTaxpayerReferenceYesNoPage(id)).value mustBe true
+        answers.get(SubcontractorsUniqueTaxpayerReferencePage(id)).value mustBe "1123456789"
+
+        answers.get(NationalInsuranceNumberYesNoPage(id)).value mustBe true
+        answers.get(SubNationalInsuranceNumberPage(id)).value mustBe "AA123456A"
+
+        answers.get(WorksReferenceNumberYesNoPage(id)).value mustBe true
+        answers.get(WorksReferenceNumberPage(id)).value mustBe "XLS345-MM"
+
+        answers.get(ShowVerificationDetailsPage(id)).value mustBe true
+        answers.get(CisIdQuery(id)).value mustBe cisId // TODO DTR-9463: Do I need to update query with amend?
+
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value mustBe OriginalIndividualAnswers( // TODO DTR-9463: Do I need to update query with id?
+          individualNamesOptions = Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName),
+          tradingName = Some("Test Trading Name"),
+          subcontractorName = Some(
+            SubcontractorName(
+              firstName = "John",
+              middleName = Some("Middle"),
+              lastName = "Smith"
+            )
+          ),
+          addressYesNo = Some(true),
+          address = Some(expectedAddress),
+          individualContactMethodsYesNo = Some(true),
+          individualContactMethod = Set(Email, Phone, Mobile),
+          email = Some("test@example.com"),
+          phone = Some("02070000000"),
+          mobile = Some("07123456789"),
+          utrYesNo = Some(true),
+          utr = Some("1123456789"),
+          ninoYesNo = Some(true),
+          nino = Some("AA123456A"),
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
+        )
+      }
+
+      "must set IndividualNamesOptionsPage answer to SubcontractorName when trading name is missing" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            tradingName = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(IndividualNamesOptionsPage(id)).value mustBe Set(IndividualNamesOptions.SubcontractorName)
+        answers.get(TradingNameOfSubcontractorPage(id)) mustBe None
+
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .individualNamesOptions mustBe Set( // TODO DTR-9463: Do I need to update query with id?
+          IndividualNamesOptions.SubcontractorName
+        )
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .tradingName mustBe None // TODO DTR-9463: Do I need to update query with id?
+      }
+
+      "must set IndividualNamesOptionsPage answer to TradingName when subcontractor name is missing" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = None,
+            secondName = None,
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(IndividualNamesOptionsPage(id)).value mustBe Set(IndividualNamesOptions.TradingName)
+        answers.get(SubcontractorNamePage(id)) mustBe None
+
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .individualNamesOptions mustBe Set( // TODO DTR-9463: Do I need to update query with id?
+          IndividualNamesOptions.TradingName
+        )
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .subcontractorName mustBe None // TODO DTR-9463: Do I need to update query with id?
+      }
+
+      "must populate subcontractor name when only surname is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = None,
+            secondName = None,
+            surname = Some("Smith")
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(SubcontractorNamePage(id)) mustBe Some(SubcontractorName("", None, "Smith"))
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .subcontractorName mustBe Some( // TODO DTR-9463: Do I need to update query with id?
+          SubcontractorName("", None, "Smith")
+        )
+      }
+
+      "must populate subcontractor name when only firstName is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = Some("John"),
+            secondName = None,
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(SubcontractorNamePage(id)) mustBe Some(SubcontractorName("John", None, ""))
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .subcontractorName mustBe Some( // TODO DTR-9463: Do I need to update query with id?
+          SubcontractorName("John", None, "")
+        )
+      }
+
+      "must populate subcontractor name when only secondName is in subcontractor name" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            firstName = None,
+            secondName = Some("Middle"),
+            surname = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.IndividualPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(SubcontractorNamePage(id)) mustBe Some(SubcontractorName("", Some("Middle"), ""))
+        answers
+          .get(OriginalIndividualAnswersQuery)
+          .value
+          .subcontractorName mustBe Some( // TODO DTR-9463: Do I need to update query with id?
+          SubcontractorName("", Some("Middle"), "")
+        )
+      }
+    }
+
     "CompanyPopulator" - {
 
       "must populate company user answers" in {
@@ -365,6 +567,109 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
       }
     }
 
+    "CompanyPopulator with id" - {
+      val id = "testId"
+
+      "must populate company user answers" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            subcontractorType = Some("company")
+          )
+
+        val result =
+          AmendSubcontractorPopulator.CompanyPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+
+        result.isSuccess mustBe true
+
+        val answers = result.get
+
+        answers.get(TypeOfSubcontractorPage(id)).value mustBe Limitedcompany
+        answers.get(CompanyNamePage(id)).value mustBe "Test Trading Name"
+
+        answers.get(CompanyAddressYesNoPage(id)).value mustBe true
+        answers.get(CompanyAddressPage(id)).value mustBe expectedAddress
+
+        answers.get(AddCompanyContactMethodsYesNoPage(id)).value mustBe true
+        answers.get(CompanyContactMethodOptionsPage(id)).value mustBe Set(Email, Phone, Mobile)
+        answers.get(CompanyEmailAddressPage(id)).value mustBe "test@example.com"
+        answers.get(CompanyPhoneNumberPage(id)).value mustBe "02070000000"
+        answers.get(CompanyMobileNumberPage(id)).value mustBe "07123456789"
+
+        answers.get(CompanyUtrYesNoPage(id)).value mustBe true
+        answers.get(CompanyUtrPage(id)).value mustBe "1123456789"
+
+        answers.get(CompanyCrnYesNoPage(id)).value mustBe true
+        answers.get(CompanyCrnPage(id)).value mustBe "12345678"
+        answers
+          .get(OriginalSubcontractorQuery)
+          .value mustBe subcontractor // TODO DTR-9463: Do I need to update query with id?
+
+        answers.get(CompanyWorksReferenceYesNoPage(id)).value mustBe true
+        answers.get(CompanyWorksReferencePage(id)).value mustBe "XLS345-MM"
+
+        answers.get(ShowVerificationDetailsPage(id)).value mustBe true
+        answers.get(CisIdQuery(id)).value mustBe cisId
+
+        answers
+          .get(OriginalCompanyAnswersQuery)
+          .value mustBe OriginalCompanyAnswers( // TODO DTR-9463: Do I need to update query with id?
+          companyName = Some("Test Trading Name"),
+          addressYesNo = Some(true),
+          address = Some(expectedAddress),
+          companyContactMethodsYesNo = Some(true),
+          companyContactMethod = Set(Email, Phone, Mobile),
+          email = Some("test@example.com"),
+          phone = Some("02070000000"),
+          mobile = Some("07123456789"),
+          crnYesNo = Some(true),
+          crn = Some("12345678"),
+          utrYesNo = Some(true),
+          utr = Some("1123456789"),
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
+        )
+      }
+
+      "must set optional company answers to false when values are missing" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            tradingName = None,
+            utr = None,
+            crn = None,
+            worksReferenceNumber = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.CompanyPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(CompanyNamePage(id)) mustBe None
+
+        answers.get(CompanyUtrYesNoPage(id)).value mustBe false
+        answers.get(CompanyUtrPage(id)) mustBe None
+
+        answers.get(CompanyCrnYesNoPage(id)).value mustBe false
+        answers.get(CompanyCrnPage(id)) mustBe None
+
+        answers.get(CompanyWorksReferenceYesNoPage(id)).value mustBe false
+        answers.get(CompanyWorksReferencePage(id)) mustBe None
+
+        val original =
+          answers.get(OriginalCompanyAnswersQuery).value // TODO DTR-9463: Do I need to update query with id?
+
+        original.companyName mustBe None
+        original.utrYesNo mustBe Some(false)
+        original.utr mustBe None
+        original.crnYesNo mustBe Some(false)
+        original.crn mustBe None
+        original.worksReferenceYesNo mustBe Some(false)
+        original.worksReference mustBe None
+      }
+    }
+
     "PartnershipPopulator" - {
 
       "must populate partnership user answers" in {
@@ -415,6 +720,86 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
         answers.get(OriginalSubcontractorQuery).value mustBe subcontractor
 
         answers.get(OriginalPartnershipAnswersQuery).value mustBe OriginalPartnershipAnswers(
+          partnershipName = Some("Test Partnership"),
+          addressYesNo = Some(true),
+          address = Some(expectedAddress),
+          partnershipContactMethodsYesNo = Some(true),
+          partnershipContactMethodOptions = Set(Email, Phone, Mobile),
+          email = Some("test@example.com"),
+          phone = Some("02070000000"),
+          mobile = Some("07123456789"),
+          hasUtrYesNo = Some(true),
+          utr = Some("1123456789"),
+          nominatedPartnerName = Some("Test Trading Name"),
+          nominatedPartnerUtrYesNo = Some(true),
+          nominatedPartnerUtr = Some("2234567890"),
+          nominatedPartnerNinoYesNo = Some(true),
+          nominatedPartnerNino = Some("AA123456A"),
+          nominatedPartnerCrnYesNo = Some(true),
+          nominatedPartnerCrn = Some("12345678"),
+          nominatedPartnerWorksReferenceYesNo = Some(true),
+          nominatedPartnerWorksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
+        )
+      }
+
+    }
+
+    "PartnershipPopulator with id" - {
+      val id = "testId"
+
+      "must populate partnership user answers" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            subcontractorType = Some("partnership")
+          )
+
+        val result =
+          AmendSubcontractorPopulator.PartnershipPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+
+        result.isSuccess mustBe true
+
+        val answers = result.get
+
+        answers.get(TypeOfSubcontractorPage(id)).value mustBe Partnership
+        answers.get(PartnershipNamePage(id)).value mustBe "Test Partnership"
+
+        answers.get(PartnershipAddressYesNoPage(id)).value mustBe true
+        answers.get(PartnershipAddressPage(id)).value mustBe expectedAddress
+
+        answers.get(AddPartnershipContactMethodsYesNoPage(id)).value mustBe true
+        answers.get(PartnershipContactMethodOptionsPage(id)).value mustBe Set(Email, Phone, Mobile)
+        answers.get(PartnershipEmailAddressPage(id)).value mustBe "test@example.com"
+        answers.get(PartnershipPhoneNumberPage(id)).value mustBe "02070000000"
+        answers.get(PartnershipMobileNumberPage(id)).value mustBe "07123456789"
+
+        answers.get(PartnershipHasUtrYesNoPage(id)).value mustBe true
+        answers.get(PartnershipUniqueTaxpayerReferencePage(id)).value mustBe "1123456789"
+
+        answers.get(PartnershipNominatedPartnerNamePage(id)).value mustBe "Test Trading Name"
+
+        answers.get(PartnershipNominatedPartnerUtrYesNoPage(id)).value mustBe true
+        answers.get(PartnershipNominatedPartnerUtrPage(id)).value mustBe "2234567890"
+
+        answers.get(PartnershipNominatedPartnerNinoYesNoPage(id)).value mustBe true
+        answers.get(PartnershipNominatedPartnerNinoPage(id)).value mustBe "AA123456A"
+
+        answers.get(PartnershipNominatedPartnerCrnYesNoPage(id)).value mustBe true
+        answers.get(PartnershipNominatedPartnerCrnPage(id)).value mustBe "12345678"
+
+        answers.get(PartnershipWorksReferenceNumberYesNoPage(id)).value mustBe true
+        answers.get(PartnershipWorksReferenceNumberPage(id)).value mustBe "XLS345-MM"
+
+        answers.get(ShowVerificationDetailsPage(id)).value mustBe true
+        answers.get(CisIdQuery(id)).value mustBe cisId // TODO DTR-9463: Do I need to update query with amend?
+        answers
+          .get(OriginalSubcontractorQuery)
+          .value mustBe subcontractor // TODO DTR-9463: Do I need to update query with id?
+
+        answers
+          .get(OriginalPartnershipAnswersQuery)
+          .value mustBe OriginalPartnershipAnswers( // TODO DTR-9463: Do I need to update query with id?
           partnershipName = Some("Test Partnership"),
           addressYesNo = Some(true),
           address = Some(expectedAddress),
@@ -527,6 +912,106 @@ class AmendSubcontractorPopulatorSpec extends SpecBase {
 
         answers.get(TrustNamePage) mustBe None
         answers.get(OriginalTrustAnswersQuery).value.trustName mustBe None
+      }
+    }
+
+    "TrustPopulator with id" - {
+      val id = "testId"
+
+      "must populate trust user answers" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            subcontractorType = Some("trust"),
+            tradingName = Some("Test Trust"),
+            partnershipTradingName = None
+          )
+
+        val result =
+          AmendSubcontractorPopulator.TrustPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+
+        result.isSuccess mustBe true
+
+        val answers = result.get
+
+        answers.get(TypeOfSubcontractorPage(id)).value mustBe Trust
+        answers.get(TrustNamePage(id)).value mustBe "Test Trust"
+
+        answers.get(TrustAddressYesNoPage(id)).value mustBe true
+        answers.get(TrustAddressPage(id)).value mustBe expectedAddress
+
+        answers.get(AddTrustContactMethodsYesNoPage(id)).value mustBe true
+        answers.get(TrustContactMethodOptionsPage(id)).value mustBe Set(Email, Phone, Mobile)
+        answers.get(TrustEmailAddressPage(id)).value mustBe "test@example.com"
+        answers.get(TrustPhoneNumberPage(id)).value mustBe "02070000000"
+        answers.get(TrustMobileNumberPage(id)).value mustBe "07123456789"
+
+        answers.get(TrustUtrYesNoPage(id)).value mustBe true
+        answers.get(TrustUtrPage(id)).value mustBe "1123456789"
+
+        answers.get(TrustWorksReferenceYesNoPage(id)).value mustBe true
+        answers.get(TrustWorksReferencePage(id)).value mustBe "XLS345-MM"
+
+        answers.get(ShowVerificationDetailsPage(id)).value mustBe true
+        answers.get(CisIdQuery(id)).value mustBe cisId // TODO DTR-9463: Do I need to update query with amend?
+        answers
+          .get(OriginalSubcontractorQuery)
+          .value mustBe subcontractor // TODO DTR-9463: Do I need to update query with id?
+
+        answers
+          .get(OriginalTrustAnswersQuery)
+          .value mustBe OriginalTrustAnswers( // TODO DTR-9463: Do I need to update query with id?
+          trustName = Some("Test Trust"),
+          addressYesNo = Some(true),
+          address = Some(expectedAddress),
+          trustContactMethodsYesNo = Some(true),
+          trustContactMethod = Set(Email, Phone, Mobile),
+          email = Some("test@example.com"),
+          phone = Some("02070000000"),
+          mobile = Some("07123456789"),
+          utrYesNo = Some(true),
+          utr = Some("1123456789"),
+          worksReferenceYesNo = Some(true),
+          worksReference = Some("XLS345-MM"),
+          verificationNumber = Some("V1234567890")
+        )
+      }
+
+      "must use partnershipTradingName as trust name when tradingName is missing" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            tradingName = None,
+            partnershipTradingName = Some("Fallback Trust")
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.TrustPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(TrustNamePage(id)).value mustBe "Fallback Trust"
+        answers.get(OriginalTrustAnswersQuery).value.trustName mustBe Some(
+          "Fallback Trust"
+        ) // TODO DTR-9463: Do I need to update query with id?
+      }
+
+      "must not populate trust name when both name fields are missing" in {
+        val subcontractor =
+          baseSubcontractor.copy(
+            tradingName = None,
+            partnershipTradingName = None
+          )
+
+        val answers =
+          AmendSubcontractorPopulator.TrustPopulator
+            .populate(emptyUserAnswers, cisId, subcontractor, id)
+            .get
+
+        answers.get(TrustNamePage(id)) mustBe None
+        answers
+          .get(OriginalTrustAnswersQuery)
+          .value
+          .trustName mustBe None // TODO DTR-9463: Do I need to update query with id?
       }
     }
 

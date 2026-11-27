@@ -107,4 +107,92 @@ class IndividualContactMethodOptionsPageSpec extends PageBehaviours {
       }
     }
   }
+
+  "IndividualContactMethodOptionsPage with id" - {
+    val id = "testId"
+
+    beRetrievable[Set[IndividualContactMethodOptions]](IndividualContactMethodOptionsPage(id))
+
+    beSettable[Set[IndividualContactMethodOptions]](IndividualContactMethodOptionsPage(id))
+
+    beRemovable[Set[IndividualContactMethodOptions]](IndividualContactMethodOptionsPage(id))
+
+    "cleanup" - {
+
+      val userAnswers = emptyUserAnswers
+        .set(IndividualEmailAddressPage(id), "old@email.com")
+        .success
+        .value
+        .set(IndividualPhoneNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(IndividualMobileNumberPage(id), "1111111111")
+        .success
+        .value
+
+      "must remove IndividualPhoneNumberPage and IndividualMobileNumberPage when Email is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Email)).success.value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe None
+
+      }
+
+      "must remove IndividualEmailAddressPage and PIndividualMobileNumberPage when Phone is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Phone)).success.value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe None
+      }
+
+      "must remove IndividualEmailAddressPage and IndividualPhoneNumberPage when Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers.set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Mobile)).success.value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+
+      "must remove IndividualMobileNumberPage when Email and Phone is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Email, ContactMethodOptions.Phone))
+            .success
+            .value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe None
+      }
+
+      "must remove IndividualPhoneNumberPage when Email and Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Email, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe Some("old@email.com")
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+
+      "must remove IndividualEmailAddressPage when Phone and Mobile is selected" in {
+        val updatedUserAnswers =
+          userAnswers
+            .set(IndividualContactMethodOptionsPage(id), Set(ContactMethodOptions.Phone, ContactMethodOptions.Mobile))
+            .success
+            .value
+
+        updatedUserAnswers.get(IndividualEmailAddressPage(id)) mustBe None
+        updatedUserAnswers.get(IndividualPhoneNumberPage(id)) mustBe Some("01234567890")
+        updatedUserAnswers.get(IndividualMobileNumberPage(id)) mustBe Some("1111111111")
+      }
+    }
+  }
 }
