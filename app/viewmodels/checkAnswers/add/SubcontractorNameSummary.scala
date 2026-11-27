@@ -25,7 +25,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
-import java.util.UUID
 
 object SubcontractorNameSummary {
 
@@ -50,31 +49,6 @@ object SubcontractorNameSummary {
         )
       )
     }
-
-  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
-    messages: Messages
-  ): Option[SummaryListRow] = {
-    val subJourneyId = flowId.toString
-    answers.get(SubcontractorNamePage(subJourneyId)).map { answer =>
-      val fullName = Seq(
-        Some(answer.firstName),
-        answer.middleName,
-        Some(answer.lastName)
-      ).flatten.mkString(" ")
-
-      SummaryListRowViewModel(
-        key = "subcontractorName.checkYourAnswersLabel",
-        value = ValueViewModel(Text(fullName)),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.SubcontractorNameController.onPageLoad(mode).url // TODO DTR-9463: Update with id
-          ).withVisuallyHiddenText(messages("subcontractorName.change.hidden"))
-            .withAttribute("id" -> "subcontractor-name")
-        )
-      )
-    }
-  }
 
   def row(
     answers: IndividualAnswers

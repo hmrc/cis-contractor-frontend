@@ -27,7 +27,6 @@ import viewmodels.checkAnswers.verify.ValueViewModelHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
-import java.util.UUID
 
 object IndividualContactMethodOptionsSummary {
 
@@ -52,34 +51,6 @@ object IndividualContactMethodOptionsSummary {
         )
       )
     }
-
-  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
-    messages: Messages
-  ): Option[SummaryListRow] = {
-    val subJourneyId = flowId.toString
-    answers.get(IndividualContactMethodOptionsPage(subJourneyId)).map { selectedMethods =>
-      val options =
-        ContactMethodOptions
-          .ordered(selectedMethods)
-          .map(m => HtmlFormat.escape(messages(s"individualContactMethodOptions.$m")).toString)
-      SummaryListRowViewModel(
-        key = "individualContactMethodOptions.checkYourAnswersLabel",
-        value = ValueViewModelHelper
-          .makeGovukBulletList(options, false)
-          .getOrElse(ValueViewModel(HtmlContent(""))),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.IndividualContactMethodOptionsController
-              .onPageLoad(mode)
-              .url // TODO DTR-9463: Update with id
-          )
-            .withVisuallyHiddenText(messages("individualContactMethodOptions.change.hidden"))
-            .withAttribute("id" -> "individual-methods-of-contact")
-        )
-      )
-    }
-  }
 
   def row(
     answers: IndividualAnswers

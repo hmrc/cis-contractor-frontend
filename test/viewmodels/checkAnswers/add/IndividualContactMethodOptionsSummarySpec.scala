@@ -189,7 +189,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(flowId, answers)
+      val result = IndividualContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -236,7 +236,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(flowId, answers, AmendMode)
+      val result = IndividualContactMethodOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 
@@ -280,7 +280,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(flowId, answers)
+      val result = IndividualContactMethodOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -299,7 +299,7 @@ class IndividualContactMethodOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualContactMethodOptionsSummary.row(flowId, answers, AmendMode)
+      val result = IndividualContactMethodOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 

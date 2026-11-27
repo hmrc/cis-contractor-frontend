@@ -119,7 +119,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
           .success
           .value
 
-      val maybeRow = WorksReferenceNumberSummary.row(flowId, answers)
+      val maybeRow = WorksReferenceNumberSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -152,7 +152,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
           .success
           .value
 
-      val maybeRow = WorksReferenceNumberSummary.row(flowId, answers, AmendMode)
+      val maybeRow = WorksReferenceNumberSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -180,7 +180,7 @@ class WorksReferenceNumberSummarySpec extends AnyFreeSpec with Matchers with Cya
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      WorksReferenceNumberSummary.row(flowId, answers) shouldBe None
+      WorksReferenceNumberSummary.row(answers) shouldBe None
     }
   }
 

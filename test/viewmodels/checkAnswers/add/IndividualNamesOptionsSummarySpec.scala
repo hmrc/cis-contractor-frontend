@@ -178,7 +178,7 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualNamesOptionsSummary.row(flowId, answers)
+      val result = IndividualNamesOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -224,7 +224,7 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualNamesOptionsSummary.row(flowId, answers, AmendMode)
+      val result = IndividualNamesOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 
@@ -267,7 +267,7 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualNamesOptionsSummary.row(flowId, answers)
+      val result = IndividualNamesOptionsSummary.row(answers)
 
       result mustBe defined
 
@@ -286,7 +286,7 @@ class IndividualNamesOptionsSummarySpec extends SpecBase with Matchers {
           .success
           .value
 
-      val result = IndividualNamesOptionsSummary.row(flowId, answers, AmendMode)
+      val result = IndividualNamesOptionsSummary.row(answers, AmendMode)
 
       result mustBe defined
 

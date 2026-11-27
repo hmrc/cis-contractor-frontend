@@ -133,7 +133,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
@@ -166,7 +166,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers, AmendMode)
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row =
@@ -201,7 +201,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = UniqueTaxpayerReferenceYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -211,7 +211,7 @@ class UniqueTaxpayerReferenceYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      UniqueTaxpayerReferenceYesNoSummary.row(flowId, answers) shouldBe None
+      UniqueTaxpayerReferenceYesNoSummary.row(answers) shouldBe None
     }
   }
 

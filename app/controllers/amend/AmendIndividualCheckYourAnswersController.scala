@@ -180,7 +180,6 @@ class AmendIndividualCheckYourAnswersController @Inject() (
       if (isVerified) {
         Seq(
           SubcontractorsUniqueTaxpayerReferenceSummary.row(
-            flowId,
             ua,
             AmendMode,
             showActions = false
@@ -270,9 +269,9 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     val nameRows     =
       if (!isVerified) {
         Seq(
-          IndividualNamesOptionsSummary.row(flowId, ua, AmendMode),
-          SubcontractorNameSummary.row(flowId, ua, AmendMode),
-          TradingNameOfSubcontractorSummary.row(flowId, ua, AmendMode)
+          IndividualNamesOptionsSummary.row(ua, AmendMode),
+          SubcontractorNameSummary.row(ua, AmendMode),
+          TradingNameOfSubcontractorSummary.row(ua, AmendMode)
         )
       } else {
         Nil
@@ -280,15 +279,15 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     val addressRows =
       Seq(
-        SubAddressYesNoSummary.row(flowId, ua, AmendMode),
+        SubAddressYesNoSummary.row(ua, AmendMode),
         AddressOfSubcontractorSummary.row(ua, AmendMode)
       )
 
     val utrRows =
       if (!isVerified) {
         Seq(
-          UniqueTaxpayerReferenceYesNoSummary.row(flowId, ua, AmendMode),
-          SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, ua, AmendMode)
+          UniqueTaxpayerReferenceYesNoSummary.row(ua, AmendMode),
+          SubcontractorsUniqueTaxpayerReferenceSummary.row(ua, AmendMode)
         )
       } else {
         Nil
@@ -296,28 +295,19 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     val contactRows =
       Seq(
-        AddIndividualContactMethodsYesNoSummary.row(
-          ua,
-          AmendMode,
-          Some(
-            controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
-              .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
-              .url
-          ),
-          Some(subJourneyId)
-        ),
-        IndividualContactMethodOptionsSummary.row(flowId, ua, AmendMode),
-        IndividualEmailAddressSummary.row(flowId, ua, AmendMode),
-        IndividualPhoneNumberSummary.row(flowId, ua, AmendMode),
-        IndividualMobileNumberSummary.row(flowId, ua, AmendMode)
+        AddIndividualContactMethodsYesNoSummary.row(ua, AmendMode),
+        IndividualContactMethodOptionsSummary.row(ua, AmendMode),
+        IndividualEmailAddressSummary.row(ua, AmendMode),
+        IndividualPhoneNumberSummary.row(ua, AmendMode),
+        IndividualMobileNumberSummary.row(ua, AmendMode)
       )
 
     val additionalRows =
       Seq(
-        NationalInsuranceNumberYesNoSummary.row(flowId, ua, AmendMode),
-        SubNationalInsuranceNumberSummary.row(flowId, ua, AmendMode),
-        WorksReferenceNumberYesNoSummary.row(flowId, ua, AmendMode),
-        WorksReferenceNumberSummary.row(flowId, ua, AmendMode)
+        NationalInsuranceNumberYesNoSummary.row(ua, AmendMode),
+        SubNationalInsuranceNumberSummary.row(ua, AmendMode),
+        WorksReferenceNumberYesNoSummary.row(ua, AmendMode),
+        WorksReferenceNumberSummary.row(ua, AmendMode)
       )
 
     nameRows ++ addressRows ++ contactRows ++ utrRows ++ additionalRows

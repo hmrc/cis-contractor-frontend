@@ -331,7 +331,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       val userAnswers = UserAnswers("id")
 
-      AddressOfSubcontractorSummary.row(flowId, userAnswers) shouldBe None
+      AddressOfSubcontractorSummary.row(userAnswers) shouldBe None
     }
 
     "render the address without a country line when country is None" in {
@@ -351,7 +351,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(flowId, userAnswers).value
+      val row = AddressOfSubcontractorSummary.row(userAnswers).value
 
       row.value.content shouldBe HtmlContent(
         "10 Downing Street<br/>" +
@@ -378,7 +378,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(flowId, userAnswers).value
+      val row = AddressOfSubcontractorSummary.row(userAnswers).value
 
       row.value.content shouldBe HtmlContent(
         "10 Downing Street<br/>" +
@@ -403,7 +403,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val row = AddressOfSubcontractorSummary.row(flowId, answers).value
+      val row = AddressOfSubcontractorSummary.row(answers).value
 
       val html = extractHtml(row)
 

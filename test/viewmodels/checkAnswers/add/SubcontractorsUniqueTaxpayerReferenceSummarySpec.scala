@@ -167,7 +167,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
           .success
           .value
 
-      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers)
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -202,7 +202,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
           .success
           .value
 
-      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers, AmendMode)
+      val maybeRow = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -232,7 +232,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers) shouldBe None
+      SubcontractorsUniqueTaxpayerReferenceSummary.row(answers) shouldBe None
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
@@ -245,7 +245,7 @@ class SubcontractorsUniqueTaxpayerReferenceSummarySpec extends AnyFreeSpec with 
           .success
           .value
 
-      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(flowId, answers).value
+      val row = SubcontractorsUniqueTaxpayerReferenceSummary.row(answers).value
 
       val html = extractHtml(row)
 

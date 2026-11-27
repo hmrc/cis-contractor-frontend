@@ -133,7 +133,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
@@ -166,7 +166,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(flowId, answers, AmendMode)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row =
@@ -201,7 +201,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = NationalInsuranceNumberYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -211,7 +211,7 @@ class NationalInsuranceNumberYesNoSummarySpec extends AnyFreeSpec with Matchers 
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      NationalInsuranceNumberYesNoSummary.row(flowId, answers) shouldBe None
+      NationalInsuranceNumberYesNoSummary.row(answers) shouldBe None
     }
   }
 

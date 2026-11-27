@@ -132,7 +132,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
@@ -164,7 +164,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(flowId, answers, AmendMode)
+      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row =
@@ -199,7 +199,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = SubAddressYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -209,7 +209,7 @@ class SubAddressYesNoSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubAddressYesNoSummary.row(flowId, answers) shouldBe None
+      SubAddressYesNoSummary.row(answers) shouldBe None
     }
   }
 

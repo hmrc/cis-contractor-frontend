@@ -134,7 +134,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
           .success
           .value
 
-      val maybeRow = IndividualPhoneNumberSummary.row(flowId, answers)
+      val maybeRow = IndividualPhoneNumberSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -167,7 +167,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
           .success
           .value
 
-      val maybeRow = IndividualPhoneNumberSummary.row(flowId, answers, AmendMode)
+      val maybeRow = IndividualPhoneNumberSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -195,7 +195,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      IndividualPhoneNumberSummary.row(flowId, answers) shouldBe None
+      IndividualPhoneNumberSummary.row(answers) shouldBe None
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
@@ -208,7 +208,7 @@ class IndividualPhoneNumberSummarySpec extends AnyFreeSpec with Matchers with Cy
           .success
           .value
 
-      val row = IndividualPhoneNumberSummary.row(flowId, answers).value
+      val row = IndividualPhoneNumberSummary.row(answers).value
 
       val html = extractHtml(row)
 

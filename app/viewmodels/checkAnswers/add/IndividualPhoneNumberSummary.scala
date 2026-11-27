@@ -23,7 +23,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
-import java.util.UUID
 
 object IndividualPhoneNumberSummary {
 
@@ -42,26 +41,6 @@ object IndividualPhoneNumberSummary {
         )
       )
     }
-
-  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
-    messages: Messages
-  ): Option[SummaryListRow] = {
-    val subJourneyId = flowId.toString
-    answers.get(IndividualPhoneNumberPage(subJourneyId)).map { answer =>
-      SummaryListRowViewModel(
-        key = "individualPhoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(answer),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.add.routes.IndividualPhoneNumberController.onPageLoad(mode).url // TODO DTR-9463: Update with id
-          )
-            .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
-            .withAttribute("id" -> "individual-phone-number")
-        )
-      )
-    }
-  }
 
   def row(
     answers: IndividualAnswers

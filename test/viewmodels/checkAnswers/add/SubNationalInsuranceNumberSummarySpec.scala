@@ -135,7 +135,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
           .success
           .value
 
-      val maybeRow = SubNationalInsuranceNumberSummary.row(flowId, answers)
+      val maybeRow = SubNationalInsuranceNumberSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -168,7 +168,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
           .success
           .value
 
-      val maybeRow = SubNationalInsuranceNumberSummary.row(flowId, answers, AmendMode)
+      val maybeRow = SubNationalInsuranceNumberSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -196,7 +196,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      SubNationalInsuranceNumberSummary.row(flowId, answers) shouldBe None
+      SubNationalInsuranceNumberSummary.row(answers) shouldBe None
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
@@ -209,7 +209,7 @@ class SubNationalInsuranceNumberSummarySpec extends AnyFreeSpec with Matchers wi
           .success
           .value
 
-      val row = SubNationalInsuranceNumberSummary.row(flowId, answers).value
+      val row = SubNationalInsuranceNumberSummary.row(answers).value
 
       val html = extractHtml(row)
 

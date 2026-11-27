@@ -135,7 +135,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row =
@@ -169,7 +169,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(flowId, answers, AmendMode)
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row =
@@ -205,7 +205,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
         .success
         .value
 
-      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(flowId, answers)
+      val maybeRow: Option[SummaryListRow] = AddIndividualContactMethodsYesNoSummary.row(answers)
       maybeRow shouldBe defined
 
       val row           = maybeRow.value
@@ -215,7 +215,7 @@ class AddIndividualContactMethodsYesNoSummarySpec extends AnyFreeSpec with Match
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      AddIndividualContactMethodsYesNoSummary.row(flowId, answers) shouldBe None
+      AddIndividualContactMethodsYesNoSummary.row(answers) shouldBe None
     }
   }
 

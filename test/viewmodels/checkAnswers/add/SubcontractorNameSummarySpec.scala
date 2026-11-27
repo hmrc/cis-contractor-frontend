@@ -167,7 +167,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
           .success
           .value
 
-      val row = SubcontractorNameSummary.row(flowId, answers).value
+      val row = SubcontractorNameSummary.row(answers).value
 
       row.key.content.asHtml.toString should include(
         messages("subcontractorName.checkYourAnswersLabel")
@@ -209,7 +209,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
           .success
           .value
 
-      val row = SubcontractorNameSummary.row(flowId, answers, AmendMode).value
+      val row = SubcontractorNameSummary.row(answers, AmendMode).value
 
       row.key.content.asHtml.toString should include(
         messages("subcontractorName.checkYourAnswersLabel")
@@ -241,7 +241,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
 
       val answers = UserAnswers("test-id")
 
-      SubcontractorNameSummary.row(flowId, answers) shouldBe None
+      SubcontractorNameSummary.row(answers) shouldBe None
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
@@ -258,7 +258,7 @@ class SubcontractorNameSummarySpec extends AnyFreeSpec with Matchers with CyaEnc
           .success
           .value
 
-      val row = SubcontractorNameSummary.row(flowId, answers).value
+      val row = SubcontractorNameSummary.row(answers).value
 
       val html = extractHtml(row)
 

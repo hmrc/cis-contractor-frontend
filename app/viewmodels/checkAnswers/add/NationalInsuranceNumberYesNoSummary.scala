@@ -24,7 +24,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 import models.info.IndividualAnswers
-import java.util.UUID
 
 object NationalInsuranceNumberYesNoSummary {
 
@@ -50,36 +49,6 @@ object NationalInsuranceNumberYesNoSummary {
         )
       )
     }
-
-  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
-    messages: Messages
-  ): Option[SummaryListRow] = {
-    val subJourneyId = flowId.toString
-    answers.get(NationalInsuranceNumberYesNoPage(subJourneyId)).map { answer =>
-
-      val value = if (answer) "site.yes" else "site.no"
-
-      SummaryListRowViewModel(
-        key = "nationalInsuranceNumberYesNo.checkYourAnswersLabel",
-        value = ValueViewModel(value),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            if answer && mode == AmendMode then
-              controllers.amend.routes.AmendIndividualRemoveDetailYesNoController // TODO DTR-9463: Update with id
-                .onPageLoad(AmendIndividualRemoveDetail.NationalInsuranceNumber.key)
-                .url
-            else
-              controllers.add.routes.NationalInsuranceNumberYesNoController
-                .onPageLoad(mode)
-                .url // TODO DTR-9463: Update with id
-          )
-            .withVisuallyHiddenText(messages("nationalInsuranceNumberYesNo.change.hidden"))
-            .withAttribute("id" -> "national-insurance-number-yes-no")
-        )
-      )
-    }
-  }
 
   def row(
     answers: IndividualAnswers

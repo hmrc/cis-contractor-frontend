@@ -144,7 +144,7 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
           .success
           .value
 
-      val maybeRow = IndividualEmailAddressSummary.row(flowId, answers)
+      val maybeRow = IndividualEmailAddressSummary.row(answers)
 
       maybeRow shouldBe defined
 
@@ -179,7 +179,7 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
           .success
           .value
 
-      val maybeRow = IndividualEmailAddressSummary.row(flowId, answers, AmendMode)
+      val maybeRow = IndividualEmailAddressSummary.row(answers, AmendMode)
 
       maybeRow shouldBe defined
 
@@ -210,7 +210,7 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
 
       val answers = UserAnswers("test-id")
 
-      IndividualEmailAddressSummary.row(flowId, answers) shouldBe None
+      IndividualEmailAddressSummary.row(answers) shouldBe None
     }
 
     "must HTML-escape special characters correctly (single encoding only)" in {
@@ -223,7 +223,7 @@ class IndividualEmailAddressSummarySpec extends AnyFreeSpec with Matchers with C
           .success
           .value
 
-      val row = IndividualEmailAddressSummary.row(flowId, answers).value
+      val row = IndividualEmailAddressSummary.row(answers).value
 
       val html = extractHtml(row)
 

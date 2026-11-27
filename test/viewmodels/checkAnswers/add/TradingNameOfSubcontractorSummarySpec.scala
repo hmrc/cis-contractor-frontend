@@ -117,7 +117,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
           .success
           .value
 
-      val maybeRow = TradingNameOfSubcontractorSummary.row(flowId, answers)
+      val maybeRow = TradingNameOfSubcontractorSummary.row(answers)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -150,7 +150,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
           .success
           .value
 
-      val maybeRow = TradingNameOfSubcontractorSummary.row(flowId, answers, AmendMode)
+      val maybeRow = TradingNameOfSubcontractorSummary.row(answers, AmendMode)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -178,7 +178,7 @@ class TradingNameOfSubcontractorSummarySpec extends AnyFreeSpec with Matchers wi
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      TradingNameOfSubcontractorSummary.row(flowId, answers) shouldBe None
+      TradingNameOfSubcontractorSummary.row(answers) shouldBe None
     }
   }
 
