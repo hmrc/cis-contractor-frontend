@@ -23,45 +23,86 @@ import pages.QuestionPage
 import pages.add.company.*
 import play.api.libs.json.JsPath
 
-case class AmendCompanyRemoveDetailYesNoPage(subcontractorDetail: AmendCompanyRemoveDetail)
-    extends QuestionPage[Boolean] {
+case class AmendCompanyRemoveDetailYesNoPage(
+  subcontractorDetail: AmendCompanyRemoveDetail,
+  subJourneyId: Option[String] = None
+) extends QuestionPage[Boolean] {
 
   // All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = subJourneyId match {
+    case Some(id) => JsPath \ "amendSubcontractor" \ id \ toString
+    case None     => JsPath \ toString
+  }
 
   override def toString: String = "amendCompanyRemoveDetailYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
-    subcontractorDetail match {
-      case Address if value.contains(true) =>
-        userAnswers
-          .remove(CompanyAddressPage)
-          .flatMap(_.set(CompanyAddressYesNoPage, false))
+    subJourneyId match {
+      case Some(id) =>
+        subcontractorDetail match {
+          case Address if value.contains(true) =>
+            userAnswers
+              .remove(CompanyAddressPage(id))
+              .flatMap(_.set(CompanyAddressYesNoPage(id), false))
 
-      case ContactDetails if value.contains(true) =>
-        userAnswers
-          .remove(CompanyContactMethodOptionsPage)
-          .flatMap(_.remove(CompanyEmailAddressPage))
-          .flatMap(_.remove(CompanyPhoneNumberPage))
-          .flatMap(_.remove(CompanyMobileNumberPage))
-          .flatMap(_.set(AddCompanyContactMethodsYesNoPage, false))
+          case ContactDetails if value.contains(true) =>
+            userAnswers
+              .remove(CompanyContactMethodOptionsPage(id))
+              .flatMap(_.remove(CompanyEmailAddressPage(id)))
+              .flatMap(_.remove(CompanyPhoneNumberPage(id)))
+              .flatMap(_.remove(CompanyMobileNumberPage(id)))
+              .flatMap(_.set(AddCompanyContactMethodsYesNoPage(id), false))
 
-      case Utr if value.contains(true) =>
-        userAnswers
-          .remove(CompanyUtrPage)
-          .flatMap(_.set(CompanyUtrYesNoPage, false))
+          case Utr if value.contains(true) =>
+            userAnswers
+              .remove(CompanyUtrPage(id))
+              .flatMap(_.set(CompanyUtrYesNoPage(id), false))
 
-      case CompanyRegistrationNumber if value.contains(true) =>
-        userAnswers
-          .remove(CompanyCrnPage)
-          .flatMap(_.set(CompanyCrnYesNoPage, false))
+          case CompanyRegistrationNumber if value.contains(true) =>
+            userAnswers
+              .remove(CompanyCrnPage(id))
+              .flatMap(_.set(CompanyCrnYesNoPage(id), false))
 
-      case WorksReferenceNumber if value.contains(true) =>
-        userAnswers
-          .remove(CompanyWorksReferencePage)
-          .flatMap(_.set(CompanyWorksReferenceYesNoPage, false))
+          case WorksReferenceNumber if value.contains(true) =>
+            userAnswers
+              .remove(CompanyWorksReferencePage(id))
+              .flatMap(_.set(CompanyWorksReferenceYesNoPage(id), false))
 
-      case _ =>
-        super.cleanup(value, userAnswers)
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
+      case None     =>
+        subcontractorDetail match {
+          case Address if value.contains(true) =>
+            userAnswers
+              .remove(CompanyAddressPage)
+              .flatMap(_.set(CompanyAddressYesNoPage, false))
+
+          case ContactDetails if value.contains(true) =>
+            userAnswers
+              .remove(CompanyContactMethodOptionsPage)
+              .flatMap(_.remove(CompanyEmailAddressPage))
+              .flatMap(_.remove(CompanyPhoneNumberPage))
+              .flatMap(_.remove(CompanyMobileNumberPage))
+              .flatMap(_.set(AddCompanyContactMethodsYesNoPage, false))
+
+          case Utr if value.contains(true) =>
+            userAnswers
+              .remove(CompanyUtrPage)
+              .flatMap(_.set(CompanyUtrYesNoPage, false))
+
+          case CompanyRegistrationNumber if value.contains(true) =>
+            userAnswers
+              .remove(CompanyCrnPage)
+              .flatMap(_.set(CompanyCrnYesNoPage, false))
+
+          case WorksReferenceNumber if value.contains(true) =>
+            userAnswers
+              .remove(CompanyWorksReferencePage)
+              .flatMap(_.set(CompanyWorksReferenceYesNoPage, false))
+
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
     }
 }

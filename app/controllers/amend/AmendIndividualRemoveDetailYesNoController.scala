@@ -129,35 +129,35 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 
   private def detailIsPresentWithId(
     flowId: UUID,
-       detail: AmendIndividualRemoveDetail,
-       userAnswers: UserAnswers
-     ): Boolean = {
+    detail: AmendIndividualRemoveDetail,
+    userAnswers: UserAnswers
+  ): Boolean = {
     val subJourneyId = flowId.toString
-    
+
     detail match {
       case AmendIndividualRemoveDetail.TradingName =>
         userAnswers
           .get(IndividualNamesOptionsPage(subJourneyId))
           .exists(_.contains(SubcontractorName)) &&
-          userAnswers
-            .get(SubcontractorNamePage(subJourneyId))
-            .isDefined &&
-          userAnswers
-            .get(TradingNameOfSubcontractorPage(subJourneyId))
-            .isDefined &&
-          !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
+        userAnswers
+          .get(SubcontractorNamePage(subJourneyId))
+          .isDefined &&
+        userAnswers
+          .get(TradingNameOfSubcontractorPage(subJourneyId))
+          .isDefined &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.SubcontractorName =>
         userAnswers
           .get(IndividualNamesOptionsPage(subJourneyId))
           .exists(_.contains(TradingName)) &&
-          userAnswers
-            .get(SubcontractorNamePage(subJourneyId))
-            .isDefined &&
-          userAnswers
-            .get(TradingNameOfSubcontractorPage(subJourneyId))
-            .isDefined &&
-          !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
+        userAnswers
+          .get(SubcontractorNamePage(subJourneyId))
+          .isDefined &&
+        userAnswers
+          .get(TradingNameOfSubcontractorPage(subJourneyId))
+          .isDefined &&
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.Address =>
         userAnswers
@@ -173,7 +173,7 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         userAnswers
           .get(UniqueTaxpayerReferenceYesNoPage(subJourneyId))
           .contains(true) &&
-          !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
+        !AmendControllerUtils.isVerifiedForAmendJourney(userAnswers)
 
       case AmendIndividualRemoveDetail.NationalInsuranceNumber =>
         userAnswers
@@ -226,8 +226,10 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
 
   def onPageLoadWithId(flowId: UUID, subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val formAction = Some(controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmitWithId(flowId, subcontractorDetail))
-      
+      val formAction = Some(
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmitWithId(flowId, subcontractorDetail)
+      )
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
@@ -248,7 +250,9 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
               val subcontractorDetailTitle =
                 messages(detailType.messageKey)
 
-              Future.successful(Ok(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, form, formAction)))
+              Future.successful(
+                Ok(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, form, formAction))
+              )
             }
           }
         }
@@ -313,10 +317,12 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
         }
   }
 
-  def onSubmitWithId(flowId: UUID, subcontractorDetail: String): Action[AnyContent] = 
+  def onSubmitWithId(flowId: UUID, subcontractorDetail: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
-      val formAction = Some(controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmitWithId(flowId, subcontractorDetail))
-      
+      val formAction = Some(
+        controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmitWithId(flowId, subcontractorDetail)
+      )
+
       subcontractorNameExtractor
         .getSubcontractorName(request.userAnswers, AmendMode)
         .map { subcontractorName =>
@@ -340,7 +346,15 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                       messages(detailType.messageKey)
 
                     Future.successful(
-                      BadRequest(view(subcontractorName, subcontractorDetail, subcontractorDetailTitle, formWithErrors, formAction))
+                      BadRequest(
+                        view(
+                          subcontractorName,
+                          subcontractorDetail,
+                          subcontractorDetailTitle,
+                          formWithErrors,
+                          formAction
+                        )
+                      )
                     )
                   ,
                   value =>
@@ -351,8 +365,10 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
                             .set(AmendIndividualRemoveDetailYesNoPage(detailType), value)
                             .flatMap(_.remove(AmendIndividualRemoveDetailYesNoPage(detailType)))
                         )
-                      _ <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoadWithId(flowId)))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(
+                      controllers.amend.routes.AmendIndividualCheckYourAnswersController.onPageLoadWithId(flowId)
+                    ))
                       .recover { case ex =>
                         logger.error(
                           s"Failed to save remove detail answer for '$subcontractorDetail'",
@@ -368,5 +384,5 @@ class AmendIndividualRemoveDetailYesNoController @Inject() (
           logger.error("[AmendIndividualRemoveDetailYesNoController][onSubmitWithId] - name missing from userAnswers")
           Future.successful(journeyRecovery)
         }
-  }
+    }
 }
