@@ -25,11 +25,15 @@ import pages.add.partnership.*
 import play.api.libs.json.JsPath
 
 case class AmendPartnershipRemoveDetailYesNoPage(
-  detail: String
+  detail: String,
+  subJourneyId: Option[String] = None
 ) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    JsPath \ toString
+    subJourneyId match {
+      case Some(id) => JsPath \ "amendSubcontractor" \ id \ toString
+      case None     => JsPath \ toString
+    }
 
   override def toString: String =
     s"removePartnershipSubcontractorDetailYesNo-$detail"
@@ -38,47 +42,92 @@ case class AmendPartnershipRemoveDetailYesNoPage(
     value: Option[Boolean],
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
-    AmendPartnershipRemoveDetail.fromKey(detail) match {
+    subJourneyId match {
+      case Some(id) =>
+        AmendPartnershipRemoveDetail.fromKey(detail) match {
+          case Some(Address) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipAddressPage(id))
+              .flatMap(_.set(PartnershipAddressYesNoPage(id), false))
 
-      case Some(Address) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipAddressPage)
-          .flatMap(_.set(PartnershipAddressYesNoPage, false))
+          case Some(ContactDetails) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipContactMethodOptionsPage(id))
+              .flatMap(_.remove(PartnershipEmailAddressPage(id)))
+              .flatMap(_.remove(PartnershipPhoneNumberPage(id)))
+              .flatMap(_.remove(PartnershipMobileNumberPage(id)))
+              .flatMap(_.set(AddPartnershipContactMethodsYesNoPage(id), false))
 
-      case Some(ContactDetails) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipContactMethodOptionsPage)
-          .flatMap(_.remove(PartnershipEmailAddressPage))
-          .flatMap(_.remove(PartnershipPhoneNumberPage))
-          .flatMap(_.remove(PartnershipMobileNumberPage))
-          .flatMap(_.set(AddPartnershipContactMethodsYesNoPage, false))
+          case Some(Utr) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipUniqueTaxpayerReferencePage(id))
+              .flatMap(_.set(PartnershipHasUtrYesNoPage(id), false))
 
-      case Some(Utr) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipUniqueTaxpayerReferencePage)
-          .flatMap(_.set(PartnershipHasUtrYesNoPage, false))
+          case Some(WorksReferenceNumber) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipWorksReferenceNumberPage(id))
+              .flatMap(_.set(PartnershipWorksReferenceNumberYesNoPage(id), false))
 
-      case Some(WorksReferenceNumber) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipWorksReferenceNumberPage)
-          .flatMap(_.set(PartnershipWorksReferenceNumberYesNoPage, false))
+          case Some(NominatedPartnerUtr) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerUtrPage(id))
+              .flatMap(_.set(PartnershipNominatedPartnerUtrYesNoPage(id), false))
 
-      case Some(NominatedPartnerUtr) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipNominatedPartnerUtrPage)
-          .flatMap(_.set(PartnershipNominatedPartnerUtrYesNoPage, false))
+          case Some(NominatedPartnerNino) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerNinoPage(id))
+              .flatMap(_.set(PartnershipNominatedPartnerNinoYesNoPage(id), false))
 
-      case Some(NominatedPartnerNino) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipNominatedPartnerNinoPage)
-          .flatMap(_.set(PartnershipNominatedPartnerNinoYesNoPage, false))
+          case Some(NominatedPartnerCompanyRegistrationNumber) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerCrnPage(id))
+              .flatMap(_.set(PartnershipNominatedPartnerCrnYesNoPage(id), false))
 
-      case Some(NominatedPartnerCompanyRegistrationNumber) if value.contains(true) =>
-        userAnswers
-          .remove(PartnershipNominatedPartnerCrnPage)
-          .flatMap(_.set(PartnershipNominatedPartnerCrnYesNoPage, false))
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
+      case None     =>
+        AmendPartnershipRemoveDetail.fromKey(detail) match {
+          case Some(Address) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipAddressPage)
+              .flatMap(_.set(PartnershipAddressYesNoPage, false))
 
-      case _ =>
-        super.cleanup(value, userAnswers)
+          case Some(ContactDetails) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipContactMethodOptionsPage)
+              .flatMap(_.remove(PartnershipEmailAddressPage))
+              .flatMap(_.remove(PartnershipPhoneNumberPage))
+              .flatMap(_.remove(PartnershipMobileNumberPage))
+              .flatMap(_.set(AddPartnershipContactMethodsYesNoPage, false))
+
+          case Some(Utr) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipUniqueTaxpayerReferencePage)
+              .flatMap(_.set(PartnershipHasUtrYesNoPage, false))
+
+          case Some(WorksReferenceNumber) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipWorksReferenceNumberPage)
+              .flatMap(_.set(PartnershipWorksReferenceNumberYesNoPage, false))
+
+          case Some(NominatedPartnerUtr) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerUtrPage)
+              .flatMap(_.set(PartnershipNominatedPartnerUtrYesNoPage, false))
+
+          case Some(NominatedPartnerNino) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerNinoPage)
+              .flatMap(_.set(PartnershipNominatedPartnerNinoYesNoPage, false))
+
+          case Some(NominatedPartnerCompanyRegistrationNumber) if value.contains(true) =>
+            userAnswers
+              .remove(PartnershipNominatedPartnerCrnPage)
+              .flatMap(_.set(PartnershipNominatedPartnerCrnYesNoPage, false))
+
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
     }
 }

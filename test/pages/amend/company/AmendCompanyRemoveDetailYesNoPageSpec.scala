@@ -267,7 +267,10 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails, id), true).success.value
+        userAnswers
+          .set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails, id), true)
+          .success
+          .value
 
       updatedUserAnswers.get(CompanyContactMethodOptionsPage(id)) mustBe None
       updatedUserAnswers.get(CompanyEmailAddressPage(id)) mustBe None
@@ -298,7 +301,10 @@ class AmendCompanyRemoveDetailYesNoPageSpec extends PageBehaviours {
         .value
 
       val updatedUserAnswers =
-        userAnswers.set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails, id), false).success.value
+        userAnswers
+          .set(AmendCompanyRemoveDetailYesNoPage(AmendCompanyRemoveDetail.ContactDetails, id), false)
+          .success
+          .value
 
       updatedUserAnswers.get(CompanyContactMethodOptionsPage(id)) mustBe Some(
         Set(ContactMethodOptions.Email, ContactMethodOptions.Phone, ContactMethodOptions.Mobile)

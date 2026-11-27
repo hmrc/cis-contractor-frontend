@@ -240,4 +240,223 @@ class AmendPartnershipRemoveDetailYesNoPageSpec extends PageBehaviours {
       }
     }
   }
+
+  "AmendPartnershipRemoveDetailYesNoPage with id" - {
+    val id = "testId"
+
+    val amendPartnershipRemoveDetailYesNoPage =
+      AmendPartnershipRemoveDetailYesNoPage("address", id)
+
+    beRetrievable[Boolean](amendPartnershipRemoveDetailYesNoPage)
+
+    beSettable[Boolean](amendPartnershipRemoveDetailYesNoPage)
+
+    beRemovable[Boolean](amendPartnershipRemoveDetailYesNoPage)
+
+    val address = Address(
+      addressLine1 = "line 1",
+      addressLine2 = Some("line 2"),
+      addressLine3 = Some("line 3"),
+      addressLine4 = Some("line 4"),
+      postcode = Some("NX1 1AA"),
+      country = Some(Country(Some("GB"), Some("United Kingdom")))
+    )
+
+    "cleanup: must remove PartnershipAddressPage and set PartnershipAddressYesNoPage to No when Yes is selected" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(PartnershipAddressPage(id), address)
+        .success
+        .value
+        .set(PartnershipAddressYesNoPage(id), true)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(AmendPartnershipRemoveDetailYesNoPage("address", id), true)
+          .success
+          .value
+
+      updatedUserAnswers.get(PartnershipAddressPage(id)) mustBe None
+      updatedUserAnswers.get(PartnershipAddressYesNoPage(id)) mustBe Some(false)
+    }
+
+    "cleanup: must retain PartnershipAddressPage and PartnershipAddressYesNoPage when No is selected" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(PartnershipAddressPage(id), address)
+        .success
+        .value
+        .set(PartnershipAddressYesNoPage(id), true)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(AmendPartnershipRemoveDetailYesNoPage("address", id), false)
+          .success
+          .value
+
+      updatedUserAnswers.get(PartnershipAddressPage(id)) mustBe Some(address)
+      updatedUserAnswers.get(PartnershipAddressYesNoPage(id)) mustBe Some(true)
+    }
+
+    "cleanup: must remove all contact details and set AddPartnershipContactMethodsYesNoPage to No when Yes is selected" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(
+          PartnershipContactMethodOptionsPage(id),
+          Set(
+            ContactMethodOptions.Email,
+            ContactMethodOptions.Phone,
+            ContactMethodOptions.Mobile
+          )
+        )
+        .success
+        .value
+        .set(PartnershipEmailAddressPage(id), "old@email.com")
+        .success
+        .value
+        .set(PartnershipPhoneNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(PartnershipMobileNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(AddPartnershipContactMethodsYesNoPage(id), true)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(AmendPartnershipRemoveDetailYesNoPage("contact-details", id), true)
+          .success
+          .value
+
+      updatedUserAnswers.get(PartnershipContactMethodOptionsPage(id)) mustBe None
+      updatedUserAnswers.get(PartnershipEmailAddressPage(id)) mustBe None
+      updatedUserAnswers.get(PartnershipPhoneNumberPage(id)) mustBe None
+      updatedUserAnswers.get(PartnershipMobileNumberPage(id)) mustBe None
+      updatedUserAnswers.get(AddPartnershipContactMethodsYesNoPage(id)) mustBe Some(false)
+    }
+
+    "cleanup: must retain all contact details when No is selected" in {
+
+      val userAnswers = emptyUserAnswers
+        .set(
+          PartnershipContactMethodOptionsPage(id),
+          Set(
+            ContactMethodOptions.Email,
+            ContactMethodOptions.Phone,
+            ContactMethodOptions.Mobile
+          )
+        )
+        .success
+        .value
+        .set(PartnershipEmailAddressPage(id), "old@email.com")
+        .success
+        .value
+        .set(PartnershipPhoneNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(PartnershipMobileNumberPage(id), "01234567890")
+        .success
+        .value
+        .set(AddPartnershipContactMethodsYesNoPage(id), true)
+        .success
+        .value
+
+      val updatedUserAnswers =
+        userAnswers
+          .set(AmendPartnershipRemoveDetailYesNoPage("contact-details", id), false)
+          .success
+          .value
+
+      updatedUserAnswers.get(PartnershipContactMethodOptionsPage(id)) mustBe Some(
+        Set(
+          ContactMethodOptions.Email,
+          ContactMethodOptions.Phone,
+          ContactMethodOptions.Mobile
+        )
+      )
+      updatedUserAnswers.get(PartnershipEmailAddressPage(id)) mustBe Some("old@email.com")
+      updatedUserAnswers.get(PartnershipPhoneNumberPage(id)) mustBe Some("01234567890")
+      updatedUserAnswers.get(PartnershipMobileNumberPage(id)) mustBe Some("01234567890")
+      updatedUserAnswers.get(AddPartnershipContactMethodsYesNoPage(id)) mustBe Some(true)
+    }
+
+    Seq(
+      (
+        "utr",
+        PartnershipUniqueTaxpayerReferencePage(id),
+        PartnershipHasUtrYesNoPage(id),
+        "7777777777"
+      ),
+      (
+        "works-reference-number",
+        PartnershipWorksReferenceNumberPage(id),
+        PartnershipWorksReferenceNumberYesNoPage(id),
+        "WR-001"
+      ),
+      (
+        "nominated-partner-utr",
+        PartnershipNominatedPartnerUtrPage(id),
+        PartnershipNominatedPartnerUtrYesNoPage(id),
+        "7777777777"
+      ),
+      (
+        "nominated-partner-nino",
+        PartnershipNominatedPartnerNinoPage(id),
+        PartnershipNominatedPartnerNinoYesNoPage(id),
+        "AA123456A"
+      ),
+      (
+        "nominated-partner-company-registration-number",
+        PartnershipNominatedPartnerCrnPage(id),
+        PartnershipNominatedPartnerCrnYesNoPage(id),
+        "12345678"
+      )
+    ).foreach { case (detail, detailPage, yesNoPage, dummyDetail) =>
+      s"cleanup: must remove $detailPage and set $yesNoPage to No when Yes is selected" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(detailPage, dummyDetail)
+          .success
+          .value
+          .set(yesNoPage, true)
+          .success
+          .value
+
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendPartnershipRemoveDetailYesNoPage(detail, id), true)
+            .success
+            .value
+
+        updatedUserAnswers.get(detailPage) mustBe None
+        updatedUserAnswers.get(yesNoPage) mustBe Some(false)
+      }
+
+      s"cleanup: must retain $detailPage and keep $yesNoPage as Yes when No is selected" in {
+
+        val userAnswers = emptyUserAnswers
+          .set(detailPage, dummyDetail)
+          .success
+          .value
+          .set(yesNoPage, true)
+          .success
+          .value
+
+        val updatedUserAnswers =
+          userAnswers
+            .set(AmendPartnershipRemoveDetailYesNoPage(detail, id), false)
+            .success
+            .value
+
+        updatedUserAnswers.get(detailPage) mustBe Some(dummyDetail)
+        updatedUserAnswers.get(yesNoPage) mustBe Some(true)
+      }
+    }
+  }
 }

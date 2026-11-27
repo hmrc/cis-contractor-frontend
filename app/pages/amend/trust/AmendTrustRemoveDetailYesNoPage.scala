@@ -23,39 +23,77 @@ import pages.QuestionPage
 import pages.add.trust.*
 import play.api.libs.json.JsPath
 
-case class AmendTrustRemoveDetailYesNoPage(subcontractorDetail: AmendTrustRemoveDetail) extends QuestionPage[Boolean] {
+case class AmendTrustRemoveDetailYesNoPage(
+  subcontractorDetail: AmendTrustRemoveDetail,
+  subJourneyId: Option[String] = None
+) extends QuestionPage[Boolean] {
 
   // All variants share one JSON key: this value is transient and removed immediately after submit, so concurrent detail types never clash.
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath =
+    subJourneyId match {
+      case Some(id) => JsPath \ "amendSubcontractor" \ id \ toString
+      case None     => JsPath \ toString
+    }
 
   override def toString: String = "amendTrustRemoveDetailYesNo"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers) =
-    subcontractorDetail match {
-      case Address if value.contains(true) =>
-        userAnswers
-          .remove(TrustAddressPage)
-          .flatMap(_.set(TrustAddressYesNoPage, false))
+    subJourneyId match {
+      case Some(id) =>
+        subcontractorDetail match {
+          case Address if value.contains(true) =>
+            userAnswers
+              .remove(TrustAddressPage(id))
+              .flatMap(_.set(TrustAddressYesNoPage(id), false))
 
-      case ContactDetails if value.contains(true) =>
-        userAnswers
-          .remove(TrustContactMethodOptionsPage)
-          .flatMap(_.remove(TrustEmailAddressPage))
-          .flatMap(_.remove(TrustPhoneNumberPage))
-          .flatMap(_.remove(TrustMobileNumberPage))
-          .flatMap(_.set(AddTrustContactMethodsYesNoPage, false))
+          case ContactDetails if value.contains(true) =>
+            userAnswers
+              .remove(TrustContactMethodOptionsPage(id))
+              .flatMap(_.remove(TrustEmailAddressPage(id)))
+              .flatMap(_.remove(TrustPhoneNumberPage(id)))
+              .flatMap(_.remove(TrustMobileNumberPage(id)))
+              .flatMap(_.set(AddTrustContactMethodsYesNoPage(id), false))
 
-      case Utr if value.contains(true) =>
-        userAnswers
-          .remove(TrustUtrPage)
-          .flatMap(_.set(TrustUtrYesNoPage, false))
+          case Utr if value.contains(true) =>
+            userAnswers
+              .remove(TrustUtrPage(id))
+              .flatMap(_.set(TrustUtrYesNoPage(id), false))
 
-      case WorksReferenceNumber if value.contains(true) =>
-        userAnswers
-          .remove(TrustWorksReferencePage)
-          .flatMap(_.set(TrustWorksReferenceYesNoPage, false))
+          case WorksReferenceNumber if value.contains(true) =>
+            userAnswers
+              .remove(TrustWorksReferencePage(id))
+              .flatMap(_.set(TrustWorksReferenceYesNoPage(id), false))
 
-      case _ =>
-        super.cleanup(value, userAnswers)
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
+      case None     =>
+        subcontractorDetail match {
+          case Address if value.contains(true) =>
+            userAnswers
+              .remove(TrustAddressPage)
+              .flatMap(_.set(TrustAddressYesNoPage, false))
+
+          case ContactDetails if value.contains(true) =>
+            userAnswers
+              .remove(TrustContactMethodOptionsPage)
+              .flatMap(_.remove(TrustEmailAddressPage))
+              .flatMap(_.remove(TrustPhoneNumberPage))
+              .flatMap(_.remove(TrustMobileNumberPage))
+              .flatMap(_.set(AddTrustContactMethodsYesNoPage, false))
+
+          case Utr if value.contains(true) =>
+            userAnswers
+              .remove(TrustUtrPage)
+              .flatMap(_.set(TrustUtrYesNoPage, false))
+
+          case WorksReferenceNumber if value.contains(true) =>
+            userAnswers
+              .remove(TrustWorksReferencePage)
+              .flatMap(_.set(TrustWorksReferenceYesNoPage, false))
+
+          case _ =>
+            super.cleanup(value, userAnswers)
+        }
     }
 }
