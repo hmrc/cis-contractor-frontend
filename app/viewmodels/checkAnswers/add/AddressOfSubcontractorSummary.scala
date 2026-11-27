@@ -21,7 +21,6 @@ import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import models.info.IndividualAnswers
-import java.util.UUID
 
 object AddressOfSubcontractorSummary {
 
@@ -39,28 +38,6 @@ object AddressOfSubcontractorSummary {
         id = "address-of-subcontractor"
       )
     }
-
-  def row(flowId: UUID, answers: UserAnswers, mode: Mode = CheckMode)(implicit
-    messages: Messages
-  ): Option[SummaryListRow] = {
-    val subJourneyId = flowId.toString
-
-    answers.get(AddressOfSubcontractorPage(subJourneyId)).map { answer =>
-      AddressSummaryRow.row(
-        address = answer,
-        key = "addressOfSubcontractor.checkYourAnswersLabel",
-        changeCall = if (mode == AmendMode) {
-          controllers.add.routes.AddressOfSubcontractorController
-            .redirectToAmendAddressLookup() // TODO DTR-9463: Update with id
-        } else {
-          controllers.add.routes.AddressOfSubcontractorController
-            .redirectToAddressLookup(NormalMode, Some("change")) // TODO DTR-9463: Update with id
-        },
-        hiddenTextKey = "addressOfSubcontractor.change.hidden",
-        id = "address-of-subcontractor"
-      )
-    }
-  }
 
   def row(
     answers: IndividualAnswers

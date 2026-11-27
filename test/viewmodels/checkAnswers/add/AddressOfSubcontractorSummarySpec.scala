@@ -20,7 +20,7 @@ import controllers.add.routes
 import helpers.CyaEncodingSpecHelper
 import models.address.{Address, Country}
 import models.info.IndividualAnswers
-import models.{AmendMode, NormalMode, UserAnswers}
+import models.{AmendMode, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.wordspec.AnyWordSpec
@@ -29,6 +29,7 @@ import pages.add.AddressOfSubcontractorPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+
 import java.util.UUID
 
 class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with CyaEncodingSpecHelper {
@@ -245,7 +246,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val result = AddressOfSubcontractorSummary.row(flowId, userAnswers)
+      val result = AddressOfSubcontractorSummary.row(userAnswers, CheckMode, )
 
       result shouldBe defined
 
@@ -294,7 +295,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
           .success
           .value
 
-      val result = AddressOfSubcontractorSummary.row(flowId, userAnswers, AmendMode)
+      val result = AddressOfSubcontractorSummary.row(userAnswers, AmendMode)
 
       result shouldBe defined
 
@@ -317,7 +318,7 @@ class AddressOfSubcontractorSummarySpec extends AnyWordSpec with Matchers with C
 
       action.href shouldBe
         routes.AddressOfSubcontractorController // TODO DTR-9463: Update with id
-          .redirectToAmendAddressLookup()
+          .redirectToAmendAddressLookupWithId()
           .url
 
       action.visuallyHiddenText.value shouldBe

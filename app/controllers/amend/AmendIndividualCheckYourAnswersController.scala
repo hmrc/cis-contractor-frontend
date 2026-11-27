@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import models.add.ValidatedSubcontractor
-import models.amend.{AmendJourneyType, OriginalIndividualAnswers}
+import models.amend.{AmendIndividualRemoveDetail, AmendJourneyType, OriginalIndividualAnswers}
 import models.requests.{CisIdDataRequest, DataRequest}
 import models.{AmendMode, UserAnswers}
 import pages.amend.{AmendCheckYourAnswersSubmittedPage, AmendJourneyTypePage}
@@ -266,8 +266,8 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     ua: UserAnswers,
     isVerified: Boolean
   )(implicit messages: Messages): Seq[Option[SummaryListRow]] = {
-
-    val nameRows =
+    val subJourneyId = flowId.toString
+    val nameRows     =
       if (!isVerified) {
         Seq(
           IndividualNamesOptionsSummary.row(flowId, ua, AmendMode),
@@ -281,7 +281,7 @@ class AmendIndividualCheckYourAnswersController @Inject() (
     val addressRows =
       Seq(
         SubAddressYesNoSummary.row(flowId, ua, AmendMode),
-        AddressOfSubcontractorSummary.row(flowId, ua, AmendMode)
+        AddressOfSubcontractorSummary.row(ua, AmendMode)
       )
 
     val utrRows =
@@ -296,7 +296,16 @@ class AmendIndividualCheckYourAnswersController @Inject() (
 
     val contactRows =
       Seq(
-        AddIndividualContactMethodsYesNoSummary.row(flowId, ua, AmendMode),
+        AddIndividualContactMethodsYesNoSummary.row(
+          ua,
+          AmendMode,
+          Some(
+            controllers.amend.routes.AmendIndividualRemoveDetailYesNoController
+              .onPageLoad(AmendIndividualRemoveDetail.ContactDetails.key)
+              .url
+          ),
+          Some(subJourneyId)
+        ),
         IndividualContactMethodOptionsSummary.row(flowId, ua, AmendMode),
         IndividualEmailAddressSummary.row(flowId, ua, AmendMode),
         IndividualPhoneNumberSummary.row(flowId, ua, AmendMode),
