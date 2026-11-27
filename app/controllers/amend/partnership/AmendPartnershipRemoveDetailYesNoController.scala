@@ -357,7 +357,7 @@ class AmendPartnershipRemoveDetailYesNoController @Inject() (
                 updatedAnswers <-
                   Future.fromTry(
                     request.userAnswers.set(
-                      AmendPartnershipRemoveDetailYesNoPage(subcontractorDetail), // TODO DTR-9463: Update with di
+                      AmendPartnershipRemoveDetailYesNoPage(subcontractorDetail, Some(subJourneyId)),
                       value
                     )
                   )

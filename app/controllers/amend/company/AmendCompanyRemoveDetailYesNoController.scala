@@ -310,10 +310,10 @@ class AmendCompanyRemoveDetailYesNoController @Inject() (
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
-                            .set(AmendCompanyRemoveDetailYesNoPage(detailType), value) // TODO DTR-9463: Update with id
+                            .set(AmendCompanyRemoveDetailYesNoPage(detailType, Some(subJourneyId)), value)
                             .flatMap(
-                              _.remove(AmendCompanyRemoveDetailYesNoPage(detailType))
-                            ) // TODO DTR-9463: Update with id
+                              _.remove(AmendCompanyRemoveDetailYesNoPage(detailType, Some(subJourneyId)))
+                            )
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(

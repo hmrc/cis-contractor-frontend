@@ -306,10 +306,10 @@ class AmendTrustRemoveDetailYesNoController @Inject() (
                       updatedAnswers <-
                         Future.fromTry(
                           request.userAnswers
-                            .set(AmendTrustRemoveDetailYesNoPage(detailType), value) // TODO DTR-9463: Update with id
+                            .set(AmendTrustRemoveDetailYesNoPage(detailType, Some(subJourneyId)), value)
                             .flatMap(
-                              _.remove(AmendTrustRemoveDetailYesNoPage(detailType))
-                            ) // TODO DTR-9463: Update with id
+                              _.remove(AmendTrustRemoveDetailYesNoPage(detailType, Some(subJourneyId)))
+                            )
                         )
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(
