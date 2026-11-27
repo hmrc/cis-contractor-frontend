@@ -43,6 +43,8 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new IndividualNamesOptionsFormProvider()
   private val form         = formProvider()
+  private val submitAction =
+    controllers.add.routes.IndividualNamesOptionsController.onSubmit(NormalMode)
 
   val subcontractorName = SubcontractorName(
     firstName = "John",
@@ -67,7 +69,10 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -86,7 +91,11 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndividualNamesOptions.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(
+          form.fill(IndividualNamesOptions.values.toSet),
+          NormalMode,
+          submitAction
+        )(
           request,
           messages(application)
         ).toString
@@ -359,7 +368,10 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, submitAction)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -410,7 +422,7 @@ class IndividualNamesOptionsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, submitAction)(
           request,
           messages(application)
         ).toString

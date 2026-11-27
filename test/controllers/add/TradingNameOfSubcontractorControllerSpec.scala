@@ -77,7 +77,8 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         contentAsString(result) mustEqual
           view(
             form,
-            FinalValidationMode
+            FinalValidationMode,
+            controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(FinalValidationMode)
           )(request, messages(application)).toString
       }
     }
@@ -94,7 +95,11 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -112,7 +117,11 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form.fill("answer"),
+          NormalMode,
+          controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -159,7 +168,11 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -180,7 +193,11 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -279,7 +296,11 @@ class TradingNameOfSubcontractorControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[TradingNameOfSubcontractorView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          controllers.add.routes.TradingNameOfSubcontractorController.onSubmit(AmendMode)
+        )(request, messages(application)).toString
       }
     }
 

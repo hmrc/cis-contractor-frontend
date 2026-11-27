@@ -94,10 +94,78 @@ object ValidatedSubcontractor extends Validation {
       workReference
     )
 
+  def build(answers: UserAnswers, id: String): Either[ValidationError, ValidatedSubcontractor] =
+    for {
+      typeOfSubcontractor            <- validateType(answers, id)
+      tradingName                    <- getNamesPageValue(
+                                          answers,
+                                          TradingNameOfSubcontractorPage(id),
+                                          IndividualNamesOptions.TradingName
+                                        )
+      subcontractorName              <-
+        getNamesPageValue(answers, SubcontractorNamePage(id), IndividualNamesOptions.SubcontractorName)
+      address                        <- getOptionalPageValue(answers, AddressOfSubcontractorPage(id), SubAddressYesNoPage(id))
+      individualContactMethodOptions <-
+        getOptionalPageValue(answers, IndividualContactMethodOptionsPage(id), AddIndividualContactMethodsYesNoPage(id))
+          .flatMap {
+            case Some(methods) if methods.nonEmpty =>
+              Right(Some(methods))
+
+            case Some(_) =>
+              Left(InvalidAnswer(IndividualContactMethodOptionsPage))
+
+            case None =>
+              Right(None)
+          }
+
+      individualEmail  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualEmailAddressPage(id),
+                            ContactMethodOptions.Email
+                          )
+      individualPhone  <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualPhoneNumberPage(id),
+                            ContactMethodOptions.Phone
+                          )
+      individualMobile <- getContactPageValue(
+                            answers,
+                            individualContactMethodOptions,
+                            IndividualMobileNumberPage(id),
+                            ContactMethodOptions.Mobile
+                          )
+      utr              <- getOptionalPageValue(
+                            answers,
+                            SubcontractorsUniqueTaxpayerReferencePage(id),
+                            UniqueTaxpayerReferenceYesNoPage(id)
+                          )
+      nino             <- getOptionalPageValue(answers, SubNationalInsuranceNumberPage(id), NationalInsuranceNumberYesNoPage(id))
+      workReference    <- getOptionalPageValue(answers, WorksReferenceNumberPage(id), WorksReferenceNumberYesNoPage(id))
+    } yield ValidatedSubcontractor(
+      tradingName,
+      subcontractorName,
+      address,
+      individualContactMethodOptions,
+      individualEmail,
+      individualPhone,
+      individualMobile,
+      utr,
+      nino,
+      workReference
+    )
+
   private def validateType(answers: UserAnswers): Either[ValidationError, Unit] =
     getPageValue(answers, TypeOfSubcontractorPage).flatMap {
       case TypeOfSubcontractor.Individualorsoletrader => Right(())
       case _                                          => Left(InvalidAnswer(TypeOfSubcontractorPage))
+    }
+
+  private def validateType(answers: UserAnswers, id: String): Either[ValidationError, Unit] =
+    getPageValue(answers, TypeOfSubcontractorPage(id)).flatMap {
+      case TypeOfSubcontractor.Individualorsoletrader => Right(())
+      case _                                          => Left(InvalidAnswer(TypeOfSubcontractorPage(id)))
     }
 
   private def getNamesPageValue[A](

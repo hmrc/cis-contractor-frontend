@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.SubcontractorNameExtractor
 import views.html.add.AddIndividualContactMethodsYesNoView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,6 +44,7 @@ class AddIndividualContactMethodsYesNoController @Inject() (
   formProvider: AddIndividualContactMethodsYesNoFormProvider,
   subcontractorNameExtractor: SubcontractorNameExtractor,
   val controllerComponents: MessagesControllerComponents,
+  multiTabAction: MultiTabAction,
   view: AddIndividualContactMethodsYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -65,7 +67,14 @@ class AddIndividualContactMethodsYesNoController @Inject() (
           logger.error("[AddIndividualContactMethodsYesNoController][onPageLoad] - subcontractor name missing")
           recoveryRedirect
         } { subcontractorName =>
-          Ok(view(preparedForm, mode, subcontractorName))
+          Ok(
+            view(
+              preparedForm,
+              mode,
+              subcontractorName,
+              routes.AddIndividualContactMethodsYesNoController.onSubmit(mode)
+            )
+          )
         }
     }
 
@@ -80,7 +89,55 @@ class AddIndividualContactMethodsYesNoController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName))),
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      mode,
+                      subcontractorName,
+                      routes.AddIndividualContactMethodsYesNoController.onSubmit(mode)
+                    )
+                  )
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AddIndividualContactMethodsYesNoPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(AddIndividualContactMethodsYesNoPage, mode, updatedAnswers))
+            )
+        }
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.AddIndividualContactMethodsYesNoController.onSubmitWithId(flowId, mode)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
+        .fold {
+          logger.error("[AddIndividualContactMethodsYesNoController][onPageLoad] - subcontractor name missing")
+          recoveryRedirect
+        } { subcontractorName =>
+          Ok(view(preparedForm, mode, subcontractorName, submitAction))
+        }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.AddIndividualContactMethodsYesNoController.onSubmitWithId(flowId, mode)
+      subcontractorNameExtractor
+        .getSubcontractorName(request.userAnswers, mode, id)
+        .fold {
+          logger.error("[AddIndividualContactMethodsYesNoController][onSubmit] - subcontractor name missing")
+          Future.successful(recoveryRedirect)
+        } { subcontractorName =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName, submitAction))),
               value =>
                 for {
                   updatedAnswers <- Future.fromTry(request.userAnswers.set(AddIndividualContactMethodsYesNoPage, value))

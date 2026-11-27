@@ -22,6 +22,22 @@ import play.api.libs.json.JsPath
 
 import scala.util.Try
 
+case class SubAddressYesNoPage(id: String) extends QuestionPage[Boolean] with IndividualJourney {
+
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "subAddressYesNo"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if value.contains(false) then {
+      userAnswers
+        .remove(AddressOfSubcontractorPage(id))
+    } else {
+      super.cleanup(value, userAnswers)
+    }
+
+}
+
 case object SubAddressYesNoPage extends QuestionPage[Boolean] with IndividualJourney {
 
   override def path: JsPath = JsPath \ toString

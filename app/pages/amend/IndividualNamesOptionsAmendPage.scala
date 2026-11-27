@@ -21,6 +21,15 @@ import pages.QuestionPage
 import pages.add.IndividualJourney
 import play.api.libs.json.JsPath
 
+case class IndividualNamesOptionsAmendPage(id: String)
+    extends QuestionPage[Set[IndividualNamesOptions]]
+    with IndividualJourney {
+  override def path: JsPath = JsPath \ "addSubcontractor" \ id \ toString
+
+  override def toString: String = "individualNamesOptions"
+
+}
+
 case object IndividualNamesOptionsAmendPage extends QuestionPage[Set[IndividualNamesOptions]] with IndividualJourney {
   override def path: JsPath = JsPath \ toString
 

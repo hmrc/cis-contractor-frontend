@@ -84,6 +84,48 @@ class IndividualNavigatorSpec extends SpecBase {
             .onPageLoad(NormalMode)
         }
 
+        "to SubcontractorName WithId when only SubcontractorName is selected" in {
+          val id = "11111111-1111-1111-1111-111111111111"
+          navigator.nextPage(
+            IndividualNamesOptionsPage(id),
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage(id),
+                Set(IndividualNamesOptions.SubcontractorName)
+              )
+          ) mustBe controllers.add.routes.SubcontractorNameController
+            .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
+        }
+
+        "to SubcontractorName WithId when SubcontractorName and TradingName are selected" in {
+          val id = "11111111-1111-1111-1111-111111111111"
+          navigator.nextPage(
+            IndividualNamesOptionsPage(id),
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage(id),
+                Set(IndividualNamesOptions.SubcontractorName, IndividualNamesOptions.TradingName)
+              )
+          ) mustBe controllers.add.routes.SubcontractorNameController
+            .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
+        }
+
+        "to TradingName WithId when only TradingName is selected" in {
+          val id = "11111111-1111-1111-1111-111111111111"
+          navigator.nextPage(
+            IndividualNamesOptionsPage(id),
+            NormalMode,
+            emptyUserAnswers
+              .setOrException(
+                IndividualNamesOptionsPage(id),
+                Set(IndividualNamesOptions.TradingName)
+              )
+          ) mustBe controllers.add.routes.TradingNameOfSubcontractorController
+            .onPageLoadWithId(java.util.UUID.fromString(id), NormalMode)
+        }
+
         "to JourneyRecoveryPage Page when IndividualContactMethodOptions answer is not present" in {
           navigator.nextPage(
             IndividualNamesOptionsPage,

@@ -37,13 +37,18 @@ GET   /subcontractor/access-denied  controllers.AccessDeniedController.onPageLoa
 
 GET   /subcontractor/system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
-GET   /subcontractor/individual-address-lookup               controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
-GET   /subcontractor/individual-address-return               controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
-GET   /subcontractor/individual-address-return/change        controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
-GET   /subcontractor/amend/individual-address-lookup         controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
-GET   /subcontractor/amend/address-change                    controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
-GET   /subcontractor/amend/individual-address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
-GET   /subcontractor/amend/individual-address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
+# TODO: MULTI TAB  ROUTES DTR-9567
+GET   /subcontractor/individual-address-lookup/:flowId          controllers.add.AddressOfSubcontractorController.redirectToAddressLookupWithId(flowId: java.util.UUID, mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/individual-address-lookup                  controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/individual-address-return/:flowId          controllers.add.AddressOfSubcontractorController.addressLookupCallbackWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/individual-address-return                  controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/individual-address-return/change/:flowId   controllers.add.AddressOfSubcontractorController.addressLookupCallbackChangeWithId(flowId: java.util.UUID, id: String ?= "", mode: Mode = NormalMode)
+GET   /subcontractor/individual-address-return/change           controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+
+GET   /subcontractor/amend/individual-address-lookup            controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = AmendMode, changeRoute: Option[String] ?= None)
+GET   /subcontractor/amend/address-change                       controllers.add.AddressOfSubcontractorController.redirectToAmendAddressLookup()
+GET   /subcontractor/amend/individual-address-return            controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = AmendMode)
+GET   /subcontractor/amend/individual-address-return/change     controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = AmendMode)
 
 GET   /subcontractor/amend/name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = AmendMode)
 POST  /subcontractor/amend/name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = AmendMode)
@@ -243,15 +248,31 @@ POST  /subcontractor/add/type-of-subcontractor         controllers.add.TypeOfSub
 GET   /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-type-of-subcontractor  controllers.add.TypeOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
 
+# TODO: MULTI TAB  ROUTES DTR-9567
+GET   /subcontractor/add/trading-name/:flowId         controllers.add.TradingNameOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/trading-name/:flowId         controllers.add.TradingNameOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-trading-name/:flowId  controllers.add.TradingNameOfSubcontractorController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-trading-name/:flowId  controllers.add.TradingNameOfSubcontractorController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/trading-name         controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-trading-name  controllers.add.TradingNameOfSubcontractorController.onSubmit(mode: Mode = CheckMode)
 
+GET   /subcontractor/add/name/:flowId         controllers.add.SubcontractorNameController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/name/:flowId         controllers.add.SubcontractorNameController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-name/:flowId  controllers.add.SubcontractorNameController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-name/:flowId  controllers.add.SubcontractorNameController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 GET   /subcontractor/add/name         controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/name         controllers.add.SubcontractorNameController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-name  controllers.add.SubcontractorNameController.onSubmit(mode: Mode = CheckMode)
+
+# TODO: MULTI TAB  ROUTES DTR-9567
+GET   /subcontractor/add/check-address/:flowId         controllers.add.SubAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/check-address/:flowId         controllers.add.SubAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-check-address/:flowId  controllers.add.SubAddressYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-check-address/:flowId  controllers.add.SubAddressYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-address         controllers.add.SubAddressYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -261,6 +282,12 @@ POST  /subcontractor/add/change-check-address  controllers.add.SubAddressYesNoCo
 GET   /subcontractor/add/address                controllers.add.AddressOfSubcontractorController.redirectToAddressLookup(mode: Mode = NormalMode, changeRoute: Option[String] ?= None)
 GET   /subcontractor/add/address-return         controllers.add.AddressOfSubcontractorController.addressLookupCallback(id: String ?= "", mode: Mode = NormalMode)
 GET   /subcontractor/add/address-return/change  controllers.add.AddressOfSubcontractorController.addressLookupCallbackChange(id: String ?= "", mode: Mode = NormalMode)
+
+# TODO: MULTI TAB  ROUTES DTR-9567
+GET   /subcontractor/add/check-national-insurance-number/:flowId         controllers.add.NationalInsuranceNumberYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/check-national-insurance-number/:flowId         controllers.add.NationalInsuranceNumberYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-check-national-insurance-number/:flowId  controllers.add.NationalInsuranceNumberYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-check-national-insurance-number/:flowId  controllers.add.NationalInsuranceNumberYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-national-insurance-number         controllers.add.NationalInsuranceNumberYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -272,10 +299,22 @@ POST  /subcontractor/add/national-insurance-number         controllers.add.SubNa
 GET   /subcontractor/add/change-national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-national-insurance-number  controllers.add.SubNationalInsuranceNumberController.onSubmit(mode: Mode = CheckMode)
 
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/check-unique-taxpayer-reference/:flowId         controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/check-unique-taxpayer-reference/:flowId         controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-check-unique-taxpayer-reference/:flowId  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-check-unique-taxpayer-reference/:flowId  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+
 GET   /subcontractor/add/check-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/check-unique-taxpayer-reference         controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-check-unique-taxpayer-reference  controllers.add.UniqueTaxpayerReferenceYesNoController.onSubmit(mode: Mode = CheckMode)
+
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/unique-taxpayer-reference/:flowId         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/unique-taxpayer-reference/:flowId         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-unique-taxpayer-reference/:flowId  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-unique-taxpayer-reference/:flowId  controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/unique-taxpayer-reference         controllers.add.SubcontractorsUniqueTaxpayerReferenceController.onSubmit(mode: Mode = NormalMode)
@@ -307,7 +346,15 @@ POST  /subcontractor/add/email-address         controllers.add.IndividualEmailAd
 GET   /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-email-address  controllers.add.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/individual/subcontractor-added/:flowId  controllers.add.SubcontractorAddedController.individualSubcontractorAddedWithId(flowId: java.util.UUID)
 GET   /subcontractor/add/individual/subcontractor-added  controllers.add.SubcontractorAddedController.individualSubcontractorAdded()
+
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/add-contact-details/:flowId         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/add-contact-details/:flowId         controllers.add.AddIndividualContactMethodsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-add-contact-details/:flowId  controllers.add.AddIndividualContactMethodsYesNoController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-add-contact-details/:flowId  controllers.add.AddIndividualContactMethodsYesNoController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/add-contact-details         controllers.add.AddIndividualContactMethodsYesNoController.onSubmit(mode: Mode = NormalMode)
@@ -318,6 +365,12 @@ GET   /subcontractor/add/select-contact-details         controllers.add.Individu
 POST  /subcontractor/add/select-contact-details         controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = NormalMode)
 GET   /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onPageLoad(mode: Mode = CheckMode)
 POST  /subcontractor/add/change-select-contact-details  controllers.add.IndividualContactMethodOptionsController.onSubmit(mode: Mode = CheckMode)
+
+# TODO: MULTI TAB ROUTES DTR-9567
+GET   /subcontractor/add/names/:flowId         controllers.add.IndividualNamesOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+POST  /subcontractor/add/names/:flowId         controllers.add.IndividualNamesOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = NormalMode)
+GET   /subcontractor/add/change-names/:flowId  controllers.add.IndividualNamesOptionsController.onPageLoadWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
+POST  /subcontractor/add/change-names/:flowId  controllers.add.IndividualNamesOptionsController.onSubmitWithId(flowId: java.util.UUID, mode: Mode = CheckMode)
 
 GET   /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onPageLoad(mode: Mode = NormalMode)
 POST  /subcontractor/add/names         controllers.add.IndividualNamesOptionsController.onSubmit(mode: Mode = NormalMode)

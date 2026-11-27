@@ -29,6 +29,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.SubcontractorNameView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,6 +40,7 @@ class SubcontractorNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   formProvider: SubcontractorNameFormProvider,
   redirectVerifiedSubcontractor: RedirectVerifiedSubcontractorAction,
   val controllerComponents: MessagesControllerComponents,
@@ -51,6 +53,7 @@ class SubcontractorNameController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor) { implicit request =>
+      val submitAction = routes.SubcontractorNameController.onSubmit(mode)
       mode match {
         case FinalValidationMode =>
           val preparedForm =
@@ -59,7 +62,7 @@ class SubcontractorNameController @Inject() (
               case None                    => form
             }
 
-          Ok(view(preparedForm, mode))
+          Ok(view(preparedForm, mode, submitAction))
 
         case _ =>
           val namesOptions =
@@ -73,7 +76,7 @@ class SubcontractorNameController @Inject() (
                   case None                    => form
                 }
 
-              Ok(view(preparedForm, mode))
+              Ok(view(preparedForm, mode, submitAction))
 
             case _ =>
               Redirect(
@@ -85,10 +88,11 @@ class SubcontractorNameController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen redirectVerifiedSubcontractor).async { implicit request =>
+      val submitAction = routes.SubcontractorNameController.onSubmit(mode)
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage, value))
@@ -96,6 +100,35 @@ class SubcontractorNameController @Inject() (
             } yield Redirect(
               navigator.nextPage(SubcontractorNamePage, mode, updatedAnswers)
             )
+        )
+    }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.SubcontractorNameController.onSubmitWithId(flowId, mode)
+      request.userAnswers.get(IndividualNamesOptionsPage(id)) match {
+        case Some(namesOptions) if namesOptions.contains(SubcontractorName) =>
+          val preparedForm = request.userAnswers.get(SubcontractorNamePage(id)).fold(form)(form.fill)
+          Ok(view(preparedForm, mode, submitAction))
+        case _                                                              =>
+          Redirect(controllers.add.routes.IndividualNamesOptionsController.onPageLoadWithId(flowId, mode))
+      }
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.SubcontractorNameController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubcontractorNamePage(id), value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(SubcontractorNamePage(id), mode, updatedAnswers))
         )
     }
 }

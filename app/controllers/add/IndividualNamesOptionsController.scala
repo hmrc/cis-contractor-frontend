@@ -30,6 +30,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.add.IndividualNamesOptionsView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,6 +42,7 @@ class IndividualNamesOptionsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: IndividualNamesOptionsFormProvider,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: IndividualNamesOptionsView
 )(implicit ec: ExecutionContext)
@@ -56,7 +58,7 @@ class IndividualNamesOptionsController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, routes.IndividualNamesOptionsController.onSubmit(mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -64,7 +66,10 @@ class IndividualNamesOptionsController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, mode, routes.IndividualNamesOptionsController.onSubmit(mode)))
+            ),
           value =>
 
             val ua = request.userAnswers
@@ -82,4 +87,41 @@ class IndividualNamesOptionsController @Inject() (
             } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage, mode, updatedAnswers))
         )
   }
+
+  def onPageLoadWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)) { implicit request =>
+
+      val id           = flowId.toString
+      val page         = IndividualNamesOptionsPage(id)
+      val preparedForm = request.userAnswers.get(page).fold(form)(form.fill)
+      Ok(view(preparedForm, mode, routes.IndividualNamesOptionsController.onSubmitWithId(flowId, mode)))
+    }
+
+  def onSubmitWithId(flowId: UUID, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val id           = flowId.toString
+      val submitAction = routes.IndividualNamesOptionsController.onSubmitWithId(flowId, mode)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future
+              .successful(BadRequest(view(formWithErrors, mode, submitAction))),
+          value =>
+
+            val ua = request.userAnswers
+
+            val pageToUpdate: QuestionPage[Set[IndividualNamesOptions]] =
+              (mode, ua.get(SubcontractorNamePage), ua.get(TradingNameOfSubcontractorPage(id))) match {
+                case (AmendMode, Some(_), Some(_)) if value.size == 1 => IndividualNamesOptionsAmendPage(id)
+                case _                                                =>
+                  IndividualNamesOptionsPage(id)
+              }
+
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(pageToUpdate, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IndividualNamesOptionsPage(id), mode, updatedAnswers))
+        )
+    }
 }

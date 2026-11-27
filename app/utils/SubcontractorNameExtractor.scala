@@ -42,6 +42,24 @@ class SubcontractorNameExtractor {
     getSubcontractorName(userAnswers)
       .orElse(Option.when(mode == AmendMode || mode == FinalValidationMode)(messages("verify.noName")))
 
+  def getSubcontractorName(userAnswers: UserAnswers, mode: Mode, id: String)(implicit
+    messages: Messages
+  ): Option[String] =
+    userAnswers
+      .get(SubcontractorNamePage(id))
+      .flatMap { name =>
+        val firstName = name.firstName.trim
+        val lastName  = name.lastName.trim
+
+        (firstName.nonEmpty, lastName.nonEmpty) match {
+          case (true, true)  => Some(s"$firstName $lastName")
+          case (false, true) => Some(lastName)
+          case _             => None
+        }
+      }
+      .orElse(userAnswers.get(TradingNameOfSubcontractorPage(id)).map(_.trim).filter(_.nonEmpty))
+      .orElse(Option.when(mode == AmendMode || mode == FinalValidationMode)(messages("verify.noName")))
+
   def displaySubcontractorName(userAnswers: UserAnswers)(implicit messages: Messages): String =
     getSubcontractorName(userAnswers)
       .getOrElse(messages("verify.noName"))

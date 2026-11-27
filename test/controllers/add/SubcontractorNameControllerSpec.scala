@@ -77,7 +77,8 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual
           view(
             form,
-            FinalValidationMode
+            FinalValidationMode,
+            controllers.add.routes.SubcontractorNameController.onSubmit(FinalValidationMode)
           )(request, messages(application)).toString
       }
     }
@@ -94,7 +95,11 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SubcontractorNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          NormalMode,
+          controllers.add.routes.SubcontractorNameController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -212,7 +217,11 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          NormalMode,
+          controllers.add.routes.SubcontractorNameController.onSubmit(NormalMode)
+        )(request, messages(application)).toString
       }
     }
 
@@ -319,7 +328,11 @@ class SubcontractorNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SubcontractorNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, AmendMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          AmendMode,
+          controllers.add.routes.SubcontractorNameController.onSubmit(AmendMode)
+        )(request, messages(application)).toString
       }
     }
 

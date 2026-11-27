@@ -38,7 +38,7 @@ class IndividualNamesOptionsViewSpec extends AnyWordSpec with Matchers with Guic
 
     "render the page with title, heading, radios and submit button" in new Setup {
 
-      val html: HtmlFormat.Appendable = view(form, NormalMode)
+      val html: HtmlFormat.Appendable = view(form, NormalMode, submitAction)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
       doc.select("title").text() must include(messages("individualNamesOptions.title"))
 
@@ -71,7 +71,7 @@ class IndividualNamesOptionsViewSpec extends AnyWordSpec with Matchers with Guic
       val errorForm: Form[Set[IndividualNamesOptions]] =
         form.withError("value", "individualNamesOptions.error.required")
 
-      val html: HtmlFormat.Appendable = view(errorForm, NormalMode)
+      val html: HtmlFormat.Appendable = view(errorForm, NormalMode, submitAction)
       val doc: Document               = org.jsoup.Jsoup.parse(html.toString())
 
       val summary: Elements = doc.select(".govuk-error-summary")
@@ -98,5 +98,7 @@ class IndividualNamesOptionsViewSpec extends AnyWordSpec with Matchers with Guic
       )
 
     val view: IndividualNamesOptionsView = app.injector.instanceOf[IndividualNamesOptionsView]
+    val submitAction                     =
+      controllers.add.routes.IndividualNamesOptionsController.onSubmit(NormalMode)
   }
 }
