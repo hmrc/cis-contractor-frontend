@@ -15,6 +15,7 @@
  *@
 
 @import config.FrontendAppConfig
+@import play.api.mvc.Call
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import viewmodels.verify.{ReviewUnmatchedViewModel, MissingSubcontractorRow, LinkViewModel}
@@ -34,7 +35,7 @@
     appConfig: FrontendAppConfig
 )
 
-@(viewModel: ReviewUnmatchedViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: ReviewUnmatchedViewModel, submitAction: Call = controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onSubmit(), backToResultsUrl: String = controllers.verify.routes.VerificationResultsController.onPageLoad().url)(implicit request: Request[_], messages: Messages)
 
 @nameLink(vm: LinkViewModel, name: String) = {
     @link(
@@ -124,7 +125,7 @@
     }
 
     @if(viewModel.allReady) {
-        @formHelper(action = controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onSubmit()) {
+        @formHelper(action = submitAction) {
             @govukButton(Button(
                 content = Text(messages("site.continue"))
             ))
@@ -133,7 +134,7 @@
 
     @link(
         linkTextKey = "verify.reviewUnmatched.backToResults.link",
-        linkUrl = controllers.verify.routes.VerificationResultsController.onPageLoad().url,
+        linkUrl = backToResultsUrl,
         prefixTextKey = "site.backTo",
         hasFullStop = true
     )

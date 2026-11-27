@@ -1655,6 +1655,41 @@ class NewestVerificationBatchControllerSpec
         }
       }
 
+      "must redirect to unmatched subcontractors with id when SUBMITTED has an associated unmatched verification" in {
+        val mockService = mock[VerificationService]
+
+        when(mockService.refreshNewestVerificationBatch(any(), any())(any()))
+          .thenAnswer { invocation =>
+            val answers = invocation.getArgument[UserAnswers](0)
+            val id      = invocation.getArgument[Option[String]](1).get
+            Future.successful(
+              answers
+                .set(
+                  NewestVerificationBatchResponsePage(id),
+                  newestBatchResponse(
+                    subcontractors = Seq(associatedUnverifiedSubcontractor),
+                    verifications = Seq(unmatchedVerification(verificationResourceRef)),
+                    monthlyReturn = Some(activeMonthlyReturn),
+                    status = Some("SUBMITTED")
+                  )
+                )
+                .flatMap(_.set(UnverifiedSubcontractorsPage(id), Seq(associatedUnverifiedSubcontractor)))
+                .success
+                .value
+            )
+          }
+
+        val application = appBuilder(mockService).build()
+
+        running(application) {
+          val result = route(application, FakeRequest(GET, startUrl)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value must include("/subcontractor/verify/unmatched-subcontractors-exist/")
+          redirectLocation(result).value must not include "/subcontractor/verify/unmatched-subcontractors-exist?"
+        }
+      }
+
       "must redirect to Journey Recovery when the organisation is not authorised for the cisId" in {
         val mockService = mock[VerificationService]
         val application = appBuilder(mockService).build()

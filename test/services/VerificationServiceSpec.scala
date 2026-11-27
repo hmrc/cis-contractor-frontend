@@ -711,6 +711,38 @@ final class VerificationServiceSpec extends SpecBase with MockitoSugar with Mode
       verify(mockRepo, never()).set(any[UserAnswers])
       verifyNoMoreInteractions(mockConnector)
     }
+
+    "must store the last submitted verification batch under the nested page when a sub journey id is provided" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val mockRepo      = mock[SessionRepository]
+      val service       = buildService(mockConnector, mockRepo)
+      val subJourneyId  = "11111111-1111-1111-1111-111111111111"
+
+      val ua =
+        emptyUserAnswers
+          .set(VerifyCisIdQuery(subJourneyId), instanceId)
+          .success
+          .value
+
+      when(mockConnector.getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(response))
+
+      when(mockRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result = service.getLastSubmittedVerificationBatch(ua, Some(subJourneyId)).futureValue
+
+      result.get(LastSubmittedVerificationBatchResponsePage(subJourneyId)) mustBe Some(response)
+      result.get(LastSubmittedVerificationBatchResponsePage) mustBe None
+
+      verify(mockConnector).getLastSubmittedVerificationBatch(eqTo(instanceId))(any[HeaderCarrier])
+      verify(mockRepo).set(
+        org.mockito.ArgumentMatchers.argThat { (saved: UserAnswers) =>
+          saved.get(LastSubmittedVerificationBatchResponsePage(subJourneyId)).contains(response)
+        }
+      )
+      verifyNoMoreInteractions(mockConnector)
+    }
   }
 
   "VerificationService.createVerificationBatchAndVerifications" - {

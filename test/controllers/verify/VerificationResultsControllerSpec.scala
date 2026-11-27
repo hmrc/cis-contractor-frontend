@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.{SubcontractorLastVerification, UserAnswers, VerificationLastVerification}
 import org.mockito.ArgumentCaptor
@@ -28,13 +28,15 @@ import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import queries.VerifyCisIdQuery
 import repositories.SessionRepository
 import viewmodels.verify.VerificationResultsViewModel
 import views.html.verify.VerificationResultsView
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
+class VerificationResultsControllerSpec extends SpecBase with MockitoSugar with WithFakeCisTaxpayer {
 
   private val subcontractor = SubcontractorLastVerification(
     subcontractorId = 1L,
@@ -116,6 +118,43 @@ class VerificationResultsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and the correct view for a GET with id" in {
+      val flowId     = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val userAnswer = emptyUserAnswers
+        .set(VerifyCisIdQuery(flowId.toString), "AB12")
+        .success
+        .value
+        .set(LastSubmittedVerificationBatchResponsePage(flowId.toString), batchResponse)
+        .success
+        .value
+
+      val manageSubcontractorsUrl = s"${applicationConfig.manageSubcontractorsUrl}/AB12"
+      val unmatchedReviewUrl      =
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId(flowId).url
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswer))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
+
+      running(application) {
+        val request            =
+          FakeRequest(GET, controllers.verify.routes.VerificationResultsController.onPageLoadWithId(flowId).url)
+        val result             = route(application, request).value
+        val view               = application.injector.instanceOf[VerificationResultsView]
+        val expectedViewModels = VerificationResultsViewModel.from(batchResponse)(messages(application))
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(expectedViewModels, manageSubcontractorsUrl, unmatchedReviewUrl)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

@@ -630,6 +630,7 @@ GET   /subcontractor/verify/check-verification-batch-readiness/change  controlle
 GET   /subcontractor/verify/newest/start/:cisId  controllers.verify.NewestVerificationBatchController.onPageLoadStart(cisId: String)
 GET   /subcontractor/verify/newest  controllers.verify.NewestVerificationBatchController.onPageLoad()
 
+GET   /subcontractor/verify/check-results/:flowId  controllers.verify.CheckVerificationResultsController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/check-results  controllers.verify.CheckVerificationResultsController.onPageLoad()
 
 GET   /subcontractor/verify/inactive-scheme-warning/continue  controllers.verify.NewestVerificationBatchController.onContinue
@@ -728,22 +729,30 @@ GET   /subcontractor/verify/verification-status/select-subcontractors    control
 GET   /verify/verification-status/reverification-decision                controllers.verify.VerificationStatusController.goToReverificationDecision(mode: Mode = NormalMode)
 GET   /verify/verification-status/select-subcontractors                  controllers.verify.VerificationStatusController.goToSelectSubcontractorsToReverify(mode: Mode = NormalMode)
 
+GET   /subcontractor/verify/no-verification-results/:flowId  controllers.verify.NoVerificationResultsController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/no-verification-results  controllers.verify.NoVerificationResultsController.onPageLoad()
 
+GET   /subcontractor/verify/verification-results/:flowId  controllers.verify.VerificationResultsController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/verification-results  controllers.verify.VerificationResultsController.onPageLoad()
 
+GET   /subcontractor/verify/unmatched-subcontractors/:flowId  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsRoutingController.onPageLoad()
 
+GET   /subcontractor/verify/review-unmatched-subcontractors/:flowId  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoadWithId(flowId: java.util.UUID)
+POST  /subcontractor/verify/review-unmatched-subcontractors/:flowId  controllers.verify.ReviewUnmatchedSubcontractorsController.onSubmitWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/review-unmatched-subcontractors  controllers.verify.ReviewUnmatchedSubcontractorsController.onSubmit()
 
 GET   /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onPageLoad()
 POST  /subcontractor/verify/subcontractors-have-missing-information  controllers.verify.ReviewInsufficientInfoSubcontractorsController.onSubmit()
 
+GET   /subcontractor/verify/unmatched-subcontractors-exist/:flowId  controllers.UnmatchedSubcontractorsController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/unmatched-subcontractors-exist  controllers.UnmatchedSubcontractorsController.onPageLoad()
 
+GET   /subcontractor/verify/no-unmatched-subcontractors/:flowId  controllers.NoUnmatchedSubcontractorsController.onPageLoadWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/no-unmatched-subcontractors  controllers.NoUnmatchedSubcontractorsController.onPageLoad()
 
+GET   /subcontractor/verify/continue-verification-submission/:flowId  controllers.verify.ContinueVerificationSubmissionController.onSubmitWithId(flowId: java.util.UUID)
 GET   /subcontractor/verify/continue-verification-submission  controllers.verify.ContinueVerificationSubmissionController.onSubmit()
 
 # Contractor Details

@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import models.response.GetLastSubmittedVerificationBatchResponse
 import models.{SubcontractorLastVerification, UserAnswers, VerificationBatchLastVerification, VerificationLastVerification}
 import org.mockito.ArgumentMatchers.any
@@ -27,14 +27,15 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import repositories.SessionRepository
 import services.{CisManageService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar {
+class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar with WithFakeCisTaxpayer {
 
   private val endpointUrl = "/subcontractor/verify/check-results"
 
@@ -221,6 +222,66 @@ class CheckVerificationResultsControllerSpec extends SpecBase with MockitoSugar 
           controllers.routes.SystemErrorController.onPageLoad().url
 
         verify(mockService).getLastSubmittedVerificationBatch(any[UserAnswers])(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to VerificationResults with id when the last submitted batch is available" in {
+      val flowId      = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val mockService = mock[VerificationService]
+      val response    = responseWithStatus(Some("VALIDATED"))
+      val ua          = emptyUserAnswers
+        .set(VerifyCisIdQuery(flowId.toString), "AB12")
+        .success
+        .value
+        .set(LastSubmittedVerificationBatchResponsePage(flowId.toString), response)
+        .success
+        .value
+
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers], any[Option[String]])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
+      val application = appBuilder(mockService, ua).build()
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.CheckVerificationResultsController.onPageLoadWithId(flowId).url)
+          ).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.VerificationResultsController.onPageLoadWithId(flowId).url
+      }
+    }
+
+    "must redirect to NoVerificationResults with id when status is PENDING" in {
+      val flowId      = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val mockService = mock[VerificationService]
+      val response    = responseWithStatus(Some("PENDING"))
+      val ua          = emptyUserAnswers
+        .set(VerifyCisIdQuery(flowId.toString), "AB12")
+        .success
+        .value
+        .set(LastSubmittedVerificationBatchResponsePage(flowId.toString), response)
+        .success
+        .value
+
+      when(mockService.getLastSubmittedVerificationBatch(any[UserAnswers], any[Option[String]])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ua))
+
+      val application = appBuilder(mockService, ua).build()
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.CheckVerificationResultsController.onPageLoadWithId(flowId).url)
+          ).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.NoVerificationResultsController.onPageLoadWithId(flowId).url
       }
     }
   }

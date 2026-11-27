@@ -18,11 +18,14 @@ package controllers.verify
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.VerifyCisIdQuery
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.NoVerificationResultsView
 
+import java.util.UUID
 import javax.inject.Inject
 
 class NoVerificationResultsController @Inject() (
@@ -31,15 +34,31 @@ class NoVerificationResultsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   view: NoVerificationResultsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId) {
     implicit request =>
       val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/${request.cisId}"
       Ok(view(manageSubcontractorsUrl))
   }
+
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      request.userAnswers.get(VerifyCisIdQuery(flowId.toString)) match {
+        case Some(cisId) =>
+          val manageSubcontractorsUrl = s"${appConfig.manageSubcontractorsUrl}/$cisId"
+          Ok(view(manageSubcontractorsUrl))
+        case None        =>
+          logger.error(
+            "[NoVerificationResultsController][onPageLoadWithId] - VerifyCisIdQuery missing from userAnswers"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
 }

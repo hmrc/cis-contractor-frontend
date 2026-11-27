@@ -21,7 +21,7 @@
     link: components.Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(nextUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("unmatchedSubcontractors.title"))) {
 
@@ -30,6 +30,6 @@
     @paragraph(messages("unmatchedSubcontractors.p2"))
     @link(
         linkTextKey = "unmatchedSubcontractors.verificationResults.link",
-        linkUrl = controllers.verify.routes.CheckVerificationResultsController.onPageLoad().url
+        linkUrl = nextUrl
     )
 }

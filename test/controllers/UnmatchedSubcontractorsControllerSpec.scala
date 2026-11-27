@@ -16,12 +16,18 @@
 
 package controllers
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.VerifyCisIdQuery
 import views.html.UnmatchedSubcontractorsView
 
-class UnmatchedSubcontractorsControllerSpec extends SpecBase {
+import java.util.UUID
+
+class UnmatchedSubcontractorsControllerSpec extends SpecBase with WithFakeCisTaxpayer {
+
+  private val flowId = UUID.fromString("11111111-1111-1111-1111-111111111111")
+  private val cisId  = "AB12"
 
   "UnmatchedSubcontractors Controller" - {
 
@@ -37,7 +43,9 @@ class UnmatchedSubcontractorsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[UnmatchedSubcontractorsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          controllers.verify.routes.CheckVerificationResultsController.onPageLoad().url
+        )(request, messages(application)).toString
       }
     }
 
@@ -49,6 +57,25 @@ class UnmatchedSubcontractorsControllerSpec extends SpecBase {
         val result  = route(application, request).value
 
         status(result) mustEqual OK
+      }
+    }
+
+    "must return OK and the correct view for a GET with id" in {
+      val answers     =
+        emptyUserAnswers.set(VerifyCisIdQuery(flowId.toString), cisId).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.UnmatchedSubcontractorsController.onPageLoadWithId(flowId).url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[UnmatchedSubcontractorsView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          controllers.verify.routes.CheckVerificationResultsController.onPageLoadWithId(flowId).url
+        )(request, messages(application)).toString
       }
     }
   }

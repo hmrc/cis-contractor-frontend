@@ -16,7 +16,7 @@
 
 package controllers.verify
 
-import base.SpecBase
+import base.{SpecBase, WithFakeCisTaxpayer}
 import models.UserAnswers
 import models.contractordetails.{ContractorDetailsFinalValidation, ContractorDetailsValidationTarget}
 import models.response.GetLastSubmittedVerificationBatchResponse
@@ -28,13 +28,14 @@ import pages.verify.LastSubmittedVerificationBatchResponsePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.CisIdQuery
+import queries.{CisIdQuery, VerifyCisIdQuery}
 import services.{ContractorDetailsFinalValidationService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.util.UUID
 import scala.concurrent.Future
 
-class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with MockitoSugar {
+class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with MockitoSugar with WithFakeCisTaxpayer {
 
   private val endpointUrl = "/subcontractor/verify/unmatched-subcontractors"
 
@@ -333,6 +334,51 @@ class ReviewUnmatchedSubcontractorsRoutingControllerSpec extends SpecBase with M
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
           controllers.finalvalidations.routes.ContractorDetailsFinalValidationController.onPageLoad().url
+      }
+    }
+
+    "must redirect to ReviewUnmatchedSubcontractors with id when unmatched resource refs are still on the live list" in {
+      val flowId      = UUID.fromString("11111111-1111-1111-1111-111111111111")
+      val mockService = mock[VerificationService]
+      val response    = batchResponse(verification(verificationNumber = None, verificationResourceRef = Some(10L)))
+      val userAnswers = emptyUserAnswers
+        .set(LastSubmittedVerificationBatchResponsePage(flowId.toString), response)
+        .success
+        .value
+        .set(VerifyCisIdQuery(flowId.toString), "AB12")
+        .success
+        .value
+
+      when(
+        mockService.anyUnmatchedResourceRefsStillPresent(
+          eqTo("AB12"),
+          eqTo(response)
+        )(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockService.recreateCurrentBatchFromUnmatchedVerifications(
+          eqTo("AB12"),
+          eqTo(userAnswers),
+          eqTo(Some(flowId.toString))
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(userAnswers))
+
+      val application = applicationWithFinalValidation(Some(userAnswers))
+        .overrides(bind[VerificationService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val result =
+          route(
+            application,
+            FakeRequest(GET, routes.ReviewUnmatchedSubcontractorsRoutingController.onPageLoadWithId(flowId).url)
+          ).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.ReviewUnmatchedSubcontractorsController.onPageLoadWithId(flowId).url
       }
     }
   }

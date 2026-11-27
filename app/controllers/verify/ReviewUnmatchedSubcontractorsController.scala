@@ -22,12 +22,13 @@ import pages.finalvalidation.{FinalValidationContextPage, VerifyFinalValidationS
 import pages.verify.CurrentVerificationBatchResponsePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.ReviewUnmatchedSubcontractorsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.ReviewUnmatchedSubcontractorsView
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -37,6 +38,7 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  multiTabAction: MultiTabAction,
   val controllerComponents: MessagesControllerComponents,
   sessionRepository: SessionRepository,
   reviewUnmatchedSubcontractorsService: ReviewUnmatchedSubcontractorsService,
@@ -48,46 +50,79 @@ class ReviewUnmatchedSubcontractorsController @Inject() (
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(CurrentVerificationBatchResponsePage) match {
-        case Some(currentBatch) =>
-          reviewUnmatchedSubcontractorsService.buildViewModel(currentBatch) match {
-            case Success(viewModel) =>
-              Ok(view(viewModel))
+      showPage(
+        request.userAnswers.get(CurrentVerificationBatchResponsePage),
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onSubmit(),
+        controllers.verify.routes.VerificationResultsController.onPageLoad().url
+      )
+    }
 
-            case Failure(e) =>
-              logger.error(
-                "[ReviewUnmatchedSubcontractorsController] Failed to build review unmatched subcontractors view model",
-                e
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
-
-        case None =>
-          logger.error(
-            "[ReviewUnmatchedSubcontractorsController][onPageLoad] - CurrentVerificationBatchResponsePage missing from userAnswers"
-          )
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+  def onPageLoadWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)) { implicit request =>
+      showPage(
+        request.userAnswers.get(CurrentVerificationBatchResponsePage(flowId.toString)),
+        controllers.verify.routes.ReviewUnmatchedSubcontractorsController.onSubmitWithId(flowId),
+        controllers.verify.routes.VerificationResultsController.onPageLoadWithId(flowId).url
+      )
     }
 
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      for {
-        withContext <- Future.fromTry(
-                         request.userAnswers.set(
-                           FinalValidationContextPage,
-                           FinalValidationContext.VerifySubcontractor
-                         )
-                       )
-        withSource  <- Future.fromTry(
-                         withContext.set(
-                           VerifyFinalValidationSourcePage,
-                           VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
-                         )
-                       )
-        _           <- sessionRepository.set(withSource)
-      } yield Redirect(
+      persistAndContinue(
+        request.userAnswers,
         controllers.verify.routes.ContinueVerificationSubmissionController.onSubmit()
       )
     }
+
+  def onSubmitWithId(flowId: UUID): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen multiTabAction.forVerifyJourney(flowId)).async {
+      implicit request =>
+        persistAndContinue(
+          request.userAnswers,
+          controllers.verify.routes.ContinueVerificationSubmissionController.onSubmitWithId(flowId)
+        )
+    }
+
+  private def showPage(
+    currentBatch: Option[models.response.GetCurrentVerificationBatchResponse],
+    submitAction: Call,
+    backToResultsUrl: String
+  )(implicit request: play.api.mvc.Request[?], messages: play.api.i18n.Messages) =
+    currentBatch match {
+      case Some(batch) =>
+        reviewUnmatchedSubcontractorsService.buildViewModel(batch) match {
+          case Success(viewModel) =>
+            Ok(view(viewModel, submitAction, backToResultsUrl))
+
+          case Failure(e) =>
+            logger.error(
+              "[ReviewUnmatchedSubcontractorsController] Failed to build review unmatched subcontractors view model",
+              e
+            )
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+
+      case None =>
+        logger.error(
+          "[ReviewUnmatchedSubcontractorsController][onPageLoad] - CurrentVerificationBatchResponsePage missing from userAnswers"
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+
+  private def persistAndContinue(userAnswers: models.UserAnswers, continue: Call): Future[play.api.mvc.Result] =
+    for {
+      withContext <- Future.fromTry(
+                       userAnswers.set(
+                         FinalValidationContextPage,
+                         FinalValidationContext.VerifySubcontractor
+                       )
+                     )
+      withSource  <- Future.fromTry(
+                       withContext.set(
+                         VerifyFinalValidationSourcePage,
+                         VerifyFinalValidationSource.ReviewUnmatchedSubcontractors
+                       )
+                     )
+      _           <- sessionRepository.set(withSource)
+    } yield Redirect(continue)
 }

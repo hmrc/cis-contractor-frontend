@@ -172,7 +172,9 @@ class NewestVerificationBatchController @Inject() (
         } yield
           if (decisions.exists(_.considerForReverification)) {
             Redirect(
-              controllers.routes.UnmatchedSubcontractorsController.onPageLoad()
+              flowId
+                .map(id => controllers.routes.UnmatchedSubcontractorsController.onPageLoadWithId(id))
+                .getOrElse(controllers.routes.UnmatchedSubcontractorsController.onPageLoad())
             )
           } else {
             continueToF4(response, unverified, flowId)
