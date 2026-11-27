@@ -128,11 +128,13 @@ class AmendSubcontractorController @Inject() (
     }
 
   def onPageLoadWithId( // TODO DTR-9463: Do I need to add id anywhere for this?
+    flowId: UUID,
     subbieResourceRef: Long,
-    journeyType: String,
-    flowId: UUID
+    journeyType: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen multiTabAction.forJourney(flowId)).async { implicit request =>
+      val subJourneyId = flowId.toString
+
       AmendJourneyType.fromString(journeyType) match {
         case None =>
           logger.error(
@@ -157,7 +159,7 @@ class AmendSubcontractorController @Inject() (
               Future.successful(redirect)
 
             case Right(checkedAnswers) =>
-              checkedAnswers.get(CisIdQuery) match {
+              checkedAnswers.get(CisIdQuery(subJourneyId)) match {
 
                 case None =>
                   logger.error(
@@ -194,7 +196,7 @@ class AmendSubcontractorController @Inject() (
           }.recover { case error =>
             logger.error(
               s"[AmendSubcontractorController] Failed to retrieve subcontractor. " +
-                s"cisId=${userAnswers.get(CisIdQuery)}, subbieResourceRef=$subbieResourceRef",
+                s"cisId=${userAnswers.get(CisIdQuery(subJourneyId))}, subbieResourceRef=$subbieResourceRef",
               error
             )
 

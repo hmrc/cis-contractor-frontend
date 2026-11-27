@@ -35,7 +35,7 @@
 @layout(pageTitle = title(form, messages("amendIndividualRemoveDetailYesNo.title"))) {
 
         @formHelper(
-            action = formAction.getOElse(controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail)),
+            action = formAction.getOrElse(controllers.amend.routes.AmendIndividualRemoveDetailYesNoController.onSubmit(subcontractorDetail)),
             Symbol("autoComplete") -> "off"
         ) {
 
